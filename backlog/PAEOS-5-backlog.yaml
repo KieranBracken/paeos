@@ -1,0 +1,392 @@
+# PAEOS-5 Constitutional Implementation Backlog (v1.0)
+# ============================================================================
+# This file IS the decomposition of root goal G6 ("PAEOS is self-hosting").
+# Each node is a leaf Goal: `accept` is its evidence_spec; `deps` are DAG edges;
+# `actor` is derived by the router matrix, not asserted (see assignment_rule).
+# Feed nodes whose deps are all `integrated` to any runtime; a node is done
+# ONLY when its `accept` tests pass (K1: no promotion without evidence).
+# Clause refs: K4 = PAEOS-4 kernel spec, R = PAEOS-4.5 reference impl doc.
+# ============================================================================
+
+assignment_rule: |
+  Derived from the router matrix (PAEOS-2 §4, K3), not from preference:
+  - actor: fable  ⟺ the task's output IS a verifier or frozen contract
+    (fixtures, SPI, conformance definitions — verifiers cannot be verified
+    mechanically; freezing is irreversible ⇒ top-right quadrant), OR the
+    output is constitutional content (policy text, scars, protocols — taste
+    and judgment; no mechanical check exists).
+  - actor: sonnet ⟺ the acceptance tests are executable before the task
+    starts (bottom-left quadrant: checks are the adversary; K3 satisfied
+    mechanically). Requires its fable-authored fixtures to be integrated
+    first — which yields provenance decorrelation between test author and
+    implementer, satisfying K3 by construction.
+  - actor: founder ⟺ A4 channel (intent, appetite).
+  - actor: paeos   ⟺ falls after the handoff point (R §15.1): MUST be
+    registered as a Goal in the store and executed by the system itself;
+    hand-implementation would violate clean-intent.
+
+conventions:
+  accept: "test IDs from PAEOS-4.5 §11 hierarchy (L0–L5) and PAEOS-4 §12.4 (C1–C8)"
+  wave: "max parallelization layer; all nodes in a wave are mutually independent"
+  stage: "earliest legitimate bootstrap stage (PAEOS-3 S0–S4)"
+
+# ── Wave 0: spec-only, zero deps, all parallel ──────────────────────────────
+nodes:
+
+  - id: F-SCHEMA
+    title: Author schema fixture corpus + golden serialization bytes
+    clause: [R§1.2, K4§2, C1]
+    actor: fable
+    wave: 0
+    stage: S0
+    deps: []
+    deliverables: every object type × kind × required/optional combination,
+      valid and invalid instances, expected JCS bytes and SHA-256 hashes
+    accept: [self-consistency lint — every K4§2 field exercised by ≥1 fixture]
+
+  - id: F-SPI
+    title: Freeze adapter SPI signatures (5 functions)
+    clause: [R§10, K4§12, K4§14.2]
+    actor: fable
+    wave: 0
+    stage: S0
+    deps: []
+    deliverables: exact signatures for invoke_model/sandbox_exec/sign/capabilities/lower,
+      error taxonomy, CapabilityVector schema
+    accept: [reviewed against K4§12.1-12.3 clause-by-clause; frozen per K4§14.2]
+
+  - id: G-CONST
+    title: Author Constitution policy artifacts (K1–K11, D1–D2)
+    clause: [K4§4, K4§13.1, PAEOS-3 SVK-4]
+    actor: fable
+    wave: 0
+    stage: S0
+    deps: []
+    deliverables: one Policy(kind=constitution) per invariant with scar refs,
+      falsifier, firing-record stub; total ≤ CAP tokens (K10)
+    accept: [validator admission run once I-VAL exists — gated at G-RUN]
+
+  - id: G-CORPUS
+    title: Mine Sentium excavation into scar-corpus import
+    clause: [K4§13.1 scar_corpus, PAEOS-3 §1.2, A-18]
+    actor: fable
+    wave: 0
+    stage: S0
+    deps: []
+    deliverables: incident-format imports; scar_class=incurred|vicarious tagging;
+      seed taste exemplars for the K4§14.1 taste namespace
+    accept: [every G-CONST scar ref resolves into this corpus; validator-clean at G-RUN]
+
+  - id: G-ROLES
+    title: Author role policy bodies + 4 genesis protocols
+    clause: [K4§5, K4§2.7, PAEOS-3 SVK-6/7]
+    actor: fable
+    wave: 0
+    stage: S0
+    deps: []
+    deliverables: Builder/(F,WORK)/(S,WORK)/(S,GOALSTRUCT) bodies (rest demand-paged);
+      one maximally naive protocol per (v,r) quadrant
+    accept: [compile() over each produces valid Context at F-COMP fixtures; exercised by C6]
+
+  - id: G-ROOT
+    title: Author root goal + set appetite budget
+    clause: [K4§10.2, PAEOS-3 SVK-8, K4§14.1]
+    actor: founder
+    wave: 0
+    stage: S0
+    deps: []
+    accept: [schema-valid Goal; evidence_spec = K4§13.3 verbatim; budget vector complete]
+
+# ── Wave 1: fixtures + foundation code ──────────────────────────────────────
+
+  - id: I-CONST
+    title: Implement constants lib (JCS, SHA-256, ULID)
+    clause: [R§1.1]
+    actor: sonnet
+    wave: 1
+    stage: S0
+    deps: [F-SCHEMA]
+    accept: [L0-bytes — byte-identical against F-SCHEMA golden bytes]
+
+  - id: I-STORE
+    title: Implement store (objects, ref transactions, snapshots, rebuildable indexes)
+    clause: [R§1.3, R§6, K4§2.1, K4§11]
+    actor: sonnet
+    wave: 1
+    stage: S0
+    deps: [F-SCHEMA]
+    accept: [L0-append-only, L0-snapshot-monotonic, L0-index-rebuild, C5-store-subset]
+
+  - id: F-VAL
+    title: Author L1 invariant fixture pairs (K1–K11, X1–X6, MUT, SCH)
+    clause: [R§1.4, R§7, K4§4]
+    actor: fable
+    wave: 1
+    stage: S0
+    deps: [F-SCHEMA]
+    deliverables: ≥1 passing + ≥1 violating store-state fixture per registered check
+    accept: [coverage lint — every K4§4 check id has both polarities]
+
+  - id: F-COMP
+    title: Author golden manifest fixtures (6 compiler stages)
+    clause: [R§1.8, R§8, K4§6]
+    actor: fable
+    wave: 1
+    stage: S1
+    deps: [F-SCHEMA]
+    accept: [fixtures cover resolution order, closure, truncation records, scope conflict]
+
+  - id: F-ROUTE
+    title: Author route-cell + escalation fixtures
+    clause: [R§1.9, K4§7]
+    actor: fable
+    wave: 1
+    stage: S2
+    deps: [F-SCHEMA]
+    accept: [all (v,r) cells covered; all four K4§7.2 escalation triggers covered]
+
+  - id: F-CONF
+    title: Author conformance test definitions C2–C8
+    clause: [R§1.13, K4§12.4]
+    actor: fable
+    wave: 1
+    stage: S0
+    deps: [F-SCHEMA, F-SPI]
+    accept: [each Cn maps to its K4§12.4 clause; executable-harness spec complete]
+
+  - id: F-REFGOAL
+    title: Author the C6 reference goal fixture
+    clause: [K4§12.4-C6, PAEOS-3 §5]
+    actor: fable
+    wave: 1
+    stage: S1
+    deps: [F-SCHEMA, G-ROLES]
+    accept: [reachable-verified by construction under genesis protocols; used verbatim by C6]
+
+# ── Wave 2: pure kernel modules — five independent tracks ───────────────────
+
+  - id: I-SCHEMA
+    title: Implement schema code + artifact emission + drift check
+    clause: [R§1.2, K4§9.5]
+    actor: sonnet
+    wave: 2
+    stage: S0
+    deps: [I-CONST, F-SCHEMA]
+    accept: [C1 full round-trip; mechanical code↔artifact consistency check green]
+
+  - id: I-BUDGET
+    title: Implement budget vectors + conservation predicate
+    clause: [R§1.7, K4§10]
+    actor: sonnet
+    wave: 2
+    stage: S0
+    deps: [I-SCHEMA]
+    accept: [C8, L2-conservation property tests]
+
+  - id: I-LIVE
+    title: Implement liveness engine (read-set index, transitive expiry, regression calc)
+    clause: [R§1.5, K4§2.6, K2]
+    actor: sonnet
+    wave: 2
+    stage: S1
+    deps: [I-SCHEMA, I-STORE]
+    accept: [C3-cascade incl. basis edges, L2-liveness property (status = max-valid)]
+
+  - id: I-COMP
+    title: Implement compiler pipeline (6 pure stages + cache)
+    clause: [R§1.8, R§8, K4§6]
+    actor: sonnet
+    wave: 2
+    stage: S1
+    deps: [I-SCHEMA, I-STORE, F-COMP]
+    accept: [L0-golden-manifests byte-identical per stage; truncation-completeness property]
+
+  - id: I-ROUTE
+    title: Implement route() + DispatchRecord construction
+    clause: [R§1.9, K4§7.1]
+    actor: sonnet
+    wave: 2
+    stage: S2
+    deps: [I-SCHEMA, I-BUDGET, F-ROUTE]
+    accept: [L0-route-cells, L1-escalation-triggers, reproducibility check from DispatchRecord]
+
+  - id: I-VAL
+    title: Implement validator registry + all checks
+    clause: [R§1.4, R§7, K4§4, K4§11-WRITE]
+    actor: sonnet
+    wave: 2
+    stage: S0
+    deps: [I-SCHEMA, I-STORE, I-BUDGET, F-VAL]
+    accept: [L1 registry-driven coverage green — both polarities per check, computed not listed]
+
+# ── Wave 3: syscall core + harness ──────────────────────────────────────────
+
+  - id: I-SYS-RW
+    title: Implement READ/WRITE syscalls (validate→commit→liveness trigger)
+    clause: [R§1.10, K4§11]
+    actor: sonnet
+    wave: 3
+    stage: S0
+    deps: [I-STORE, I-VAL, I-LIVE]
+    accept: [L3-error-taxonomy (RW subset), C2-forge-rejection (signing stubbed via null key)]
+
+  - id: T-HARNESS
+    title: Implement conformance runner (C1–C8 against any adapter)
+    clause: [R§1.13, R§11]
+    actor: sonnet
+    wave: 3
+    stage: S0
+    deps: [F-CONF, I-SCHEMA]
+    accept: [self-test against stub adapter; every Cn executable and individually reportable]
+
+  - id: I-CLI
+    title: Implement founder ABI surface (5 verbs, nothing more)
+    clause: [R§1.16, K4§14.1]
+    actor: sonnet
+    wave: 3
+    stage: S0
+    deps: [I-SYS-RW]
+    accept: [L3-verb↔object-class map; audit performs zero writes; no sixth verb exists]
+
+# ── Wave 4: full syscalls, reactor, genesis, traceability ───────────────────
+
+  - id: I-SYS-EXEC
+    title: Implement EXEC (sandbox delegation + signed evidence emission)
+    clause: [R§1.10, K4§11-EXEC, A-09]
+    actor: sonnet
+    wave: 4
+    stage: S1
+    deps: [I-SYS-RW, F-SPI]
+    accept: [C2 complete; NONZERO_EXIT emits polarity=refutes evidence; agents cannot author execution class]
+
+  - id: I-SYS-SPAWN
+    title: Implement SPAWN (compile → branch isolation → collect ProposedWrites)
+    clause: [R§1.10, K4§11-SPAWN, A-16]
+    actor: sonnet
+    wave: 4
+    stage: S1
+    deps: [I-SYS-RW, I-COMP, F-SPI]
+    accept: [C4-isolation (sibling speculations unreadable), C5-crash-kill convergence]
+
+  - id: I-REACTOR
+    title: Implement reactor (T1, T2, T5; T3/T4 stubs until I-AMEND)
+    clause: [R§1.6, K4§3.3]
+    actor: sonnet
+    wave: 4
+    stage: S2
+    deps: [I-LIVE, I-VAL, I-SYS-RW]
+    accept: [C3-T1-regression, L2-T5 (blocked flag + auto-incident), reactor-has-no-bypass test]
+
+  - id: I-NULL
+    title: Implement null adapter (shell + API, sequential SPAWN, branch isolation)
+    clause: [R§1.11, K4§12.5]
+    actor: sonnet
+    wave: 4
+    stage: S3
+    deps: [F-SPI]
+    accept: [C1–C5 on null; zero shared code with reference adapter beyond kernel lib + SPI]
+
+  - id: I-GEN
+    title: Implement genesis module (single-shot G1–G7 emitter)
+    clause: [R§1.14, R§12, K4§13]
+    actor: sonnet
+    wave: 4
+    stage: S0
+    deps: [I-SYS-RW, I-CLI]
+    accept: [L1-genesis-record schema; re-run on non-empty store MUST fail]
+
+  - id: T-TRACE
+    title: Implement traceability matrix generator (clause × module × tests)
+    clause: [R§11.4, A6]
+    actor: sonnet
+    wave: 4
+    stage: S1
+    deps: [I-VAL, T-HARNESS]
+    accept: [CI fails on any unmapped K4 clause; matrix is generated, never hand-edited]
+
+# ── Wave 5: loop closure + genesis execution ────────────────────────────────
+
+  - id: I-RECON
+    title: Implement reconciler loop (naive FIFO, demand-paged roles)
+    clause: [R§1.15, R§9]
+    actor: sonnet
+    wave: 5
+    stage: S1
+    deps: [I-SYS-SPAWN, I-SYS-EXEC, I-ROUTE, I-REACTOR]
+    accept: [L2-non-starvation; scheduling policy read from protocol Policy, not hardcoded]
+
+  - id: G-RUN
+    title: Execute genesis sequence G1–G7 (recorded WRITE batches)
+    clause: [R§12, K4§13, PAEOS-3 S0]
+    actor: founder            # under genesis authority, via I-GEN; the recorded founding act
+    wave: 5
+    stage: S0-exit
+    deps: [I-GEN, G-CONST, G-ROLES, G-CORPUS, G-ROOT, I-VAL]
+    accept: [S0-exit test — store validates; constitution passes its own admission rules]
+
+# ── Milestone gate ───────────────────────────────────────────────────────────
+
+  - id: M-HANDOFF
+    title: "MILESTONE: first C6 pass on null adapter — implementation handoff"
+    clause: [R§15.1, K4§12.4-C6]
+    actor: none               # evidence gate, not a task
+    wave: 6
+    stage: S1-exit
+    deps: [I-RECON, I-NULL, T-HARNESS, F-REFGOAL, G-RUN]
+    accept: [C6 green on null adapter — reference goal declared→verified end-to-end by an agent]
+    note: every node below this gate MUST be registered as a Goal in the store
+      and executed by PAEOS itself (R§15.1); hand-implementation after this
+      point is a clean-intent violation.
+
+# ── Post-handoff: actor=paeos (system executes; humans/models via SPAWN only) ─
+
+  - id: I-AMEND
+    title: Amendment machinery (PolicyDelta apply, provisional arm, T3 revert, T4 finalize)
+    clause: [R§13-P8, K4§9.4, A-06]
+    actor: paeos
+    wave: 7
+    stage: S3
+    deps: [M-HANDOFF, I-REACTOR]
+    accept: [C7 full cycle — incident → amendment → provisional → verified AND reverted paths]
+
+  - id: I-CC
+    title: Claude Code reference adapter (native SPAWN acceleration, hooks, lowering)
+    clause: [R§1.12, K4§12.6]
+    actor: paeos
+    wave: 7
+    stage: S3
+    deps: [M-HANDOFF, F-SPI]
+    accept: [C1–C8 on reference adapter; capability vector accuracy; preamble hashed + declared]
+
+  - id: M-DUAL-CONF
+    title: "MILESTONE: dual-adapter conformance (S3 exit)"
+    clause: [PAEOS-3 S3, K4§13.3]
+    actor: none
+    wave: 8
+    stage: S3-exit
+    deps: [I-AMEND, I-CC, I-NULL]
+    accept: [C1–C8 green on BOTH adapters + one full Incident→Amendment cycle evidenced]
+
+  - id: M-RATIFY
+    title: "MILESTONE: self-hosting criterion + ratification amendment (S4)"
+    clause: [K4§13.3, K4§13.4, R§15.2, L5-final]
+    actor: paeos              # founder acts only via resolve (the ratification decision)
+    wave: 9
+    stage: S4
+    deps: [M-DUAL-CONF]
+    accept: [L5-final — kernel-directed change traverses declared→integrated; founder writes
+      ∈ five verbs only during window; genesis authority.expired := true]
+
+# ── DAG summary (edges implied by deps; waves = antichains) ──────────────────
+dag_properties:
+  nodes: 30
+  critical_path: [F-SCHEMA, I-CONST, I-SCHEMA, I-VAL, I-SYS-RW, I-SYS-SPAWN, I-RECON, M-HANDOFF, I-AMEND, M-DUAL-CONF, M-RATIFY]
+  max_parallelism: 7          # wave 1 (5 fixture tracks + 2 code tracks)
+  fable_nodes: [F-SCHEMA, F-SPI, F-VAL, F-COMP, F-ROUTE, F-CONF, F-REFGOAL, G-CONST, G-CORPUS, G-ROLES]
+  sonnet_nodes: [I-CONST, I-STORE, I-SCHEMA, I-BUDGET, I-LIVE, I-COMP, I-ROUTE, I-VAL,
+                 I-SYS-RW, T-HARNESS, I-CLI, I-SYS-EXEC, I-SYS-SPAWN, I-REACTOR, I-NULL,
+                 I-GEN, T-TRACE, I-RECON]
+  founder_nodes: [G-ROOT, G-RUN]
+  paeos_nodes: [I-AMEND, I-CC, M-RATIFY]
+  decorrelation_note: every sonnet node's acceptance fixtures are fable-authored —
+    test author and implementer differ in provenance, satisfying K3 by construction.
