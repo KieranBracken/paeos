@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+*.log
+.scratch/
+.runtime/          # PAEOS-9 compiled-context cache: rebuildable from the corpus every boot, never authoritative (H-08/D1)

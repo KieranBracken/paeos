@@ -1,0 +1,369 @@
+# PAEOS Engineering Lifecycle — Executable State Machine v1.0
+# Machine-readable form of operations/ENGINEERING_LIFECYCLE.md.
+# The future PAEOS Runtime consumes this to drive engineering automatically.
+# Implementation-independent; multi-model; router-compatible via ceremony_depth.
+
+version: "1.1"    # v1.1 Constitutional Execution Rules amendment, founder-ratified 2026-07-21
+frozen: true
+governs: [paeos-runtime, sentium, orca-strator, inspiration-engine, library-of-fire, sakg, "*future"]
+
+constitutional_rule: >
+  No engineering artifact may transition directly to Implementation. Every artifact
+  progresses through the lifecycle unless explicitly rejected. Each state produces
+  artifacts that become evidence for the next. A transition without evidence is invalid.
+
+# ---- Constitutional Execution Rules (v1.1) — govern EVERY state; add no state ----
+# Canonical definition: operations/ENGINEERING_LIFECYCLE.md §Constitutional Execution Rules.
+# PAEOS exists to discover the best architecture, not implement the first that works.
+constitutional_execution_rules:
+  CER-1_mandatory_critical_thinking: >
+    Every task MUST actively attempt to FALSIFY the current architecture (weaknesses,
+    complexity, hidden assumptions, better abstractions, simpler designs, missing rules,
+    smaller TCB, better verification/determinism/portability). Acceptance is never
+    sufficient. A stance carried in every state; enforced by the prompt Universal Preamble.
+  CER-2_improvement_proposals:
+    rule: >
+      No silent constitutional improvement. Every discovered improvement MUST emit
+      proposals/PAEOS-IP-NNNN.md. Implementation MAY continue regardless of acceptance.
+    fields: [observation, current_behaviour, proposed_improvement, justification, risks,
+             backwards_compatibility, constitutional_impact, recommendation]
+    kernel_mapping: draft amendment-goal awaiting founder ratification (K7 / §14.5)
+  CER-3_architectural_debt_ledger:
+    rule: >
+      Every deliberate non-ideal choice MUST be recorded at ledger/debt/DEBT-NNNN.md.
+      Debt MUST NOT live only in conversation (A2; Sentium buried-decisions scar).
+    fields: [compromise, reason, ideal_solution, repayment_conditions, priority, estimated_impact]
+    kernel_mapping: recorded compromise / open incident (K7)
+  CER-4_end_of_task_constitutional_review:
+    rule: "Every completed task MUST end with a Constitutional Review (produced at L17)."
+    questions: [weaknesses_discovered, assumptions_invalidated, parts_of_paeos_strengthened,
+                proposals_created, debt_recorded, should_strategy_change]
+  CER-5_separation_of_powers: >
+    Proposals NEVER auto-modify PAEOS. Only a founder-ratified amendment may change
+    kernel/lifecycle/authority/invariants/law (§14.5, K7, D2). The runtime MAY recommend;
+    it MUST NEVER legislate. This makes CER-1..CER-4 safe.
+
+artifact_sinks:                         # where CER outputs persist (not lifecycle states)
+  proposals: proposals/PAEOS-IP-NNNN.md   # CER-2
+  debt:      ledger/debt/DEBT-NNNN.md      # CER-3
+
+# ---- Ceremony depth: how the router stays compatible with a full lifecycle ----
+ceremony_depth:
+  assigned_at: L02
+  basis: [verifiability, reversibility]   # kernel router (v x r)
+  levels:
+    trace_a:            # reversible AND cheaply verified
+      description: routine work; Runtime auto-discharges the Trace-B front-end
+      auto_discharge: [L03, L04, L05, L06, L07, L08, L09, L10, L11, L17, L18]
+      execute_full:   [L01, L02, L12, L13, L14, L15, L16]
+      evolution:      L19_on_trigger
+      human: none
+    trace_b:            # irreversible OR expensive to verify
+      description: full ceremony; founder Decisions at gates
+      execute_full: [L01..L19]
+      human: founder_decisions_at_gates
+  rule: >
+    auto_discharge != skip. Each auto-discharged state MUST still emit an evidence stub
+    {result: auto_pass, reason: trace_a, by: runtime} so every transition remains valid.
+
+# ---- Model orchestration (Runtime assigns; decorrelation is mandatory) ----
+model_policy:
+  classes:
+    opus:   {use: [deep-reasoning, planning, adversarial, court, audit], }
+    sonnet: {use: [fast-generation, construction, docs], }
+    gemini: {use: [frontier-research, decorrelated-critique], }
+    local:  {use: [mechanical-checks, lint, compile], }
+  decorrelation:            # kernel A-08 / I3
+    rule: >
+      The model family verifying or auditing work (L10, L13-adversarial, L14) MUST differ
+      from the family that built it (L12). Same-family verification is theater.
+    enforced_at: [L10, L14]
+  runtime_selects: true     # per-state recommended_model is advisory; Runtime binds actual model
+
+# ---- Roles (full defs: operations/ROLE_RESPONSIBILITIES.md) ----
+roles: [founder, planner, researcher, builder, reviewer, court, adversary, auditor, runtime]
+
+# ---- Approval gates (a transition through a gate needs the named approver) ----
+gates:
+  triage_reject:   {at: L02, approver: founder, when: "reject/dormant on founder-authored intent"}
+  court_verdict:   {at: L10, approver: court,   blocks_on: [REJECT, unresolved_amendments]}
+  plan_freeze:     {at: L11, approver: [planner, court], founder_if: irreversible_scope}
+  audit_gate:      {at: L14, approver: auditor, blocks_on: [slop, mock, violation, regression]}
+  promotion:       {at: L16, approver: integrator, founder_if: "seal/reject of founder work"}
+  kernel_change:   {at: L19, approver: founder, ceremony: "§14.5 self-application (Trace-B)"}
+
+# ---- States ----
+# Each: phase, purpose, role, recommended_model, entry, required_artifacts,
+# produced_evidence, exit, transitions (target: condition), failure.
+states:
+
+  L01:
+    name: Intake
+    phase: I-Discovery
+    role: runtime
+    recommended_model: n/a
+    entry: "a source has something worth recording"
+    required_artifacts: [description, source, motivation, expected_value, initial_classification]
+    produced_evidence: [declared_artifact]
+    exit: "artifact exists as Goal(declared)"
+    transitions:
+      L02: "artifact declared"
+    failure: "malformed intent -> not admitted"
+
+  L02:
+    name: Triage
+    phase: I-Discovery
+    role: planner
+    recommended_model: [opus, sonnet]
+    entry: "declared artifact from L01"
+    required_artifacts: [disposition, priority, scope, duplicate_analysis, forbidden_zone_analysis, classification_v_r, dispatch_record]
+    produced_evidence: [disposition_record, classification_evidence, dispatch_record]
+    exit: "exactly one disposition + classification Evidence (bound, expiring: A-14)"
+    transitions:
+      L03:  "disposition in [keep, immediate] AND ceremony=trace_b"
+      L12:  "disposition in [keep, immediate] AND ceremony=trace_a"   # auto-discharge L03..L11
+      L05:  "disposition = research"
+      DONE: "disposition in [reject, merge, dormant]"
+    failure: "unclassifiable -> L05 or escalate Decision"
+
+  L03:
+    name: First-Principles Re-Derivation
+    phase: II-Understanding
+    role: [planner, researcher]
+    recommended_model: opus
+    entry: "L02 keep/research/immediate AND trace_b"
+    required_artifacts: [first_principles_model, constraints, fundamental_laws]
+    produced_evidence: [derivation_artifact]
+    exit: "problem independently derived, not inherited"
+    transitions: {L04: "derivation complete", L05: "blocked on external knowledge"}
+    failure: "cannot derive -> spawn L05"
+
+  L04:
+    name: Ambitious Ideation
+    phase: II-Understanding
+    role: [planner, builder]
+    recommended_model: [opus, gemini]
+    entry: "L03 complete"
+    required_artifacts: [alternative_architectures, idealized_solution, failure_modes]
+    produced_evidence: [candidate_set]
+    exit: "candidate space genuinely wide (decorrelated options)"
+    transitions: {L05: "needs prior art", L06: "candidates exist"}
+    failure: "degenerate space -> collapse to single approach (noted)"
+
+  L05:
+    name: Frontier Research
+    phase: II-Understanding
+    role: researcher
+    recommended_model: [gemini, opus]
+    entry: "a blocked understanding needs external knowledge (pull-driven)"
+    required_artifacts: [research_dossier, novelty_assessment, prior_art]
+    produced_evidence: [research_dossier]   # bound, expiring (K2)
+    exit: "named blocker resolves"
+    approval: {founder_inject: "market/user/money ground truth"}
+    transitions: {L03: "reframes problem", L04: "informs ideation", L06: "informs tradeoffs", L08: "informs design"}
+    failure: "consumer-less research -> scope-creep incident"
+
+  L06:
+    name: Trade-off Analysis
+    phase: II-Understanding
+    role: [planner, reviewer]
+    recommended_model: opus
+    entry: ">=1 viable approach from L04"
+    required_artifacts: [tradeoff_matrix]
+    produced_evidence: [tradeoff_matrix]
+    exit: "decision axes explicit and comparable"
+    transitions: {L07: "matrix has material risks", L08: "no material risk"}
+    failure: "omitted axis surfaced later -> incident"
+
+  L07:
+    name: Trade-off Mitigation
+    phase: II-Understanding
+    role: [planner, adversary]
+    recommended_model: opus
+    entry: "L06 matrix with material risks"
+    required_artifacts: [mitigation_catalogue, kill_switches, fallback_behaviour, shadow_mode, safety_constraints]
+    produced_evidence: [mitigation_catalogue]
+    exit: "every high-severity tradeoff mitigated or accepted-risk recorded"
+    approval: {founder_decision: "irreversible accepted-risks"}
+    transitions: {L08: "mitigations designed"}
+    failure: "unmitigated high-severity risk, no accepted-risk record -> blocks L08"
+
+  L08:
+    name: System Design
+    phase: II-Understanding
+    role: planner
+    recommended_model: opus
+    entry: "selected approach + mitigations"
+    required_artifacts: [component_graph, interfaces, data_flow, state_machines, schemas, storage, apis, dependencies]
+    produced_evidence: [architecture_artifacts, conservation_audit, spec_sufficiency_audit]
+    exit: "intent-conservation passes; seams are good product boundaries (Ω-24); constraints tightened only (D2)"
+    transitions: {L09: "architecture produced"}
+    failure: "orphan/gap/loosened-constraint -> redesign or escalate"
+
+  L09:
+    name: Multi-Perspective Critique
+    phase: III-Constitutional-Review
+    role: reviewer
+    recommended_model: [gemini, opus]
+    perspectives: [builder, architect, risk_officer, performance, security, replay, maintainer]
+    entry: "architecture from L08"
+    required_artifacts: [finding_register, required_changes]
+    produced_evidence: [finding_register]
+    exit: "every perspective reported"
+    transitions: {L10: "critique complete"}
+    failure: "a perspective skipped -> incomplete, cannot advance"
+
+  L10:
+    name: Adversarial Review
+    phase: III-Constitutional-Review
+    role: [court, adversary]
+    recommended_model: [opus, gemini]   # MUST differ from builder family
+    entry: "L08 design + L09 findings"
+    required_artifacts: [adversarial_report, blocking_amendments]
+    produced_evidence: [adversarial_report, verdict]
+    exit: "verdict in [RATIFY, RATIFY_WITH_AMENDMENTS(resolved)]"
+    gate: court_verdict
+    transitions:
+      L11:  "verdict = RATIFY or amendments resolved"
+      L08:  "verdict = REJECT or blocking finding"
+    failure: "proven contradiction -> back to L08"
+
+  L11:
+    name: Formal Planning
+    phase: III-Constitutional-Review
+    role: planner
+    recommended_model: opus
+    entry: "L10 ratified"
+    required_artifacts: [affected_files, forbidden_files, rollback_plan, acceptance_criteria, test_strategy, dependencies]
+    produced_evidence: [implementation_contract]
+    exit: "implementation contract approved"
+    gate: plan_freeze
+    transitions: {L12: "contract approved"}
+    failure: "ambiguous contract -> incident (ambiguity = incident)"
+
+  L12:
+    name: Branch Implementation
+    phase: IV-Engineering
+    role: builder
+    recommended_model: sonnet
+    entry: "approved contract on isolated branch/worktree (A-16)"
+    required_artifacts: [implementation, commits_referencing_contract]
+    produced_evidence: [implementation_artifacts, execution_self_report]  # NOT promoting evidence (X6)
+    exit: "approved scope built and runs (executed); no scope creep"
+    transitions: {L13: "executed"}
+    failure: "scope creep OR cap-overrun -> incident (A-12)"
+
+  L13:
+    name: Verification
+    phase: IV-Engineering
+    role: [auditor, adversary]
+    recommended_model: [local, sonnet, opus]
+    order: [compile, lint, unit, integration, simulation, replay, performance]
+    entry: "executed implementation from L12"
+    required_artifacts: [evidence_records, test_logs, coverage]
+    produced_evidence: [signed_execution_evidence, test_logs, coverage, perf]   # EXEC-emitted, signed (A-09)
+    exit: "acceptance criteria satisfied by live signed independent evidence; no live refutation; flaky != refutation (Ω-01)"
+    transitions: {L14: "verification passed", L19: "refuted -> incident"}
+    failure: "any refutation -> regress + incident"
+
+  L14:
+    name: Independent Audit
+    phase: IV-Engineering
+    role: auditor
+    recommended_model: [opus, gemini]   # MUST differ from L12 builder family (A-08)
+    hunts: [ai_slop, hidden_mocks, fake_implementations, dead_code, architecture_violations, security_flaws, regression]
+    entry: "L13 passed"
+    required_artifacts: [audit_report]
+    produced_evidence: [independent_audit_report]
+    exit: "audit clean"
+    gate: audit_gate
+    transitions: {L15: "audit clean", L12: "findings -> rebuild"}
+    failure: "slop/mock/violation -> back to L12"
+
+  L15:
+    name: Documentation & Ledger
+    phase: V-Integration
+    role: [runtime, builder]
+    recommended_model: sonnet
+    entry: "L14 clean"
+    required_artifacts: [inventory_atlas, roadmaps, architecture_diagrams, knowledge_graph, decision_logs]
+    produced_evidence: [ledger_deltas, traceability_links]
+    exit: "institutional records synchronized; traceable to origin"
+    transitions: {L16: "ledger updated"}
+    failure: "stale ledger -> incident (undocumented change)"
+
+  L16:
+    name: Promotion Decision
+    phase: V-Integration
+    role: [runtime, founder]
+    recommended_model: opus
+    entry: "L15 complete; artifact verified"
+    required_artifacts: [final_disposition]  # merge | seal | reject | research_only | dormant
+    produced_evidence: [merge_commit, aggregation_rollup]
+    exit: "merged single-threaded (I9/K8) or alternate disposition recorded"
+    gate: promotion
+    transitions: {L17: "merged or dispositioned"}
+    failure: "merge conflict / coherence break -> incident"
+
+  L17:
+    name: Retrospective + Constitutional Review
+    phase: VI-Learning
+    role: [auditor, runtime]
+    recommended_model: opus
+    entry: "L16 complete OR any failure"
+    required_artifacts: [lessons_learned, workflow_amendments, constitutional_review]  # CER-4
+    constitutional_review_questions: [weaknesses_discovered, assumptions_invalidated,
+                                      parts_of_paeos_strengthened, proposals_created,
+                                      debt_recorded, should_strategy_change]
+    produced_evidence: [lessons_record, constitutional_review, proposal_links, debt_links]
+    exit: "Constitutional Review written (CER-4); every lesson discarded-with-reason or converted to L18/L19/Proposal/Debt"
+    transitions: {L18: "lessons exist", L19: "workflow/policy change implied"}
+    failure: "repeated mistake, no lesson -> meta-failure (Ω-11); no Constitutional Review -> task not done (CER-4)"
+
+  L18:
+    name: Knowledge Extraction
+    phase: VI-Learning
+    role: auditor    # Steward stance
+    recommended_model: opus
+    entry: "L17 lessons exist"
+    required_artifacts: [new_pattern_or_protocol_or_skill_or_template_or_invariant_or_amendment_or_heuristic]
+    produced_evidence: [institutional_knowledge_artifact]   # versioned, scarred, falsifiable (K6)
+    exit: "reusable knowledge captured as versioned artifact"
+    transitions: {L19: "kernel-scope change implied", DONE: "workload-scope knowledge captured"}
+    failure: "repeated mistake not converted to skill/template/amendment (global rule 10)"
+
+  L19:
+    name: Constitutional Evolution
+    phase: VII-Evolution
+    role: [court, founder]
+    recommended_model: opus
+    entry: "incident OR L18 amendment candidate OR kernel-surface finding"
+    required_artifacts: [incident, amendment, policy_evolution, kernel_proposal_if_warranted]
+    produced_evidence: [incident_record, amendment_ledger_entry, recompiled_policy]
+    exit: "amendment provisional -> verified|reverted (A-06); kernel change passes §14.5 + founder"
+    gate: kernel_change
+    transitions: {DONE: "amendment integrated or reverted"}
+    failure: "falsifier fires -> mechanical revert; defect with no incident -> unlearned (Ω-11)"
+
+# ---- Global invariants (checked on every transition) ----
+global_rules:
+  - no_direct_intake_to_implementation
+  - every_transition_requires_evidence            # K1
+  - implementation_never_creates_architecture     # L12 bound to L11
+  - architecture_never_creates_policy             # L08 -> policy only via L19
+  - policy_changes_require_constitutional_review  # §14.5
+  - every_implementation_survives_independent_audit  # L14, A-08
+  - every_task_improves_institutional_knowledge   # L15/L18
+  - every_defect_becomes_incident
+  - every_ambiguity_becomes_incident              # HALT rule
+  - every_repeated_mistake_becomes_skill_template_or_amendment
+  - every_artifact_traceable_to_origin            # serving-clause chain
+  - workflow_is_versioned_and_amendable           # this file evolves via L19
+  - every_task_attempts_to_falsify_architecture   # CER-1
+  - every_improvement_becomes_a_proposal_not_a_silent_change  # CER-2
+  - every_deliberate_nonideal_choice_becomes_debt # CER-3
+  - every_task_ends_with_constitutional_review    # CER-4
+  - only_founder_ratifies_kernel_lifecycle_authority_invariants  # CER-5 (runtime recommends, never legislates)
+
+terminal_states: [DONE]
+initial_state: L01

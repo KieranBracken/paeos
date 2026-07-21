@@ -379,7 +379,7 @@ nodes:
 
 # ── DAG summary (edges implied by deps; waves = antichains) ──────────────────
 dag_properties:
-  nodes: 30
+  nodes: 35            # corrected 2026-07-18: yq audit counted 35 (30 tasks + 2 founder + 3 milestones); original figure was a miscount
   critical_path: [F-SCHEMA, I-CONST, I-SCHEMA, I-VAL, I-SYS-RW, I-SYS-SPAWN, I-RECON, M-HANDOFF, I-AMEND, M-DUAL-CONF, M-RATIFY]
   max_parallelism: 7          # wave 1 (5 fixture tracks + 2 code tracks)
   fable_nodes: [F-SCHEMA, F-SPI, F-VAL, F-COMP, F-ROUTE, F-CONF, F-REFGOAL, G-CONST, G-CORPUS, G-ROLES]

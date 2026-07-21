@@ -1,0 +1,9 @@
+# constitutional_basis — SHA-256 of the frozen derivation chain (PAEOS-4 §13.1)
+# Generated 2026-07-19. Stable while derivation/ files remain frozen.
+# A mismatch here at G-RUN = the lineage was altered = HALT genesis.
+
+fbf7176461a519bec60e354b1a493cd41cbc8d1ad2ab87ae58608e24f455eb54  derivation/PAEOS-0-foundations.md
+b48903419e01a782b97c897e55882347ef499cb623f867a86f3a5450b0c971d5  derivation/PAEOS-1-architecture.md
+e523513b2dbe26782990cc16627365fbe339f30e65d2ba7b30e7960ad1f9fc9a  derivation/PAEOS-2-workflow.md
+3205da075bca27ea38db306752475686f4f5138d5955ba5013b50beaa1fb3a67  derivation/PAEOS-3-bootstrap.md
+ece1f1e6d290062e8f02c6b6214fae8f15c64d3499f56eab5c6e13723b50d0d3  derivation/PAEOS-3.5-adversarial-ratification.md
