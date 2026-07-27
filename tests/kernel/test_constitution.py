@@ -90,6 +90,36 @@ def test_lineage_resolves_hash_to_clause_and_provenance() -> None:
     assert con.lineage(con.get_clause("DOC-B#c1").content_hash).supersedes == ()
 
 
+def test_query_ordering_is_canonical_numeric() -> None:
+    # ordinal is compared as an int, so c2 precedes c10 (not lexical "c10" < "c2").
+    doc = "\n".join(f"[c{n}] shared token clause {n}" for n in (1, 2, 10, 3, 20))
+    con = Constitution({"D": doc})
+    hits = con.query("shared token")
+    assert [c.ordinal for c in hits] == [1, 2, 3, 10, 20]
+    assert [c.id for c in hits] == ["D#c1", "D#c2", "D#c3", "D#c10", "D#c20"]
+
+
+def test_query_ordering_is_insertion_independent() -> None:
+    # The binding invariant: order is fixed by (document, ordinal), never by load order.
+    docs = {
+        "PAEOS-2": "[c2] shared beta\n[c1] shared alpha",
+        "PAEOS-0": "[c1] shared gamma",
+        "PAEOS-1": "[c3] shared delta\n[c1] shared epsilon",
+    }
+    canonical = ["PAEOS-0#c1", "PAEOS-1#c1", "PAEOS-1#c3", "PAEOS-2#c1", "PAEOS-2#c2"]
+    # build the same corpus from several different insertion orders
+    orderings = [
+        list(docs.items()),
+        list(reversed(list(docs.items()))),
+        sorted(docs.items()),
+    ]
+    for ordering in orderings:
+        con = Constitution(dict(ordering))
+        assert [c.id for c in con.query("shared")] == canonical
+        assert con.clause_ids() == canonical
+        assert con.documents() == ["PAEOS-0", "PAEOS-1", "PAEOS-2"]
+
+
 def test_lineage_unknown_hash_raises() -> None:
     with pytest.raises(ClauseNotFound):
         _fixture().lineage("0" * 64)

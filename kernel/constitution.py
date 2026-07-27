@@ -144,6 +144,17 @@ class Constitution:
 
     Construct from a mapping of {document: markdown} or from a directory of `.md` files.
     Loads once; thereafter it only answers queries. No method mutates the corpus.
+
+    **Ordering invariant (binding on every conformant implementation).** Any method that
+    returns a sequence of clauses or ids — `query`, `clause_ids` — MUST return them in the
+    canonical order **`(document, ordinal)`**, ascending, with `ordinal` compared as an
+    integer (so `c2` precedes `c10`). `documents` returns identities sorted ascending. This
+    order is *total and unique*: duplicate clause ids are rejected at construction
+    (`DuplicateClause`), so `(document, ordinal)` is a unique key and the result is fully
+    determined by the *set* of clauses — never by load order, dict iteration, or backend.
+    Two conformant accessors over byte-identical corpora therefore return byte-identical
+    sequences. This is a conformance requirement, not an implementation detail; the tests in
+    `test_constitution.py` pin it.
     """
 
     def __init__(self, documents: Mapping[str, str]) -> None:
@@ -181,7 +192,10 @@ class Constitution:
             raise ClauseNotFound(f"no clause {clause_id!r}") from None
 
     def query(self, pattern: str) -> list[Clause]:
-        """Return clauses whose text matches `pattern` (regex, case-insensitive), sorted by id."""
+        """Return clauses whose text matches `pattern` (regex, case-insensitive).
+
+        Ordering is the binding canonical `(document, ordinal)` — see the class-level
+        ordering invariant. Deterministic and backend-independent."""
         rx = re.compile(pattern, re.IGNORECASE)
         hits = [c for c in self._clauses.values() if rx.search(c.text)]
         return sorted(hits, key=lambda c: (c.document, c.ordinal))
@@ -198,7 +212,7 @@ class Constitution:
         )
 
     def clause_ids(self) -> list[str]:
-        """All clause ids, sorted by (document, ordinal)."""
+        """All clause ids in the canonical `(document, ordinal)` order (ordinal as int)."""
         return [
             c.id for c in sorted(self._clauses.values(), key=lambda c: (c.document, c.ordinal))
         ]
