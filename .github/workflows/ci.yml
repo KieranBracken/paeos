@@ -35,11 +35,11 @@ jobs:
 
       # ---- coverage / mutation / replay / seal gates (stubbed until their tasks) ----
       - name: Coverage gate (kernel ≥ 90%)
-        run: echo "TODO(B0.10): enable once kernel modules exist"
+        run: 'echo "TODO(B0.10): enable once kernel modules exist"'
       - name: Mutation gate (gates/evidence/seal/permissions ≥ 80%)
-        run: echo "TODO(B1): enable with mutmut once those modules exist"
+        run: 'echo "TODO(B1): enable with mutmut once those modules exist"'
       - name: Replay-determinism gate (byte-identical head)
-        run: echo "TODO(B0.10): replay determinism suite"
+        run: 'echo "TODO(B0.10): replay determinism suite"'
 
       # ---- TCB gates — the constitutional CI (LIVE from B0.0) ----
       - name: 'TCB F1 — kernel/ LOC budget ≤ 20k'
