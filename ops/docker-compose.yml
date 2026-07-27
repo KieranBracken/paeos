@@ -1,0 +1,22 @@
+# PAEOS local dev substrate (PAEOS-8 §3: event-sourced Postgres; Temporal deferred to Phase 2).
+# Phase 0/1 is local only — no auto-deploy of the kernel (§8).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: paeos-postgres
+    environment:
+      POSTGRES_USER: paeos
+      POSTGRES_PASSWORD: paeos_dev_only   # dev-only; real secrets never in-repo (§9)
+      POSTGRES_DB: paeos
+    ports:
+      - "5432:5432"
+    volumes:
+      - paeos_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paeos -d paeos"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  paeos_pgdata:

@@ -1,0 +1,80 @@
+# PAEOS CI — the constitutional pipeline (PAEOS-8 §8). Every PR. Stages fail closed.
+# B0.0: lint/type/test + the TCB gates are LIVE and RED-capable. Coverage/mutation/
+# replay/seal gates are stubbed (marked TODO<task>) until their tasks land — but the
+# TCB gates (F1 LOC budget, F2 TCB-diff, F3 supply-chain) are enforced from day one.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # TCB-diff (F2) needs the merge base
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync (locked, no unpinned installs — §9 supply chain)
+        run: uv sync --locked --group dev
+
+      # ---- lint + type ----
+      - name: Lint (ruff)
+        run: uv run ruff check .
+      - name: Type (pyright — strict on kernel/)
+        run: uv run pyright
+
+      # ---- tests ----
+      - name: Unit + property tests
+        run: uv run pytest
+
+      # ---- coverage / mutation / replay / seal gates (stubbed until their tasks) ----
+      - name: Coverage gate (kernel ≥ 90%)
+        run: echo "TODO(B0.10): enable once kernel modules exist"
+      - name: Mutation gate (gates/evidence/seal/permissions ≥ 80%)
+        run: echo "TODO(B1): enable with mutmut once those modules exist"
+      - name: Replay-determinism gate (byte-identical head)
+        run: echo "TODO(B0.10): replay determinism suite"
+
+      # ---- TCB gates — the constitutional CI (LIVE from B0.0) ----
+      - name: 'TCB F1 — kernel/ LOC budget ≤ 20k'
+        run: uv run python ops/ci/loc_budget.py
+
+      - name: 'TCB F2 — soft/hard blast-radius detector'
+        id: tcb
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "no base ref → SOFT"; exit 0
+          fi
+          # tcb_diff.py: exit 2 => HARD-LOOP (kernel/ or constitution/ touched).
+          # F2 is a MERGE gate: on pull_request a HARD-LOOP must fail the check so a
+          # kernel/constitution PR cannot merge on Builder+Verifier approval alone
+          # (PAEOS-8 §8 F2 — requires human ratifier + Adversary). On push to main the
+          # merge is already founder-ratified, so HARD-LOOP is informational, not RED.
+          set +e
+          git diff --name-only "$BASE"...HEAD | uv run python ops/ci/tcb_diff.py
+          rc=$?
+          set -e
+          if [ "$rc" -eq 2 ]; then
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "::error::HARD-LOOP: kernel/ or constitution/ touched — requires human ratifier + Adversary before merge (F2)"
+              exit 2
+            fi
+            echo "::warning::HARD-LOOP on push to ${{ github.ref_name }} — TCB change is founder-ratified by this merge (informational)"
+            exit 0
+          fi
+          exit "$rc"
+
+      - name: 'TCB F3 — no secrets/keys in tree; lockfile present'
+        run: |
+          test -f uv.lock || { echo "uv.lock missing (supply chain, §9)"; exit 1; }
+          if git ls-files | grep -E '(^|/)ops/keys/.+' | grep -v '\.gitkeep$'; then
+            echo "key material committed under ops/keys/ (§9 T2)"; exit 1
+          fi
+          echo "F3 GREEN: lockfile present; no committed key material"
