@@ -4,7 +4,9 @@ version = "0.0.0"
 description = "PAEOS runtime — the constitutional engineering operating system (Phase 0 bootstrap)."
 requires-python = ">=3.12"
 # Runtime deps land with the tasks that need them (B0.1+). B0.0 is skeleton + toolchain only.
-dependencies = []
+dependencies = [
+    "pynacl>=1.6.2",
+]
 
 [dependency-groups]
 # uv-managed dev toolchain — locked in PAEOS-8 §3. Run via `uv run <tool>`.
