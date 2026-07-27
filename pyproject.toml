@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 # Runtime deps land with the tasks that need them (B0.1+). B0.0 is skeleton + toolchain only.
 dependencies = [
     "pynacl>=1.6.2",
+    "structlog>=26.1.0",
 ]
 
 [dependency-groups]
