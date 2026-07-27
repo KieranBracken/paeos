@@ -43,3 +43,8 @@ amendment may change constitutional law.
 - `PAEOS-IP-0002.md` — Define `EvidenceRef` (used but undefined in PAEOS-7.6 §4/§5). Status:
   **RATIFIED BY FOUNDER** (2026-07-27). `EvidenceRef = Hash` added to 7.6 §3; `TransitionRequest`
   + `CapabilityToken` completed in B0.4 (`kernel/types.py`).
+- `PAEOS-IP-0003.md` — Pin the `StageId` legal-edge table: weight-class semantics + failure-edge
+  scope (source: Task B0.5). Status: **awaiting founder ratification**. `is_legal` blocked on a
+  corpus contradiction (§2.3 "shape invariant" vs YAML `L02→L12` vs B0.5 acceptance "edges
+  differ"); recommends failure edges are kernel-routed (not `is_legal`) + ROUTINE adds the
+  `TRIAGE→IMPLEMENT` compression edge.
