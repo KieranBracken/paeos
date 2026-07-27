@@ -60,6 +60,7 @@ StageId      = enum{ RAW, RE_DERIVE, INTAKE, TRIAGE, IDEATE, RESEARCH,
 Role         = enum{ PLANNER, BUILDER, CRITIC, VERIFIER, ADVERSARY, DOC, RATIFIER }
 WeightClass  = enum{ ROUTINE, SUBSTANTIAL, KERNEL_TOUCHING }   // set at TRIAGE
 ArtifactRef  = { hash: Hash, type: string }
+EvidenceRef  = Hash              // content address of an Evidence (§6); its hash IS its id ⟵ PAEOS-IP-0002
 Outcome      = enum{ COMMITTED, REMAND, REJECT, QUARANTINE, ABORT }
 ```
 

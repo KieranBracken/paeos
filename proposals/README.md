@@ -41,5 +41,5 @@ amendment may change constitutional law.
   ratification** (source finding: `reviews/7-skills-as-capabilities.md`; also excluded from
   PAEOS-4 v1.1 pending ratification per §16).
 - `PAEOS-IP-0002.md` — Define `EvidenceRef` (used but undefined in PAEOS-7.6 §4/§5). Status:
-  **awaiting founder ratification** (source finding: Task B0.4). Recommends `EvidenceRef = Hash`;
-  blocks completion of `TransitionRequest` until ratified.
+  **RATIFIED BY FOUNDER** (2026-07-27). `EvidenceRef = Hash` added to 7.6 §3; `TransitionRequest`
+  + `CapabilityToken` completed in B0.4 (`kernel/types.py`).

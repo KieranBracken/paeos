@@ -11,13 +11,11 @@ Fidelity discipline (CER-6, constitutional preamble): every name, field, and enu
 below is a verbatim transcription of PAEOS-7.6 §3-4. Nothing is added. Field names that
 shadow builtins (`id`, `type`) are kept exactly as the spec writes them.
 
-**Deliberate omission — `TransitionRequest` (PAEOS-7.6 §4).** Its `evidence: EvidenceRef[]`
-field references a type, `EvidenceRef`, that PAEOS-7.6 *uses* (§4, §5) but never *defines* —
-and the spec's precedent (`ArtifactRef = {hash, type}`, a struct rather than a bare `Hash`)
-makes its shape genuinely ambiguous. Per the preamble ("default to derivation, not
-invention; if invention is genuinely required, HALT and produce an Improvement Proposal")
-`TransitionRequest` is held back pending founder ratification of **PAEOS-IP-0002**. It lands
-in a B0.4 follow-up the moment `EvidenceRef` is pinned. Everything else in §3-4 is here.
+**`EvidenceRef` and `TransitionRequest`** were held back during initial B0.4 because 7.6
+*used* `EvidenceRef` (§4, §5) without *defining* it. That gap was surfaced as **PAEOS-IP-0002**
+and **RATIFIED by the founder (2026-07-27)**: `EvidenceRef = Hash` (§3), and the
+`CapabilityToken` *type* lives here in B0.4 (its broker behaviour stays B0.8, the only acyclic
+placement since B0.8 depends on B0.4). Both are now included below, verbatim from 7.6 §4/§7.
 """
 
 from __future__ import annotations
@@ -27,7 +25,10 @@ from enum import Enum
 
 __all__ = [
     "ArtifactRef",
+    "CapabilityBinding",
+    "CapabilityToken",
     "Claim",
+    "EvidenceRef",
     "GoalId",
     "Hash",
     "Outcome",
@@ -35,6 +36,7 @@ __all__ = [
     "RunId",
     "Sig",
     "StageId",
+    "TransitionRequest",
     "TransitionResult",
     "Ts",
     "ValidationClaim",
@@ -49,6 +51,9 @@ type RunId = str
 type Hash = str
 type Sig = str
 type Ts = int
+# EvidenceRef = content address of an Evidence (§6); an Evidence's hash IS its id.
+# Defined per PAEOS-IP-0002 (RATIFIED 2026-07-27), PAEOS-7.6 §3.
+type EvidenceRef = Hash
 
 
 # ---- enums (PAEOS-7.6 §3) -------------------------------------------------
@@ -158,3 +163,49 @@ class TransitionResult:
     remand_to: StageId | None
     reason: str
     verdict_ref: Hash | None
+
+
+# ---- capability token (PAEOS-7.6 §7) --------------------------------------
+# The type lives here (B0.4) per PAEOS-IP-0002; the mint/verify broker is B0.8. §7's
+# `bound_to` is an anonymous struct — given the minimal name CapabilityBinding for Python,
+# fields verbatim. `bound_to is immutable` (SI-3) is captured by freezing the sub-struct.
+
+
+@dataclass(frozen=True, slots=True)
+class CapabilityBinding:
+    """The immutable binding of a capability token (PAEOS-7.6 §7 `bound_to`)."""
+
+    goal_id: GoalId
+    run_id: RunId
+    stage: StageId
+    role: Role
+    session: str
+
+
+@dataclass(frozen=True, slots=True)
+class CapabilityToken:
+    """The unforgeable authority object (PAEOS-7.6 §7). Kernel-minted; `operations` is the
+    explicit allow-list; short, stage-scoped TTL via `issued_seq`/`expires_seq`."""
+
+    token: Sig
+    bound_to: CapabilityBinding
+    operations: tuple[str, ...]
+    issued_seq: Ts
+    expires_seq: Ts
+
+
+# ---- the four-tuple transition contract (PAEOS-7.6 §4) --------------------
+
+
+@dataclass(frozen=True, slots=True)
+class TransitionRequest:
+    """Every state change in PAEOS: exactly four things — Authority, Goal, Evidence,
+    Validation (PAEOS-7.6 §4). Miss any one ⇒ no transition (FR-4, deny-by-default)."""
+
+    authority: CapabilityToken
+    goal_id: GoalId
+    run_id: RunId
+    from_state: StageId
+    to_state: StageId
+    evidence: tuple[EvidenceRef, ...]
+    validation: ValidationClaim

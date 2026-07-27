@@ -1,6 +1,8 @@
 # PAEOS-IP-0002 — Define `EvidenceRef` (used but undefined in PAEOS-7.6)
 
-Status: **AWAITING FOUNDER RATIFICATION** · Filed: 2026-07-27 · Channel: CER-2
+Status: **RATIFIED BY FOUNDER** (2026-07-27) · Filed: 2026-07-27 · Channel: CER-2
+Resolution: `EvidenceRef = Hash` added to `spec/PAEOS-7.6` §3; `CapabilityToken` type placed in
+`kernel/types.py` (B0.4), broker behaviour stays B0.8. `TransitionRequest` completed in B0.4.
 Source finding: Task **B0.4** implementation (core runtime types, PAEOS-7.6 §3–4). This
 proposal is the halt-and-surface required by the constitutional preamble ("default to
 derivation, not invention; if invention is genuinely required, HALT and produce an

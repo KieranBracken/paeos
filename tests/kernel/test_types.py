@@ -9,14 +9,16 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
 
-import kernel.types as types_module
 import pytest
 from kernel.types import (
     ArtifactRef,
+    CapabilityBinding,
+    CapabilityToken,
     Claim,
     Outcome,
     Role,
     StageId,
+    TransitionRequest,
     TransitionResult,
     ValidationClaim,
     WeightClass,
@@ -135,13 +137,52 @@ def test_transition_result_committed_and_non_committed() -> None:
         remanded.reason = "x"  # type: ignore[misc]
 
 
-# ---- deliberate omission: TransitionRequest (PAEOS-IP-0002) ----------------
+# ---- capability token + four-tuple (PAEOS-IP-0002 RATIFIED) ----------------
 
 
-def test_transition_request_is_deliberately_absent() -> None:
-    # B0.4 halts TransitionRequest: its `evidence: EvidenceRef[]` field references a type
-    # 7.6 uses but never defines. Held pending founder ratification of PAEOS-IP-0002 rather
-    # than inventing EvidenceRef's shape (constitutional preamble / CER-6). This test makes
-    # the omission explicit and intentional, not an oversight.
-    assert not hasattr(types_module, "TransitionRequest")
-    assert "TransitionRequest" not in types_module.__all__
+def _token() -> CapabilityToken:
+    return CapabilityToken(
+        token="sig",
+        bound_to=CapabilityBinding(
+            goal_id="g-1", run_id="r-1", stage=StageId.IMPLEMENT, role=Role.BUILDER, session="s"
+        ),
+        operations=("propose_transition", "cas:write:kernel/validator.py"),
+        issued_seq=10,
+        expires_seq=40,
+    )
+
+
+def test_capability_token_shape_and_frozen() -> None:
+    tok = _token()
+    assert tok.bound_to.stage is StageId.IMPLEMENT
+    assert tok.bound_to.role is Role.BUILDER
+    assert "propose_transition" in tok.operations
+    with pytest.raises(FrozenInstanceError):
+        tok.expires_seq = 99  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        tok.bound_to.role = Role.VERIFIER  # bound_to immutable (SI-3)  # type: ignore[misc]
+
+
+def test_transition_request_is_the_four_tuple() -> None:
+    # EvidenceRef = Hash (PAEOS-IP-0002): evidence is a tuple of content-address hashes.
+    validation = ValidationClaim(
+        gate_id="G-Court",
+        claims=(Claim(id="builds", statement="exit 0", evidence_refs=("e" * 64,)),),
+        producer=Role.VERIFIER,
+        produced_against="art" + "0" * 61,
+    )
+    req = TransitionRequest(
+        authority=_token(),
+        goal_id="g-1",
+        run_id="r-1",
+        from_state=StageId.IMPLEMENT,
+        to_state=StageId.VERIFY,
+        evidence=("e" * 64,),
+        validation=validation,
+    )
+    assert req.from_state is StageId.IMPLEMENT
+    assert req.to_state is StageId.VERIFY
+    assert req.evidence == ("e" * 64,)  # EvidenceRef[] == Hash[]
+    assert req.validation is validation
+    with pytest.raises(FrozenInstanceError):
+        req.to_state = StageId.SEAL  # type: ignore[misc]
