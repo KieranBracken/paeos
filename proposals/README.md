@@ -40,3 +40,6 @@ amendment may change constitutional law.
 - `PAEOS-IP-0001.md` — Capability-based skill loading (CAP-1). Status: **awaiting founder
   ratification** (source finding: `reviews/7-skills-as-capabilities.md`; also excluded from
   PAEOS-4 v1.1 pending ratification per §16).
+- `PAEOS-IP-0002.md` — Define `EvidenceRef` (used but undefined in PAEOS-7.6 §4/§5). Status:
+  **awaiting founder ratification** (source finding: Task B0.4). Recommends `EvidenceRef = Hash`;
+  blocks completion of `TransitionRequest` until ratified.
