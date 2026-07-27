@@ -44,7 +44,6 @@ amendment may change constitutional law.
   **RATIFIED BY FOUNDER** (2026-07-27). `EvidenceRef = Hash` added to 7.6 §3; `TransitionRequest`
   + `CapabilityToken` completed in B0.4 (`kernel/types.py`).
 - `PAEOS-IP-0003.md` — Pin the `StageId` legal-edge table: weight-class semantics + failure-edge
-  scope (source: Task B0.5). Status: **awaiting founder ratification**. `is_legal` blocked on a
-  corpus contradiction (§2.3 "shape invariant" vs YAML `L02→L12` vs B0.5 acceptance "edges
-  differ"); recommends failure edges are kernel-routed (not `is_legal`) + ROUTINE adds the
-  `TRIAGE→IMPLEMENT` compression edge.
+  scope (source: Task B0.5). Status: **RATIFIED BY FOUNDER** (2026-07-27). Failure edges are
+  kernel-routed (not `is_legal`); ROUTINE/Trace-A adds `TRIAGE→IMPLEMENT` + `RAW→INTAKE`.
+  Implemented in `kernel/lifecycle.py`; canonical table added to PAEOS-7 §4.1.

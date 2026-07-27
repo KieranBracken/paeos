@@ -1,6 +1,10 @@
 # PAEOS-IP-0003 — Pin the StageId legal-edge table: weight-class semantics + failure-edge scope
 
-Status: **AWAITING FOUNDER RATIFICATION** · Filed: 2026-07-27 · Channel: CER-2
+Status: **RATIFIED BY FOUNDER** (2026-07-27) · Filed: 2026-07-27 · Channel: CER-2
+Resolution: Both parts ratified as recommended. (A) failure outcomes are kernel-routed, not
+`is_legal` edges. (B) ROUTINE/Trace-A admits `TRIAGE → IMPLEMENT` and `RAW → INTAKE`;
+KERNEL_TOUCHING/SUBSTANTIAL enforce the full chain. Implemented in `kernel/lifecycle.py`;
+canonical edge table added to PAEOS-7 §4.1.
 Source finding: Task **B0.5** (Lifecycle legal-edge table & `is_legal`, PAEOS-8 §10). Halt per
 the constitutional preamble + CER-6: `is_legal(from, to, weight_class)` cannot be implemented
 faithfully because the corpus (a) does not enumerate the fast-path `StageId` edges and (b)

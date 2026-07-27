@@ -354,6 +354,34 @@ The numbered stages map to these machine constants (`StageId` in PAEOS-7.6 §3) 
 | 8 | `CRITIQUE` | Ideation | 19 | `RESTART` | Evolution |
 | 9 | `PLAN` | Construction | | | |
 
+#### Canonical legal-edge table (⟵ PAEOS-IP-0003, ratified 2026-07-27)
+
+`is_legal(from, to, weight_class)` (PAEOS-7.6 §4 `propose_transition` step 2) governs
+**requester-initiated forward edges only**. Failure outcomes (`REMAND`, `REJECT`,
+`QUARANTINE`, `ABORT`) are kernel reactor failure-routing (`TransitionResult.remand_to`), **not**
+entries in this table. Deny-by-default: any edge not listed is illegal (FR-4).
+
+**Forward chain (legal for every weight class):**
+
+```
+RAW → RE_DERIVE → INTAKE → TRIAGE → IDEATE → RESEARCH → TRADEOFF → MITIGATION → DESIGN →
+CRITIQUE → PLAN → IMPLEMENT → VERIFY → ADVERSARIAL_REVIEW → LEDGER_SYNC → SEAL → RETROSPECT →
+EVOLVE → MEMORY_UPDATE → IMPROVE_RUNTIME → RESTART        (20 edges)
+RESTART → RE_DERIVE                                        (re-execution cycle, stage 19)
+```
+
+**Weight-class variation (fast path vs full path):**
+
+| `WeightClass` | Trace | Legal edges |
+|---|---|---|
+| `KERNEL_TOUCHING`, `SUBSTANTIAL` | Trace-B | the full forward chain above (21 edges) |
+| `ROUTINE` | Trace-A | the full chain **plus** `TRIAGE → IMPLEMENT` and `RAW → INTAKE` |
+
+The two ROUTINE compression edges are the `StageId` image of the ceremony rule in
+`WORKFLOW_STATE_MACHINE.yaml` (L02→L12; `RE_DERIVE` is Trace-B only). Auto-discharge stubs still
+populate the compressed states in the ledger, so PAEOS-9 §2.3's "complete, replayable record"
+holds while the reference monitor admits the cheaper edge (the primary economic control, §13.8).
+
 ### 4.2 Stage sub-state model
 
 Every stage is itself a small state machine, uniform across all 20 stages (this uniformity is what makes the engine generic and self-hostable, FR-9):
