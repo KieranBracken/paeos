@@ -1,0 +1,13 @@
+{
+  "id": "CANARY-0001",
+  "category": "forged-evidence",
+  "description": "Deterministic evidence claiming a result its reproducible_command does not produce (T2).",
+  "expected": "CAUGHT",
+  "detection_signature": "kernel re-run (evidence.verify_deterministic) yields a result != the claimed result",
+  "artifact": {
+    "kind": "Evidence",
+    "determinism": "DETERMINISTIC",
+    "reproducible_command": "echo real",
+    "claimed_result": { "exit_code": 0, "stdout": "FORGED\n" }
+  }
+}
