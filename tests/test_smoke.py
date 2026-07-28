@@ -3,7 +3,6 @@
 
 def test_skeleton_imports() -> None:
     import cli  # noqa: F401
-
     import kernel  # noqa: F401
     import runtime  # noqa: F401
 
