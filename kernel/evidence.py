@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import shlex
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 
@@ -136,16 +137,33 @@ def verify_binding(evidence: Evidence, artifact_under_review: Hash) -> None:
 # ---- reproduction (T2: kernel re-runs deterministic evidence) -------------
 
 
-def reproduce(evidence: Evidence, *, timeout_s: int = _DEFAULT_TIMEOUT_S) -> dict[str, JsonValue]:
+# A runner re-runs a command and returns {"exit_code", "stdout"}. Default is a bare subprocess;
+# the court injects `kernel.sandbox.sandbox_runner()` so untrusted agent commands run resource-
+# limited (DEBT-0005). Keeping it injectable avoids a hard kernel→sandbox coupling at import.
+Runner = Callable[[str], dict[str, JsonValue]]
+
+
+def reproduce(
+    evidence: Evidence,
+    *,
+    timeout_s: int = _DEFAULT_TIMEOUT_S,
+    runner: Runner | None = None,
+) -> dict[str, JsonValue]:
     """Re-run the evidence's `reproducible_command` and return the fresh result
     `{"exit_code", "stdout"}`. The kernel — not the agent — determines what happened.
 
-    Only for DETERMINISTIC evidence with a command. Raises NotReproducible otherwise.
+    Only for DETERMINISTIC evidence with a command. If `runner` is given (e.g. the sandbox runner)
+    it executes the command; else a bare, shell-free subprocess is used. Raises NotReproducible.
     """
     if evidence.determinism is not Determinism.DETERMINISTIC:
         raise NotReproducible(f"evidence {evidence.hash} is non-deterministic; cannot re-run")
     if not evidence.reproducible_command:
         raise NotReproducible(f"evidence {evidence.hash} has no reproducible_command")
+    if runner is not None:
+        try:
+            return runner(evidence.reproducible_command)
+        except Exception as exc:  # any runner failure is a reproduction failure
+            raise NotReproducible(f"re-run of evidence {evidence.hash} failed: {exc}") from exc
     args = shlex.split(evidence.reproducible_command)
     if not args:
         raise NotReproducible(f"evidence {evidence.hash} has an empty reproducible_command")
@@ -164,12 +182,16 @@ def reproduce(evidence: Evidence, *, timeout_s: int = _DEFAULT_TIMEOUT_S) -> dic
 
 
 def verify_deterministic(
-    evidence: Evidence, artifact_under_review: Hash, *, timeout_s: int = _DEFAULT_TIMEOUT_S
+    evidence: Evidence,
+    artifact_under_review: Hash,
+    *,
+    timeout_s: int = _DEFAULT_TIMEOUT_S,
+    runner: Runner | None = None,
 ) -> None:
     """Full deterministic-evidence check: binding + kernel re-run reproduces the claimed result.
     Raises StaleEvidence, NotReproducible, or ReproductionMismatch. This is the T2 gate."""
     verify_binding(evidence, artifact_under_review)
-    fresh = reproduce(evidence, timeout_s=timeout_s)
+    fresh = reproduce(evidence, timeout_s=timeout_s, runner=runner)
     if fresh != evidence.result:
         raise ReproductionMismatch(
             f"evidence {evidence.hash} claimed {evidence.result!r} "
