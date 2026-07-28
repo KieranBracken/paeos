@@ -159,6 +159,13 @@ class ControlPlane:
         self._cas.put(evidence.hash.encode("ascii"))
         return evidence.hash
 
+    def store_artifact(self, data: bytes) -> Hash:
+        """Put a content-addressed artifact in the CAS; return its hash."""
+        return self._cas.put(data)
+
+    def has_artifact(self, artifact_hash: Hash) -> bool:
+        return self._cas.has(artifact_hash)
+
     def advance(
         self,
         *,
