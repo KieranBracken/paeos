@@ -6,8 +6,11 @@ kernel/ or constitution/ ⇒ HARD; elsewhere ⇒ SOFT; unresolvable ⇒ HARD (fa
 
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
+
 import pytest
-from kernel.classifier import classify_paths
+from kernel.classifier import HARD_PREFIXES, classify_paths
 
 
 @pytest.mark.parametrize(
@@ -69,3 +72,20 @@ def test_kernel_lookalike_is_not_hard() -> None:
     # a genuine runtime file whose name merely contains "kernel" is SOFT (it is in runtime/)
     assert classify_paths(["runtime/kernel_shim.py"]) == "SOFT"
     assert classify_paths(["kernelish/x.py"]) == "SOFT"  # not the kernel/ dir
+
+
+# ---- DEBT-0007: Synchronisation guard with ops/ci/tcb_diff.py -----------------
+
+
+def test_tcb_diff_prefixes_sync() -> None:
+    tcb_diff_path = Path(__file__).resolve().parents[2] / "ops" / "ci" / "tcb_diff.py"
+    spec = importlib.util.spec_from_file_location("tcb_diff", tcb_diff_path)
+    assert spec is not None and spec.loader is not None
+    tcb_diff = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tcb_diff)
+
+    tcb_diff_dirs = tuple(p.rstrip("/") for p in tcb_diff.HARD_PREFIXES)
+    assert tcb_diff_dirs == HARD_PREFIXES
+
+
+
