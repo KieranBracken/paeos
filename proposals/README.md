@@ -47,14 +47,18 @@ amendment may change constitutional law.
   scope (source: Task B0.5). Status: **RATIFIED BY FOUNDER** (2026-07-27). Failure edges are
   kernel-routed (not `is_legal`); ROUTINE/Trace-A adds `TRIAGE→IMPLEMENT` + `RAW→INTAKE`.
   Implemented in `kernel/lifecycle.py`; canonical table added to PAEOS-7 §4.1.
-- `PAEOS-IP-0004.md` — Scar-ownership: who writes the stage-17 (`MEMORY_UPDATE`) scar? (source:
-  Task B2.F). Status: **awaiting founder ratification**. Two ratified components (B1.F `SoftLoop`
-  inline scar; B2.F `EvolutionLayer`) both own the remand→scar write with incompatible recurrence
-  semantics. Recommends Option A (Evolution Layer owns stage 17) as a **separate** follow-on task.
-  **Not implemented** — B2.F ships on ratified behaviour only.
-- `PAEOS-IP-0005.md` — Ownership of institutional-memory *creation*: a first-principles derivation
-  (founder-directed analysis). Status: **awaiting founder ratification**. Derives, from CER-1..6 +
-  FR-3/4/5/6 + the 19-stage lifecycle, that memory creation is a three-owner act — *trigger*
-  (kernel/Court), *authoring* (Evolution Layer, stages 15→17), *commit* (kernel, G-Memory 17) — and
-  that detection stages (11/12) may emit triggers only. Generalises IP-0004; diverges from the
-  current inline-scar implementation. **Not implemented.**
+- `PAEOS-IP-0004.md` — Ephemeral Execution Context vs. Constitutional Institutional Memory (source:
+  Task B2.F). Status: **RATIFIED BY FOUNDER** (2026-07-30). Establishes **L1 Ephemeral Execution
+  Context** (run-scoped operational retry state on the TaskPackage; destroyed at run-scope end; never
+  institutional memory) as the operational complement to IP-0005. Enforced by **Task B2.G**.
+- `PAEOS-IP-0005.md` — Constitutional Memory Authority & Separation of Powers (source: Task B2.F +
+  founder-directed first-principles analysis). Status: **RATIFIED BY FOUNDER** (2026-07-30). The
+  memory trilogy: **Trigger** (Verification Court) → **Author** (Evolution Layer, stages 15→17) →
+  **Commit** (Kernel TCB, stage 17). Operational execution (`SoftLoop`/`Builder`) may never author or
+  commit institutional memory. Enforced by **Task B2.G**.
+- `PAEOS-IP-0006.md` — Constitutional Knowledge Lifetime Ontology (L0–L5). Status: **RATIFIED BY
+  FOUNDER** (2026-07-30). A second classification axis (Purpose × Lifetime): L0 Scratch (Worker),
+  **L1 Ephemeral Execution Context (Runtime)**, L2 Runtime Projection (Runtime), **L3 Institutional
+  Memory (Evolution)**, L4 Constitutional Knowledge (Founder), L5 Historical Truth (Kernel).
+  Promotion between classes only via verified transitions (L1→L3 via Stage 17). B2.G enforces the
+  L1/L3 boundary; full per-artifact `lifetime_class` annotation is a follow-on conformance pass.
