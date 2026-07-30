@@ -348,7 +348,24 @@ def run_demo() -> ControlPlane:
     return plane
 
 
-def _self_host(backlog_path: str, *, db_path: str, keys_path: str) -> int:
+def _calibrate(canary_dir: str) -> int:
+    """Run the standing canary calibration against the live Court. Exit 0 if calibrated, else 3."""
+    from runtime.calibration import calibrate
+
+    report = calibrate(canary_dir)
+    _print(
+        {
+            "calibration": "PASS" if report.passed else "QUARANTINE",
+            "results": [
+                {"canary": r.canary_id, "passed": r.passed, "detail": r.detail}
+                for r in report.results
+            ],
+        }
+    )
+    return 0 if report.passed else 3
+
+
+def _self_host(backlog_path: str, *, db_path: str, keys_path: str, canary_dir: str) -> int:
     """Run a backlog through the LIVE soft loop (real claude sessions — needs auth + env)."""
     from kernel.cas import (
         CAS,
@@ -356,9 +373,24 @@ def _self_host(backlog_path: str, *, db_path: str, keys_path: str) -> int:
     )
     from kernel.keystore import load_or_create_signing_key
     from kernel.ledger_sqlite import SqliteLedgerStore
+    from runtime.calibration import calibrate
     from runtime.integrations import ClaudeCodeRuntime
     from runtime.orchestrator import RunStatus
     from runtime.selfhost import outcome_summary, parse_backlog, run_backlog
+
+    # Standing FR-2/FR-3 tripwire (PAEOS-7 §5.3): a blunted Court must never seal. A canary miss
+    # QUARANTINES — no backlog work runs, no seal is possible.
+    calibration = calibrate(canary_dir)
+    if not calibration.passed:
+        _print(
+            {
+                "quarantine": "canary calibration failed — refusing to run",
+                "misses": [
+                    {"canary": r.canary_id, "detail": r.detail} for r in calibration.misses
+                ],
+            }
+        )
+        return 3
 
     backlog = parse_backlog(json.loads(Path(backlog_path).read_text(encoding="utf-8")))
     state_dir = Path(db_path).parent
@@ -384,12 +416,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     sh.add_argument("backlog", help="path to a JSON backlog of intakes")
     sh.add_argument("--db", default="ops/state/ledger.db", help="durable ledger path (SQLite)")
     sh.add_argument("--keys", default="ops/keys/kernel_ed25519.key", help="kernel signing key path")
+    sh.add_argument("--canaries", default="constitution/canaries", help="canary dir (tripwire)")
+    cal = sub.add_parser("calibrate", help="run the standing canary calibration (FR-2 tripwire)")
+    cal.add_argument("--canaries", default="constitution/canaries", help="canary directory")
     args = parser.parse_args(argv)
     if args.command == "demo":
         run_demo()
         return 0
+    if args.command == "calibrate":
+        return _calibrate(args.canaries)
     if args.command == "self-host":
-        return _self_host(args.backlog, db_path=args.db, keys_path=args.keys)
+        return _self_host(
+            args.backlog, db_path=args.db, keys_path=args.keys, canary_dir=args.canaries
+        )
     return 1
 
 
