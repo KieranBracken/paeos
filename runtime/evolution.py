@@ -23,8 +23,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from kernel.classifier import Classification, classify_paths
+from kernel.types import StageId
 
 from runtime.amendment import AmendmentProposal
+from runtime.lifetime import LifetimeClass, may_promote
 from runtime.memory import Scar, ScarDraft, ScarQuarantined, ScarStore, parse_signature
 from runtime.orchestrator import RunOutcome, RunStatus
 
@@ -117,6 +119,11 @@ class EvolutionLayer:
     def _memory_update(
         self, retro: Retrospective, signature_tags: frozenset[str]
     ) -> tuple[tuple[Scar, ...], tuple[frozenset[str], ...]]:
+        # IP-0006 §5: authoring an L3 scar from a run's L1 evidence IS a lifetime promotion, allowed
+        # ONLY at Stage 17. This layer *is* Stage 17, so the guard holds by construction; the check
+        # here pins the constitutional basis at the one sanctioned promotion site.
+        if not may_promote(LifetimeClass.L1, LifetimeClass.L3, via_stage=StageId.MEMORY_UPDATE):
+            raise RuntimeError("L1->L3 promotion is not sanctioned outside Stage 17 (IP-0006 §5)")
         draft = ScarDraft(
             signature=signature_tags,
             lesson="; ".join(retro.findings),
