@@ -162,6 +162,40 @@ def test_live_invoker_passes_accept_edits_permission_mode(monkeypatch) -> None: 
     assert "acceptEdits" in captured["cmd"]
 
 
+# ---- B2.J: workspace context (constitution + materialized refs) -----------
+
+
+def test_constitution_is_seeded_into_the_workspace(tmp_path: Path) -> None:
+    source = tmp_path / "repo"
+    (source / "constitution").mkdir(parents=True)
+    (source / "constitution" / "PAEOS-4.md").write_text("K1: durable seals")
+    captured: dict[str, bool] = {}
+
+    def _inspect(spec: SessionSpec) -> SessionResult:
+        captured["has_law"] = (spec.workspace / "constitution" / "PAEOS-4.md").is_file()
+        return SessionResult(_TRANSCRIPT)
+
+    ClaudeCodeRuntime(invoker=_inspect, workspace_source=source).run(_package())
+    assert captured["has_law"]  # the session can read/cite the law (B2.J)
+
+
+def test_context_refs_are_materialized_from_the_resolver(tmp_path: Path) -> None:
+    from dataclasses import replace
+
+    from kernel.types import ArtifactRef
+
+    pkg = replace(_package(), context_refs=(ArtifactRef(hash="a" * 64, type="plan"),))
+    captured: dict[str, bytes | None] = {}
+
+    def _inspect(spec: SessionSpec) -> SessionResult:
+        files = [p for p in (spec.workspace / "context").rglob("*") if p.is_file()]
+        captured["content"] = files[0].read_bytes() if files else None
+        return SessionResult(_TRANSCRIPT)
+
+    ClaudeCodeRuntime(invoker=_inspect, artifact_resolver=lambda _h: b"the plan").run(pkg)
+    assert captured["content"] == b"the plan"  # the injected context is readable in the workspace
+
+
 # ---- plugs into the dispatcher (it IS an AgentRuntime) --------------------
 
 

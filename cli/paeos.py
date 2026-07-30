@@ -436,9 +436,10 @@ def _self_host(backlog_path: str, *, db_path: str, keys_path: str, canary_dir: s
         ledger=ledger,
         signing_key=signing_key,
         cas=cas,
-        # LIVE — the real claude CLI; seed each session workspace from the repo so edit
-        # objectives resolve, and headless writes auto-apply (acceptEdits) (B2.I).
-        agent_runtime=ClaudeCodeRuntime(workspace_source=Path.cwd()),
+        # LIVE — the real claude CLI. Seed each session workspace from the repo (edit objectives +
+        # constitution) and materialize injected context from the CAS (B2.I/B2.J); headless writes
+        # auto-apply (acceptEdits).
+        agent_runtime=ClaudeCodeRuntime(workspace_source=Path.cwd(), artifact_resolver=cas.get),
     )
     _print(outcome_summary(outcomes))
     return 0 if all(o.status is RunStatus.SEALED for o in outcomes) else 2

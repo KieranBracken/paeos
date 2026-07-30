@@ -46,7 +46,9 @@ class _Recorder:
             StageId.DESIGN: (AgentWrite("design/d.md", b"d"),),
             StageId.PLAN: (AgentWrite("plan/p.md", b"p"),),
             StageId.IMPLEMENT: (AgentWrite("runtime/x.py", _CODE),),
-            StageId.ADVERSARIAL_REVIEW: (AgentWrite("review/adversary_report.md", b"ok"),),
+            StageId.ADVERSARIAL_REVIEW: (
+                AgentWrite("review/adversary_report.md", b"ok\nVERDICT: PASS\n"),
+            ),
         }
 
     def run(self, package: TaskPackage) -> RunOutput:

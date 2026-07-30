@@ -33,7 +33,9 @@ class ScriptedRuntime:
             StageId.DESIGN: (AgentWrite("design/design.md", b"design"),),
             StageId.PLAN: (AgentWrite("plan/plan.md", b"plan"),),
             StageId.IMPLEMENT: (AgentWrite("runtime/x.py", _CODE),),
-            StageId.ADVERSARIAL_REVIEW: (AgentWrite("review/adversary_report.md", b"ok"),),
+            StageId.ADVERSARIAL_REVIEW: (
+                AgentWrite("review/adversary_report.md", b"ok\nVERDICT: PASS\n"),
+            ),
         }
 
     def run(self, package: TaskPackage) -> RunOutput:

@@ -1,6 +1,6 @@
 # PAEOS-IP-0007 — The soft loop seals despite a blocking adversarial dissent (FR-3 is toothless)
 
-Status: **AWAITING FOUNDER** · Filed: 2026-07-30 · Channel: CER-2 (security-critical)
+Status: **RATIFIED BY FOUNDER** (2026-07-30, Option A) · Filed: 2026-07-30 · Channel: CER-2 (security-critical)
 Source finding: the **live R4 self-hosting runs** (contained, founder-authorised). Inspecting what the
 live agents actually did — rather than trusting the `SEALED` status — revealed that a run **seals even
 when the isolated Adversary returns BLOCK with blocking dissents**. This is a constitutional defect in

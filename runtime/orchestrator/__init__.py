@@ -32,7 +32,12 @@ from runtime.agents import StagePlaybook
 from runtime.claude_code import AgentDispatcher, AgentRuntime
 from runtime.court import Court, Verdict, VerdictOutcome
 from runtime.memory import ScarStore
-from runtime.review import InformationBarrierManager, ReviewHarness
+from runtime.review import (
+    AdversaryOutcome,
+    InformationBarrierManager,
+    ReviewHarness,
+    read_adversary_verdict,
+)
 from runtime.task_package import Budget, ExecutionContext
 from runtime.triage import BudgetExceeded, GoalBudget, triage
 
@@ -125,18 +130,23 @@ class SoftLoop:
 
         try:
             # --- Planner: DESIGN then PLAN (matched scars injected, FR-6) ---
+            # Stage context chains forward (B2.J): PLAN sees DESIGN, IMPLEMENT sees design + plan —
+            # so the live Builder has a plan to implement against (it blocked without one).
+            planner_artifacts: list[ArtifactRef] = []
             for stage in (StageId.DESIGN, StageId.PLAN):
                 scars = self._scar_refs(goal_signature, stage)
                 result = self._playbook.run_stage(
                     goal_id=goal_id, run_id=run_id, stage=stage, session="planner",
-                    budget=decision.budget, scars=scars,
+                    budget=decision.budget, scars=scars, context_refs=tuple(planner_artifacts),
                 )
                 budget.charge(result.cost)
+                planner_artifacts.extend(result.artifacts)
 
-            # --- Builder: IMPLEMENT on the plan-authorized scopes ---
+            # --- Builder: IMPLEMENT on the plan scopes, with design + plan as context (B2.J) ---
             build = self._playbook.run_stage(
                 goal_id=goal_id, run_id=run_id, stage=StageId.IMPLEMENT, session="builder",
                 budget=decision.budget, write_scopes=plan_write_scopes,
+                context_refs=tuple(planner_artifacts),
             )
             budget.charge(build.cost)
             if not build.artifacts:
@@ -186,6 +196,22 @@ class SoftLoop:
             budget.charge(adversary.cost)
         except BudgetExceeded as exc:
             return RunOutcome(RunStatus.HALTED, goal_id, f"budget breach at review: {exc}")
+
+        # --- Adversary gate (B2.K / IP-0007, FR-3): a seal requires an adversarial PASS.
+        # Fail-closed: no report (adversary could not review), or a BLOCK verdict, REMANDS. ---
+        if adversary.artifacts:
+            adversary_outcome = read_adversary_verdict(self._cas.get(adversary.artifacts[0].hash))
+        else:
+            adversary_outcome = AdversaryOutcome.BLOCK
+        if adversary_outcome is AdversaryOutcome.BLOCK:
+            context = ExecutionContext(
+                retry_hints=("the adversary filed a blocking dissent — fix the defect, re-review",),
+                diagnostics=(f"adversary BLOCK on goal {goal_id} at ADVERSARIAL_REVIEW",),
+            )
+            return RunOutcome(
+                RunStatus.REMANDED, goal_id, "adversary blocked the seal",
+                verdict=verdict, ephemeral_context=context,
+            )
 
         # --- Seal (B0.9): idempotent, over the bundle + verdict + adversary + ledger head ---
         verdict_ref = self._cas.put(_canonical(verdict).encode("ascii"))

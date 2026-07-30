@@ -26,6 +26,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
+from kernel.cas import CasMiss
+from kernel.types import ArtifactRef, Hash
+
 from runtime.claude_code import AgentWrite, RunOutput, within_scopes
 from runtime.task_package import Cost, TaskPackage, TaskStatus
 
@@ -141,13 +144,17 @@ class ClaudeCodeRuntime:
         invoker: CliInvoker | None = None,
         workspace_root: Path | None = None,
         workspace_source: Path | None = None,
+        artifact_resolver: Callable[[Hash], bytes] | None = None,
         default_model: str = "claude-code",
     ) -> None:
         self._invoker = invoker  # None ⇒ built per-package from claude_cli_invoker at run()
         self._workspace_root = workspace_root
         # Repo root to seed each session's workspace from, so an *edit* objective has the current
-        # file content to modify (B2.I). None ⇒ an empty workspace (new files only).
+        # file content to modify (B2.I) and the constitution to cite (B2.J). None ⇒ empty workspace.
         self._workspace_source = workspace_source
+        # Resolves an injected context ref (design, plan, matched scars, the adversary bundle) to
+        # its bytes to materialise into the workspace (B2.J). Typically `CAS.get`.
+        self._artifact_resolver = artifact_resolver
         self._default_model = default_model
 
     def run(self, package: TaskPackage) -> RunOutput:
@@ -157,6 +164,10 @@ class ClaudeCodeRuntime:
         try:
             if self._workspace_source is not None:
                 _seed_workspace(workspace, self._workspace_source, package.permissions.write_scopes)
+                _seed_constitution(workspace, self._workspace_source)  # B2.J: the law
+            if self._artifact_resolver is not None:
+                # B2.J: injected context (design/plan/scars/bundle) into the workspace
+                _materialize_context(workspace, package.context_refs, self._artifact_resolver)
             spec = SessionSpec(
                 workspace=workspace,
                 prompt=build_prompt(package),
@@ -177,6 +188,30 @@ class ClaudeCodeRuntime:
             )
         finally:
             shutil.rmtree(workspace, ignore_errors=True)
+
+
+def _seed_constitution(workspace: Path, source: Path) -> None:
+    """Copy the constitution into the session so agents can *read and cite the law* (B2.J) — the
+    live Planner blocked without it ("constitution/ does not exist… nothing to cite")."""
+    src = source / "constitution"
+    if src.is_dir():
+        shutil.copytree(src, workspace / "constitution", dirs_exist_ok=True)
+
+
+def _materialize_context(
+    workspace: Path, context_refs: tuple[ArtifactRef, ...], resolve: Callable[[Hash], bytes]
+) -> None:
+    """Write each injected context artifact (design, plan, matched scars, the adversary bundle) into
+    a `context/` dir so the session can actually read it (B2.J). Refs are content hashes; a ref
+    whose blob is absent is skipped (best-effort — evidence refs need not be blobs)."""
+    ctx = workspace / "context"
+    for ref in context_refs:
+        try:
+            content = resolve(ref.hash)
+        except CasMiss:
+            continue
+        ctx.mkdir(parents=True, exist_ok=True)
+        (ctx / f"{ref.type}-{ref.hash[:12]}.txt").write_bytes(content)
 
 
 def _seed_workspace(workspace: Path, source: Path, write_scopes: tuple[str, ...]) -> None:

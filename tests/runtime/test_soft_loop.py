@@ -66,7 +66,9 @@ def _writes(impl_path: str = "runtime/feature.py") -> dict[StageId, tuple[AgentW
         StageId.DESIGN: (AgentWrite("design/design.md", b"design"),),
         StageId.PLAN: (AgentWrite("plan/plan.md", b"plan"),),
         StageId.IMPLEMENT: (AgentWrite(impl_path, _CODE),),
-        StageId.ADVERSARIAL_REVIEW: (AgentWrite("review/adversary_report.md", b"no dissent"),),
+        StageId.ADVERSARIAL_REVIEW: (
+            AgentWrite("review/adversary_report.md", b"no dissent\nVERDICT: PASS\n"),
+        ),
     }
 
 
@@ -152,6 +154,53 @@ def test_evidence_is_bound_to_the_produced_artifact() -> None:
     )
     assert outcome.status is RunStatus.SEALED  # would REMAND (StaleEvidence) without rebinding
     assert outcome.seal is not None
+
+
+# ---- B2.K / IP-0007: the seal is gated on the adversary's PASS verdict (FR-3) ----
+
+
+def test_adversary_block_remands_the_seal() -> None:
+    from runtime.review import AdversaryOutcome, read_adversary_verdict
+
+    # fail-closed verdict parsing (deny-by-default)
+    assert read_adversary_verdict(b"looks fine\nVERDICT: PASS\n") is AdversaryOutcome.PASS
+    assert read_adversary_verdict(b"D1 broken\nVERDICT: BLOCK\n") is AdversaryOutcome.BLOCK
+    assert read_adversary_verdict(b"no verdict line") is AdversaryOutcome.BLOCK
+
+    # a blocking dissent must REMAND, not seal — even when the court passed
+    writes = _writes()
+    writes[StageId.ADVERSARIAL_REVIEW] = (
+        AgentWrite("review/adversary_report.md", b"D1: unreadable bundle\nVERDICT: BLOCK\n"),
+    )
+    outcome = _loop(ScriptedRuntime(writes)).run(
+        objective="x", changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    assert outcome.status is RunStatus.REMANDED
+    assert "adversary blocked" in outcome.detail
+    assert outcome.seal is None
+
+
+def test_missing_adversary_report_fails_closed() -> None:
+    # the adversary produced NO report (could not review) ⇒ deny-by-default REMAND
+    writes = _writes()
+    writes[StageId.ADVERSARIAL_REVIEW] = ()  # no report written
+    outcome = _loop(ScriptedRuntime(writes)).run(
+        objective="x", changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    assert outcome.status is RunStatus.REMANDED
+
+
+def test_implement_receives_design_and_plan_as_context() -> None:
+    # B2.J: design + plan chain forward so the Builder has a plan to implement against
+    runtime = ScriptedRuntime(_writes())
+    _loop(runtime).run(
+        objective="x", changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    impl_pkg = runtime.packages[StageId.IMPLEMENT]
+    assert impl_pkg.context_refs  # design + plan artifacts injected as IMPLEMENT context
 
 
 # ---- scars are injected into the Planner's context (FR-6) ------------------

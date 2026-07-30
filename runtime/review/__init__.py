@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
+from enum import Enum
 
 from kernel.types import ArtifactRef, GoalId, Hash, Role, RunId, StageId
 
@@ -27,11 +28,36 @@ from runtime.claude_code import AgentDispatcher
 from runtime.task_package import Budget, TaskResult
 
 __all__ = [
+    "AdversaryOutcome",
     "BarrierViolation",
     "InformationBarrierManager",
     "ReviewHarness",
     "SealedBundle",
+    "read_adversary_verdict",
 ]
+
+# The verdict line the adversary MUST end its report with (B2.K / IP-0007). A seal requires an
+# explicit adversarial PASS; anything else blocks it.
+VERDICT_PASS_MARKER = "VERDICT: PASS"
+VERDICT_BLOCK_MARKER = "VERDICT: BLOCK"
+
+
+class AdversaryOutcome(Enum):
+    """The isolated adversary's machine-readable verdict on the sealed bundle (FR-3)."""
+
+    PASS = "PASS"  # the adversary failed to break the change — a seal precondition (PAEOS-3.5)
+    BLOCK = "BLOCK"  # a blocking dissent — the change may not seal
+
+
+def read_adversary_verdict(report: bytes | str) -> AdversaryOutcome:
+    """Parse the adversary's report for its verdict. **Fail-closed** (FR-3): BLOCK unless an
+    explicit `VERDICT: PASS` is present with no `VERDICT: BLOCK` — a missing verdict never seals."""
+    text = report.decode("utf-8", "replace") if isinstance(report, bytes) else report
+    if VERDICT_BLOCK_MARKER in text:
+        return AdversaryOutcome.BLOCK
+    if VERDICT_PASS_MARKER in text:
+        return AdversaryOutcome.PASS
+    return AdversaryOutcome.BLOCK  # deny-by-default: no clear PASS ⇒ no seal
 
 
 class BarrierViolation(Exception):
@@ -122,7 +148,11 @@ class ReviewHarness:
             stage=StageId.ADVERSARIAL_REVIEW,
             role=Role.ADVERSARY,
             session=session,
-            objective="Attack the sealed evidence bundle; file blocking dissents on what fails.",
+            objective=(
+                "Attack the sealed evidence bundle; file blocking dissents on what fails. "
+                f"End your report with exactly one line: '{VERDICT_PASS_MARKER}' if you could not "
+                f"break it, or '{VERDICT_BLOCK_MARKER}' if you found a blocking defect."
+            ),
             write_scopes=(report_scope,),  # the adversary may write only its report
             read_scopes=(bundle.bundle_hash,),  # and read only the sealed bundle
             mcp_servers=("constitution",),  # constitution only — NOT memory / builder context
