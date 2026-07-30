@@ -47,3 +47,8 @@ amendment may change constitutional law.
   scope (source: Task B0.5). Status: **RATIFIED BY FOUNDER** (2026-07-27). Failure edges are
   kernel-routed (not `is_legal`); ROUTINE/Trace-A adds `TRIAGE→IMPLEMENT` + `RAW→INTAKE`.
   Implemented in `kernel/lifecycle.py`; canonical table added to PAEOS-7 §4.1.
+- `PAEOS-IP-0004.md` — Scar-ownership: who writes the stage-17 (`MEMORY_UPDATE`) scar? (source:
+  Task B2.F). Status: **awaiting founder ratification**. Two ratified components (B1.F `SoftLoop`
+  inline scar; B2.F `EvolutionLayer`) both own the remand→scar write with incompatible recurrence
+  semantics. Recommends Option A (Evolution Layer owns stage 17) as a **separate** follow-on task.
+  **Not implemented** — B2.F ships on ratified behaviour only.
