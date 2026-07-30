@@ -26,6 +26,8 @@ from kernel.types import Role, WeightClass
 from nacl.signing import SigningKey
 
 from runtime.claude_code import AgentRuntime
+from runtime.evolution import EvolutionLayer
+from runtime.memory import ScarStore
 from runtime.orchestrator import Intake, RunOutcome, SelfHostRunner, SoftLoop
 from runtime.task_package import Budget
 
@@ -92,15 +94,32 @@ def run_backlog(
     agent_runtime: AgentRuntime,
     budget_by_class: Mapping[WeightClass, Budget] | None = None,
 ) -> list[RunOutcome]:
-    """Run every intake through one shared soft loop (scars accumulate; ledger records all)."""
+    """Run every intake through one shared soft loop; the Evolution Layer authors L3 memory.
+
+    L1/L3 separation (IP-0005/0006, B2.G): the loop produces only an **L1** execution note on a
+    remand and never writes a scar. The **Evolution Layer** is the **sole author of L3 memory**, at
+    Stage 17, run by run — so scars still accumulate across the backlog (each authored scar is
+    injectable into later runs) without the operational loop ever authoring or committing memory.
+    """
+    scar_store = ScarStore()
     loop = SoftLoop(
         ledger=ledger,
         signing_key=signing_key,
         cas=cas,
         agent_runtime=agent_runtime,
         budget_by_class=budget_by_class if budget_by_class is not None else DEFAULT_BUDGETS,
+        scar_store=scar_store,
     )
-    return SelfHostRunner(loop).run_backlog(backlog)
+    runner = SelfHostRunner(loop)
+    evolution = EvolutionLayer(scar_store=scar_store)  # the sole L3 author (Stage 17)
+    outcomes: list[RunOutcome] = []
+    for intake in backlog:
+        (outcome,) = runner.run_backlog([intake])
+        evolution.run(
+            outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
+        )
+        outcomes.append(outcome)
+    return outcomes
 
 
 def outcome_summary(outcomes: list[RunOutcome]) -> list[dict[str, JsonValue]]:

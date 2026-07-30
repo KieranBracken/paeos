@@ -27,12 +27,26 @@ __all__ = [
     "Budget",
     "Cost",
     "EvidenceObligation",
+    "ExecutionContext",
     "Permissions",
     "SkillRef",
     "TaskPackage",
     "TaskResult",
     "TaskStatus",
 ]
+
+
+@dataclass(frozen=True, slots=True)
+class ExecutionContext:
+    """L1 Ephemeral Execution Context (IP-0004).
+    
+    Scoped strictly to the active run_id. Holds transient operational retry state.
+    Destroyed when the execution scope terminates. NEVER written to institutional memory.
+    """
+
+    retry_hints: tuple[str, ...] = ()
+    diagnostics: tuple[str, ...] = ()
+    flags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,6 +101,7 @@ class TaskPackage:
     context_refs: tuple[ArtifactRef, ...]  # injected: design, plan, and MATCHED SCARS (FR-6)
     budget: Budget
     forbidden: tuple[str, ...] = ()  # documentation of intent; enforcement is by capability (T1)
+    ephemeral_context: ExecutionContext = field(default_factory=ExecutionContext)
 
 
 class TaskStatus(Enum):

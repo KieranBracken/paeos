@@ -31,9 +31,9 @@ from nacl.signing import SigningKey
 from runtime.agents import StagePlaybook
 from runtime.claude_code import AgentDispatcher, AgentRuntime
 from runtime.court import Court, Verdict, VerdictOutcome
-from runtime.memory import ScarDraft, ScarStore
+from runtime.memory import ScarStore
 from runtime.review import InformationBarrierManager, ReviewHarness
-from runtime.task_package import Budget
+from runtime.task_package import Budget, ExecutionContext
 from runtime.triage import BudgetExceeded, GoalBudget, triage
 
 __all__ = ["Intake", "RunOutcome", "RunStatus", "SelfHostRunner", "SoftLoop"]
@@ -54,6 +54,10 @@ class RunOutcome:
     detail: str
     seal: SealRecord | None = None
     verdict: Verdict | None = None
+    # L1 Ephemeral Execution Context (IP-0004/0006): run-scoped operational state produced on a
+    # remand (retry hints/diagnostics), NOT institutional memory. Never promoted in place — the
+    # Evolution Layer authors the L3 scar out-of-band at Stage 17.
+    ephemeral_context: ExecutionContext | None = None
 
 
 class SoftLoop:
@@ -150,14 +154,17 @@ class SoftLoop:
         )
         verdict = self._court.adjudicate(artifact.hash, claims)
         if verdict.outcome is VerdictOutcome.REMAND:
-            self._scars.propose_scar(
-                ScarDraft(
-                    signature=frozenset({f"stage:{StageId.VERIFY.name}", "kind:court-remand"}),
-                    lesson=f"unmet claims {verdict.unmet_claims} for goal {goal_id}",
-                    detection="court re-run reproduced a different result",
-                )
+            # L1/L3 boundary (IP-0005/0006, B2.G): the operational loop does NOT author or commit
+            # an L3 scar — that is the Evolution Layer's Stage-17 authority. The loop records only
+            # L1 Ephemeral Execution Context (run-scoped retry hints), never institutional memory.
+            context = ExecutionContext(
+                retry_hints=("re-run and fix the unmet claims the court could not reproduce",),
+                diagnostics=(f"court remanded {goal_id}: unmet {verdict.unmet_claims}",),
             )
-            return RunOutcome(RunStatus.REMANDED, goal_id, "court remanded", verdict=verdict)
+            return RunOutcome(
+                RunStatus.REMANDED, goal_id, "court remanded",
+                verdict=verdict, ephemeral_context=context,
+            )
 
         # --- Isolated Adversary over the sealed bundle (B1.D / FR-3) ---
         bundle = self._ibm.seal(

@@ -116,10 +116,10 @@ def test_seal_is_idempotent_reseal_same() -> None:
     assert first.status is RunStatus.SEALED and first.seal is not None
 
 
-# ---- court remand writes a scar (FR-6) ------------------------------------
+# ---- court remand produces an L1 note, NOT an L3 scar (IP-0005/0006, B2.G) -
 
 
-def test_court_remand_writes_a_scar() -> None:
+def test_court_remand_produces_l1_note_and_writes_no_scar() -> None:
     forged = (_evidence("builds", "echo built", "FORGED\n"),)  # command emits "built", not "FORGED"
     scar_store = ScarStore()
     runtime = ScriptedRuntime(_writes())
@@ -129,9 +129,11 @@ def test_court_remand_writes_a_scar() -> None:
     )
     assert outcome.status is RunStatus.REMANDED
     assert outcome.verdict is not None and outcome.verdict.outcome is VerdictOutcome.REMAND
-    # a scar recording the remand was written and now matches this failure class
-    matched = scar_store.match_scars("stage:VERIFY,kind:court-remand,goal:x")
-    assert len(matched) == 1
+    # L1/L3 boundary: the loop records only L1 Ephemeral Execution Context (run-scoped)...
+    assert outcome.ephemeral_context is not None
+    assert outcome.ephemeral_context.retry_hints  # a retry hint, not a scar
+    # ...and authors NO L3 scar (that is the Evolution Layer's Stage-17 authority, IP-0005 Axiom 1).
+    assert scar_store.match_scars("stage:VERIFY,kind:court-remand,goal:x") == []
 
 
 # ---- scars are injected into the Planner's context (FR-6) ------------------

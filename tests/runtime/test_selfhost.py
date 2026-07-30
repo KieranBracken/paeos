@@ -12,6 +12,7 @@ from kernel.ledger import InMemoryLedgerStore, Ledger
 from kernel.types import Role, StageId, WeightClass
 from nacl.signing import SigningKey
 from runtime.claude_code import AgentWrite, RunOutput
+from runtime.evolution import EvolutionLayer
 from runtime.memory import ScarDraft, ScarStore
 from runtime.orchestrator import Intake, RunStatus, SelfHostRunner, SoftLoop
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
@@ -85,14 +86,23 @@ def test_runs_a_backlog_of_goals() -> None:
     assert outcomes[0].seal is not None
 
 
-# ---- self-improvement: scars accumulate across runs -----------------------
+# ---- L1/L3 boundary: the loop writes no scar; Evolution authors it (B2.G) --
 
 
-def test_a_run_writes_a_scar_into_the_shared_store() -> None:
+def test_loop_writes_no_scar_and_evolution_authors_it() -> None:
     runner = _runner(ScriptedRuntime())
-    assert runner.scar_store.match_scars("kind:court-remand,stage:VERIFY,x:1") == []
-    runner.run_backlog([_intake(_FORGED)])  # court remands → a scar is written
-    assert len(runner.scar_store.match_scars("kind:court-remand,stage:VERIFY,x:1")) == 1
+    sig = "domain:runtime,task:t"  # the default _intake signature
+    query = f"{sig},stage:VERIFY,kind:court-remand"
+    assert runner.scar_store.match_scars(query) == []
+    outcomes = runner.run_backlog([_intake(_FORGED)])  # court remands
+    # the operational loop produces only L1 context and authors NO L3 scar (IP-0005 Axiom 1)
+    assert outcomes[0].ephemeral_context is not None
+    assert runner.scar_store.match_scars(query) == []
+    # the Evolution Layer is the sole L3 author (Stage 17)
+    EvolutionLayer(scar_store=runner.scar_store).run(
+        outcomes[0], goal_signature=sig, changed_paths=("runtime/x.py",)
+    )
+    assert len(runner.scar_store.match_scars(query)) == 1
 
 
 def test_stored_scar_is_injected_into_a_later_design() -> None:
