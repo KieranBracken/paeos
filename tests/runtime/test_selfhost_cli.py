@@ -1,0 +1,78 @@
+"""Tests for the self-hosting entry (parse a backlog, run it) — PAEOS-8 §12 R4.
+
+The live `claude` call is out of scope (behind ClaudeCodeRuntime, auth-gated); here we test parsing
++ the run over a scripted runtime.
+"""
+
+from __future__ import annotations
+
+import pytest
+from kernel.cas import CAS, InMemoryCasStore, content_hash
+from kernel.ledger import InMemoryLedgerStore, Ledger
+from kernel.types import StageId
+from nacl.signing import SigningKey
+from runtime.claude_code import AgentWrite, RunOutput
+from runtime.orchestrator import RunStatus
+from runtime.selfhost import outcome_summary, parse_backlog, run_backlog
+from runtime.task_package import Cost, TaskPackage, TaskStatus
+
+_CODE = b"def x():\n    return 1\n"
+_ART = content_hash(_CODE)
+
+
+class ScriptedRuntime:
+    def run(self, package: TaskPackage) -> RunOutput:
+        writes = {
+            StageId.DESIGN: (AgentWrite("design/d.md", b"d"),),
+            StageId.PLAN: (AgentWrite("plan/p.md", b"p"),),
+            StageId.IMPLEMENT: (AgentWrite("runtime/x.py", _CODE),),
+            StageId.ADVERSARIAL_REVIEW: (AgentWrite("review/adversary_report.md", b"ok"),),
+        }.get(package.stage, ())
+        return RunOutput(TaskStatus.COMPLETE, writes, (), b"t", Cost(100, 1.0, "m"))
+
+
+def _backlog_json() -> list[object]:
+    return [
+        {
+            "objective": "add x()",
+            "changed_paths": ["runtime/x.py"],
+            "plan_write_scopes": ["runtime/x.py"],
+            "goal_signature": "domain:runtime",
+            "builder_evidence": [
+                {
+                    "claim_id": "builds", "kind": "TEST", "command": "echo built",
+                    "artifact_hash": _ART, "exit_code": 0, "stdout": "built\n",
+                }
+            ],
+        }
+    ]
+
+
+def test_parse_backlog_builds_intakes() -> None:
+    intakes = parse_backlog(_backlog_json())
+    assert len(intakes) == 1
+    intake = intakes[0]
+    assert intake.objective == "add x()"
+    assert intake.plan_write_scopes == ("runtime/x.py",)
+    assert intake.builder_evidence[0].artifact_hash == _ART
+    assert intake.builder_evidence[0].reproducible_command == "echo built"
+
+
+def test_parse_backlog_rejects_non_list() -> None:
+    with pytest.raises(ValueError):
+        parse_backlog({"not": "a list"})
+
+
+def test_run_backlog_seals_a_good_intake() -> None:
+    intakes = parse_backlog(_backlog_json())
+    outcomes = run_backlog(
+        intakes,
+        ledger=Ledger(InMemoryLedgerStore()),
+        signing_key=SigningKey.generate(),
+        cas=CAS(InMemoryCasStore()),
+        agent_runtime=ScriptedRuntime(),
+    )
+    assert [o.status for o in outcomes] == [RunStatus.SEALED]
+    summary = outcome_summary(outcomes)
+    assert summary[0]["status"] == "SEALED"
+    assert summary[0]["seal_hash"] is not None

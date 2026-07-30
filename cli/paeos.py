@@ -28,6 +28,7 @@ import uuid
 from collections.abc import Iterable, Sequence
 from dataclasses import replace
 from hashlib import sha256
+from pathlib import Path
 
 from kernel.capability import CapabilityBroker, CapabilityError
 from kernel.cas import CAS, InMemoryCasStore
@@ -347,14 +348,48 @@ def run_demo() -> ControlPlane:
     return plane
 
 
+def _self_host(backlog_path: str, *, db_path: str, keys_path: str) -> int:
+    """Run a backlog through the LIVE soft loop (real claude sessions — needs auth + env)."""
+    from kernel.cas import (
+        CAS,
+        FilesystemCasStore,
+    )
+    from kernel.keystore import load_or_create_signing_key
+    from kernel.ledger_sqlite import SqliteLedgerStore
+    from runtime.integrations import ClaudeCodeRuntime
+    from runtime.orchestrator import RunStatus
+    from runtime.selfhost import outcome_summary, parse_backlog, run_backlog
+
+    backlog = parse_backlog(json.loads(Path(backlog_path).read_text(encoding="utf-8")))
+    state_dir = Path(db_path).parent
+    ledger = Ledger(SqliteLedgerStore(db_path))
+    signing_key = load_or_create_signing_key(keys_path)
+    cas = CAS(FilesystemCasStore(state_dir / "cas"))
+    outcomes = run_backlog(
+        backlog,
+        ledger=ledger,
+        signing_key=signing_key,
+        cas=cas,
+        agent_runtime=ClaudeCodeRuntime(),  # LIVE — the real claude CLI
+    )
+    _print(outcome_summary(outcomes))
+    return 0 if all(o.status is RunStatus.SEALED for o in outcomes) else 2
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="paeos", description="PAEOS control plane")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("demo", help="drive a goal through several stages end-to-end")
+    sh = sub.add_parser("self-host", help="run a JSON backlog through the live soft loop (R4)")
+    sh.add_argument("backlog", help="path to a JSON backlog of intakes")
+    sh.add_argument("--db", default="ops/state/ledger.db", help="durable ledger path (SQLite)")
+    sh.add_argument("--keys", default="ops/keys/kernel_ed25519.key", help="kernel signing key path")
     args = parser.parse_args(argv)
     if args.command == "demo":
         run_demo()
         return 0
+    if args.command == "self-host":
+        return _self_host(args.backlog, db_path=args.db, keys_path=args.keys)
     return 1
 
 
