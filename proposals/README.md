@@ -62,3 +62,7 @@ amendment may change constitutional law.
   Memory (Evolution)**, L4 Constitutional Knowledge (Founder), L5 Historical Truth (Kernel).
   Promotion between classes only via verified transitions (L1→L3 via Stage 17). B2.G enforces the
   L1/L3 boundary; full per-artifact `lifetime_class` annotation is a follow-on conformance pass.
+- `PAEOS-IP-0007.md` — **security-critical**: the soft loop **seals despite a blocking adversarial
+  dissent** (FR-3 toothless), found via the live R4 runs. Status: **awaiting founder ratification**.
+  Recommends gating the seal on a machine-readable adversary verdict (REMAND on BLOCK) as **B2.K**;
+  companion gaps B2.J (materialise agent workspace context) + live-evidence flow. **Not implemented.**
