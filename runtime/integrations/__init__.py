@@ -112,6 +112,12 @@ def claude_cli_invoker(package: TaskPackage) -> CliInvoker:
             "json",
             "--allowedTools",
             ",".join(spec.allowed_tools),
+            # Headless sessions cannot answer interactive prompts, so writes need an auto-accept
+            # mode to land. `acceptEdits` (not the blanket `--dangerously-skip-permissions`) auto-
+            # applies edits, and the blast radius is already bounded: an isolated temp workspace +
+            # the write-scope filter in `_collect_writes` (B2.I).
+            "--permission-mode",
+            "acceptEdits",
         ]
         proc = subprocess.run(
             cmd,
@@ -134,10 +140,14 @@ class ClaudeCodeRuntime:
         *,
         invoker: CliInvoker | None = None,
         workspace_root: Path | None = None,
+        workspace_source: Path | None = None,
         default_model: str = "claude-code",
     ) -> None:
         self._invoker = invoker  # None ⇒ built per-package from claude_cli_invoker at run()
         self._workspace_root = workspace_root
+        # Repo root to seed each session's workspace from, so an *edit* objective has the current
+        # file content to modify (B2.I). None ⇒ an empty workspace (new files only).
+        self._workspace_source = workspace_source
         self._default_model = default_model
 
     def run(self, package: TaskPackage) -> RunOutput:
@@ -145,6 +155,8 @@ class ClaudeCodeRuntime:
             tempfile.mkdtemp(prefix=f"paeos-{package.task_id}-", dir=self._workspace_root)
         )
         try:
+            if self._workspace_source is not None:
+                _seed_workspace(workspace, self._workspace_source, package.permissions.write_scopes)
             spec = SessionSpec(
                 workspace=workspace,
                 prompt=build_prompt(package),
@@ -165,6 +177,18 @@ class ClaudeCodeRuntime:
             )
         finally:
             shutil.rmtree(workspace, ignore_errors=True)
+
+
+def _seed_workspace(workspace: Path, source: Path, write_scopes: tuple[str, ...]) -> None:
+    """Copy the current repo files at the write scopes into the session workspace, so an *edit*
+    objective has the content to modify (B2.I). Scopes with no existing file (new files, or
+    directory/glob prefixes) are skipped — the session creates those from scratch."""
+    for scope in write_scopes:
+        src = source / scope
+        if src.is_file():
+            dst = workspace / scope
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
 
 
 def _collect_writes(workspace: Path, write_scopes: tuple[str, ...]) -> tuple[AgentWrite, ...]:

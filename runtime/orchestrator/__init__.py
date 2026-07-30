@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import uuid
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 
 from kernel.capability import CapabilityBroker
@@ -144,6 +144,14 @@ class SoftLoop:
             artifact = build.artifacts[0]
         except BudgetExceeded as exc:
             return RunOutcome(RunStatus.HALTED, goal_id, f"budget breach: {exc}")
+
+        # Live evidence binding (R4): bind the declared evidence to the artifact the builder
+        # ACTUALLY produced, so a live, novel artifact is adjudicable (its hash is unknowable when
+        # the backlog is authored). The court still RE-RUNS each `reproducible_command`, so the T2
+        # anti-forgery property is intact — only the artifact_hash binding is set to the real hash.
+        builder_evidence = tuple(
+            replace(ev, artifact_hash=artifact.hash) for ev in builder_evidence
+        )
 
         # --- Verification Court: reproduce every claim (B1.E) ---
         for evidence in builder_evidence:

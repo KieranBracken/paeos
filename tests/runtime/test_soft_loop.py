@@ -136,6 +136,24 @@ def test_court_remand_produces_l1_note_and_writes_no_scar() -> None:
     assert scar_store.match_scars("stage:VERIFY,kind:court-remand,goal:x") == []
 
 
+# ---- live evidence binding: evidence binds to the produced artifact (R4) ---
+
+
+def test_evidence_is_bound_to_the_produced_artifact() -> None:
+    from dataclasses import replace as _replace
+
+    # a live artifact's hash is unknowable when the backlog is authored, so the declared evidence
+    # carries a mismatched artifact_hash; the loop rebinds it to the produced artifact and seals.
+    ev = _replace(_evidence("builds", "echo built", "built\n"), artifact_hash="f" * 64)
+    runtime = ScriptedRuntime(_writes())
+    outcome = _loop(runtime).run(
+        objective="x", changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=(ev,),
+    )
+    assert outcome.status is RunStatus.SEALED  # would REMAND (StaleEvidence) without rebinding
+    assert outcome.seal is not None
+
+
 # ---- scars are injected into the Planner's context (FR-6) ------------------
 
 

@@ -106,6 +106,62 @@ def test_workspace_is_cleaned_up() -> None:
     assert not capture["workspace"].exists()  # isolated workspace removed after the run
 
 
+# ---- B2.I: workspace seeding + headless auto-accept -----------------------
+
+
+def test_workspace_is_seeded_with_existing_write_scope_files(tmp_path: Path) -> None:
+    # a repo-like source with an existing file the objective will edit
+    source = tmp_path / "repo"
+    (source / "runtime").mkdir(parents=True)
+    (source / "runtime" / "feature.py").write_bytes(b"original\n")
+    capture: dict[str, bytes] = {}
+
+    def _inspecting_invoker(spec: SessionSpec) -> SessionResult:
+        # the session sees the seeded file and can edit it in place
+        capture["seeded"] = (spec.workspace / "runtime" / "feature.py").read_bytes()
+        (spec.workspace / "runtime" / "feature.py").write_bytes(b"original\n# edited\n")
+        return SessionResult(transcript=_TRANSCRIPT)
+
+    out = ClaudeCodeRuntime(invoker=_inspecting_invoker, workspace_source=source).run(
+        _package(write_scopes=("runtime/feature.py",))
+    )
+    assert capture["seeded"] == b"original\n"  # seeded from the source
+    assert out.writes[0].content == b"original\n# edited\n"  # the edit is collected
+
+
+def test_no_source_means_empty_workspace(tmp_path: Path) -> None:
+    capture: dict[str, bytes | None] = {}
+
+    def _inspecting_invoker(spec: SessionSpec) -> SessionResult:
+        f = spec.workspace / "runtime" / "feature.py"
+        capture["present"] = f.read_bytes() if f.exists() else None
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_bytes(b"new\n")
+        return SessionResult(transcript=_TRANSCRIPT)
+
+    ClaudeCodeRuntime(invoker=_inspecting_invoker).run(_package())  # no workspace_source
+    assert capture["present"] is None  # nothing seeded — a fresh workspace
+
+
+def test_live_invoker_passes_accept_edits_permission_mode(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    import runtime.integrations as integ
+
+    captured: dict[str, list[str]] = {}
+
+    class _Proc:
+        stdout = _TRANSCRIPT
+
+    def _fake_run(cmd, **kwargs):  # type: ignore[no-untyped-def]
+        captured["cmd"] = cmd
+        return _Proc()
+
+    monkeypatch.setattr(integ.subprocess, "run", _fake_run)
+    invoker = integ.claude_cli_invoker(_package())
+    invoker(SessionSpec(Path("/tmp"), "p", ("Write",), (), 60))
+    assert "--permission-mode" in captured["cmd"]
+    assert "acceptEdits" in captured["cmd"]
+
+
 # ---- plugs into the dispatcher (it IS an AgentRuntime) --------------------
 
 
