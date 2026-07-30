@@ -365,6 +365,40 @@ def _calibrate(canary_dir: str) -> int:
     return 0 if report.passed else 3
 
 
+def _amend(proposal_path: str, *, keys_path: str, cas_dir: str) -> int:
+    """Prepare an amendment for the human ratification gate. Applies NOTHING (§7.4).
+
+    Exit: 0 AWAITING_RATIFICATION (ready for founder sign-off) · 4 NOT_AN_AMENDMENT (use soft loop)
+    · 5 ADVERSARY_INCOMPLETE (not ready)."""
+    from kernel.cas import CAS, FilesystemCasStore
+    from kernel.keystore import load_or_create_signing_key
+    from runtime.amendment import AmendmentStatus, parse_proposal, prepare_amendment
+    from runtime.integrations import ClaudeCodeRuntime
+
+    proposal = parse_proposal(json.loads(Path(proposal_path).read_text(encoding="utf-8")))
+    packet = prepare_amendment(
+        proposal,
+        signing_key=load_or_create_signing_key(keys_path),
+        cas=CAS(FilesystemCasStore(Path(cas_dir))),
+        adversary_runtime=ClaudeCodeRuntime(),  # LIVE — the isolated ratification adversary
+    )
+    _print(
+        {
+            "proposal": packet.proposal.proposal_id,
+            "classification": packet.classification,
+            "status": packet.status.value,
+            "applied": packet.applied,  # always False — the runtime never amends the TCB
+            "adversary_trace": packet.adversary_trace_ref,
+            "detail": packet.detail,
+        }
+    )
+    return {
+        AmendmentStatus.AWAITING_RATIFICATION: 0,
+        AmendmentStatus.NOT_AN_AMENDMENT: 4,
+        AmendmentStatus.ADVERSARY_INCOMPLETE: 5,
+    }[packet.status]
+
+
 def _self_host(backlog_path: str, *, db_path: str, keys_path: str, canary_dir: str) -> int:
     """Run a backlog through the LIVE soft loop (real claude sessions — needs auth + env)."""
     from kernel.cas import (
@@ -419,12 +453,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     sh.add_argument("--canaries", default="constitution/canaries", help="canary dir (tripwire)")
     cal = sub.add_parser("calibrate", help="run the standing canary calibration (FR-2 tripwire)")
     cal.add_argument("--canaries", default="constitution/canaries", help="canary directory")
+    am = sub.add_parser("amend", help="prepare a constitutional amendment for the human gate")
+    am.add_argument("proposal", help="path to a JSON amendment proposal")
+    am.add_argument("--keys", default="ops/keys/kernel_ed25519.key", help="kernel signing key path")
+    am.add_argument("--cas", default="ops/state/cas", help="CAS directory for the diff + review")
     args = parser.parse_args(argv)
     if args.command == "demo":
         run_demo()
         return 0
     if args.command == "calibrate":
         return _calibrate(args.canaries)
+    if args.command == "amend":
+        return _amend(args.proposal, keys_path=args.keys, cas_dir=args.cas)
     if args.command == "self-host":
         return _self_host(
             args.backlog, db_path=args.db, keys_path=args.keys, canary_dir=args.canaries
