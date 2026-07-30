@@ -52,3 +52,9 @@ amendment may change constitutional law.
   inline scar; B2.F `EvolutionLayer`) both own the remand→scar write with incompatible recurrence
   semantics. Recommends Option A (Evolution Layer owns stage 17) as a **separate** follow-on task.
   **Not implemented** — B2.F ships on ratified behaviour only.
+- `PAEOS-IP-0005.md` — Ownership of institutional-memory *creation*: a first-principles derivation
+  (founder-directed analysis). Status: **awaiting founder ratification**. Derives, from CER-1..6 +
+  FR-3/4/5/6 + the 19-stage lifecycle, that memory creation is a three-owner act — *trigger*
+  (kernel/Court), *authoring* (Evolution Layer, stages 15→17), *commit* (kernel, G-Memory 17) — and
+  that detection stages (11/12) may emit triggers only. Generalises IP-0004; diverges from the
+  current inline-scar implementation. **Not implemented.**
