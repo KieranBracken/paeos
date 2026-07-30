@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from enum import Enum
 
@@ -36,7 +36,7 @@ from runtime.review import InformationBarrierManager, ReviewHarness
 from runtime.task_package import Budget
 from runtime.triage import BudgetExceeded, GoalBudget, triage
 
-__all__ = ["RunOutcome", "RunStatus", "SoftLoop"]
+__all__ = ["Intake", "RunOutcome", "RunStatus", "SelfHostRunner", "SoftLoop"]
 
 GOAL_CREATED = "goal_created"
 
@@ -82,6 +82,11 @@ class SoftLoop:
         self._review = ReviewHarness(self._ibm, dispatcher)
         self._scars = scar_store if scar_store is not None else ScarStore()
         self._seal = SealAuthority(signing_key, ledger)
+
+    @property
+    def scar_store(self) -> ScarStore:
+        """The shared scar store — scars written across runs accumulate here (self-improvement)."""
+        return self._scars
 
     def _now(self) -> int:
         head = self._ledger.head()
@@ -196,3 +201,48 @@ def _canonical(verdict: Verdict) -> str:
         sort_keys=True,
         separators=(",", ":"),
     )
+
+
+@dataclass(frozen=True, slots=True)
+class Intake:
+    """One backlog item — the intake a self-hosting run consumes."""
+
+    objective: str
+    changed_paths: tuple[str, ...]
+    plan_write_scopes: tuple[str, ...]
+    builder_evidence: tuple[Evidence, ...]
+    goal_signature: str = ""
+    verifiable: bool = True
+    reversible: bool = True
+
+
+class SelfHostRunner:
+    """Pulls goals from a backlog and runs each through one shared `SoftLoop` (§12 R3→R4).
+
+    The loop is shared, so **scars accumulate across runs** and the ledger records every run — the
+    soft-loop self-improvement the R3→R4 rung requires. A live run uses a live `AgentRuntime`; the
+    composition (and the learning across runs) is the same either way.
+    """
+
+    def __init__(self, loop: SoftLoop) -> None:
+        self._loop = loop
+
+    @property
+    def scar_store(self) -> ScarStore:
+        return self._loop.scar_store
+
+    def run_backlog(self, backlog: Iterable[Intake]) -> list[RunOutcome]:
+        outcomes: list[RunOutcome] = []
+        for intake in backlog:
+            outcomes.append(
+                self._loop.run(
+                    objective=intake.objective,
+                    changed_paths=intake.changed_paths,
+                    plan_write_scopes=intake.plan_write_scopes,
+                    builder_evidence=intake.builder_evidence,
+                    goal_signature=intake.goal_signature,
+                    verifiable=intake.verifiable,
+                    reversible=intake.reversible,
+                )
+            )
+        return outcomes
