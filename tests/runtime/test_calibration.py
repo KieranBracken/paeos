@@ -62,3 +62,22 @@ def test_calibrate_cli_quarantines_empty_dir(tmp_path: Path) -> None:
     from cli.paeos import main
 
     assert main(["calibrate", "--canaries", str(tmp_path)]) == 3
+
+
+def test_vacuous_evidence_canary_is_caught() -> None:
+    # B2.O-min / CANARY-0002: a bare-echo command exercises nothing → caught as non-probative
+    from kernel.canary import load_canaries
+
+    vac = [c for c in load_canaries(_CANARY_DIR) if c.category == "vacuous-evidence"]
+    assert vac, "CANARY-0002 (vacuous-evidence) should be present in the corpus"
+    assert court_detector(vac[0]) is True
+
+
+def test_probative_command_is_not_flagged_vacuous() -> None:
+    from kernel.canary import Canary
+
+    probative = Canary(
+        id="X", category="vacuous-evidence", description="", expected="CAUGHT",
+        detection_signature="", artifact={"reproducible_command": 'python -c "import runtime"'},
+    )
+    assert court_detector(probative) is False  # a code-invoking command is probative, not vacuous

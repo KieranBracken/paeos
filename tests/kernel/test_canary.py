@@ -64,8 +64,8 @@ def _blind_detector(_canary: Canary) -> bool:
 
 def test_seed_canary_loads_with_expected_fields() -> None:
     canaries = load_canaries(_CANARY_DIR)
-    assert [c.id for c in canaries] == ["CANARY-0001"]
-    seed = canaries[0]
+    assert "CANARY-0001" in [c.id for c in canaries]
+    seed = next(c for c in canaries if c.id == "CANARY-0001")
     assert seed.category == "forged-evidence"
     assert seed.expected == "CAUGHT"
     assert seed.detection_signature
@@ -92,7 +92,9 @@ def test_blind_detector_misses_and_harness_records_it() -> None:
 
 
 def test_calibration_runs_over_all_canaries() -> None:
-    canaries = load_canaries(_CANARY_DIR)
+    # the kernel harness with the forged-evidence detector: scoped to forged canaries (the
+    # vacuous-evidence class, CANARY-0002, is caught by the runtime court_detector)
+    canaries = [c for c in load_canaries(_CANARY_DIR) if c.category == "forged-evidence"]
     results = run_calibration(canaries, _forged_evidence_detector)
-    assert len(results) == len(canaries)
-    assert all(r.passed for r in results)  # every seed canary is caught by the correct detector
+    assert len(results) == len(canaries) >= 1
+    assert all(r.passed for r in results)  # every forged-evidence canary is caught

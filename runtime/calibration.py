@@ -40,8 +40,13 @@ __all__ = [
 
 CANARY_DIR_DEFAULT = Path("constitution/canaries")
 _FORGED_EVIDENCE = "forged-evidence"
+_VACUOUS_EVIDENCE = "vacuous-evidence"
 # A placeholder artifact hash: the Court reproduces the canary's *command*, not any artifact bytes.
 _CANARY_ART = "a" * 64
+# A command that invokes one of these actually *executes* the artifact under review; a command with
+# none (a bare literal `echo`) exercises nothing — non-probative (CANARY-0002, IP from the R4
+# Adversary). The full with/without-artifact discrimination detector is the follow-on B2.O.
+_CODE_INVOCATION_TOKENS = ("python", "pytest", "node", "ruby", "import ", "-m ", "uv run", "make ")
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,8 +68,16 @@ class CalibrationReport:
 
 
 def court_detector(canary: Canary) -> bool:
-    """A live detector: reconstruct the canary's known-bad artifact and run it through a real
-    `Court` (which re-runs the command in the DEBT-0005 sandbox). Caught iff the court REMANDS."""
+    """A live detector: reconstruct the canary's known-bad artifact and check the right control
+    catches it. `forged-evidence` (CANARY-0001) is caught by the Court's deterministic re-run;
+    `vacuous-evidence` (CANARY-0002) is caught by the probative check — a command that executes no
+    interpreter/test exercises nothing (zero discriminating power)."""
+    if canary.category == _VACUOUS_EVIDENCE:
+        command = canary.artifact.get("reproducible_command")
+        if not isinstance(command, str):
+            return False
+        # caught iff non-probative (executes no interpreter/test)
+        return not any(tok in command for tok in _CODE_INVOCATION_TOKENS)
     if canary.category != _FORGED_EVIDENCE:
         return False  # fail-safe: an un-exercisable planted canary is a miss (alarm)
     command = canary.artifact.get("reproducible_command")
