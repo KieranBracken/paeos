@@ -138,6 +138,35 @@ def test_court_remand_produces_l1_note_and_writes_no_scar() -> None:
     assert scar_store.match_scars("stage:VERIFY,kind:court-remand,goal:x") == []
 
 
+# ---- B2.P: autonomous evidence from the court pool (agent-submitted) ---------
+
+
+def test_autonomous_evidence_from_the_court_pool_seals() -> None:
+    from runtime.orchestrator import CourtEvidencePool
+
+    pool = CourtEvidencePool()
+    for ev in _GOOD_EVIDENCE:  # the Builder "submits" its own evidence (via the court MCP)
+        pool.submit("r-1", ev)
+    outcome = _loop(ScriptedRuntime(_writes())).run(
+        objective="x", changed_paths=("runtime/f.py",), plan_write_scopes=("runtime/feature.py",),
+        builder_evidence=(),  # NONE pre-declared — it comes from the court pool
+        evidence_source=pool.evidence_for,
+    )
+    assert outcome.status is RunStatus.SEALED  # sealed on the agent's own submitted evidence
+
+
+def test_no_submitted_evidence_remands() -> None:
+    from runtime.orchestrator import CourtEvidencePool
+
+    pool = CourtEvidencePool()  # the agent submitted nothing
+    outcome = _loop(ScriptedRuntime(_writes())).run(
+        objective="x", changed_paths=("runtime/f.py",), plan_write_scopes=("runtime/feature.py",),
+        builder_evidence=(), evidence_source=pool.evidence_for,
+    )
+    assert outcome.status is RunStatus.REMANDED
+    assert "no evidence" in outcome.detail
+
+
 # ---- B2.O: vacuous (non-probative) evidence is remanded when verified --------
 
 

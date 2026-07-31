@@ -48,9 +48,32 @@ from runtime.verification import (
     workspace_runner,
 )
 
-__all__ = ["Intake", "RunOutcome", "RunStatus", "SelfHostRunner", "SoftLoop"]
+__all__ = [
+    "CourtEvidencePool",
+    "Intake",
+    "RunOutcome",
+    "RunStatus",
+    "SelfHostRunner",
+    "SoftLoop",
+]
 
 GOAL_CREATED = "goal_created"
+
+
+class CourtEvidencePool:
+    """The autonomous evidence source (B2.P, toward R5): evidence the Builder **submits per run**,
+    replacing the pre-declared backlog. In deployment the live Builder submits via the `CourtServer`
+    MCP (`mcp:court:write`); this pool records submissions by `run_id` and the `SoftLoop` pulls what
+    was submitted for its run — so the agent produces its own evidence, never authored for it."""
+
+    def __init__(self) -> None:
+        self._by_run: dict[str, list[Evidence]] = {}
+
+    def submit(self, run_id: str, evidence: Evidence) -> None:
+        self._by_run.setdefault(run_id, []).append(evidence)
+
+    def evidence_for(self, run_id: str) -> tuple[Evidence, ...]:
+        return tuple(self._by_run.get(run_id, ()))
 
 
 class RunStatus(Enum):
@@ -123,6 +146,7 @@ class SoftLoop:
         reversible: bool = True,
         goal_signature: str = "",
         run_id: str = "r-1",
+        evidence_source: Callable[[str], tuple[Evidence, ...]] | None = None,
     ) -> RunOutcome:
         decision = triage(
             changed_paths=changed_paths,
@@ -170,6 +194,16 @@ class SoftLoop:
             artifact = build.artifacts[0]
         except BudgetExceeded as exc:
             return RunOutcome(RunStatus.HALTED, goal_id, f"budget breach: {exc}")
+
+        # Autonomous evidence (B2.P, toward R5): pull the evidence the Builder SUBMITTED for this
+        # run (via the court MCP) instead of the pre-declared backlog. Empty ⇒ REMAND — the agent
+        # must produce its own probative evidence, not have it authored for it.
+        if evidence_source is not None:
+            builder_evidence = evidence_source(run_id)
+            if not builder_evidence:
+                return RunOutcome(
+                    RunStatus.REMANDED, goal_id, "no evidence submitted to the court for this run"
+                )
 
         # Live evidence binding (R4): bind the declared evidence to the artifact the builder
         # ACTUALLY produced, so a live, novel artifact is adjudicable (its hash is unknowable when
