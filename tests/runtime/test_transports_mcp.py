@@ -16,7 +16,8 @@ from kernel.constitution import Constitution
 from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
 from kernel.ledger import Event, InMemoryLedgerStore, Ledger
 from kernel.types import Role, StageId
-from mcp.servers import (
+from nacl.signing import SigningKey
+from runtime.transports.mcp.servers import (
     ArtifactsServer,
     ConstitutionServer,
     CourtServer,
@@ -24,7 +25,6 @@ from mcp.servers import (
     MemoryServer,
     Unauthorized,
 )
-from nacl.signing import SigningKey
 
 _NOW = 20  # within [issued=10, expires=40]
 
