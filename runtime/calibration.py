@@ -43,9 +43,11 @@ _FORGED_EVIDENCE = "forged-evidence"
 _VACUOUS_EVIDENCE = "vacuous-evidence"
 # A placeholder artifact hash: the Court reproduces the canary's *command*, not any artifact bytes.
 _CANARY_ART = "a" * 64
-# A command that invokes one of these actually *executes* the artifact under review; a command with
-# none (a bare literal `echo`) exercises nothing — non-probative (CANARY-0002, IP from the R4
-# Adversary). The full with/without-artifact discrimination detector is the follow-on B2.O.
+# B2.Q AUDIT (unify-onto-vacuous_commands attempted, FALSIFIED): the runtime B2.O gate discriminates
+# against the **real** artifact-under-review; a *calibration* canary has none, so a synthetic-change
+# discrimination over-flags (any command that ignores the synthetic file reads as "vacuous", incl.
+# genuinely probative ones). The calibration proxy therefore stays a *shape* check: evidence that
+# invokes no interpreter/test exercises nothing. The two detect the same defect at different layers.
 _CODE_INVOCATION_TOKENS = ("python", "pytest", "node", "ruby", "import ", "-m ", "uv run", "make ")
 
 
@@ -76,7 +78,9 @@ def court_detector(canary: Canary) -> bool:
         command = canary.artifact.get("reproducible_command")
         if not isinstance(command, str):
             return False
-        # caught iff non-probative (executes no interpreter/test)
+        # caught iff non-probative (executes no interpreter/test) — a shape proxy; the real
+        # discrimination gate (B2.O `vacuous_commands`) lives in the SoftLoop where a real artifact
+        # exists to test against. See the B2.Q audit note above.
         return not any(tok in command for tok in _CODE_INVOCATION_TOKENS)
     if canary.category != _FORGED_EVIDENCE:
         return False  # fail-safe: an un-exercisable planted canary is a miss (alarm)

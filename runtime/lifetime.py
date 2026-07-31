@@ -110,7 +110,10 @@ def classify_type(type_name: str) -> LifetimeClass:
 # constitutional transitions, e.g. L1 -> L3 Scar via Stage 17 Evolution").
 _PROMOTIONS: dict[tuple[LifetimeClass, LifetimeClass], StageId] = {
     (LifetimeClass.L1, LifetimeClass.L3): StageId.MEMORY_UPDATE,  # ephemeral -> institutional
-    (LifetimeClass.L5, LifetimeClass.L3): StageId.MEMORY_UPDATE,  # ledger evidence -> scar
+    # B2.Q audit (the live R4 Adversary flagged this): a former (L5 -> L3) entry was REMOVED. A scar
+    # is *authored from* the run's L1 context at Stage 17 (the L5 ledger evidence is a referenced
+    # input, immutable and unpromoted) — so the only promotion is L1 -> L3. Framing "derive a scar
+    # from immutable evidence" as an L5 -> L3 *promotion* was a category confusion (IP-0006 §5).
 }
 
 

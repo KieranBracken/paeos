@@ -50,3 +50,6 @@ def test_unsanctioned_promotions_are_denied_by_default() -> None:
     # no L3->L5, no L0->L3, etc.
     assert may_promote(LifetimeClass.L3, LifetimeClass.L5, via_stage=StageId.SEAL) is False
     assert may_promote(LifetimeClass.L0, LifetimeClass.L3, via_stage=StageId.MEMORY_UPDATE) is False
+    # B2.Q audit: the L5->L3 entry was removed — a scar is authored from the run's L1 context, not
+    # "promoted" from immutable ledger evidence (that was a category confusion).
+    assert may_promote(LifetimeClass.L5, LifetimeClass.L3, via_stage=StageId.MEMORY_UPDATE) is False
