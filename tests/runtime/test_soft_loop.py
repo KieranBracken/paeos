@@ -326,3 +326,22 @@ def test_budget_breach_halts_the_run() -> None:
         plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
     )
     assert outcome.status is RunStatus.HALTED  # design (1000) + plan (1000) > 1500
+
+
+def test_file_court_evidence_pool_roundtrips(tmp_path: object) -> None:
+    # R5: the durable, cross-process evidence pool a live submitter writes and the loop reads
+    from pathlib import Path
+
+    from runtime.orchestrator import FileCourtEvidencePool
+
+    pool = FileCourtEvidencePool(Path(str(tmp_path)) / "court")
+    assert pool.evidence_for("r-1") == ()  # empty before any submission
+    for ev in _GOOD_EVIDENCE:
+        pool.submit("r-1", ev)
+    got = pool.evidence_for("r-1")
+    assert len(got) == len(_GOOD_EVIDENCE)
+    assert got[0].claim_id == _GOOD_EVIDENCE[0].claim_id
+    assert got[0].reproducible_command == _GOOD_EVIDENCE[0].reproducible_command
+    assert got[0].result == _GOOD_EVIDENCE[0].result
+    # a fresh pool over the same dir reads the durably-persisted submissions (cross-process)
+    assert len(FileCourtEvidencePool(Path(str(tmp_path)) / "court").evidence_for("r-1")) == 2

@@ -24,10 +24,10 @@ from pathlib import Path
 
 from kernel.capability import CapabilityBroker
 from kernel.cas import CAS
-from kernel.evidence import Evidence
-from kernel.ledger import Event, Ledger
+from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
+from kernel.ledger import Event, JsonValue, Ledger
 from kernel.seal import SealAuthority, SealRecord
-from kernel.types import ArtifactRef, Claim, StageId, WeightClass
+from kernel.types import ArtifactRef, Claim, Role, StageId, WeightClass
 from nacl.signing import SigningKey
 
 from runtime.agents import StagePlaybook
@@ -50,6 +50,7 @@ from runtime.verification import (
 
 __all__ = [
     "CourtEvidencePool",
+    "FileCourtEvidencePool",
     "Intake",
     "RunOutcome",
     "RunStatus",
@@ -58,6 +59,32 @@ __all__ = [
 ]
 
 GOAL_CREATED = "goal_created"
+
+
+class FileCourtEvidencePool:
+    """A **durable, cross-process** evidence pool (R5): the sink a live evidence submitter writes to
+    and the `SoftLoop` reads from, in separate processes. Evidence for a run lands in
+    `<dir>/<run_id>.jsonl` (one JSON evidence per line). This is the substrate a `CourtServer` MCP —
+    or a file-writing Builder session — binds to; the `SoftLoop` pulls via `evidence_for`."""
+
+    def __init__(self, directory: Path) -> None:
+        self._dir = Path(directory)
+        self._dir.mkdir(parents=True, exist_ok=True)
+
+    def _path(self, run_id: str) -> Path:
+        return self._dir / f"{run_id}.jsonl"
+
+    def submit(self, run_id: str, evidence: Evidence) -> None:
+        line = json.dumps(_evidence_to_json(evidence), sort_keys=True)
+        with self._path(run_id).open("a", encoding="utf-8") as fh:
+            fh.write(line + "\n")
+
+    def evidence_for(self, run_id: str) -> tuple[Evidence, ...]:
+        path = self._path(run_id)
+        if not path.is_file():
+            return ()
+        lines = [ln for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+        return tuple(_evidence_from_json(json.loads(ln)) for ln in lines)
 
 
 class CourtEvidencePool:
@@ -318,6 +345,41 @@ class SoftLoop:
             ).encode("ascii")
             refs.append(ArtifactRef(hash=self._cas.put(content), type="scar"))
         return tuple(refs)
+
+
+def _evidence_to_json(ev: Evidence) -> dict[str, JsonValue]:
+    """A round-trippable JSON view of an evidence (for the durable/cross-process pool, R5)."""
+    return {
+        "hash": ev.hash,
+        "kind": ev.kind.name,
+        "claim_id": ev.claim_id,
+        "artifact_hash": ev.artifact_hash,
+        "environment_hash": ev.environment_hash,
+        "reproducible_command": ev.reproducible_command,
+        "result": ev.result,
+        "producer_role": ev.producer.role.name,
+        "producer_session": ev.producer.session,
+        "determinism": ev.determinism.name,
+        "attestation": ev.attestation,
+    }
+
+
+def _evidence_from_json(d: Mapping[str, JsonValue]) -> Evidence:
+    command = d.get("reproducible_command")
+    return Evidence(
+        hash=str(d["hash"]),
+        kind=EvidenceKind[str(d["kind"])],
+        claim_id=str(d["claim_id"]),
+        artifact_hash=str(d["artifact_hash"]),
+        environment_hash=str(d["environment_hash"]),
+        reproducible_command=str(command) if isinstance(command, str) else None,
+        producer=EvidenceProducer(
+            role=Role[str(d["producer_role"])], session=str(d["producer_session"])
+        ),
+        determinism=Determinism[str(d["determinism"])],
+        result=d["result"],
+        attestation=str(d["attestation"]),
+    )
 
 
 def _serialize_evidence(ev: Evidence) -> bytes:
