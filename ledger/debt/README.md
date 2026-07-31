@@ -34,3 +34,19 @@ whose ideal solution requires a constitutional change SHOULD also file a Proposa
 ## Index
 
 - `DEBT-0001.md` — Provisional genesis parameters set without tournament evidence.
+- `DEBT-0002.md` — B0.0 Day-1 spawnability spike (RESOLVED).
+- `DEBT-0003.md` — Production persistence backend (SQLite built, Postgres deferred).
+- `DEBT-0004.md` — Constitutional corpus not yet populated; clause-id scheme not yet ratified.
+- `DEBT-0005.md` — Evidence reproduction runs without OS-level sandboxing.
+- `DEBT-0006.md` — Consolidate `SealAuthority` Index Under `Projector[SealRecord]`.
+- `DEBT-0007.md` — Dual TCB Prefix Definitions (`tcb_diff.py` vs `classifier.py`).
+- `DEBT-0008.md` — Live `AgentRuntime` CLI Invoker Deployment Seam.
+- `DEBT-0009.md` — Constitutional Amendment Hard-Loop Implemented in Runtime (Z2) Without Kernel (Z0/Z1) Gate or Ledger Persistence.
+- `DEBT-0010.md` — Duplicated Context Compilation Logic (`build_prompt` vs `compile_context`).
+- `DEBT-0011.md` — Evolution Engine Stage-17 Memory Update Bypasses Kernel Gate & Reference Monitor.
+- `DEBT-0012.md` — Silent Zero-Cost Fallback in CLI Output Parser (`ClaudeCodeRuntime`).
+- `DEBT-0013.md` — Standing Canary Calibration Category Hardcoding & Unratified Pre-Flight Gate.
+- `DEBT-0014.md` — Unenforced Ephemeral Memory Boundaries at CAS/Ledger Substrate Level.
+- `DEBT-0015.md` — Control Plane Duplication Between In-Memory CLI and Self-Host Drivers.
+- `DEBT-0016.md` — Physical Repository Tree Duplication in Probative Verification Workspace.
+- `DEBT-0017.md` — Ad-hoc Serialization of Evidence Bundles in Adversary Workspace Context.
