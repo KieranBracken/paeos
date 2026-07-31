@@ -63,6 +63,11 @@ amendment may change constitutional law.
   Promotion between classes only via verified transitions (L1→L3 via Stage 17). B2.G enforces the
   L1/L3 boundary; full per-artifact `lifetime_class` annotation is a follow-on conformance pass.
 - `PAEOS-IP-0007.md` — **security-critical**: the soft loop **seals despite a blocking adversarial
-  dissent** (FR-3 toothless), found via the live R4 runs. Status: **awaiting founder ratification**.
-  Recommends gating the seal on a machine-readable adversary verdict (REMAND on BLOCK) as **B2.K**;
-  companion gaps B2.J (materialise agent workspace context) + live-evidence flow. **Not implemented.**
+  dissent** (FR-3 toothless), found via the live R4 runs. Status: **RATIFIED BY FOUNDER** (2026-07-30,
+  Option A). Gated the seal on a machine-readable adversary verdict (REMAND on BLOCK) = **B2.K**;
+  companion **B2.J** (materialise agent workspace context) shipped.
+- `PAEOS-IP-0008.md` — **Architectural Invariants** as a first-class, CI-executed registry
+  (`architecture/invariants.yaml` + `ops/ci/invariants.py`): each invariant carries a runnable
+  verifier so CI *executes* architectural truth (runtime⊥MCP, single committer, read-only evidence
+  interface, adversary-PASS seal, probative evidence, F1/F2/F3 absorbed). Status: **awaiting founder
+  ratification**; implement after R5.1. Companion observation: name the Constitutional Evolution Loop.
