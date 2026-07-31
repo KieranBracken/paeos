@@ -132,12 +132,17 @@ class SoftLoop:
             # --- Planner: DESIGN then PLAN (matched scars injected, FR-6) ---
             # Stage context chains forward (B2.J): PLAN sees DESIGN, IMPLEMENT sees design + plan —
             # so the live Builder has a plan to implement against (it blocked without one).
+            # The goal objective is threaded into every stage (B2.L) so DESIGN designs FOR it, PLAN
+            # plans FOR it, and the Builder is told the specific change — without it each stage got
+            # only a generic role objective and the Builder had nothing concrete to implement.
+            goal_detail = f"Goal objective: {objective}"
             planner_artifacts: list[ArtifactRef] = []
             for stage in (StageId.DESIGN, StageId.PLAN):
                 scars = self._scar_refs(goal_signature, stage)
                 result = self._playbook.run_stage(
                     goal_id=goal_id, run_id=run_id, stage=stage, session="planner",
                     budget=decision.budget, scars=scars, context_refs=tuple(planner_artifacts),
+                    detail=goal_detail,
                 )
                 budget.charge(result.cost)
                 planner_artifacts.extend(result.artifacts)
@@ -146,7 +151,7 @@ class SoftLoop:
             build = self._playbook.run_stage(
                 goal_id=goal_id, run_id=run_id, stage=StageId.IMPLEMENT, session="builder",
                 budget=decision.budget, write_scopes=plan_write_scopes,
-                context_refs=tuple(planner_artifacts),
+                context_refs=tuple(planner_artifacts), detail=goal_detail,
             )
             budget.charge(build.cost)
             if not build.artifacts:
@@ -185,9 +190,11 @@ class SoftLoop:
             )
 
         # --- Isolated Adversary over the sealed bundle (B1.D / FR-3) ---
-        bundle = self._ibm.seal(
-            artifact_refs=(artifact,), evidence_refs=tuple(ev.hash for ev in builder_evidence)
-        )
+        # B2.M: store a serialized copy of each evidence in the CAS and reference THAT, so the
+        # adversary can actually read (and re-run) the evidence in its workspace — a bare evidence
+        # hash is not a CAS blob and materialises to nothing (the adversary blocked without it).
+        evidence_refs = tuple(self._cas.put(_serialize_evidence(ev)) for ev in builder_evidence)
+        bundle = self._ibm.seal(artifact_refs=(artifact,), evidence_refs=evidence_refs)
         try:
             adversary = self._review.review(
                 goal_id=goal_id, run_id=run_id, session="adversary", bundle=bundle,
@@ -230,6 +237,22 @@ class SoftLoop:
             ).encode("ascii")
             refs.append(ArtifactRef(hash=self._cas.put(content), type="scar"))
         return tuple(refs)
+
+
+def _serialize_evidence(ev: Evidence) -> bytes:
+    """A readable copy of an evidence for the adversary's workspace (B2.M) — the claim, the command
+    to re-run, the claimed result, and the artifact it binds to."""
+    return json.dumps(
+        {
+            "claim_id": ev.claim_id,
+            "kind": ev.kind.name,
+            "reproducible_command": ev.reproducible_command,
+            "result": ev.result,
+            "artifact_hash": ev.artifact_hash,
+        },
+        sort_keys=True,
+        indent=2,
+    ).encode("utf-8")
 
 
 def _canonical(verdict: Verdict) -> str:

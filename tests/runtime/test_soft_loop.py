@@ -192,6 +192,32 @@ def test_missing_adversary_report_fails_closed() -> None:
     assert outcome.status is RunStatus.REMANDED
 
 
+def test_goal_objective_is_threaded_into_every_stage() -> None:
+    # B2.L: DESIGN/PLAN/IMPLEMENT must each receive the goal objective, not just a generic role one
+    runtime = ScriptedRuntime(_writes())
+    _loop(runtime).run(
+        objective="ADD_SENTINEL_XYZ helper", changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    for stage in (StageId.DESIGN, StageId.PLAN, StageId.IMPLEMENT):
+        assert "ADD_SENTINEL_XYZ" in runtime.packages[stage].objective
+
+
+def test_adversary_receives_serialized_evidence() -> None:
+    # B2.M: the adversary's context carries readable, materialisable evidence (not a bare hash)
+    from runtime.orchestrator import _serialize_evidence
+
+    blob = _serialize_evidence(_GOOD_EVIDENCE[0])
+    assert b"reproducible_command" in blob and b"echo built" in blob
+    runtime = ScriptedRuntime(_writes())
+    _loop(runtime).run(
+        objective="x", changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    adv_pkg = runtime.packages[StageId.ADVERSARIAL_REVIEW]
+    assert any(ref.type == "evidence" for ref in adv_pkg.context_refs)
+
+
 def test_implement_receives_design_and_plan_as_context() -> None:
     # B2.J: design + plan chain forward so the Builder has a plan to implement against
     runtime = ScriptedRuntime(_writes())
