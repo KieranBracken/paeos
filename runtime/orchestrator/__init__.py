@@ -21,6 +21,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, replace
 from enum import Enum
 from pathlib import Path
+from typing import Protocol
 
 from kernel.capability import CapabilityBroker
 from kernel.cas import CAS
@@ -50,6 +51,7 @@ from runtime.verification import (
 
 __all__ = [
     "CourtEvidencePool",
+    "EvidenceSource",
     "FileCourtEvidencePool",
     "Intake",
     "RunOutcome",
@@ -59,6 +61,17 @@ __all__ = [
 ]
 
 GOAL_CREATED = "goal_created"
+
+
+class EvidenceSource(Protocol):
+    """The stable interface the runtime depends on for a run's evidence (CER-1 amendment).
+
+    The `SoftLoop` pulls a run's evidence through THIS and nothing else — it never imports or knows
+    about MCP. `CourtEvidencePool` (in-memory), `FileCourtEvidencePool` (durable, cross-process),
+    and a future MCP-backed source all satisfy it. **MCP is one transport *behind* this interface,
+    not a runtime dependency** — the invariant, now named and pyright-enforced."""
+
+    def evidence_for(self, run_id: str) -> tuple[Evidence, ...]: ...
 
 
 class FileCourtEvidencePool:
@@ -173,7 +186,7 @@ class SoftLoop:
         reversible: bool = True,
         goal_signature: str = "",
         run_id: str = "r-1",
-        evidence_source: Callable[[str], tuple[Evidence, ...]] | None = None,
+        evidence_source: EvidenceSource | None = None,
     ) -> RunOutcome:
         decision = triage(
             changed_paths=changed_paths,
@@ -226,7 +239,7 @@ class SoftLoop:
         # run (via the court MCP) instead of the pre-declared backlog. Empty ⇒ REMAND — the agent
         # must produce its own probative evidence, not have it authored for it.
         if evidence_source is not None:
-            builder_evidence = evidence_source(run_id)
+            builder_evidence = evidence_source.evidence_for(run_id)
             if not builder_evidence:
                 return RunOutcome(
                     RunStatus.REMANDED, goal_id, "no evidence submitted to the court for this run"
