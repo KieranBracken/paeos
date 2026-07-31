@@ -66,8 +66,7 @@ amendment may change constitutional law.
   dissent** (FR-3 toothless), found via the live R4 runs. Status: **RATIFIED BY FOUNDER** (2026-07-30,
   Option A). Gated the seal on a machine-readable adversary verdict (REMAND on BLOCK) = **B2.K**;
   companion **B2.J** (materialise agent workspace context) shipped.
-- `PAEOS-IP-0008.md` — **Architectural Invariants** as a first-class, CI-executed registry
-  (`architecture/invariants.yaml` + `ops/ci/invariants.py`): each invariant carries a runnable
-  verifier so CI *executes* architectural truth (runtime⊥MCP, single committer, read-only evidence
-  interface, adversary-PASS seal, probative evidence, F1/F2/F3 absorbed). Status: **awaiting founder
-  ratification**; implement after R5.1. Companion observation: name the Constitutional Evolution Loop.
+- `PAEOS-IP-0008.md` — Universal `WorkerTransport` Architecture & MCP Namespace Hygiene:
+  rename local `mcp/` to `runtime/transports/mcp/`; introduce vendor-agnostic `WorkerTransport` protocol;
+  sequence R5 into R5.1 (FileWorkerTransport), R5.2 (ClaudeCliWorkerTransport), and R5.3 (McpWorkerTransport).
+  Status: **RATIFIED BY FOUNDER** (2026-07-31).
