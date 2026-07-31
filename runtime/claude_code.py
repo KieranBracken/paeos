@@ -169,12 +169,15 @@ class AgentDispatcher:
         output = self._runtime.run(package)  # the scoped, DEBT-0002-validated spawn
 
         artifacts: list[ArtifactRef] = []
+        written_paths: list[tuple[str, str]] = []
         for write in output.writes:
             if not within_scopes(write.path, write_scopes):
                 raise ScopeViolation(
                     f"session wrote {write.path!r} outside its write_scopes {write_scopes}"
                 )
-            artifacts.append(ArtifactRef(hash=self._cas.put(write.content), type="artifact"))
+            artifact_hash = self._cas.put(write.content)
+            artifacts.append(ArtifactRef(hash=artifact_hash, type="artifact"))
+            written_paths.append((write.path, artifact_hash))  # keep the path for B2.N verification
 
         trace_ref = self._cas.put(output.trace)  # persist the full transcript (immutable, in CAS)
         return TaskResult(
@@ -184,4 +187,5 @@ class AgentDispatcher:
             evidence=output.evidence,
             trace_ref=trace_ref,
             cost=output.cost,
+            written_paths=tuple(written_paths),
         )

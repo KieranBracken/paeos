@@ -440,6 +440,8 @@ def _self_host(backlog_path: str, *, db_path: str, keys_path: str, canary_dir: s
         # constitution) and materialize injected context from the CAS (B2.I/B2.J); headless writes
         # auto-apply (acceptEdits).
         agent_runtime=ClaudeCodeRuntime(workspace_source=Path.cwd(), artifact_resolver=cas.get),
+        # B2.N: verify each reproducible_command against a workspace with the change applied.
+        repo_root=Path.cwd(),
     )
     _print(outcome_summary(outcomes))
     return 0 if all(o.status is RunStatus.SEALED for o in outcomes) else 2

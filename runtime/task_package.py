@@ -130,3 +130,6 @@ class TaskResult:
     evidence: tuple[EvidenceRef, ...]  # bound to artifact + environment (§6)
     trace_ref: Hash  # full agent I/O transcript (immutable; audit + self-improvement)
     cost: Cost = field(default_factory=lambda: Cost(0, 0.0, "unknown"))
+    # (repo-relative path, CAS hash) for each file the session wrote, so a verification workspace
+    # can apply the change at its real path and the court can test it probatively (B2.N).
+    written_paths: tuple[tuple[str, Hash], ...] = ()

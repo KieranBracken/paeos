@@ -18,6 +18,7 @@ via the court MCP (B2.B Observation 1) — the last live-integration refinement 
 from __future__ import annotations
 
 from collections.abc import Mapping
+from pathlib import Path
 
 from kernel.cas import CAS, content_hash
 from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
@@ -93,6 +94,7 @@ def run_backlog(
     cas: CAS,
     agent_runtime: AgentRuntime,
     budget_by_class: Mapping[WeightClass, Budget] | None = None,
+    repo_root: Path | None = None,
 ) -> list[RunOutcome]:
     """Run every intake through one shared soft loop; the Evolution Layer authors L3 memory.
 
@@ -109,6 +111,7 @@ def run_backlog(
         agent_runtime=agent_runtime,
         budget_by_class=budget_by_class if budget_by_class is not None else DEFAULT_BUDGETS,
         scar_store=scar_store,
+        repo_root=repo_root,
     )
     runner = SelfHostRunner(loop)
     evolution = EvolutionLayer(scar_store=scar_store)  # the sole L3 author (Stage 17)

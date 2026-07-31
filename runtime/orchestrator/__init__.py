@@ -15,10 +15,12 @@ Claude Agent SDK adapter implements it, tests script it. Nothing here can grant 
 from __future__ import annotations
 
 import json
+import shutil
 import uuid
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, replace
 from enum import Enum
+from pathlib import Path
 
 from kernel.capability import CapabilityBroker
 from kernel.cas import CAS
@@ -38,8 +40,9 @@ from runtime.review import (
     ReviewHarness,
     read_adversary_verdict,
 )
-from runtime.task_package import Budget, ExecutionContext
+from runtime.task_package import Budget, ExecutionContext, TaskResult
 from runtime.triage import BudgetExceeded, GoalBudget, triage
+from runtime.verification import build_verification_workspace, workspace_runner
 
 __all__ = ["Intake", "RunOutcome", "RunStatus", "SelfHostRunner", "SoftLoop"]
 
@@ -79,10 +82,14 @@ class SoftLoop:
         court: Court | None = None,
         scar_store: ScarStore | None = None,
         ibm: InformationBarrierManager | None = None,
+        repo_root: Path | None = None,
     ) -> None:
         self._ledger = ledger
         self._cas = cas
         self._budget_by_class = budget_by_class
+        # When set, the court verifies each reproducible_command against a workspace with the
+        # builder's change applied (B2.N) — so probative evidence can pass. None ⇒ injected court.
+        self._repo_root = repo_root
         broker = CapabilityBroker(signing_key)
         dispatcher = AgentDispatcher(broker, cas, agent_runtime, clock=self._now)
         self._playbook = StagePlaybook(dispatcher)
@@ -168,14 +175,19 @@ class SoftLoop:
             replace(ev, artifact_hash=artifact.hash) for ev in builder_evidence
         )
 
-        # --- Verification Court: reproduce every claim (B1.E) ---
-        for evidence in builder_evidence:
-            self._court.submit_evidence(evidence)
+        # --- Verification Court: reproduce every claim (B1.E). For a live run the command runs
+        # against a workspace with the change applied (B2.N), so probative evidence can pass. ---
         claims = tuple(
             Claim(id=ev.claim_id, statement="produced", evidence_refs=(ev.hash,))
             for ev in builder_evidence
         )
-        verdict = self._court.adjudicate(artifact.hash, claims)
+        court, cleanup = self._court_for_run(build)
+        try:
+            for evidence in builder_evidence:
+                court.submit_evidence(evidence)
+            verdict = court.adjudicate(artifact.hash, claims)
+        finally:
+            cleanup()
         if verdict.outcome is VerdictOutcome.REMAND:
             # L1/L3 boundary (IP-0005/0006, B2.G): the operational loop does NOT author or commit
             # an L3 scar — that is the Evolution Layer's Stage-17 authority. The loop records only
@@ -227,6 +239,18 @@ class SoftLoop:
             verdict_ref=verdict_ref, adversary_ref=adversary.trace_ref,
         )
         return RunOutcome(RunStatus.SEALED, goal_id, "sealed", seal=seal, verdict=verdict)
+
+    def _court_for_run(self, build: TaskResult) -> tuple[Court, Callable[[], None]]:
+        """The court to adjudicate this run's evidence (B2.N). For a live run (repo_root set + the
+        builder wrote files), verify commands against a workspace with the change applied — so
+        probative evidence passes; otherwise use the injected court. Returns (court, cleanup)."""
+        if self._repo_root is None or not build.written_paths:
+            return self._court, lambda: None
+        workspace = build_verification_workspace(self._repo_root, build.written_paths, self._cas)
+        return (
+            Court(runner=workspace_runner(workspace)),
+            lambda: shutil.rmtree(workspace, ignore_errors=True),
+        )
 
     def _scar_refs(self, goal_signature: str, stage: StageId) -> tuple[ArtifactRef, ...]:
         refs: list[ArtifactRef] = []
