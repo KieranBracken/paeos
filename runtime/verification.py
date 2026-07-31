@@ -27,7 +27,7 @@ from kernel.ledger import JsonValue
 from kernel.sandbox import run_sandboxed
 from kernel.types import Hash
 
-__all__ = ["build_verification_workspace", "workspace_runner"]
+__all__ = ["build_verification_workspace", "vacuous_commands", "workspace_runner"]
 
 _SKIP = {".git", ".venv", "__pycache__", ".ruff_cache", ".pytest_cache", ".mypy_cache"}
 _IGNORE = shutil.ignore_patterns(*_SKIP, "*.pyc")
@@ -52,6 +52,26 @@ def build_verification_workspace(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(cas.get(artifact_hash))
     return ws
+
+
+def vacuous_commands(
+    repo_root: Path,
+    written_paths: tuple[tuple[str, Hash], ...],
+    cas: CAS,
+    commands: tuple[str, ...],
+) -> tuple[str, ...]:
+    """The **vacuous** commands (B2.O): those whose sandboxed result is **identical** whether the
+    builder's change is applied or not — zero discriminating power, so they prove nothing about the
+    change (the defect the live Adversary caught, now mechanised). Runs each command in a workspace
+    *with* the change and a baseline *without* it, once each."""
+    with_change = build_verification_workspace(repo_root, written_paths, cas)
+    baseline = build_verification_workspace(repo_root, (), cas)
+    try:
+        run_with, run_without = workspace_runner(with_change), workspace_runner(baseline)
+        return tuple(c for c in commands if run_with(c) == run_without(c))
+    finally:
+        shutil.rmtree(with_change, ignore_errors=True)
+        shutil.rmtree(baseline, ignore_errors=True)
 
 
 def workspace_runner(workspace: Path) -> Callable[[str], dict[str, JsonValue]]:

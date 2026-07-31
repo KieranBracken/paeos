@@ -42,7 +42,11 @@ from runtime.review import (
 )
 from runtime.task_package import Budget, ExecutionContext, TaskResult
 from runtime.triage import BudgetExceeded, GoalBudget, triage
-from runtime.verification import build_verification_workspace, workspace_runner
+from runtime.verification import (
+    build_verification_workspace,
+    vacuous_commands,
+    workspace_runner,
+)
 
 __all__ = ["Intake", "RunOutcome", "RunStatus", "SelfHostRunner", "SoftLoop"]
 
@@ -200,6 +204,25 @@ class SoftLoop:
                 RunStatus.REMANDED, goal_id, "court remanded",
                 verdict=verdict, ephemeral_context=context,
             )
+
+        # --- Probative-evidence gate (B2.O / CANARY-0002): even a reproducing command must
+        # DISCRIMINATE — its result must differ with the change vs without. Vacuous (non-probative)
+        # evidence remands, mechanising the vacuous-evidence defect the live Adversary caught. ---
+        if self._repo_root is not None:
+            commands = tuple(
+                ev.reproducible_command for ev in builder_evidence if ev.reproducible_command
+            )
+            vacuous = vacuous_commands(self._repo_root, build.written_paths, self._cas, commands)
+            if vacuous:
+                context = ExecutionContext(
+                    retry_hints=("evidence must exercise the change — a command with the same "
+                                 "result with and without it proves nothing; supply a real test",),
+                    diagnostics=(f"non-probative (vacuous) evidence: {vacuous}",),
+                )
+                return RunOutcome(
+                    RunStatus.REMANDED, goal_id, "non-probative (vacuous) evidence",
+                    verdict=verdict, ephemeral_context=context,
+                )
 
         # --- Isolated Adversary over the sealed bundle (B1.D / FR-3) ---
         # B2.M: store a serialized copy of each evidence in the CAS and reference THAT, so the

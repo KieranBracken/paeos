@@ -138,6 +138,31 @@ def test_court_remand_produces_l1_note_and_writes_no_scar() -> None:
     assert scar_store.match_scars("stage:VERIFY,kind:court-remand,goal:x") == []
 
 
+# ---- B2.O: vacuous (non-probative) evidence is remanded when verified --------
+
+
+def test_vacuous_evidence_remands_under_verification(tmp_path: object) -> None:
+    from pathlib import Path
+
+    from kernel.ledger import InMemoryLedgerStore, Ledger
+
+    # a verification repo whose file the builder "changes"; the echo evidence is non-discriminating
+    repo = Path(str(tmp_path)) / "repo"
+    (repo / "runtime").mkdir(parents=True)
+    (repo / "runtime" / "feature.py").write_text("old\n")
+    loop = SoftLoop(
+        ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
+        cas=CAS(InMemoryCasStore()), agent_runtime=ScriptedRuntime(_writes()),
+        budget_by_class=_BUDGETS, repo_root=repo,
+    )
+    outcome = loop.run(
+        objective="x", changed_paths=("runtime/feature.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    assert outcome.status is RunStatus.REMANDED  # echo evidence proves nothing about the change
+    assert "vacuous" in outcome.detail
+
+
 # ---- live evidence binding: evidence binds to the produced artifact (R4) ---
 
 

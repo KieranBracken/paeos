@@ -11,7 +11,24 @@ import shutil
 from pathlib import Path
 
 from kernel.cas import CAS, InMemoryCasStore
-from runtime.verification import build_verification_workspace, workspace_runner
+from runtime.verification import (
+    build_verification_workspace,
+    vacuous_commands,
+    workspace_runner,
+)
+
+
+def test_vacuous_commands_flags_non_discriminating(tmp_path: Path) -> None:
+    # B2.O: a command whose result is the same with/without the change is vacuous; one that
+    # observes the change is probative.
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "marker.txt").write_text("ABSENT\n")
+    cas = CAS(InMemoryCasStore())
+    written = (("marker.txt", cas.put(b"PRESENT\n")),)
+    vac = vacuous_commands(repo, written, cas, ("echo hi", "cat marker.txt"))
+    assert "echo hi" in vac  # same output regardless of the change → vacuous
+    assert "cat marker.txt" not in vac  # reads the change → probative
 
 
 def test_workspace_applies_the_change_over_the_repo(tmp_path: Path) -> None:
