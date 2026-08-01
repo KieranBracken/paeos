@@ -1,6 +1,6 @@
 # PAEOS-IP-0010 — Architectural Invariants as a first-class, CI-executed registry
 
-Status: **AWAITING FOUNDER** · Filed: 2026-07-31 (re-filed 2026-08-01) · Channel: CER-2
+Status: **RATIFIED BY FOUNDER** (2026-08-01) · Filed: 2026-07-31 (re-filed 2026-08-01) · Channel: CER-2
 Level: **operational / execution-architecture** (adds an artifact + CI step; no kernel amendment).
 Supersedes: none. Renumbering note: originally filed as IP-0008; renumbered to **IP-0010** after the
 number was re-used for the ratified *Universal WorkerTransport Architecture* proposal.

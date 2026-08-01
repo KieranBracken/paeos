@@ -73,11 +73,11 @@ amendment may change constitutional law.
 - `PAEOS-IP-0009.md` — Name the **Constitutional Evolution Loop** (build → CER-1 falsify → proposal →
   ratify → refine → re-enter): a *second lifecycle* distinct from the 19-stage goal-execution lifecycle,
   governing how PAEOS's own architecture/constitution evolves. Source: Phase-3 architectural review.
-  Status: **awaiting founder ratification**. Architectural clarification — **invents no mechanism**
+  Status: **RATIFIED BY FOUNDER** (2026-08-01). Architectural clarification — **invents no mechanism**
   (CER-6). Supersedes none.
 - `PAEOS-IP-0010.md` — **Architectural Invariants** as a first-class, CI-executed registry
   (`architecture/invariants.yaml` + `ops/ci/invariants.py`); each invariant carries a runnable verifier
   so CI *executes* architectural truth (AI-001 runtime⊥MCP, AI-002 single committer, AI-003 read-only
   evidence, AI-004 adversary-PASS seal, AI-005 probative evidence, F1/F2/F3 absorbed, + AI-010 Port
-  Independence & AI-011 Least-Privilege Interface from the Phase-3 review). Status: **awaiting founder
-  ratification** (re-filed from the original IP-0008 after that number was re-used for WorkerTransport).
+  Independence & AI-011 Least-Privilege Interface from the Phase-3 review). Status: **RATIFIED BY
+  FOUNDER** (2026-08-01) (re-filed from the original IP-0008 after that number was re-used for WorkerTransport).

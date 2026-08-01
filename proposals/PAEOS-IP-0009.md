@@ -1,6 +1,6 @@
 # PAEOS-IP-0009 — Name the Constitutional Evolution Loop (a second lifecycle)
 
-Status: **AWAITING FOUNDER** · Filed: 2026-08-01 · Channel: CER-2
+Status: **RATIFIED BY FOUNDER** (2026-08-01) · Filed: 2026-08-01 · Channel: CER-2
 Level: **architectural clarification** (names an existing process; **invents no mechanism** — CER-6).
 Source finding: the Phase-3 architectural review (`reviews/phase3_architectural_review.md`, Phase 4).
 Supersedes: none. Companion to: IP-0010 §6 (the invariants registry, which recommended this proposal;
