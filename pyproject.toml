@@ -5,6 +5,7 @@ description = "PAEOS runtime — the constitutional engineering operating system
 requires-python = ">=3.12"
 # Runtime deps land with the tasks that need them (B0.1+). B0.0 is skeleton + toolchain only.
 dependencies = [
+    "mcp>=2.0.0",
     "pynacl>=1.6.2",
     "structlog>=26.1.0",
 ]
