@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from kernel.cas import CasMiss
-from kernel.types import ArtifactRef, Hash
+from kernel.types import ArtifactRef, Hash, Role
 
 from runtime.claude_code import AgentWrite, RunOutput, within_scopes
 from runtime.task_package import Cost, TaskPackage, TaskStatus
@@ -92,6 +92,21 @@ def build_prompt(package: TaskPackage) -> str:
         "# Forbidden (documented intent; enforced by capability):",
         *[f"  - {item}" for item in package.forbidden],
     ]
+    # The court is the BUILDER's channel to submit probative evidence about the artifact it
+    # produces (R5.3). Planner stages produce artifacts adjudicated by their own stage gates, not
+    # the court pool — so only the Builder is told to submit, and only the Builder gets the tool.
+    if package.role is Role.BUILDER:
+        lines += [
+            "",
+            "# Submitting evidence to the court (autonomous, R5.3):",
+            f"  Your run_id is EXACTLY: {package.run_id}",
+            "  After you write the artifact, call the MCP tool `submit_evidence` once per required",
+            "  claim above. Pass: run_id (exactly the run_id above), claim_id, command (a REAL,",
+            "  PROBATIVE shell command whose result would DIFFER if your change were absent, run",
+            "  against ONLY the file(s) you wrote), artifact_hash (sha256 of the file you wrote),",
+            "  exit_code, and stdout. Vacuous evidence that does not discriminate your change from",
+            "  its absence will be rejected by the court.",
+        ]
     return "\n".join(lines)
 
 
@@ -102,11 +117,16 @@ def _allowed_tools(package: TaskPackage) -> tuple[str, ...]:
     return tuple(tools)
 
 
-def claude_cli_invoker(package: TaskPackage) -> CliInvoker:
+def claude_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = None) -> CliInvoker:
     """The real invoker: run the `claude` CLI headless in the workspace. Needs auth + the target env
-    (so it is not exercised by unit tests). Kept as a factory so the model/flags can be tuned."""
+    (so it is not exercised by unit tests). Kept as a factory so the model/flags can be tuned. When
+    `mcp_config_path` is given, the session gets `--mcp-config` so it can call the court MCP tool
+    (autonomous evidence submission, R5.3)."""
 
     def _invoke(spec: SessionSpec) -> SessionResult:
+        allowed = list(spec.allowed_tools)
+        if mcp_config_path is not None:
+            allowed.append("mcp__paeos-court__submit_evidence")  # autonomous evidence tool (R5.3)
         cmd = [
             "claude",
             "-p",
@@ -114,7 +134,7 @@ def claude_cli_invoker(package: TaskPackage) -> CliInvoker:
             "--output-format",
             "json",
             "--allowedTools",
-            ",".join(spec.allowed_tools),
+            ",".join(allowed),
             # Headless sessions cannot answer interactive prompts, so writes need an auto-accept
             # mode to land. `acceptEdits` (not the blanket `--dangerously-skip-permissions`) auto-
             # applies edits, and the blast radius is already bounded: an isolated temp workspace +
@@ -122,6 +142,8 @@ def claude_cli_invoker(package: TaskPackage) -> CliInvoker:
             "--permission-mode",
             "acceptEdits",
         ]
+        if mcp_config_path is not None:
+            cmd += ["--mcp-config", str(mcp_config_path)]
         proc = subprocess.run(
             cmd,
             cwd=str(spec.workspace),
@@ -145,9 +167,11 @@ class ClaudeCodeRuntime:
         workspace_root: Path | None = None,
         workspace_source: Path | None = None,
         artifact_resolver: Callable[[Hash], bytes] | None = None,
+        mcp_config_path: Path | None = None,
         default_model: str = "claude-code",
     ) -> None:
         self._invoker = invoker  # None ⇒ built per-package from claude_cli_invoker at run()
+        self._mcp_config_path = mcp_config_path  # --mcp-config for live sessions (autonomous, R5.3)
         self._workspace_root = workspace_root
         # Repo root to seed each session's workspace from, so an *edit* objective has the current
         # file content to modify (B2.I) and the constitution to cite (B2.J). None ⇒ empty workspace.
@@ -175,7 +199,14 @@ class ClaudeCodeRuntime:
                 read_scopes=package.permissions.read_scopes,
                 timeout_s=package.budget.wallclock_s,
             )
-            invoker = self._invoker if self._invoker is not None else claude_cli_invoker(package)
+            # Only the Builder submits to the court (its evidence channel); Planner stages must
+            # not write the run's evidence pool (their citations aren't court-reproducible).
+            mcp_cfg = self._mcp_config_path if package.role is Role.BUILDER else None
+            invoker = (
+                self._invoker
+                if self._invoker is not None
+                else claude_cli_invoker(package, mcp_config_path=mcp_cfg)
+            )
             result = invoker(spec)
             writes = _collect_writes(workspace, package.permissions.write_scopes)
             cost = _parse_cost(result.transcript, self._default_model)
