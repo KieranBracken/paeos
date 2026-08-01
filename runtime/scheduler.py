@@ -14,7 +14,9 @@ self-host driver.
 
 from __future__ import annotations
 
+import threading
 from collections.abc import Callable, Iterable, Mapping
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from enum import Enum
 
@@ -25,6 +27,7 @@ from runtime.task_package import Budget
 from runtime.triage import triage
 
 __all__ = [
+    "ConcurrentScheduler",
     "ContinuousScheduler",
     "EconomicGovernor",
     "GlobalBudget",
@@ -54,34 +57,85 @@ class EconomicGovernor:
         self._tokens = 0
         self._wallclock = 0
         self._runs = 0
+        # The governor is the K11 *parent* shared by concurrently-admitted children (M2). Every
+        # mutation of the running totals is taken under this lock, so `try_admit` is atomic and
+        # Σ children.reserved ≤ parent holds no matter how many schedulers admit in parallel.
+        self._lock = threading.Lock()
 
-    def can_admit(self, allocation: Budget) -> bool:
+    def _can_admit_locked(self, allocation: Budget) -> bool:
         return (
             self._tokens + allocation.tokens <= self._budget.tokens
             and self._wallclock + allocation.wallclock_s <= self._budget.wallclock_s
             and self._runs + 1 <= self._budget.runs
         )
 
+    def can_admit(self, allocation: Budget) -> bool:
+        with self._lock:
+            return self._can_admit_locked(allocation)
+
+    def try_admit(self, allocation: Budget) -> bool:
+        """Atomically admit **and** charge an allocation, or refuse — the concurrency-safe gate.
+
+        Under concurrency the check-then-charge of `can_admit`+`charge` would race (two children
+        could both pass the check against the same free budget, then both charge, breaching K11).
+        `try_admit` fuses them under the lock: it reserves the allocation iff it fits, so the K11
+        parent invariant Σ children.reserved ≤ parent holds across any number of concurrent admits.
+        Returns True if reserved (the caller must later `settle`), False if refused (halt-not-spin).
+        """
+        with self._lock:
+            if not self._can_admit_locked(allocation):
+                return False
+            self._tokens += allocation.tokens
+            self._wallclock += allocation.wallclock_s
+            self._runs += 1
+            return True
+
     def charge(self, allocation: Budget) -> None:
         """Debit an admitted allocation. Enforces K11: raises if it would exceed the global."""
-        if not self.can_admit(allocation):
-            raise BudgetConservationError("charge would breach the global budget (K11)")
-        self._tokens += allocation.tokens
-        self._wallclock += allocation.wallclock_s
-        self._runs += 1
+        with self._lock:
+            if not self._can_admit_locked(allocation):
+                raise BudgetConservationError("charge would breach the global budget (K11)")
+            self._tokens += allocation.tokens
+            self._wallclock += allocation.wallclock_s
+            self._runs += 1
+
+    def settle(self, reserved: Budget, spent_tokens: int, spent_wallclock_s: float) -> None:
+        """Refund the unspent portion of an already-charged reservation (M2 actual-spend metering).
+
+        Tightens K11 from *ceiling-conservative* to *exact*: `charge` reserves the weight-class
+        ceiling before the run (so admission can never over-commit — the property concurrency
+        relies on); `settle` then credits back ``reserved - actual`` per resource dimension once
+        the run reports what it truly spent, so the running total tracks **actual** spend and more
+        runs fit under the same global budget. Invariants that keep it conservation-safe:
+
+        - The refund is **clamped to ``[0, reserved]``** per dimension — never refunds more than was
+          reserved, and an over-spend (``actual > reserved``, which `GoalBudget` already forbids)
+          refunds nothing rather than crediting phantom budget.
+        - The wallclock refund is **floored** (``int``), so a fractional second is kept reserved,
+          never released — the refund never exceeds the true unspent amount.
+        - The **run count is never refunded**: a run consumes one run-slot regardless of spend, so
+          the `runs` dimension keeps bounding *how many* runs, independent of *how much* each cost.
+        """
+        spent_t = max(0, min(spent_tokens, reserved.tokens))
+        spent_w = max(0.0, min(spent_wallclock_s, float(reserved.wallclock_s)))
+        with self._lock:
+            self._tokens -= reserved.tokens - spent_t
+            self._wallclock -= int(reserved.wallclock_s - spent_w)  # floor: keep fraction reserved
 
     def remaining(self) -> GlobalBudget:
-        return GlobalBudget(
-            self._budget.tokens - self._tokens,
-            self._budget.wallclock_s - self._wallclock,
-            self._budget.runs - self._runs,
-        )
+        with self._lock:
+            return GlobalBudget(
+                self._budget.tokens - self._tokens,
+                self._budget.wallclock_s - self._wallclock,
+                self._budget.runs - self._runs,
+            )
 
     def tier(self) -> str:
         """Model-tier hint (backpressure): 'economy' when the token budget runs low, else 'full'."""
         if self._budget.tokens <= 0:
             return "economy"
-        remaining_fraction = (self._budget.tokens - self._tokens) / self._budget.tokens
+        with self._lock:
+            remaining_fraction = (self._budget.tokens - self._tokens) / self._budget.tokens
         return "economy" if remaining_fraction < self._economy_below else "full"
 
 
@@ -103,6 +157,16 @@ class SchedulerReport:
     stop_reason: StopReason
 
 
+def _allocation(intake: Intake, budget_by_class: Mapping[WeightClass, Budget]) -> Budget:
+    """The weight-class ceiling this intake reserves — the triage budget it is admitted against."""
+    return triage(
+        changed_paths=intake.changed_paths,
+        verifiable=intake.verifiable,
+        reversible=intake.reversible,
+        budget_by_class=budget_by_class,
+    ).budget
+
+
 class ContinuousScheduler:
     """Stage-19 RESTART: pull goals and run each through the soft loop, governed by K11."""
 
@@ -118,13 +182,7 @@ class ContinuousScheduler:
         self._budget_by_class = budget_by_class
 
     def _allocation(self, intake: Intake) -> Budget:
-        decision = triage(
-            changed_paths=intake.changed_paths,
-            verifiable=intake.verifiable,
-            reversible=intake.reversible,
-            budget_by_class=self._budget_by_class,
-        )
-        return decision.budget
+        return _allocation(intake, self._budget_by_class)
 
     def run(self, source: Iterable[Intake]) -> SchedulerReport:
         """Run goals until the source is exhausted OR the governor halts the loop."""
@@ -135,6 +193,95 @@ class ContinuousScheduler:
             if not self._governor.can_admit(allocation):
                 stop = StopReason.BUDGET_EXHAUSTED  # halt, do NOT spin (§9.4)
                 break
-            self._governor.charge(allocation)  # K11: reserve before running
-            outcomes.append(self._run_one(intake))
+            self._governor.charge(allocation)  # K11: reserve the ceiling before running
+            outcome = self._run_one(intake)
+            # M2: refund the unspent allocation so the running total tracks ACTUAL spend, not the
+            # ceiling — exact K11 accounting, so more real work fits under the same global budget.
+            self._governor.settle(allocation, outcome.spent_tokens, outcome.spent_wallclock_s)
+            outcomes.append(outcome)
         return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
+
+
+class ConcurrentScheduler:
+    """Multi-goal concurrency under the global K11 parent (M2): run up to `max_concurrency` goals
+    in parallel, each an isolated child of the one `EconomicGovernor`.
+
+    The K11 tree is explicit here: the governor is the **parent** budget and every in-flight goal is
+    a **child** holding a reserved allocation; `try_admit` (atomic) guarantees Σ children.reserved ≤
+    parent at all times, so parallelism can never breach the global budget. Each goal is isolated —
+    its own `run_id`, workspace, and `GoalBudget` — and one goal's failure neither corrupts another
+    nor leaks its reservation (every admitted allocation is `settle`d exactly once on completion).
+
+    **Halt, don't spin (§9.4):** when the governor refuses the next goal *and* nothing is in flight
+    to free budget, the loop stops (`BUDGET_EXHAUSTED`). When it refuses but goals *are* running, it
+    is not exhausted — it applies backpressure by waiting for an in-flight goal to complete (its
+    `settle` frees budget) and retries, rather than dropping the goal or busy-waiting.
+
+    **Separation of powers / K8:** this parallelises *execution* (`run_one`). Integration into the
+    single-writer ledger is the driver's responsibility to serialize — parallel generation, serial
+    integration (FP-1). `run_one` must therefore be safe to call from a worker thread.
+    """
+
+    def __init__(
+        self,
+        run_one: Callable[[Intake], RunOutcome],
+        *,
+        governor: EconomicGovernor,
+        budget_by_class: Mapping[WeightClass, Budget],
+        max_concurrency: int = 4,
+    ) -> None:
+        if max_concurrency < 1:
+            raise ValueError("max_concurrency must be >= 1")
+        self._run_one = run_one
+        self._governor = governor
+        self._budget_by_class = budget_by_class
+        self._max_concurrency = max_concurrency
+
+    def run(self, source: Iterable[Intake]) -> SchedulerReport:
+        """Admit and run goals concurrently under the K11 parent until the source is exhausted or
+        the governor halts the loop. Outcomes are returned in completion order."""
+        it = iter(source)
+        outcomes: list[RunOutcome] = []
+        stop = StopReason.SOURCE_EXHAUSTED
+        inflight: dict[Future[RunOutcome], Budget] = {}
+        holdover: Intake | None = None  # an intake refused under pressure, awaiting freed budget
+        source_done = False
+
+        with ThreadPoolExecutor(max_workers=self._max_concurrency) as pool:
+            while True:
+                # 1) Fill the pool: admit while concurrency slots AND budget allow.
+                while not source_done and len(inflight) < self._max_concurrency:
+                    intake = holdover if holdover is not None else next(it, None)
+                    holdover = None
+                    if intake is None:
+                        source_done = True
+                        break
+                    allocation = self._allocation(intake)
+                    if self._governor.try_admit(allocation):  # atomic reserve (K11 child)
+                        inflight[pool.submit(self._run_one, intake)] = allocation
+                    elif not inflight:
+                        stop = StopReason.BUDGET_EXHAUSTED  # nothing will free budget → HALT
+                        source_done = True
+                        break
+                    else:
+                        holdover = intake  # backpressure: wait for a settle, then retry this one
+                        break
+
+                # 2) Nothing running ⇒ source exhausted or halted.
+                if not inflight:
+                    break
+
+                # 3) Wait for ≥1 goal to finish; settle it (frees budget for the next admit).
+                done, _ = wait(inflight, return_when=FIRST_COMPLETED)
+                for fut in done:
+                    allocation = inflight.pop(fut)
+                    outcome = fut.result()
+                    self._governor.settle(
+                        allocation, outcome.spent_tokens, outcome.spent_wallclock_s
+                    )
+                    outcomes.append(outcome)
+
+        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
+
+    def _allocation(self, intake: Intake) -> Budget:
+        return _allocation(intake, self._budget_by_class)

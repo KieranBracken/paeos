@@ -42,7 +42,7 @@ from runtime.review import (
     read_adversary_verdict,
 )
 from runtime.task_package import Budget, ExecutionContext, TaskResult
-from runtime.triage import BudgetExceeded, GoalBudget, triage
+from runtime.triage import BudgetExceeded, GoalBudget, TriageDecision, triage
 from runtime.verification import (
     build_verification_workspace,
     vacuous_commands,
@@ -133,6 +133,11 @@ class RunOutcome:
     # remand (retry hints/diagnostics), NOT institutional memory. Never promoted in place — the
     # Evolution Layer authors the L3 scar out-of-band at Stage 17.
     ephemeral_context: ExecutionContext | None = None
+    # Actual spend on this run, on EVERY exit path (seal, remand, halt) — the metering the
+    # EconomicGovernor settles against (M2): it refunds the unspent allocation so Σ tracked = Σ
+    # actual, tightening K11 from ceiling-conservative to exact. Set centrally in `run()`.
+    spent_tokens: int = 0
+    spent_wallclock_s: float = 0.0
 
 
 class SoftLoop:
@@ -194,7 +199,36 @@ class SoftLoop:
             reversible=reversible,
             budget_by_class=self._budget_by_class,
         )
+        # Reserve-then-settle metering (M2): the run consumes a GoalBudget; whatever it ACTUALLY
+        # spent — on any exit path (seal, remand, or halt) — is reported on the RunOutcome here, in
+        # ONE place, so the EconomicGovernor can refund the unspent allocation and keep K11
+        # accounting exact rather than charging the weight-class ceiling for every run.
         budget = GoalBudget(decision.budget)
+        outcome = self._run_body(
+            budget=budget, decision=decision, objective=objective,
+            changed_paths=changed_paths, plan_write_scopes=plan_write_scopes,
+            builder_evidence=builder_evidence, goal_signature=goal_signature,
+            run_id=run_id, evidence_source=evidence_source,
+        )
+        return replace(
+            outcome,
+            spent_tokens=budget.spent_tokens,
+            spent_wallclock_s=budget.spent_wallclock,
+        )
+
+    def _run_body(
+        self,
+        *,
+        budget: GoalBudget,
+        decision: TriageDecision,
+        objective: str,
+        changed_paths: tuple[str, ...],
+        plan_write_scopes: tuple[str, ...],
+        builder_evidence: tuple[Evidence, ...],
+        goal_signature: str,
+        run_id: str,
+        evidence_source: EvidenceSource | None,
+    ) -> RunOutcome:
         goal_id = "g-" + uuid.uuid4().hex[:12]
         self._ledger.append(
             Event(

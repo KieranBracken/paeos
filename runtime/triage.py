@@ -112,5 +112,9 @@ class GoalBudget:
         return self._spent_tokens
 
     @property
+    def spent_wallclock(self) -> float:
+        return self._spent_wallclock
+
+    @property
     def remaining_tokens(self) -> int:
         return self._budget.tokens - self._spent_tokens
