@@ -78,3 +78,9 @@ jobs:
             echo "key material committed under ops/keys/ (§9 T2)"; exit 1
           fi
           echo "F3 GREEN: lockfile present; no committed key material"
+
+      - name: 'Architectural invariants (IP-0010 — AI-001..011 executed)'
+        # Executes architectural truth every commit: runtime-transport independence, single
+        # committer, adversary-PASS seal, probative evidence, Port Independence, kernel LOC budget.
+        # F2/F3 (AI-007/008) + pyright (AI-003/011) are delegated to the steps above.
+        run: uv run python ops/ci/invariants.py
