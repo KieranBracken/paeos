@@ -143,6 +143,22 @@ def test_no_source_means_empty_workspace(tmp_path: Path) -> None:
     assert capture["present"] is None  # nothing seeded — a fresh workspace
 
 
+def test_builder_session_is_granted_bash_to_produce_court_evidence() -> None:
+    # DEBT-0019: an autonomous builder must RUN a reproduction command to obtain probative
+    # exit_code/stdout for the court. Without Bash on the allow-list, the headless session's
+    # command execution is declined ("requires approval") and no evidence is ever submitted.
+    captured: dict[str, tuple[str, ...]] = {}
+
+    def _capture(spec: SessionSpec) -> SessionResult:
+        captured["allowed"] = spec.allowed_tools
+        (spec.workspace / "runtime").mkdir(parents=True, exist_ok=True)
+        (spec.workspace / "runtime" / "feature.py").write_bytes(b"code")
+        return SessionResult(transcript=_TRANSCRIPT)
+
+    ClaudeCodeRuntime(invoker=_capture).run(_package(write_scopes=("runtime/feature.py",)))
+    assert "Bash" in captured["allowed"], captured["allowed"]
+
+
 def test_live_invoker_passes_accept_edits_permission_mode(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     import runtime.integrations as integ
 
