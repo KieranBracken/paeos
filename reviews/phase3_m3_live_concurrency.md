@@ -7,13 +7,15 @@ multi-goal concurrency (`ConcurrentScheduler`).
 **Branch**: `phase3-m3-live-concurrency` (base `ce23f5e`, "Phase 3 M2: exact-spend metering +
 multi-goal concurrency under the K11 parent").
 
-## VERDICT: RATIFIED (code) — LIVE RUN HELD FOR FOUNDER AUTHORIZATION
+## VERDICT: MECHANISM RATIFIED · LIVE RUN EXECUTED (0 seals — genuine remand)
 
-The concurrency touchpoints are lawful and green. The **genuine live multi-goal concurrent
-self-hosting run** was **not** executed: it spawns live `claude` subprocesses and spends real
-tokens (configured ceiling 8M tokens / ~20h / 8 runs), an outward-facing, hard-to-reverse action
-reserved for explicit Founder authorization. This review ratifies the *mechanism*; the *live seal*
-remains pending that authorization.
+The concurrency touchpoints are lawful and green (§ below). The **genuine live multi-goal
+concurrent self-hosting run** was executed on Founder authorization (2026-08-02) under a reduced
+ceiling (2M tokens / 3600s / 3 runs, `max_concurrency=2`). It **sealed nothing**: both goals were
+honestly REMANDED because no probative evidence reached the court. The concurrency, K8 ledger,
+budget metering, and staged pipeline all worked; the **autonomous evidence path** did not. This is
+the anti-forgery invariant functioning — no evidence, no seal — and it surfaced one localized,
+fixable integration gap. Full account in **§ Live Run Results (2026-08-02)** at the end.
 
 ## Summary of Findings
 
@@ -132,5 +134,71 @@ Requested: ratification of the K8 concurrency touchpoint + `ConcurrentScheduler`
 self-hosting run** (real `claude` subprocesses, real token spend). The mechanism is green and
 lawful; the live seal awaits Founder authorization.
 
-> **Founder decision:** ▢ Ratify mechanism · ▢ Authorize live run (specify budget / concurrency /
-> backlog) · ▢ Hold
+> **Founder decision (2026-08-02):** ☑ Ratify mechanism · ☑ Authorize live run (reduced ceiling
+> 2M / 3600s / 3 runs, `max_concurrency=2`, Founder-authored 2-goal backlog) · run executed.
+
+---
+
+## Live Run Results (2026-08-02)
+
+**Command:** a bounded runner reusing the ratified `ops/autonomous_run.build_scheduler` wiring with
+`GlobalBudget(tokens=2_000_000, wallclock_s=3_600, runs=3)` and `max_concurrency=2` over a
+Founder-authored 2-goal backlog (two genuinely-absent additive pure functions in
+`runtime/lifetime.py`: `classify_obj` and `is_institutional`, each with a self-contained,
+absolute-`.venv`-path verification command). Run under `.venv` Python 3.13.5.
+
+### Outcome — 0 seals, both genuinely REMANDED
+
+| Signal | Value |
+|---|---|
+| Goals run (concurrent) | 2 |
+| **Sealed** | **0** |
+| Both outcomes | REMANDED — *"no evidence submitted to the court for this run"* |
+| Tokens spent | ~91k of 2,000,000 (remaining 1,908,796) |
+| Stop reason | `source-exhausted` (clean) |
+| Ledger | advanced; 2 `goal_created` events; head hash verified via `verify_chain()` |
+| Court pool | **empty** — no `submit_evidence` call landed |
+
+### What worked
+
+Concurrency (two goals through `ConcurrentScheduler` at `max_concurrency=2` under one K11
+`EconomicGovernor`), the K8 thread-safe ledger, exact-spend budget metering, and the staged
+DESIGN → PLAN → IMPLEMENT pipeline all executed and wrote artifacts to CAS. The mechanism ratified
+above held under a live, real-token load.
+
+### Root cause — autonomous evidence path blocked (headless permission gate)
+
+`runtime/integrations/__init__.py:113` `_allowed_tools()` grants only `["Read", "Write", "Edit"]`
+(+ `mcp:<server>`) and the invoker runs `claude -p … --permission-mode acceptEdits`. `acceptEdits`
+auto-applies **file edits only**; it does **not** auto-approve `Bash`. A headless `claude -p`
+session has no human to approve, so **every command execution is declined** ("This command
+requires approval"). The IMPLEMENT/CODER sessions reported this directly:
+
+> *"I've completed the code change … every Bash invocation is returning 'This command requires
+> approval' … I cannot capture the exit code / stdout that the court requires, nor compute the
+> artifact sha256."*
+
+The builders made the **correct** edits (both functions, verified right by inspection) but could
+not **run** the verification command → nothing probative to submit → the court remanded.
+
+### This is the anti-forgery invariant working, not a corruption
+
+No evidence → no seal. The system refused to fabricate. The DESIGN/PLAN sessions **explicitly
+declined** to run out-of-scope code and cited `CANARY-0001` (forged-evidence) / `CANARY-0002`
+(vacuous-evidence) as the reason — precisely the behaviour the calibration corpus exists to
+enforce. A genuine remand is the correct, honest result; a fake seal would have been the failure.
+
+### Recommended follow-up (NOT done here — new scope)
+
+- **DEBT-0019** — *autonomous evidence blocked in headless builder sessions*: `_allowed_tools`
+  omits `Bash`, so the IMPLEMENT/VERIFY session cannot run its reproduction command or hash the
+  artifact, and never submits court evidence.
+- **Fix** (well-localized): grant the IMPLEMENT/VERIFY session `Bash` — ideally scoped to the exact
+  verification command — via `_allowed_tools`/the invoker, under TDD, then re-run the same backlog
+  to seek a genuine seal.
+
+### Reproduction
+
+Backlog + bounded runner live in the session scratchpad (not committed): `m3-backlog.json`,
+`m3_run.py`; state dir `m3-live-state/` (ledger.db, cas/, empty court/). The run is repeatable once
+DEBT-0019 is fixed.
