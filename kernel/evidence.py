@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import shlex
 import subprocess
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import Enum
 
@@ -181,6 +181,22 @@ def reproduce(
     return {"exit_code": proc.returncode, "stdout": proc.stdout}
 
 
+def _normalized_result(result: JsonValue) -> JsonValue:
+    """A result compared modulo **trailing whitespace on stdout**. A command's trailing newline
+    (what `print` emits) is not semantically part of the evidence, yet requiring the agent to
+    report it byte-exact made live sealing brittle: an agent that reports `"PASS"` for a command
+    that prints `"PASS\\n"` was remanded though it reproduced perfectly (CER-1, the M2 concurrent
+    run). Exit code and stdout *content* are still compared exactly, so anti-forgery (T2) is intact
+    — a command doing different work still differs in exit code or in non-trailing output."""
+    if not isinstance(result, Mapping):
+        return result
+    normalized = dict(result)
+    stdout = normalized.get("stdout")
+    if isinstance(stdout, str):
+        normalized["stdout"] = stdout.rstrip()
+    return normalized
+
+
 def verify_deterministic(
     evidence: Evidence,
     artifact_under_review: Hash,
@@ -192,7 +208,7 @@ def verify_deterministic(
     Raises StaleEvidence, NotReproducible, or ReproductionMismatch. This is the T2 gate."""
     verify_binding(evidence, artifact_under_review)
     fresh = reproduce(evidence, timeout_s=timeout_s, runner=runner)
-    if fresh != evidence.result:
+    if _normalized_result(fresh) != _normalized_result(evidence.result):
         raise ReproductionMismatch(
             f"evidence {evidence.hash} claimed {evidence.result!r} "
             f"but the kernel re-run produced {fresh!r}"

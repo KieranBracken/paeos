@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Protocol, runtime_checkable
@@ -235,25 +236,34 @@ class Ledger:
         self._store = store
         self._writer_id = writer_id
         self._closed = False
+        # Serializes the compose-and-commit critical section of `append` (read head → derive seq +
+        # chain hash → append_row) so concurrent callers each take the NEXT seq in turn instead of
+        # racing to the same one. This is the single-writer *integration* point (K8): parallel
+        # generation feeds it, but institutional commit is strictly serialized (M2 concurrency).
+        self._append_lock = threading.Lock()
         store.acquire_writer(writer_id)  # FR-5: refuses a competing writer here
 
     def append(self, event: Event) -> int:
-        """Append ``event``; return its 1-based seq. Never mutates an existing row."""
-        self._ensure_open()
-        prev = self._store.head()
-        prev_hash = prev.row_hash if prev is not None else GENESIS_HASH
-        seq = (prev.seq if prev is not None else 0) + 1
-        timestamp = _utcnow_iso()
-        row_hash = compute_row_hash(prev_hash, seq, timestamp, event)
-        row = LedgerRow(
-            seq=seq,
-            timestamp=timestamp,
-            event=event,
-            prev_hash=prev_hash,
-            row_hash=row_hash,
-        )
-        self._store.append_row(row)  # atomic; ForkRejected if a racer took this seq
-        return seq
+        """Append ``event``; return its 1-based seq. Never mutates an existing row.
+
+        Thread-safe: the whole read-head→derive-seq→commit sequence runs under `_append_lock`, so
+        parallel goals (ConcurrentScheduler) integrate serially onto one dense, unforked chain."""
+        with self._append_lock:
+            self._ensure_open()
+            prev = self._store.head()
+            prev_hash = prev.row_hash if prev is not None else GENESIS_HASH
+            seq = (prev.seq if prev is not None else 0) + 1
+            timestamp = _utcnow_iso()
+            row_hash = compute_row_hash(prev_hash, seq, timestamp, event)
+            row = LedgerRow(
+                seq=seq,
+                timestamp=timestamp,
+                event=event,
+                prev_hash=prev_hash,
+                row_hash=row_hash,
+            )
+            self._store.append_row(row)  # atomic; ForkRejected if a racer took this seq
+            return seq
 
     def read(self, start: int = 1, end: int | None = None) -> list[LedgerRow]:
         """Rows with seq in [start, end); end=None reads through the head."""

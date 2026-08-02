@@ -3,6 +3,7 @@ persists across restart (PAEOS-8 §10 / FR-5)."""
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 
 import pytest
@@ -69,3 +70,29 @@ def test_tamper_detected_on_reopened_ledger(tmp_path: Path) -> None:
     ledger2 = Ledger(SqliteLedgerStore(db))
     with pytest.raises(ChainCorruption):
         ledger2.verify_chain()
+
+
+def test_concurrent_appends_produce_one_dense_unforked_chain(tmp_path: Path) -> None:
+    # K8 integration under M2 concurrency: many threads append to ONE ledger at once. The serialized
+    # compose-and-commit (Ledger._append_lock) + the store's connection lock must yield a dense,
+    # gap-free, hash-verified chain with every event present exactly once — no fork, no lost write.
+    ledger = Ledger(SqliteLedgerStore(tmp_path / "ledger.db"))
+    n_threads, per_thread = 8, 25
+    barrier = threading.Barrier(n_threads)  # release all threads at once to maximise contention
+
+    def worker(t: int) -> None:
+        barrier.wait()
+        for i in range(per_thread):
+            ledger.append(Event(1, "e", {"t": t, "i": i}))
+
+    threads = [threading.Thread(target=worker, args=(t,)) for t in range(n_threads)]
+    for th in threads:
+        th.start()
+    for th in threads:
+        th.join()
+
+    rows = ledger.read()
+    assert [r.seq for r in rows] == list(range(1, n_threads * per_thread + 1))  # dense, no gaps
+    assert ledger.verify_chain() == ledger.head_hash()  # chain intact (no fork/tamper)
+    submitted = {(t, i) for t in range(n_threads) for i in range(per_thread)}
+    assert {(r.event.payload["t"], r.event.payload["i"]) for r in rows} == submitted  # none lost

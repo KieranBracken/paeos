@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import sys
+import threading
 import uuid
 from pathlib import Path
 
@@ -29,15 +30,26 @@ from kernel.ledger_sqlite import SqliteLedgerStore
 from runtime.evolution import EvolutionLayer
 from runtime.integrations import ClaudeCodeRuntime
 from runtime.orchestrator import Intake, RunOutcome, RunStatus, SoftLoop
-from runtime.scheduler import ContinuousScheduler, EconomicGovernor, GlobalBudget
+from runtime.scheduler import (
+    ConcurrentScheduler,
+    ContinuousScheduler,
+    EconomicGovernor,
+    GlobalBudget,
+)
 from runtime.selfhost import DEFAULT_BUDGETS, parse_backlog
 from runtime.transports.mcp.transport import McpWorkerTransport
 
 
 def build_scheduler(
-    state_dir: Path, repo_root: Path, *, global_budget: GlobalBudget
-) -> tuple[ContinuousScheduler, EvolutionLayer, Ledger]:
-    """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`."""
+    state_dir: Path, repo_root: Path, *, global_budget: GlobalBudget, max_concurrency: int = 1
+) -> tuple[ContinuousScheduler | ConcurrentScheduler, EvolutionLayer, Ledger]:
+    """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`.
+
+    `max_concurrency > 1` runs goals in parallel (ConcurrentScheduler). This is K8-safe: the ledger
+    serializes institutional commit (kernel/ledger.py `_append_lock` + the SQLite connection lock),
+    and L3 memory authoring (the Evolution Layer, IP-0005 sole committer) is serialized here too —
+    parallel *generation*, serial *integration*. `max_concurrency == 1` is the sequential loop.
+    """
     state_dir.mkdir(parents=True, exist_ok=True)
 
     # The evidence pool + the --mcp-config that launches the court server against THIS pool. The
@@ -63,6 +75,7 @@ def build_scheduler(
         repo_root=repo_root,  # B2.N: the court verifies each command in a workspace WITH the change
     )
     evolution = EvolutionLayer(scar_store=loop.scar_store)  # sole L3 author (Stage 17)
+    evolution_lock = threading.Lock()  # IP-0005: serialize L3 authoring under parallel execution
 
     def run_one(intake: Intake) -> RunOutcome:
         run_id = "r-" + uuid.uuid4().hex[:8]  # unique per run: keys this run's court pool + prompt
@@ -77,24 +90,34 @@ def build_scheduler(
             run_id=run_id,
             evidence_source=transport,  # the EvidenceSource port — MCP is just one implementation
         )
-        evolution.run(
-            outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
-        )
+        with evolution_lock:  # single-committer L3 authoring stays serial under parallel execution
+            evolution.run(
+                outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
+            )
         return outcome
 
     governor = EconomicGovernor(global_budget)
-    scheduler = ContinuousScheduler(
-        run_one, governor=governor, budget_by_class=DEFAULT_BUDGETS
+    scheduler: ContinuousScheduler | ConcurrentScheduler = (
+        ConcurrentScheduler(
+            run_one, governor=governor, budget_by_class=DEFAULT_BUDGETS,
+            max_concurrency=max_concurrency,
+        )
+        if max_concurrency > 1
+        else ContinuousScheduler(run_one, governor=governor, budget_by_class=DEFAULT_BUDGETS)
     )
     return scheduler, evolution, ledger
 
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    if len(argv) != 2:
-        print("usage: python ops/autonomous_run.py <backlog.json> <state_dir>", file=sys.stderr)
+    if not 2 <= len(argv) <= 3:
+        print(
+            "usage: python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency]",
+            file=sys.stderr,
+        )
         return 64
     backlog_path, state_dir = Path(argv[0]), Path(argv[1])
+    max_concurrency = int(argv[2]) if len(argv) == 3 else 1
     repo_root = Path.cwd()
 
     backlog = parse_backlog(json.loads(backlog_path.read_text(encoding="utf-8")))
@@ -102,7 +125,8 @@ def main(argv: list[str] | None = None) -> int:
         state_dir,
         repo_root,
         # A contained ceiling: enough for a few full-weight runs; halts (not spins) when exhausted.
-        global_budget=GlobalBudget(tokens=4_000_000, wallclock_s=36_000, runs=6),
+        global_budget=GlobalBudget(tokens=8_000_000, wallclock_s=72_000, runs=8),
+        max_concurrency=max_concurrency,
     )
     report = scheduler.run(backlog)
 

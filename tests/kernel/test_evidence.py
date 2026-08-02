@@ -81,9 +81,24 @@ def test_verify_deterministic_passes_when_result_matches() -> None:
     verify_deterministic(ev, _ART)
 
 
+def test_verify_deterministic_tolerates_trailing_whitespace_on_stdout() -> None:
+    # CER-1 (M2 concurrent run): the command prints "real\n"; an agent that reports the stdout
+    # newline-stripped ("real") still reproduced it perfectly and must PASS, not remand.
+    ev = _ev(command="echo real", result={"exit_code": 0, "stdout": "real"})
+    verify_deterministic(ev, _ART)  # no raise — trailing whitespace is not part of the evidence
+
+
 def test_forged_result_is_caught_by_kernel_rerun() -> None:
     # T2: the agent claims a passing result the command does not actually produce.
     forged = _ev(command="echo real", result={"exit_code": 0, "stdout": "FORGED\n"})
+    with pytest.raises(ReproductionMismatch):
+        verify_deterministic(forged, _ART)
+
+
+def test_content_difference_is_still_caught_despite_whitespace_tolerance() -> None:
+    # Anti-forgery intact: only TRAILING whitespace is tolerated — a real content difference
+    # (here an extra interior/leading token) still remands.
+    forged = _ev(command="echo real", result={"exit_code": 0, "stdout": "real extra\n"})
     with pytest.raises(ReproductionMismatch):
         verify_deterministic(forged, _ART)
 

@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import threading
 from pathlib import Path
 
 from kernel.ledger import Event, ForkRejected, JsonValue, LedgerRow, SingleWriterViolation
@@ -47,81 +48,95 @@ class SqliteLedgerStore:
     def __init__(self, path: str | os.PathLike[str]) -> None:
         self._path = Path(path)
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._db = sqlite3.connect(str(self._path), isolation_level=None)  # autocommit
+        # `check_same_thread=False` lets the connection be used from ConcurrentScheduler worker
+        # threads; `_lock` (reentrant — `append_row` calls `count`) then serializes EVERY connection
+        # operation, so a SQLite connection that is not itself concurrency-safe is only ever touched
+        # by one thread at a time. K8 single-writer integration under parallel generation (M2).
+        self._db = sqlite3.connect(
+            str(self._path), isolation_level=None, check_same_thread=False
+        )  # autocommit
+        self._lock = threading.RLock()
         self._db.execute("PRAGMA journal_mode=WAL")
         self._db.execute("PRAGMA synchronous=FULL")
         self._db.executescript(_SCHEMA)
 
     def acquire_writer(self, owner: str) -> None:
-        row = self._db.execute("SELECT owner FROM ledger_writer WHERE id = 1").fetchone()
-        current: str | None = row[0] if row is not None else None
-        if current is not None and current != owner:
-            raise SingleWriterViolation(
-                f"ledger already owned by writer {current!r}; {owner!r} refused"
-            )
-        self._db.execute("UPDATE ledger_writer SET owner = ? WHERE id = 1", (owner,))
+        with self._lock:
+            row = self._db.execute("SELECT owner FROM ledger_writer WHERE id = 1").fetchone()
+            current: str | None = row[0] if row is not None else None
+            if current is not None and current != owner:
+                raise SingleWriterViolation(
+                    f"ledger already owned by writer {current!r}; {owner!r} refused"
+                )
+            self._db.execute("UPDATE ledger_writer SET owner = ? WHERE id = 1", (owner,))
 
     def release_writer(self, owner: str) -> None:
-        self._db.execute(
-            "UPDATE ledger_writer SET owner = NULL WHERE id = 1 AND owner = ?", (owner,)
-        )
+        with self._lock:
+            self._db.execute(
+                "UPDATE ledger_writer SET owner = NULL WHERE id = 1 AND owner = ?", (owner,)
+            )
 
     def head(self) -> LedgerRow | None:
-        row = self._db.execute(
-            "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
-            "FROM ledger_rows ORDER BY seq DESC LIMIT 1"
-        ).fetchone()
+        with self._lock:
+            row = self._db.execute(
+                "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
+                "FROM ledger_rows ORDER BY seq DESC LIMIT 1"
+            ).fetchone()
         return _to_row(row) if row is not None else None
 
     def append_row(self, row: LedgerRow) -> None:
-        expected = self.count() + 1
-        if row.seq != expected:
-            raise ForkRejected(
-                f"expected seq {expected} (head+1); got {row.seq} — fork refused"
-            )
-        try:
-            self._db.execute(
-                "INSERT INTO ledger_rows "
-                "(seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (
-                    row.seq,
-                    row.timestamp,
-                    row.prev_hash,
-                    row.row_hash,
-                    row.event.schema_ver,
-                    row.event.kind,
-                    json.dumps(dict(row.event.payload), sort_keys=True, separators=(",", ":")),
-                ),
-            )
-        except sqlite3.IntegrityError as exc:  # duplicate seq PK ⇒ a racing fork
-            raise ForkRejected(f"seq {row.seq} already present — fork refused") from exc
+        with self._lock:
+            expected = self.count() + 1
+            if row.seq != expected:
+                raise ForkRejected(
+                    f"expected seq {expected} (head+1); got {row.seq} — fork refused"
+                )
+            try:
+                self._db.execute(
+                    "INSERT INTO ledger_rows "
+                    "(seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        row.seq,
+                        row.timestamp,
+                        row.prev_hash,
+                        row.row_hash,
+                        row.event.schema_ver,
+                        row.event.kind,
+                        json.dumps(dict(row.event.payload), sort_keys=True, separators=(",", ":")),
+                    ),
+                )
+            except sqlite3.IntegrityError as exc:  # duplicate seq PK ⇒ a racing fork
+                raise ForkRejected(f"seq {row.seq} already present — fork refused") from exc
 
     def read(self, start: int, end: int | None) -> list[LedgerRow]:
         if start < 1:
             raise ValueError(f"start must be >= 1, got {start}")
-        if end is None:
-            rows = self._db.execute(
-                "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
-                "FROM ledger_rows WHERE seq >= ? ORDER BY seq",
-                (start,),
-            ).fetchall()
-        else:
-            if end < start:
-                raise ValueError(f"end ({end}) must be >= start ({start})")
-            rows = self._db.execute(
-                "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
-                "FROM ledger_rows WHERE seq >= ? AND seq < ? ORDER BY seq",
-                (start, end),
-            ).fetchall()
+        if end is not None and end < start:
+            raise ValueError(f"end ({end}) must be >= start ({start})")
+        with self._lock:
+            if end is None:
+                rows = self._db.execute(
+                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
+                    "FROM ledger_rows WHERE seq >= ? ORDER BY seq",
+                    (start,),
+                ).fetchall()
+            else:
+                rows = self._db.execute(
+                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
+                    "FROM ledger_rows WHERE seq >= ? AND seq < ? ORDER BY seq",
+                    (start, end),
+                ).fetchall()
         return [_to_row(r) for r in rows]
 
     def count(self) -> int:
-        row = self._db.execute("SELECT COUNT(*) FROM ledger_rows").fetchone()
+        with self._lock:
+            row = self._db.execute("SELECT COUNT(*) FROM ledger_rows").fetchone()
         return int(row[0]) if row is not None else 0
 
     def close(self) -> None:
-        self._db.close()
+        with self._lock:
+            self._db.close()
 
 
 def _to_row(record: tuple[object, ...]) -> LedgerRow:
