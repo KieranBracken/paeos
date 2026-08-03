@@ -81,3 +81,8 @@ amendment may change constitutional law.
   evidence, AI-004 adversary-PASS seal, AI-005 probative evidence, F1/F2/F3 absorbed, + AI-010 Port
   Independence & AI-011 Least-Privilege Interface from the Phase-3 review). Status: **RATIFIED BY
   FOUNDER** (2026-08-01) (re-filed from the original IP-0008 after that number was re-used for WorkerTransport).
+- `PAEOS-IP-0011-t2-normalization.md` — **T2 Evidence-Result Normalization Protocol**: formalize the
+  deterministic-reproduction comparison so `stdout` matches modulo *trailing* whitespace (exit code +
+  non-trailing content still exact), with an anti-forgery proof. Kernel-surface (amends PAEOS-4 §T2);
+  the code (`kernel/evidence.py::_normalized_result`) already shipped in M3. Source: **DEBT-0020**
+  (drift audit). Status: **DRAFTED — awaiting founder ratification**.

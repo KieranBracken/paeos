@@ -111,17 +111,23 @@ def build_prompt(package: TaskPackage) -> str:
 
 
 def _allowed_tools(package: TaskPackage) -> tuple[str, ...]:
-    """The session's tool allow-list: scoped Read/Write/Edit + Bash + one entry per MCP server.
+    """The session's tool allow-list: scoped Read/Write/Edit (+ Bash for the BUILDER) + one entry
+    per MCP server.
 
-    `Bash` is required so an autonomous builder can RUN its reproduction command and hash the
+    `Bash` is required so an autonomous **builder** can RUN its reproduction command and hash the
     artifact — the probative `exit_code`/`stdout` the court's `submit_evidence` needs (DEBT-0019).
     Under `--permission-mode acceptEdits` a headless session cannot approve command execution, so
     without Bash on the allow-list every command is declined and no evidence is ever submitted.
-    This does not widen authority: the session runs in an isolated, ephemeral workspace; writes are
-    filtered to `write_scopes`; and the court's independent kernel re-run (T2) is the real
-    anti-forgery monitor — a forged/vacuous command is caught there regardless of what ran here.
-    It is a scoped allow-list entry, not the blanket `--dangerously-skip-permissions`."""
-    tools = ["Read", "Write", "Edit", "Bash"]
+
+    It is granted **only to `Role.BUILDER`** (DEBT-0021, least privilege / FP-7): PLANNER and DESIGN
+    sessions produce design/plan artifacts, never run code, so they get no command-execution
+    authority. This does not widen the builder's authority either — it runs in an isolated,
+    ephemeral workspace; writes are filtered to `write_scopes`; and the court's independent kernel
+    re-run (T2) is the real anti-forgery monitor. It is a scoped allow-list entry, not the blanket
+    `--dangerously-skip-permissions`."""
+    tools = ["Read", "Write", "Edit"]
+    if package.role is Role.BUILDER:
+        tools.append("Bash")  # only the builder RUNS its reproduction command (DEBT-0019 / 0021)
     tools.extend(f"mcp:{server}" for server in package.permissions.mcp_servers)
     return tuple(tools)
 

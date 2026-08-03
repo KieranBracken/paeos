@@ -159,6 +159,37 @@ def test_builder_session_is_granted_bash_to_produce_court_evidence() -> None:
     assert "Bash" in captured["allowed"], captured["allowed"]
 
 
+def _planner_package() -> TaskPackage:
+    broker = CapabilityBroker(SigningKey.generate())
+    token = broker.mint(
+        goal_id="g", run_id="r", stage=StageId.DESIGN, role=Role.PLANNER, session="s",
+        operations=("mcp:artifacts",), issued_seq=0, expires_seq=100,
+    )
+    return TaskPackage(
+        task_id="t-1", goal_id="g", run_id="r", stage=StageId.DESIGN, role=Role.PLANNER,
+        objective="produce the design", capability=token,
+        permissions=Permissions(("design/",), ("constitution/",), ("artifacts",)),
+        required_evidence=(), context_refs=(), budget=Budget(100000, 60, 1),
+    )
+
+
+def test_builder_allow_list_contains_bash() -> None:
+    # DEBT-0021: the BUILDER (and only the builder) gets Bash to run its reproduction command.
+    from runtime.integrations import _allowed_tools
+
+    assert "Bash" in _allowed_tools(_package())
+
+
+def test_planner_allow_list_omits_bash_least_privilege() -> None:
+    # DEBT-0021 / FP-7: a PLANNER produces design/plan artifacts and never runs code, so it must
+    # NOT receive command-execution authority. Least privilege — Bash is builder-only.
+    from runtime.integrations import _allowed_tools
+
+    allowed = _allowed_tools(_planner_package())
+    assert "Bash" not in allowed, allowed
+    assert {"Read", "Write", "Edit"} <= set(allowed)  # still gets the scoped non-exec tools
+
+
 def test_live_invoker_passes_accept_edits_permission_mode(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     import runtime.integrations as integ
 
