@@ -159,6 +159,10 @@ Liveness (computed, never stored):
   Expiry is transitive along basis edges (justification graph invalidation) ⟵ A-07, 05-§2a
 ```
 
+T2 reproduction-comparison (the deterministic re-run anti-forgery gate; `kernel/evidence.py`):
+result-equivalence is defined by **PAEOS-IP-0011** — exit code exact, stdout equal modulo *trailing*
+whitespace, all other content exact (anti-forgery preserved). ⟵ IP-0011
+
 ### 2.7 Policy ⟵ A-13, A-17, A-18
 
 ```

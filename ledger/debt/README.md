@@ -54,5 +54,5 @@ whose ideal solution requires a constitutional change SHOULD also file a Proposa
 - `DEBT-0019.md` — Autonomous evidence path blocked in headless builder sessions (`_allowed_tools` omits `Bash`) (RESOLVED).
 - `DEBT-0020.md` — T2 evidence result normalization lacks formal specification (IP candidate) (RESOLVED — IP-0011 ratified).
 - `DEBT-0021.md` — Over-broad tool authority in session tool allow-list (`Bash` granted to non-Builder sub-sessions) (RESOLVED).
-- `DEBT-0022.md` — Artifact selection prefers compiled `.pyc` over source; fragile adversary materialization.
+- `DEBT-0022.md` — Artifact selection prefers compiled `.pyc` over source; fragile adversary materialization (RESOLVED).
 

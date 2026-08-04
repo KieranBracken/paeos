@@ -85,6 +85,33 @@ def test_run_collects_only_in_scope_writes() -> None:
     assert out.writes[0].content == b"code"
 
 
+def test_run_excludes_pycache_bytecode_byproducts() -> None:
+    # DEBT-0022: a `builds` command like `python -m py_compile lib/greet.py` emits a `.pyc` under
+    # __pycache__. Even in-scope, the compiled bytecode must NOT be collected — otherwise it can
+    # become the reviewed artifact and the adversary must materialise sourceless, version-coupled
+    # bytecode. The reviewed artifact must be the deterministic Python SOURCE the goal authored.
+    invoker = _fake_invoker(
+        {
+            "lib/greet.py": b"def greet():\n    return 'hi'\n",
+            "lib/__pycache__/greet.cpython-313.pyc": b"\x00compiled-bytecode",
+            "lib/greet.pyo": b"\x00optimised-bytecode",
+        }
+    )
+    out = ClaudeCodeRuntime(invoker=invoker).run(_package(write_scopes=("lib/",)))
+    assert [w.path for w in out.writes] == ["lib/greet.py"]  # only source; .pyc/.pyo dropped
+    assert out.writes[0].content.startswith(b"def greet()")
+
+
+def test_is_build_byproduct_matches_bytecode_only() -> None:
+    from runtime.integrations import _is_build_byproduct
+
+    assert _is_build_byproduct("lib/__pycache__/greet.cpython-313.pyc")
+    assert _is_build_byproduct("lib/greet.pyc")
+    assert _is_build_byproduct("greet.pyo")
+    assert not _is_build_byproduct("lib/greet.py")  # source is not a by-product
+    assert not _is_build_byproduct("pycache_notes.py")  # not under a __pycache__ dir
+
+
 def test_run_parses_cost_from_transcript() -> None:
     out = ClaudeCodeRuntime(invoker=_fake_invoker({"runtime/feature.py": b"x"})).run(_package())
     assert out.cost.tokens == 1500  # 1000 + 500

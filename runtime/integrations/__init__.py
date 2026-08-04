@@ -272,15 +272,27 @@ def _seed_workspace(workspace: Path, source: Path, write_scopes: tuple[str, ...]
             shutil.copy2(src, dst)
 
 
+def _is_build_byproduct(rel: str) -> bool:
+    """A compiler by-product (Python bytecode), never authored source (DEBT-0022).
+
+    Running a `builds` command like `python -m py_compile lib/x.py` emits `__pycache__/x.*.pyc`.
+    If that `.pyc` is collected it can become `build.artifacts[0]` — the *reviewed* artifact — and
+    the adversary/court then have to materialise sourceless, interpreter-version-coupled bytecode,
+    which is fragile (the M3 seal/block asymmetry). Excluding it keeps the reviewed artifact the
+    deterministic Python **source** the goal actually authored."""
+    return rel.endswith((".pyc", ".pyo")) or "__pycache__" in rel.split("/")
+
+
 def _collect_writes(workspace: Path, write_scopes: tuple[str, ...]) -> tuple[AgentWrite, ...]:
     """Every file the session wrote in its workspace, as repo-relative paths — filtered to scope.
-    A write outside `write_scopes` is dropped (never becomes an artifact)."""
+    A write outside `write_scopes` is dropped (never becomes an artifact); so is compiled Python
+    bytecode (`__pycache__/*.pyc`), a build by-product rather than authored source (DEBT-0022)."""
     writes: list[AgentWrite] = []
     for path in sorted(workspace.rglob("*")):
         if not path.is_file():
             continue
         rel = path.relative_to(workspace).as_posix()
-        if within_scopes(rel, write_scopes):
+        if within_scopes(rel, write_scopes) and not _is_build_byproduct(rel):
             writes.append(AgentWrite(path=rel, content=path.read_bytes()))
     return tuple(writes)
 
