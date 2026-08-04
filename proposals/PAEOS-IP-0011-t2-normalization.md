@@ -1,6 +1,6 @@
 # PAEOS-IP-0011 — T2 Evidence-Result Normalization Protocol (stdout trailing whitespace)
 
-Status: **DRAFTED — awaiting founder ratification** · Filed: 2026-08-04 · Channel: CER-2
+Status: **RATIFIED BY FOUNDER** (2026-08-04) · Filed: 2026-08-04 · Channel: CER-2
 Level: **kernel-surface** (amends the T2 deterministic-reproduction gate, `kernel/evidence.py`;
 needs §14.5 ceremony + founder — the change is already implemented as `_normalized_result`, this
 proposal formalizes the contract it must satisfy). Source: **DEBT-0020**; discovered by the Phase-3

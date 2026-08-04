@@ -50,3 +50,9 @@ whose ideal solution requires a constitutional change SHOULD also file a Proposa
 - `DEBT-0015.md` — Control Plane Duplication Between In-Memory CLI and Self-Host Drivers.
 - `DEBT-0016.md` — Physical Repository Tree Duplication in Probative Verification Workspace.
 - `DEBT-0017.md` — Ad-hoc Serialization of Evidence Bundles in Adversary Workspace Context.
+- `DEBT-0018.md` — Continuous Scheduler Global Governor Halts Lack Kernel Ledger Event Logging.
+- `DEBT-0019.md` — Autonomous evidence path blocked in headless builder sessions (`_allowed_tools` omits `Bash`) (RESOLVED).
+- `DEBT-0020.md` — T2 evidence result normalization lacks formal specification (IP candidate) (RESOLVED — IP-0011 ratified).
+- `DEBT-0021.md` — Over-broad tool authority in session tool allow-list (`Bash` granted to non-Builder sub-sessions) (RESOLVED).
+- `DEBT-0022.md` — Artifact selection prefers compiled `.pyc` over source; fragile adversary materialization.
+

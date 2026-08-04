@@ -85,4 +85,7 @@ amendment may change constitutional law.
   deterministic-reproduction comparison so `stdout` matches modulo *trailing* whitespace (exit code +
   non-trailing content still exact), with an anti-forgery proof. Kernel-surface (amends PAEOS-4 §T2);
   the code (`kernel/evidence.py::_normalized_result`) already shipped in M3. Source: **DEBT-0020**
-  (drift audit). Status: **DRAFTED — awaiting founder ratification**.
+  (drift audit). Status: **RATIFIED BY FOUNDER** (2026-08-04); resolves DEBT-0020. The §3 contract
+  (exit_code exact; stdout equal modulo *trailing* whitespace; leading/interior/content still
+  remand) is now the definition of T2 result-equivalence — a recommended follow-up is a one-line
+  pointer in PAEOS-4 §T2 (kernel-doc edit, founder-owned).
