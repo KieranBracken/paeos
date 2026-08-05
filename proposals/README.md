@@ -89,3 +89,9 @@ amendment may change constitutional law.
   (exit_code exact; stdout equal modulo *trailing* whitespace; leading/interior/content still
   remand) is now the definition of T2 result-equivalence — a recommended follow-up is a one-line
   pointer in PAEOS-4 §T2 (kernel-doc edit, founder-owned).
+- `PAEOS-IP-0012-budget-elevation.md` — **Dynamic Budget Ceiling Elevation Protocol (K11 Mid-Run Elevation)**:
+  allow in-flight workers to request a budget ceiling elevation from the EconomicGovernor (K11) rather than taking
+  low-quality shortcuts or remanding prematurely. Cost is conserved (drawn from remaining parent tokens); time is the
+  only buffer (waiting longer for session limit reset). Status: **RATIFIED BY FOUNDER** (2026-08-05).
+
+
