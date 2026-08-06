@@ -59,6 +59,10 @@ Why is this worth exploring? What problem does it solve?
 - **[`RB-0006-the-builder-to-ecosystem-transition.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0006-the-builder-to-ecosystem-transition.md)** — **The Transition from Builder Construction to Ecosystem Execution**:
   ratifies the strategic shift from building internal PAEOS machinery to using PAEOS as an engineering operating system to build external ecosystem components (SAKG, Concept Graph, Sentium, KAE, Orca-strator, Library of Fire).
   Status: **Ratified Ecosystem Principle**.
+- **[`RB-0007-architecture-discovery-engine.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0007-architecture-discovery-engine.md)** — **Architecture Discovery Engine (ADE)**:
+  investigates how PAEOS systematically searches the architectural design space to discover candidate solutions before debate and evaluation begin, filling the gap between Knowledge Acquisition (RB-0004) and Deliberation (RB-0001/0003/0005).
+  Status: **High Priority (Future Phase)**.
+
 
 
 
