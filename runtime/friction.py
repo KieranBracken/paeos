@@ -238,19 +238,22 @@ def classify_friction(
     changed_paths: tuple[str, ...] = (),
     *,
     has_matching_scar: bool = False,
+    remand_count: int = 1,
 ) -> FrictionRecord:
     """Classify a ``RunOutcome`` into a fully-scored ``FrictionRecord``.
 
-    Applies all three friction primitives in sequence:
+    Applies friction primitives & safeguards in sequence:
         1. **Pattern classification** → NONE / DEBT / RESEARCH / PROPOSAL
-        2. **Leverage scoring** (Primitive 4) → ROI estimate
-        3. **Confidence assessment** (Primitive 5) → auto-promote recurring SOFT DEBT to INTAKE_FIX
+        2. **Remand-Cap Safeguard** → 2+ remands escalate SOFT DEBT to RESEARCH (prevent AI slop)
+        3. **Leverage scoring** (Primitive 4) → ROI estimate
+        4. **Confidence assessment** (Primitive 5) → auto-promote single-occurrence SOFT DEBT to INTAKE_FIX
 
     Args:
         outcome: The run outcome to classify.
         changed_paths: The paths the run's intake targeted.
         has_matching_scar: Whether a scar already exists for this failure signature (from the
             Evolution Layer's ScarStore). When True, the friction is considered recurring.
+        remand_count: How many times this goal signature has remanded. When >= 2, forces RESEARCH.
     """
     leverage = score_leverage(changed_paths, has_matching_scar=has_matching_scar)
 
@@ -279,6 +282,12 @@ def classify_friction(
     if leverage.blast_radius == "HARD" and has_matching_scar:
         category = FrictionCategory.PROPOSAL
         title = f"Recurring TCB Failure — {title}"
+
+    # Remand-Cap Safeguard: If a goal has remanded 2+ times, force classification to RESEARCH
+    # so we stop forcing the Builder to retry and risk producing AI slop.
+    if outcome.status is RunStatus.REMANDED and remand_count >= 2 and leverage.blast_radius != "HARD":
+        category = FrictionCategory.RESEARCH
+        title = f"Remand Cap Exceeded (2+ Remands) — {title}"
 
     # Step 2: confidence assessment (Primitive 5).
     confidence = assess_confidence(category, leverage)
