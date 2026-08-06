@@ -23,6 +23,9 @@ import threading
 import uuid
 from pathlib import Path
 
+# RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
+from runtime.friction import FrictionCategory, classify_friction, record_friction
+
 from kernel.cas import CAS, FilesystemCasStore
 from kernel.keystore import load_or_create_signing_key
 from kernel.ledger import Ledger
@@ -94,6 +97,12 @@ def build_scheduler(
             evolution.run(
                 outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
             )
+        # RB-0008: autonomous friction detection — classify and record structural gaps.
+        friction = classify_friction(outcome, intake.changed_paths)
+        if friction.category is not FrictionCategory.NONE:
+            path = record_friction(friction, repo_root)
+            if path:
+                print(f"[RB-0008] Friction recorded: {path}", file=sys.stderr)
         return outcome
 
     governor = EconomicGovernor(global_budget)
@@ -125,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
         state_dir,
         repo_root,
         # A contained ceiling: enough for a few full-weight runs; halts (not spins) when exhausted.
-        global_budget=GlobalBudget(tokens=8_000_000, wallclock_s=72_000, runs=8),
+        global_budget=GlobalBudget(tokens=25_000_000, wallclock_s=72_000, runs=25),
         max_concurrency=max_concurrency,
     )
     report = scheduler.run(backlog)

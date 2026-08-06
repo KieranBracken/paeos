@@ -28,6 +28,8 @@ from nacl.signing import SigningKey
 
 from runtime.claude_code import AgentRuntime
 from runtime.evolution import EvolutionLayer
+# RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
+from runtime.friction import FrictionCategory, classify_friction, record_friction
 from runtime.memory import ScarStore
 from runtime.orchestrator import Intake, RunOutcome, SelfHostRunner, SoftLoop
 from runtime.task_package import Budget
@@ -121,6 +123,11 @@ def run_backlog(
         evolution.run(
             outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
         )
+        # RB-0008: autonomous friction detection — classify and record structural gaps.
+        if repo_root is not None:
+            friction = classify_friction(outcome, intake.changed_paths)
+            if friction.category is not FrictionCategory.NONE:
+                record_friction(friction, repo_root)
         outcomes.append(outcome)
     return outcomes
 
