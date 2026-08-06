@@ -125,7 +125,10 @@ def run_backlog(
         )
         # RB-0008: autonomous friction detection — classify and record structural gaps.
         if repo_root is not None:
-            friction = classify_friction(outcome, intake.changed_paths)
+            has_matching_scar = bool(loop.scar_store.match_scars(intake.goal_signature)) if intake.goal_signature else False
+            friction = classify_friction(
+                outcome, intake.changed_paths, has_matching_scar=has_matching_scar
+            )
             if friction.category is not FrictionCategory.NONE:
                 record_friction(friction, repo_root)
         outcomes.append(outcome)

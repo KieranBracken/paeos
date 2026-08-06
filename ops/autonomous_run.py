@@ -98,7 +98,10 @@ def build_scheduler(
                 outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
             )
         # RB-0008: autonomous friction detection — classify and record structural gaps.
-        friction = classify_friction(outcome, intake.changed_paths)
+        has_matching_scar = bool(loop.scar_store.match_scars(intake.goal_signature)) if intake.goal_signature else False
+        friction = classify_friction(
+            outcome, intake.changed_paths, has_matching_scar=has_matching_scar
+        )
         if friction.category is not FrictionCategory.NONE:
             path = record_friction(friction, repo_root)
             if path:
