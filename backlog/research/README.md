@@ -62,6 +62,10 @@ Why is this worth exploring? What problem does it solve?
 - **[`RB-0007-architecture-discovery-engine.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0007-architecture-discovery-engine.md)** — **Architecture Discovery Engine (ADE)**:
   investigates how PAEOS systematically searches the architectural design space to discover candidate solutions before debate and evaluation begin, filling the gap between Knowledge Acquisition (RB-0004) and Deliberation (RB-0001/0003/0005).
   Status: **High Priority (Future Phase)**.
+- **[`RB-0008-autonomous-technical-leadership.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0008-autonomous-technical-leadership.md)** — **Autonomous Technical Leadership & Self-Improvement Loop**:
+  establishes the operational blueprint and success metrics for long-running autonomous runs where PAEOS builds external systems, identifies its own structural gaps, files research/proposals/debt, calculates ROI, and self-corrects without founder intervention.
+  Status: **Critical (Phase 4 Mission Target)**.
+
 
 
 
