@@ -69,6 +69,7 @@ def build_prompt(package: TaskPackage) -> str:
     """Compile the package into a session prompt (K5 — generated, not handwritten)."""
     lines = [
         "You are a scoped PAEOS worker session. Do ONLY the objective below, then stop.",
+        "During execution, you may freely consult the Research Backlog (`backlog/research/`) when it is relevant, but do not interrupt the mission to implement backlog items unless you can demonstrate they are prerequisites for successful completion.",
         "",
         f"# Objective\n{package.objective}",
         "",

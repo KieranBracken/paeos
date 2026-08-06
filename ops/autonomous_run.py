@@ -125,22 +125,23 @@ def build_scheduler(
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    if not 2 <= len(argv) <= 3:
+    if not 2 <= len(argv) <= 4:
         print(
-            "usage: python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency]",
+            "usage: python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency] [max_runs]",
             file=sys.stderr,
         )
         return 64
     backlog_path, state_dir = Path(argv[0]), Path(argv[1])
-    max_concurrency = int(argv[2]) if len(argv) == 3 else 1
+    max_concurrency = int(argv[2]) if len(argv) >= 3 else 1
+    max_runs = int(argv[3]) if len(argv) >= 4 else 25
     repo_root = Path.cwd()
 
     backlog = parse_backlog(json.loads(backlog_path.read_text(encoding="utf-8")))
     scheduler, _evolution, ledger = build_scheduler(
         state_dir,
         repo_root,
-        # A contained ceiling: enough for a few full-weight runs; halts (not spins) when exhausted.
-        global_budget=GlobalBudget(tokens=25_000_000, wallclock_s=72_000, runs=25),
+        # A contained ceiling: enough for specified runs; halts (not spins) when exhausted.
+        global_budget=GlobalBudget(tokens=25_000_000, wallclock_s=72_000, runs=max_runs),
         max_concurrency=max_concurrency,
     )
     report = scheduler.run(backlog)
