@@ -195,19 +195,28 @@ Research:
 
 ---
 
-## 8. Engineering Friction
+## 8. Engineering Friction & Blockage Analysis
 
-Investigate engineering friction as a measurable quantity.
+Investigate engineering friction as a multi-signal diagnostic quantity rather than a rigid integer threshold.
 
-Possible questions:
+Instead of a simple "N remands = research" rule, research a rich `BlockageAnalysis` that evaluates:
 
-* repeated blockers
-* recurring remands
-* capability demand frequency
-* implementation pain points
-* organisational bottlenecks
+* repeated remands
+* blockage type (implementation error vs planning gap vs architectural flaw)
+* capability availability
+* confidence trajectory
 
-Can friction itself become an optimisation signal?
+Possible diagnostic routing outputs:
+
+* `RETRY` (local implementation bug)
+* `RETURN_TO_PLANNER` (flawed plan)
+* `RETURN_TO_DESIGNER` (architectural uncertainty)
+* `REQUEST_CAPABILITY` (missing specialist or tool)
+* `RESEARCH` (unknown domain knowledge)
+* `PROPOSAL` (constitutional/TCB conflict)
+* `FOUNDER` (ambiguous founder intent)
+
+Can friction itself become an optimization signal?
 
 ---
 

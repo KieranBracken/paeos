@@ -133,15 +133,6 @@ def test_recurring_remand_auto_promotes_to_intake_fix() -> None:
     assert record.confidence.can_auto_promote
 
 
-def test_remand_cap_exceeded_escalates_to_research() -> None:
-    outcome = _outcome(RunStatus.REMANDED, "builder produced no artifact")
-    record = classify_friction(
-        outcome, changed_paths=("sakg/x.py",), remand_count=2
-    )
-    assert record.category is FrictionCategory.RESEARCH
-    assert "Remand Cap Exceeded" in record.title
-
-
 def test_recurring_tcb_failure_classifies_as_proposal() -> None:
     outcome = _outcome(RunStatus.REMANDED, "court remanded")
     record = classify_friction(

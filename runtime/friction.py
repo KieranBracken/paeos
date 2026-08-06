@@ -283,12 +283,6 @@ def classify_friction(
         category = FrictionCategory.PROPOSAL
         title = f"Recurring TCB Failure — {title}"
 
-    # Remand-Cap Safeguard: If a goal has remanded 2+ times, force classification to RESEARCH
-    # so we stop forcing the Builder to retry and risk producing AI slop.
-    if outcome.status is RunStatus.REMANDED and remand_count >= 2 and leverage.blast_radius != "HARD":
-        category = FrictionCategory.RESEARCH
-        title = f"Remand Cap Exceeded (2+ Remands) — {title}"
-
     # Step 2: confidence assessment (Primitive 5).
     confidence = assess_confidence(category, leverage)
 
