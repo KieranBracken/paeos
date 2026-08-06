@@ -26,6 +26,8 @@ from runtime.orchestrator import Intake, RunOutcome
 from runtime.task_package import Budget
 from runtime.triage import triage
 
+from collections import deque
+
 __all__ = [
     "ConcurrentScheduler",
     "ContinuousScheduler",
@@ -100,27 +102,12 @@ class EconomicGovernor:
             self._runs += 1
 
     def settle(self, reserved: Budget, spent_tokens: int, spent_wallclock_s: float) -> None:
-        """Refund the unspent portion of an already-charged reservation (M2 actual-spend metering).
-
-        Tightens K11 from *ceiling-conservative* to *exact*: `charge` reserves the weight-class
-        ceiling before the run (so admission can never over-commit — the property concurrency
-        relies on); `settle` then credits back ``reserved - actual`` per resource dimension once
-        the run reports what it truly spent, so the running total tracks **actual** spend and more
-        runs fit under the same global budget. Invariants that keep it conservation-safe:
-
-        - The refund is **clamped to ``[0, reserved]``** per dimension — never refunds more than was
-          reserved, and an over-spend (``actual > reserved``, which `GoalBudget` already forbids)
-          refunds nothing rather than crediting phantom budget.
-        - The wallclock refund is **floored** (``int``), so a fractional second is kept reserved,
-          never released — the refund never exceeds the true unspent amount.
-        - The **run count is never refunded**: a run consumes one run-slot regardless of spend, so
-          the `runs` dimension keeps bounding *how many* runs, independent of *how much* each cost.
-        """
+        """Refund the unspent portion of an already-charged reservation (M2 actual-spend metering)."""
         spent_t = max(0, min(spent_tokens, reserved.tokens))
         spent_w = max(0.0, min(spent_wallclock_s, float(reserved.wallclock_s)))
         with self._lock:
             self._tokens -= reserved.tokens - spent_t
-            self._wallclock -= int(reserved.wallclock_s - spent_w)  # floor: keep fraction reserved
+            self._wallclock -= int(reserved.wallclock_s - spent_w)
 
     def remaining(self) -> GlobalBudget:
         with self._lock:
@@ -188,39 +175,25 @@ class ContinuousScheduler:
         """Run goals until the source is exhausted OR the governor halts the loop."""
         outcomes: list[RunOutcome] = []
         stop = StopReason.SOURCE_EXHAUSTED
-        for intake in source:
+        queue = deque(source)
+        while queue:
+            intake = queue.popleft()
             allocation = self._allocation(intake)
             if not self._governor.can_admit(allocation):
                 stop = StopReason.BUDGET_EXHAUSTED  # halt, do NOT spin (§9.4)
                 break
             self._governor.charge(allocation)  # K11: reserve the ceiling before running
             outcome = self._run_one(intake)
-            # M2: refund the unspent allocation so the running total tracks ACTUAL spend, not the
-            # ceiling — exact K11 accounting, so more real work fits under the same global budget.
             self._governor.settle(allocation, outcome.spent_tokens, outcome.spent_wallclock_s)
             outcomes.append(outcome)
+            # RB-0008 §3: Queue high-leverage (>5x) friction repair intakes immediately ahead of remaining goals
+            if outcome.high_leverage_intake is not None:
+                queue.appendleft(outcome.high_leverage_intake)
         return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
 
 
 class ConcurrentScheduler:
-    """Multi-goal concurrency under the global K11 parent (M2): run up to `max_concurrency` goals
-    in parallel, each an isolated child of the one `EconomicGovernor`.
-
-    The K11 tree is explicit here: the governor is the **parent** budget and every in-flight goal is
-    a **child** holding a reserved allocation; `try_admit` (atomic) guarantees Σ children.reserved ≤
-    parent at all times, so parallelism can never breach the global budget. Each goal is isolated —
-    its own `run_id`, workspace, and `GoalBudget` — and one goal's failure neither corrupts another
-    nor leaks its reservation (every admitted allocation is `settle`d exactly once on completion).
-
-    **Halt, don't spin (§9.4):** when the governor refuses the next goal *and* nothing is in flight
-    to free budget, the loop stops (`BUDGET_EXHAUSTED`). When it refuses but goals *are* running, it
-    is not exhausted — it applies backpressure by waiting for an in-flight goal to complete (its
-    `settle` frees budget) and retries, rather than dropping the goal or busy-waiting.
-
-    **Separation of powers / K8:** this parallelises *execution* (`run_one`). Integration into the
-    single-writer ledger is the driver's responsibility to serialize — parallel generation, serial
-    integration (FP-1). `run_one` must therefore be safe to call from a worker thread.
-    """
+    """Multi-goal concurrency under the global K11 parent (M2)."""
 
     def __init__(
         self,
@@ -241,6 +214,7 @@ class ConcurrentScheduler:
         """Admit and run goals concurrently under the K11 parent until the source is exhausted or
         the governor halts the loop. Outcomes are returned in completion order."""
         it = iter(source)
+        pending: deque[Intake] = deque()
         outcomes: list[RunOutcome] = []
         stop = StopReason.SOURCE_EXHAUSTED
         inflight: dict[Future[RunOutcome], Budget] = {}
@@ -251,7 +225,13 @@ class ConcurrentScheduler:
             while True:
                 # 1) Fill the pool: admit while concurrency slots AND budget allow.
                 while not source_done and len(inflight) < self._max_concurrency:
-                    intake = holdover if holdover is not None else next(it, None)
+                    if holdover is not None:
+                        intake = holdover
+                    elif pending:
+                        intake = pending.popleft()
+                    else:
+                        intake = next(it, None)
+
                     holdover = None
                     if intake is None:
                         source_done = True
@@ -280,6 +260,10 @@ class ConcurrentScheduler:
                         allocation, outcome.spent_tokens, outcome.spent_wallclock_s
                     )
                     outcomes.append(outcome)
+                    # RB-0008 §3: Immediate queueing for high-leverage (>5x) friction repair intakes
+                    if outcome.high_leverage_intake is not None:
+                        pending.appendleft(outcome.high_leverage_intake)
+                        source_done = False
 
         return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
 

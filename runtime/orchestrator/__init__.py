@@ -138,6 +138,8 @@ class RunOutcome:
     # actual, tightening K11 from ceiling-conservative to exact. Set centrally in `run()`.
     spent_tokens: int = 0
     spent_wallclock_s: float = 0.0
+    # RB-0008 §3: high-leverage (>5x) friction repair intake for immediate queue insertion
+    high_leverage_intake: Intake | None = None
 
 
 class SoftLoop:

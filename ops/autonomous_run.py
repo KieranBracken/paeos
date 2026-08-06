@@ -106,6 +106,9 @@ def build_scheduler(
             path = record_friction(friction, repo_root)
             if path:
                 print(f"[RB-0008] Friction recorded: {path}", file=sys.stderr)
+        if friction.high_leverage_intake is not None:
+            from dataclasses import replace
+            outcome = replace(outcome, high_leverage_intake=friction.high_leverage_intake)
         return outcome
 
     governor = EconomicGovernor(global_budget)

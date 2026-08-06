@@ -10,18 +10,18 @@ Implements all five primitives of RB-0008 that are achievable without external d
         friction (sakg/, spec/) because substrate fixes unblock *all* downstream goals.
         Recurrence (a matching scar already exists) doubles the leverage because the system has
         already tried and failed to guard against this class of failure.
+        If leverage >= 5.0, a high-leverage Intake is dynamically constructed for immediate queueing.
 
     **Primitive 5 — Autonomous Confidence & Ratification Thresholds** (this module):
         A friction event is scored for *confidence* — how certain the system is that it can
         characterize and act on the friction autonomously. High-confidence, low-blast-radius,
         recurring friction is auto-downgraded to ``INTAKE_FIX`` (immediate in-scope repair with
         no new DEBT/RB file). Kernel-touching friction always requires human review and is never
-        auto-promoted. The threshold is conservative: only well-understood, previously-scarred,
-        SOFT-classified friction qualifies for autonomous handling.
+        auto-promoted. Recurring TCB-touching friction generates a formal ``PAEOS-IP-XXXX.md`` proposal.
 
 Design invariants:
     - **No kernel writes**: this module never touches ``kernel/`` or the TCB — it is a runtime
-      utility that writes only ``ledger/`` and ``backlog/`` files.
+      utility that writes only ``ledger/``, ``backlog/``, and ``proposals/`` files.
     - **No opinion generation**: it classifies the *type* of friction from structural signals
       (the ``RunOutcome.detail`` string and the ``RunStatus``), never inventing explanations.
     - **Idempotent numbering**: sequence numbers are derived from scanning existing files on disk,
@@ -40,7 +40,7 @@ from enum import Enum
 from pathlib import Path
 
 from kernel.classifier import Classification, classify_paths
-from runtime.orchestrator import RunOutcome, RunStatus
+from runtime.orchestrator import Intake, RunOutcome, RunStatus
 
 __all__ = [
     "FrictionCategory",
@@ -58,6 +58,7 @@ class FrictionCategory(Enum):
     NONE = "none"  # clean seal — no friction
     DEBT = "debt"  # known implementation compromise — ledger/debt/
     RESEARCH = "research"  # unknown gap — needs exploration — backlog/research/
+    PROPOSAL = "proposal"  # architectural / constitutional amendment — proposals/
     INTAKE_FIX = "intake-fix"  # trivial in-scope repair — log only, no new file
 
 
@@ -156,15 +157,22 @@ def assess_confidence(
     """Determine if a friction event can be handled autonomously (Primitive 5).
 
     Auto-promotion threshold (all conditions must hold):
-        1. Category is DEBT (known pattern, not unknown RESEARCH gap)
+        1. Category is DEBT (known pattern, not unknown RESEARCH gap or PROPOSAL)
         2. Blast radius is SOFT (not kernel-touching)
         3. Friction is recurring (a scar already exists — well-understood failure class)
 
     If ANY of these fail, the friction requires human review:
+        - PROPOSAL → TCB/constitutional change requires human/founder ratification (A4)
         - RESEARCH → unknown gap, needs investigation
         - HARD blast radius → A4 human ratification required, non-negotiable
         - Not recurring → first occurrence, needs human characterization
     """
+    if category is FrictionCategory.PROPOSAL:
+        return ConfidenceAssessment(
+            can_auto_promote=False,
+            reason="PROPOSAL friction (TCB / constitutional) requires human/founder ratification under A4",
+        )
+
     if category is FrictionCategory.RESEARCH:
         return ConfidenceAssessment(
             can_auto_promote=False,
@@ -204,6 +212,7 @@ class FrictionRecord:
     changed_paths: tuple[str, ...]
     leverage: LeverageScore  # Primitive 4: how impactful is fixing this
     confidence: ConfidenceAssessment  # Primitive 5: can this be handled autonomously
+    high_leverage_intake: Intake | None = None  # RB-0008 §3: immediate queue fix if leverage >= 5x
 
 
 # Each rule is (substring to match in RunOutcome.detail, category, title template).
@@ -233,7 +242,7 @@ def classify_friction(
     """Classify a ``RunOutcome`` into a fully-scored ``FrictionRecord``.
 
     Applies all three friction primitives in sequence:
-        1. **Pattern classification** → NONE / DEBT / RESEARCH
+        1. **Pattern classification** → NONE / DEBT / RESEARCH / PROPOSAL
         2. **Leverage scoring** (Primitive 4) → ROI estimate
         3. **Confidence assessment** (Primitive 5) → auto-promote recurring SOFT DEBT to INTAKE_FIX
 
@@ -265,6 +274,12 @@ def classify_friction(
             category, title = matched_category, matched_title
             break
 
+    # If the change is TCB-implicated (HARD blast radius) and recurring (scar exists), it triggers stage 18
+    # IMPROVE_RUNTIME → classify as PROPOSAL (PAEOS-IP-XXXX.md).
+    if leverage.blast_radius == "HARD" and has_matching_scar:
+        category = FrictionCategory.PROPOSAL
+        title = f"Recurring TCB Failure — {title}"
+
     # Step 2: confidence assessment (Primitive 5).
     confidence = assess_confidence(category, leverage)
 
@@ -272,6 +287,20 @@ def classify_friction(
     # INTAKE_FIX so no DEBT/RB file is created (the scar already guards future runs).
     if confidence.can_auto_promote:
         category = FrictionCategory.INTAKE_FIX
+
+    # Step 4: High-leverage immediate queueing (RB-0008 §3 Step 3).
+    # If leverage >= 5.0 and category is actionable (DEBT or INTAKE_FIX), generate a high-leverage intake.
+    high_leverage_intake: Intake | None = None
+    if leverage.exceeds_threshold and category in (FrictionCategory.DEBT, FrictionCategory.INTAKE_FIX):
+        high_leverage_intake = Intake(
+            objective=f"RB-0008 Immediate Fix: {title} ({outcome.detail})",
+            changed_paths=changed_paths,
+            plan_write_scopes=changed_paths,
+            builder_evidence=(),
+            goal_signature=f"high-leverage-fix:{outcome.goal_id}",
+            verifiable=True,
+            reversible=True,
+        )
 
     return FrictionRecord(
         category=category,
@@ -281,6 +310,7 @@ def classify_friction(
         changed_paths=changed_paths,
         leverage=leverage,
         confidence=confidence,
+        high_leverage_intake=high_leverage_intake,
     )
 
 
@@ -289,6 +319,7 @@ def classify_friction(
 
 _DEBT_PATTERN = re.compile(r"^DEBT-(\d{4})\.md$")
 _RB_PATTERN = re.compile(r"^RB-(\d{4})")
+_IP_PATTERN = re.compile(r"^PAEOS-IP-(\d{4})")
 
 
 def _next_sequence(directory: Path, pattern: re.Pattern[str]) -> int:
@@ -401,12 +432,47 @@ def _format_research(record: FrictionRecord, seq: int) -> str:
     """)
 
 
+def _format_proposal(record: FrictionRecord, seq: int) -> str:
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    paths_str = ", ".join(f"`{p}`" for p in record.changed_paths) if record.changed_paths else "N/A"
+    return textwrap.dedent(f"""\
+        # PAEOS-IP-{seq:04d} — {record.title}
+
+        Status: **PROPOSED** · Filed: {now} · Channel: CER-2
+        Level: **runtime-constitution** (autonomous friction detection, RB-0008).
+        Source: Autonomous run — goal `{record.goal_id}`.
+
+        ## 1. Observation
+
+        During autonomous execution, goal `{record.goal_id}` encountered recurring or high-leverage TCB friction:
+        `{record.detail}`.
+
+        Implicated paths: {paths_str}.
+
+        ## 2. Leverage & Blast Radius Assessment (RB-0008 Primitive 4)
+
+        **Leverage: {record.leverage.raw:.1f}×** (Substrate: {'yes' if record.leverage.is_substrate else 'no'}, Recurring: {'yes' if record.leverage.is_recurring else 'no'}).
+        Blast Radius: **{record.leverage.blast_radius}** (TCB-implicated).
+
+        ## 3. Proposed Protocol
+
+        1. Investigate the failure of existing scar guards on paths {paths_str}.
+        2. Author an explicit safety invariant diff to resolve constitutional drift.
+        3. Submit to Adversarial Ratification and Founder signature (A4 gate).
+
+        ## 4. Architectural Invariants Preserved
+
+        - **Human Ratification Gate (A4)**: Un-delegated TCB changes require explicit ratification.
+        - **Quality Over Haste (A2)**: Prevents un-derived kernel modifications.
+    """)
+
+
 def record_friction(record: FrictionRecord, repo_root: Path) -> Path | None:
     """Write a classified friction record to disk. Returns the path written, or ``None``.
 
     ``NONE`` and ``INTAKE_FIX`` categories produce no disk artifact (the latter is logged by the
     caller but needs no permanent file — Primitive 5 auto-promoted it). ``DEBT`` writes to
-    ``ledger/debt/``, ``RESEARCH`` writes to ``backlog/research/``.
+    ``ledger/debt/``, ``RESEARCH`` writes to ``backlog/research/``, ``PROPOSAL`` writes to ``proposals/``.
     """
     if record.category is FrictionCategory.NONE or record.category is FrictionCategory.INTAKE_FIX:
         return None
@@ -417,15 +483,19 @@ def record_friction(record: FrictionRecord, repo_root: Path) -> Path | None:
         content = _format_debt(record, seq)
         filename = f"DEBT-{seq:04d}.md"
     elif record.category is FrictionCategory.RESEARCH:
-        directory = repo_root / "ledger" / "debt"  # scan debt for max, but write to research
-        debt_seq = _next_sequence(directory, _DEBT_PATTERN)  # noqa: F841 — unused but reserved
         research_dir = repo_root / "backlog" / "research"
         seq = _next_sequence(research_dir, _RB_PATTERN)
         content = _format_research(record, seq)
-        # RB files use a slug derived from the title
         slug = re.sub(r"[^a-z0-9]+", "-", record.title.lower()).strip("-")[:50]
         filename = f"RB-{seq:04d}-{slug}.md"
         directory = research_dir
+    elif record.category is FrictionCategory.PROPOSAL:
+        proposal_dir = repo_root / "proposals"
+        seq = _next_sequence(proposal_dir, _IP_PATTERN)
+        content = _format_proposal(record, seq)
+        slug = re.sub(r"[^a-z0-9]+", "-", record.title.lower()).strip("-")[:50]
+        filename = f"PAEOS-IP-{seq:04d}-{slug}.md"
+        directory = proposal_dir
     else:
         return None
 

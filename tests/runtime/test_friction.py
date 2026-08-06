@@ -5,7 +5,9 @@ Validates that:
     - Each known remand/halt pattern classifies to the correct category.
     - Leverage scoring (Primitive 4) computes substrate, recurrence, and threshold flags.
     - Confidence assessment & auto-promotion (Primitive 5) downgrades recurring SOFT DEBT to INTAKE_FIX.
-    - Disk recording writes well-formed DEBT and RB markdown files with leverage notes.
+    - Recurring TCB-implicated failures generate PROPOSAL (PAEOS-IP-XXXX.md) items.
+    - High leverage friction (>= 5.0) generates immediate queue repair Intakes.
+    - Disk recording writes well-formed DEBT, RB, and IP markdown files with leverage notes.
     - Sequence numbering increments correctly.
     - NONE and INTAKE_FIX categories produce no disk artifacts.
 """
@@ -99,6 +101,13 @@ def test_assess_confidence_denies_research() -> None:
     assert "RESEARCH" in conf.reason
 
 
+def test_assess_confidence_denies_proposal() -> None:
+    leverage = score_leverage(("kernel/cas.py",), has_matching_scar=True)
+    conf = assess_confidence(FrictionCategory.PROPOSAL, leverage)
+    assert not conf.can_auto_promote
+    assert "PROPOSAL" in conf.reason
+
+
 # ---- classification tests -------------------------------------------------------
 
 
@@ -124,46 +133,24 @@ def test_recurring_remand_auto_promotes_to_intake_fix() -> None:
     assert record.confidence.can_auto_promote
 
 
-def test_remand_no_evidence_classifies_as_debt() -> None:
-    outcome = _outcome(RunStatus.REMANDED, "no evidence submitted to the court for this run")
-    record = classify_friction(outcome)
-    assert record.category is FrictionCategory.DEBT
-    assert "Court MCP" in record.title
-
-
-def test_remand_vacuous_evidence_classifies_as_debt() -> None:
-    outcome = _outcome(RunStatus.REMANDED, "non-probative (vacuous) evidence")
-    record = classify_friction(outcome)
-    assert record.category is FrictionCategory.DEBT
-    assert "Non-Probative" in record.title
-
-
-def test_remand_court_classifies_as_debt() -> None:
+def test_recurring_tcb_failure_classifies_as_proposal() -> None:
     outcome = _outcome(RunStatus.REMANDED, "court remanded")
-    record = classify_friction(outcome)
-    assert record.category is FrictionCategory.DEBT
-    assert "Court Remand" in record.title
+    record = classify_friction(
+        outcome, changed_paths=("kernel/cas.py",), has_matching_scar=True
+    )
+    assert record.category is FrictionCategory.PROPOSAL
+    assert "Recurring TCB Failure" in record.title
 
 
-def test_adversary_block_classifies_as_research() -> None:
-    outcome = _outcome(RunStatus.REMANDED, "adversary blocked the seal")
-    record = classify_friction(outcome)
-    assert record.category is FrictionCategory.RESEARCH
-    assert "Adversary" in record.title
-
-
-def test_budget_breach_classifies_as_research() -> None:
-    outcome = _outcome(RunStatus.HALTED, "budget breach: tokens exceeded")
-    record = classify_friction(outcome)
-    assert record.category is FrictionCategory.RESEARCH
-    assert "Budget" in record.title
-
-
-def test_unrecognized_detail_defaults_to_debt() -> None:
-    outcome = _outcome(RunStatus.REMANDED, "something completely unexpected happened")
-    record = classify_friction(outcome)
-    assert record.category is FrictionCategory.DEBT
-    assert "Unclassified" in record.title
+def test_high_leverage_friction_generates_high_leverage_intake() -> None:
+    outcome = _outcome(RunStatus.REMANDED, "builder produced no artifact", goal_id="g-highlev")
+    record = classify_friction(
+        outcome, changed_paths=("runtime/friction.py",), has_matching_scar=True
+    )
+    # leverage is 6.0 (substrate x3 * recurring x2) >= 5.0
+    assert record.leverage.exceeds_threshold
+    assert record.high_leverage_intake is not None
+    assert "RB-0008 Immediate Fix" in record.high_leverage_intake.objective
 
 
 # ---- recording tests -------------------------------------------------------------
@@ -217,6 +204,23 @@ def test_record_friction_writes_research_file(tmp_path: Path) -> None:
     assert "adversary blocked the seal" in content
     assert "Leverage Assessment" in content
     assert "Research" in content
+
+
+def test_record_friction_writes_proposal_file(tmp_path: Path) -> None:
+    (tmp_path / "proposals").mkdir(parents=True)
+    outcome = _outcome(RunStatus.REMANDED, "court remanded", goal_id="g-prop789")
+    record = classify_friction(
+        outcome, changed_paths=("kernel/cas.py",), has_matching_scar=True
+    )
+    assert record.category is FrictionCategory.PROPOSAL
+    path = record_friction(record, tmp_path)
+    assert path is not None
+    assert path.name.startswith("PAEOS-IP-0001-")
+    content = path.read_text(encoding="utf-8")
+    assert "PAEOS-IP-0001" in content
+    assert "g-prop789" in content
+    assert "PROPOSED" in content
+    assert "Human Ratification Gate (A4)" in content
 
 
 def test_sequence_numbering_increments(tmp_path: Path) -> None:

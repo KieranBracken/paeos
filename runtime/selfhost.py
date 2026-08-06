@@ -117,8 +117,12 @@ def run_backlog(
     )
     runner = SelfHostRunner(loop)
     evolution = EvolutionLayer(scar_store=scar_store)  # the sole L3 author (Stage 17)
+    from collections import deque
+
+    queue = deque(backlog)
     outcomes: list[RunOutcome] = []
-    for intake in backlog:
+    while queue:
+        intake = queue.popleft()
         (outcome,) = runner.run_backlog([intake])
         evolution.run(
             outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
@@ -131,6 +135,10 @@ def run_backlog(
             )
             if friction.category is not FrictionCategory.NONE:
                 record_friction(friction, repo_root)
+            if friction.high_leverage_intake is not None:
+                from dataclasses import replace
+                outcome = replace(outcome, high_leverage_intake=friction.high_leverage_intake)
+                queue.appendleft(friction.high_leverage_intake)
         outcomes.append(outcome)
     return outcomes
 
