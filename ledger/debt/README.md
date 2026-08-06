@@ -55,4 +55,8 @@ whose ideal solution requires a constitutional change SHOULD also file a Proposa
 - `DEBT-0020.md` — T2 evidence result normalization lacks formal specification (IP candidate) (RESOLVED — IP-0011 ratified).
 - `DEBT-0021.md` — Over-broad tool authority in session tool allow-list (`Bash` granted to non-Builder sub-sessions) (RESOLVED).
 - `DEBT-0022.md` — Artifact selection prefers compiled `.pyc` over source; fragile adversary materialization (RESOLVED).
+- `DEBT-0023.md` — Fixed write-scope coupling in autonomous intake generation drops valid deliverable files (OPEN).
+- `DEBT-0024.md` — Traceability broken by uncommitted `PAEOS-9-execution-architecture.md` dependency in `SAEOS-1` (OPEN).
+- `DEBT-0025.md` — Parallel backlog format duplication (YAML DAG vs. JSON Intake list) (OPEN).
+
 
