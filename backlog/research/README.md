@@ -65,6 +65,9 @@ Why is this worth exploring? What problem does it solve?
 - **[`RB-0008-autonomous-technical-leadership.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0008-autonomous-technical-leadership.md)** — **Autonomous Technical Leadership & Self-Improvement Loop**:
   establishes the operational blueprint and success metrics for long-running autonomous runs where PAEOS builds external systems, identifies its own structural gaps, files research/proposals/debt, calculates ROI, and self-corrects without founder intervention.
   Status: **Critical (Phase 4 Mission Target)**.
+- **[`RB-0009-organisational-cognition-and-capability-brokering.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0009-organisational-cognition-and-capability-brokering.md)** — **Organizational Cognition & Capability Brokering Architecture**:
+  redefines execution failure from naive retries to a Failure Routing Engine; models role-incentive bias and blind spots; establishes Capability Requests (voice without authority) and the Capability Broker for demand-driven self-improvement.
+  Status: **Cognitive Foundations Research**.
 
 
 
