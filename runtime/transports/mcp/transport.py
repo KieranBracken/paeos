@@ -27,7 +27,7 @@ class McpWorkerTransport:
     to launch that server against this pool."""
 
     def __init__(self, pool_dir: str | Path, *, server_name: str = "paeos-court") -> None:
-        self._dir = Path(pool_dir)
+        self._dir = Path(pool_dir).resolve()
         self._pool = FileCourtEvidencePool(self._dir)
         self._server_name = server_name
 
