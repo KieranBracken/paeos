@@ -42,6 +42,37 @@ Governs **how one single debate works** between agents:
 - Turn bounds & deadlock prevention
 - Objective evidence-bound dispositions (`Accepted`, `Rejected-with-Evidence`, `Deferred`, `Escalated`)
 
+---
+
+## 3. Position in the Research Pipeline & IP Derivation
+
+`RB-0003` sits at the center of the PAEOS autonomous research pipeline:
+
+```text
+RB-0004 (Knowledge Acquisition Engine)
+        │
+        ▼
+RB-0003 (Collective Intelligence & Deliberation Engine)
+        │
+        ▼
+RB-0007 (Architecture Discovery Engine)
+        │
+        ▼
+Downstream Implementation Proposals (IPs)
+```
+
+Knowledge acquisition (`RB-0004`) comes first, followed by collective reasoning and deliberation (`RB-0003`), which feeds systematic architecture search (`RB-0007`), before producing concrete, ratified implementation proposals:
+
+```text
+RB-0003 (Master Deliberation Engine)
+    │
+    ├── IP-0013 (Dialectic Proposer/Challenger Pairs)
+    ├── IP-0014 (Dynamic Specialist & Capability Discovery)
+    ├── IP-0015 (Heterogeneous & Temporary Debate Councils)
+    ├── IP-0016 (Confidence Aggregation & Voting Protocols)
+    └── IP-0017 (Debate Termination & EVAD Stopping Guards)
+```
+
 ### Level 2 — Deliberation Architecture (ORCA-strator Scope)
 Governs **how multiple reasoning paths are organized and combined**:
 - Heterogeneous vs. Homogeneous councils
