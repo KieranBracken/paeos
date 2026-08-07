@@ -101,12 +101,12 @@ def build_prompt(package: TaskPackage) -> str:
             "",
             "# Submitting evidence to the court (autonomous, R5.3):",
             f"  Your run_id is EXACTLY: {package.run_id}",
-            "  After you write the artifact, call the MCP tool `submit_evidence` once per required",
-            "  claim above. Pass: run_id (exactly the run_id above), claim_id, command (a REAL,",
-            "  PROBATIVE shell command whose result would DIFFER if your change were absent, run",
-            "  against ONLY the file(s) you wrote), artifact_hash (sha256 of the file you wrote),",
-            "  exit_code, and stdout. Vacuous evidence that does not discriminate your change from",
-            "  its absence will be rejected by the court.",
+            "  After you write the artifact, call the MCP tool `submit_evidence` once per required claim above.",
+            "  If no required claims are listed above, you MUST submit at least one claim (claim_id: 'builds') verifying your artifact.",
+            "  Pass: run_id (exactly the run_id above), claim_id, command (a REAL, PROBATIVE shell command,",
+            "  e.g., pytest or test -f, whose result would DIFFER if your change were absent, run against ONLY",
+            "  the file(s) you wrote), artifact_hash (sha256 of the file you wrote), exit_code, and stdout.",
+            "  Vacuous evidence that does not discriminate your change from its absence will be rejected by the court.",
         ]
     return "\n".join(lines)
 
