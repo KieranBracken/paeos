@@ -217,7 +217,7 @@ def test_planner_allow_list_omits_bash_least_privilege() -> None:
     assert {"Read", "Write", "Edit"} <= set(allowed)  # still gets the scoped non-exec tools
 
 
-def test_live_invoker_passes_accept_edits_permission_mode(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+def test_live_invoker_passes_dangerously_skip_permissions(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     import runtime.integrations as integ
 
     captured: dict[str, list[str]] = {}
@@ -232,8 +232,7 @@ def test_live_invoker_passes_accept_edits_permission_mode(monkeypatch) -> None: 
     monkeypatch.setattr(integ.subprocess, "run", _fake_run)
     invoker = integ.claude_cli_invoker(_package())
     invoker(SessionSpec(Path("/tmp"), "p", ("Write",), (), 60))
-    assert "--permission-mode" in captured["cmd"]
-    assert "acceptEdits" in captured["cmd"]
+    assert "--dangerously-skip-permissions" in captured["cmd"]
 
 
 # ---- B2.J: workspace context (constitution + materialized refs) -----------

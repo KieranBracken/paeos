@@ -151,12 +151,9 @@ def claude_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = N
             "json",
             "--allowedTools",
             ",".join(allowed),
-            # Headless sessions cannot answer interactive prompts, so writes need an auto-accept
-            # mode to land. `acceptEdits` (not the blanket `--dangerously-skip-permissions`) auto-
-            # applies edits, and the blast radius is already bounded: an isolated temp workspace +
-            # the write-scope filter in `_collect_writes` (B2.I).
-            "--permission-mode",
-            "acceptEdits",
+            # Headless sessions in isolated temp sandboxes cannot answer interactive permission prompts.
+            # `--dangerously-skip-permissions` allows Bash and MCP tool calls to execute without hanging.
+            "--dangerously-skip-permissions",
         ]
         if mcp_config_path is not None:
             cmd += ["--mcp-config", str(mcp_config_path)]
