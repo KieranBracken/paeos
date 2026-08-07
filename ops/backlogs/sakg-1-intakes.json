@@ -1,27 +1,13 @@
 [
   {
-    "objective": "[S-PROBE] Extraction feasibility spike \u2014 falsify SAEOS-1 \u00a79/A8 before building. Deliverables: reviews/spikes/sakg-s1-extraction-probe.md \u2014 for each of 3 real sealed goals from ledger/ + reviews/tasks/, a hand-extraction attempt into the SAEOS-1 \u00a74.3 node types, recording per-field: extractable / partial / absent. Explicit verdict GO or NO-GO with the loss ratio.\n. Accept: ['test -f reviews/spikes/sakg-s1-extraction-probe.md', \"rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md\", \"test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3\", \"rg -q '^loss_ratio: 0\\\\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md\"]",
+    "objective": "[S-PROBE] Extraction feasibility spike — falsify SAEOS-1 §9/A8 before building. Deliverables: reviews/spikes/sakg-s1-extraction-probe.md — for each of 3 real sealed goals from reviews/tasks/ (e.g. B0.0_review.md, B0.1_review.md, B0.2_review.md), a hand-extraction attempt into the SAEOS-1 §4.3 node types, recording per-field: extractable / partial / absent. Explicit verdict GO or NO-GO with the loss ratio.\n. Accept: ['test -f reviews/spikes/sakg-s1-extraction-probe.md', \"rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md\", \"test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3\", \"rg -q '^loss_ratio: 0\\\\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md\"]",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "reviews/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "reviews/"
     ],
     "goal_signature": "domain:sakg,task:s-probe",
     "verifiable": true,
@@ -31,26 +17,12 @@
   {
     "objective": "[F-ENVELOPE] Freeze the universal node envelope schema + fixture corpus. Deliverables: sakg/schema/envelope.schema.json (JSON Schema, draft 2020-12) covering every \u00a74.2 field; tests/sakg/fixtures/envelope/{valid,invalid}/*.json exercising every field, every status value, and every \u00a74.2 invariant violation (authored confidence, frequency-based promotion, deleted node).\n. Accept: ['uv run python -c \"import json,pathlib;json.loads(pathlib.Path(\\'sakg/schema/envelope.schema.json\\').read_text())\"', 'uv run pytest tests/sakg/test_envelope_schema.py -q', 'test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12', 'test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:f-envelope",
     "verifiable": true,
@@ -60,26 +32,10 @@
   {
     "objective": "[G-S1-GO] FOUNDER GATE: A4 go/no-go on the S1 build, on S-PROBE evidence. Deliverables: A recorded founder decision (ledger entry) \u2014 PROCEED or REVERT \u2014 citing the S-PROBE loss ratio.\n. Accept: [\"rg -q 'SAKG-1/G-S1-GO' ledger/decisions/*.md\", \"rg -q '^decision: (PROCEED|REVERT)$' ledger/decisions/SAKG-1-G-S1-GO.md\"]",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/"
     ],
     "goal_signature": "domain:sakg,task:g-s1-go",
     "verifiable": true,
@@ -89,26 +45,12 @@
   {
     "objective": "[F-BUNDLE] Freeze the Emission Bundle contract + golden serialization bytes. Deliverables: sakg/schema/bundle.schema.json \u2014 the append-only outbox record emitted at L15/L16, carrying Decision, TradeOff, Option (including rejected), Constraint, Component, Scar, EvidenceRef. Golden JCS bytes + SHA-256 for each fixture. Explicitly forbids inline evidence payloads (\u00a73.3.3).\n. Accept: ['uv run pytest tests/sakg/test_bundle_schema.py -q', 'uv run pytest tests/sakg/test_bundle_golden_bytes.py -q', 'uv run pytest tests/sakg/test_bundle_forbids_inline_evidence.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:f-bundle",
     "verifiable": true,
@@ -118,26 +60,12 @@
   {
     "objective": "[F-EXTRACT-FIX] Golden extraction fixtures \u2014 sealed PAEOS goal \u2192 expected bundle. Deliverables: tests/sakg/fixtures/extract/<goal_id>/{input/,expected_bundle.json} for the 3 S-PROBE goals plus 2 adversarial cases (a remanded goal; a goal whose L06 matrix is absent).\n. Accept: ['test $(ls -d tests/sakg/fixtures/extract/*/ | wc -l) -ge 5', 'uv run pytest tests/sakg/test_extract_fixtures_wellformed.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:f-extract-fix",
     "verifiable": true,
@@ -147,26 +75,12 @@
   {
     "objective": "[I-STORE] Implement the SAKG graph store \u2014 append-only nodes, edges, supersession. Deliverables: sakg/store.py \u2014 node + edge persistence honouring the \u00a74.2 envelope; append-only (no delete, supersession only); namespace isolation at the storage boundary; the 8 \u00a74.4 edge families with edge-as-object properties. Registers `sakg` in pyproject [tool.hatch.build.targets.wheel].packages.\n. Accept: ['uv run pytest tests/sakg/test_store.py -q', 'uv run pytest tests/sakg/test_store_append_only.py -q', 'uv run pytest tests/sakg/test_store_namespace_isolation.py -q', 'uv run pytest tests/sakg/test_edge_families.py -q', 'uv run ruff check sakg/', 'uv run pyright sakg/']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-store",
     "verifiable": true,
@@ -176,26 +90,14 @@
   {
     "objective": "[I-OUTBOX] Implement the PAEOS-side post-seal outbox writer (L15/L16). Deliverables: runtime/emission/outbox.py \u2014 append-only bundle writer invoked at L15/L16 after seal. MUST NOT import `sakg`. MUST be a no-op when the goal did not reach `integrated`.\n. Accept: ['uv run pytest tests/runtime/test_outbox_append_only.py -q', 'uv run pytest tests/runtime/test_outbox_noop_unless_sealed.py -q', 'uv run pytest tests/runtime/test_outbox_post_seal_ordering.py -q', \"! rg -q 'import sakg|from sakg' runtime/\", 'uv run pyright runtime/emission/']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
+      "tests/sakg/",
       "sakg/",
-      "ledger/",
-      "backlog/"
+      "runtime/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
+      "tests/sakg/",
       "sakg/",
-      "ledger/",
-      "backlog/"
+      "runtime/"
     ],
     "goal_signature": "domain:sakg,task:i-outbox",
     "verifiable": true,
@@ -205,26 +107,12 @@
   {
     "objective": "[I-EXTRACT] Implement PAEOS artifact \u2192 typed node extractors. Deliverables: sakg/extract.py \u2014 L06 matrix \u2192 TradeOff; L04 candidates \u2192 Option (incl. rejected); L08 design set \u2192 Component; L11 contract \u2192 Constraint; decision-graph \u2192 Decision; scar-graph \u2192 Scar; CAS hashes \u2192 EvidenceRef. Unextractable fields are recorded as explicit gaps, never silently dropped.\n. Accept: ['uv run pytest tests/sakg/test_extract.py -q', 'uv run pytest tests/sakg/test_extract_golden.py -q', 'uv run pytest tests/sakg/test_extract_records_gaps.py -q', 'uv run pytest tests/sakg/test_extract_rejected_options_retained.py -q', 'uv run pyright sakg/']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-extract",
     "verifiable": true,
@@ -234,26 +122,14 @@
   {
     "objective": "[I-INGEST] Implement pull-based ingest \u2014 outbox \u2192 candidate nodes in namespace. Deliverables: sakg/ingest.py \u2014 reads the outbox, writes nodes at status=candidate in the producing project's namespace, idempotent on re-read.\n. Accept: ['uv run pytest tests/sakg/test_ingest.py -q', 'uv run pytest tests/sakg/test_ingest_idempotent.py -q', 'uv run pytest tests/sakg/test_ingest_lands_candidate_only.py -q', 'uv run pytest tests/sakg/test_promotion_requires_evidence_binding.py -q', 'uv run pytest tests/sakg/test_frequency_never_promotes.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
+      "tests/sakg/",
       "sakg/",
-      "ledger/",
-      "backlog/"
+      "runtime/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
+      "tests/sakg/",
       "sakg/",
-      "ledger/",
-      "backlog/"
+      "runtime/"
     ],
     "goal_signature": "domain:sakg,task:i-ingest",
     "verifiable": true,
@@ -263,26 +139,12 @@
   {
     "objective": "[T-ROUNDTRIP] S1 EXIT HARNESS: lossless round-trip on a real sealed goal. Deliverables: tests/sakg/test_roundtrip.py + a hypothesis property test over generated bundles. Reports a machine-readable loss ratio.\n. Accept: ['uv run pytest tests/sakg/test_roundtrip.py -q', 'uv run pytest tests/sakg/test_roundtrip_property.py -q', 'uv run python -m sakg.report roundtrip --assert-loss-ratio 0']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:t-roundtrip",
     "verifiable": true,
@@ -292,26 +154,12 @@
   {
     "objective": "[F-PROJ] Freeze the Projection Request/Response contract + fixtures. Deliverables: sakg/schema/projection.schema.json \u2014 request (method, subject, namespace, budget{max_tokens,max_nodes,tier}, filters{min_confidence,as_of,status}) and response (results[{node_summary,score,why}], provenance{sakg_version, corpus_hash,query_hash}, truncated, omitted, trust, tier). `trust` is the constant \"untrusted\"; `tier` never admits FULL.\n. Accept: ['uv run pytest tests/sakg/test_projection_schema.py -q', 'uv run pytest tests/sakg/test_projection_trust_constant.py -q', 'uv run pytest tests/sakg/test_projection_rejects_full_tier.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:f-proj",
     "verifiable": true,
@@ -321,26 +169,12 @@
   {
     "objective": "[F-BUDGET-FIX] Golden budget-enforcement fixtures \u2014 drop-and-count, never truncate. Deliverables: tests/sakg/fixtures/budget/*.json \u2014 cases where results exceed max_tokens and max_nodes, each with the expected retained set, `omitted` count and `truncated` flag. Includes the pathological case where a single result exceeds the whole budget.\n. Accept: ['test $(ls tests/sakg/fixtures/budget/*.json | wc -l) -ge 6', 'uv run pytest tests/sakg/test_budget_fixtures_wellformed.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:f-budget-fix",
     "verifiable": true,
@@ -350,26 +184,12 @@
   {
     "objective": "[F-TRADEOFF-FIX] Golden `tradeoff_precedents` fixtures \u2014 query \u2192 ranked results + why. Deliverables: tests/sakg/fixtures/tradeoff/*.json \u2014 for real trade-off axes present in the ingested corpus, the expected ranked Decision set, each with its expected `why` traversal path and its joined Outcome.\n. Accept: ['test $(ls tests/sakg/fixtures/tradeoff/*.json | wc -l) -ge 5', 'uv run pytest tests/sakg/test_tradeoff_fixtures_wellformed.py -q', 'uv run pytest tests/sakg/test_tradeoff_fixtures_reference_real_goals.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:f-tradeoff-fix",
     "verifiable": true,
@@ -379,26 +199,12 @@
   {
     "objective": "[I-BACKFILL] Backfill historical Outcome nodes from ledger/debt + incident records. Deliverables: sakg/backfill.py mapping ledger/debt/DEBT-*.md and incident records onto Outcome nodes bound to their Decisions; ledger/debt/DEBT-00NN.md recording the compromise, its repayment condition (S3 automatic loop), and its risk.\n. Accept: ['uv run pytest tests/sakg/test_backfill.py -q', 'uv run pytest tests/sakg/test_backfill_outcomes_bound_to_decisions.py -q', 'uv run pytest tests/sakg/test_backfill_marked_hand_attributed.py -q', \"rg -q 'SAKG-1/I-BACKFILL' ledger/debt/DEBT-*.md\"]",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-backfill",
     "verifiable": true,
@@ -408,26 +214,12 @@
   {
     "objective": "[I-TRAVERSE] Implement traversal primitives over the 8 edge families. Deliverables: sakg/traverse.py \u2014 typed walks per \u00a74.4 family; acyclicity enforcement on dependency edges; non-transitive `analogous_to`; cross-namespace edges gated on both disclosure policies.\n. Accept: ['uv run pytest tests/sakg/test_traverse.py -q', 'uv run pytest tests/sakg/test_traverse_dependency_acyclic.py -q', 'uv run pytest tests/sakg/test_traverse_analogous_not_transitive.py -q', 'uv run pytest tests/sakg/test_traverse_cross_namespace_gated.py -q', 'uv run pyright sakg/']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-traverse",
     "verifiable": true,
@@ -437,26 +229,12 @@
   {
     "objective": "[I-PROJ] Implement the projection engine \u2014 budget, ranking, `why`, provenance. Deliverables: sakg/project.py \u2014 hard max_tokens ceiling; drop-and-count (never mid- structure truncation); mandatory `why` path on every result; corpus_hash + query_hash so any projection is reproducible.\n. Accept: ['uv run pytest tests/sakg/test_projection.py -q', 'uv run pytest tests/sakg/test_projection_budget_golden.py -q', 'uv run pytest tests/sakg/test_projection_never_exceeds_budget.py -q', 'uv run pytest tests/sakg/test_projection_every_result_has_why.py -q', 'uv run pytest tests/sakg/test_projection_reproducible_hashes.py -q', 'uv run pyright sakg/']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-proj",
     "verifiable": true,
@@ -466,26 +244,12 @@
   {
     "objective": "[I-TRADEOFF] Implement `tradeoff_precedents` \u2014 the single S2 method. Deliverables: sakg/methods/tradeoff_precedents.py \u2014 match TradeOff on axes, walk to the resolving Decision, join its realized Outcome.\n. Accept: ['uv run pytest tests/sakg/test_tradeoff_precedents.py -q', 'uv run pytest tests/sakg/test_tradeoff_golden.py -q', 'uv run pytest tests/sakg/test_tradeoff_joins_outcome.py -q', 'test $(ls sakg/methods/*.py | grep -v __init__ | wc -l) -eq 1']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-tradeoff",
     "verifiable": true,
@@ -495,26 +259,12 @@
   {
     "objective": "[I-MCP] Implement the read-only `sakg` MCP server surface. Deliverables: sakg/mcp_server.py \u2014 exposes `tradeoff_precedents` only; deny-by-default; NO mutating method exists on the surface (structural, not policy); every response tagged provenance=sakg, trust=untrusted, tier\u2208{SUMMARY,INDEX}.\n. Accept: ['uv run pytest tests/mcp/test_sakg_server.py -q', 'uv run pytest tests/mcp/test_sakg_server_readonly.py -q', 'uv run pytest tests/mcp/test_sakg_server_tags_untrusted.py -q', 'uv run pyright sakg/']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:i-mcp",
     "verifiable": true,
@@ -524,26 +274,12 @@
   {
     "objective": "[T-NONAUTH] CONFORMANCE: the three structural non-authority guarantees. Deliverables: tests/sakg/test_nonauthority.py \u2014 (1) no mutating method reachable from any consumer capability; (2) every result carries trust=untrusted and a SUMMARY/INDEX tier; (3) SAKG cannot mint an object of type Evidence \u2014 only EvidenceRef; (4) PAEOS does not import sakg anywhere.\n. Accept: ['uv run pytest tests/sakg/test_nonauthority.py -q', 'uv run pytest tests/sakg/test_nonauthority_no_mutating_egress.py -q', 'uv run pytest tests/sakg/test_nonauthority_no_evidence_minting.py -q', \"! rg -q 'import sakg|from sakg' kernel/ runtime/ cli/\", 'uv run pytest tests/sakg/test_poisoned_corpus_cannot_gate.py -q']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:t-nonauth",
     "verifiable": true,
@@ -553,26 +289,12 @@
   {
     "objective": "[T-BASELINE] MEASUREMENT: no-SAKG baseline harness (the \u00a77 falsifier). Deliverables: sakg/baseline.py + tests \u2014 runs a fixed goal set with and without the sakg allow-list entry, reporting the delta in research spawns, L10 remands, and tokens. Also asserts correct behaviour against an EMPTY graph (cold start).\n. Accept: ['uv run pytest tests/sakg/test_baseline_harness.py -q', 'uv run pytest tests/sakg/test_empty_graph_returns_empty_not_error.py -q', 'uv run pytest tests/sakg/test_unreachable_sakg_degrades_cleanly.py -q', 'uv run python -m sakg.baseline report --emit-json baseline.json', 'uv run python -c \"import json;d=json.load(open(\\'baseline.json\\'));assert set(d)>={\\'research_spawns_delta\\',\\'remands_delta\\',\\'tokens_delta\\'}\"']",
     "changed_paths": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "plan_write_scopes": [
-      "spec/",
-      "runtime/",
-      "kernel/",
-      "tests/",
-      "cli/",
-      "reviews/",
-      "sakg/",
-      "ledger/",
-      "backlog/"
+      "tests/sakg/",
+      "sakg/"
     ],
     "goal_signature": "domain:sakg,task:t-baseline",
     "verifiable": true,
