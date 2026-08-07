@@ -50,12 +50,40 @@ Resume Ecosystem Mission
 | **1. Knowledge Acquisition (RB-0004)** | Local repo + LLM weights only. | Autonomous crawling of papers, GitHub repos, and benchmarks when local knowledge is absent. |
 | **2. Architecture Discovery (RB-0007)** | Evaluates 1 proposal. | Generates and searches 30 candidate designs before debate begins. |
 | **3. Heterogeneous Councils (RB-0001/0003)** | Builder + Adversary. | Multi-role council (Architect, Economist, Security, Devil's Advocate, Performance). |
-| **4. Autonomous Prioritization** | Founder commands task sequence. | PAEOS estimates ROI, ranks substrate friction vs feature delivery, and reschedules tasks. |
+| **4. Capability Escalation Framework** | Naive retries & remands. | Stage-agnostic capability requests (voice without authority) routed via Capability Broker. |
 | **5. Autonomous Confidence Thresholds** | Founder ratifies proposals. | Constitutional rules define evidence thresholds where PAEOS auto-promotes low-risk improvements. |
 
 ---
 
-# 3. Operational Directive for Long-Running Autonomous Missions
+# 3. Capability Escalation Framework (Stage-Agnostic Blockage Diagnosis)
+
+Instead of a rigid `remand_count >= 2 → RESEARCH` rule, PAEOS implements a stage-agnostic Capability Escalation Framework.
+
+At **any stage** (`Planner`, `Designer`, `Builder`, `Adversary`, `Court`, `Evolution`), when execution encounters a blockage:
+
+```text
+Any Stage Blocked
+       │
+       ▼
+Diagnose Root Cause (Why blocked?)
+       │
+       ▼
+Request Needed Capability (Voice Without Authority)
+       │
+       ▼
+Capability Broker / Supervisor Decision
+ ┌─────┴────────────────────────┬──────────────────────┐
+ │                              │                      │
+ ▼                              ▼                      ▼
+Spawn Specialist Subagent     Retrieve Knowledge     Escalate to Proposal / Research
+(e.g., Economist, Compiler)   (RB-0004 KAE)          (RB-0009)
+```
+
+Workers recommend capability needs based on local optimization incentives, but **never decide resource allocation**. The Capability Broker evaluates global ROI and selects the appropriate response.
+
+---
+
+# 4. Operational Directive for Long-Running Autonomous Missions
 
 When launched on long-running missions (e.g. 8–10 hour autonomous build runs), PAEOS shall operate under the following protocol:
 

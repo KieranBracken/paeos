@@ -130,53 +130,32 @@ without allowing requesting agents to allocate resources themselves.
 
 ---
 
-## 5. Local vs Global Optimisation
+## 5. Local vs Global Optimisation (The Mechanic Analogy)
 
-Each role possesses different motivations.
+Each role possesses different local optimization incentives:
 
-Examples:
+* **Builder (The Mechanic)**: Wants implementation simplicity and larger access hatches.
+* **Designer (The Architect)**: Wants architectural elegance, lightweight structures, and aesthetic harmony.
+* **Verifier (The Safety Engineer)**: Wants strict certainty and exhaustive proof.
+* **Adversary (The Auditor)**: Wants falsification and boundary destruction.
+* **Founder (The CEO)**: Wants original intent preserved, overall ROI, and long-term ecosystem evolution.
 
-Planner
+If PAEOS blindly optimizes for the Builder, it produces ugly, bloated code. If it blindly optimizes for the Designer, the Builder cannot maintain it.
 
-* wants planning clarity
-
-Builder
-
-* wants implementation simplicity
-
-Designer
-
-* wants architectural elegance
-
-Verifier
-
-* wants certainty
-
-Adversary
-
-* wants falsification
-
-Founder
-
-* wants original intent preserved
-
-Research how these competing motivations should be balanced.
+Therefore, **workers recommend (voice without authority), but do not decide**. CER-5's separation of recommendation from authority maintains global architectural alignment.
 
 ---
 
-## 6. Dynamic Specialists
+## 6. Adaptive Specialist Ecology
 
-Rather than maintaining hundreds of permanent specialist agents,
+Rather than maintaining hundreds of permanent, hardcoded specialist agents, PAEOS investigates an **Adaptive Specialist Ecology** where specialists emerge dynamically from capability requests.
 
-investigate whether specialists should emerge dynamically from capability requests.
+Key research questions:
 
-Questions include:
-
-* temporary specialists
-* reusable specialists
-* retirement
-* capability evolution
-* specialist merging
+* **Specialist Selection & Form**: Should specialists be prompt templates, specialized LLM models, custom tools, scripted subagent workflows, or hybrid compositions?
+* **Ecology Lifecycle**: How are temporary specialists spawned, reused, merged, or retired when demand drops?
+* **Selection & Routing**: How does the Capability Broker match a stage's capability request to the optimal specialist or council?
+* **Spontaneous Councils**: When should multiple specialists be combined into a temporary, capability-specific review board?
 
 ---
 
