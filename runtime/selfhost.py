@@ -17,6 +17,7 @@ via the court MCP (B2.B Observation 1) — the last live-integration refinement 
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -35,7 +36,13 @@ from runtime.memory import ScarStore
 from runtime.orchestrator import Intake, RunOutcome, SelfHostRunner, SoftLoop
 from runtime.task_package import Budget
 
-__all__ = ["DEFAULT_BUDGETS", "outcome_summary", "parse_backlog", "run_backlog"]
+__all__ = [
+    "DEFAULT_BUDGETS",
+    "infer_write_scopes",
+    "outcome_summary",
+    "parse_backlog",
+    "run_backlog",
+]
 
 DEFAULT_BUDGETS: dict[WeightClass, Budget] = {
     WeightClass.ROUTINE: Budget(400_000, 1800, 2),
@@ -44,6 +51,57 @@ DEFAULT_BUDGETS: dict[WeightClass, Budget] = {
 }
 
 _DEFAULT_ENV_HASH = content_hash(b"paeos-selfhost-env")
+
+VALID_TOP_DIRS: tuple[str, ...] = (
+    "architecture/",
+    "backlog/",
+    "cli/",
+    "constitution/",
+    "derivation/",
+    "design/",
+    "docs/",
+    "genesis/",
+    "kernel/",
+    "ledger/",
+    "methodology/",
+    "operations/",
+    "ops/",
+    "plan/",
+    "prompts/",
+    "proposals/",
+    "reviews/",
+    "runtime/",
+    "sakg/",
+    "skills/",
+    "spec/",
+    "templates/",
+    "tests/",
+)
+
+
+def infer_write_scopes(
+    objective: str,
+    accept: tuple[str, ...],
+    explicit_changed: tuple[str, ...],
+    explicit_scopes: tuple[str, ...],
+) -> tuple[str, ...]:
+    """Infer required write scopes from declared deliverables and explicit scopes (DEBT-0023)."""
+    found = set(explicit_changed) | set(explicit_scopes)
+    text = objective + " " + " ".join(accept)
+    for word in re.findall(r"[a-zA-Z0-9_.-]+/[a-zA-Z0-9_./*-]+", text):
+        top = word.split("/")[0] + "/"
+        if top in VALID_TOP_DIRS:
+            found.add(top)
+
+    top_level = {p for p in found if p in VALID_TOP_DIRS}
+    non_redundant = set()
+    for p in found:
+        top = p.split("/")[0] + "/"
+        if top in top_level and p != top:
+            continue
+        non_redundant.add(p)
+
+    return tuple(sorted(non_redundant))
 
 
 def parse_backlog(raw: object) -> list[Intake]:
@@ -55,11 +113,19 @@ def parse_backlog(raw: object) -> list[Intake]:
 
 def _parse_intake(item: object) -> Intake:
     obj = _as_object(item, "intake")
+    objective = _req_str(obj, "objective")
+    accept = _str_tuple(obj.get("accept", []))
+    changed_paths = _str_tuple(obj.get("changed_paths", []))
+    plan_write_scopes = _str_tuple(obj.get("plan_write_scopes", []))
     evidence = tuple(_parse_evidence(e) for e in _as_list(obj.get("builder_evidence", [])))
+
+    inferred_scopes = infer_write_scopes(objective, accept, changed_paths, plan_write_scopes)
+    inferred_changed = tuple(sorted(set(changed_paths) | set(inferred_scopes)))
+
     return Intake(
-        objective=_req_str(obj, "objective"),
-        changed_paths=_str_tuple(obj.get("changed_paths", [])),
-        plan_write_scopes=_str_tuple(obj.get("plan_write_scopes", [])),
+        objective=objective,
+        changed_paths=inferred_changed,
+        plan_write_scopes=inferred_scopes,
         builder_evidence=evidence,
         goal_signature=_as_str(obj.get("goal_signature")) or "",
         verifiable=_as_bool(obj.get("verifiable")),

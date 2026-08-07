@@ -118,3 +118,16 @@ def test_stored_scar_is_injected_into_a_later_design() -> None:
     )
     design_pkg = runtime.packages[StageId.DESIGN]
     assert any(ref.type == "scar" for ref in design_pkg.context_refs)  # prior lesson on the path
+
+
+def test_infer_write_scopes() -> None:
+    from runtime.selfhost import infer_write_scopes
+
+    scopes = infer_write_scopes(
+        objective="Create sakg/store.py and test in tests/sakg/test_store.py",
+        accept=("test -f sakg/store.py", "pytest tests/sakg/test_store.py"),
+        explicit_changed=("runtime/selfhost.py",),
+        explicit_scopes=(),
+    )
+    assert scopes == ("runtime/selfhost.py", "sakg/", "tests/")
+
