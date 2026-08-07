@@ -1,0 +1,365 @@
+# S-PROBE — SAKG S1 Extraction Feasibility Spike
+
+**Node:** `S-PROBE` (`backlog/SAKG-1-backlog.yaml`) · **Slice:** S1 · **Wave:** 0
+**Clauses:** SAEOS-1 §9/A8 · SAEOS-1 §10/D7 · SAEOS-1 §8/S1 · CER-1
+**Role:** Researcher/Planner · **Date:** 2026-08-07
+**Method:** hand extraction, no code, from artifacts as they exist on disk today.
+
+---
+
+verdict: NO-GO
+
+loss_ratio: 0.367
+
+loss_ratio_contract_path: 0.551
+loss_ratio_as_written: 1.000
+
+---
+
+## §1 What was tested
+
+SAEOS-1 §9/A8 is the ratified specification's self-declared **single largest untested
+assumption**:
+
+> "Ω1 (self-population) is presented as a breakthrough but assumes PAEOS emits clean
+> structured decisions. Does it?" **[MODIFY]** Partially. PAEOS *produces* all the required
+> artifacts … but as prose documents, not as typed emission bundles. Slice S1 exists
+> precisely to build and test that extraction. **Carried:** if L15 artifacts prove too
+> unstructured to extract losslessly, S1 fails and Ω1's value is overstated.
+
+D7 ratified S1 as "explicitly a falsification test, not a build". This probe runs that test
+**before** any code, by hand, against three real sealed goals.
+
+The test has two parts, and they are separable:
+
+- **T1 — the source test.** Do the seven producer artifacts §6.1b names actually exist?
+- **T2 — the content test.** Of the SAEOS-1 §4.3 node fields, how many can a human recover
+  from whatever *does* exist?
+
+A8 anticipated failing T2 (prose, not types). It did not anticipate T1.
+
+## §2 Corpus
+
+Three sealed goals, selected because `docs/IMPLEMENTATION_ATLAS.md` records all three as
+**Sealed** with the L17 review as the sealed record — i.e. they are genuine, completed,
+promoted PAEOS goals, not drafts.
+
+| Goal | Subject | Atlas seal record | Findings at seal |
+|---|---|---|---|
+| B0.0 | Repo skeleton + toolchain + TCB-gated CI | `reviews/tasks/B0.0_review.md` | 0/0/0 + 1 OBSERVATION |
+| B0.1 | Append-only hash-chained single-writer Ledger | `reviews/tasks/B0.1_review.md` | 0/0/0 + 1 OBSERVATION |
+| B0.2 | Immutable content-addressable store | `reviews/tasks/B0.2_review.md` | 0/0/0 + 0 OBSERVATION |
+
+Extraction was attempted against **two source sets**, scored separately:
+
+- **Contract path** — what an extractor bound to the ratified interface reads:
+  `reviews/tasks/<id>_review.md` (the path mandated by
+  `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md` §1 and pointed at by the L15 atlas) plus
+  `ledger/debt/DEBT-*.md`. This is what S-PROBE's brief names (`ledger/ + reviews/tasks/`).
+- **Full corpus** — the contract path plus everything else that happens to exist:
+  `docs/<id>-constitutional-review.md`, the `PAEOS-8 §11` task row, the module docstring,
+  `docs/IMPLEMENTATION_ATLAS.md`, `reviews/spikes/DEBT-0002-spawnability-spike.md`.
+
+## §3 T1 — the source test (decisive, and not what A8 predicted)
+
+SAEOS-1 §6.1b specifies the emission bundle by naming, for each node type, the PAEOS
+artifact it is extracted *from*. Every one of those artifacts was searched for, for all
+three goals:
+
+| §6.1b emission | Named source | Present for B0.0 / B0.1 / B0.2? |
+|---|---|---|
+| `Decision` | the decision-graph (ADR records + `constitutional_basis`) | **absent** — `ledger/` contains only `debt/`; no `ledger/decisions/` exists |
+| `TradeOff` | the L06 trade-off matrix | **absent** — no trade-off matrix exists anywhere outside `backlog/research/` |
+| `Option` | L04 candidates, including rejected | **absent** — no candidate architecture set for any B0.x goal |
+| `Constraint` | the L11 implementation contract | **absent** — no implementation contract artifact |
+| `Component` | the L08 architecture artifact set | **absent** — `architecture/` contains only `invariants.json` |
+| `Scar` | the scar-graph (root-cause bundle, A-10) | **absent** — no scar-graph on disk |
+| `EvidenceRef` | hashes from PAEOS's CAS | **absent** — no `artifact_hash`/`env_hash` recorded in any sealed review |
+
+**7 of 7 named sources do not exist.** An extractor implemented literally against §6.1b
+returns an empty bundle for every one of these goals: `loss_ratio_as_written: 1.000`.
+
+This is not sloppiness on the goals' part. `operations/ENGINEERING_LIFECYCLE.md` (FROZEN
+v1.0) defines **ceremony depth**: Trace-A "auto-discharges L03–L11 … each records a machine
+'auto-pass, Trace-A' evidence stub". L04, L06, L07, L08 and L11 — five of the six sources
+above — sit inside the auto-discharged band. For any goal not routed Trace-B, those
+artifacts are **stubs by constitutional design**. §6.1b sources the emission bundle from
+the exact lifecycle range the lifecycle is entitled to skip.
+
+Worse for reproducibility: **no L02 ceremony-depth record exists for any B0.x goal**, so an
+extractor cannot even determine which artifacts it is entitled to expect, or distinguish
+"legitimately auto-discharged" from "missing".
+
+What *does* exist per sealed goal is five artifacts — the PAEOS-8 §11 task row, the
+`reviews/tasks/` L17 review, the off-contract `docs/` review, the CER-3 debt entry, and the
+module docstring. **None of the five is named in §6.1b.** §6.1b's producer map is wrong in
+both directions: it names sources that do not exist and omits every source that does.
+
+## §4 T2 — the content test: scoring method
+
+Because T1 alone forces the verdict, T2 was run anyway to answer the *next* question the
+founder gate needs: if §6.1b's source map were corrected to point at the artifacts that do
+exist, how much survives?
+
+**Unit.** One *slot* = (node type × content-bearing field). Scope is the seven node types
+§6.1b puts in the S1 bundle.
+
+**Fields scored (content-bearing only).** Nine shared envelope fields from SAEOS-1 §4.2 —
+`label`, `summary`, `provenance.origin`, `provenance.source_hash`, `evidence[]`,
+`valid_from`, `valid_until`, `falsifier`, `coordinates` — plus type payload:
+Decision 5 (`problem_context`, `chosen`, `alternatives_considered`, `rationale`,
+`constitutional_basis`) · TradeOff 4 (`axis`, `side_a`, `side_b`, `resolution`) ·
+Option 3 · Constraint 3 · Component 3 (`element_kind`, `interface`, `dependency_edges`) ·
+Scar 3 (`root_cause`, `detection_signature`, `guard_action`) · EvidenceRef 4
+(`hash`, `uri`, `kind`, `reverification_instructions`).
+
+**Deliberately excluded from the denominator** — the seven envelope fields the extractor
+*mints* rather than extracts (`id`, `type`, `namespace`, `provenance.author_kind`,
+`provenance.ingested_at`, `status`, `confidence`), and `facets` (no facet is registered at
+v1). Counting minted fields as "extractable" is the specific way this probe could have
+flattered itself into a GO; they are excluded on purpose. `confidence` is excluded under
+§4.2's own invariant that it is derived, never authored.
+
+**Scale.** extractable = 1.0 · partial = 0.5 · absent = 0.0.
+**Totals.** 88 slots per goal (14+13+12+12+12+12+13), 264 across the corpus.
+`loss_ratio = 1 − (Σ score ÷ 264)`.
+
+**On "structurally absent".** No node type was scored `n/a`. Each of the seven was checked
+for whether the goal genuinely had nothing to say (which would be an unfair loss) versus
+had something to say that the artifact failed to capture (a real loss). In all 21 cases the
+material existed in some form — including B0.2's `Scar`, which is the sharpest cell in the
+probe (§5.3). The denominator is therefore never shrunk in SAKG's favour.
+
+---
+
+## §5 Per-goal extraction
+
+## goal: B0.0 — Repo skeleton + toolchain + TCB-gated CI
+
+goal_score: 51.0/88 · goal_loss_ratio: 0.420 (contract path: 0.540)
+
+| Node type | env 9 | payload | total | Notes |
+|---|---|---|---|---|
+| Decision | 6.5 | 4.5/5 | **11.0**/14 | One real decision recoverable: *defer the Day-1 spawnability spike, record as DEBT-0002, non-blocking for B0.1*. `constitutional_basis` fully explicit (CER-3 channel, CER-5 separation of powers, PAEOS-8 §13.2). Rare `falsifier` present verbatim: "if it is false, the agent-runtime decision reopens". |
+| TradeOff | 4.0 | 2.0/4 | **6.0**/13 | A trade was made (validation certainty ↔ build progress) but no axis is ever named. `axis = 0.0`. |
+| Option | 4.0 | 2.5/3 | **6.5**/12 | The only rejected option recoverable is a *framing*, not an architecture: "A debt is not the same thing as a blocker" (founder). The toolchain alternatives were never considered here — `docs` (b) records that PAEOS-8 §3 *locked* them upstream. |
+| Constraint | 5.5 | 2.5/3 | **8.0**/12 | Best-scoring type. Real limits with values: F1 LOC budget 20000, `strict=["kernel"]`, `dependencies = []`. `kind` must be minted — no constraint taxonomy exists. |
+| Component | 5.5 | 0.5/3 | **6.0**/12 | Labels extract cleanly (`pyproject.toml`, `ci.yml`, wheel targets). `interface = 0.0`, `dependency_edges = 0.0`. |
+| Scar | 4.0 | 2.0/3 | **6.0**/12 | Two frictions with root cause + guard action (`extend-exclude` for vendored dirs; pyright top-level `strict` key). Both appear **only** in `docs/`; the contract-path review records 0 findings. `detection_signature = 0.0`. |
+| EvidenceRef | 5.5 | 2.0/4 | **7.5**/13 | URIs and gate results extract; `hash = 0.0`. |
+
+**Finding.** B0.0's substantive decisions were legislated *upstream* in PAEOS-8 §3/§8 and
+merely *conformed to* here. The exhaust records conformance, not choice. A SAKG built from
+it would learn that the toolchain is correct, never why it was chosen or what lost.
+
+## goal: B0.1 — Append-only, hash-chained, single-writer Ledger
+
+goal_score: 62.0/88 · goal_loss_ratio: 0.295 (contract path: 0.460)
+
+| Node type | env 9 | payload | total | Notes |
+|---|---|---|---|---|
+| Decision | 6.5 | 5.0/5 | **11.5**/14 | The corpus's best node. *Prove the algebra in-memory behind the `LedgerStore` waist; defer the durable backend.* Full payload: context, choice, alternatives, rationale ("no docker daemon … building the TCB's foundation blind against an un-runnable backend would be reckless"), and `constitutional_basis` (FR-5, K9, K8/I9, CER-3, CER-5, PAEOS-4 §3). |
+| TradeOff | 5.5 | 3.5/4 | **9.0**/13 | Both sides and the resolution are stated in prose (DEBT-0003 + `docs` (b)). `axis = 0.5`: the substance is there, the axis label ("durability vs. local verifiability") must be minted by the extractor — so two goals resolving the *same* trade would not match. |
+| Option | 5.5 | 3.0/3 | **8.5**/12 | Postgres 16 / in-memory / SQLite all named, with dispositions and an explicit rejection reason. The only clean `Option` in the corpus. |
+| Constraint | 5.5 | 2.5/3 | **8.0**/12 | "No docker daemon available" — a genuine environmental constraint with a stated consequence. LOC 242 ≤ 800; F1 320/20000. |
+| Component | 6.0 | 2.0/3 | **8.0**/12 | `interface = 1.0`: `docs` lists the Protocol's exact methods (`acquire_writer`/`release_writer`/`head`/`append_row`/`read`/`count`). `dependency_edges = 0.5`: `instance_of` is stated, no `depends_on`/`calls` graph. |
+| Scar | 6.0 | 2.5/3 | **8.5**/12 | A real adversary finding: *a writer with total store access can rewrite every row with consistent hashes and pass `verify_chain()`.* Root cause and guard action both explicit; `detection_signature = 0.5` — signatures exist for the three *defended* classes (`ForkRejected`, `ChainCorruption`, `SingleWriterViolation`) and none for the one that actually passes. |
+| EvidenceRef | 6.0 | 2.5/4 | **8.5**/13 | Eight acceptance criteria each bound to a *named test*. Still `hash = 0.0`. |
+
+**Finding — the Ω2 loop exists, but socially.** `DEBT-0003` was later edited to record a
+realized outcome ("SQLite … verified: cross-restart persistence + chain verify + tamper
+detection on reopen") and its priority downgraded MEDIUM→LOW. That is exactly SAEOS-1 Ω2 /
+FPL-2 behaviour — an outcome flowing back to a prior decision and revising its standing. It
+happened by **hand-editing a prose file**, is attributed to goal B1.B rather than B0.1, and
+would be invisible to any extractor keyed on goal id. The loop SAKG needs is real; the
+structure to carry it is not.
+
+## goal: B0.2 — Immutable content-addressable store
+
+goal_score: 54.0/88 · goal_loss_ratio: 0.386 (contract path: 0.653)
+
+| Node type | env 9 | payload | total | Notes |
+|---|---|---|---|---|
+| Decision | 6.0 | 4.5/5 | **10.5**/14 | *Content-addressed files on the filesystem are a sufficient durable store; the CAS needs no database.* `alternatives_considered = 0.5` — the database alternative appears only as a negation. No `falsifier` for a claim that is precisely the kind scale could refute. |
+| TradeOff | 4.0 | 1.0/4 | **5.0**/13 | Worst cell in the corpus. The decision is presented as strictly dominant; no cost is named, so no exchange exists to extract. `axis = 0.0`, `side_b = 0.0`. |
+| Option | 4.0 | 1.5/3 | **5.5**/12 | "Without requiring an external database" is the only trace of a rejected candidate. |
+| Constraint | 5.5 | 2.5/3 | **8.0**/12 | F1 556/20000; 174 LOC; 10k-blob scale. |
+| Component | 6.0 | 2.0/3 | **8.0**/12 | `CasStore` Protocol methods listed (`write`/`read`/`exists`/`delete`/`iter_keys`). `dependency_edges = 0.5`: "uses `content_hash` matching `kernel.ledger` hash mechanics" is a `depends_on` in prose. |
+| Scar | 6.0 | 2.5/3 | **8.5**/12 | A real defect: a crash mid-write leaves a `.tmp` file that the first cut of `iter_keys` would have yielded as a bogus key, polluting counts and GC. Root cause and guard action (`is_valid_hash` filter) both explicit, with a regression test. |
+| EvidenceRef | 6.0 | 2.5/4 | **8.5**/13 | Nine criteria bound to named tests. `hash = 0.0`. |
+
+**Finding — the clean-goal inversion.** B0.2 is the cleanest of the three: zero blockers,
+zero debt, zero observations. Its **contract-path** artifact,
+`reviews/tasks/B0.2_review.md` — the one the L15 atlas cites as the sealed record — reports
+`OBSERVATION: 0`, "Zero technical debt", and PASS on all ten checks. The temp-file defect
+above appears **nowhere in it**. An extractor honouring the ratified review protocol
+extracts `Scar = 0.0` from a goal that produced a real, root-caused, test-guarded failure
+class.
+
+This is A4 ("corpus sample bias") in a sharper and more damaging form than A4 states. The
+bias is not merely that SAKG sees only what PAEOS built — it is that **the better the
+engineering, the emptier the memory**, because the artifact that gets sealed summarizes
+resolved problems as PASS.
+
+---
+
+## §6 Aggregate result
+
+| | Score | Recall | Loss |
+|---|---|---|---|
+| **Full corpus** (all artifacts that exist) | 167.0 / 264 | 0.633 | **0.367** |
+| **Contract path** (`reviews/tasks/` + `ledger/debt/` only) | 118.5 / 264 | 0.449 | **0.551** |
+| **§6.1b as written** (named sources only) | 0 / 264 | 0.000 | **1.000** |
+
+The headline `loss_ratio: 0.367` is the **most favourable defensible number**: it assumes a
+corrected §6.1b that reads every artifact on disk, including one (`docs/…`) that no
+protocol mandates and that a future goal may simply not produce.
+
+### The aggregate hides the shape of the loss
+
+Uniform across all 21 node-slots:
+
+| Envelope field | Result | Consequence |
+|---|---|---|
+| `provenance.origin` | **21/21 extractable** | Every artifact is dated and names its task id. |
+| `valid_from` | **21/21 extractable** | Same. |
+| `provenance.source_hash` | 10.5/21 — *partial everywhere* | A hash of today's bytes is computable, but nothing binds it to seal-time state. In this working copy there is no `.git`, so no commit anchor exists either; SAEOS-1 §1.1 already records the same uncommitted-working-tree hazard for its own sources. |
+| `coordinates` | 10.5/21 — *partial everywhere* | No dimension vocabulary exists; the extractor must invent one, so two goals' coordinates would not be comparable. |
+| `valid_until` | **0/21 — absent everywhere** | Not one artifact states an expiry. FPL-6 (Decay) and Ω4 have **no source at all**. |
+| `falsifier` | 1.5/21 — 93% absent | Only B0.0's spike decision carries one. FPL-6/K6 has effectively no source. |
+
+Payload fields that S2 depends on:
+
+| Field | Score across 3 goals | Consequence |
+|---|---|---|
+| `EvidenceRef.hash` | **0.0/3** | §3.3.3 says SAKG emits `EvidenceRef` — a pointer that "must be independently re-verified". No sealed review records an `artifact_hash`/`env_hash` binding, so the pointer cannot be re-verified. The non-authority guarantee that depends on it is unbacked. |
+| `TradeOff.axis` | **0.5/3** | This is the *match key* of `tradeoff_precedents(axes)` — the only method S2 builds. |
+| `Component.dependency_edges` | **1.0/3** | The blast-radius substrate `dependency_impact` traverses. |
+| `Scar.detection_signature` | **1.0/3** | What PAEOS's own scar-matching at L03/L08/L09/L13 keys on. |
+| `Decision.rationale` | **3.0/3** | ✓ |
+| `Decision.constitutional_basis` | **3.0/3** | ✓ |
+
+**The one genuinely good result.** `Decision` is the strongest node type in all three goals
+(11.0, 11.5, 10.5 of 14), and `rationale` + `constitutional_basis` are fully present
+everywhere. SAEOS-1 ✓1 — *Decision is the central object* — is **empirically confirmed** by
+this probe, independently of the verdict. Whatever is built later should keep that.
+
+---
+
+## §7 Verdict
+
+verdict is stated at the head of this document as **NO-GO**. Scope of that verdict, stated
+precisely so the founder gate `G-S1-GO` can act on it:
+
+**What is falsified:**
+
+1. **SAEOS-1 §6.1b's producer map.** 7 of 7 named source artifacts do not exist for any of
+   three sealed goals; five of them sit in the L03–L11 band that
+   `ENGINEERING_LIFECYCLE.md` auto-discharges as stubs. This is a *mechanism* failure, not
+   a quality shortfall, and A8 did not predict it — A8 assumed the artifacts existed and
+   were merely prose.
+2. **SAEOS-1 §8's S1 exit criterion**, which reads "a sealed PAEOS goal produces a valid
+   bundle; **round-trip is lossless**." Measured loss is 0.367 at best and 0.551 on the
+   ratified contract path. Not lossless under any reading.
+3. **The S2 bet.** §8 calls S1+S2 "the whole bet", and S2's only method is
+   `tradeoff_precedents(axes)`. Its match key `TradeOff.axis` scores 0.5/3 and its
+   outcome join scores 1 informal instance in 3 goals. S2 cannot pass its own exit
+   criterion on this corpus regardless of how well S1 is implemented.
+
+**What is *not* falsified** (and should not be reverted on this evidence): §3 (position and
+the three non-authority guarantees), §4.2/§4.3 (the envelope and node types — the
+extraction failures are source-side, not schema-side), §5 (the projection contract), §6.2,
+§6.3, §7. And ✓1 is positively corroborated (§6).
+
+**Note on §7's falsifier.** SAEOS-1 §7's falsifier is scoped to *consumer benefit measured
+against a no-SAKG baseline after one measurement window* — a condition this probe does not
+test and cannot fire. `G-S1-GO` couples NO-GO to that falsifier; on the evidence here the
+coupling is broader than the finding. Per CER-5 this document recommends and does not
+legislate: the choice between **revert** and **amend §6.1b + §8/S1** is the founder's.
+
+**The recommended amendment, if the founder chooses amend.** The measured failure is that
+S1 tries to *extract backwards* from artifacts never designed to carry the fields. The
+cheaper inversion is to *require forwards*: the six near-absent fields (`valid_until`,
+`falsifier`, `TradeOff.axis`, `EvidenceRef.hash`, `Component.dependency_edges`,
+`Scar.detection_signature`) are all things the author knows at L17 and simply is not asked
+for. Adding them to the mandatory checklist in
+`operations/IMPLEMENTATION_REVIEW_PROTOCOL.md` converts a lossy extraction problem into a
+lossless emission problem, costs no SAKG code, and is testable on the very next sealed
+goal. It is a governance act (founder, CER-2), not an engineering one — which is why this
+document stops at recommending it.
+
+Two defects worth fixing regardless of the verdict, because they degrade PAEOS itself:
+
+- **The two-review-path split.** `docs/<id>-constitutional-review.md` is materially richer
+  than the protocol-mandated `reviews/tasks/<id>_review.md`, and the L15 atlas seals the
+  poorer one. B0.2's real defect exists only in the unsealed copy. One canonical path.
+- **No L02 ceremony-depth record** exists for any sealed goal, so neither a reader nor an
+  extractor can tell an auto-discharged stage from a missing artifact.
+
+---
+
+## §8 Assumptions surfaced (PAEOS-6 register)
+
+| # | Assumption this probe rests on | Falsifier | Status |
+|---|---|---|---|
+| P1 | The three goals are representative of PAEOS sealed goals. | Extract a Trace-B goal (e.g. B1.x, B2.x) and find L04/L06/L08/L11 artifacts present. | **Carried.** All three are Phase-0 bootstrap goals built when humans played all roles. This is the probe's weakest point and is stated as such. §3's finding is a lifecycle-design argument that does not depend on P1; §5–§6's numbers do. |
+| P2 | The 0.5 "partial" weight is meaningful. | Re-score the 86 partial cells at either extreme: partial = 0.0 gives loss 0.530; partial = 1.0 gives loss 0.205. (124 full · 86 partial · 54 absent of 264.) | **Carried.** The verdict is invariant across the whole range: even at partial = 1.0 the loss is not zero, and §3 and the query-key table (§6) drive the verdict, not the aggregate. |
+| P3 | Excluding the seven minted envelope fields is correct. | Include them; loss falls to ≈0.26. | **Defended.** Minting `id`/`status`/`namespace` is evidence about the extractor, not about PAEOS's exhaust. Including them measures the wrong thing. |
+| P4 | A human extractor is an upper bound on an automated one. | Build an extractor that beats hand extraction. | **Defended.** A human reads intent from prose ("this is the axis being traded"); a parser cannot. The reported ratios are therefore optimistic. |
+| P5 | Absence on disk = absence, not relocation. | Locate a decision-graph, scar-graph or L06 matrix outside this working tree. | **Carried, weakly.** Searched `ledger/`, `architecture/`, `docs/`, `plan/`, `proposals/`, `runtime/`, `backlog/`. SAEOS-1 §1.1 already warns that key PAEOS sources live in uncommitted local state. |
+| P6 | `reviews/tasks/` is the canonical seal record. | The founder designates `docs/` canonical. | **Defended.** `IMPLEMENTATION_REVIEW_PROTOCOL.md` §1 mandates it and `IMPLEMENTATION_ATLAS.md` cites it as each goal's seal record. |
+| P7 | This working copy is not a git repository, so no commit-anchored `EvidenceRef` is constructible. | Run in the founder's checkout. | **Carried, non-load-bearing.** Even with git, no sealed review records an `artifact_hash`/`env_hash`; `EvidenceRef.hash = 0.0/3` stands on that, not on the missing `.git`. |
+
+**No unmitigated critical assumption remains:** P1 and P5 are the only ones that could move
+the numbers, both are stated with their falsifiers, and neither reverses §3, which alone is
+sufficient for the verdict.
+
+## §9 Perspectives covered (L09, seven stances)
+
+- **Builder** — the extractor is buildable; there is nothing valid to point it at. Effort
+  would land in parser heuristics over prose, which P4 says degrade against hand results.
+- **Architect** — the fault is a layering error: §6.1b binds SAKG to *lifecycle stages*,
+  while `ENGINEERING_LIFECYCLE.md` guarantees artifacts only for *ceremony depth*. Binding
+  to the L17 review + CER-3 debt ledger — the two artifacts every sealed goal has — is the
+  stable seam.
+- **Risk Officer** — an S1 built as specified would report success on empty bundles
+  (7/7 sources absent ⇒ zero nodes ⇒ no error), giving a green slice with no corpus. The
+  §7 "no benefit ⇒ drop" falsifier would then fire a full window later, at maximum sunk
+  cost — the exact failure Δ8 was written to prevent.
+- **Performance** — not reached; nothing here is throughput-bound.
+- **Security** — `EvidenceRef.hash = 0.0/3` means the §3.3.3 guarantee ("emits a pointer …
+  must be independently re-verified") has no backing field. An unverifiable `EvidenceRef`
+  is precisely the Ω6 poisoning surface, and it would ship in S1.
+- **Replay** — `provenance.source_hash` is partial everywhere and `corpus_hash` (§5.1) would
+  be computed over mutable working-tree bytes, so §5.1 rule 3's reproducibility guarantee
+  does not hold today.
+- **Maintainer** — two divergent review paths and no L02 depth record mean a maintainer
+  cannot tell missing from auto-discharged. Fix before automating anything over it.
+
+## §10 Orphan/gap audit
+
+- **Every §6.1b emission accounted for** — all seven in §3, all seven scored in §5.
+- **The five §4.3 types outside the S1 bundle** — `Problem`, `Objective`, `Mechanism`,
+  `Pattern`, `Outcome` — are out of S1 scope by §6.1b and were not scored. `Outcome` is
+  noted separately in §5 (B0.1) because §6.1b rule 3 makes it S1-adjacent: one informal
+  instance across three goals.
+- **Every §4.2 envelope field accounted for** — nine scored, seven excluded as minted with
+  the exclusion justified in §4, `facets` excluded (no facet registered at v1).
+- **Every goal in the atlas's sealed set at this depth was considered**; three were scored
+  and the selection rule (atlas seal status) is stated in §2.
+- **No orphan finding**: each §7 claim traces to a scored cell or to a §3 source check.
+- **Known gap, declared:** no Trace-B goal was scored (P1). Scoring one is the single
+  highest-value follow-up and would refine, not reverse, §3.
+
+## §11 Traceability
+
+| Claim | Source |
+|---|---|
+| A8, Ω1, Ω2, §4.2/§4.3, §6.1b, §8/S1, §7 falsifier | `spec/SAEOS-1-architecture.md` |
+| S-PROBE definition, accept criteria, G-S1-GO coupling | `backlog/SAKG-1-backlog.yaml` |
+| Trace-A auto-discharge of L03–L11; L04/L06/L08/L11/L15/L17 required artifacts | `operations/ENGINEERING_LIFECYCLE.md` |
+| Canonical review path; the 10-point checklist; severity classes | `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md` |
+| B0.0/B0.1/B0.2 task rows, acceptance criteria, §13.2 spike | `spec/PAEOS-8-runtime-implementation-playbook.md` §10–§13 |
+| Seal status and seal record per goal | `docs/IMPLEMENTATION_ATLAS.md` |
+| Contract-path extraction sources | `reviews/tasks/B0.{0,1,2}_review.md`; `ledger/debt/DEBT-0002.md`, `DEBT-0003.md` |
+| Full-corpus extraction sources | `docs/B0.{0,1,2}-constitutional-review.md`; `kernel/ledger.py`, `kernel/cas.py` docstrings; `reviews/spikes/DEBT-0002-spawnability-spike.md` |

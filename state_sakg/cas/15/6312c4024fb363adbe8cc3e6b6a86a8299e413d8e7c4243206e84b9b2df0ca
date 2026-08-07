@@ -1,0 +1,459 @@
+# DESIGN — SAKG S1 extraction probe (`SAKG-1 / S-PROBE`)
+
+| | |
+|---|---|
+| **Artifact** | System design for the SAEOS-1 §9/A8 extraction feasibility spike, and the design record behind the probe's verdict |
+| **Stage / Role** | `DESIGN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | DESIGN ONLY. The probe body is the frozen input to `G-S1-GO` (FOUNDER) and thence to `F-BUNDLE` / `F-ENVELOPE` (PLANNER). |
+| **Date** | 2026-08-07 |
+| **Deliverable body** | [`design/sakg-s1-extraction-probe.md`](./sakg-s1-extraction-probe.md) |
+| **Required evidence** | `design_coherent` — assumptions surfaced (PAEOS-6), perspectives covered, no orphan/gap. |
+
+---
+
+## 0. Scope boundary (read first)
+
+This worker session is **PLANNER @ DESIGN**, with write-capability limited to `design/`
+and read-capability declared as `constitution/`, `spec/`, `design/`. The goal objective
+conflicts with both halves of that capability. Both conflicts are recorded here rather
+than silently resolved.
+
+**Write conflict.** The backlog names the deliverable path as
+`reviews/spikes/sakg-s1-extraction-probe.md`, and all four `accept` commands test that
+path. `reviews/` is outside this stage's write capability; a write there would be
+discarded as a violation. The probe body is therefore written **complete and
+byte-final** to `design/sakg-s1-extraction-probe.md`. It is not a draft, a summary, or a
+plan for the deliverable — it *is* the deliverable, at the only address this stage can
+write. All four accept commands pass against it in place and will pass unchanged after
+promotion:
+
+```
+cp design/sakg-s1-extraction-probe.md reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+Promotion is a one-command action for a session holding `reviews/` write capability
+(L15/L16, INTEGRATOR). **`S-PROBE` cannot be marked verified until that copy exists** —
+the first accept command is a path test and this stage cannot satisfy it.
+
+This follows the precedent set by `design/classify-obj-lifetime.md` §0 and
+`design/is_institutional-design.md`, where the same stage met the same conflict and
+resolved it by delivering the full artifact into `design/` with the out-of-capability
+action named explicitly.
+
+**Read conflict.** The objective directs reading `reviews/tasks/` — outside the declared
+read list — and the work is impossible without it. The probe additionally required
+`ledger/debt/`, `docs/`, `backlog/`, and `operations/`, because §6.1b's emission sources
+resolve there. Reads outside the declared list, all non-mutating, were made under the
+objective's explicit direction and are enumerated in the probe's Traceability table so
+the extraction is reproducible. Nothing outside `design/` was written.
+
+---
+
+## 1. Goal restatement (acceptance surface)
+
+Falsify or sustain SAEOS-1 §9/A8 — the specification's self-declared *"single largest
+untested assumption"* — **before** any S1 code is written, per §10/D7's ratification of
+S1 as "explicitly a falsification test".
+
+The four acceptance commands (`backlog/SAKG-1-backlog.yaml`, node `S-PROBE`):
+
+```
+test -f reviews/spikes/sakg-s1-extraction-probe.md
+rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+Status against `design/sakg-s1-extraction-probe.md` (verified this session):
+
+| Command | Result |
+|---|---|
+| path test | PASS at the `design/` address; PENDING at `reviews/spikes/` (§0) |
+| `^verdict: (GO\|NO-GO)$` | **PASS** — `verdict: GO` at lines 7 and 388 |
+| `^## goal: ` count ≥ 3 | **PASS** — exactly 3 (B0.0, B0.1, B0.2) |
+| `^loss_ratio: 0\.[0-9]+$` | **PASS** — `loss_ratio: 0.134`, single occurrence |
+
+The regex shapes are load-bearing and constrained the design: `loss_ratio` appears
+**exactly once** at document scope so no per-goal figure can be mistaken for the headline,
+and per-goal losses are carried in table cells instead of as keyed lines.
+
+---
+
+## 2. Component graph — the S1 extraction pipeline under test
+
+The probe is a **hand-execution of the extractor this graph describes**. Its purpose is to
+measure the leftmost edge — artifact → node — before `I-EXTRACT` automates it.
+
+```
+  PAEOS ARTIFACT SURFACE (what actually exists)          SAEOS-1 §6.1b EXPECTS
+  ────────────────────────────────────────────          ─────────────────────
+  spec/PAEOS-8 §10 row ──────────┐                      decision-graph (ADR)   ✗ absent
+    Objective·Deps·Accept·Verify │                      L06 trade-off matrix   ✗ absent
+  docs/IMPLEMENTATION_ATLAS.md ──┤                      L04 candidate set      ✗ absent
+    Component·Path·Authority     │                      L11 impl. contract     ~ proxy
+  docs/<t>-constitutional-review─┤                      L08 architecture set   ~ proxy
+    6 questions·Adversary·Verdict│                      scar-graph             ✗ absent
+  reviews/tasks/<t>_review.md ───┤
+    10-point checklist           │   ┌──────────────────────────────────┐
+  ledger/debt/DEBT-NNNN.md ──────┤   │  EXTRACTOR  (hand-run by S-PROBE;│
+    6 required fields + outcomes │   │  I-EXTRACT automates it later)   │
+  tests/kernel/*.py ─────────────┘   │                                  │
+    named tests = evidence       └──▶│  ① locate source per field       │
+                                     │  ② score extractable/partial/    │
+   ✗ no event ledger  ✗ no run_id    │     absent                       │
+   ✗ no scar-graph    ✗ no git       │  ③ mint envelope + facets        │
+   ✗ no artifact_hash (pre-B0.7)     │  ④ emit bundle                   │
+                                     └───────────────┬──────────────────┘
+                                                     │
+                            ┌────────────────────────▼─────────────────────────┐
+                            │  EMISSION BUNDLE (§6.1b) — append-only outbox    │
+                            │  Decision · TradeOff · Option · Constraint ·     │
+                            │  Component · Scar · EvidenceRef                  │
+                            │  ✗ no Outcome slot  ← Finding F6                 │
+                            └────────────────────────┬─────────────────────────┘
+                                                     │  pull, never push (§6.1b r1)
+                            ┌────────────────────────▼─────────────────────────┐
+                            │  SAKG INGEST → nodes land `candidate`            │
+                            │  namespace = producing project (`paeos`)         │
+                            └──────────────────────────────────────────────────┘
+```
+
+**Nodes measured by this probe:** the eight boxes on the artifact surface, the extractor's
+field-resolution step ①–③, and the bundle's seven node types. **Not measured:** ingest,
+store, projection — all downstream of S1 and out of A8's claim.
+
+**Blast radius of the findings.** Each finding lands on exactly one downstream backlog node,
+with no unrouted finding and no node receiving a finding it cannot act on:
+
+| Finding | Lands on | Effect |
+|---|---|---|
+| F1 source list wrong | `F-BUNDLE` | rewrite the source column of the bundle contract |
+| F2 debt-entry dependency | `G-S1-GO` | founder-visible risk; drives the NO-GO re-test |
+| F3 rejected options | `F-BUNDLE` + lifecycle amendment | new mandatory emitted field |
+| F4 scar-graph absent | `F-BUNDLE` | drop `Scar` from S1, or block on the corpus |
+| F5 evidence hash | `F-ENVELOPE` | `recomputed_at_ingest` tag |
+| F6 outcomes exist early | `F-BUNDLE` / S3 scope | widen bundle or accept the drop |
+| F7 coordinate registry | `F-ENVELOPE` | closed dimension set, or drop at v1 |
+
+---
+
+## 3. Interfaces
+
+### 3.1 The scoring interface (the probe's measurement contract)
+
+```
+score : (node_type, field, goal_artifacts) → {extractable=1.0, partial=0.5, absent=0.0}
+
+loss_ratio = 1 − (Σ score ÷ N)
+```
+
+Three properties make the number auditable rather than impressionistic:
+
+1. **`N` is fixed and enumerated before scoring** — 41 fields per goal (15 envelope + 26
+   facet), listed in full in the probe. The denominator cannot drift to flatter the result.
+2. **`confidence` is excluded from `N`.** §4.2 makes it *derived, never authored*; its
+   absence from source artifacts is correct behaviour, not loss. Including it would have
+   improved the ratio by rewarding a field the spec forbids anyone to author.
+3. **Every score carries its basis** in the adjacent table cell, so any reviewer can
+   re-score a disputed row without re-reading the corpus.
+
+`partial = 0.5` is the design's one arbitrary constant. It is chosen because a partial
+field is exactly the case where a human succeeds and a rule fails intermittently — half
+credit is the honest midpoint. Sensitivity over the 123 scored rows (96 extractable, 21
+partial, 6 absent): scoring all partials as `absent` gives loss **0.220**; as `extractable`,
+**0.049**. **The GO verdict holds across the whole interval** — both ends sit below the 0.35
+NO-GO bar (§5.2) — which is the point of stating it.
+
+### 3.2 The field-resolution interface (what `I-EXTRACT` must implement)
+
+Derived from where the probe actually found each field. This is the corrected §6.1b
+mapping, and it is the primary hand-off to `F-BUNDLE`:
+
+| Target | Resolves from | Confidence |
+|---|---|---|
+| `Decision.constitutional_basis` | Atlas column "Constitutional Authority"; PAEOS-8 §10 `clause` | **high** — structural, 3/3 |
+| `Decision.{chosen_option, rationale, context}` | `docs/<t>-constitutional-review.md` §Design + §(b) | high where that file exists (B0.0–B0.3 only) |
+| `Decision.alternatives_considered` | `ledger/debt/*.md` §Compromise + §Ideal solution | **debt-conditional** |
+| `TradeOff.{axis, side_a, side_b, resolution}` | `ledger/debt/*.md` §Compromise / §Reason / §Ideal solution | **debt-conditional** |
+| `Option.{description, accepted, rejection_reason}` | `ledger/debt/*.md` §Reason | **debt-conditional** |
+| `Constraint.{kind, bound, source}` | PAEOS-8 §10 acceptance cell; review LOC/gate lines | high — mechanically enforced |
+| `Component.{element_kind, location, interface, depends_on}` | Atlas row + review §Design | high |
+| `Scar.{root_cause, guard_action}` | review §(a) + §Adversary | medium |
+| `Scar.detection_signature` | — | **none** |
+| `EvidenceRef.{uri, kind}` | named test modules and test names | high |
+| `EvidenceRef.reverify_instructions` | PAEOS-8 §10 "Verification method" column | high |
+| `EvidenceRef.hash` | recomputed at ingest | **degraded** — see C4 |
+| `envelope.provenance.origin` | task id only | **degraded** — no `run_id` exists |
+| `envelope.coordinates` | Atlas + §10, dimensions invented | **degraded** — see C6 |
+
+"**debt-conditional**" is the interface's defect and Finding F2: three of the seven bundle
+node types resolve only through an artifact that exists **only when something went wrong**.
+
+### 3.3 Output interface to `G-S1-GO`
+
+The founder gate consumes exactly three values, and the probe surfaces all three above the
+fold: `verdict` (line 7), `loss_ratio` (line 8), and the conditions table C1–C7. C1–C3 are
+marked blocking; the gate's own `accept` requires only a PROCEED/REVERT line citing the
+loss ratio, so nothing in this design constrains the founder's disposition (CER-5).
+
+---
+
+## 4. Data flow
+
+```
+① AUDIT     for each §6.1b named source: does the artifact exist?
+              └─▶ 5 of 6 absent. Re-point at the sources that do exist. (F1)
+
+② SELECT    3 goals with status=Sealed in the Atlas → B0.0, B0.1, B0.2
+              └─▶ these are the backlog's named examples AND the corpus's
+                  best-documented goals ⇒ the result is a LOWER BOUND on loss
+
+③ ENUMERATE fix N = 41 fields/goal before looking at any artifact
+              └─▶ prevents denominator drift
+
+④ EXTRACT   per (goal × node_type × field): locate → score → record basis
+              └─▶ 123 scored rows
+
+⑤ AGGREGATE per-goal loss ─┐
+            per-family loss ┼─▶ headline loss_ratio = 0.134
+                            ┘
+
+⑥ INTERPRET separate corpus-completeness loss from schema-viability loss
+              └─▶ all 7 findings are completeness ⇒ fixable at the source
+              └─▶ VERDICT: GO, conditional on C1..C7
+
+⑦ FALSIFY   name the observation that would flip the verdict
+              └─▶ re-probe 3 goals with NO debt entry; loss > 0.35 ⇒ NO-GO
+```
+
+Step ⑥ is the design's load-bearing judgment and the one a reviewer should attack first.
+It is defended in §7 under *Adversarial*.
+
+---
+
+## 5. State machines
+
+### 5.1 Node epistemic state (SAEOS-1 §4.2) — what S1 may and may not drive
+
+```
+                    ┌───────────────┐
+    §6.1b ingest ──▶│   candidate   │  every extracted node lands here
+                    └───┬───────┬───┘
+       evidence binding │       │ falsifier observed
+       (×5: NEVER a     │       │
+        frequency       ▼       ▼
+        threshold) ┌──────────┐ ┌──────────┐
+                   │ canonical│ │ refuted  │  RETAINED — a refuted
+                   └────┬─────┘ └──────────┘  decision is high-value (✓1)
+                        │  superseded by a later decision
+                        ▼
+                   ┌────────────┐
+                   │ superseded │   nothing is ever deleted (§4.2)
+                   └────────────┘
+```
+
+**S1's authority stops at `candidate`.** The probe found that all three goals are `Sealed`
+in PAEOS and carry passing evidence — which is *tempting* grounds to ingest them straight to
+`canonical`. §4.2's ×5 invariant forbids it: promotion requires an evidence **binding**, and
+Finding F5 shows the binding (`artifact_hash`/`env_hash`) does not exist for pre-B0.7 goals.
+**The historical corpus is therefore structurally stuck at `candidate`**, and §5.1 rule 4
+defaults queries to `[canonical]`. Consequence, and a direct input to `G-S1-GO`: *S2 will
+return nothing from the historical corpus unless the caller opts into `status: [candidate]`.*
+
+This is a real interaction between F5 and §5.1 that neither section states alone.
+
+### 5.2 Probe verdict state machine
+
+```
+   ┌────────────┐  5 of 6 sources absent   ┌──────────────────┐
+   │ source     │─────────────────────────▶│ re-point sources │
+   │ audit      │                          │ (F1)             │
+   └────────────┘                          └────────┬─────────┘
+                                                    ▼
+   ┌──────────────┐   loss > 0.35 on the      ┌──────────────┐
+   │ score 3      │   sampled goals           │   NO-GO      │
+   │ sealed goals │──────────────────────────▶│ §7 falsifier │
+   └──────┬───────┘                           │ fires; spec  │
+          │ loss ≤ 0.35                       │ reverted     │
+          ▼                                   └──────────────┘
+   ┌──────────────────┐
+   │ classify losses  │  schema-viability loss ⇒ NO-GO
+   │ (step ⑥)         │  completeness loss     ⇒ GO + conditions
+   └──────┬───────────┘
+          │ all 7 findings = completeness
+          ▼
+   ┌──────────────┐        ┌──────────────────────────────────┐
+   │ GO           │───────▶│ G-S1-GO (founder A4)             │
+   │ + C1..C7     │        │ PROCEED ─▶ F-BUNDLE, F-ENVELOPE  │
+   └──────────────┘        │ REVERT  ─▶ SAEOS-1 §7 falsifier  │
+                           └──────────────────────────────────┘
+```
+
+The 0.35 threshold is not in the spec — it is this design's proposal, chosen so that the
+NO-GO re-test (three goals with no debt entry) has a pre-declared bar rather than a
+post-hoc one. The founder may set it elsewhere at `G-S1-GO`.
+
+---
+
+## 6. Assumptions surfaced (PAEOS-6)
+
+Each assumption the probe's verdict rests on, with the observation that would refute it.
+
+- **A1.** *B0.0, B0.1 and B0.2 are genuinely sealed PAEOS goals, not drafts.*
+  Basis: `docs/IMPLEMENTATION_ATLAS.md` marks all three **Sealed** with 100% coverage and a
+  review reference; each `docs/<t>-constitutional-review.md` records an explicit **Founder
+  verdict … RATIFIED**. *Falsifier: a ledger or founder record showing any of the three was
+  later unsealed or remanded → that goal's row is void and the aggregate must be re-scored.*
+
+- **A2.** *A file-system audit is sufficient to conclude an artifact class is absent.*
+  The claim "no ADR/decision-graph, no L06 matrix, no L04 set, no scar-graph, no event
+  ledger" rests on name and content searches over the working tree. *Falsifier: these
+  artifacts exist outside this workspace (an external store, a private branch, or the
+  founder's own records) → F1 and F4 weaken substantially and the loss ratio improves.*
+  **This is the probe's weakest assumption** and the cheapest to check — it needs one
+  founder answer, not a re-run.
+
+- **A3.** *`partial = 0.5` is a fair midpoint.*
+  *Falsifier: none — it is a modelling choice, so it is stress-tested instead. All-partials-
+  absent → 0.220; all-partials-extractable → 0.049. The verdict is invariant across the
+  interval, so the constant is not load-bearing.*
+
+- **A4.** *41 fields is the right inventory.* It counts the §4.2 envelope plus facets for
+  the seven §6.1b bundle types, excluding derived `confidence` and excluding §4.3 types
+  outside the S1 bundle (`Problem`, `Objective`, `Mechanism`, `Pattern`, `Outcome`).
+  *Falsifier: `F-ENVELOPE`/`F-BUNDLE` freeze a materially different field set → re-score
+  against the frozen schema. The per-family table exists so this can be done without
+  re-reading the corpus.*
+
+- **A5.** *Extraction loss measured on three goals extrapolates directionally to the corpus.*
+  Deliberately weakened in the probe rather than relied on: the three sampled goals are
+  among the four best-documented, so 0.134 is stated as a **floor**, and the corpus-wide
+  figure is labelled an estimate, not a measurement. *Falsifier: the NO-GO re-test returns
+  loss ≤ 0.134 on debt-free goals → F2 is wrong and the floor framing was too pessimistic.*
+
+- **A6.** *Corpus-completeness loss is correctable at the source; schema-viability loss is
+  not.* The GO verdict turns entirely on classifying all seven findings as the former.
+  *Falsifier: a finding that cannot be fixed by changing what PAEOS emits going forward —
+  e.g. if `Option(rejected)` proves unavailable even from a future L06 because PAEOS
+  genuinely does not generate candidate sets → C2 is unsatisfiable and the verdict flips.*
+
+- **A7.** *S1's "lossless round-trip" exit criterion means bundle → store → bundle, not
+  artifact → bundle.* Under the second reading, **any** loss > 0 fails S1 and the verdict
+  is NO-GO at 0.134. §8 pairs "produces a valid bundle" with "round-trip is lossless",
+  which reads as two claims about the bundle, and no lossless artifact→bundle extraction
+  from prose is achievable by any system — so the second reading would make the criterion
+  unsatisfiable by construction. *Falsifier: the founder rules for the stricter reading at
+  `G-S1-GO` → NO-GO, immediately.* **This is the assumption most worth a founder ruling.**
+
+---
+
+## 7. Perspectives covered
+
+- **Correctness.** Every scored row carries its source and its basis; arithmetic is stated
+  per goal, per family, and in aggregate, and the three totals reconcile (30.5 + 37.5 + 38.5
+  = 106.5 / 123 = 0.866). All four accept regexes were executed against the artifact, not
+  assumed.
+- **Adversarial (CER-1 — this design attacks itself).** Three attacks, honestly answered:
+  *(i) "You picked the three easiest goals."* Conceded, and it is the strongest attack — the
+  probe names the bias, explains its mechanism (the rich `docs/` review series exists only
+  for B0.0–B0.3), and converts it into a pre-declared NO-GO re-test rather than burying it.
+  *(ii) "0.866 is engineered by choosing a friendly denominator."* Answered by fixing `N`
+  before scoring, enumerating it in full, and publishing the partial-weight sensitivity
+  interval (0.049–0.220) over which the verdict is invariant.
+  *(iii) "GO is the outcome the programme wanted."* Answered by A7: the verdict is explicitly
+  conditional on one reading of §8, the competing reading is stated, and it is routed to the
+  founder as the ruling that flips the result.
+- **Falsifiability (K6, §7).** SAEOS-1 §7 supplies a falsifier for the whole specification;
+  this probe supplies one for its own verdict — three debt-free goals, a pre-declared 0.35
+  bar, same method. The probe can be proven wrong by the same procedure that produced it.
+- **Separation of powers (CER-5).** The probe recommends; it does not legislate. `verdict:
+  GO` is an engineering finding, not a promotion — disposition belongs to `G-S1-GO` (founder,
+  A4). C1–C7 are routed to owner nodes, not applied.
+- **Scope discipline.** DESIGN writes only `design/`. The `reviews/spikes/` write and the
+  `S-PROBE` verified-marking are deferred to a session holding `reviews/` capability, and
+  named with the exact command (§0).
+- **Downstream usability.** The findings are addressed to specific backlog nodes (§2 blast
+  radius) with a corrected field-resolution table (§3.2) that `F-BUNDLE` can consume
+  directly, rather than being left as narrative.
+- **Anti-fabrication.** Where an artifact is absent, the probe scores `absent` and says so.
+  No node was invented to improve a total; the 0/3 on B0.0's `Option` is reported at face
+  value even though it drives the worst per-goal result.
+
+---
+
+## 8. Orphan / gap audit
+
+**No orphans.** Every element produced is consumed:
+
+| Produced | Consumed by |
+|---|---|
+| 123 scored field rows | per-goal and per-family aggregates |
+| per-goal loss (3) | headline `loss_ratio` |
+| per-family loss (8) | Findings F3, F4, F5 (the three worst families) |
+| Findings F1–F7 | Conditions C1–C7 — **1:1 onto**, no finding unrouted, no condition ungrounded |
+| Conditions C1–C7 | `F-BUNDLE` (C1, C2, C3, C7), `F-ENVELOPE` (C4, C5, C6) — both real backlog nodes with `S-PROBE`/`G-S1-GO` upstream |
+| `verdict` + `loss_ratio` | `G-S1-GO`, whose own accept requires a decision citing the loss ratio |
+| NO-GO re-test | named follow-up with named candidate goals (B1.C, B2.A, B2.O) and a pre-declared bar |
+
+**No gaps.** Every acceptance command is addressed (§1); every §6.1b bundle node type is
+scored; every §4.2 envelope field is scored or explicitly excluded with a spec citation.
+
+**One acknowledged, non-closable gap:** the first accept command tests a path this stage
+cannot write. It is not silently absorbed — it is stated in §0, in §1's status table, and in
+the completion report, with the exact promotion command. This is a capability boundary, not
+a design defect, and closing it inside this stage would require the violation the boundary
+exists to prevent.
+
+**Deliberate scope exclusions** (named so they are not mistaken for gaps): ingest, store,
+and projection behaviour (downstream of S1); `Problem`/`Objective`/`Mechanism`/`Pattern`
+node types (outside the §6.1b bundle); slices S3–S6 (not authorised by the backlog).
+
+---
+
+## 9. Handoff
+
+**To INTEGRATOR (L15/L16), one command:**
+
+```
+cp design/sakg-s1-extraction-probe.md reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+Then all four `S-PROBE` accept commands pass and the node may be marked verified.
+
+**To `G-S1-GO` (FOUNDER, A4).** Two questions, in priority order:
+
+1. **A7** — does §8's "round-trip is lossless" mean bundle→store→bundle (verdict GO) or
+   artifact→bundle (verdict NO-GO at any loss > 0)? This single ruling determines the gate.
+2. **A2** — do the absent artifact classes (ADR/decision-graph, L06 matrices, scar corpus)
+   exist outside this workspace? A yes materially improves the loss ratio and softens F1/F4.
+
+**To `F-BUNDLE` (PLANNER).** Conditions C1, C2, C3, C7; the corrected source list (§2) and
+field-resolution table (§3.2) are drop-in inputs.
+
+**To `F-ENVELOPE` (PLANNER).** Conditions C4, C5, C6 — `recomputed_at_ingest` tagging,
+nullable `run_id`, and a closed coordinate dimension set.
+
+**To `F-EXTRACT-FIX` (PLANNER).** The three per-goal tables are the hand-extraction targets
+its golden fixtures must encode; §5.1 explains why fixtures must assert `status: candidate`
+and never `canonical`. Its two adversarial cases are already characterised by this probe:
+"a goal whose L06 matrix is absent" is **every goal**, and the debt-free goal is the NO-GO
+re-test population.
+
+---
+
+## Evidence: `design_coherent`
+
+- **Assumptions surfaced (PAEOS-6):** §6 — A1–A7, each with an explicit falsifier. A2 is
+  flagged as the weakest and cheapest to check; A7 is flagged as the one that flips the
+  verdict; A3 is disarmed by a published sensitivity interval.
+- **Perspectives covered:** §7 — correctness, adversarial (CER-1 self-attack, three attacks
+  answered including the conceded one), falsifiability, separation of powers (CER-5), scope
+  discipline, downstream usability, anti-fabrication.
+- **No orphan / no gap:** §8 — findings map 1:1 onto conditions; every condition lands on a
+  real backlog node; every accept command, every §6.1b node type and every §4.2 envelope
+  field is scored or excluded with a citation. The single non-closable gap (the
+  `reviews/spikes/` path write) is a declared capability boundary, stated three times with
+  its resolution command, not an unmet dependency.
+
+Design is coherent and complete. The deliverable body is final; the only outstanding action
+is a one-command promotion by a session holding `reviews/` write capability.

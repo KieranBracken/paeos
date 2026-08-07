@@ -1,0 +1,299 @@
+# PLAN — [S-PROBE] SAKG S1 extraction feasibility spike (`reviews/spikes/sakg-s1-extraction-probe.md`)
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | PLAN ONLY — no deliverable written, no assertion run. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-07 |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | Sealed DESIGN artifact `4f1a7a30a451cf6d…3b671a5` (the completed probe, §1–§9); `constitution/README.md` (TCB / trust-zone boundary); `plan/classify-obj-lifetime-plan.md` (house PLAN shape); `design/classify-obj-lifetime.md` §0 (capability-discipline precedent); `backlog/research/RB-0005-mission-zero-sakg-discovery.md` (Mission-0 lineage this probe serves). |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN**, write-capability `plan/`, read-capability
+`constitution/`, `design/`, `plan/`. The goal objective names one action this stage **does not
+and must not perform**:
+
+1. **Write `reviews/spikes/sakg-s1-extraction-probe.md`** — a `reviews/`-tree write owned by
+   **BUILDER @ IMPLEMENT**. It is outside this session's write-capability; any such write is
+   discarded as a violation. Planned as **WU-1**.
+2. **Run the four accept assertions** — they read a file that does not yet exist, and they
+   produce `VERIFY`-stage evidence owned by **VERIFIER @ VERIFY**. Running them now would fail
+   and would misrepresent verify-stage evidence as plan output. Planned as **WU-2**.
+
+Evidence emitted by *this* session is `plan_executable` (this file) — **not** the probe
+deliverable and **not** the assertion results.
+
+**Unusual shape, noted once.** The intellectual work of this goal (the extraction, the loss
+ratio, the GO verdict) was completed at DESIGN and is sealed in artifact `4f1a7a30a451…`. This
+PLAN does not re-derive, re-score, or re-verdict it; the verdict is **carried, not re-opened**.
+What remains is a landing problem — getting sealed content to an asserted path — plus routing
+the probe's own six preconditions so they do not become orphans. That is what §2 plans.
+
+**Citation honesty.** This session cannot read `spec/` or `reviews/`. Every reference below to
+`spec/SAEOS-1-architecture.md` (§4.2, §4.3, §6.1b, §8, §9/A8), `spec/PAEOS-8-…§10`,
+`operations/ENGINEERING_LIFECYCLE.md:96` and the `docs/B0.x` / `ledger/debt/` corpus is
+**carried transitively from the sealed DESIGN artifact's §9 traceability table**, not
+independently confirmed here. Downstream stages own that confirmation (§4, ledger row A6).
+
+---
+
+## 1. Objective restatement and acceptance surface (traceability)
+
+Land the completed extraction probe at `reviews/spikes/sakg-s1-extraction-probe.md`: for each
+of three real sealed goals (B0.0, B0.1, B0.2), a hand-extraction into the SAEOS-1 §4.3 node
+types scored per-field extractable / partial / absent, with an explicit GO or NO-GO verdict and
+the loss ratio. The sealed artifact satisfies this in full: **126 slots scored across 3 goals,
+`verdict: GO`, `loss_ratio: 0.25`.**
+
+The gate is four assertions, run from the repo root. They are the acceptance oracle and are
+reproduced **verbatim** — do not alter one character:
+
+```
+A1  test -f reviews/spikes/sakg-s1-extraction-probe.md
+A2  rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+A3  test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+A4  rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+**Assertion-fragility analysis (load-bearing — read before editing the deliverable).**
+
+| # | Satisfied by | Fragility the BUILDER must not introduce |
+|---|---|---|
+| A1 | the file at exactly that path | `reviews/spikes/` already exists (holds `DEBT-0002-spawnability-spike.md`), so no directory creation is needed; a path typo is the only realistic failure |
+| A2 | `verdict: GO` at the artifact's header **and** again in §5 | `^…$` anchors: **any** trailing whitespace, leading indent, or wrapping the line inside a fenced code block breaks the match |
+| A3 | exactly three `## goal: B0.x — …` headings | requires literal `## goal: ` with **one** space after the colon; `-ge 3` is a floor, so adding goals is safe, renaming or re-casing the heading is not |
+| A4 | `loss_ratio: 0.25` at the header | the three `goal_loss_ratio: 0.35 / 0.17 / 0.23` lines **must not** match, and do not, solely because of the `^` anchor. **Do not rename `goal_loss_ratio` to end in a bare `loss_ratio` at line start** — it would still pass, but it would make A4 ambiguous about which number the gate read |
+
+**A3 failure-mode hazard.** On zero matches `rg -c` prints nothing and exits 1, so A3 degrades
+to `test  -ge 3` — a shell *syntax error*, not a clean FAIL. VERIFIER must therefore run A1
+first and report A3's raw count separately (§3, E2), so "file absent", "heading malformed" and
+"too few goals" are distinguishable rather than collapsing into one uninterpretable error.
+
+**Ignore-rules check (cleared).** `rg` honours `.gitignore`, but the repo `.gitignore` excludes
+only `.DS_Store`, `node_modules/`, `*.log`, `.scratch/`, `.runtime/`, `.venv/`, `__pycache__/`,
+`*.py[cod]`, `.pytest_cache/`, `.ruff_cache/` and `ops/keys/*` — `reviews/` is not excluded, and
+an explicitly-named file path overrides ignore rules regardless. A2/A3/A4 are safe.
+
+---
+
+## 2. The one blocking defect in the upstream hand-off
+
+The sealed artifact's **§9 Disposition** prescribes:
+
+> *"Action required: `git mv design/sakg-s1-extraction-probe.md reviews/spikes/sakg-s1-extraction-probe.md`."*
+
+**That instruction is unexecutable as written, for two independent reasons**, both established
+by direct inspection at plan time:
+
+| # | Finding | Consequence |
+|---|---|---|
+| **D1** | `design/sakg-s1-extraction-probe.md` **does not exist**. `design/` holds exactly three files: `PAEOS-skills-gen1.md`, `classify-obj-lifetime.md`, `is_institutional-design.md`. The DESIGN session's write did not land on disk in this workspace. | there is no source path to move **from** |
+| **D2** | The workspace is **not a git work tree** (`git rev-parse` → *fatal: not a git repository*). | `git mv` fails even given a valid source |
+
+**The content's only durable carrier is the sealed artifact `4f1a7a30a451…` itself** — which is
+content-addressed and immutable, and is therefore a *stronger* source than the file would have
+been. The correct WU-1 is a **materialization from the sealed artifact**, not a move. This is
+the single substantive correction this PLAN makes to the DESIGN hand-off; everything else in
+the artifact is carried unchanged.
+
+---
+
+## 3. Work units (executable, ordered, single-owner)
+
+Each work unit is atomic, has one owning stage/role, a precondition, an exact action, a
+done-check, and the evidence it feeds. Ordering: `WU-1 → WU-2 → (WU-3) → WU-4 → WU-5`.
+WU-1 and WU-2 are **gating**; WU-3 is conditional; WU-4 and WU-5 are routing units that
+prevent orphans and do not block the gate.
+
+### WU-1 — Materialize the probe at the asserted path
+- **Owner:** BUILDER @ IMPLEMENT (not this session) — requires `reviews/` write capability.
+- **Ref:** sealed artifact `4f1a7a30a451…` §1–§9; §2 findings D1/D2 above.
+- **Preconditions (BUILDER re-confirms at execution time — see §4 ledger A1–A3):**
+  `reviews/spikes/` exists; `reviews/spikes/sakg-s1-extraction-probe.md` does **not** yet exist
+  (this is a create, never an overwrite — inspect before writing); the sealed artifact is
+  retrievable by hash.
+- **Action (exact):** write `reviews/spikes/sakg-s1-extraction-probe.md` containing the sealed
+  artifact's content **byte-for-byte, §1 through §9, verbatim**. Do **not** `git mv`. Do **not**
+  reflow, re-wrap, re-indent, fence, or normalise whitespace — §1's fragility table explains
+  why each of those breaks A2/A3/A4. Do not renumber sections. Do not touch any other file.
+- **Done-check:** the file exists at that exact path and hashes identically to the sealed
+  artifact's content; `reviews/spikes/DEBT-0002-spawnability-spike.md` is unmodified.
+- **Feeds:** evidence E1.
+
+### WU-2 — Run the four accept assertions (acceptance oracle)
+- **Owner:** VERIFIER @ VERIFY (not this session).
+- **Ref:** §1 of this plan (assertions verbatim + failure-mode hazard).
+- **Precondition:** WU-1 complete.
+- **Action (verbatim, from repo root, in order A1 → A2 → A3 → A4):** run the four commands as
+  printed in §1. Run **A1 first and independently**, so an absent file is reported as an absent
+  file rather than as A3's shell syntax error. For A3, capture and report the raw
+  `rg -c '^## goal: '` output (expected: `3`) alongside the `test` verdict.
+- **Done-check:** all four exit `0`; the reported A3 count is `≥ 3`.
+- **Feeds:** evidence E2. **This is the mission gate.**
+
+### WU-3 — Correct the now-stale §9 disposition block *(conditional)*
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** §2 findings D1/D2.
+- **Precondition:** **WU-2 fully green first.** Sequencing is deliberate: landing verbatim then
+  correcting means any assertion regression is unambiguously attributable to this edit.
+- **Trigger (conditional, not automatic):** execute only if the corpus requires §9 to describe
+  the disposition that actually occurred. If seal fidelity to `4f1a7a30a451…` is valued more
+  highly, **skip WU-3 and record the skip** — no assertion reads §9, so skipping costs nothing
+  at the gate.
+- **Action (exact, minimal):** in §9's *Deliverable location* paragraph only, replace the
+  `git mv` instruction with the disposition that occurred — materialised from sealed artifact
+  `4f1a7a30a451…` at PLAN→IMPLEMENT, no `design/` intermediate, workspace not a git work tree.
+  Change **nothing else**, and touch **no line** matching `^verdict:`, `^loss_ratio:` or
+  `^## goal: `.
+- **Done-check:** §9 no longer prescribes an unexecutable action; **WU-2 re-run, all four still
+  green**; the deliverable diff versus the sealed artifact is confined to §9's location
+  paragraph.
+- **Feeds:** evidence E3.
+
+### WU-4 — Route the six preconditions P1–P6 to durable carriers
+- **Owner:** PLANNER/STEWARD at a **subsequent** goal (not this session, not this gate).
+- **Ref:** sealed artifact §6 (P1–P6, each with a falsifier), §4 (findings F1–F4).
+- **Rationale (why this is in scope for a *plan* and not scope creep):** the probe's GO is
+  **conditional** — its §6 states *"P1, P2 and P5 are gating"* before S1 is built. A plan that
+  lands the verdict and drops its conditions would ship an unconditional GO the probe did not
+  give. This WU **routes** them; it does not execute them.
+- **Action (routing only, no amendment authored here):** carry each precondition, with its
+  falsifier verbatim, into whatever register governs pre-build conditions for S1 — proposal,
+  debt record, or backlog node, per whichever the corpus already uses; do not invent a new
+  carrier. Preserve the gating/non-gating split:
+  - **Gating before S1 is built:** **P1** (`artifact_hash` + `env_hash` in the L15 close-out
+    template — without it §6.1b rule 2 is unimplementable, finding F2); **P2** (either make L06
+    mandatory for `TradeOff`-emitting goals, or drop `tradeoff_precedents` as S2's method —
+    finding F1, TradeOff loss **0.79**); **P5** (replace §8's *"round-trip is lossless"* with
+    the bounded criterion in the probe's §5, or S1 has no test that can fail — Δ3).
+  - **Land alongside S1:** **P3** (add `ledger/debt/` to the §6.1b source list — finding F3);
+    **P4** (make `detection_signature` required and the adversary pass mandatory — finding F4);
+    **P6** (define a coordinate vocabulary or remove `coordinates` from the v1 envelope).
+  - **Carry, do not close:** the probe's §8 open question — `Problem`, `Objective`, `Mechanism`
+    and `Pattern` are §4.3 node types with **no specified producer stage**; routed to S4.
+- **Done-check:** each of P1–P6 plus the S4 open question resolves to a named, addressable
+  register entry; none exists only inside the probe prose.
+- **Feeds:** evidence E4.
+
+### WU-5 — Register the Ω-P1 verdict-flip watch
+- **Owner:** VERIFIER/STEWARD at the **first true L15-sealed goal** (not this session).
+- **Ref:** sealed artifact §7 Ω-P1 — *"the probe's largest threat to validity"*.
+- **Why separate from WU-4:** Ω-P1 is not a precondition to satisfy; it is the **one stated
+  condition under which this GO becomes a NO-GO**. A verdict-reversal trigger must be watchable
+  independently of the conditions it sits beside, or it silently expires.
+- **Content of the watch (verbatim from §7):** B0.0–B0.2 are pre-lifecycle Phase-0 bootstrap
+  tasks that never ran L04/L06/L08/L11, so this probe measured **substitute** artifacts, not the
+  specified ones. *Repayment:* re-run the probe's §2 method against the first true L15-sealed
+  goal **before S1 is declared passed**. **Escalation:** if TradeOff loss does not fall below
+  **0.30** there, **P2 escalates from precondition to NO-GO**.
+- **Secondary watch (Ω-P2):** the S1 extractor, once built, must have its output diffed against
+  this hand extraction; **divergence > 0.10 invalidates this verdict**, not the extractor.
+- **Done-check:** both watches are registered against a named future trigger event, with the
+  0.30 and 0.10 thresholds recorded numerically.
+- **Feeds:** evidence E5.
+
+**Blast radius.** Additive: one new file in `reviews/spikes/`, plus (conditionally) a
+paragraph-scoped edit to that same new file, plus register entries in WU-4/WU-5. **The
+constitution/TCB tree is untouched** — `constitution/` is Trust Zone 0, read-only at runtime,
+amend-only, and its only legal writer is `kernel/amendment.py` (`constitution/README.md`;
+PAEOS-8 §1, PAEOS-7 §7.4). No CI TCB-diff gate is engaged; no ratifier or Adversary review is
+required for this change. Classification expected **SOFT**.
+
+---
+
+## 4. Evidence plan (obligations → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` — this file: work units, evidence obligations, rollback declared, refs cited. | PLANNER @ PLAN (this session) | Presence of §3 (WUs), §4 (this table), §5 (rollback), §6 (completeness), and upstream refs (header + inline). | **PLAN** |
+| **E1** | Deliverable exists at `reviews/spikes/sakg-s1-extraction-probe.md`, byte-identical to sealed artifact `4f1a7a30a451…`. | BUILDER @ IMPLEMENT | Content hash of the written file equals the sealed artifact's; `DEBT-0002-spawnability-spike.md` unmodified. | IMPLEMENT |
+| **E2** | Four accept assertions green; A3 raw count reported. | VERIFIER @ VERIFY | Run A1–A4 from §1 verbatim, in order, A1 independently. All exit `0`; A3 count `= 3`. | **VERIFY (mission gate)** |
+| **E3** | §9 currency — no unexecutable `git mv` instruction remains; assertions still green. | BUILDER @ IMPLEMENT | WU-2 re-run after the WU-3 edit; diff versus sealed artifact confined to §9's location paragraph. **Or** an explicit recorded skip. | IMPLEMENT *(conditional)* |
+| **E4** | P1–P6 + the S4 open question each resolve to a named register entry, gating split preserved. | PLANNER/STEWARD, subsequent goal | Each precondition dereferences to an addressable entry carrying its falsifier verbatim. | downstream |
+| **E5** | Ω-P1 and Ω-P2 watches registered with numeric thresholds (0.30, 0.10) and named triggers. | VERIFIER/STEWARD, first L15 goal | Watch exists and names its trigger event before S1 is declared passed. | downstream |
+
+**Assumption → verification-owner ledger.** Facts A1–A5 were established by direct inspection
+of this workspace at plan time (2026-08-07); each still carries a re-confirm obligation because
+the execution workspace may differ. A6 was **not** verifiable here and is a genuine carry.
+
+| id | Assumption | Established | Confirmed at |
+|----|------------|-------------|--------------|
+| **A1** | `reviews/spikes/` exists (holds `DEBT-0002-spawnability-spike.md`) — no directory creation needed. | inspected, plan time | **WU-1**, BUILDER |
+| **A2** | `design/sakg-s1-extraction-probe.md` does **not** exist — §2/D1, so WU-1 is a create, not a move. | inspected, plan time | **WU-1**, BUILDER |
+| **A3** | Workspace is not a git work tree — §2/D2, so `git mv` is unavailable and rollback is a filesystem operation, not a revert. | inspected, plan time | **WU-1**, BUILDER |
+| **A4** | `.gitignore` does not exclude `reviews/` — A2/A3/A4 are not silently skipped by `rg`. | inspected, plan time | **WU-2**, VERIFIER |
+| **A5** | `reviews/tasks/B0.{0,1,2}_review.md` exist — the three goals the probe scored are real. | inspected, plan time | **WU-2**, VERIFIER |
+| **A6** | The probe's clause citations into `spec/SAEOS-1-architecture.md` (§4.2/§4.3/§6.1b/§8/§9-A8), `spec/PAEOS-8-…§10`, `docs/B0.x-constitutional-review.md`, `ledger/debt/DEBT-000{2,3}.md` and `operations/ENGINEERING_LIFECYCLE.md:96` resolve as stated. | **not verifiable in this session** — `spec/`, `docs/`, `ledger/`, `operations/` are outside read-capability | **WU-2**, VERIFIER, against the probe's §9 traceability table |
+
+No assumption changes the plan. A2 and A3 changed the *hand-off* — that correction is §2 and is
+already absorbed into WU-1.
+
+---
+
+## 5. Rollback plan
+
+The change is additive and non-TCB, so rollback is clean and bounded. **The content's source of
+truth is the immutable content-addressed artifact `4f1a7a30a451…`, so re-materialisation after
+any rollback is always available and always exact.**
+
+**Trigger:** any A1–A4 assertion exits non-zero; the written file diverges from the sealed
+artifact's content hash; the WU-3 edit turns a green assertion red; or the WU-1 write is found
+to have modified any pre-existing file.
+
+**Rollback actions, per work unit** (BUILDER @ IMPLEMENT, on a `reviews/` write capability):
+
+| WU | Rollback | Residue |
+|---|---|---|
+| **WU-1** | Delete the single path `reviews/spikes/sakg-s1-extraction-probe.md`. Because the workspace is not a git work tree (A3), this is a filesystem delete, not a `git revert`. | none — the tree returns to its pre-change state, with `reviews/spikes/DEBT-0002-spawnability-spike.md` untouched |
+| **WU-3** | Restore §9 to the sealed artifact's text verbatim; or, if the edit is unrecoverable, delete the file and re-run WU-1 from the artifact. | none |
+| **WU-4 / WU-5** | Remove the register entries added. Both are additive; neither amends an existing entry. | none |
+
+**Verification of rollback:** `test -f reviews/spikes/sakg-s1-extraction-probe.md` returns
+non-zero; no other file under `reviews/` differs from its pre-change state.
+
+**Blast containment.** Nothing outside the one new file and the WU-4/WU-5 register entries is
+modified, and `constitution/` is untouched, so rollback cannot leave partial state and requires
+no kernel amendment, no ratifier, and no Adversary review.
+
+**What rollback does *not* undo — stated explicitly.** Deleting the file does **not** retract
+the verdict. `verdict: GO` at `loss_ratio: 0.25` is a finding about the corpus, sealed in
+`4f1a7a30a451…`; it is not a property of a file's presence. **The only path that reverses the
+verdict is the Ω-P1 escalation in WU-5** — re-running the probe's §2 method against the first
+true L15-sealed goal and observing TradeOff loss ≥ 0.30 — or the Ω-P2 condition, extractor
+divergence > 0.10. Conflating file rollback with verdict retraction would lose exactly the
+falsifier the probe was built to expose.
+
+**Recovery path:** after rollback, re-enter **IMPLEMENT**, re-materialise from the sealed
+artifact (correcting whatever broke the byte-identity or an anchored line), then re-run WU-2.
+
+---
+
+## 6. Completeness check (no orphan / no gap)
+
+- **Every objective clause maps to a work unit.** Deliverable at the named path → WU-1;
+  three goals × §4.3 node types × per-field E/P/A scoring, explicit verdict, loss ratio → all
+  carried in the sealed artifact and landed verbatim by WU-1, gated by WU-2.
+- **Every accept assertion has a named oracle and owner.** A1–A4 → WU-2 → E2, with the A3
+  zero-match hazard and the A2/A4 anchor fragilities called out in §1 before they can bite.
+- **Every work unit feeds an evidence obligation.** WU-1→E1, WU-2→E2, WU-3→E3, WU-4→E4,
+  WU-5→E5; this file is E0.
+- **Every assumption has a downstream verification owner** (§4 ledger A1–A6), including the one
+  — A6 — this session honestly could not check.
+- **The upstream hand-off defect is closed, not inherited.** §2/D1+D2 replace an unexecutable
+  `git mv` with a materialisation from the immutable artifact.
+- **The probe's conditional GO stays conditional.** P1/P2/P5 (gating), P3/P4/P6 (alongside),
+  the S4 four-orphan-node-types question, and the Ω-P1/Ω-P2 verdict-flip watches are all routed
+  to named owners by WU-4 and WU-5 rather than left in prose.
+- **A rollback is declared and bounded for every mutating unit** (§5), with the file-rollback /
+  verdict-retraction distinction stated rather than blurred.
+- **All claims cite an upstream ref:** sealed DESIGN artifact `4f1a7a30a451…` (§§1–9);
+  `constitution/README.md` (TCB boundary, PAEOS-8 §1 / PAEOS-7 §7.4);
+  `plan/classify-obj-lifetime-plan.md` (house PLAN shape); `design/classify-obj-lifetime.md` §0
+  (capability-discipline precedent); `backlog/research/RB-0005-mission-zero-sakg-discovery.md`
+  (Mission-0 lineage); repo `.gitignore` and workspace inspection (§4 ledger A1–A5).
+
+**Evidence for this gate:** `plan_executable` = this file.
