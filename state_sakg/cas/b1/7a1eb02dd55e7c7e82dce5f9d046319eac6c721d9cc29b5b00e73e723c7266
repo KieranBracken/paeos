@@ -1,0 +1,20 @@
+# DEBT-0063 — Unused Signature Parameter and Workspace Over-Exposure in `_seed_workspace`
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-integrations** (touches `runtime/integrations/__init__.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`_seed_workspace(workspace, source, write_scopes)` accepts a `write_scopes` parameter, but does not use it. Instead, it copies the entire source repository into the temporary workspace.
+
+This creates a dead parameter in the signature and over-exposes repository contents (including untracked state or unrelated code) to worker sessions beyond their declared `read_scopes`.
+
+## 2. Root Cause
+
+Commit `8d8a12f` refactored workspace seeding to fix missing read paths for worker sessions, but left `write_scopes` in the function signature while expanding copy scope to the entire repository without restricting it to `read_scopes`.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Remove the unused `write_scopes` parameter from `_seed_workspace` or filter the copy to declared `read_scopes`.
+- **Long-term:** Implement precise workspace seeding that copies only paths matching `read_scopes` and mandatory context files.

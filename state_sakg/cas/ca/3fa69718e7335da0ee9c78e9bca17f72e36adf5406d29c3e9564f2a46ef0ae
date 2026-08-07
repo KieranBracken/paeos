@@ -1,0 +1,23 @@
+# DEBT-0008 — Live `AgentRuntime` CLI Invoker Deployment Seam
+
+**Status**: OPEN  
+**Filed**: 2026-07-30  
+**Priority**: Low  
+**Category**: Deployment Integration / Seam Scoping  
+
+---
+
+## 1. Compromise
+The live `AgentRuntime` adapter in [runtime/integrations/__init__.py](file:///Users/bob/GitHub/paeos/runtime/integrations/__init__.py) (`ClaudeCodeRuntime`) isolates the actual model execution call behind a pluggable `claude_cli_invoker` function seam.
+
+## 2. Reason
+Unit and integration tests must run deterministically in isolated sandboxes without making external network calls to the Anthropic API or requiring active `claude` CLI authentication on CI runners.
+
+## 3. Ideal Solution
+The adapter logic (context compilation, prompt generation, worktree isolation, `write_scopes` filtering, cost parsing) is fully unit-tested against a mock session invoker. Live production deployment requires providing the concrete `claude_cli_invoker` function bound to an authenticated host `claude` CLI environment.
+
+## 4. Repayment Conditions
+Repay during final Phase 3 production deployment configuration.
+
+## 5. Estimated Impact
+Low. The security-critical adapter logic and scope enforcement are 100% verified in code; only host process execution requires environment binding.

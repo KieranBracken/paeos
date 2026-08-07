@@ -1,0 +1,66 @@
+# DEBT-0005 — Evidence reproduction runs without OS-level sandboxing
+
+Status: **RESOURCE SANDBOX BUILT (B1.E) — container isolation is the deploy-env residual** · Filed: 2026-07-27 · Channel: CER-3 · Priority: **LOW (was MEDIUM-HIGH)**
+
+## Sandbox built (2026-07-28, B1.E)
+
+`kernel/sandbox.py` `run_sandboxed`/`sandbox_runner` runs untrusted agent commands under **OS
+resource limits** (CPU time, address space, file size, open files via `setrlimit`, best-effort per
+platform) + a **wallclock timeout** + a **minimal environment** + a **scoped cwd**. The Verification
+Court (`runtime/court`) re-runs evidence through it by default, and `kernel/evidence.reproduce` takes
+an injectable `runner` so the sandbox is used on the court path. Verified: timeout → non-success,
+nonzero exit reported, resource caps applied. This repays the **resource/DoS** half of the debt.
+
+**Residual (why LOW, not closed):** container-grade **filesystem namespacing and network isolation**
+need containers/namespaces (docker, root) unavailable in this environment (same constraint as
+DEBT-0003's Postgres). The `Sandbox` seam lets a container adapter drop in for production deploys.
+Founder-accepted (2026-07-28): resource sandbox for Phase 1; container isolation is a deploy-env task.
+
+## Compromise
+
+B0.7's `kernel/evidence.py::reproduce` re-runs an evidence's `reproducible_command` to catch
+forged results (7.5 T2). It runs the command **without a shell** (args via `shlex.split`) and
+with a **hard timeout**, but with **no OS-level sandbox** — no resource limits (CPU/memory/
+file-descriptors), no filesystem isolation, and no network isolation. 7.5 §T2/EXEC requires
+execution to be sandboxed.
+
+## Reason
+
+The reproduction *logic* (binding, deterministic re-run, forgery detection, two-producer
+corroboration) is fully implementable and testable now and is what B0.7 gates on. A real
+sandbox (seccomp/cgroups/containers, or an adapter-provided EXEC substrate) is an
+infrastructure concern that belongs with the execution substrate, not the evidence algebra,
+and would have blocked B0.7 on environment work. Kept the split: algebra now, sandbox tracked.
+
+## Ideal solution
+
+`reproduce` executes inside a sandboxed EXEC substrate with: CPU/wallclock/memory limits, a
+read-only or scoped filesystem view, no network by default, and a killed-on-breach policy.
+Per PAEOS-4.5 this is the adapter's EXEC responsibility (the "only author of execution-class
+Evidence", A-09); the kernel calls the adapter's sandboxed EXEC rather than `subprocess`
+directly. The evidence-verification logic is unchanged — only the execution boundary hardens.
+
+## Repayment conditions
+
+Before any **untrusted** command reaches `reproduce` — i.e. before the runtime executes
+evidence produced by autonomous agent sessions (Phase 1). In Phase 0 bootstrap, evidence
+commands are founder/Builder-authored and reviewed, so the exposure is bounded; the timeout +
+no-shell parsing are interim mitigations.
+
+## Priority
+
+MEDIUM-HIGH. Not blocking for B0.8/B0.6 (which consume the verification *result*, not the
+sandbox), but a real security control that must land before agent-produced evidence is
+reproduced autonomously.
+
+## Estimated impact
+
+Contained: the sandbox is an execution-boundary swap behind `reproduce`; the binding /
+determinism / two-producer logic and its tests are unchanged. Low blast radius, high security
+value.
+
+## Links
+
+Source: PAEOS-7.5 §T2 hardening (2) + EXEC sandbox; PAEOS-4.5 §1 (adapter EXEC / A-09);
+PAEOS-8 §10 B0.7. Implementation: `kernel/evidence.py::reproduce`. Review:
+`reviews/tasks/B0.7_review.md`.

@@ -1,0 +1,31 @@
+# DEBT-0066 — No Evidence Submitted to Court MCP
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime** (autonomous friction detection, RB-0008).
+Source: Autonomous run — goal `g-82f296a0a3d7`.
+
+## 1. Observation
+
+During autonomous execution, goal `g-82f296a0a3d7` encountered friction:
+`no evidence submitted to the court for this run`.
+
+Implicated paths: `tests/sakg/`, `reviews/`, `spec/`.
+
+## 2. Leverage Assessment (RB-0008 Primitive 4)
+
+**Leverage: 1.0x** (below immediate-queue threshold). Substrate: no. Recurring: no. Blast radius: SOFT.
+
+## 3. Confidence Assessment (RB-0008 Primitive 5)
+
+First occurrence — no prior scar match, needs human characterization
+
+## 4. Root Cause
+
+To be investigated. This debt item was autonomously filed by the RB-0008 friction handler
+when the runtime detected a non-seal outcome during a self-hosting run.
+
+## 5. Remediation Strategy
+
+- **Short-term:** Review the run outcome and determine whether the friction was caused by
+  an intake misconfiguration, a missing write scope, or a genuine code defect.
+- **Long-term:** Address the root cause so future runs of this goal signature seal cleanly.

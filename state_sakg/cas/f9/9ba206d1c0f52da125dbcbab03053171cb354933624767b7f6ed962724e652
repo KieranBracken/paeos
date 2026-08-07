@@ -1,0 +1,23 @@
+# DEBT-0018 — Continuous Scheduler Global Governor Halts Lack Kernel Ledger Event Logging
+
+**Status**: OPEN  
+**Filed**: 2026-08-01  
+**Priority**: Medium  
+**Category**: Architectural Deviation / Audit Deficit  
+
+---
+
+## 1. Compromise
+In [runtime/scheduler.py](file:///Users/bob/GitHub/paeos/runtime/scheduler.py), when `EconomicGovernor` refuses to admit a run (`BUDGET_EXHAUSTED`), `ContinuousScheduler.run()` returns a transient `SchedulerReport` with `StopReason.BUDGET_EXHAUSTED` without writing a `scheduler_halted` or `governor_budget_breached` event to the single-writer kernel ledger.
+
+## 2. Reason
+`ContinuousScheduler` was implemented as a pure functional orchestrator over `SoftLoop` (`run_one`) to decouple continuous scheduling logic from specific ledger storage backends during Phase 3 continuous daemon setup.
+
+## 3. Ideal Solution
+Inject a `Ledger` instance into `ContinuousScheduler` and log a signed `scheduler_halted` / `governor_budget_breached` event whenever global budget limits halt admission, ensuring durable auditability per PAEOS-0 Axiom A2 ("artifacts durable, context ephemeral").
+
+## 4. Repayment Conditions
+Repay during Phase 3 continuous daemon production deployment.
+
+## 5. Estimated Impact
+Medium. Global scheduler halts and budget exhaustion events exist only in transient in-memory return objects. If the daemon process crashes, the halt record and remaining budget allocation state are lost.

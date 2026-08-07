@@ -1,0 +1,23 @@
+# DEBT-0014 — Unenforced Ephemeral Memory Boundaries at CAS/Ledger Substrate Level
+
+**Status**: OPEN  
+**Filed**: 2026-07-30  
+**Priority**: Medium  
+**Category**: Architectural Deviation / Policy Enforcement Deficit  
+
+---
+
+## 1. Compromise
+While IP-0004, IP-0005, and IP-0006 define L1 ephemeral vs L3 institutional memory lifetime boundaries, the enforcement in [runtime/evolution.py](file:///Users/bob/GitHub/paeos/runtime/evolution.py) and [runtime/task_package.py](file:///Users/bob/GitHub/paeos/runtime/task_package.py) relies entirely on runtime code assertions (`may_promote()`). The underlying CAS (`kernel/cas.py`) and Ledger (`kernel/ledger.py`) stores lack lifetime metadata tags or kernel-level promotion enforcement policies.
+
+## 2. Reason
+B2.G introduced memory lifetime classes (`L1`, `L2`, `L3`) and `ExecutionContext` as runtime abstractions to separate ephemeral operational retry context from durable institutional scars. Updating kernel storage primitives (CAS / Ledger) to enforce lifetime tags required broader structural changes.
+
+## 3. Ideal Solution
+Incorporate lifetime metadata tags (`L1`, `L2`, `L3`) into kernel CAS artifacts and Ledger event payloads, enforcing promotion policy rules directly within the TCB storage substrate and reference monitor gates.
+
+## 4. Repayment Conditions
+Repay during Phase 3 CAS/Ledger substrate hardening.
+
+## 5. Estimated Impact
+Medium. Misbehaving or buggy runtime components could write L1 ephemeral execution context directly into CAS or Ledger stores without triggering a TCB gate failure.

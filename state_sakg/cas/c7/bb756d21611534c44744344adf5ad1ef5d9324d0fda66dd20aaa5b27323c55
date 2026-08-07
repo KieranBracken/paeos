@@ -1,0 +1,20 @@
+# DEBT-0064 — Unratified Specification Deletion and Lineage Breakdown (`PAEOS-9`)
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3 / CER-5
+Level: **spec** (touches `spec/PAEOS-9-runtime-bootstrap.md` & `spec/PAEOS-9A-runtime-bootstrap.md`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`spec/PAEOS-9-runtime-bootstrap.md` was deleted from git, replaced by `spec/PAEOS-9A-runtime-bootstrap.md` and `spec/PAEOS-9-execution-architecture.md`. However, `reviews/9-ratification-paeos-9.md` remains untracked and unratified by the Founder.
+
+Deleting core specification documents without completing the formal ratification protocol breaks specification lineage and violates CER-5.
+
+## 2. Root Cause
+
+Refactoring of the execution architecture specification occurred concurrently with active development without staging through formal proposal and ratification phases.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Keep `spec/PAEOS-9A-runtime-bootstrap.md` and `spec/PAEOS-9-execution-architecture.md` as active working drafts.
+- **Long-term:** Formalize `reviews/9-ratification-paeos-9.md` for Founder ratification to restore unbroken specification lineage.

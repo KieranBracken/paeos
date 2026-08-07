@@ -1,0 +1,20 @@
+# DEBT-0077 — Dynamic High-Leverage Queue Prepending Lacks Re-entry / Loop Detection
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-scheduler** (touches `runtime/scheduler.py`, `runtime/selfhost.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+In `ContinuousScheduler`, `ConcurrentScheduler`, and `run_backlog`, when a goal returns a `high_leverage_intake`, it is prepended to the active execution queue without checking whether this exact repair intake signature has already been attempted or failed previously.
+
+If a high-leverage repair intake encounters a non-sealing outcome and generates another high-leverage intake (or the same one), the runtime can enter an un-bounded repair loop, repeatedly executing the failing repair until global budget exhaustion.
+
+## 2. Root Cause
+
+Queue prepending in `ContinuousScheduler` and `ConcurrentScheduler` lacks deduplication, re-entry tracking, or retry caps for high-leverage repair intakes.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Add a `seen_repair_signatures: set[str]` or retry counter to schedulers, preventing duplicate repair intakes from being re-queued more than once.
+- **Long-term:** Formalize queue mutation invariants and loop detection within the continuous scheduler architecture.
