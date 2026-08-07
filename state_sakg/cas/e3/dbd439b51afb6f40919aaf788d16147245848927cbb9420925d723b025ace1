@@ -1,0 +1,96 @@
+# Constitutional Implementation Review: [B0.9]
+
+**Date**: 2026-07-27
+**Task**: B0.9 — Seal Authority + Persistent Kernel Keystore (PAEOS-7.6 §10 / 7 §4.3 G-Seal / FR-7)
+**Reviewer Role**: Auditor / Builder Self-Adversarial (Adversary pass = double-seal + forged verdict, T2)
+
+## Summary of Findings
+
+- **BLOCKER**: 0
+- **MAJOR**: 0
+- **MINOR**: 0
+- **OBSERVATION**: 3
+
+Deliverable: `kernel/seal.py` (`SealRecord` + `SealAuthority.seal`/`verify_seal`) and
+`kernel/keystore.py` (`load_or_create_signing_key`). Evidence: 13 tests in
+`tests/kernel/test_seal.py`; 139 kernel tests total; ruff clean; pyright 0 errors (strict);
+F1 1932/20000; F3 green (no key material committed).
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Enforces the §10/G-Seal invariant: refuse without a passing verdict AND a resolved
+adversary review AND a verified ledger chain (`SealRefused`, all three tested). Idempotent by
+content (FR-7). Immutable: a defect produces a *new* seal with `supersedes`, never an edit (SI-7,
+tested). Signed with the kernel key (A-5) from the persistent keystore.
+
+### 2. Architectural Drift
+**PASS.** `SealRecord` transcribes §10 verbatim (incl. `promote_to?`, `supersedes?`). The
+`seal_hash` uses the §10 formula over a canonical JSON — the same hashing discipline as the rest
+of the kernel. No new mechanism.
+
+### 3. Duplication of Mechanisms
+**PASS.** Reuses the ledger (B0.1) for commit + chain verification + index rebuild, `types`
+(Hash/Ts/…), and the same Ed25519 primitive as B0.8. The keystore is the single kernel-key
+source that B0.8's broker can now also use (closes B0.8 Observation 1).
+
+### 4. Bypassing Mechanisms
+**PASS.** The seal commits through `Ledger.append` (single-writer, B0.1) — it does not write the
+ledger out of band. Chain verification runs *before* any commit.
+
+### 5. Simpler Implementation Possible
+**PASS / minimal.** One authority class + two module functions. Idempotency is a dict index
+rebuilt from the ledger — no separate store.
+
+### 6. Better Derivation
+**PASS.** Refusal, idempotency, signing, and supersession map 1:1 to §10's invariant sentence.
+
+### 7. Hidden Technical Debt
+**PASS.** No new debt. The keystore *repays* the persistent-key part of B0.8 Observation 1.
+`DEBT-0005` (evidence sandbox) is unrelated and still tracked.
+
+### 8. Security Implications
+**PASS.** The seal is the canonical-truth authority — its signing key is the highest-value asset
+(7.5 §Position). It lives only in the keystore file (`ops/keys/`, 0600, gitignored, F3-enforced),
+never committed, never in an agent's hands (A-5). A tampered seal fails `verify_seal` (hash or
+signature); a seal from another key fails (tested). Boundary (Observation 1): B0.9 requires a
+verdict/adversary *ref* to be present but does not itself re-adjudicate that they are genuinely
+passing — that is the Court's job (B0.6/upstream); the seal *binds* them so any substitution is
+detectable.
+
+### 9. Runtime Implications
+**PASS.** `seal` is O(ledger) once at construction (index rebuild) then O(1); commit is one
+ledger append. Keystore write is atomic (temp + fsync + replace). No leaks.
+
+### 10. Future Extensibility
+**PASS.** B0.10 (projections/replay) will subsume the ad-hoc index rebuild into the general
+projection layer; the seal-event schema (`SealCommitted`) is already ledgered for it. B0.12 wires
+`request_seal` into the CLI.
+
+## Adversary pass
+
+1. **Double-seal** (same content twice) → same `SealRecord`, **committed once** (`_seal_count == 1`,
+   tested). Also **across a simulated restart** (fresh authority rebuilds the index from the
+   ledger) → still one commit (tested).
+2. **Seal without verdict / without adversary review** → `SealRefused` (tested).
+3. **Seal on a corrupted chain** (tampered ledger row) → `SealRefused` (tested).
+4. **Tamper a sealed record** (swap `verdict_ref` or `attestation`) → `verify_seal` False (tested).
+5. **Forge with a different key** → `verify_seal` False (tested).
+6. **Boundary honesty:** B0.9 does not re-validate that `verdict_ref`/`adversary_ref` are genuinely
+   passing (Court's job); it enforces presence + binding + chain (Observation 1).
+
+## OBSERVATIONS
+1. **Verdict genuineness is upstream.** The seal requires and *binds* a verdict/adversary ref but
+   does not re-adjudicate them; the Court (B0.6 / verification) owns that. Recorded so the seal is
+   not over-trusted as a verdict validator.
+2. **Idempotency key excludes `ledger_head`.** "Same content" = (goal, run, artifact_bundle,
+   verdict_ref, adversary_ref); the recorded `ledger_head` is the position at *first* seal. This is
+   what makes re-sealing return the identical record (§10 "same record, committed once").
+3. **Keystore now available to B0.8.** The broker still defaults to an ephemeral key; wiring it to
+   `load_or_create_signing_key` for a shared persistent kernel key is a one-line change at the
+   composition point (B0.12), not a kernel change here.
+
+## Action Items & Proposals
+- [ ] **Founder**: ratify B0.9 → merge, remote CI, tag `b0.9`.
+- [ ] **B0.10 (Projections + replay)** next: subsume the seal index into the general projection
+      layer; `verify_against_head`.

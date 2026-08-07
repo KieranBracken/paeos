@@ -2,8 +2,11 @@
 
 
 def test_skeleton_imports() -> None:
-    import cli  # noqa: F401
-    import kernel  # noqa: F401
-    import runtime  # noqa: F401
+    import cli
+    import kernel
+    import runtime
 
-    assert True
+    assert hasattr(kernel, "ledger")
+    assert hasattr(cli, "paeos")
+    assert hasattr(runtime, "claude_code")
+

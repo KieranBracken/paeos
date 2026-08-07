@@ -1,0 +1,78 @@
+# Constitutional Implementation Review: [B1.D]
+
+**Date**: 2026-07-28
+**Task**: B1.D — Information-Barrier Manager + Isolated Adversary (PAEOS-8 §10 / FR-3 / 7 §5.3)
+**Reviewer Role**: Auditor / Builder Self-Adversarial (Adversary pass = T1/SI-5 self-exfil)
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverable: `runtime/review/__init__.py` — `InformationBarrierManager` (`seal`/`adversary_context`/
+`verify_isolation`), `SealedBundle`, `ReviewHarness`. Evidence: 6 tests in
+`tests/runtime/test_barrier.py`; **241 total**; ruff clean (clean-cache); pyright 0 errors (strict on
+kernel); F1 2644/20000. **F2-SOFT** (`runtime/review/`, Z2).
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Independence is *constructed* (FR-3): the adversary's `context_refs` are derived from the
+sealed bundle **only** (artifact(s) + evidence), never builder context. `verify_isolation` proves the
+adversary shares no ref with the builder-private set (SI-5); a leak is refused.
+
+### 2. Architectural Drift
+**PASS.** No new mechanism. `seal` is the same content-address discipline (canonical JSON + sha256);
+the harness dispatches through the B1.B dispatcher with adversary role + report-only write scope.
+
+### 3. Duplication of Mechanisms
+**PASS.** Reuses the dispatcher (B1.B), CAS content-addressing, and `ArtifactRef`. The bundle is a
+projection of what already exists, not a new store.
+
+### 4. Bypassing Mechanisms
+**PASS.** The barrier is enforced by *construction* (the adversary is only ever handed bundle refs)
+**and** backstopped by `verify_isolation` before dispatch — a leaky bundle refuses and never
+dispatches (tested). The adversary's MCP allow-list is `constitution` only (not `memory`/builder).
+
+### 5. Simpler Implementation Possible
+**PASS.** A frozen bundle + three small methods + a harness over the dispatcher.
+
+### 6. Better Derivation
+**PASS.** "Adversary sees only the bundle" is expressed as set-containment on refs — the most direct
+form of SI-5.
+
+### 7. Hidden Technical Debt
+**PASS.** None. Read-scope enforcement at the real spawn (the adapter, B1.B Observation 1) backs the
+construction-time isolation; the harness proves the barrier at the ref level.
+
+### 8. Security Implications
+**PASS — this is the FR-3 barrier.** Adversary pass below. The adversary cannot read builder context
+because it is never in its `context_refs`, its `read_scopes` are the bundle only, and its MCP grants
+exclude `memory`. A self-exfil (a builder-private ref smuggled into the context) is caught.
+
+### 9. Runtime Implications
+**PASS.** Pure set operations + one dispatch; typed refusal (`BarrierViolation`).
+
+### 10. Future Extensibility
+**PASS.** B1.E's court verdict feeds the sealed bundle; the seal harness composes into the soft loop;
+richer bundles (redacted transcripts) extend behind `seal`.
+
+## Adversary pass (T1 / SI-5)
+
+1. **Self-exfil** — a context that smuggles a builder-private ref alongside the bundle →
+   `BarrierViolation` (`verify_isolation`, tested).
+2. **Leaky bundle** — a builder-private ref present in the sealed bundle → the harness refuses
+   *before dispatch* (`runtime.received is None`, tested).
+3. **Bundle-only context** — `adversary_context` == exactly {artifact(s), evidence}; builder scratch
+   absent (tested).
+4. **Scope of the dispatched adversary** — role ADVERSARY, `read_scopes` = the bundle, `mcp_servers`
+   = `constitution` only, `write_scopes` = report only (tested).
+
+## OBSERVATIONS
+1. **Ref-level isolation + spawn-level read enforcement.** The barrier proves the adversary's *context
+   refs* exclude builder-private material; the real spawn adapter (B1.B Obs 1) additionally enforces
+   `read_scopes` at the OS/session level. Both together are the full SI-5 barrier; this task owns the
+   construction-time proof.
+
+## Action Items & Proposals
+- [ ] **Founder**: ratify B1.D (F2-SOFT) → merge, remote CI, tag `b1.D`.
+- [ ] **B1.C (Planner/Builder roles for stages 7/9/10)** next per the ratified order.

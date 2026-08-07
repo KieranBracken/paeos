@@ -1,0 +1,492 @@
+# F-ENVELOPE — System Design
+
+**Goal:** Freeze the universal node envelope schema + fixture corpus.
+**Deliverables (from the goal statement):**
+- `sakg/schema/envelope.schema.json` — JSON Schema, draft 2020-12, covering every §4.2 field
+- `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` — exercising every field, every status
+  value, and every §4.2 invariant violation (authored confidence, frequency-based promotion,
+  deleted node)
+
+> **Precondition:** §4.2's text was not readable in this session (`constitution/README.md:6-10`).
+> Field names are reconstructed. See [`assumptions.md`](assumptions.md) before implementing.
+
+---
+
+## 1. Component graph
+
+```
+                        ┌──────────────────────────────────────────┐
+                        │  PRODUCERS (out of scope for F-ENVELOPE) │
+                        │  builder · adversary · doc · court · ingestor
+                        └──────────────────┬───────────────────────┘
+                                           │ envelope draft (dict)
+                                           ▼
+   ┌───────────────────────────────────────────────────────────────────────┐
+   │  sakg/schema/  ── THE DELIVERABLE ──                                  │
+   │                                                                       │
+   │   ┌─────────────────────────────┐      ┌────────────────────────────┐ │
+   │   │ envelope.schema.json        │◄─────│ __init__.py                │ │
+   │   │  (draft 2020-12)            │ load │  load_envelope_schema()    │ │
+   │   │                             │      │  envelope_validator()      │ │
+   │   │  $defs:                     │      │  validate_envelope(obj)    │ │
+   │   │    node_id, evidence_ref,   │      │  ENVELOPE_SCHEMA_PATH      │ │
+   │   │    timestamp, sha256,       │      │  ENVELOPE_SCHEMA_VERSION   │ │
+   │   │    status, basis,           │      └─────────────┬──────────────┘ │
+   │   │    confidence_method,       │                    │                │
+   │   │    trust_zone, actor_role,  │                    │ Violation[]    │
+   │   │    provenance, confidence,  │                    │                │
+   │   │    promotion, retraction,   │                    │                │
+   │   │    quarantine, deprecation, │                    │                │
+   │   │    legal_transition         │                    │                │
+   │   └─────────────────────────────┘                    │                │
+   └───────────────────────────────────────────────────────┼───────────────┘
+                                                           │
+              ┌────────────────────────────────────────────┴──────────────┐
+              │                                                           │
+              ▼  LAYER 1 verdict                       LAYER 2 (F-INVARIANTS, not this goal)
+   ┌──────────────────────────┐                    ┌──────────────────────────────────┐
+   │ structurally well-formed │───────────────────►│ sakg/schema/invariants.py        │
+   └──────────────────────────┘                    │  referential · temporal · subset │
+                                                   │  · hash-recompute · cross-node   │
+                                                   └───────────────┬──────────────────┘
+                                                                   ▼
+                                                        append-only store (F-STORE)
+
+   ┌───────────────────────────────────────────────────────────────────────┐
+   │  tests/sakg/  ── THE OTHER DELIVERABLE ──                             │
+   │                                                                       │
+   │   fixtures/envelope/                                                  │
+   │     ├── valid/    V01..V16.json   (16 files, ≥12 required)            │
+   │     ├── invalid/  I01..I23.json   (23 files, ≥8 required)             │
+   │     └── manifest.json   ← expectations live HERE, outside the globs   │
+   │                                                                       │
+   │   test_envelope_schema.py                                             │
+   │     ├── schema self-tests        (metaschema, $defs resolve)          │
+   │     ├── valid corpus             (each accepted)                      │
+   │     ├── invalid corpus           (each rejected AT the declared       │
+   │     │                             pointer BY the declared keyword)    │
+   │     └── coverage tests           (status × field × invariant closure) │
+   └───────────────────────────────────────────────────────────────────────┘
+```
+
+**Ownership.** F-ENVELOPE owns the two boxes labelled *THE DELIVERABLE*. Everything else is named
+so that no responsibility in this design is orphaned; see `traceability.md` §3-4.
+
+---
+
+## 2. The layering decision (the load-bearing choice)
+
+### 2.1 Why there are two layers
+
+JSON Schema is a *document* validator. It cannot see other documents, cannot compare two values, and
+cannot recompute a hash. Several §4.2-class invariants need exactly those powers. If the design
+pretended otherwise, the schema would silently under-enforce and the fixture corpus would give false
+assurance — which is precisely the failure mode `CANARY-0002` was authored to catch
+(`constitution/canaries/CANARY-0002.json:4-6`: evidence that "reproduces faithfully but never
+references, imports, or executes the artifact under review — zero discriminating power").
+
+So the design commits to an explicit split and *publishes* it, rather than leaving the gap implicit.
+
+### 2.2 The split
+
+| Layer | Mechanism | Enforces | In F-ENVELOPE? |
+|---|---|---|---|
+| **L1** | `envelope.schema.json` | presence, type, format, enum membership, conditional presence, closed property sets, **legal (from,to) transition pairs**, **basis↔transition binding** | **Yes** — this goal |
+| **L2** | `sakg/schema/invariants.py` | referential resolution, temporal ordering, subset relations, hash recomputation, cross-node uniqueness | No — **F-INVARIANTS** |
+
+### 2.3 The test for which layer a rule belongs to
+
+> A rule is **L1** iff it can be decided by looking at one document with no arithmetic beyond
+> enum/pattern matching and no access to any other document.
+
+Applied consistently, this test does more work than it looks like. Two examples where it produced a
+non-obvious answer:
+
+- **Transition legality is L1.** Because the envelope carries `promotion.from` *and*
+  `promotion.to` in one document, the legal edge set can be encoded as an `anyOf` over 19 const
+  pairs. This pulls the entire state machine — including the absorbing tombstone — into schema
+  enforcement, which is what makes fixtures like `I11-illegal-transition-retracted-to-active`
+  schema-catchable. It also aligns the schema with the constitution's `illegal-transition` defect
+  class (`constitution/canaries/README.md:18`).
+- **`promotion.evidence_refs ⊆ evidence_refs` is L2.** It compares two arrays. No schema keyword
+  does subset-of-a-sibling.
+
+### 2.4 The constraint this puts on the fixture corpus
+
+The acceptance criteria run exactly one test module and no L2 code exists yet. Therefore **every
+invalid fixture must be rejectable by L1 alone.** This is a real design constraint, not a
+convenience: it is why the corpus contains `I10-retracted-without-tombstone` (conditional presence —
+L1) and *not* "retraction cites a non-existent superseding node" (referential — L2). L2-only
+invariants are enumerated in `traceability.md` §3 with their future fixture ids reserved, so the
+deferral is recorded rather than lost.
+
+### 2.5 Draft 2020-12 mechanics that this design depends on
+
+Three choices that IMPLEMENT must not silently substitute:
+
+1. **`unevaluatedProperties: false`, never `additionalProperties: false`, at any level that has an
+   `allOf`/`if`/`then`.** `additionalProperties` does not see siblings' evaluated properties, so a
+   conditional branch adding `superseded_by` would be rejected by an `additionalProperties: false`
+   at the same level. `unevaluatedProperties` is the 2020-12 keyword that composes correctly. This
+   is also the keyword that gives the second, independent catch for smuggled frequency counters
+   (§5.3).
+2. **`pattern`, not `format`, for timestamps and hashes.** Format assertion is an opt-in vocabulary
+   in 2020-12; a validator with formats off would accept `"created_at": "yesterday"`. Patterns are
+   always assertive. Keep `format` alongside as documentation, but never rely on it. (Assumption A7.)
+3. **`$defs` + `$ref` for every repeated shape.** The status enum appears in four places
+   (`status`, `promotion.from`, `promotion.to`, and the transition table). One definition, four refs
+   — otherwise a reconciliation edit (assumptions.md §4.2) has to find all four.
+
+---
+
+## 3. Interfaces
+
+### 3.1 `sakg/schema/__init__.py`
+
+```python
+ENVELOPE_SCHEMA_PATH: Final[Path]      # importlib.resources-resolved, not __file__-relative
+ENVELOPE_SCHEMA_VERSION: Final[str]    # "1.0.0" — read from the schema's own $defs, not duplicated
+
+@dataclass(frozen=True)
+class Violation:
+    pointer: str        # RFC 6901 JSON Pointer into the instance, e.g. "/promotion/basis"
+    keyword: str        # the failing schema keyword, e.g. "enum", "required", "anyOf"
+    schema_pointer: str # RFC 6901 pointer into the schema, e.g. "/$defs/basis/enum"
+    message: str        # validator-supplied, human-readable
+    invariant: str | None  # INV-* id, lifted from the failing subschema's $comment
+
+def load_envelope_schema() -> dict: ...
+def envelope_validator() -> Draft202012Validator: ...   # cached; constructed once
+def validate_envelope(obj: object) -> list[Violation]:  # [] means valid
+    """Layer 1 only. Ordered by pointer depth then document order — stable across runs."""
+```
+
+**Design notes on this interface:**
+
+- `validate_envelope` returns *all* violations, not the first. The invalid corpus asserts on a
+  specific `(pointer, keyword)` pair, and several fixtures legitimately trip more than one rule
+  (e.g. `I06` trips both `unevaluatedProperties` and `minItems` — by design, §5.3). Returning only
+  the first would make the test order-dependent on the validator's internal iteration.
+- `Violation.invariant` is the mechanism that makes the invariant roster machine-checkable: each
+  invariant-bearing subschema carries `"$comment": "INV-PROMO-1: promotion basis may not be a
+  frequency"`, the validator lifts the `INV-*` id, and `test_every_invariant_has_invalid_fixture`
+  (§6.4) closes the loop. Without this, "every §4.2 invariant violation is exercised" would be a
+  claim a human has to re-audit by hand on every edit.
+  **One `$comment` may declare several ids**, semicolon-separated — JSON forbids duplicate keys, so
+  a subschema enforcing two invariants (`promotion` enforces `INV-PROMO-2` *and* `INV-PROMO-4`)
+  cannot carry two `$comment` members. Lift ids with `re.findall(r"INV-[A-Z]+-\d+", comment)`, not a
+  `^`-anchored match, or the second id in every such comment is silently invisible to the coverage
+  test — a gap that would look exactly like coverage.
+- Returning `list[Violation]` rather than raising keeps L1 composable with L2, which will return the
+  same type so a caller can concatenate.
+
+### 3.2 The schema's public surface
+
+```
+$id:     https://sakg.dev/schema/envelope/1.0.0.json
+$schema: https://json-schema.org/draft/2020-12/schema
+```
+
+`$id` is versioned so that a future `1.1.0` can be served alongside and `$ref`'d by migration tools.
+The path segment matches `schema_version`'s value, and a schema self-test asserts that
+correspondence (§6.1) — a drifted `$id` is otherwise invisible.
+
+---
+
+## 4. Lifecycle state machine
+
+### 4.1 States
+
+| Status | Meaning | Detail block required | Terminal |
+|---|---|---|---|
+| `PROPOSED` | Asserted; no evidence yet. The only state where `evidence_refs` may be empty. | — | no |
+| `CANDIDATE` | Evidence attached; awaiting ratification. | — | no |
+| `ACTIVE` | Promoted. Canonical knowledge; safe to read. | — | no |
+| `DEPRECATED` | Still true, discouraged. | `deprecation` | no |
+| `SUPERSEDED` | Replaced by a named node. | `superseded_by` | near — only → `RETRACTED` |
+| `QUARANTINED` | Integrity suspect; frozen pending Adversary review. Truth undetermined. | `quarantine` | no |
+| `RETRACTED` | Falsified. **Tombstone.** | `retraction` | **absorbing** |
+
+### 4.2 Transition table (19 legal edges)
+
+```
+                   ┌──────────────────────────────────────────────────┐
+                   │                                                  │
+   (create)        ▼                                                  │
+      │      ┌───────────┐  evidence_withdrawn   ┌───────────┐        │
+      └─────►│ PROPOSED  │◄──────────────────────│ CANDIDATE │        │
+             └─────┬─────┘                       └─────┬─────┘        │
+                   │  deterministic_evidence           │              │
+                   └──────────────────────────────────►│              │
+                                                       │ court_ratification
+                                                       ▼              │
+             ┌────────────┐   supersession       ┌───────────┐        │
+             │ DEPRECATED │◄─────────────────────│  ACTIVE   │        │
+             └──────┬─────┘  court_ratification  └─────┬─────┘        │
+                    │        ────────────────────►     │              │
+                    │  supersession                    │ supersession │
+                    ▼                                  ▼              │
+             ┌────────────────────────────────────────────────┐       │
+             │                  SUPERSEDED                    │       │
+             └───────────────────────┬────────────────────────┘       │
+                                     │ falsification                  │
+   any non-terminal ──integrity_alarm──►  QUARANTINED ────────────────┘
+                                     │        │ adversary_cleared
+                                     ▼        │ falsification
+                            ┌────────────────┐▼
+                            │   RETRACTED    │  ◄── absorbing: no outbound edge
+                            └────────────────┘      no DELETED state exists
+```
+
+| From | To | Permitted `basis` |
+|---|---|---|
+| `PROPOSED` | `CANDIDATE` | `deterministic_evidence`, `court_ratification`, `founder_ratification` |
+| `PROPOSED` | `QUARANTINED` | `integrity_alarm` |
+| `PROPOSED` | `RETRACTED` | `falsification`, `founder_ratification` |
+| `CANDIDATE` | `ACTIVE` | `court_ratification`, `deterministic_evidence`, `founder_ratification` |
+| `CANDIDATE` | `PROPOSED` | `evidence_withdrawn` |
+| `CANDIDATE` | `QUARANTINED` | `integrity_alarm` |
+| `CANDIDATE` | `RETRACTED` | `falsification`, `founder_ratification` |
+| `ACTIVE` | `DEPRECATED` | `supersession`, `court_ratification`, `founder_ratification` |
+| `ACTIVE` | `SUPERSEDED` | `supersession` |
+| `ACTIVE` | `QUARANTINED` | `integrity_alarm` |
+| `ACTIVE` | `RETRACTED` | `falsification`, `founder_ratification` |
+| `DEPRECATED` | `ACTIVE` | `court_ratification`, `founder_ratification` |
+| `DEPRECATED` | `SUPERSEDED` | `supersession` |
+| `DEPRECATED` | `QUARANTINED` | `integrity_alarm` |
+| `DEPRECATED` | `RETRACTED` | `falsification`, `founder_ratification` |
+| `QUARANTINED` | `ACTIVE` | `adversary_cleared` |
+| `QUARANTINED` | `CANDIDATE` | `adversary_cleared` |
+| `QUARANTINED` | `RETRACTED` | `falsification`, `founder_ratification` |
+| `SUPERSEDED` | `RETRACTED` | `falsification`, `founder_ratification` |
+| `RETRACTED` | — | *(none — absorbing)* |
+
+### 4.3 Three properties the topology is built to guarantee
+
+**P1 — No node ever leaves the graph.** There is no `DELETED` status and no edge out of
+`RETRACTED`. Deletion is expressible only as a transition *into* `RETRACTED`, which requires a
+`retraction` block naming who retracted it, when, why, and on what evidence. This is the structural
+form of the goal's "deleted node" invariant; `I08`, `I09`, `I10`, and `I11` attack it from four
+directions (`fixture-corpus.md` §3).
+
+**P2 — Promotion is never free.** Every edge requires a `basis` from a closed epistemic enum and
+≥1 `evidence_refs` entry. There is no edge whose basis may be a count. (§5.3.)
+
+**P3 — Quarantine is reversible, retraction is not.** `QUARANTINED` exists so that discovering bad
+*evidence* (the `CANARY-0001`/`CANARY-0002` situation) does not force a verdict on the *claim*.
+`adversary_cleared` returns the node to `ACTIVE` or `CANDIDATE`; `falsification` moves it to the
+tombstone. Collapsing these would mean every forged-evidence catch permanently destroys a possibly-
+true claim.
+
+### 4.4 How the machine is encoded in L1
+
+```jsonc
+"$defs": {
+  "legal_transition": {
+    "$comment": "INV-FSM-1: (from,to) must be a legal edge; RETRACTED is absorbing",
+    "anyOf": [
+      { "properties": { "from": {"const":"PROPOSED"},  "to": {"const":"CANDIDATE"} } },
+      { "properties": { "from": {"const":"PROPOSED"},  "to": {"const":"QUARANTINED"} } },
+      // ... 17 more, one per row of §4.2 ...
+      { "properties": { "from": {"const":"SUPERSEDED"},"to": {"const":"RETRACTED"} } }
+    ]
+  }
+}
+```
+
+`RETRACTED` needs no explicit rule: it appears in no `from` position, so any promotion out of it
+fails `anyOf`. The basis↔transition binding of §4.2's third column is a parallel `allOf` of
+`if (from,to) then basis ∈ {...}` clauses, carrying `$comment: "INV-FSM-2: ..."`.
+
+> **Implementation note.** `anyOf` produces a poor error message (it reports the whole branch set).
+> The `Violation` mapper should special-case `anyOf` failures whose `schema_pointer` starts with
+> `/$defs/legal_transition` and emit pointer `/promotion` with keyword `anyOf` — the manifest
+> expectations for `I11`/`I17` are written against that normalised form.
+
+---
+
+## 5. The three named invariants — how each is made violable
+
+The goal names three invariant violations that fixtures must exercise. Each is encoded with
+**redundant, independent** structural defences, so that a single relaxed keyword during future
+maintenance does not silently disarm the invariant.
+
+### 5.1 Authored confidence
+
+| Defence | Encoding | Defeated fixture |
+|---|---|---|
+| D1 | `confidence` is `{"type":"object"}` — a bare number is a type error | `I01` |
+| D2 | `confidence.method` closed enum with no `authored`/`asserted` member | `I02` |
+| D3 | `confidence.inputs` `minItems: 1` — a derivation with no inputs *is* authoring | `I03` |
+| D4 | `confidence.computed_by` required, pattern `^sakg\.confidence\.[a-z_]+$` — a component, not a person | `I21` |
+
+D3 is the subtle one and the reason the invariant is stated as *authored*, not *hand-written*:
+`{"value": 0.95, "method": "evidence_weighted", "inputs": []}` is syntactically a derivation and
+semantically an assertion. Requiring ≥1 input closes it.
+
+### 5.2 Range, so `value` cannot be smuggled
+
+`confidence.value` is `{"type":"number","minimum":0,"maximum":1}`. `I04` uses `1.4`. This is not a
+named goal invariant, but an out-of-range confidence is the cheapest way to fake certainty and costs
+one fixture.
+
+### 5.3 Frequency-based promotion
+
+| Defence | Encoding | Defeated fixture |
+|---|---|---|
+| D1 | `promotion.basis` closed enum of 8 epistemic bases; no count-shaped member | `I05` |
+| D2 | `promotion` has `unevaluatedProperties: false` — `observation_count`, `occurrences`, `seen_n_times` are all rejected as unknown | `I06` |
+| D3 | `promotion.evidence_refs` `minItems: 1` — a promotion justified by a tally carries no evidence refs | `I06`, `I07` |
+| D4 | basis↔transition binding (§4.4) — even a legal basis is rejected on the wrong edge | `I17` |
+
+D1 and D2 are deliberately independent: D1 catches the honest spelling (`basis: "frequency"`), D2
+catches the dishonest one (a legitimate-looking basis with a counter riding alongside). An
+implementer who "fixes" a validation failure by adding `observation_count` to the allowed properties
+still trips D1 if they name it, and still trips D3 if they have no evidence.
+
+### 5.4 Deleted node
+
+| Defence | Encoding | Defeated fixture |
+|---|---|---|
+| D1 | `status` closed enum — no `DELETED` member | `I08` |
+| D2 | top-level `unevaluatedProperties: false` — no `deleted`, `tombstoned`, `removed` flag | `I09` |
+| D3 | `if status == RETRACTED then required: ["retraction"]` — erasure without a tombstone fails | `I10` |
+| D4 | `RETRACTED` absent from every `from` position — no resurrection | `I11` |
+| D5 | detail-block exclusivity: a non-`RETRACTED` node carrying a `retraction` block fails | `I13` |
+
+D5 deserves a note. Without it, a producer could half-delete a node — mark it `ACTIVE` for readers
+while attaching a retraction that some other consumer honours. Requiring that exactly the
+status-matching detail block be present makes the lifecycle state single-valued and readable from
+one field.
+
+---
+
+## 6. Test architecture (`tests/sakg/test_envelope_schema.py`)
+
+Four groups. Groups 1-3 verify the artifact; group 4 verifies the *corpus*, and is what makes
+"every field / every status / every invariant" a checked claim rather than a prose promise.
+
+### 6.1 Schema self-tests
+
+- The file parses as JSON (also the first acceptance command, run standalone).
+- `Draft202012Validator.check_schema(schema)` passes — the schema is itself valid 2020-12.
+- Every `$ref` resolves; no `$defs` entry is unreferenced (catches copy-paste orphans).
+- `$id`'s version segment == `properties.schema_version.const` (§3.2).
+- No subschema uses `additionalProperties: false` at a level that also has `allOf`/`if` (§2.5.1) —
+  a static guard against the composition bug, since its symptom is *silent over-rejection*.
+
+### 6.2 Valid corpus
+
+Parametrised over `sorted(valid/*.json)`. Each must produce `validate_envelope(obj) == []`. On
+failure, print the `Violation` list — a valid fixture that fails is usually a schema bug, and the
+pointer says where.
+
+### 6.3 Invalid corpus — rejected *for the right reason*
+
+Parametrised over `sorted(invalid/*.json)`. For each, look up `manifest.json → invalid → <filename>`
+and assert:
+
+1. `validate_envelope(obj) != []` — it is rejected; **and**
+2. some violation has `pointer == expect.pointer` **and** `keyword == expect.keyword`; **and**
+3. that violation's `invariant` == `expect.invariant`.
+
+Step 2-3 are the point. `assert not valid` alone would pass for a fixture rejected because of a
+typo'd `created_at` — a fixture with zero discriminating power for the invariant it claims to test.
+That is `CANARY-0002`'s exact defect class transplanted into a fixture corpus
+(`constitution/canaries/CANARY-0002.json:4`: "the same PASS for the claim and its negation"), and
+the manifest is how this design refuses it.
+
+### 6.4 Corpus coverage tests
+
+These read the **schema**, not a hardcoded list, so the corpus cannot drift from the artifact:
+
+| Test | Reads | Fails when |
+|---|---|---|
+| `test_every_status_has_valid_fixture` | `$defs.status.enum` | a status value has no accepting fixture |
+| `test_every_field_appears_in_valid_corpus` | `properties` + each `$defs` object's `properties` | a field (incl. optional, incl. nested) is never populated |
+| `test_every_invariant_has_invalid_fixture` | every `INV-[A-Z]+-\d+` found in any `$comment` (findall, §3.1) | an invariant has no fixture claiming it in the manifest |
+| `test_every_legal_transition_has_valid_fixture` | `$defs.legal_transition.anyOf` | *warns* — see note |
+| `test_manifest_matches_filesystem` | both fixture dirs | a fixture exists without a manifest entry, or vice versa |
+| `test_corpus_size_floors` | both dirs | `valid < 12` or `invalid < 8` — mirrors acceptance commands 3 and 4 inside pytest so the floor breaks in CI, not only in the shell |
+
+> **On `test_every_legal_transition_has_valid_fixture`:** 19 edges × one fixture each would be a
+> 19-fixture corpus dominated by near-duplicates. The design covers 14 edges across V03-V16 and
+> asserts a floor (≥12 of 19) plus mandatory coverage of the 5 safety-critical edges
+> (`*→RETRACTED` ×1, `*→QUARANTINED` ×1, `QUARANTINED→ACTIVE`, `ACTIVE→SUPERSEDED`,
+> `CANDIDATE→ACTIVE`). Uncovered edges are listed explicitly in `fixture-corpus.md` §4 rather than
+> left implicit — an uncovered edge should be a visible decision.
+
+---
+
+## 7. Reconciliation gate (exit criterion beyond the stated acceptance commands)
+
+The four acceptance commands verify that the artifact *parses*, that its tests *pass*, and that the
+corpus meets its *size floors*. They cannot verify the one thing most likely to be wrong: whether
+the fields are §4.2's fields. IMPLEMENT should therefore treat the following as a fifth,
+human-adjudicated criterion:
+
+1. `assumptions.md` §4's checklist has been walked against the real §4.2, **or**
+2. §4.2 is still unavailable, in which case `envelope.schema.json` carries a top-level
+   `"$comment": "UNRECONCILED: field roster reconstructed per design/F-ENVELOPE/assumptions.md A0;
+   not yet diffed against §4.2"`, and `README.md`'s "Read this first" warning stands.
+
+Option 2 is a legitimate outcome — the goal is executable without §4.2, and a corpus that encodes
+the three named invariants is worth having now. What is *not* legitimate is producing the artifact
+with no marker and letting a reader assume it was reconciled. The `$comment` is cheap and is
+removed by a one-line diff when reconciliation happens.
+
+---
+
+## 8. Perspectives
+
+The design was walked from each role named in readable artifacts
+(`constitution/canaries/README.md:4-9`). Each produced at least one change to the design above.
+
+**Builder.** Needs to emit envelopes without fighting the schema. → `content` stays opaque (A2), so
+a new node kind needs no schema change. → `validate_envelope` returns all violations with pointers,
+so a malformed draft is fixable in one pass rather than one-error-at-a-time. → `$defs` for every
+repeated shape, so a producer library can codegen from the definitions.
+
+**Adversary.** Asks how the corpus could pass while being worthless. → produced §6.3 (assert the
+*reason* for rejection, not just rejection), which is the single most important test-design decision
+here. → produced the redundant-defence structure of §5 (D1/D2 independence), so disarming an
+invariant takes two edits, not one. → produced `QUARANTINED` (§4.3 P3): the Adversary's own catches
+(`CANARY-0001`, `CANARY-0002`) are evidence defects, and without quarantine they would force
+retraction of claims that may be true.
+
+**Verification Court.** Needs a machine-checkable verdict. → `Violation.invariant` lifts `INV-*` ids
+from `$comment`, so a rejection names the rule it broke. → `court_ratification` and
+`adversary_cleared` are distinct promotion bases, so the record shows *which* body cleared a node.
+→ `promotion.actor` + `provenance.actor_role` make the ratifier attributable.
+
+**Doc.** Needs the artifact to explain itself. → every invariant-bearing subschema carries a prose
+`$comment`; the schema is the documentation and cannot drift from it. → `manifest.json` gives each
+fixture a human-readable purpose. → the transition table (§4.2) is the normative source and
+`$defs.legal_transition` is generated from it, so there is one place to edit.
+
+**Founder / ratifier.** Owns changes to safety calibration
+(`constitution/canaries/README.md:8-9`). → `founder_ratification` is a valid basis on every edge
+including into `RETRACTED`, because a human must be able to overrule the machine. → A1 in
+`assumptions.md` flags that whether this schema is TCB at all is unsettled, which is a founder
+decision, not mine. → §7's `UNRECONCILED` marker means an unratified schema is visibly unratified.
+
+**Where the perspectives conflicted.** Builder wanted `promotion` optional everywhere (less
+ceremony); Adversary wanted it mandatory everywhere (no untracked transitions). Resolved by making
+it required exactly when `status != PROPOSED` — a node that has never moved has nothing to record,
+and a node that has moved must say how. This is `INV-PROMO-3`, exercised by `I18` (an `ACTIVE` node
+with no promotion) and pinned in both directions by `V01` (new node, absent, legal) and `V13` (a
+*demoted* node that is `PROPOSED` **and** carries a promotion — see `fixture-corpus.md` §4, which
+is why the clause has no `else` branch).
+
+---
+
+## 9. Risks
+
+| Risk | Severity | Mitigation |
+|---|---|---|
+| Field roster is wrong (A0) | **High** | §7 gate; `assumptions.md` §4 checklist; structure designed to survive renames |
+| `jsonschema` not in the dependency set | Medium | `uv add jsonschema` is an IMPLEMENT prerequisite; acceptance command 2 fails loudly at import if missed (A12) |
+| `unevaluatedProperties` misapplied as `additionalProperties` | Medium | §6.1 static guard test; symptom is silent over-rejection, so a test is the only reliable catch |
+| Sibling `.expect.json` files inflating the acceptance globs | Medium | Expectations live in `fixtures/envelope/manifest.json`, one level *above* `valid/` and `invalid/`, so `ls .../invalid/*.json` counts only fixtures. Do not move it into the fixture dirs. |
+| `anyOf` error messages unusable for transition failures | Low | §4.4 implementation note: normalise to `/promotion` + `anyOf` |
+| Corpus grows without coverage | Low | §6.4 tests derive expectations from the schema, so a new status/field/invariant fails until covered |

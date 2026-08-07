@@ -15,6 +15,7 @@ self-host driver.
 from __future__ import annotations
 
 import threading
+from collections import deque
 from collections.abc import Callable, Iterable, Mapping
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
@@ -25,8 +26,6 @@ from kernel.types import WeightClass
 from runtime.orchestrator import Intake, RunOutcome
 from runtime.task_package import Budget
 from runtime.triage import triage
-
-from collections import deque
 
 __all__ = [
     "ConcurrentScheduler",
@@ -102,7 +101,7 @@ class EconomicGovernor:
             self._runs += 1
 
     def settle(self, reserved: Budget, spent_tokens: int, spent_wallclock_s: float) -> None:
-        """Refund the unspent portion of an already-charged reservation (M2 actual-spend metering)."""
+        """Refund unspent portion of reserved budget (M2 actual-spend metering)."""
         spent_t = max(0, min(spent_tokens, reserved.tokens))
         spent_w = max(0.0, min(spent_wallclock_s, float(reserved.wallclock_s)))
         with self._lock:
@@ -118,7 +117,7 @@ class EconomicGovernor:
             )
 
     def tier(self) -> str:
-        """Model-tier hint (backpressure): 'economy' when the token budget runs low, else 'full'."""
+        """Model-tier hint (backpressure): 'economy' when token budget runs low, else 'full'."""
         if self._budget.tokens <= 0:
             return "economy"
         with self._lock:
@@ -186,7 +185,7 @@ class ContinuousScheduler:
             outcome = self._run_one(intake)
             self._governor.settle(allocation, outcome.spent_tokens, outcome.spent_wallclock_s)
             outcomes.append(outcome)
-            # RB-0008 §3: Queue high-leverage (>5x) friction repair intakes immediately ahead of remaining goals
+            # RB-0008 §3: Queue high-leverage (>5x) friction repair intakes ahead of goals
             if outcome.high_leverage_intake is not None:
                 queue.appendleft(outcome.high_leverage_intake)
         return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)

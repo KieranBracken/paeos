@@ -1,0 +1,63 @@
+# Constitutional Implementation Review: [B1.G]
+
+**Date**: 2026-07-28
+**Task**: B1.G — Triage cost gate (fast/full path) + per-goal budget (PAEOS-8 §10 / K11 / §2.3)
+**Reviewer Role**: Auditor / Builder Self-Adversarial (Adversary pass = T6 triage-inflation)
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverable: `runtime/triage.py` — `triage`, `TriageDecision`, `Trace`, `GoalBudget`,
+`BudgetExceeded`. Evidence: 11 tests in `tests/runtime/test_triage.py`; **258 total**; ruff clean
+(clean-cache); pyright 0 errors (strict on kernel); F1 2644/20000. **F2-SOFT** (`runtime/triage.py`).
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Routine goal → fast path (Trace-A, `ROUTINE`); kernel-touching → full path (Trace-B,
+`KERNEL_TOUCHING`); budget breach **halts** (K11). Triage reuses the B0.11 classifier for the TCB
+decision and the kernel router's `verifiability × reversibility` for the rest (§2.3). The weight-class
+budget is **policy-set**, not caller-requested (K11 conservation / A-7).
+
+### 2. Architectural Drift
+**PASS.** No new mechanism. The fast-path *edges* remain the ratified `is_legal` ROUTINE compression
+edges (B0.5); triage only assigns the class + budget. `Trace` names the two ceremony depths (§2.3).
+
+### 3–6. Duplication / Bypass / Simplicity / Derivation
+**PASS.** Reuses `classify_paths`, `WeightClass`, `Budget`, `Cost`. `GoalBudget.charge` checks
+*before* mutating (a rejected charge leaves spend unchanged). The class→path→budget mapping is the
+direct expression of §2.3 + K11.
+
+### 7. Hidden Technical Debt
+**PASS.** None. Two-tier parent/child budget splitting (A-7, deeper K11 conservation across spawns)
+is an additive extension for the soft loop (Observation 1), not hidden debt.
+
+### 8. Security Implications
+**PASS — T6 closed.** Adversary pass below. A TCB touch cannot be triage-inflated onto the fast path
+(the classifier overrides any `verifiable`/`reversible` claim, incl. traversal paths); the budget is
+fixed by class, so a bloated request cannot buy compute; and `GoalBudget` halts any breach.
+
+### 9–10. Runtime / Extensibility
+**PASS.** Pure functions + a small stateful budget; the soft loop calls `triage` at TRIAGE and
+charges the `GoalBudget` per dispatched `Cost`.
+
+## Adversary pass (T6 — triage-inflation)
+
+1. **Fast-path a kernel change** (`kernel/gates.py`, claiming reversible + verifiable) →
+   `KERNEL_TOUCHING`/full path (classifier wins), tested.
+2. **Traversal TCB touch** (`runtime/../kernel/x.py`) → still `KERNEL_TOUCHING` (normalised), tested.
+3. **Budget inflation** — budget is `budget_by_class`, not caller-supplied; a routine goal gets the
+   routine budget (tested).
+4. **Overspend** — token / wallclock / cumulative / retry breaches each raise `BudgetExceeded`;
+   a rejected charge leaves spend unchanged (tested).
+
+## OBSERVATIONS
+1. **Two-tier budget conservation is additive.** `GoalBudget` enforces the per-goal cap; splitting a
+   parent budget across spawned children with `sum(children) ≤ parent` (A-7 two-tier) extends behind
+   the same class when the soft loop spawns sub-goals. Not needed for a single run.
+
+## Action Items & Proposals
+- [ ] **Founder**: ratify B1.G (F2-SOFT) → merge, remote CI, tag `b1.G`.
+- [ ] **B1.F (scar store + signature matching)** next per the ratified order; then the **soft-loop
+      integration** (R2→R3 unattended run).

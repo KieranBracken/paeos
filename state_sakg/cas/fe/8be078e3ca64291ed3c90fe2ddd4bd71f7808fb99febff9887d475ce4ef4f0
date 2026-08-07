@@ -1,0 +1,156 @@
+# F-ENVELOPE — Evidence Plan
+
+Ten obligations. Each declares **what is claimed · the command that produces the observation · what
+the observation must show · which work unit it discharges · why it cannot pass vacuously.**
+
+The last column is not ceremony. `CANARY-0002` is a piece of evidence that "reproduces faithfully
+but never references, imports, or executes the artifact under review — zero discriminating power
+(the same PASS for the claim and its negation)"
+(`constitution/canaries/CANARY-0002.json:4`). An evidence plan that does not ask that question of
+itself is producing exactly that artifact. So every obligation below states the mutation that would
+make it fail; an obligation with no such mutation is not evidence.
+
+---
+
+## 1. Obligations
+
+### E1 — Environment is prepared
+
+| | |
+|---|---|
+| **Claims** | `jsonschema` is installed, the package/test tree exists, pytest collects cleanly, and the A1/TCB question has an answer. |
+| **Command** | `uv run python -c "import jsonschema; print(jsonschema.__version__)"` · `uv run pytest tests/sakg/ -q` |
+| **Shows** | A version string; pytest exits 0 with 0 tests collected and no collection errors. |
+| **Discharges** | W0 |
+| **Non-vacuity** | Uninstalling `jsonschema` fails it. Note the *recorded version* — 2020-12 `unevaluatedProperties` behaviour is implementation-sensitive, so an unpinned pass is not reproducible evidence. |
+
+### E2 — The reconciliation gate has a verdict
+
+| | |
+|---|---|
+| **Claims** | A0 has been settled one way or the other, and the outcome is visible in the artifact. |
+| **Command** | Not a command — a **human-adjudicated** observation (`design.md` §7). Either the `assumptions.md` §4 checklist is walked and the field diff recorded, **or** `grep -c UNRECONCILED sakg/schema/envelope.schema.json` returns 1. |
+| **Shows** | Exactly one of: a recorded field diff, or the marker `$comment` present in the schema. |
+| **Discharges** | W1 |
+| **Non-vacuity** | This is the one obligation the four acceptance commands **cannot** reach (`traceability.md` §5). A schema with the reconstructed roster and no marker passes A1–A4 identically to a reconciled one. The marker is the only observable difference — which is why its absence, not its presence, is the failure. |
+
+### E3 — The schema is a valid, self-consistent 2020-12 document
+
+| | |
+|---|---|
+| **Claims** | It parses; it is valid draft 2020-12; every `$ref` resolves; no `$defs` entry is orphaned; `$id`'s version segment matches `properties.schema_version.const`; no `additionalProperties: false` sits at a level that also has `allOf`/`if`. |
+| **Command** | Acceptance A1, plus the group-1 tests (`design.md` §6.1) once W11 lands. Run incrementally at W2/W3/W4/W5. |
+| **Shows** | A1 exits 0; group-1 tests pass. |
+| **Discharges** | W2, W3, W4, W5, W8 |
+| **Non-vacuity** | **A1 alone is high-risk**: a file containing `{}` passes it (`traceability.md` §5 row 1). The `check_schema` + `$ref`-resolution + `$id`-correspondence + static-guard tests are what A1 cannot reach, and they are the reason E3 is not simply "A1 passed". Deleting one `$defs` entry, or drifting `$id` to `1.1.0`, must fail it. |
+
+### E4 — The transition table transcribed correctly
+
+| | |
+|---|---|
+| **Claims** | `$defs.legal_transition.anyOf` has exactly 19 branches, matching `design.md` §4.2 row for row, and the `INV-FSM-2` binding clauses match its third column. |
+| **Command** | `uv run python -c "import json;s=json.load(open('sakg/schema/envelope.schema.json'));print(len(s['\$defs']['legal_transition']['anyOf']))"` → `19`; then a row-by-row diff of the generated `(from,to)` set against the design table. |
+| **Shows** | Count is 19; the set difference against §4.2 is empty in both directions. |
+| **Discharges** | W4 |
+| **Non-vacuity** | A miscounted table is **invisible to `check_schema`** — an 18-row table is a perfectly valid schema that silently forbids one legal transition, and an extra row silently permits an illegal one. Neither shows up in any other obligation unless a fixture happens to exercise that exact edge, and 5 of 19 edges are deliberately uncovered (`fixture-corpus.md` §4.1). This obligation exists to cover that gap. |
+
+### E5 — The validator interface behaves as specified
+
+| | |
+|---|---|
+| **Claims** | `validate_envelope` returns *all* violations in a stable order; `Violation.invariant` lifts every `INV-*` id including the second one in a multi-id `$comment`; `anyOf` failures under `legal_transition` normalise to `/promotion`. |
+| **Command** | Unit assertions inside `tests/sakg/test_envelope_schema.py`, plus: `uv run python -c "import re,json;s=open('sakg/schema/envelope.schema.json').read();print(len(set(re.findall(r'INV-[A-Z]+-\d+', s))))"` compared against the count of distinct ids `Violation.invariant` can produce. |
+| **Shows** | The two counts agree; `I11`/`I17` report pointer `/promotion`, keyword `anyOf`. |
+| **Discharges** | W6 |
+| **Non-vacuity** | The failure mode here is the nastiest in the package: an anchored `^INV-` match silently drops the second id in `promotion`'s `$comment`, so `INV-PROMO-4` never appears in the invariant roster, `test_every_invariant_has_invalid_fixture` never demands a fixture for it, **and the suite goes green** (`design.md` §3.1). The count comparison is what makes that visible. |
+
+### E6 — Every valid fixture is accepted
+
+| | |
+|---|---|
+| **Claims** | All 16 `V*` fixtures validate clean, **including after the world is closed**. |
+| **Command** | Group-2 tests (`design.md` §6.2); acceptance A3. |
+| **Shows** | `validate_envelope(obj) == []` for each; `ls valid/*.json \| wc -l` ≥ 12 (16 authored). |
+| **Discharges** | W7, and **re-run** at W8 |
+| **Non-vacuity** | A3 is a **count, not coverage** (`traceability.md` §5 row 3) — 12 copies of one file pass it. Coverage is supplied by `test_every_status_has_valid_fixture` and `test_every_field_appears_in_valid_corpus`, which read the schema, so a field with no populating fixture fails. The W8 re-run is separately load-bearing: it is the only observation that catches `unevaluatedProperties` over-rejecting. |
+
+### E7 — Every invalid fixture is rejected *for its declared reason*
+
+| | |
+|---|---|
+| **Claims** | Each of the 23 `I*` fixtures is rejected, **and** some violation matches the manifest's `pointer` and `keyword`, **and** that violation's `invariant` matches. |
+| **Command** | Group-3 tests (`design.md` §6.3); acceptance A4. |
+| **Shows** | All three assertions hold per fixture; `ls invalid/*.json \| wc -l` ≥ 8 (23 authored). |
+| **Discharges** | W9 |
+| **Non-vacuity** | **This is the obligation the whole design exists to make meaningful.** `assert not valid` would pass for a fixture rejected because of a typo'd `created_at` — the same PASS for the claim and its negation, `CANARY-0002`'s defect class in fixture form (`constitution/canaries/CANARY-0002.json:4`). The `(pointer, keyword, invariant)` triple is what refuses it. It also requires the mutations to be *minimal* (`fixture-corpus.md` §5): a two-place mutation can satisfy the triple by coincidence. |
+
+### E8 — Manifest and filesystem agree
+
+| | |
+|---|---|
+| **Claims** | Every fixture has a manifest entry and every entry has a fixture; no non-fixture `*.json` sits in either directory. |
+| **Command** | `test_manifest_matches_filesystem`; `ls tests/sakg/fixtures/envelope/valid tests/sakg/fixtures/envelope/invalid`. |
+| **Shows** | Bidirectional set equality; the directory listings contain only `V*.json` / `I*.json`. |
+| **Discharges** | W10 |
+| **Non-vacuity** | A stray `.json` in `invalid/` inflates A4 and makes the number stop meaning "fixtures" (`traceability.md` §5 row 4). Dropping `manifest.json` into `invalid/` fails this obligation *and* A4's meaning simultaneously — which is the point of keeping it one level up. |
+
+### E9 — The acceptance commands pass, verbatim, from clean
+
+| | |
+|---|---|
+| **Claims** | A1–A4 as literally stated in the goal, in order, on a clean checkout. |
+| **Command** | The four commands, copied character-for-character from the goal statement. |
+| **Shows** | Four zero exit codes; pytest reports 0 failures. Capture stdout for all four. |
+| **Discharges** | W12 |
+| **Non-vacuity** | Run from a **clean checkout**, not the working tree — an uncommitted fixture or an untracked `__pycache__`-shadowed module makes a passing run unreproducible. Paraphrasing the commands (e.g. `pytest` instead of `uv run pytest`) invalidates this obligation; the goal's spelling is the spelling. |
+
+### E10 — Discrimination probe: the corpus detects a disarmed invariant
+
+| | |
+|---|---|
+| **Claims** | The corpus has discriminating power — disarming a defence makes a *specific, predictable* fixture start passing, and the corpus names which defence broke. |
+| **Command** | For each of the three goal-named invariants, apply one transient mutation to the schema, run A2, record which tests flip, then **revert**: <br>① add `"authored"` to `$defs.confidence_method.enum` → expect `I02` to stop failing, `I01`/`I03`/`I04`/`I21` unaffected. <br>② change `promotion`'s `unevaluatedProperties: false` to `true` → expect `I06` to stop failing, `I05`/`I07`/`I17` unaffected. <br>③ add `"DELETED"` to `$defs.status.enum` → expect `I08` to stop failing, `I09`–`I13` unaffected. |
+| **Shows** | Each mutation flips **exactly** the predicted fixture. The blast radius is one fixture, not zero and not many. |
+| **Discharges** | W11, W12 |
+| **Non-vacuity** | This obligation *is* the non-vacuity check for E6/E7, and it is the direct application of the canary discipline to this goal: "if a detector fails to catch a canary, the detector is miscalibrated — a *miss* — and that is an alarm" (`constitution/canaries/README.md:3-5`). A mutation that flips **zero** fixtures means the invariant was never exercised. A mutation that flips **several** means the defences are not independent, contradicting `design.md` §5.3, and the corpus can no longer tell you which one broke. `detection_signature` exists so "a miss points at the exact detector to fix" (`constitution/canaries/README.md:27-28`) — the manifest's `(pointer, keyword, invariant)` triple is this corpus's equivalent, and E10 is what proves it points accurately. |
+
+> **E10 leaves the schema broken while it runs.** W12 step 2 requires verifying a clean working tree
+> afterwards. A forgotten revert ships a disarmed invariant with a fully green suite — the worst
+> single outcome available in this plan. Prefer running each mutation in a throwaway copy of the
+> schema rather than editing the deliverable in place.
+
+---
+
+## 2. Obligation → work unit coverage
+
+| Unit | W0 | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | W10 | W11 | W12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Evidence | E1 | E2 | E3 | E3 | E3,E4 | E3 | E5 | E6 | E3,E6 | E7 | E8 | E9,E10 | E9,E10 |
+
+No unit is evidence-free. W1's evidence is human-adjudicated by construction — that is a stated
+property, not a gap (`design.md` §7).
+
+## 3. Acceptance command → obligation
+
+| # | Command | Discharged by | Residual risk it does not cover |
+|---|---|---|---|
+| A1 | `json.loads(envelope.schema.json)` | E3 | `{}` passes. Covered by E3's `check_schema` + `$ref` + `$id` tests, and E4. |
+| A2 | `pytest tests/sakg/test_envelope_schema.py -q` | E5, E6, E7, E9 | Weak tests pass. Covered by E7's triple assertion and E10's probe. |
+| A3 | `valid/*.json` ≥ 12 | E6 | A count is not coverage. Covered by the schema-derived group-4 tests. |
+| A4 | `invalid/*.json` ≥ 8 | E7 | Stray `.json` inflates it. Covered by E8. |
+| — | *(none)* | **E2** | **Whether the fields are §4.2's fields. No command reaches this** (`traceability.md` §5). |
+
+## 4. Evidence bundle to capture at W12
+
+Retain, attached to the merge:
+
+1. `uv.lock` diff + resolved `jsonschema` version (E1).
+2. The W1 verdict: field diff, or the schema's `UNRECONCILED` `$comment` quoted (E2).
+3. Stdout + exit code of A1–A4 from a clean checkout (E9).
+4. The 19-branch count and the transition set-difference output (E4).
+5. The `INV-*` id count comparison (E5).
+6. The E10 probe log: three mutations, the fixture that flipped for each, and confirmation of revert
+   plus a clean `git status`.
+
+Items 4, 5 and 6 are the ones a reviewer cannot reconstruct from a green suite. They are the
+difference between "the tests passed" and "the corpus covers the artifact".

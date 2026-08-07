@@ -1,0 +1,84 @@
+# Constitutional Implementation Review: [B0.13]
+
+**Date**: 2026-07-27
+**Task**: B0.13 — Observability: structured logging + cost/trace meter (PAEOS-8 §10 / §3)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0
+- **MAJOR**: 0
+- **MINOR**: 0
+- **OBSERVATION**: 2
+
+Deliverable: `kernel/observability.py` — `configure_logging`/`get_logger`/`scrub_secrets`,
+`Meter`/`MeterRow`, `traced`. Evidence: 6 tests in `tests/kernel/test_observability.py`; 170
+kernel tests total; ruff clean; pyright 0 errors (strict); F1 2249/20000; F3 green.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Uses `structlog` (§3-pinned) → one JSON object per event. The cost/trace meter records
+`tokens`/`wallclock_s`/`model_ver` per action (K11 budget material; model-drift audit). **Logs are
+secret-scrubbed** — a redaction processor sits in the chain (acceptance).
+
+### 2. Architectural Drift
+**PASS.** Two small primitives + one wrapper; no new subsystem. `traced` composes a log and a meter
+row so "every kernel call emits a structured log; the meter records a row per action" is a single
+call site for B0.12 to adopt.
+
+### 3. Duplication of Mechanisms
+**PASS.** No hand-rolled JSON logger — structlog does the rendering. The meter is a plain list of
+frozen rows, not a second event store (the ledger remains the source of truth; the meter is
+observability, not authority).
+
+### 4. Bypassing Mechanisms
+**PASS.** Scrubbing is a *processor in the chain*, so it applies to every event regardless of call
+site — it cannot be bypassed by a caller who forgets to redact.
+
+### 5. Simpler Implementation Possible
+**PASS / minimal.** Precise scrub rules (exact keys + substrings) rather than a broad regex, which
+avoids over-redaction.
+
+### 6. Better Derivation
+**PASS.** Metering exactly the §10 fields; logging exactly structlog-JSON. Nothing invented.
+
+### 7. Hidden Technical Debt
+**PASS.** None. The meter is in-memory; a durable meter *table* (Postgres, per §3) is a Phase-1
+persistence concern that reuses `MeterRow` — Observation 2, not debt (no Phase-0 consumer needs it).
+
+### 8. Security Implications
+**PASS — scrubbing is the point.** Secrets (`password`, `seed`, `signing_key`, `private_key`,
+`api_key`, `credential`, `token`, `attestation`) are redacted; a **count** (`tokens`) and a **public
+content hash** (`artifact_hash`) are deliberately *preserved* (tested). Bare `token` is matched
+exactly so `tokens` is not caught — precision prevents both a leak and a false redaction. The kernel
+seed never appears in logs because the keystore never puts it in an event, and the processor is a
+backstop.
+
+### 9. Runtime Implications
+**PASS.** `traced` measures with `time.monotonic()`; logging is synchronous to the configured
+stream. No blocking beyond the sink write; no leaks. Observation 1: `structlog.configure` is global
+process state (configured once at startup; tests reconfigure per-test).
+
+### 10. Future Extensibility
+**PASS.** A durable meter sink and additional processors (sampling, redaction rules) drop in behind
+`configure_logging`; `MeterRow` is the row schema a Postgres meter table will mirror.
+
+## Adversary pass
+
+1. **Leak a secret via a log field** (`password`, `seed`, `signing_key`, `token`, `attestation`) →
+   all redacted to `***REDACTED***` (tested), including via the processor directly.
+2. **False-redaction probe** (`tokens` count, `artifact_hash`) → preserved (tested) — the meter and
+   audit trail are not corrupted by over-zealous scrubbing.
+
+## OBSERVATIONS
+1. **Global logging config.** `configure_logging` sets process-global structlog state (call once at
+   startup). Expected for structlog; noted so B0.12 configures it once at CLI entry.
+2. **In-memory meter.** Durable metering (Postgres table, §3) is a Phase-1 concern reusing
+   `MeterRow`; no Phase-0 consumer needs persistence, so not tracked as debt.
+
+## Action Items & Proposals
+- [ ] **Founder**: ratify B0.13 → merge, remote CI, tag `b0.13`.
+- [ ] **B0.12 (CLI control plane)** next (now all deps built): wire `traced`/`Meter` around every
+      action, `Gate.propose_transition` ↔ `Ledger.append`, `classify_paths` ↔ step 5; commands
+      `create-goal`/`advance`/`ledger`/`replay`/`seal`/`inspect` + capability-token acquisition.

@@ -1,0 +1,401 @@
+# PLAN — [S-PROBE] SAKG/SAEOS-1 extraction feasibility spike (`reviews/spikes/sakg-s1-extraction-probe.md`)
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | PLAN ONLY — no spike executed, no extraction attempted, no verification run. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-07 |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | Goal objective (deliverable path + 4 acceptance commands, quoted verbatim in §4); `SAEOS-1 §4.3` (node types — schema authority); `SAEOS-1 §9 / A8` (the claim under test); `reviews/tasks/B0.0_review.md`, `B0.1_review.md`, `B0.2_review.md` (named specimens); `constitution/README.md` (TCB boundary — `constitution/` is amend-only; `reviews/` is not TCB; confirms `B0.*` task numbering is real); `design/PAEOS-skills-gen1.md` §S1 (`kernel-clause`: the corpus is layered and base clause text may be overridden by amendments — §9/A8 must be resolved as an *effective* rule, not a base read); `design/is_institutional-design.md` §6 (assumption-with-explicit-falsifier discipline, PAEOS-6); `plan/classify-obj-lifetime-plan.md` (house plan structure: WU / evidence table / rollback / completeness). |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/` and
+read-capability limited to `constitution/`, `design/`, `plan/`. The goal objective names
+three actions this stage **does not and must not perform**; they are planned here as
+downstream work units, not executed:
+
+1. **Create `reviews/spikes/sakg-s1-extraction-probe.md`** — a `reviews/`-tree write owned by
+   **BUILDER @ IMPLEMENT**. It is outside this session's write-capability; any such write is
+   discarded as a violation. Planned as **WU-1 … WU-5**.
+2. **Read `reviews/tasks/*_review.md` and the SAEOS-1 spec** — both are outside this session's
+   read-capability. This plan therefore specifies *how* to extract, not *what* the extraction
+   will find; every fact drawn from those trees is carried as a named assumption (§5) with a
+   falsifier and a downstream confirmation owner.
+3. **Run the 4 acceptance commands** — they presuppose the artifact exists and produce
+   `VERIFY`-stage evidence, owned by **VERIFIER @ VERIFY**. Running them now would fail
+   (the file does not exist) and would misrepresent verify-stage evidence as plan output.
+   Planned as **WU-6**.
+
+Evidence emitted by *this* session is `plan_executable` (this file) — nothing else.
+
+---
+
+## 1. Objective restatement (traceability)
+
+Produce one new document, `reviews/spikes/sakg-s1-extraction-probe.md`, that attempts —
+**by hand, adversarially, with intent to falsify** — to extract the SAEOS-1 §4.3 node types
+out of **3 real sealed goals** from `reviews/tasks/` (named specimens: `B0.0_review.md`,
+`B0.1_review.md`, `B0.2_review.md`), recording for every field one of
+`extractable` / `partial` / `absent`, and closing with an explicit `GO` or `NO-GO` verdict
+plus the loss ratio.
+
+**The spike's purpose is falsification, not construction** (goal title: *falsify SAEOS-1 §9/A8
+before building*). Two consequences bind every work unit below:
+
+- **A `NO-GO` verdict is a success, not a failure.** It is the cheap outcome the spike exists
+  to buy. Nothing in §6 (rollback) may be triggered by the verdict's polarity.
+- **The schema, the scoring rule, and the pass threshold are pre-registered** (WU-1) and frozen
+  *before* any goal review is opened (WU-3). A probe that chooses its fields after seeing the
+  data cannot falsify anything — it can only confirm. This is the single largest validity
+  threat to this spike and WU-1/WU-2 ordering is the control for it.
+
+---
+
+## 2. Work units (executable, ordered, single-owner)
+
+Each work unit is atomic, has one owning stage/role, a precondition, an exact action, a
+done-check, and the evidence it feeds. WUs are strictly sequential: `WU-1 → … → WU-6`.
+**The WU-1 → WU-3 order is load-bearing, not stylistic** (see §1).
+
+### WU-1 — Pre-register the extraction schema, scoring rule, and threshold
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** `SAEOS-1 §4.3` (node types), `SAEOS-1 §9 / A8` (claim under test);
+  `design/PAEOS-skills-gen1.md` §S1 (resolve the *effective* rule across amendment layers).
+- **Precondition:** SAEOS-1 readable. **No file under `reviews/tasks/` has been opened yet in
+  this session.**
+- **Action (exact, in this order):**
+  1. Resolve the **effective** text of §9/A8 — base clause plus every amendment layer touching
+     it (`design/PAEOS-skills-gen1.md` §S1 warns that base text may be overridden by 3.5/5.5/SC/Ω
+     layers). Quote the effective claim verbatim into the artifact. This is the proposition the
+     spike attempts to falsify; if it is not an extraction-feasibility claim, stop → **A4 falsified**,
+     escalate per §6/R3.
+  2. Transcribe from §4.3 the **complete** list of node types, and for each node type its complete
+     list of named fields. Do not add, merge, rename, or omit fields. If §4.3 is prose rather than a
+     field-level schema, derive the roster, mark it `derived: true`, and quote the prose span each
+     field came from (**A1 falsifier path** — evidence strength drops, the spike still runs).
+  3. Record `node_type_count` and the total field count **N** (= Σ fields over all node types).
+  4. Designate each field `load-bearing: yes/no` — `yes` iff the effective §9/A8 claim depends on
+     that field being recoverable. Derive this from the §9/A8 text quoted in step 1, not from taste.
+  5. Freeze the scoring rule verbatim (weights: `extractable`→0, `partial`→0.5, `absent`→1) and the
+     pass threshold (§3 below). If §9/A8 states its own numeric tolerance, that value **supersedes**
+     the default threshold; record the substitution and its source.
+- **Done-check:** every §4.3 node type appears in the roster; every node type has ≥1 field; `N` is
+  recorded; every field carries a `load-bearing` flag; the scoring rule and threshold are written
+  down; the effective §9/A8 claim is quoted verbatim with its amendment chain.
+- **Feeds:** evidence E1.
+
+### WU-2 — Select and freeze the 3 specimen goals
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** goal objective ("3 real sealed goals from `reviews/tasks/`"); `constitution/README.md`
+  (corroborates the `B0.*` task series: B0.0, B0.3, B0.11, B0.14 are named there).
+- **Precondition:** WU-1 complete and frozen.
+- **Action (exact):** list `reviews/tasks/`. Take `B0.0_review.md`, `B0.1_review.md`,
+  `B0.2_review.md` as the default specimens. For each, confirm it exists **and is sealed**, and
+  record the concrete criterion used to establish sealedness (status field, seal marker, ledger
+  entry — whichever the corpus actually uses; **A3**). If a named specimen is missing or unsealed,
+  substitute the next **sealed** review in lexical order and record the substitution and its reason
+  in the artifact. Never substitute an unsealed review to reach three (**A2 falsifier path**: if
+  fewer than 3 sealed reviews exist, stop and escalate per §6/R3 — do not soften "sealed").
+- **Done-check:** exactly 3 repo-relative paths recorded verbatim; each verified to exist; each
+  verified sealed by a stated criterion; any substitution justified in writing.
+- **Feeds:** evidence E2.
+
+### WU-3 — Hand-extraction: populate the 3 × N grid
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** WU-1 roster (frozen); WU-2 specimens (frozen).
+- **Precondition:** WU-1 and WU-2 complete. The roster is now **immutable** — discovering that a
+  field is awkward to extract is a *result*, never a reason to edit the roster.
+- **Action (exact):** for each specimen (3) × each field in the roster (N), attempt the extraction
+  by hand and record exactly one verdict per cell, under these pre-declared rules:
+  - **`extractable`** — a verbatim span in the review supplies the field with **no inference**. The
+    span must be quoted in the cell's evidence column.
+  - **`partial`** — a span bears on the field but underdetermines it (human judgment, cross-document
+    lookup, or guesswork is needed to finish it). Quote the span and state in one clause what is
+    still missing.
+  - **`absent`** — no span in the review bears on the field. Evidence column is `—`.
+
+  If an entire node type is not instantiable from a goal review at all, mark the node
+  `instantiable: no` and score **every** field of that node `absent` for that goal. That is a real,
+  reportable finding — not a scoring gap.
+- **Done-check:** the grid is fully populated — `3 × N` cells, **zero blanks**; every `extractable`
+  and every `partial` cell carries a quoted source span; every `absent` cell carries `—`.
+- **Feeds:** evidence E3.
+
+### WU-4 — Compute the loss ratio and issue the verdict
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** the WU-1 scoring rule and threshold (both frozen before WU-3).
+- **Precondition:** WU-3 grid complete with zero blanks.
+- **Action (exact arithmetic — no discretion):**
+  ```
+  cells_total   = 3 * N
+  loss_raw      = (cells_absent + 0.5 * cells_partial) / cells_total
+  loss_ratio    = round(loss_raw, 2)        # half-up, exactly 2 decimal places
+  ```
+  Report `cells_extractable`, `cells_partial`, `cells_absent`, `cells_total`, the unrounded
+  fraction, and the rounded `loss_ratio`, so the rounding is auditable.
+
+  **Worked example (illustrative arithmetic only, not a predicted result):** N = 12 →
+  `cells_total` = 36. With 4 `absent` and 8 `partial`: `loss_raw` = (4 + 4) / 36 = 0.2222… →
+  `loss_ratio: 0.22`.
+
+  **Verdict rule (pre-registered in WU-1, applied mechanically here):**
+  ```
+  GO     iff  loss_ratio <= 0.30
+              AND every load-bearing field is extractable-or-partial in >= 2 of the 3 goals
+  NO-GO  otherwise
+  ```
+  State which clause decided it. If the verdict is `NO-GO`, name the specific fields that drove it —
+  that list is the spike's actual payload for the §9/A8 decision.
+- **Done-check:** arithmetic reproducible from the published cell counts; verdict follows
+  mechanically from the frozen rule; deciding clause named.
+- **Integrity constraints (binding):**
+  - Do **not** revise the roster, re-score cells, or move the threshold to change the verdict. If the
+    threshold now looks wrong, say so in "threats to validity" and leave the verdict standing.
+  - **Gate-conflict hazard:** acceptance command 4 matches `^loss_ratio: 0\.[0-9]+$`, which can only
+    represent a value in `[0.00, 0.99]`. A true `loss_ratio` of `1.00` (zero extractable and zero
+    partial cells across all three goals) is **unrepresentable** by that regex. If that occurs, publish
+    the true value `loss_ratio: 1.00`, accept that acceptance command 4 legitimately fails, and escalate
+    the regex conflict to the court per §6/R4. **Never round 1.00 down to 0.99 to pass a gate** —
+    that is forged evidence of exactly the shape `constitution/canaries/CANARY-0001.json` exists to
+    catch. A true value of `0.00` is representable (`loss_ratio: 0.00` matches) and needs no handling.
+- **Feeds:** evidence E4.
+
+### WU-5 — Emit the artifact in gate-satisfying form
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** the 4 acceptance commands (§4), quoted verbatim from the goal objective.
+- **Precondition:** WU-4 complete. **Check the target path first** (`test -e
+  reviews/spikes/sakg-s1-extraction-probe.md`): if a file is already there, read it and report before
+  writing — do not blind-overwrite (**A7**). Create `reviews/spikes/` if absent, and record whether
+  this WU created it (§6 rollback depends on knowing).
+- **Action (exact):** write `reviews/spikes/sakg-s1-extraction-probe.md` in this exact shape.
+  Everything in angle brackets is filled from WU-1…WU-4 outputs; nothing else about the marked lines
+  may change.
+
+  ````markdown
+  ---
+  artifact: sakg-s1-extraction-probe
+  stage: IMPLEMENT
+  date: <YYYY-MM-DD>
+  probe_target: SAEOS-1 §9 / A8
+  node_type_count: <int>
+  field_count_N: <int>
+  cells_total: <3 * N>
+  cells_extractable: <int>
+  cells_partial: <int>
+  cells_absent: <int>
+  loss_ratio: <WU-4 value, 2 dp, bare digits — see formatting constraints below>
+  verdict: <GO or NO-GO, uppercase, unquoted — see formatting constraints below>
+  ---
+
+  # S-PROBE — SAKG/SAEOS-1 extraction feasibility
+
+  ## 0. Pre-registration (frozen before any review was opened — WU-1)
+
+  Effective §9/A8 claim under test (verbatim, with amendment chain): <quote + chain>
+
+  Node-type / field roster from SAEOS-1 §4.3 (`derived: <true|false>`):
+
+  | node_type | field | load-bearing |
+  |---|---|---|
+  | <...> | <...> | <yes/no> |
+
+  Scoring rule: extractable=0, partial=0.5, absent=1;
+  loss_ratio = (absent + 0.5*partial) / (3*N), rounded half-up to 2 dp.
+  Threshold: GO iff loss_ratio <= 0.30 AND every load-bearing field is
+  extractable-or-partial in >= 2 of 3 goals. <note any §9/A8 supersession>
+
+  ## 1. Specimens (WU-2)
+
+  | # | path | sealed? | criterion | substitution reason |
+  |---|---|---|---|---|
+  | 1 | reviews/tasks/B0.0_review.md | yes | <criterion> | — |
+
+  ## goal: reviews/tasks/B0.0_review.md
+
+  | node_type | instantiable | field | verdict | source span | what's missing |
+  |---|---|---|---|---|---|
+  | <...> | yes | <...> | extractable | "<verbatim span>" | — |
+
+  Subtotal — extractable: <int>  partial: <int>  absent: <int>
+
+  ## goal: reviews/tasks/B0.1_review.md
+
+  <same table shape>
+
+  ## goal: reviews/tasks/B0.2_review.md
+
+  <same table shape>
+
+  ## 2. Result (WU-4)
+
+  cells_total = 3 * <N> = <int>; loss_raw = (<absent> + 0.5*<partial>) / <cells_total>
+  = <unrounded>; loss_ratio = <rounded>.
+  Deciding clause: <threshold clause | load-bearing clause>.
+  Fields driving the verdict: <list, or "none — threshold met">.
+
+  ## 3. Threats to validity
+
+  <roster derivation, specimen representativeness, single-extractor bias, and any
+  disagreement with the frozen threshold — stated, not acted on>
+  ````
+
+- **Formatting constraints (these are what the gates actually read — violating one fails a gate):**
+  - `verdict:` and `loss_ratio:` must each appear **at column 0** and **exactly once in the whole
+    file**. The acceptance regexes use `rg -q`, which is satisfied by *any* matching line — so a
+    stray `verdict: GO` illustration anywhere in the document (including inside a fenced code block,
+    which `rg` still scans) could let a `NO-GO` artifact pass the gate. Do not write example
+    `verdict:` or `loss_ratio:` lines anywhere in the body.
+  - Each goal heading is exactly `## goal: ` — **two** hashes, one space, `goal:`, one space, then the
+    path. `### goal:` or `##goal:` fails acceptance command 3. There must be ≥ 3 such lines.
+  - `verdict:` value is exactly `GO` or `NO-GO` — uppercase, no quotes, no trailing whitespace
+    (the regex is anchored with `$`).
+  - `loss_ratio:` value is `0.` followed by ≥ 1 digit — `0.22`, `0.00`. Bare `0`, `.22`, `1.0`, or a
+    quoted `"0.22"` all fail.
+- **Done-check:** file exists at the exact path; the 4 acceptance commands pass locally; `verdict:`
+  and `loss_ratio:` each appear exactly once; the goal-heading count is ≥ 3 and equals the number of
+  specimens actually extracted.
+- **Feeds:** evidence E5.
+
+### WU-6 — Run the acceptance gates
+- **Owner:** VERIFIER @ VERIFY (not this session).
+- **Ref:** goal objective acceptance list.
+- **Precondition:** WU-5 complete and committed.
+- **Action:** run the four commands in §4 verbatim, plus the two uniqueness checks, from the repo
+  root. Report each command's exit code back to the court.
+- **Done-check:** all six commands exit `0`.
+- **Feeds:** evidence E6.
+
+**Blast radius (A-2):** one new document under `reviews/spikes/`. No code, no runtime, no kernel, no
+schema change, no caller. `constitution/` is untouched — per `constitution/README.md` that tree is
+Trust Zone 0, amend-only, and guarded by the CI TCB-diff gate; `reviews/` is outside it. Kernel
+classification expected **SOFT**; no amendment path required *for this artifact*. (A `NO-GO` verdict
+may later motivate an amendment to SAEOS-1 §9/A8 — that is downstream work, out of this plan's scope,
+and is exactly the cost the spike exists to surface early.)
+
+---
+
+## 3. Evidence plan (obligations → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` — this file: work units, evidence obligations, rollback declared, refs cited. | PLANNER @ PLAN (this session) | Presence of §2 (WUs), §3 (this table), §6 (rollback), and upstream refs (header + inline). | **PLAN** |
+| **E1** | Pre-registered roster: every §4.3 node type + fields, `N`, load-bearing flags, frozen scoring rule + threshold, effective §9/A8 quote with amendment chain. | BUILDER @ IMPLEMENT | Roster section present and complete; written before any specimen was opened (ordering attested in the artifact). | IMPLEMENT |
+| **E2** | 3 specimen paths, each existing and sealed, with the sealedness criterion stated and any substitution justified. | BUILDER @ IMPLEMENT | `test -f` each path; criterion cited per specimen. | IMPLEMENT |
+| **E3** | Fully populated `3 × N` grid, zero blanks; every non-`absent` cell carries a quoted source span. | BUILDER @ IMPLEMENT | Cell count == `3 × N`; no empty verdict cells; spot-check quoted spans against the source reviews. | IMPLEMENT |
+| **E4** | `loss_ratio` reproducible from the published cell counts; verdict follows mechanically from the frozen threshold. | BUILDER @ IMPLEMENT | Recompute `(absent + 0.5*partial)/(3N)` from the published counts; confirm it matches the printed value and that the verdict matches the rule. | IMPLEMENT |
+| **E5** | Artifact exists at `reviews/spikes/sakg-s1-extraction-probe.md` in gate-satisfying form. | BUILDER @ IMPLEMENT | The four §4 commands pass; `verdict:`/`loss_ratio:` uniqueness holds. | IMPLEMENT |
+| **E6** | All six §4 commands exit `0`. | VERIFIER @ VERIFY | Run verbatim from repo root; report exit codes. | **VERIFY** |
+
+---
+
+## 4. Acceptance commands (verbatim — VERIFIER runs these unchanged)
+
+```
+test -f reviews/spikes/sakg-s1-extraction-probe.md
+rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+Two **additional** checks this plan adds, because `rg -q` on commands 2 and 4 is satisfied by any
+single matching line and would otherwise let a contradictory or duplicated declaration through:
+
+```
+test $(rg -c '^verdict: ' reviews/spikes/sakg-s1-extraction-probe.md) -eq 1
+test $(rg -c '^loss_ratio: ' reviews/spikes/sakg-s1-extraction-probe.md) -eq 1
+```
+
+These six are the complete VERIFY surface. (Note for VERIFIER: `rg -c` prints nothing and exits `1`
+when there is no match, which makes `test $(...) -eq 1` itself error out — that is a failure signal,
+not a harness bug.)
+
+---
+
+## 5. Assumption → verification-owner ledger (PAEOS-6; falsifier discipline per `design/is_institutional-design.md` §6)
+
+`SAEOS-1`, `reviews/`, and `spec/` are all outside this PLAN session's read-capability, so every fact
+about them is an assumption carried with an explicit falsifier and a named downstream owner.
+
+| id | Assumption | Falsifier → response | Confirmed at |
+|----|------------|----------------------|--------------|
+| **A1** | SAEOS-1 §4.3 defines an enumerable set of node types with named fields. | §4.3 is prose with no field-level schema → BUILDER derives the roster, sets `derived: true`, quotes the source span per field; evidence strength drops, spike still runs. | WU-1 (BUILDER) |
+| **A2** | `reviews/tasks/` holds ≥ 3 **sealed** goal reviews, including `B0.0/B0.1/B0.2_review.md`. | Fewer than 3 sealed exist → **stop and escalate** (§6/R3). Do not relax "sealed" to reach three. | WU-2 (BUILDER) |
+| **A3** | "Sealed" is a determinable property of a review file (status field / seal marker / ledger entry). | No determinable marker → BUILDER records the criterion actually used and flags it in "threats to validity". | WU-2 (BUILDER) |
+| **A4** | SAEOS-1 §9/A8 asserts an extraction-feasibility claim that a loss ratio can falsify. | §9/A8 is about something else → the probe target is misidentified; **stop and escalate** (§6/R3) rather than probe the wrong clause. | WU-1 step 1 (BUILDER) |
+| **A5** | §9/A8's effective text may differ from its base text (amendment overlay). | Overlay resolution unavailable → BUILDER records that the base text was used unresolved, and flags it as a validity threat. | WU-1 step 1 (BUILDER) |
+| **A6** | BUILDER holds read on `spec/` + `reviews/` and write on `reviews/spikes/`. | Capability missing → the goal is mis-scoped to the stage; escalate before writing anything. | WU-5 (BUILDER) |
+| **A7** | No file exists yet at `reviews/spikes/sakg-s1-extraction-probe.md`. | A file exists → read it and report before writing; never blind-overwrite prior spike evidence. | WU-5 (BUILDER) |
+| **A8** | The true `loss_ratio` lands in `[0.00, 0.99]`, so acceptance command 4's regex can represent it. | True value is `1.00` → publish `1.00`, let command 4 fail honestly, escalate the regex conflict (§6/R4). Never fudge to `0.99`. | WU-4 (BUILDER) |
+
+No assumption changes the plan; each is a fact a downstream WU confirms, and every WU's action is
+well-defined under either branch of its falsifier.
+
+---
+
+## 6. Rollback plan
+
+The deliverable is a single additive, non-TCB document, so rollback is clean and bounded.
+
+**Triggers.**
+- **R1 — format failure:** any of the six §4 commands fails for a *formatting* reason (heading depth,
+  duplicated `verdict:`/`loss_ratio:` lines, malformed frontmatter fence, trailing whitespace defeating
+  the `$` anchor).
+- **R2 — validity defect:** the roster was authored or edited after a specimen was opened; a non-sealed
+  or non-existent goal was used; the grid has blank cells; fewer than 3 goals were extracted; a cell's
+  quoted span does not appear in the cited review.
+- **R3 — wrong target / insufficient corpus:** A2 or A4 falsified (fewer than 3 sealed goals; §9/A8 is
+  not an extraction-feasibility claim). Escalate to the court; do **not** improvise a substitute claim
+  or a substitute specimen set.
+- **R4 — gate conflict:** true `loss_ratio == 1.00`, which acceptance command 4's regex cannot express
+  (A8). Publish the artifact with the true value, report the failing gate and the conflict, and let the
+  court amend the regex.
+
+**Explicitly NOT a trigger.** A **`NO-GO` verdict is not a rollback condition.** The goal is titled
+*falsify SAEOS-1 §9/A8 before building*; `NO-GO` is a successful, cheap falsification and is the
+highest-value outcome available here. A downstream agent that deletes or "fixes" a `NO-GO` artifact
+has destroyed the deliverable, not repaired it. Likewise, a high `loss_ratio` is a *result*, never a
+defect to be tuned away.
+
+**Rollback action (BUILDER @ IMPLEMENT, on a `reviews/` write capability):**
+1. Delete `reviews/spikes/sakg-s1-extraction-probe.md`.
+2. Remove `reviews/spikes/` **only if** WU-5 created it and it is now empty (WU-5 records this).
+3. Touch nothing else — no other path is written by any WU in this plan, so no collateral revert exists.
+
+**Verification of rollback:** `test ! -e reviews/spikes/sakg-s1-extraction-probe.md` exits `0`, and
+`git status` shows no other modified path.
+
+**Blast containment:** no code, no runtime, no kernel, no `constitution/` write (Trust Zone 0 is
+untouched — `constitution/README.md`), so rollback cannot leave partial state and requires no kernel
+amendment or ratifier action.
+
+**Recovery path:** re-enter IMPLEMENT at the WU whose done-check failed — **WU-1** for R2 defects that
+poison the pre-registration (the roster must be re-frozen before specimens are re-opened, and the fact
+that a prior pass saw the data must be disclosed as a validity threat), **WU-5** for pure R1 formatting
+failures (the grid and verdict from WU-3/WU-4 remain valid and must be carried over **unchanged** —
+a reformat is not a re-scoring).
+
+---
+
+## 7. Completeness check (no orphan / no gap)
+
+- Every objective clause (§1) maps to a work unit (§2): §4.3 node types → WU-1; 3 real sealed goals
+  from `reviews/tasks/` → WU-2; per-field `extractable`/`partial`/`absent` → WU-3; loss ratio +
+  explicit GO/NO-GO verdict → WU-4; the deliverable file → WU-5.
+- Every acceptance command (§4) has an owning work unit that makes it pass: cmd 1 → WU-5; cmd 2 → WU-4
+  (value) + WU-5 (form); cmd 3 → WU-2 (count) + WU-5 (heading syntax); cmd 4 → WU-4 (value) + WU-5 (form);
+  the two added uniqueness checks → WU-5.
+- Every work unit produces or feeds an evidence obligation (§3): WU-1→E1 … WU-6→E6; this file is E0.
+- Every assumption (§5) has an explicit falsifier, a defined response under both branches, and a named
+  downstream confirmation owner.
+- A rollback is declared and bounded for the only mutating stage (§6), with its non-triggers stated so
+  the spike's own negative result cannot be mistaken for a defect.
+- All claims cite an upstream ref (header + inline): the goal objective, SAEOS-1 §4.3 and §9/A8,
+  the three `reviews/tasks/B0.*_review.md` specimens, `constitution/README.md`,
+  `design/PAEOS-skills-gen1.md` §S1, `design/is_institutional-design.md` §6,
+  `constitution/canaries/CANARY-0001.json`, and `plan/classify-obj-lifetime-plan.md`.
+
+**Evidence for this gate:** `plan_executable` = this file.

@@ -1,0 +1,35 @@
+# F-ENVELOPE — Implementation Plan Index
+
+**Goal:** Freeze the universal node envelope schema + fixture corpus.
+**Stage:** PLAN (PLANNER). Input contract for IMPLEMENT. No implementation artifacts here.
+
+| Document | Contains |
+|---|---|
+| [`plan.md`](plan.md) | The 13 work units, their DAG, per-unit steps / done-conditions / rollback pointers |
+| [`evidence-plan.md`](evidence-plan.md) | Evidence obligations E1–E10, the commands that discharge them, and the anti-vacuity provisions |
+| [`rollback.md`](rollback.md) | Rollback granularity, per-unit rollback procedures, abort criteria, blast radius |
+
+## Upstream inputs (normative; this plan does not restate them)
+
+- `design/F-ENVELOPE/design.md` — layering, state machine, test architecture, reconciliation gate
+- `design/F-ENVELOPE/envelope-fields.md` — field roster, JSON Schema encodings, assembly order (§7)
+- `design/F-ENVELOPE/fixture-corpus.md` — the 16 + 23 fixture matrix, manifest format, base document (§6)
+- `design/F-ENVELOPE/assumptions.md` — A0–A12, reconciliation checklist (§4)
+- `design/F-ENVELOPE/traceability.md` — field→clause→fixture and invariant→fixture matrices
+- `constitution/README.md`, `constitution/canaries/README.md`, `CANARY-0001.json`, `CANARY-0002.json`
+
+**The design tables are the single source of truth for every `(fixture, pointer, keyword, invariant)`
+triple.** This plan deliberately does *not* copy them. A copy would be a second place to edit during
+reconciliation (`assumptions.md` §4) and the two would drift silently — the same class of defect the
+corpus itself is built to catch.
+
+## Read this first
+
+Two facts change how IMPLEMENT is executed, not just what it produces:
+
+1. **§4.2's text was never read** (`assumptions.md` A0; `constitution/README.md:6-10`). The field
+   roster is a reconstruction. **W1 is a blocking gate** and must run before any schema bytes are
+   written — see `plan.md` §W1 and `rollback.md` §5.
+2. **Whether `sakg/schema/` is inside the TCB-diff gate is unsettled** (`assumptions.md` A1;
+   `constitution/README.md:15-16`). If it is, merge requires a human ratifier + Adversary review.
+   This is checked in W0 and affects the *merge* step only, never the build steps.

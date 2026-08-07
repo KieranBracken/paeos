@@ -1,0 +1,114 @@
+# Constitutional Implementation Review: [B0.4]
+
+**Date**: 2026-07-27
+**Task**: B0.4 — Core Types + StageId + Interface Contracts (PAEOS-7.6 §3–4)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 1 — **RESOLVED** (halt + PAEOS-IP-0002, **RATIFIED by founder 2026-07-27**)
+- **MAJOR**: 0
+- **MINOR**: 0
+- **OBSERVATION**: 3
+
+> **BLOCKER-1 resolution (2026-07-27).** PAEOS-IP-0002 was **RATIFIED**: `EvidenceRef = Hash`
+> added to `spec/PAEOS-7.6` §3; `CapabilityToken` type placed in `kernel/types.py` (broker →
+> B0.8). `TransitionRequest` + `CapabilityToken` + `CapabilityBinding` were added to
+> `kernel/types.py` verbatim from 7.6 §4/§7, with tests (`test_transition_request_is_the_four_tuple`,
+> `test_capability_token_shape_and_frozen`). B0.4 is now **complete** — all of §3–4 present; 13
+> type tests / 76 kernel total green; pyright strict clean; F1 997/20000. One residual naming
+> note: §7's anonymous `bound_to` struct is named `CapabilityBinding` (Observation 1 below).
+
+Deliverable: `kernel/types.py` (all of PAEOS-7.6 §3 + §4's `Claim`, `ValidationClaim`,
+`TransitionResult`). `TransitionRequest` **deliberately omitted** — see BLOCKER-1.
+Evidence: 12 tests in `tests/kernel/test_types.py`; 75 in the kernel suite; ruff clean;
+pyright 0 errors (strict on `kernel/`); F1 946/20000.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Every enum member and field is a verbatim transcription of PAEOS-7.6 §3–4. FR-1/K-
+invariants untouched (this is pure data). CER-6 honoured: no field, method, or type not in
+7.6 was added. The one place derivation would have required invention (`EvidenceRef`) was
+halted and surfaced as PAEOS-IP-0002 rather than guessed — CER-2 + the constitutional preamble
+executed as written.
+
+### 2. Architectural Drift
+**PASS.** No concepts beyond §3–4. String-valued enums (`value == name`) add no numbering the
+spec does not pin — the "0→19 + RAW" numbering is descriptive and the legal-edge ordering is
+B0.5's, not this module's. No behaviour was added; kernel operations (`propose_transition`,
+`open_stage`) remain their own tasks' work.
+
+### 3. Duplication of Mechanisms
+**PASS.** `Hash`/`Sig`/`Ts` aliases match the ledger/CAS notion of a content address and a
+sequence number without redefining them structurally (they are `str`/`str`/`int`). No schema
+or helper duplicated. (When `EvidenceRef` is ratified as `Hash`, it *unifies* the existing
+bare-hash evidence references rather than duplicating them — see IP-0002 §6.)
+
+### 4. Bypassing Mechanisms
+**PASS.** Nothing bypassed. Immutability is enforced by `frozen=True, slots=True`; illegal
+enum values are rejected by `Enum` natively (tested). No logging/validation was in scope to
+bypass (pure types).
+
+### 5. Simpler Implementation Possible
+**PASS / minimal.** Stdlib `enum.Enum` + frozen `dataclass` is the smallest faithful encoding.
+No third-party dependency, no metaclass, no custom validation. `tuple[...]` (not `list`) keeps
+the frozen contracts hashable and immutable.
+
+### 6. Better Derivation
+**PASS.** The types are a direct transcription; there is no logic to derive more cleanly. The
+one derivation *decision* (EvidenceRef) is escalated rather than resolved locally, which is the
+correct move under the preamble.
+
+### 7. Hidden Technical Debt
+**PASS (surfaced, not hidden).** The single deferred item — completing `TransitionRequest` — is
+not hidden debt but an explicit, ratification-gated Improvement Proposal (PAEOS-IP-0002) plus a
+self-testing omission (`test_transition_request_is_deliberately_absent`). No hardcoded values,
+no silent edge cases. No `DEBT-NNNN` needed: this is a spec gap for the founder to legislate,
+not a compromise the runtime accepted.
+
+### 8. Security Implications
+**PASS.** No inputs, permissions, or blast radius — pure value types. Frozen contracts prevent
+post-construction tampering (relevant later when tokens/claims flow through gates). `Sig`/`Hash`
+are opaque `str` here; their cryptographic meaning is enforced by B0.8/B0.9, correctly not here.
+
+### 9. Runtime Implications
+**PASS.** No blocking calls, no I/O, no resource handles. Enum/dataclass construction only.
+
+### 10. Future Extensibility
+**PASS, with one watch.** Defining `EvidenceRef = Hash` (if ratified) locks evidence references
+to bare content addresses; IP-0002 §5 names the one scenario that would force a widening and
+argues it will not arise (evidence `kind` lives inside `Evidence`). Flagged for founder eyes so
+the lock-in is a ratified choice, not an accident.
+
+## BLOCKER-1 (resolved by escalation)
+
+**`EvidenceRef` is used in PAEOS-7.6 §4/§5 but defined nowhere.** `TransitionRequest.evidence:
+EvidenceRef[]` therefore cannot be implemented without inventing the type's shape, and the
+spec's `ArtifactRef` precedent makes bare-`Hash`-vs-struct genuinely ambiguous. Per the
+resolution protocol (§4 of the review protocol) the implementation was **not** modified to add
+un-derived architecture; instead `TransitionRequest` is held and **PAEOS-IP-0002** was filed,
+recommending `EvidenceRef = Hash`. Task closure on `TransitionRequest` is gated on founder
+ratification (CER-5). Everything else in §3–4 is complete and green.
+
+## OBSERVATIONS
+
+1. **CapabilityToken placement + `bound_to` naming.** `CapabilityToken` (§7) is placed in
+   `kernel/types.py` (ratified), broker → B0.8 — the only acyclic split. §7's `bound_to` is an
+   *anonymous* struct; Python requires a name, so it is transcribed as `CapabilityBinding`
+   (fields verbatim, frozen to capture "bound_to is immutable", SI-3). This is a transcription
+   necessity, not an invented abstraction — the same situation the spec itself resolved by
+   naming `ArtifactRef`. Flagged for founder awareness; no new mechanism introduced.
+2. **Field names shadow builtins** (`id`, `type`) by deliberate spec fidelity. Harmless (they are
+   attributes), and renaming them would itself be drift.
+3. **Pattern continues.** Third task in a row (after DEBT-0003 narrowing, DEBT-0004 constitution
+   split) where the correct move was to surface a spec/scope seam to the founder rather than
+   paper over it. The lifecycle is doing its job.
+
+## Action Items & Proposals
+- [ ] **Founder**: ratify or amend **PAEOS-IP-0002** (`EvidenceRef = Hash`; CapabilityToken type
+      in B0.4).
+- [ ] **On ratification**: add `TransitionRequest` (+ `CapabilityToken` per §7) to
+      `kernel/types.py` verbatim, with tests; close B0.4.
+- [ ] **Founder**: ratify B0.4-as-shipped (all §3–4 types except `TransitionRequest`) → merge,
+      remote CI, tag `b0.4`.

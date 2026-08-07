@@ -1,0 +1,339 @@
+# Plan — [S-PROBE] SAEOS-1 §9/A8 extraction feasibility
+
+```
+role:                PLANNER
+stage:               PLAN
+target_deliverable:  reviews/spikes/sakg-s1-extraction-probe.md
+plan_status:         COMPLETE — plan is executable; execution is BLOCKED on WU-0
+upstream:            design artifact a18080df3cd5 (§0–§7), hereafter DESIGN
+write_scope(this):   plan/
+read_scope(this):    constitution/, design/, plan/
+```
+
+---
+
+## 0. Carry-forward: this plan cannot be self-executed
+
+DESIGN §0 established that the probe is unrunnable under the dispatched capability set: the inputs
+(`spec/` §4.3 + §9/A8, `ledger/`, `reviews/tasks/`) are outside read scope and absent from disk
+(DESIGN §0 B1), and the output path `reviews/spikes/` is outside write scope (DESIGN §0 B2). The PLAN
+session inherits a *narrower* scope than DESIGN did — read `constitution/`, `design/`, `plan/`; write
+`plan/` — so every one of those blocks still holds here, unchanged and unfixable from inside.
+
+This is not a reason to produce nothing. PLAN's deliverable is the plan, and the plan is complete and
+executable *by a correctly-scoped worker*. What this session must not do is close the gap by inventing
+inputs: a synthetic sealed goal authored by the same agent that reads §4.3 extracts cleanly by
+construction, yielding `verdict: GO` with identical probability whether §4.3 is sound or worthless —
+the null-discriminator defect class `constitution/canaries/CANARY-0002.json` exists to catch
+("identical result whether the artifact is applied or not"). See §4.4.
+
+**Consequence for the gate:** the four goal-level accept predicates bind to `reviews/spikes/…` and
+therefore still FAIL after this session. They are discharged by WU-8, not by PLAN. The PLAN-stage
+evidence obligation (`plan_executable`) is discharged by this document — §2 work units, §3 evidence
+plan, §4 rollback, §6 citations.
+
+---
+
+## 1. Critical path
+
+```
+WU-0 re-dispatch  ──►  WU-1 preconditions  ──►  WU-2 fix accept criteria
+                                                        │
+                                                        ▼
+                            WU-3 schema (F)  ──►  WU-4 select+LOCK (G)
+                                                        │
+                                                        ▼
+                                                 WU-5 extract cells
+                                                        │
+                                                        ▼
+                              WU-6 score  ──►  WU-7 verdict  ──►  WU-8 emit  ──►  WU-9 court
+```
+
+WU-2 must land **before** WU-3, and WU-4's lock must land **before** WU-5. Both orderings are integrity
+constraints, not conveniences — see §4.2 and §4.3.
+
+---
+
+## 2. Work units
+
+Each unit: **owner** (capability required) · **in** · **do** · **out** · **done-when** · **evidence**.
+
+### WU-0 — Re-dispatch with probe capability `[BLOCKER]`
+- **owner:** orchestrator (no worker can self-grant)
+- **in:** DESIGN §0 remediation
+- **do:** re-dispatch as `PROBE` with read `spec/`, `ledger/`, `reviews/tasks/`, `constitution/`,
+  `design/`, `plan/`; write `reviews/spikes/`.
+- **out:** a worker session whose scope covers both the corpus and the output path.
+- **done-when:** `test -r spec/ && test -r ledger/ && test -r reviews/tasks/ && test -w reviews/spikes/`
+- **evidence:** E0 (§3).
+- **note:** DESIGN §0 B3 diagnoses this as the root cause — DESIGN capabilities were granted to a PROBE
+  objective. B1 and B2 are symptoms. Fixing only one of them leaves the probe blocked.
+
+### WU-1 — Precondition audit (fail fast, cheaply)
+- **owner:** PROBE worker · **depends:** WU-0
+- **in:** `spec/`, `ledger/`, `reviews/tasks/`
+- **do:** confirm, in order: (a) SAEOS-1 present in `spec/`; (b) §4.3 enumerates a **closed, finite** set
+  of node types each with a named field list (assumption A1); (c) §9/A8 exists and is quotable verbatim
+  (A2); (d) "sealed" is a determinate queryable state (A3); (e) ≥3 sealed goals exist (A4).
+- **out:** `preconditions` block for the artifact frontmatter; verbatim §9/A8 quote.
+- **done-when:** all five hold, **or** the corresponding terminal state is entered:
+  - ¬(a) or ¬(b) → `ABORT(schema-undefined)` (DESIGN §5) — carries **no** evidential weight about §9/A8
+  - ¬(c) → `ABORT(claim-unlocatable)` — probe cannot know what it is falsifying
+  - ¬(d) → `ABORT(sample-frame-undefined)` — pre-registration (WU-4) is void without it
+  - ¬(e) → `NO-GO(insufficient-corpus)` — a *result*, not an abort; do not pad the sample
+- **evidence:** E1.
+
+### WU-2 — Repair the accept criterion defect
+- **owner:** orchestrator (criteria are gate-owned) · **depends:** WU-1 · **blocks:** WU-3
+- **in:** DESIGN §0 B4
+- **do:** replace `rg -q '^loss_ratio: 0\.[0-9]+$'` with
+  `rg -q '^loss_ratio: (0(\.[0-9]+)?|1(\.0+)?)$'`.
+- **why:** the current regex rejects the two most decision-relevant outcomes — perfect extraction
+  (`loss_ratio: 0`) and total extraction failure (`loss_ratio: 1`). The latter is the strongest possible
+  NO-GO and precisely what a falsification probe hunts for. A probe whose acceptance test errors on its
+  own most informative result is miscalibrated.
+- **out:** amended accept criteria.
+- **done-when:** the new regex matches `0`, `0.417`, `1`, `1.0` and rejects `abc`, `2.0`, ` 0.5`.
+- **evidence:** E2.
+- **fallback if declined:** proceed. WU-6 pins `loss_ratio` to 3 dp (`0.000`–`1.000`), which satisfies
+  the *current* regex for all values in (0,1) and for `0.000`/`1.000` under the corrected one. The
+  boundary defect then remains latent and must be restated as a finding in WU-8's `## analysis`.
+
+### WU-3 — Build the field matrix `F` (component C1)
+- **owner:** PROBE worker · **depends:** WU-2
+- **in:** SAEOS-1 §4.3
+- **do:** transcribe every `(node_type, field)` pair into `F`. No invented fields; no dropped fields.
+- **out:** `F`, `field_count = |F|` — the per-goal scoring denominator.
+- **done-when:** each §4.3 field appears in `F` exactly once, verified by a count against the section.
+- **evidence:** E3.
+- **risk:** this is the gap DESIGN could not close (DESIGN §6 G1) — the node types are *not* enumerated
+  upstream. Everything downstream is parameterized over `|F|`, so no rework is implied, but WU-3 is the
+  first point at which the instrument touches ground truth.
+
+### WU-4 — Select and **lock** the sample `G` (component C2)
+- **owner:** PROBE worker · **depends:** WU-3 · **blocks:** WU-5
+- **in:** `ledger/`, `reviews/tasks/`
+- **do:** apply the pre-registered selection rule (DESIGN §3.4) *without deviation*:
+  1. enumerate all sealed goals across both sources;
+  2. order by sealing timestamp;
+  3. take **oldest**, **median**, **newest**; ties → lowest id;
+  4. if one is unreadable/malformed, take the next by timestamp and **record the substitution**.
+- **out:** `G = {g1, g2, g3}` with source paths and selection labels; enumeration recorded.
+- **done-when:** `|G| = 3`, each with `source:` and `selection:`, and the enumeration is written down
+  **before** any extraction begins.
+- **evidence:** E4.
+- **why mechanical:** free choice of sample is the natural, unforced way an honest agent manufactures a
+  false GO (DESIGN §1 A7). Spanning oldest→newest also tests generalization across the corpus's
+  evolution rather than three easy contemporaries.
+- **LOCK:** once recorded, `G` is immutable for the remainder of the probe. See §4.3.
+
+### WU-5 — Hand-extract all `|G| × |F|` cells (component C3)
+- **owner:** PROBE worker · **depends:** WU-4 (locked)
+- **do:** for each (goal × node_type × field) score `extractable` (1.0) / `partial` (0.5) / `absent`
+  (0.0) per DESIGN §3.1. Every cell carries an evidence pointer into the source goal, or the literal
+  `—` for `absent`. **No cell left blank.**
+- **rule:** `partial` is the honest default under doubt — if a cell needs an argument to justify
+  `extractable`, it is `partial`.
+- **out:** three cell tables + per-goal `subtotal: <n_extractable> / <n_partial> / <n_absent>`.
+- **done-when:** filled-cell count `== 3 × |F|` exactly.
+- **evidence:** E5.
+
+### WU-6 — Score (component C4)
+- **owner:** PROBE worker · **depends:** WU-5
+- **do:** purely mechanically, no judgement:
+  ```
+  fidelity   = Σ score(cell) / (|G| × |F|)
+  loss_ratio = 1 − fidelity                      # emit at 3 dp
+  veto_fields = { f ∈ F : f scores `absent` for all three goals }
+  ```
+- **out:** `fidelity`, `loss_ratio`, `veto_fields`.
+- **done-when:** recomputation from the published tables reproduces all three values.
+- **evidence:** E6.
+- **why the veto exists:** §3.2 is an average, and averages launder critical failures. A 20-field schema
+  with 3 universally-absent load-bearing fields scores `loss_ratio = 0.15` — a comfortable GO — while
+  being unimplementable. The veto is the instrument's main defence against a false GO and the single
+  most likely reason this probe returns NO-GO on real data.
+
+### WU-7 — Apply the pre-registered verdict rule (component C5)
+- **owner:** PROBE worker · **depends:** WU-6
+- **do:** apply, as written, without amendment:
+  ```
+  GO     iff  loss_ratio ≤ 0.30  AND  veto_fields = ∅
+  NO-GO  otherwise
+  ```
+- **out:** `verdict: GO` | `verdict: NO-GO`.
+- **done-when:** the emitted verdict is the rule's output on WU-6's numbers.
+- **evidence:** E7.
+- **hard constraint:** after seeing the cells, *every* threshold looks arguable. A worker who reaches
+  this unit and wants to move 0.30 must instead **emit the verdict the rule produces** and argue for a
+  different threshold as a finding in `## analysis`. Moving it here is goalpost-shifting and voids the
+  probe (DESIGN §3.4). The threshold is a judgement, not a derivation (DESIGN §6 G2) — pre-registration
+  is what makes it mean anything.
+
+### WU-8 — Emit the artifact and run the accept predicates
+- **owner:** PROBE worker · **depends:** WU-7
+- **do:** write `reviews/spikes/sakg-s1-extraction-probe.md` to the DESIGN §4 template. Line-start
+  fields are exact — the accept regexes are anchored at column 0. Frontmatter carries
+  `claim_under_test:` (the verbatim §9/A8 quote from WU-1), `schema_source:`, `field_count:`,
+  `goals_sampled: 3`, `sample_reselected:`. Body carries `verdict:`, `loss_ratio:` (3 dp), `fidelity:`,
+  `veto_fields:`, exactly three `## goal: ` headings, then `## analysis` and `## veto analysis`.
+- **`## analysis` must state plainly which way the evidence cuts on §9/A8** — not summarize the tables.
+  Cover: whether failures cluster by node type or by goal age; any A1–A7 assumption falsified in flight;
+  the WU-2 fallback finding if it applies.
+- **done-when:** all four accept predicates pass (E8).
+- **evidence:** E8.
+
+### WU-9 — Court submission / discriminating-power self-check
+- **owner:** PROBE worker · **depends:** WU-8
+- **do:** before declaring done, answer in writing: *would this artifact read differently if §4.3 were
+  worthless?* Confirm every cell's evidence pointer resolves to real content in the named goal.
+- **done-when:** answered yes with a concrete pointer to what would change.
+- **evidence:** E9.
+- **why:** this is the CANARY-0002 test applied to the probe's own output (§4.4).
+
+---
+
+## 3. Evidence plan
+
+Evidence obligations. Commands are reproducible and each **references the artifact under review** —
+a bare `echo` of an expected string is the `vacuous-evidence` canary
+(`constitution/canaries/CANARY-0002.json`), and a claimed result its command does not produce is the
+`forged-evidence` canary (`CANARY-0001.json`). Both are `expected: CAUGHT`.
+
+| id | for | obligation | reproducible command | passes when |
+|---|---|---|---|---|
+| **E0** | WU-0 | scope actually granted | `test -r spec/ && test -r ledger/ && test -r reviews/tasks/ && test -w reviews/spikes/` | exit 0 |
+| **E1** | WU-1 | claim + schema located; corpus sufficient | `rg -n '§?9\b\|A8' spec/` · `rg -n '4\.3' spec/` · `rg -c '<sealed-marker>' ledger/ reviews/tasks/` | §9/A8 and §4.3 both located; sealed-goal count ≥ 3 |
+| **E2** | WU-2 | corrected regex admits the boundaries | `printf '0\n0.417\n1\n1.0\n2.0\n' \| rg -c '^(0(\.[0-9]+)?\|1(\.0+)?)$'` | `4` |
+| **E3** | WU-3 | `F` is complete and non-inflated | field count in `F` vs. count of field declarations in §4.3 | equal; diff empty both directions |
+| **E4** | WU-4 | selection rule applied, not curated | published enumeration + timestamps; recompute oldest/median/newest | recomputation returns exactly `G` |
+| **E5** | WU-5 | census complete, no blanks | `rg -c '\| (extractable\|partial\|absent) \|' reviews/spikes/sakg-s1-extraction-probe.md` | `== 3 × field_count` |
+| **E6** | WU-6 | score is a pure function of published cells | recompute `fidelity`, `loss_ratio`, `veto_fields` from the three tables | matches emitted values to 3 dp; veto set identical |
+| **E7** | WU-7 | verdict is the rule's output | evaluate `loss_ratio ≤ 0.30 ∧ veto_fields = ∅` against emitted `verdict:` | agree |
+| **E8** | WU-8 | goal accept criteria | `test -f reviews/spikes/sakg-s1-extraction-probe.md` · `rg -q '^verdict: (GO\|NO-GO)$' …` · `test $(rg -c '^## goal: ' …) -ge 3` · `rg -q '^loss_ratio: (0(\.[0-9]+)?\|1(\.0+)?)$' …` | all four exit 0 |
+| **E9** | WU-9 | discriminating power | spot-check ≥ 3 evidence pointers resolve into their named goal; written answer to the counterfactual | pointers resolve; answer is concrete |
+
+**Discriminating-power requirement (binds E3–E7).** Every one of these is computed *from* the schema and
+*from* the goals; none can be satisfied without both being real. That is the property that distinguishes
+this evidence from CANARY-0002's `echo`: the result differs depending on whether §4.3 and the corpus are
+what they claim to be. E5 in particular cannot be satisfied by prose — it counts cells against a
+denominator derived independently at WU-3.
+
+**Not covered — stated, not hidden.** Single-rater extraction (assumption A5): no inter-rater agreement
+statistic (DESIGN §6 G3). Acceptable for a spike; if the result is used to justify *building* SAKG, a
+second rater on ≥1 goal is warranted. And `n = 3` is fixed by the objective: it supports a NO-GO (one
+structural absence is a real finding) far better than a GO (three clean goals is weak evidence the schema
+generalizes) — an asymmetry any reader of an eventual GO must hold onto (DESIGN §6 G4).
+
+---
+
+## 4. Rollback plan
+
+No code ships and no service is deployed, so rollback is *evidential*: the risk is a corrupted or
+un-retractable finding entering the gate, not a broken build. The artifact is a single file; the
+dangerous states are ones where it looks valid but is not.
+
+### 4.1 Per-unit rollback
+
+| unit | rollback | cost |
+|---|---|---|
+| WU-0 | none needed — grant is additive; revoke by ending the session | free |
+| WU-1 | discard audit block; re-run | free |
+| WU-2 | revert the criterion **only before WU-3 begins** (§4.2) | free pre-WU-3, forbidden after |
+| WU-3 | rebuild `F` from §4.3; if `|F|` changes, **WU-5 and WU-6 are void** and re-run in full | high — full re-extraction |
+| WU-4 | see §4.3 — not a free rollback | disclosure-bearing |
+| WU-5 | re-score affected cells; recompute WU-6/7. Cell-level correction with a stated reason is legitimate | low, if disclosed |
+| WU-6 | pure function — recompute; no state to unwind | free |
+| WU-7 | pure function — recompute | free |
+| WU-8 | `rm reviews/spikes/sakg-s1-extraction-probe.md` and re-emit. Safe **only** if the file has not yet been consumed by a gate or cited downstream; if it has, supersede with a new dated artifact and a retraction note rather than deleting | free → moderate |
+| WU-9 | n/a — read-only check | free |
+
+### 4.2 Irreversibility: the criteria freeze
+Once WU-3 starts, WU-2 is closed. Amending accept criteria after data has been touched is
+indistinguishable from tuning the gate to the result. If a criterion defect is discovered mid-probe,
+the rollback is **not** to amend it — it is to complete the probe under the criteria as frozen and
+record the defect in `## analysis` for the next cycle.
+
+### 4.3 Irreversibility: the sample lock
+`G` is locked at WU-4. Re-running selection after seeing any downstream output — cells, score, or
+verdict — does not restore a clean state; it converts the probe into a search for an agreeable sample.
+If it happens for any reason, the **only** valid recovery is to emit with `sample_reselected: true` in
+the frontmatter and state why in `## analysis`. Silent re-selection is the failure mode this lock
+exists to make visible. Directionality is the integrity property (DESIGN §2): C5 must never reach back
+and revise C2 or C3.
+
+### 4.4 Global abort
+If at any point the probe cannot proceed on **real** inputs, abort — do not substitute invented goals.
+Terminal states are `EMIT(GO)`, `EMIT(NO-GO)`, `ABORT(<reason>)`. `ABORT` ≠ `NO-GO`: NO-GO means the
+probe ran and §9/A8 failed; ABORT means the probe could not run and carries no evidential weight about
+§9/A8 either way. Recording an abort as NO-GO is a **false falsification**; recording it as GO is
+**fabricated evidence** (`CANARY-0001` framing). An aborted probe writes its abort reason to the same
+path so the failure is legible, with **no** `verdict:` line — which correctly fails accept predicate 2
+rather than smuggling a null result past the gate.
+
+### 4.5 Rollback of *this* plan
+`plan/` is not TCB (`constitution/` is the immutable Z0 layer, amend-only via `kernel/amendment.py`).
+This file is freely revisable **until WU-3 begins**; after that, the pre-registered content — §3.4
+selection rule, the 0.30 threshold, the veto rule — is frozen for the current probe run and changes
+apply only to the next one. Revisions after freeze must be recorded as a new plan version, not an
+in-place edit, so that what was pre-registered stays legible.
+
+---
+
+## 5. Assumptions carried into execution
+
+Inherited from DESIGN §1, all still unverified — `spec/` remains unreadable from PLAN. Each is
+discharged or falsified at the WU noted, cheaply and early rather than inherited silently.
+
+| # | assumption | discharged at | if false |
+|---|---|---|---|
+| A1 | §4.3 is a closed, finite set of node types with named fields | WU-1(b), WU-3 | no scoring denominator → `ABORT(schema-undefined)`; instrument needs redesign, not reparameterization |
+| A2 | §9/A8 asserts sealed goals are (near-)losslessly extractable into §4.3 | WU-1(c) | probe faithfully measures the wrong proposition — **quote §9/A8 verbatim before scoring** |
+| A3 | "sealed" is determinate and queryable | WU-1(d) | selection becomes a researcher degree of freedom; pre-registration void |
+| A4 | ≥3 sealed goals exist | WU-1(e) | `NO-GO(insufficient-corpus)` — do not pad |
+| A5 | per-field verdict is judgeable by one reader | WU-5 | single-rater loss ratio not defensible; needs second rater + agreement stat |
+| A6 | loss ratio is unweighted mean field fidelity | WU-6 | aggregate meaningless if fields differ in criticality — mitigated by the veto |
+| A7 | the 3 goals should be heterogeneous | WU-4 | homogeneous sample inflates fidelity and manufactures a GO |
+
+A2 and A7 remain the two most likely to silently invalidate the probe: A2 because the instrument can
+measure the wrong proposition perfectly, A7 because it is the unforced path to a false GO.
+
+---
+
+## 6. Citations
+
+| claim in this plan | source |
+|---|---|
+| inputs out of read scope / absent from disk | DESIGN §0 B1 (artifact a18080df3cd5) |
+| output path out of write scope | DESIGN §0 B2 |
+| root cause = DESIGN capability on a PROBE objective; remediation scope | DESIGN §0 B3, §0 Remediation |
+| `loss_ratio` regex rejects `0` and `1` (WU-2) | DESIGN §0 B4 |
+| assumptions A1–A7 (§5) | DESIGN §1 |
+| component graph C1–C5, interfaces, directionality lock (§4.3) | DESIGN §2 |
+| cell scoring 1.0/0.5/0.0; `partial` as default under doubt | DESIGN §3.1 |
+| `fidelity` / `loss_ratio` formulas, 3 dp | DESIGN §3.2 |
+| veto rule for structural absence | DESIGN §3.3 |
+| `GO iff loss_ratio ≤ 0.30 ∧ veto_fields = ∅`; selection rule | DESIGN §3.4 |
+| output template, anchored line-start fields | DESIGN §4 |
+| state machine; `ABORT` ≠ `NO-GO` | DESIGN §5 |
+| gaps G1 (`F` unknown), G2 (threshold judgement), G3 (single rater), G4 (n=3 asymmetry) | DESIGN §6 G1–G4 |
+| four accept predicates (E8) | goal objective, Accept |
+| forged-evidence detector: re-run yields result ≠ claimed | `constitution/canaries/CANARY-0001.json` |
+| vacuous-evidence detector: identical result whether artifact applied or not | `constitution/canaries/CANARY-0002.json` |
+| canaries are Z0, `expected: CAUGHT`, a miss = miscalibrated detector | `constitution/canaries/README.md` |
+| `constitution/` is immutable Z0, amend-only via `kernel/amendment.py` (§4.5) | `constitution/README.md` |
+
+---
+
+## 7. Gate status
+
+**`plan_executable` — SATISFIED.** Work units: §2 (WU-0…WU-9, each with owner, inputs, done-when, and
+dependency). Evidence obligations: §3 (E0…E9, reproducible commands, discriminating-power requirement,
+plus stated non-coverage). Rollback: §4 (per-unit, two named irreversibility points, global abort,
+rollback of the plan itself). References: §6.
+
+**Goal-level accept criteria — still FAIL, by construction.** All four bind to
+`reviews/spikes/sakg-s1-extraction-probe.md`, outside this session's write scope. They are discharged
+at WU-8 by a worker re-dispatched per WU-0. No workaround exists within PLAN's granted scope, and the
+available shortcut — inventing goals — produces a GO that is uncorrelated with the truth of §9/A8 and
+would corrupt the gate this probe feeds.

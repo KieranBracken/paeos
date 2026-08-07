@@ -1,0 +1,539 @@
+---
+artifact: plan
+goal: S-PROBE — SAKG/SAEOS-1 extraction feasibility spike
+stage: PLAN
+role: PLANNER
+design_ref: design/S-PROBE-sakg-s1-extraction-probe.md
+preregistration_ref: plan/preregistration/S-PROBE-protocol.frozen.md
+target_deliverable: reviews/spikes/sakg-s1-extraction-probe.md
+work_units: 10
+evidence_obligations: 10
+rollback_classes: 3
+---
+
+# Plan — S-PROBE: extraction feasibility spike (falsify SAEOS-1 §9/A8)
+
+Executable schedule for the design at `design/S-PROBE-sakg-s1-extraction-probe.md`. Design
+citations below are `§N` plus a line anchor into that file, written `…:NN-MM`.
+
+## 0. Scope boundary of this PLAN stage
+
+| | |
+|---|---|
+| Writable here | `plan/` only |
+| Readable here | `constitution/`, `design/`, `plan/` |
+| Deliverable path | `reviews/spikes/sakg-s1-extraction-probe.md` — **outside** this stage's write scope |
+| Probe inputs | `spec/SAEOS-1.md`, `ledger/`, `reviews/tasks/` — **not readable** from this stage |
+
+Consequence, carried forward unchanged from the design (`…:37-40`): **this plan does not and
+cannot produce the deliverable.** The goal's four acceptance commands are satisfied by the
+downstream EXECUTE stage that holds write capability on `reviews/`. This document tells that stage
+what to do, in what order, what to prove, and how to undo it.
+
+Observed workspace at plan time: `constitution/` holds `README.md`,
+`canaries/CANARY-0001..0002.json`, `canaries/README.md`, `classifier_rules/.gitkeep`. `spec/`,
+`ledger/`, `reviews/` and `design/` were not present on this stage's path — `design/` reached this
+stage as a context artifact, not as a readable directory. `GAP-1` (`…:522-525`) therefore still
+stands at plan time: §4.3 is still unread, so no work unit below names a node type or a field.
+
+One thing this stage **could** do that later stages cannot: freeze the protocol. See WU-0.
+
+## 1. Execution preconditions
+
+The EXECUTE stage must hold, and must verify before WU-1:
+
+| Capability | Needed by | If absent |
+|---|---|---|
+| read `spec/SAEOS-1.md` | WU-1 | abort to `BLOCKED`, escalate `E-2` |
+| read `ledger/` | WU-2, WU-3 | abort to `BLOCKED`, escalate `E-3` |
+| read `reviews/tasks/` and referenced artifacts | WU-3, WU-4 | abort to `BLOCKED`, escalate `E-4` |
+| write `reviews/spikes/` | WU-8, WU-9 | abort — the goal cannot be met from that stage |
+| read `plan/preregistration/S-PROBE-protocol.frozen.md` | WU-7 | abort — thresholds must come from the frozen file, not from memory |
+
+A stage that lacks any of the first four must **stop and hand back**, not substitute a
+reachable input. Substituting unsealed goals for sealed ones, or a paraphrase of §4.3 for §4.3,
+converts the spike into a narrative (`…:530-535`).
+
+## 2. Work units
+
+| WU | Name | Component | Reads | Writes | State after | Rollback class |
+|----|------|-----------|-------|--------|-------------|----------------|
+| WU-0 | Freeze protocol | — | design | `plan/preregistration/` | `PREREGISTERED` | R-1 → R-VOID after WU-2 |
+| WU-1 | Bind spec | C1 | `spec/SAEOS-1.md` | (in-run) | `BOUND` | R-2 |
+| WU-2 | Sample sealed goals | C2 | `ledger/` | (in-run) | `SAMPLED` | R-VOID |
+| WU-3 | Close corpora | C3 | `ledger/`, `reviews/` | (in-run) | per-goal `CORPUS_CLOSED` | R-1 |
+| WU-4 | Hand-extract | C4 | closed corpora only | (in-run) | `EXTRACTING`→`EXTRACTED` | R-1 pre-WU-5 |
+| WU-5 | Challenge | C5 | closed corpora only | (in-run) | `CHALLENGED` | R-1 (whole pass only) |
+| WU-6 | Score | C6 | `FieldVerdict[]` | (in-run) | `SCORED` | R-1 |
+| WU-7 | Adjudicate | C7 | `ScoreSheet`, frozen protocol | (in-run) | `ADJUDICATED` | R-1 |
+| WU-8 | Write report | C8 | all upstream | `reviews/spikes/…md` | — | R-1 |
+| WU-9 | Gate self-check | C9 | the report | `reviews/spikes/…md` (one section) | `REPORTED` | R-1 |
+
+"(in-run)" means the artifact is an in-memory contract between components (§5, `…:140-230`) that
+lands in the report at WU-8; it is not a separate file on disk.
+
+---
+
+### WU-0 — Freeze the protocol (`DRAFT → PREREGISTERED`)
+
+**Status: DONE in this stage.** Output: `plan/preregistration/S-PROBE-protocol.frozen.md`.
+
+- **Design ref** §6 step 1 (`…:234-236`), SM-1 first row (`…:261`), §9 (`…:367-387`), §8.1–8.4
+  (`…:310-365`), §5.2 stratification (`…:162-165`).
+- **Why here.** The freeze must precede any contact with the data. This stage cannot read
+  `spec/`, `ledger/` or `reviews/` — so the ordering is enforced by **capability, not by
+  promise**. Freezing later, in a stage that can already see the corpus, would make the
+  pre-registration an assertion about the author's discipline rather than a fact about the run.
+  This is the one-way pinch point the design names at `…:251-253`.
+- **Contents frozen:** T_D1=0.20, T_D2=0.50, T_D4=0.30, D3/D5 booleans; weights 0.0/0.5/1.0;
+  half-up 2-decimal rendering; scoring unit `(goal, node_type, field)` with the `field_path`
+  extension pre-authorised for `GAP-1`; E1–E3 / P1–P4 / ABSENT / NOT_APPLICABLE label rules;
+  the downward tie-break; the stratification rule and its volume proxy; the three illegal
+  transitions; the pre-committed GO / near-threshold / NO-GO statements.
+- **Tamper pin.** `wc -lc` of the frozen file at freeze time: **162 lines, 8052 bytes**.
+  A sha256 pin would be stronger, but hashing was not permitted in this session — so the byte
+  count is the fallback pin, and WU-1 carries the obligation to compute the real
+  `sha256` at first read and record it as `protocol_sha` in the report frontmatter. Stating this
+  plainly rather than pinning a value I could not compute: a pin nobody verified is worse than a
+  weaker pin everybody can.
+- **Exit predicate.** File exists; `wc -lc` matches; every threshold in §9 of the design appears
+  with a value.
+- **Evidence:** `EV-0`.
+- **Rollback:** `R-1` (freely editable) until WU-2 completes; `R-VOID` after.
+
+---
+
+### WU-1 — Bind the spec (C1) → `BOUND`
+
+- **Design ref** C1 (`…:117-119`), `FieldMatrix` (`…:144-158`), `ASM-1` (`…:54`), `ASM-2`
+  (`…:55`), `GAP-1` (`…:522-525`).
+- **Preconditions:** WU-0 exit; read capability on `spec/SAEOS-1.md`.
+- **Steps**
+  1. Compute `sha256` of `spec/SAEOS-1.md`; this is `spec_sha`. Also compute and record
+     `protocol_sha` for the frozen file (carried obligation from WU-0).
+  2. Enumerate §4.3 node types into `FieldMatrix`: per type `name`, `is_required_by_claim`,
+     `identity_fields`, `edge_fields`, and per field `name` / `required` / `declared_type`.
+     Every row carries the §4.3 line range it came from.
+  3. Quote §9 and A8 **verbatim** into `ClaimQuote`. The probe must refute the actual claim, not
+     a paraphrase (`ASM-2`).
+  4. `GAP-1` check: if any node type is nested or polymorphic, extend the scoring unit to
+     `(goal, node_type, field_path)` — pre-authorised in the frozen protocol §4 — and record the
+     nesting path per field. **Do not flatten silently.**
+  5. If §4.3 is prose without field-level structure, the denominator is undefined: **abort to
+     `BLOCKED`, escalate `E-2`. Do not invent fields.**
+- **Outputs:** `FieldMatrix`, `ClaimQuote`, `spec_sha`, `protocol_sha`.
+- **Exit predicate:** every node type has ≥1 required field and a §4.3 line citation;
+  `ClaimQuote` is non-empty and byte-identical to the source; `is_required_by_claim` is set for
+  every type (it drives D5).
+- **Evidence:** `EV-1`.
+- **Rollback:** `R-2`. A `FieldMatrix` correction discovered after WU-4 forces a return to
+  `BOUND` and a full re-run of WU-3…WU-9 (`…:303-304`) — cells cannot be patched around a
+  changed denominator.
+
+---
+
+### WU-2 — Sample sealed goals (C2) → `SAMPLED`
+
+- **Design ref** C2 (`…:120-121`), `SelectionRecord` (`…:160-176`), `ASM-3` (`…:56`), `ASM-5`
+  (`…:58`), `GAP-2` (`…:526-528`).
+- **Preconditions:** WU-0 exit. Independent of WU-1 — may run in parallel (§6 below).
+- **Steps**
+  1. Determine the sealed marker and write `sealed_filter` **verbatim** as an executable
+     predicate over `ledger/`. If sealing is conventional rather than marked, the filter is a
+     judgment call and must be recorded as such (`GAP-2`).
+  2. Enumerate candidates → `candidate_count`. If `< 3`, **abort to `BLOCKED`, escalate `E-3`.
+     Do not substitute unsealed goals** (`ASM-5`).
+  3. Stratify per the frozen rule: goal kind, artifact volume (by the frozen proxy — see
+     `PLAN-DEC-1`), seal age. Ties → lowest goal id.
+  4. Record `excluded_notable`: any sealed goal deliberately not chosen, with the reason. This is
+     what makes cherry-picking visible.
+  5. Freeze `SelectionRecord` with `frozen_at`, **before any field is examined**.
+- **Outputs:** `SelectionRecord` (3 goal ids, strata, seal refs, filter, counts, timestamp).
+- **Exit predicate:** exactly 3 `goal_id`s; each `seal_ref` resolves; the 3 differ on ≥2 of the
+  3 strata axes; `frozen_at` precedes every `FieldVerdict` timestamp.
+- **Evidence:** `EV-2`.
+- **Rollback:** **`R-VOID`.** Re-rolling the sample after an unpromising early read is an
+  enumerated illegal transition (`…:278-279`). Past this point the thresholds are unreachable and
+  the sample is unrepeatable; see §5.
+
+---
+
+### WU-3 — Close the corpora (C3) → per-goal `CORPUS_CLOSED`
+
+- **Design ref** C3 (`…:122-125`), `GoalCorpus` (`…:178-187`), `ASM-4` (`…:57`), SM-2
+  (`…:282-287`).
+- **Steps** (per selected goal)
+  1. Seed the closure with the ledger entry and its task file under `reviews/tasks/`.
+  2. Add, transitively, every artifact those reference **by path**, restricted to files that
+     existed at seal time (see `PLAN-DEC-2` for how "existed at seal time" is decided).
+  3. Record per entry: `path`, `role` (`ledger_entry|task|evidence|review|referenced`),
+     `in_closure_because` (the reference that pulled it in). Emit `closure_size`.
+  4. If a goal's corpus cannot be closed, that goal goes to `BLOCKED` (SM-2). It may **not** be
+     quietly replaced — either unblock it, or record the substitution and its reason in
+     `SelectionRecord.excluded_notable` (`…:285-287`), and escalate `E-4`.
+- **Outputs:** `GoalCorpus` ×3, each rendered into the report's per-goal `corpus closure:` list.
+- **Exit predicate:** every path exists and is readable; every entry has a non-empty
+  `in_closure_because`; the closure list is sorted (so it is diffable and re-derivable).
+- **Evidence:** `EV-3`.
+- **Rollback:** `R-1` — a corpus may be recomputed without voiding the run, **provided** every
+  `FieldVerdict` derived from the superseded closure is discarded and re-extracted, not amended.
+
+---
+
+### WU-4 — Hand-extract (C4) → `EXTRACTING` → `EXTRACTED`
+
+The only judgment step in the run, and the one the whole result rests on.
+
+- **Design ref** C4 (`…:126-128`), `FieldVerdict` (`…:189-202`), §8.1 labels (`…:310-330`),
+  §8.2 unit (`…:332-336`), §8.3 tie-break (`…:338-342`), §6 step 5 (`…:241-243`).
+- **Steps**
+  1. Walk the **full cross-product** `3 goals × node types × fields`. One `FieldVerdict` per
+     cell. Cells with no instance are `NOT_APPLICABLE` — **never silently skipped**
+     (`…:241-242`). A skipped cell is an unscored loss, which biases toward GO.
+  2. For each cell apply E1/E2/E3 → `EXTRACTABLE`; else the P1–P4 test → `PARTIAL`; else
+     `ABSENT`. Torn between two labels → take the lower one.
+  3. Every non-`ABSENT`, non-`NOT_APPLICABLE` verdict carries a `citation` that resolves **inside
+     that goal's closure**, and a one-sentence `extraction_rule` that must generalise across
+     goals. A rule that only works for this goal is `P4`, not `EXTRACTABLE`.
+  4. Every `PARTIAL` carries a `partial_reason` code. Every `ABSENT` carries an `absent_reason`
+     naming what would have to exist — that list is the most valuable output of the spike
+     regardless of verdict (`…:325-327`).
+  5. **Prohibited inputs:** session memory, the authoring agent, any file outside the closure
+     (`…:127-128`). Recovering a field from memory and labelling it `EXTRACTABLE` is the single
+     failure mode that would make the whole probe worthless — it measures the extractor, not the
+     record.
+- **Outputs:** `FieldVerdict[]`, rendered as the three per-goal tables.
+- **Exit predicate:** cell count `== 3 × Σ(fields per node type)`; zero unlabelled cells; every
+  `PARTIAL` has a P-code; every `ABSENT` has an `absent_reason`; every citation path is a member
+  of that goal's closure list.
+- **Evidence:** `EV-4`.
+- **Rollback:** `R-1` per-cell before WU-5. After WU-5, changing a cell upward is an *upgrade* and
+  requires a new in-closure citation recorded in `challenge_outcome` (`…:302`).
+
+---
+
+### WU-5 — Challenge (C5) → `CHALLENGED`
+
+- **Design ref** C5 (`…:129-132`), SM-3 (`…:289-306`),
+  `constitution/canaries/CANARY-0002.json`.
+- **Steps**
+  1. Independent pass over **every** `EXTRACTABLE` and `PARTIAL` verdict.
+  2. Primary attack, named by the design: the `CANARY-0002` failure mode — *a citation that
+     resolves but carries none of the field's meaning*. The canary's own detection signature is
+     "identical result whether the artifact is applied or not"; the field-level analogue is: would
+     this citation support the same label for a different field, or for a different goal? If yes,
+     it has no discriminating power → downgrade.
+  3. Secondary attack: E2 generalisation. If the `extraction_rule` needs a goal-specific clause,
+     downgrade to `PARTIAL/P4`.
+  4. Downgrades stand unless a **new in-closure citation** is produced. Record
+     `challenged: true` and `challenge_outcome` on every reviewed cell.
+- **Exit predicate:** no contested cells (`…:268`); every non-`ABSENT` cell has
+  `challenged: true` and an outcome; the downgrade count is reported. **A challenge pass with
+  zero downgrades across all cells must carry a one-sentence justification** — otherwise it is
+  indistinguishable from not having run, which is the same vacuity `CANARY-0002` names.
+- **Evidence:** `EV-5`.
+- **Rollback:** `R-1`, but **only by re-running the entire pass**. Selective re-challenge of
+  individual cells is forbidden: it lets the challenger be retuned cell-by-cell until the score
+  lands where the author wants.
+
+---
+
+### WU-6 — Score (C6) → `SCORED`
+
+Pure function. No judgment, no thresholds (`…:133`).
+
+- **Design ref** `ScoreSheet` (`…:204-222`), §8.4 (`…:344-365`).
+- **Steps**
+  1. Denominator = required, applicable cells (excludes `NOT_APPLICABLE` and optional fields).
+  2. `loss_ratio` with weights 0.0/0.5/1.0; half-up to 2dp; leading zero; exactly 2 decimals.
+  3. Also compute `loss_ratio_strict` (partial=1.0), `loss_ratio_lenient` (partial=0.0),
+     `loss_ratio_all_fields` (required + optional), `edge_field_loss_ratio`, and the
+     `per_node_type` table with `identity_extractable` and `vacant_in_all_goals` flags.
+  4. If the verdict differs between `loss_ratio_strict` and `loss_ratio_lenient`, the result is
+     weight-sensitive: say so and name the partial-heavy fields individually (`…:363-365`).
+  5. If `loss_ratio ≥ 1.00`: write `1.00`. **Do not round down to fit the acceptance regex.**
+     Raise `E-1` (§5.4).
+- **Exit predicate (invariants, cheap and they catch a whole class of arithmetic error):**
+  `loss_ratio_lenient ≤ loss_ratio ≤ loss_ratio_strict`; `extractable + partial + absent ==
+  required_fields_scored`; every ratio matches `^[01]\.[0-9]{2}$`;
+  `per_node_type` covers every type in `FieldMatrix`.
+- **Evidence:** `EV-6` — the strongest obligation in this plan: the numbers must be recomputable
+  from the report's own tables, so no reviewer has to trust the scorer.
+- **Rollback:** `R-1`, recompute in place.
+
+---
+
+### WU-7 — Adjudicate (C7) → `ADJUDICATED`
+
+- **Design ref** C7 (`…:134-135`), `Verdict` (`…:224-230`), D1–D5 (`…:367-379`), `RISK-2`
+  (`…:515-518`), `RISK-3` (`…:519-521`).
+- **Steps**
+  1. **Read thresholds from `plan/preregistration/S-PROBE-protocol.frozen.md`, not from memory
+     and not from this plan's restatement.** Re-verify its pin (162 lines / 8052 bytes, plus
+     `protocol_sha` from WU-1) and paste the check into the report. A mismatch means the frozen
+     file moved during the run → `R-VOID`.
+  2. Evaluate D1–D5. `failed_predicates` empty iff GO; otherwise it names **every** failed
+     predicate, not just the first.
+  3. Rationale: ≤3 sentences, referencing the numbers.
+  4. If GO: the rationale must state that `n=3` cannot support a positive claim — a GO means
+     "not refuted at n=3" (`RISK-3`).
+  5. If `|loss_ratio − 0.20| ≤ 0.03`: say so, and re-run WU-4 independently for the node type
+     nearest the threshold before ratification (`RISK-2`). Record the re-run as a re-entry to
+     WU-4, with both extractions visible — not as a replacement of the first.
+- **Exit predicate:** `verdict ∈ {GO, NO-GO}`; `failed_predicates` empty iff GO; every failed
+  predicate named with the number that failed it; the frozen-file pin check is pasted.
+- **Evidence:** `EV-7`.
+- **Rollback:** `R-1`. A verdict can only change if the `ScoreSheet` changes, which requires a
+  WU-6 re-run — the verdict is not independently editable.
+
+---
+
+### WU-8 — Write the report (C8)
+
+- **Design ref** §10 output contract (`…:389-454`), format hazards (`…:446-454`).
+- **Steps**
+  1. Create `reviews/spikes/` if absent; write `reviews/spikes/sakg-s1-extraction-probe.md`.
+  2. Render the §10 template. Frontmatter: `spike`, `date`, `spec_sha`, `protocol_sha`,
+     `verdict`, `loss_ratio`, `loss_ratio_strict`, `loss_ratio_lenient`,
+     `loss_ratio_all_fields`, `edge_field_loss_ratio`.
+  3. Sections in order: `## falsification target`, `## protocol (pre-registered)`,
+     `## selection record`, three `## goal: ` sections, `## score sheet`, `## verdict`,
+     `## what would have to change (absent_reason roll-up)`, `## gate self-check`.
+  4. **Format hazards, all four acceptance-critical:**
+     - `## goal: ` appears **exactly three times** — only for the three real goals. No example,
+       template, appendix or quoted line may begin `## goal: `, or `rg -c` lies. In particular:
+       **do not paste the §10 template into the report as an illustration** — it contains
+       `## goal: <goal-id-1>` lines.
+     - `verdict:` and `loss_ratio:` at column 0 in the frontmatter, one space after the colon,
+       nothing trailing.
+     - The prose restatement inside `## verdict` is deliberately not a bare column-0 `verdict:`
+       line; the frontmatter line stays authoritative (`…:451-454`).
+     - `loss_ratio` rendered with a leading zero and exactly two decimals.
+- **Exit predicate:** all nine sections present and in order; all frontmatter keys present;
+  `## goal: ` count is exactly 3.
+- **Evidence:** `EV-8`.
+- **Rollback:** `R-1` — `rm reviews/spikes/sakg-s1-extraction-probe.md`. Total: the file is new,
+  so removal leaves no residue (§5.2).
+
+---
+
+### WU-9 — Gate self-check (C9) → `REPORTED`
+
+- **Design ref** C9 (`…:137-138`), §11 traceability (`…:456-467`),
+  `constitution/canaries/CANARY-0001.json`.
+- **Steps**
+  1. Run the goal's four acceptance commands **verbatim**, from the repository root.
+  2. Paste the **actual** output and exit code of each into `## gate self-check`. Pasting a
+     predicted or intended result is forged evidence — precisely `CANARY-0001`, "evidence
+     claiming a result its reproducible_command does not produce", whose detector is a re-run
+     that finds the mismatch.
+  3. Shell hazard (`…:465-467`): `rg -c` exits non-zero and prints nothing on zero matches, so
+     `test $(rg -c …) -ge 3` degrades to `test -ge 3`, a shell syntax error rather than a clean
+     failure. When self-checking, run `rg -c … || echo 0`; report the criterion as written.
+  4. If criterion 4 fails because `loss_ratio ≥ 1.00`, **record the failure honestly and raise
+     `E-1`** (§5.4). Do not adjust the number to pass its own gate.
+- **Exit predicate:** four commands run; four real outputs pasted; all pass, **or** a failure is
+  recorded with its output and the matching escalation raised.
+- **Evidence:** `EV-9`.
+- **Rollback:** `R-1`; WU-9 touches only the `## gate self-check` section.
+
+## 3. Evidence plan
+
+Every work unit carries exactly one evidence obligation. `DETERMINISTIC` evidence is discharged
+by re-running a command and comparing; `CITATION` evidence is discharged by resolving references
+and confirming each carries its sub-claim.
+
+| ID | WU | Claim | Kind | Reproducible check | A miss means |
+|----|----|-------|------|--------------------|--------------|
+| EV-0 | WU-0 | Protocol frozen before any data contact | DETERMINISTIC | `wc -lc plan/preregistration/S-PROBE-protocol.frozen.md` → `162 8052`; frontmatter `frozen_at` precedes `SelectionRecord.frozen_at` | thresholds may have been fitted to the data; run is void |
+| EV-1 | WU-1 | The probed spec text is pinned and §4.3 is enumerable | DETERMINISTIC + CITATION | `sha256(spec/SAEOS-1.md)` equals report `spec_sha`; every `FieldMatrix` row resolves to its cited §4.3 line range | the denominator is unpinned — the loss ratio measures nothing specific |
+| EV-2 | WU-2 | The 3 goals are sealed, and were chosen by a stated rule before extraction | DETERMINISTIC + CITATION | `<sealed_filter> \| wc -l` equals `candidate_count`; each `seal_ref` resolves; `frozen_at` precedes all verdicts | the sample may be the convenient goals, not real sealed ones |
+| EV-3 | WU-3 | Each corpus is closed and re-derivable | DETERMINISTIC | re-run the traversal from the ledger entry; sorted file list is byte-identical; `closure_size` equals its `wc -l` | extraction had a side door; `ABSENT` counts are not trustworthy |
+| EV-4 | WU-4 | Every cell is scored, and every claim resolves inside its closure | DETERMINISTIC | row count equals `3 × Σ(fields per node type)`; every citation path is a member of that goal's closure list | skipped cells silently remove losses from the denominator — bias toward GO |
+| EV-5 | WU-5 | The adversary pass ran and had teeth | CITATION | every non-`ABSENT` cell has `challenged: true` + outcome; downgrade count stated; zero-downgrade pass carries a justification | the challenge is decorative; vacuous citations survive (`CANARY-0002`) |
+| EV-6 | WU-6 | Every number is recomputable from the report's own tables | DETERMINISTIC | recount labels from the three per-goal tables, reapply the frozen weights, reproduce all six ratios; check `lenient ≤ headline ≤ strict` | the verdict rests on arithmetic nobody can check |
+| EV-7 | WU-7 | The verdict follows from the ScoreSheet and the frozen thresholds | DETERMINISTIC | re-evaluate D1–D5 against `## score sheet` using the frozen file; same verdict, same `failed_predicates`; frozen-file pin re-verified | thresholds may have moved mid-run |
+| EV-8 | WU-8 | The report matches the §10 contract | DETERMINISTIC | `rg -n '^## ' <report>` yields the nine section headers in order; `rg -c '^## goal: '` is exactly 3 | the acceptance gate passes or fails for format reasons unrelated to the finding |
+| EV-9 | WU-9 | The four acceptance commands were actually run, with the pasted results | DETERMINISTIC | re-run all four; outputs and exit codes match what `## gate self-check` shows | forged gate evidence (`CANARY-0001`) |
+
+### 3.1 Evidence integrity rules (binding on every EV above)
+
+Derived from the two canaries in `constitution/`, which are Z0 and immutable
+(`constitution/README.md:3-4`); a detector that fails to catch one is miscalibrated and that is an
+alarm (`constitution/canaries/README.md:3-6`).
+
+1. **No forged results** (`CANARY-0001`). `claimed_result` is filled by pasting real output.
+   Never predicted, never tidied. A deterministic evidence item whose command does not reproduce
+   its claimed result is caught by re-running it — so it will be.
+2. **No vacuous commands** (`CANARY-0002`). Every `reproducible_command` must *reference or
+   execute the artifact under review*. A bare `echo`, or a command that would print the same
+   thing whether the report were correct or empty, has zero discriminating power and does not
+   discharge anything. Test each command by asking: would this still pass if the claim were
+   false? If yes, it is not evidence.
+3. **One claim per evidence item.** An item that bundles several claims cannot be failed
+   precisely, and a check that cannot fail precisely does not locate the defect.
+4. **Evidence is produced by the WU it belongs to**, at that WU's completion — not assembled
+   retrospectively at WU-9, when the answer is already known.
+
+## 4. Sequencing
+
+```
+WU-0 (done, PLAN stage)
+  ├──► WU-1  Bind spec ──────────────┐
+  └──► WU-2  Sample ──► WU-3  Close ─┴──► WU-4 Extract ──► WU-5 Challenge
+                                                                  │
+                          WU-9 Gate ◄── WU-8 Report ◄── WU-7 Adjudicate ◄── WU-6 Score
+```
+
+- **WU-1 ∥ WU-2** — independent: different inputs (`spec/` vs `ledger/`), no shared artifact.
+  They are the only parallelism available; everything from WU-4 on is a chain.
+- **Critical path** WU-2 → WU-3 → WU-4 → WU-5 → WU-6 → WU-7 → WU-8 → WU-9. WU-4 dominates the
+  cost: it is `3 × node_types × fields` hand judgments.
+- **The pinch point** sits between WU-2 and WU-4 (`…:251-253`): once the sampler has named the
+  goals, the thresholds are unreachable. Every control in §5 exists to keep that gate shut.
+- **Do not start WU-4 before WU-1 completes.** Extracting against a provisional field list and
+  reconciling later is exactly the `FieldMatrix`-correction path that forces a full re-run (`R-2`).
+
+## 5. Rollback plan
+
+The probe writes **one new file**, `reviews/spikes/sakg-s1-extraction-probe.md`. Everything else
+is in-run state that lands inside that file. So the physical blast radius is a single path under
+`reviews/spikes/`, and physical rollback is total: remove the file and the workspace is exactly as
+it was. `constitution/` is never written (it is Z0, read-only, `constitution/README.md:3-4`);
+`spec/`, `ledger/` and `reviews/tasks/` are read-only inputs throughout.
+
+The interesting rollback risk is therefore **not** state damage. It is that rollback becomes a
+retry loop until the numbers look good. The classes below exist to make that impossible to do
+quietly.
+
+### 5.1 Rollback classes
+
+| Class | Meaning | Applies to | Procedure |
+|-------|---------|------------|-----------|
+| **R-1** | Reversible. Redo the unit; nothing upstream is affected. | WU-0 (pre-WU-2), WU-3, WU-4 (pre-WU-5), WU-5 (whole pass), WU-6, WU-7, WU-8, WU-9 | Discard the unit's outputs, re-run it, re-run every downstream unit. Note the redo and its reason in the report. |
+| **R-2** | Forced re-run. The denominator changed, so all downstream work is invalid. | WU-1 `FieldMatrix` correction discovered after WU-3 | Return to `BOUND` (`…:303-304`), re-run WU-3…WU-9 from scratch. `FieldVerdict`s from the old matrix are **discarded, not remapped**. `SelectionRecord` survives — the sample is not re-rolled. |
+| **R-VOID** | The run is void. It cannot be repaired, only replaced. | any change to the frozen protocol after WU-2; any change to `SelectionRecord` after it is frozen; skipping WU-5 or WU-6 | Stop. Record the run as **VOIDED** with the reason and preserve its `SelectionRecord`. A replacement run must cite the voided one. |
+
+### 5.2 Physical rollback per path
+
+| Path | Created or modified by | Undo |
+|---|---|---|
+| `reviews/spikes/sakg-s1-extraction-probe.md` | WU-8 (create), WU-9 (append gate section) | `rm` — the file is new, so removal restores the prior state exactly. If the workspace is under version control, `git checkout -- reviews/spikes/` instead, and `git clean` the directory if WU-8 created it. |
+| `plan/preregistration/S-PROBE-protocol.frozen.md` | WU-0 | Editable only before WU-2 completes. After that, editing it is `R-VOID` — the undo is to void the run, not to restore the file. |
+| everything else | — | not written |
+
+No process, service, migration or external system is touched, so there is nothing to drain,
+restart or reconcile. There is no partial-write hazard: WU-8 writes the report in one pass, and a
+half-written report fails EV-8 and the acceptance gate rather than silently passing.
+
+### 5.3 Anti-abuse rule (the point of this section)
+
+**Rollback may not be used to improve the number.** Specifically:
+
+- A rollback whose trigger is "the loss ratio came out badly" is not a rollback; it is
+  goalpost-moving, and it is `R-VOID` regardless of which unit is re-run.
+- Every `R-1` redo is recorded in the report with its trigger. An unrecorded redo is
+  indistinguishable from a retry loop.
+- A voided run is **preserved, not deleted**, with its `SelectionRecord` intact. Deleting a
+  voided run erases the evidence that the sample was re-rolled — which is the one thing the void
+  record exists to show.
+- Re-running WU-4 for a single node type under `RISK-2` is **not** a rollback: both extractions
+  stay visible, and they are compared, not substituted.
+
+The reasoning is the same one the canaries encode: a detector that can be retuned until it passes
+detects nothing (`constitution/canaries/README.md:3-6`). A spike that can be re-run until it
+passes measures nothing.
+
+### 5.4 `BLOCKED` is not rollback — escalations
+
+`BLOCKED` means an input is missing; the run pauses and resumes at the same state when the input
+arrives (`…:271`). Nothing is undone. Each escalation below hands over a specific, actionable
+request:
+
+| ID | Trigger | Escalation |
+|----|---------|-----------|
+| **E-1** | `loss_ratio ≥ 1.00` — total loss, the strongest possible falsification, which **fails its own acceptance gate** (`RISK-1`, `…:512-514`) | Report `loss_ratio: 1.00`, record the criterion-4 failure verbatim, and request the acceptance criterion be amended to `^loss_ratio: [01]\.[0-9]+$`. **Do not round down to pass.** The finding is the point; the gate is the instrument. |
+| **E-2** | §4.3 is not field-enumerable (`ASM-1` fails, `…:54`) | `BLOCKED`. Request either a structured §4.3 or an authoritative field list. Do not invent fields — an invented denominator makes every ratio meaningless. |
+| **E-3** | fewer than 3 sealed goals exist (`ASM-5` fails, `…:58`) | `BLOCKED`. Request confirmation of the sealed marker, or wait for a third seal. Do not substitute unsealed goals. |
+| **E-4** | a selected goal's corpus cannot be closed (`ASM-4` fails, `…:57`) | That goal → `BLOCKED` (SM-2). Either unblock it, or record the substitution and reason in `SelectionRecord.excluded_notable` and disclose it in the report. |
+| **E-5** | the frozen protocol's pin does not verify at WU-7 | `R-VOID`. The thresholds moved during the run; the result is not a falsification test. |
+
+## 6. Acceptance criteria → work unit
+
+| Acceptance command | WU | Evidence | Artifact field |
+|---|---|---|---|
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | WU-8 | EV-8 | the report exists |
+| `rg -q '^verdict: (GO\|NO-GO)$' …` | WU-7 → WU-8 | EV-7, EV-8 | `Verdict.verdict` in frontmatter |
+| `test $(rg -c '^## goal: ' …) -ge 3` | WU-2 → WU-3 → WU-4 → WU-8 | EV-2, EV-4, EV-8 | three `## goal:` sections |
+| `rg -q '^loss_ratio: 0\.[0-9]+$' …` | WU-6 → WU-8 | EV-6, EV-8 | `ScoreSheet.loss_ratio` in frontmatter |
+
+All four are checked together by WU-9 / EV-9. Note that the fourth criterion is not satisfiable
+in the total-loss case — see `E-1`; that is a defect in the criterion, not a reason to change the
+result.
+
+## 7. Plan decisions
+
+Points where the design was under-specified and this plan had to choose. Recorded as decisions so
+the executing stage inherits a resolution rather than re-deciding, and so a reviewer can overturn
+them explicitly.
+
+- **PLAN-DEC-1 — volume stratification uses a proxy.** §5.2 asks for artifact volume by "corpus
+  file count" (`…:163`), but C3 computes corpus closure *after* C2 selects (`…:238-240`) — the
+  input to the rule is not available when the rule runs. Resolution: volume is measured by the
+  count of distinct artifact paths referenced by the ledger entry plus its task file, frozen in
+  the pre-registration §8. Rejected alternative: close all candidate corpora first, then select —
+  that shows the sampler the corpus contents and invites picking the goals that extract cleanly,
+  which is precisely the bias the stratification rule exists to prevent. A coarse blind proxy
+  beats a precise sighted one here.
+- **PLAN-DEC-2 — "existed at seal time" needs a decision rule.** §5, C3 restricts the closure to
+  files that existed at seal time (`…:122-125`) without saying how that is determined.
+  Resolution, in priority order: (a) if the workspace is under version control, a file qualifies
+  if its last modification is at or before the seal commit; (b) otherwise, reference-reachability
+  from the sealed artifacts **is** the definition — a file counts if a sealed artifact references
+  it. Whichever rule is used must be stated verbatim in the report's per-goal closure section, so
+  a reviewer can see which one was in force. Rule (b) is more permissive, which biases toward
+  `EXTRACTABLE`, i.e. **against** falsification — so when (b) is used the report must say so
+  explicitly, because it makes a NO-GO stronger and a GO weaker.
+- **PLAN-DEC-3 — the freeze happens in the PLAN stage, not the EXECUTE stage.** The design
+  places the freeze at §6 step 1 without binding it to a stage. Putting it here makes the ordering
+  a capability fact rather than a claim about author discipline (WU-0). Cost: the thresholds were
+  set by a stage that had never seen the data or the spec — which is the intent, but it does mean
+  a threshold could turn out to be unmeasurable against the real §4.3. If so, that is `E-2`
+  (`BLOCKED`), not a licence to re-freeze.
+
+## 8. Risks inherited from the design
+
+Carried forward unchanged; none is resolved by this plan, and none is hidden.
+
+| ID | Statement | Where handled |
+|----|-----------|---------------|
+| RISK-1 (`…:512-514`) | The acceptance regex cannot express `loss_ratio ≥ 1.00`; the strongest falsification fails its own gate | `E-1`; WU-6 step 5; WU-9 step 4 |
+| RISK-2 (`…:515-518`) | WU-4 is judgment; two extractors may disagree | WU-5; frozen tie-break; WU-7 step 5 (±0.03 re-extraction) |
+| RISK-3 (`…:519-521`) | `n=3` cannot support a positive claim | WU-7 step 4 — a GO must be stated as "not refuted at n=3" |
+| GAP-1 (`…:522-525`) | §4.3 was unread at design time and is still unread at plan time; nested types would change the scoring unit | WU-1 step 4; extension pre-authorised in the frozen protocol §4 |
+| GAP-2 (`…:526-528`) | "Sealed" may be conventional rather than machine-detectable | WU-2 step 1 — `sealed_filter` recorded verbatim |
+| PLAN-RISK-1 | The frozen protocol is pinned by line/byte count, not sha256 (hashing was unavailable in this stage) | WU-1 computes `protocol_sha` at first read; WU-7 re-verifies; `E-5` |
+
+## 9. Scope compliance
+
+Written this stage, all under `plan/`:
+
+- `plan/S-PROBE-sakg-s1-extraction-probe.plan.md` (this file)
+- `plan/preregistration/S-PROBE-protocol.frozen.md`
+- `plan/evidence/plan_executable.md`
+
+Nothing written outside `plan/`. `constitution/` was read only. `spec/`, `ledger/` and `reviews/`
+were neither read nor written — they were not on this stage's path, which is what makes WU-0's
+freeze credible.
+
+## 10. Handoff
+
+The EXECUTE stage needs: write on `reviews/spikes/`; read on `spec/`, `ledger/`, `reviews/tasks/`
+and `plan/preregistration/`. It should run WU-1…WU-9 in the order of §4, discharge one evidence
+item per unit as that unit closes, and abort to `BLOCKED` with the matching escalation — not
+improvise — if `ASM-1`, `ASM-2`, `ASM-3`, `ASM-4` or `ASM-5` fails.
+
+The single instruction that matters most: **a NO-GO is a successful outcome** (`…:387`). The
+spike costs three hand-extractions and either saves the build or clears it. Nothing in this plan
+should be read as pressure toward GO — the tie-break, the downgrade-only challenge, the
+capability-enforced freeze and the `R-VOID` class all exist to lean the other way.

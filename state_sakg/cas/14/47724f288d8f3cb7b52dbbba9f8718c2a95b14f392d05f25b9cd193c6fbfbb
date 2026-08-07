@@ -1,0 +1,142 @@
+---
+evidence_id: plan_executable
+kind: CITATION
+stage: PLAN
+role: PLANNER
+goal: S-PROBE — SAKG/SAEOS-1 extraction feasibility spike
+subject: plan/S-PROBE-sakg-s1-extraction-probe.plan.md
+supporting_subject: plan/preregistration/S-PROBE-protocol.frozen.md
+determinism: DETERMINISTIC
+verification: resolve each cited line range against the subject and confirm it carries the sub-claim
+reproducible_command: "sed -n '61p;70p;83p;348p;354p;368p;388p;415p;431p;455p;465p;480p' plan/S-PROBE-sakg-s1-extraction-probe.plan.md"
+reproducible_command_note: >-
+  prints the representative anchor line of each sub-claim below (first and last work unit, the
+  capability argument for the freeze, the first and strongest evidence obligation, the
+  anti-vacuity rule, the dependency statement, the R-VOID class, the anti-abuse rule, the E-1
+  escalation, the acceptance mapping, the first plan decision). It resolves citations; it does
+  not adjudicate whether the plan is executable — that requires reading them.
+claimed_result_exit_code: 0
+secondary_command: "wc -lc plan/S-PROBE-sakg-s1-extraction-probe.plan.md plan/preregistration/S-PROBE-protocol.frozen.md"
+secondary_claimed_result: "539 36253 (plan); 162 8052 (frozen protocol); 701 44305 total"
+---
+
+# Evidence — `plan_executable`
+
+Claim: the plan at `plan/S-PROBE-sakg-s1-extraction-probe.plan.md` declares **work units**,
+**evidence obligations** and a **rollback plan**, each traceable by citation to the design at
+`design/S-PROBE-sakg-s1-extraction-probe.md` and to the constitutional canaries, such that the
+downstream EXECUTE stage can run it without re-deciding anything.
+
+Each sub-claim below cites the location that discharges it, so a reviewer can check the citation
+rather than the assertion. (Cf. `constitution/canaries/CANARY-0002.json`: a check that resolves
+but exercises nothing is vacuous. Every citation here names the specific passage carrying the
+burden, not the document as a whole; and the `reproducible_command` reads the subject file itself
+rather than echoing a literal.)
+
+## 1. Work units declared
+
+| Sub-claim | Citation |
+|---|---|
+| Ten work units, `WU-0`…`WU-9`, tabulated with component, reads, writes, resulting state and rollback class | `plan/S-PROBE-sakg-s1-extraction-probe.plan.md:59-70` (§2) |
+| One-to-one with the design's components `C1`…`C9`, so the design's producer/consumer closure carries over unbroken | `…:61-70` against `design/S-PROBE-sakg-s1-extraction-probe.md:115-138`, `…:490-500` |
+| Each unit states preconditions, ordered steps, outputs, an exit predicate, its evidence id and its rollback class | `…:77-102` (WU-0), `…:106-131` (WU-1), `…:183-211` (WU-4), `…:320-338` (WU-9) — the pattern holds for all ten |
+| Exit predicates are checkable rather than narrative — counts, invariants and regexes, not "looks right" | `…:206-208` (cell count `== 3 × Σ fields`), `…:256-259` (`lenient ≤ headline ≤ strict`; `^[01]\.[0-9]{2}$`) |
+| The blocking assumptions gate entry to extraction; each has a named abort path rather than an improvisation | `…:122-123` (ASM-1→E-2), `…:144-145` (ASM-5→E-3), `…:171-173` (ASM-4→E-4), against `design/…:49-58` |
+| Sequencing, the only available parallelism, and the critical path are stated | `…:378-395` (§4); `WU-1 ∥ WU-2` at `…:388-389` |
+| The design's one-way pinch point is preserved as a scheduling constraint, not just described | `…:392-393`, against `design/…:251-253` |
+
+## 2. Evidence obligations declared
+
+| Sub-claim | Citation |
+|---|---|
+| One evidence obligation per work unit, `EV-0`…`EV-9`, each with claim, kind, a reproducible check, and what a miss would mean | `…:346-357` (§3) |
+| The strongest obligation makes the verdict independently recomputable from the report's own tables, so no reviewer must trust the scorer | `…:354` (EV-6), `…:260-261` |
+| Anti-forgery rule bound to `CANARY-0001`: claimed results are pasted real output, never predicted | `…:365-367`, `constitution/canaries/CANARY-0001.json` |
+| Anti-vacuity rule bound to `CANARY-0002`, with an operational test ("would this still pass if the claim were false?") | `…:368-372`, `constitution/canaries/CANARY-0002.json` |
+| Evidence is produced by its own work unit at closure, not assembled at the end once the answer is known | `…:375-376` |
+| Each of the four acceptance commands is mapped to the work unit and evidence item that satisfies it | `…:461-472` (§6) |
+| The shell hazard in the goal's third acceptance command is carried forward with its mitigation | `…:330-332`, against `design/…:465-467` |
+
+## 3. Rollback declared
+
+| Sub-claim | Citation |
+|---|---|
+| Three rollback classes defined — `R-1` reversible, `R-2` forced re-run, `R-VOID` run voided — each with applicable units and a procedure | `…:409-415` (§5.1) |
+| Physical rollback given per written path, with the version-controlled and non-version-controlled forms | `…:417-423` (§5.2) |
+| Blast radius stated and bounded: one new file under `reviews/spikes/`; `constitution/` never written; inputs read-only | `…:399-403` |
+| No partial-write hazard: a half-written report fails EV-8 and the gate rather than passing silently | `…:425-427` |
+| The real rollback risk is named as retry-until-the-number-improves, and forbidden explicitly | `…:429-441` (§5.3) |
+| A voided run is preserved with its `SelectionRecord`, not deleted — otherwise a re-rolled sample leaves no trace | `…:437-439` |
+| `BLOCKED` is distinguished from rollback: the run pauses, nothing is undone | `…:449-451`, against `design/…:271` |
+| Five escalations `E-1`…`E-5`, each with a concrete trigger and an actionable request | `…:453-459` (§5.4) |
+| The rollback rules trace to the same reasoning as the canaries: a detector that can be retuned until it passes detects nothing | `…:443-445`, `constitution/canaries/README.md:3-6` |
+
+## 4. Refs cited
+
+- **Design** — every work unit carries design line anchors; the mapping is `WU-0`→§6.1/SM-1
+  (`…:81-82`), `WU-1`→C1/§5.1 (`…:108-109`), `WU-2`→C2/§5.2 (`…:137-138`), `WU-3`→C3/§5.3
+  (`…:163-164`), `WU-4`→C4/§5.4/§8.1-8.3 (`…:187-188`), `WU-5`→C5/SM-3 (`…:217-218`),
+  `WU-6`→§5.5/§8.4 (`…:245`), `WU-7`→C7/§5.6/§9 (`…:268-269`), `WU-8`→§10 (`…:293`),
+  `WU-9`→C9/§11 (`…:322-323`).
+- **Constitution** — `constitution/canaries/CANARY-0001.json` (forged evidence) at `…:365-367`
+  and `…:326-329`; `constitution/canaries/CANARY-0002.json` (vacuous evidence) at `…:368-372`,
+  `…:221-225` and `…:353`; `constitution/canaries/README.md:3-6` (a miss is an alarm) at
+  `…:361-363` and `…:443-445`; `constitution/README.md:3-4` (Z0 read-only) at `…:402`.
+- **Inherited risks** — RISK-1/2/3, GAP-1/2 carried forward unresolved and unhidden, each with the
+  work unit that handles it: `…:504-515` (§8).
+
+## 5. Two things this evidence does *not* claim
+
+Stated so the citation is not read as covering more than it does:
+
+- **The plan was written without the probe inputs.** `spec/SAEOS-1.md`, `ledger/` and
+  `reviews/tasks/` were not on this stage's read path, so no work unit names a real node type,
+  field or goal id. `GAP-1` therefore stands unresolved at plan time (`…:36-37`, `…:513`). The
+  plan is executable in the sense that every step is decidable by the executing stage from inputs
+  it will hold — not in the sense that its inputs have been seen.
+- **The frozen protocol is pinned by line and byte count, not by sha256.** Hashing was not
+  permitted in this session, so `wc -lc` (`162 8052`) is the fallback pin and WU-1 carries the
+  obligation to compute the real `protocol_sha` at first read, with WU-7 re-verifying it
+  (`…:93-98`, `…:271-274`, `PLAN-RISK-1` at `…:515`). A weaker pin stated plainly beats a
+  stronger one nobody computed.
+
+## 6. Verified result of `reproducible_command`
+
+Run at plan time; pasted verbatim, not predicted (`CANARY-0001`). Exit code `0`, 12 lines:
+
+```
+| WU-0 | Freeze protocol | — | design | `plan/preregistration/` | `PREREGISTERED` | R-1 → R-VOID after WU-2 |
+| WU-9 | Gate self-check | C9 | the report | `reviews/spikes/…md` (one section) | `REPORTED` | R-1 |
+- **Why here.** The freeze must precede any contact with the data. This stage cannot read
+| EV-0 | WU-0 | Protocol frozen before any data contact | DETERMINISTIC | `wc -lc plan/preregistration/S-PROBE-protocol.frozen.md` → `162 8052`; frontmatter `frozen_at` precedes `SelectionRecord.frozen_at` | thresholds may have been fitted to the data; run is void |
+| EV-6 | WU-6 | Every number is recomputable from the report's own tables | DETERMINISTIC | recount labels from the three per-goal tables, reapply the frozen weights, reproduce all six ratios; check `lenient ≤ headline ≤ strict` | the verdict rests on arithmetic nobody can check |
+2. **No vacuous commands** (`CANARY-0002`). Every `reproducible_command` must *reference or
+- **WU-1 ∥ WU-2** — independent: different inputs (`spec/` vs `ledger/`), no shared artifact.
+| **R-VOID** | The run is void. It cannot be repaired, only replaced. | any change to the frozen protocol after WU-2; any change to `SelectionRecord` after it is frozen; skipping WU-5 or WU-6 | Stop. Record the run as **VOIDED** with the reason and preserve its `SelectionRecord`. A replacement run must cite the voided one. |
+**Rollback may not be used to improve the number.** Specifically:
+| **E-1** | `loss_ratio ≥ 1.00` — total loss, the strongest possible falsification, which **fails its own acceptance gate** (`RISK-1`, `…:512-514`) | Report `loss_ratio: 1.00`, record the criterion-4 failure verbatim, and request the acceptance criterion be amended to `^loss_ratio: [01]\.[0-9]+$`. **Do not round down to pass.** The finding is the point; the gate is the instrument. |
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | WU-8 | EV-8 | the report exists |
+- **PLAN-DEC-1 — volume stratification uses a proxy.** §5.2 asks for artifact volume by "corpus
+```
+
+The twelfth line is truncated mid-sentence because `sed` prints one source line; the full decision
+runs to `…:487`.
+
+`secondary_command` output, also verbatim:
+
+```
+     539   36253 <root>/plan/S-PROBE-sakg-s1-extraction-probe.plan.md
+     162    8052 <root>/plan/preregistration/S-PROBE-protocol.frozen.md
+     701   44305 total
+```
+
+(Run with absolute paths at plan time; `<root>` stands for the workspace root, the only edit made
+to the captured output. The `162 8052` row is what WU-0's tamper pin and EV-0 check against.)
+
+## 7. Scope-compliance note
+
+Written this stage: `plan/S-PROBE-sakg-s1-extraction-probe.plan.md`,
+`plan/preregistration/S-PROBE-protocol.frozen.md`, `plan/evidence/plan_executable.md`. All three
+under `plan/`. Nothing written outside it. `constitution/` was read; `design/` arrived as a
+context artifact; `spec/`, `ledger/` and `reviews/` were neither read nor written — which is what
+makes the WU-0 freeze a capability fact rather than a claim.

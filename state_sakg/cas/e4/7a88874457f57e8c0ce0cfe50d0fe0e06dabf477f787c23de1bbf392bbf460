@@ -1,0 +1,557 @@
+# DESIGN — `[S-PROBE]` SAKG S1 extraction feasibility spike
+
+| | |
+|---|---|
+| **Artifact** | System design for the extraction-feasibility probe that falsifies `SAEOS-1 §9/A8` |
+| **Stage / Role** | `DESIGN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | DESIGN ONLY — no probe executed, no spike report written. Frozen input to the downstream execution stage. |
+| **Date** | 2026-08-07 |
+| **Required evidence** | `design_coherent` (CITATION) — assumptions surfaced (PAEOS-6), perspectives covered, no orphan/gap |
+| **Target deliverable (downstream)** | `reviews/spikes/sakg-s1-extraction-probe.md` |
+
+---
+
+## 0. Scope boundary (read first)
+
+This worker session is **PLANNER @ DESIGN**, write-capability `design/`, read-capability
+`constitution/`, `spec/`, `design/` (plus `backlog/research/` by explicit grant). The goal
+objective names two actions this stage **does not and must not perform**:
+
+1. **Read `reviews/tasks/*_review.md`** — outside read-capability. The probe's source corpus
+   is therefore characterised here from its *specified* shape (PAEOS-9 §5 graph node schemas,
+   §8.2 gate table), not from inspection. Every such characterisation is recorded as a
+   surfaced assumption in §6 with a downstream verification owner.
+2. **Write `reviews/spikes/sakg-s1-extraction-probe.md`** — a `reviews/` write, outside
+   write-capability; any such write is discarded as a violation.
+
+This document is the **probe instrument specification**: the field inventory, the scoring
+function, the pre-registered decision rule, and the exact report schema, defined with enough
+precision that the executing stage performs the extraction mechanically and the four
+acceptance assertions pass unchanged.
+
+**Why pre-registration is load-bearing.** A8 is a *falsification target*, and D7 ratified S1
+as "explicitly a falsification test" (SAEOS-1 §10). A probe whose pass-bar is chosen after
+seeing the data cannot falsify anything — it rationalises. The thresholds in §5.3 are
+therefore frozen **by this design artifact, before any extraction occurs**, and the executing
+stage may not amend them; a threshold it believes wrong must be remanded here, not adjusted
+in place.
+
+---
+
+## 1. Component graph
+
+Nine components. Everything left of `MAT` is a per-cell read of prose; everything right of it
+is a pure function over a table. That seam is deliberate: it is the only place judgment
+enters, so it is the only place bias can enter, and it is fully audited by the `locus`
+obligation (§3.3).
+
+```mermaid
+flowchart TD
+    SRC[("SRC — reviews/tasks/&lt;id&gt;_review.md<br/>sealed goal records (read-only)")]
+    SEL["SEL — Goal Selector<br/>§2.1 selection rule"]
+    SCHEMA["SCHEMA — Extraction Target Schema<br/>§2.2 · 71 cells/goal · FROZEN by this design"]
+    EX["EX — Hand Extractor<br/>per (goal × cell)"]
+    ADJ["ADJ — Cell Adjudicator<br/>§4.2 disposition FSM"]
+    MAT["MAT — Field Verdict Matrix<br/>3 × 71 cells"]
+    SCORE["SCORE — Loss Calculator<br/>§5.1 pure"]
+    GATE["GATE — Verdict Rule<br/>§5.3 pre-registered predicate"]
+    EMIT["EMIT — Report Emitter"]
+    OUT[("OUT — reviews/spikes/<br/>sakg-s1-extraction-probe.md")]
+    ACC{{"ACC — Acceptance Harness<br/>4 shell assertions (§7)"}}
+    SPEC[("SAEOS-1 §4.2 envelope · §4.3 types<br/>§6.1b bundle · PAEOS-9 §5 graphs")]
+
+    SPEC --> SCHEMA
+    SRC --> SEL
+    SEL -->|"GoalRef ×3"| EX
+    SCHEMA -->|"Cell ×71"| EX
+    SRC -->|"prose body"| EX
+    EX -->|"candidate finding + locus"| ADJ
+    ADJ -->|"CellVerdict"| MAT
+    MAT --> SCORE
+    SCORE -->|"Metrics"| GATE
+    GATE -->|"Verdict"| EMIT
+    MAT --> EMIT
+    SCORE --> EMIT
+    SEL -->|"ceremony depth"| EMIT
+    EMIT --> OUT
+    OUT --> ACC
+```
+
+**No orphan.** `SCHEMA` is consumed by `EX`; every `Cell` it emits reaches `MAT`; every `MAT`
+cell reaches both `SCORE` and `EMIT`; `SEL`'s ceremony-depth output reaches `EMIT` (it is not
+decorative — it drives the `n/a-auto-discharged` exclusion, §4.2). `ACC` is the terminal
+consumer and is the only component this design does not author (it is fixed by the gate).
+
+**No gap.** The three acceptance-visible outputs — `verdict`, `loss_ratio`, and three
+`## goal:` sections — each have exactly one producer: `GATE`, `SCORE`, `SEL`+`EMIT`.
+
+---
+
+## 2. Interfaces
+
+### 2.1 `SEL` — goal selection
+
+```
+select_goals(dir: reviews/tasks/) -> [GoalRef × 3]
+
+GoalRef:
+  task_id:        string          # e.g. "B0.0"
+  review_path:    path            # reviews/tasks/B0.0_review.md
+  sealed:         bool            # MUST be true — L16 reached (PAEOS-9 §8.2)
+  ceremony_depth: TRACE_A | TRACE_B | UNKNOWN
+  linked:         [path]          # sibling sealed artifacts the review cites
+```
+
+**Selection rule, in order:**
+
+1. Admit only goals whose review records a **seal / promotion** (L16). An unsealed goal is
+   out of scope — the exhaust contract fires post-seal only (SAEOS-1 §6.1b rule 1).
+2. **Maximise ceremony diversity.** If ≥1 `TRACE_B` sealed goal exists, at least one selected
+   goal MUST be `TRACE_B`. Rationale: Trace-A auto-discharges L03–L11 (PAEOS-9 §8.3), so a
+   Trace-A-only sample structurally cannot contain Option / TradeOff / Constraint / Component
+   content — measuring it would report ceremony depth, not extractability, and would falsify
+   the wrong proposition.
+3. Subject to (1)–(2), prefer shape diversity (different weight class / touch-set).
+4. If fewer than three sealed goals exist, or if the rule cannot be satisfied, **do not
+   substitute** — emit `verdict: NO-GO` with `verdict_scope: insufficient-sample` (§5.3 G5).
+5. `B0.0 / B0.1 / B0.2` are the objective's *example*, not a mandate. If they satisfy (1)–(3)
+   they are the default; if they are all Trace-A and a Trace-B sealed goal exists, they are
+   not.
+
+`ceremony_depth: UNKNOWN` is treated as `TRACE_A` for exclusion purposes (conservative: it
+cannot be used to satisfy rule 2) and the ambiguity is recorded in the report.
+
+### 2.2 `SCHEMA` — the extraction target (frozen field inventory)
+
+Derived backwards from the **§6.1b emission bundle**, which names the seven node types S1
+must actually produce. The other five §4.3 types are scored in an informational annex only
+(§2.3). Envelope fields are `SAEOS-1 §4.2`; content fields are grounded in the PAEOS-9 §5
+local-graph node schemas wherever those exist, so the probe measures a real extraction, not
+an invented one.
+
+**Scored envelope fields — 6, applied to each of the 7 in-bundle types:**
+
+| id | Field (§4.2) | Note |
+|----|--------------|------|
+| `E1` | `label` | |
+| `E2` | `summary` | ≤ 280 chars; the SUMMARY-tier projection unit |
+| `E3` | `evidence[]` | `EvidenceRef` pointers; hashes only (§3.2.3) |
+| `E4` | `valid_until` | expiry / TTL (Ω4) |
+| `E5` | `falsifier` | what observation refutes this (Ω4, K6) |
+| `E6` | `coordinates` | flat multi-valued dimensions (✓8) |
+
+**Synthesized envelope fields — 10, EXCLUDED from the denominator** (they are assigned by the
+ingest process, not recovered from the source; scoring them as `absent` would inflate loss
+dishonestly): `id` (ULID at ingest) · `type` (the extractor's own classification) ·
+`namespace` (§6.1b rule 4) · `provenance.origin` (producing system + goal id) ·
+`provenance.author_kind` (`= ingest`) · `provenance.ingested_at` (clock) ·
+`provenance.source_hash` (sha256 of the source artifact) · `status` (`= candidate`, §6.1b) ·
+`confidence` (derived, never authored — §4.2 invariant) · `valid_from` (`=` seal timestamp).
+
+The report MUST list these ten with their assignment rule, so exclusion is auditable rather
+than silent.
+
+**Content fields — 29, per type:**
+
+| Type | Content fields | n | Grounding |
+|------|----------------|---|-----------|
+| **Decision** | `context`, `chosen`, `rationale`, `constitutional_basis`, `decided_by_role`, `for_goal` | 6 | decision-graph node `(context, options[], chosen, rationale, constitutional_basis)` + edges *decided-by-role*, *for-goal* (PAEOS-9 §5) |
+| **Option** | `description`, `disposition{chosen\|rejected}`, `rejection_reason` | 3 | decision-graph `options[]`; §4.3 "**including rejected ones**" |
+| **Constraint** | `statement`, `kind{latency\|memory\|budget\|regulation\|physics}`, `binding{hard\|soft}`, `source` | 4 | §4.3; L11 contract (affected/forbidden files, acceptance) |
+| **TradeOff** | `axis`, `pole_a`, `pole_b`, `resolution`, `rationale` | 5 | §4.3 "the axis and the resolution"; L06 gate = *decision axes explicit* (PAEOS-9 §8.2) |
+| **Component** | `kind{service\|module\|interface\|data_store}`, `identity`, `depends_on[]` | 3 | §4.3; architecture-graph nodes + *depends-on* edge (PAEOS-9 §5) |
+| **Scar** | `failure_class`, `root_cause`, `detection_signature`, `guard_action` | 4 | scar-graph node schema (PAEOS-9 §5); §4.3 names the last three verbatim |
+| **EvidenceRef** | `hash`, `uri`, `kind`, `reverification_instruction` | 4 | §4.3 verbatim |
+
+**Cell count.** Per type: 6 envelope + content. Decision 12 · Option 9 · Constraint 10 ·
+TradeOff 11 · Component 9 · Scar 10 · EvidenceRef 10 = **71 cells per goal**, **213 total**.
+Content-only across 3 goals = **87** (the G5 floor, §5.3).
+
+*Cost note.* 213 hand-adjudicated cells is roughly 2–3 h per goal. §5.4 defines a sanctioned
+reduced matrix if that proves prohibitive.
+
+### 2.3 Out-of-bundle annex (informational, not scored into the gate)
+
+`Problem`, `Objective`, `Mechanism`, `Pattern`, `Outcome` are §4.3 types that §6.1b does
+**not** place in the S1 bundle. They are recorded present/absent at type granularity only.
+
+`Outcome` in particular MUST NOT enter the gate denominator: §4.3 defines it as "the only node
+type that may be created long after its subject," and §6.1b rule 3 sources it from L17/L19,
+not from seal. A sealed review structurally cannot contain it. That is S3 scope (§8), not an
+extraction failure, and charging it as loss would manufacture a false NO-GO.
+
+### 2.4 `SCORE` / `GATE` / `EMIT`
+
+```
+score(matrix: Matrix) -> Metrics
+Metrics:
+  n_scored:       int      # cells surviving exclusion
+  n_extractable:  int
+  n_partial:      int
+  n_absent:       int
+  loss_ratio:     float    # §5.1
+  absent_ratio:   float
+  partial_ratio:  float
+  per_type:       {NodeType: {n_scored, absent_ratio, loss_ratio}}
+  per_goal:       {task_id:  {n_scored, absent_ratio, loss_ratio}}
+
+adjudicate(m: Metrics) -> Verdict
+Verdict:
+  value:          "GO" | "NO-GO"      # closed set; §7 regex admits nothing else
+  failing:        [ConditionId]       # empty iff GO
+  scope:          string|null         # qualifier; NEVER folded into `value`
+
+emit(goals, matrix, metrics, verdict) -> Document    # §3.4 schema
+```
+
+`adjudicate` is a **pure predicate over `Metrics`** — no free parameters, no discretion. This
+is what makes the probe replayable: given the matrix, the verdict is recomputable by anyone.
+
+---
+
+## 3. Data flow
+
+### 3.1 End to end
+
+```
+reviews/tasks/<id>_review.md   (prose, sealed)
+        │  SEL: filter sealed · maximise ceremony diversity
+        ▼
+GoalRef ×3  { task_id, path, ceremony_depth }
+        │  × SCHEMA's 71 cells
+        ▼
+(goal, node_type, field)  ── EX: locate in source ──▶ candidate finding + locus
+        │
+        ▼  ADJ: §4.2 FSM
+CellVerdict { disposition, locus|searched, note }
+        │
+        ▼
+Matrix 3×71  ──▶ SCORE ──▶ Metrics ──▶ GATE ──▶ Verdict
+        │                     │                    │
+        └─────────────────────┴────────────────────┴──▶ EMIT ──▶ spike report ──▶ ACC
+```
+
+### 3.2 Dispositions
+
+Five dispositions. Three are **verdicts** (in the denominator, per the objective); two are
+**exclusions** (out of the denominator, each requiring a stated justification).
+
+| Disposition | Score `s` | In denominator | Meaning |
+|---|---|---|---|
+| `extractable` | 1.0 | ✅ | Present and mechanically locatable — a parser could find it |
+| `partial` | 0.5 | ✅ | Present but prose-embedded / ambiguous / needs judgment — **mechanical loss**, fixable by a better extractor |
+| `absent` | 0.0 | ✅ | Not in the artifact at all — **structural loss**, fixable only by changing what PAEOS emits |
+| `n/a-synthesized` | — | ❌ | Assigned at ingest, never extracted (§2.2 list of 10) |
+| `n/a-auto-discharged` | — | ❌ | The producing L-stage was pruned by ceremony depth (Trace-A, PAEOS-9 §8.3) — measures triage, not extractability |
+
+The `partial` / `absent` split is the probe's core instrument. A8 asks whether PAEOS artifacts
+are "too unstructured to extract losslessly." Prose-but-present is exactly the loss S1's
+extractor exists to eliminate; genuinely-missing is loss no extractor can touch. Collapsing
+them into one number would make the probe unable to answer the question it was commissioned
+to answer.
+
+### 3.3 The `locus` obligation
+
+Every `extractable` or `partial` cell MUST carry a `locus`: a section anchor or ≤ 120-char
+quotation from the source review. Every `absent` cell MUST carry a `searched` note naming
+where it was looked for. Every exclusion MUST carry its justification.
+
+This mirrors SAEOS-1 §5.1 rule 2 — *"Every result carries `why` … an unexplainable result is
+a defect."* An unsourced `extractable` is unfalsifiable optimism; an unsearched `absent` is
+unfalsifiable pessimism. Either one silently decides GO/NO-GO.
+
+### 3.4 Report document schema (`EMIT` output contract)
+
+```markdown
+---
+spike: sakg-s1-extraction-probe
+falsification_target: SAEOS-1 §9/A8
+date: <ISO-8601>
+goals: [<id>, <id>, <id>]
+n_scored: <int>
+n_extractable: <int>
+n_partial: <int>
+n_absent: <int>
+absent_ratio: <0.dd>
+partial_ratio: <0.dd>
+verdict: GO
+loss_ratio: 0.dd
+verdict_scope: <string|null>
+failing_conditions: []
+matrix_variant: full | reduced
+---
+
+# S-PROBE — SAKG S1 extraction feasibility
+
+## 0. Pre-registration
+<restates the §5.3 thresholds verbatim and cites design/sakg-s1-extraction-probe-design.md
+ as their frozen source; states that no threshold was changed after extraction began>
+
+## 1. Method and exclusions
+<the 10 synthesized fields + assignment rules; every auto-discharged exclusion with its
+ ceremony-depth justification; the out-of-bundle annex scope (§2.3)>
+
+## goal: <id>
+  ceremony_depth: <TRACE_A|TRACE_B>   (indented — must not match the frontmatter regexes)
+  <71-row table: node_type | field | disposition | locus / searched | note>
+  <per-goal subtotals>
+
+## goal: <id>
+  ...
+
+## goal: <id>
+  ...
+
+## 2. Aggregate matrix
+<per-type and per-goal roll-up; the §5.2 identity check>
+
+## 3. Verdict derivation
+<each of G1–G5 evaluated against Metrics, pass/fail, arithmetic shown>
+
+## 4. Findings against A8
+<what A8 got right, what it got wrong, and — on NO-GO — the specific §6.1b / §8 remand>
+
+## 5. Residual risks carried
+<sample bias (mirrors A4); adjudicator subjectivity; ceremony confound>
+```
+
+**Emission invariants (acceptance-critical, §7):**
+
+- `verdict:` and `loss_ratio:` appear **exactly once each**, at column 0, in the frontmatter.
+  Every illustrative or per-goal repetition MUST be indented ≥ 2 spaces or fenced, or it will
+  also match `^verdict: …$` and make the document self-contradicting to the harness.
+- Per-goal verdicts, if any, use the key `goal_verdict:` — never `verdict:`.
+- Exactly three lines match `^## goal: `; the goal id follows immediately (`## goal: B0.0`).
+- `loss_ratio` is rendered as `0.dd` — two decimals, leading zero, always (`0.00`, not `0`;
+  `0.40`, not `0.4`).
+
+---
+
+## 4. State machines
+
+### 4.1 Probe lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> PREREGISTERED: thresholds frozen by this design (§5.3)
+    PREREGISTERED --> SELECTING: read reviews/tasks/
+    SELECTING --> INSUFFICIENT: <3 sealed goals, or §2.1 rule 2 unsatisfiable
+    SELECTING --> EXTRACTING: 3 GoalRefs bound
+    EXTRACTING --> EXTRACTING: next (goal × cell) — 213 iterations
+    EXTRACTING --> SCORED: matrix complete (every cell has a disposition)
+    SCORED --> ADJUDICATED: GATE evaluates G1..G5
+    INSUFFICIENT --> ADJUDICATED: forced NO-GO, scope=insufficient-sample
+    ADJUDICATED --> EMITTED: report written to reviews/spikes/
+    EMITTED --> [*]: ACC runs the 4 assertions
+
+    note right of EXTRACTING
+      No exit while any cell is UNSEEN.
+      An incomplete matrix is not a low
+      score — it is not a result at all.
+    end note
+    note right of ADJUDICATED
+      GO   → S1 build authorised (SAEOS-1 §8)
+      NO-GO→ remand to SAEOS-1 §6.1b / §8;
+             A8's carried risk is realised
+    end note
+```
+
+`INSUFFICIENT` routes to `ADJUDICATED`, not to `[*]`: an aborted probe still owes a report and
+a verdict. Silence is not a NO-GO, and a NO-GO is not a failure — a falsification test that
+falsifies has succeeded.
+
+### 4.2 Per-cell adjudication
+
+```mermaid
+stateDiagram-v2
+    [*] --> UNSEEN
+    UNSEEN --> EXCLUDED_SYNTH: field ∈ §2.2 synthesized set
+    UNSEEN --> EXCLUDED_CEREMONY: producing L-stage auto-discharged (Trace-A)
+    UNSEEN --> SEARCHING: otherwise
+    SEARCHING --> LOCATED: found in source
+    SEARCHING --> NOT_FOUND: exhaustive search, nothing
+    LOCATED --> EXTRACTABLE: unambiguous + mechanically addressable
+    LOCATED --> PARTIAL: present but prose-embedded / ambiguous / needs judgment
+    NOT_FOUND --> ABSENT: record `searched:`
+    EXCLUDED_SYNTH --> [*]
+    EXCLUDED_CEREMONY --> [*]
+    EXTRACTABLE --> [*]
+    PARTIAL --> [*]
+    ABSENT --> [*]
+
+    note right of LOCATED
+      Mandatory: locus (anchor or ≤120-char quote).
+      No locus ⇒ the cell may not leave LOCATED.
+    end note
+```
+
+**Ordering is normative.** Exclusion tests run *before* search, so a Trace-A-pruned field is
+never scored as `absent`. Reversing the order is the single most likely way to produce a
+spurious NO-GO, because it silently converts a triage decision into evidence about
+extractability.
+
+Every state has an entry and a terminal exit; `UNSEEN` is the only entry; there is no state
+from which a cell can leave the machine without a disposition.
+
+---
+
+## 5. Scoring and the pre-registered decision rule
+
+### 5.1 Loss ratio
+
+```
+s(extractable) = 1.0   s(partial) = 0.5   s(absent) = 0.0
+N              = |cells with a scored disposition|      # exclusions removed
+loss_ratio     = 1 − (Σ s) / N              rounded half-up to 2 dp
+absent_ratio   = n_absent  / N
+partial_ratio  = n_partial / N
+```
+
+`partial = 0.5` encodes the claim that prose-embedded content costs roughly half of what
+missing content costs: recoverable, but only by building the extractor S1 is meant to build.
+
+### 5.2 Arithmetic self-check (MUST appear in the report)
+
+```
+loss_ratio == absent_ratio + 0.5 × partial_ratio      (± 0.01 rounding)
+n_extractable + n_partial + n_absent == N
+```
+
+### 5.3 Pre-registered GO / NO-GO conditions — FROZEN
+
+**`verdict = GO` iff G1 ∧ G2 ∧ G3 ∧ G4 ∧ G5. Otherwise `NO-GO`, listing every failing id.**
+
+| id | Condition | Derivation of the number |
+|----|-----------|--------------------------|
+| **G1** | `absent_ratio ≤ 0.25` | §6.1b names 7 bundle types; one whole type ≈ 1/7 ≈ 0.14, two ≈ 0.29. The bar admits "less than two types' worth of content is structurally missing." Above that, Ω1's "largely already solved, for free" is false — which is precisely A8's charge. |
+| **G2** | `loss_ratio ≤ 0.40` | Blended headline. At the G1 boundary this leaves `partial_ratio ≤ 0.30` — substantial prose ambiguity is tolerated, because eliminating it *is* S1's job. |
+| **G3** | `absent_ratio(Decision content) ≤ 0.15` | Decision is the central node (✓1); its five-field schema already exists in the decision-graph (PAEOS-9 §5) and global rule 11 makes `constitutional_basis` mandatory. 18 Decision content cells ⇒ ≤ 0.15 admits at most 2 absent. If the central node cannot be reconstructed, nothing downstream matters. |
+| **G4** | No in-bundle type has `absent_ratio == 1.00` | A bundle member PAEOS cannot produce *at all* is a §6.1b spec defect, not an extractor gap. It must be fixed before S1, whatever the aggregate says. |
+| **G5** | `N ≥ 87` | 87 = the 29 content fields × 3 goals. Reaching it means no whole producing stage was excluded — i.e. the sample is not Trace-A-pruned into meaninglessness. This is the ceremony-confound guard (§2.1 rule 2) expressed as a number rather than a judgment. |
+
+**No threshold may be adjusted by the executing stage.** A threshold believed wrong is a
+remand to this design artifact — recorded, re-ratified, and re-run — never an in-flight edit.
+Adjusting a pre-registered bar after seeing the data destroys the falsification (SAEOS-1 §10
+D7; PAEOS Δ3 "every spec must state at least one mechanically checkable conformance
+assertion").
+
+**Verdict is never qualified in `value`.** Qualifiers — `insufficient-sample`,
+`trace-a-only`, `reduced-matrix` — go in `verdict_scope`. The acceptance regex admits exactly
+`GO` or `NO-GO`, and a hedged verdict is not a verdict.
+
+### 5.4 Sanctioned reduced matrix (degradation path)
+
+If the 213-cell full matrix is prohibitive, the executing stage MAY run the **reduced**
+variant: all 29 content fields × 3 goals (87 cells) plus the 6 envelope fields scored **once
+per goal** rather than per type (18 cells) = **105 cells**. Conditions:
+
+- `matrix_variant: reduced` MUST be set in the frontmatter and stated in §0 of the report.
+- G5 still applies unchanged (`N ≥ 87`) — the reduction removes envelope repetition, never
+  content coverage.
+- No other threshold changes. Reduction may not be used selectively per goal.
+
+This mirrors SAEOS-1 §7: degrade in a declared, visible way, never silently.
+
+### 5.5 Representability defect in the acceptance gate (surfaced, not worked around)
+
+The gate asserts `^loss_ratio: 0\.[0-9]+$`. That pattern admits `[0.00, 0.99]` and **cannot
+express `1.00`** — total extraction failure, the strongest possible falsification of A8, is
+unrepresentable by the gate that commissioned the probe.
+
+Handling, in priority order:
+
+1. `loss_ratio = 1.00` is unreachable whenever G5 holds *and* PAEOS emits anything at all; and
+   if `N = 0`, G5 fails first and the verdict is already NO-GO.
+2. If the computed value nonetheless lands ≥ 0.995, the frontmatter renders `0.99`,
+   `loss_ratio_note: clamped-from-<exact>` is added, and the exact value appears in §2 of the
+   report body. Clamping is declared, never silent.
+3. The defect is reported to the gate author under §4 of the report. Fabricating a
+   representable number without saying so would be the one failure mode that makes the whole
+   probe untrustworthy.
+
+---
+
+## 6. Assumptions surfaced (PAEOS-6)
+
+| id | Assumption | Falsifier | Verification owner |
+|----|------------|-----------|--------------------|
+| **A1** | `reviews/tasks/` contains ≥ 3 sealed (L16-reached) goal reviews, including `B0.0/B0.1/B0.2`. | `ls reviews/tasks/` yields < 3 sealed reviews. | Executing stage, at `SELECTING`. Falsified ⇒ `INSUFFICIENT` → NO-GO, scope `insufficient-sample`. |
+| **A2** | A `_review.md` file records, or links to, the goal's decision content — not only an adversarial verdict. | The files are verdict-only stubs with no context/rationale/options. | Executing stage. Falsified ⇒ `linked` artifacts (§2.1) must be pulled in, or A2's failure *is itself* the A8 finding and is reported as such. |
+| **A3** | B0.x bootstrap goals ran at some ceremony depth ≥ Trace-A, and depth is recoverable from the review or the ledger. | No depth marker anywhere. | Executing stage. Falsified ⇒ depth `UNKNOWN` → treated as Trace-A (conservative) → likely G5 failure → NO-GO with the ceremony confound named. |
+| **A4** | The seven §6.1b types are the correct S1 extraction target; the other five §4.3 types are annex-only. | A ratified change to §6.1b's bundle list. | This design. Grounded in SAEOS-1 §6.1b + §8 S1/S2 scope; would require re-freezing §2.2. |
+| **A5** | The 29 content fields faithfully operationalise §4.3's prose type roles. §4.3 gives *roles*, not field lists; Decision/Scar/EvidenceRef are grounded verbatim, but Option/Constraint/TradeOff/Component fields are this design's operationalisation. | A reviewer shows a field that changes the loss ratio by > 0.05 either way. | L09/L10 review of this artifact, before execution. **This is the largest discretionary choice in the probe** and it is deliberately visible here rather than buried in the report. |
+| **A6** | `partial = 0.5` is a defensible weight. | Sensitivity analysis at 0.25 and 0.75 flips the verdict. | Executing stage MUST report `loss_ratio` at all three weights in §2 of the report. If the verdict is weight-sensitive, that fact outranks the verdict itself. |
+| **A7** | A single adjudicator's `extractable` vs `partial` calls are reproducible. | A second pass disagrees on > 10% of cells. | Not eliminated. Mitigated by the mandatory `locus` (§3.3), which makes every call re-checkable. Carried as a residual, mirroring SAEOS-1 A4's sample-bias carry. |
+| **A8′** | Three goals from one bootstrap epoch generalise to PAEOS exhaust at large. | A later probe over mature goals reports materially different loss. | Not eliminated — this is SAEOS-1 A4's corpus-bias residual inherited one level down. MUST be carried explicitly in report §5. A GO from this probe authorises **S1**, not the whole programme. |
+
+No assumption changes the design: each is a fact the executing stage confirms or refutes, and
+the instrument is correct under every stated assumption. A1–A3 falsify to a *defined* verdict
+path rather than to an undefined state — that is the point of specifying them.
+
+---
+
+## 7. Verification hand-off (acceptance oracle — not run in this stage)
+
+The downstream stage's output is correct iff all four assertions pass:
+
+```sh
+test -f reviews/spikes/sakg-s1-extraction-probe.md
+rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+Traceability from schema (§3.4) to assertion:
+
+| Assertion | Satisfied by |
+|---|---|
+| file exists | `EMIT` writes the §3.4 document |
+| `^verdict: (GO\|NO-GO)$` | frontmatter `verdict:`, closed set from `adjudicate` (§2.4); all repetitions indented |
+| `≥3` × `^## goal: ` | exactly three `## goal: <id>` sections, one per `GoalRef` |
+| `^loss_ratio: 0\.[0-9]+$` | frontmatter `loss_ratio`, rendered `0.dd` (§3.4 invariants), clamped per §5.5 if ever needed |
+
+Note the gate is a **shape** check: it cannot tell a rigorous probe from a fabricated one.
+The substantive guarantees are the `locus` obligation (§3.3), the pre-registered thresholds
+(§5.3), and the arithmetic self-check (§5.2) — all internal to the report and all
+re-derivable by a reviewer from the matrix alone.
+
+---
+
+## 8. Perspectives covered (multi-perspective critique input, L09)
+
+- **Correctness.** `adjudicate` is a pure predicate over `Metrics` (§2.4); `score` is a pure
+  function over the matrix (§5.1); the §5.2 identity is a redundant check on both. Given the
+  matrix, verdict and loss ratio are recomputable by any third party. ✔
+- **Falsifiability (Δ3, K6).** Thresholds are frozen before extraction (§5.3), each derived
+  from a cited structural fact rather than chosen for comfort, and each condition names the
+  observation that fails it. The probe can return NO-GO, and NO-GO has a defined consequence
+  (remand to §6.1b/§8). A probe that cannot fail is not a probe. ✔
+- **Confound control.** Ceremony depth (Trace-A auto-discharge, PAEOS-9 §8.3) is the dominant
+  confound and is neutralised three ways: selection rule 2 (§2.1), the `n/a-auto-discharged`
+  exclusion evaluated *before* search (§4.2), and G5's `N ≥ 87` floor. `Outcome` is excluded
+  for the same class of reason (§2.3). ✔
+- **Bias / auditability.** The only judgment in the system is the `LOCATED → EXTRACTABLE |
+  PARTIAL` edge; it is fully exposed by the mandatory `locus`, and A6's three-weight
+  sensitivity report shows whether the verdict survives the one free parameter. ✔
+- **Cost.** 213 cells ≈ 2–3 h/goal; a declared reduced variant (105 cells) exists and cannot
+  be applied silently or selectively (§5.4). ✔
+- **Separation of powers.** DESIGN specifies and freezes the instrument; it does not read the
+  corpus, run the probe, or write `reviews/`. The pre-registration boundary is also the
+  capability boundary — the stage that sets the bar is structurally unable to see the data,
+  which is a stronger guarantee than the discipline it replaces (§0, §5.3). ✔
+- **Honest failure.** `INSUFFICIENT` still emits a verdict (§4.1); clamping is declared
+  (§5.5); the gate's own representability defect is reported rather than quietly routed
+  around. ✔
+- **Blast radius (A-2).** The probe is read-only over `reviews/tasks/` and additive in
+  `reviews/spikes/`. No TCB path, no `constitution/`, no runtime behaviour. Expected **SOFT**.
+  It gates a *build decision*, not a promotion — consistent with FPL-3: nothing SAKG-related
+  may become a gate. ✔
+
+---
+
+**No orphan / no gap.** Every component in §1 has a producer and a consumer; every field in
+§2.2 has exactly one disposition path in §4.2; every disposition reaches either the
+denominator or a justified exclusion; every state in §4.1/§4.2 has an entry and a terminal
+exit; every acceptance assertion in §7 maps to exactly one schema element in §3.4; every
+assumption in §6 has a falsifier and a downstream owner. Evidence for this gate:
+`design_coherent` (CITATION) = this file.

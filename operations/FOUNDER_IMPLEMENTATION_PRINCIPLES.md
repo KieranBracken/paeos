@@ -15,6 +15,24 @@
 > written down so it is not lost to conversation (A2). Discipline the founder keeps here is
 > what keeps the constitution's guarantees real in practice.
 
+## The Foundational Mindset
+
+### FP-0 — Core Implementation Axioms
+Before starting any coding session, the founder and builder agents MUST adhere to these 10 immutable implementation philosophy axioms:
+
+1. **Derive before inventing.** Implementation exists solely to execute constitutional intent. Never invent architecture when derivation is possible.
+2. **Prefer existing abstractions.** Re-use existing kernel, CAS, ledger, and schema primitives before adding new abstractions.
+3. **Kernel grows only under constitutional necessity.** Keep the Trusted Computing Base (TCB) minimal. Every line in the kernel requires a scar or specification mandate.
+4. **Runtime owns orchestration.** Agents execute; the runtime orchestrates and enforces state transitions.
+5. **Evidence before optimism.** No state transition or task completion on assertion — only on verified, signed evidence.
+6. **Small trusted computing base.** Enforce strict LOC budgets (TCB $\le$ 20,000 LOC) and strict typing.
+7. **If unsure, stop and propose.** Any architectural ambiguity or un-derived requirement triggers an immediate HALT and Improvement Proposal (CER-6).
+8. **Separate constitutional law from implementation detail.** Spec/derivation is law; code is executable projection.
+9. **One source of truth.** The ledger is the single authority; state is projected, never invented.
+10. **Simplicity beats cleverness.** Clear, readable, deterministically typed code outperforms complex, implicit abstractions.
+
+---
+
 ## The seven principles
 
 ### FP-1 — One roadmap task per session

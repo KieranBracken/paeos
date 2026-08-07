@@ -1,0 +1,63 @@
+# Constitutional Implementation Review: [B2.B — Self-Hosting Driver]
+
+**Date**: 2026-07-30
+**Task**: Self-Hosting Driver — backlog + cross-run scars (Phase 2 / PAEOS-8 §12 R3→R4)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverable: `runtime/orchestrator/__init__.py` — `Intake`, `SelfHostRunner`, and `SoftLoop.scar_store`.
+Evidence: 3 tests in `tests/runtime/test_selfhost.py`; **280 total**; ruff clean (clean-cache); pyright
+0 errors (strict on kernel); F1 2644/20000. **F2-SOFT** (`runtime/orchestrator/`).
+
+## What this delivers
+
+The §12 R3→R4 exit is "PAEOS pulls its own backlog goal; writes scars; soft-loop self-improves."
+`SelfHostRunner` pulls a backlog of `Intake`s and runs each through **one shared `SoftLoop`**, so
+scars **accumulate across runs** and every run is recorded on the one shared ledger. With a live
+`AgentRuntime` (B2.A) the runs are live; the *composition* and the *learning across runs* are the same.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** The learning loop is real: a court **remand** in one run writes a scar (FR-6, §7.1); a scar
+in the shared store is **injected** into a later matching goal's DESIGN context (tested). The runtime
+still holds no opinions — every seal/remand is the court's.
+
+### 2. Architectural Drift
+**PASS.** `SelfHostRunner` is a thin loop over `SoftLoop.run`; `Intake` is a plain record. `scar_store`
+is exposed read-only. No new mechanism.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** Reuses the whole soft loop unchanged; the shared store *is* the cross-run memory. No hidden
+debt.
+
+### 8. Security Implications
+**PASS.** Each run is fully gated by the composed kernel/court/barrier; the driver adds no authority.
+A forged run remands and never seals, across the backlog (tested).
+
+### 9–10. Runtime / Extensibility
+**PASS.** Sequential backlog processing; a real backlog source (a queue, `spec/` items) drops in behind
+`Iterable[Intake]`; a live `AgentRuntime` makes it a live self-hosting loop.
+
+## Adversary / property pass
+
+1. **Backlog of goals** — a good intake SEALS, a forged one REMANDS, in one shared runner (tested).
+2. **Runs write scars** — after a remand, the shared store holds a new scar (tested).
+3. **Self-improvement** — a scar in the store is injected into a later goal whose signature matches, on
+   the DESIGN path (FR-6, tested).
+
+## OBSERVATIONS
+1. **Testable path passes evidence in; the live path flows evidence via the court MCP.** Here `Intake`
+   carries the builder's evidence (deterministic test path). In a *live* run the builder session
+   produces evidence and submits it through the court MCP server (B1.A `MemoryServer`/`CourtServer`);
+   wiring the loop to pull evidence from the court instead of the `Intake` is the live-integration
+   refinement that lands with the R4 deployment run (B2.A Observation 1). The composition and the
+   learning loop are unchanged; only the evidence *source* differs.
+
+## Action Items
+- [ ] **Founder**: ratify B2.B (F2-SOFT) → merge, remote CI, tag `b2.b`.
+- [ ] **R4 self-hosting run** (deployment): with the live adapter + auth, drive a real backlog item to a
+      sealed change to PAEOS's own `runtime/`, closing §12 R3→R4. (Founder/ops-gated; needs the live env.)

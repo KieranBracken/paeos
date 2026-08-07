@@ -1,0 +1,455 @@
+---
+artifact: design
+stage: DESIGN
+role: PLANNER
+goal: "[S-PROBE] Extraction feasibility spike — falsify SAEOS-1 §9/A8 before building"
+designs: reviews/spikes/sakg-s1-extraction-probe.md
+status: DESIGN-COMPLETE / EXECUTION-BLOCKED
+---
+
+# S-PROBE — Extraction Feasibility Spike: System Design
+
+## 0. Scope of this document
+
+This is the **DESIGN** artifact for the S-PROBE spike. It specifies the component graph,
+interfaces, data flow, and state machines for a probe whose *product* is the file
+`reviews/spikes/sakg-s1-extraction-probe.md`.
+
+It does **not** contain the probe's results. The probe was not executed — see §8 (Blockers).
+The design is deliberately **parametric over the SAEOS-1 §4.3 node-type schema** and over the
+sealed-goal corpus, so that execution is a mechanical pass once those two inputs exist.
+
+---
+
+## 1. What the probe is trying to falsify
+
+SAEOS-1 §9/A8 is (per the goal statement) the assumption that **sealed goals contain enough
+structured residue to be mechanically extracted into the §4.3 node types**. A spike that cannot
+fail is not a spike. The design therefore fixes the falsification condition *before* any goal is
+read:
+
+> **H0 (the claim under test):** for a representative sealed goal, the §4.3 node types can be
+> populated from the goal's existing artifacts with acceptable information loss.
+>
+> **Falsified when:** `loss_ratio > loss_threshold` (§5.3), or when any node type is
+> **structurally unpopulable** (every one of its required fields `absent` across all 3 goals) —
+> the latter is a NO-GO regardless of the aggregate ratio (§5.4, R-2).
+
+Pre-registering the threshold and the tie-breaks is the whole point: it removes the degree of
+freedom that would let a motivated executor land on GO.
+
+---
+
+## 2. Component graph
+
+```
+                        ┌────────────────────────┐
+                        │ C2 SchemaLoader        │
+                        │ spec/SAEOS-1 §4.3      │
+                        └───────────┬────────────┘
+                                    │ NodeTypeSchema[]
+                                    ▼
+┌──────────────────┐        ┌───────────────────────┐        ┌────────────────────┐
+│ C1 CorpusSelector│──────► │ C3 ExtractionAttempt  │ ─────► │ C4 FieldVerdict    │
+│ ledger/          │ Goal[3]│ (hand, per goal ×     │ Attempt│    Recorder        │
+│ reviews/tasks/   │        │  node × field)        │        │ E/P/A + citation   │
+└──────────────────┘        └───────────────────────┘        └─────────┬──────────┘
+        ▲                              ▲                               │
+        │ selection_rule               │ evidence pointers             │ FieldVerdict[]
+        │ (§3.1)                       │                               ▼
+┌───────┴──────────┐                   │                     ┌────────────────────┐
+│ C0 ProbeConfig   │───────────────────┴────────────────────►│ C5 LossComputer    │
+│ threshold, weights│                                        │ loss_ratio         │
+│ (pre-registered) │                                         └─────────┬──────────┘
+└──────────────────┘                                                   │
+                                                                       ▼
+                                                             ┌────────────────────┐
+                                                             │ C6 VerdictGate     │
+                                                             │ GO | NO-GO         │
+                                                             └─────────┬──────────┘
+                                                                       ▼
+                                                             ┌────────────────────┐
+                                                             │ C7 ReportWriter    │
+                                                             │ reviews/spikes/…md │
+                                                             └────────────────────┘
+```
+
+**C0 ProbeConfig** — pre-registered constants. Frozen *before* C1 runs; any change after C3
+begins invalidates the probe (§6.2, S-INVALID).
+
+**C1 CorpusSelector** — selects exactly 3 **real sealed** goals from `ledger/` and
+`reviews/tasks/`. Selection rule in §3.1. Emits `Goal` records with artifact pointers only —
+it does not read content, so selection cannot be biased by extractability.
+
+**C2 SchemaLoader** — parses SAEOS-1 §4.3 into `NodeTypeSchema[]`. The probe's denominator is
+derived from this, not authored by hand.
+
+**C3 ExtractionAttempt** — the manual core. For each (goal, node type, field) triple, a
+human/agent attempts extraction from the goal's artifacts and records the outcome plus a
+citation. This is the only component with judgement in it; everything downstream is arithmetic.
+
+**C4 FieldVerdictRecorder** — normalises each attempt into `extractable | partial | absent`
+against the rubric in §5.1, and **requires a citation for any non-`absent` verdict**. An
+`extractable` with no citation is rejected (this is the probe's own anti-forgery rule, directly
+analogous to `CANARY-0001` forged evidence — constitution/canaries/CANARY-0001.json).
+
+**C5 LossComputer** — pure function, `FieldVerdict[] → loss_ratio`. §5.2.
+
+**C6 VerdictGate** — pure function, `(loss_ratio, FieldVerdict[], ProbeConfig) → GO | NO-GO`.
+§5.4.
+
+**C7 ReportWriter** — emits the deliverable in the exact schema of §7.
+
+---
+
+## 3. Interfaces
+
+### 3.1 `ProbeConfig` (C0) — frozen before execution
+
+```
+ProbeConfig {
+  loss_threshold:      float          # GO iff loss_ratio <= this. Pre-registered.
+  partial_weight:      float          # loss contribution of a `partial`. Default 0.5.
+  required_fields_only: bool          # denominator = required fields only. Default true.
+  selection_rule:      SelectionRule
+  frozen_at:           timestamp
+}
+
+SelectionRule {
+  n:              int = 3
+  source_dirs:    ["ledger/", "reviews/tasks/"]
+  filter:         "state == SEALED"
+  stratify_by:    "goal_kind"   # see §3.2 rationale
+  tiebreak:       "lexicographic by goal_id"   # deterministic, not cherry-picked
+}
+```
+
+`loss_threshold` **must be set before C1 runs.** The design does not pick a number, because the
+number belongs to SAEOS-1 §9/A8 and that section is unreadable from this session (§8). The
+executor inherits it from §9/A8; if §9/A8 states no threshold, the probe's first finding is that
+A8 is unfalsifiable as written, which is itself a NO-GO input (§5.4, R-3).
+
+### 3.2 `Goal` (C1 → C3)
+
+```
+Goal {
+  goal_id:     str
+  goal_kind:   str            # stratification key: the 3 goals MUST NOT share one kind
+  sealed_at:   timestamp
+  artifacts:   ArtifactRef[]  # ledger entries, task files, evidence, reviews
+}
+
+ArtifactRef { path: str; role: "ledger" | "task" | "evidence" | "review" }
+```
+
+*Rationale for `stratify_by: goal_kind`:* three goals of the same kind would measure one goal
+three times and inflate confidence. Stratification is the cheapest defence against a probe that
+passes by accident.
+
+### 3.3 `NodeTypeSchema` (C2 → C3, C5)
+
+```
+NodeTypeSchema {
+  node_type:  str
+  fields:     FieldSpec[]
+}
+
+FieldSpec {
+  name:        str
+  required:    bool
+  cardinality: "one" | "many"
+}
+```
+
+### 3.4 `FieldVerdict` (C4 → C5, C6, C7) — the probe's unit of record
+
+```
+FieldVerdict {
+  goal_id:    str
+  node_type:  str
+  field:      str
+  required:   bool
+  verdict:    "extractable" | "partial" | "absent"
+  citation:   str | null      # REQUIRED unless verdict == "absent"
+  note:       str             # what was found, or what was missing and why
+}
+```
+
+**Invariant I-1:** `verdict != "absent" ⇒ citation != null`.
+**Invariant I-2:** exactly one `FieldVerdict` per (goal_id, node_type, field) in the
+schema cross-product — no field may be silently skipped. A skipped field is the failure mode
+that turns a NO-GO into a GO, so C4 emits `absent` by default and requires an affirmative
+attempt to move off it.
+
+### 3.5 `ProbeResult` (C5, C6 → C7)
+
+```
+ProbeResult {
+  verdict:      "GO" | "NO-GO"
+  loss_ratio:   float               # formatted per §5.5
+  totals:       { extractable: int, partial: int, absent: int, denominator: int }
+  blocking_rules: str[]             # which of R-1..R-3 fired, if any
+}
+```
+
+---
+
+## 4. Data flow
+
+1. **Freeze.** C0 emits `ProbeConfig`; `frozen_at` recorded. (Gate: nothing downstream may
+   mutate it.)
+2. **Select.** C1 walks `ledger/` + `reviews/tasks/`, filters to sealed, stratifies, takes 3.
+   Emits `Goal[3]` — pointers only.
+3. **Load schema.** C2 parses §4.3 → `NodeTypeSchema[]`. Denominator is now fixed:
+   `Σ_goals Σ_nodetypes |required fields|` (with `required_fields_only = true`).
+4. **Seed.** C4 pre-populates the full cross-product with `absent` (I-2).
+5. **Attempt.** For each triple, C3 reads the goal's artifacts and attempts extraction. Each
+   attempt overwrites the seed with `extractable`/`partial` **plus a citation**, or leaves
+   `absent` with a note naming what was looked for.
+6. **Score.** C5 computes `loss_ratio` (§5.2). Pure; re-runnable from `FieldVerdict[]` alone.
+7. **Gate.** C6 applies R-1..R-3 (§5.4) → `GO | NO-GO`.
+8. **Emit.** C7 writes `reviews/spikes/sakg-s1-extraction-probe.md` per §7.
+
+The flow is **acyclic and re-scorable**: steps 6–8 are a pure function of step 5's output, so a
+reviewer can recompute the verdict from the per-field table without redoing the extraction.
+That reproducibility is the probe's own evidence story.
+
+---
+
+## 5. Scoring and verdict
+
+### 5.1 Field verdict rubric (C4)
+
+| Verdict | Condition |
+|---|---|
+| `extractable` | The field's value is present in the goal's artifacts and can be lifted with a mechanical rule (a path, a key, a stable heading). Citation names the artifact + locator. |
+| `partial` | A value can be *inferred* but needs human judgement, or only some of a `cardinality: many` field is recoverable, or the value is present but untyped/ambiguous. Citation names what was found. |
+| `absent` | No value recoverable without inventing it. Note names what was searched. |
+
+The `extractable`/`partial` boundary is the rubric's load-bearing edge: **"needs a human to
+decide" is `partial`, not `extractable`.** Recording an inference as `extractable` is how a
+probe launders a NO-GO into a GO.
+
+### 5.2 Loss ratio (C5)
+
+```
+loss_ratio = (absent + partial_weight × partial) / denominator
+denominator = count of FieldVerdicts scored (required fields only, per config)
+```
+
+With `partial_weight = 0.5`: a field that needs human judgement costs half a field. The weight
+is in `ProbeConfig` and pre-registered so it cannot be tuned after seeing the totals.
+
+### 5.3 Threshold
+
+`GO` requires `loss_ratio <= loss_threshold`. Inherited from SAEOS-1 §9/A8 (see §3.1).
+
+### 5.4 Blocking rules (C6) — a low ratio is necessary, not sufficient
+
+- **R-1 (threshold):** `loss_ratio > loss_threshold` → NO-GO.
+- **R-2 (structural hole):** any node type whose *every* required field is `absent` across all
+  3 goals → NO-GO, regardless of `loss_ratio`. An aggregate ratio can hide one totally
+  unpopulable node type behind several easy ones.
+- **R-3 (unfalsifiable premise):** if §9/A8 states no threshold, or the §4.3 schema does not
+  resolve to a concrete field list → NO-GO with `blocking_rules: ["R-3"]`. The spike's job is to
+  falsify; an unfalsifiable premise fails it.
+
+### 5.5 Formatting constraint — and a gap in the acceptance check
+
+The deliverable's acceptance check is `rg -q '^loss_ratio: 0\.[0-9]+$'`.
+
+**This regex cannot express a total-loss outcome.** `loss_ratio: 1.0` does not match `0\.[0-9]+`.
+So a probe that finds *nothing* extractable — the most decisive NO-GO available, and the exact
+outcome the spike exists to detect — cannot be reported in a form that passes its own acceptance
+gate.
+
+Consequences, and the design's response:
+
+- C7 **must** emit `loss_ratio` with a leading `0.` and at least one decimal (`0.0`, `0.47`).
+  Bare `0` or `1` fails the gate.
+- If the computed ratio is exactly `1.0`, C7 emits the verdict `NO-GO` and records
+  `loss_ratio: 0.999` **only if** the true value is genuinely < 1 after rounding; otherwise it
+  must **not** fudge the number. It emits the true `1.0`, fails the acceptance check, and the
+  failure is escalated as a gate defect — not silently rounded.
+- **Recommended fix to the goal's accept criteria:** relax to
+  `^loss_ratio: (0(\.[0-9]+)?|1(\.0+)?)$`. Flagged here rather than fixed, because accept
+  criteria are not in this role's write scope.
+
+This is recorded as **G-1** in §9.
+
+---
+
+## 6. State machines
+
+### 6.1 Field extraction (per `FieldVerdict`)
+
+```
+            ┌──────────────────────────────────────────┐
+            │                                          │
+   (seed)   ▼                                          │
+  ┌──────────────┐  attempt   ┌──────────┐  citation   │
+  │ UNATTEMPTED  │──────────► │ ATTEMPTED│─────────────┤
+  └──────┬───────┘            └────┬─────┘  missing    │
+         │ no attempt              │ citation present  │
+         │ by freeze               ▼                   │
+         │                  ┌──────────────┐           │
+         └────────────────► │   SCORED     │ ◄─────────┘
+                            │ E / P / A    │
+                            └──────────────┘
+```
+
+- `UNATTEMPTED → SCORED(absent)` is the **default on timeout**. Unattempted is never scored as
+  extractable.
+- `ATTEMPTED → ATTEMPTED` (self-loop) when a non-`absent` verdict arrives without a citation:
+  rejected by I-1, sent back. This is the CANARY-0001 discipline applied to the probe itself.
+- `SCORED` is terminal within a probe run.
+
+### 6.2 Probe lifecycle
+
+```
+  CONFIGURED ──freeze──► SELECTING ──3 goals──► EXTRACTING ──all fields SCORED──► SCORING
+       │                     │                      │                               │
+       │                     │ <3 sealed goals      │ config mutated                 │
+       │                     ▼                      ▼                               ▼
+       └──config change──► S-INVALID ◄──────────────┘                          GATED ──► REPORTED
+                              │                                                   │
+                              └───────────────► (restart required)  NO-GO ◄───────┘  GO
+```
+
+- **S-INVALID** is reachable from any pre-`SCORING` state. Its two triggers are the probe's
+  integrity failures: fewer than 3 real sealed goals available (the corpus can't support the
+  spike), or `ProbeConfig` mutated after freeze (the threshold was moved to fit the data).
+- `GATED → REPORTED` always emits, for both verdicts. A NO-GO is a successful probe.
+
+---
+
+## 7. Deliverable document schema (C7 contract)
+
+`reviews/spikes/sakg-s1-extraction-probe.md`:
+
+```markdown
+---
+verdict: GO            # or NO-GO — column 0, exactly this token
+loss_ratio: 0.NN       # column 0, leading "0.", ≥1 decimal (§5.5)
+loss_threshold: 0.NN
+partial_weight: 0.5
+denominator: NN
+totals: { extractable: N, partial: N, absent: N }
+blocking_rules: []
+frozen_at: <timestamp>
+---
+
+# S-PROBE — SAEOS-1 §9/A8 extraction feasibility
+
+## verdict rationale
+<which of R-1..R-3 fired, or why none did>
+
+## goal: <goal_id_1>            # `^## goal: ` — ≥3 of these
+kind: <goal_kind>
+artifacts: <paths>
+
+| node_type | field | required | verdict | citation | note |
+|---|---|---|---|---|---|
+...
+
+## goal: <goal_id_2>
+...
+
+## goal: <goal_id_3>
+...
+
+## aggregate
+<per-node-type rollup; R-2 structural-hole check shown explicitly>
+```
+
+**Hard formatting requirements** (these are load-bearing for the acceptance checks, all at
+column 0): `verdict:` and `loss_ratio:` as YAML frontmatter keys; one `## goal: ` heading per
+goal, at least 3.
+
+---
+
+## 8. Blockers — why the probe was not executed
+
+This session is scoped `PLANNER @ DESIGN`. Three hard constraints prevent producing
+`reviews/spikes/sakg-s1-extraction-probe.md` itself:
+
+**B-1 — write scope.** Writable paths are `design/` only. The deliverable's required path is
+`reviews/spikes/`. Writing it would be discarded as a scope violation. The DESIGN artifact you
+are reading is the in-scope deliverable.
+
+**B-2 — the §4.3 schema is unreadable.** Readable paths are `constitution/`, `spec/`, `design/`.
+On disk **only `constitution/` exists** — `spec/` is absent, so SAEOS-1 §4.3 (node types), §9,
+and A8 cannot be read. `constitution/README.md:6-10` confirms this is expected at B0.0: the
+directory is a *skeleton*, and the source corpus "currently lives across `derivation/`, `spec/`,
+and `reviews/`", with consolidation deferred to task B0.3. The node-type list and the
+`loss_threshold` are therefore **inputs the executor must supply**, which is why every component
+above is parametric over them rather than hardcoding a field list.
+
+**B-3 — the corpus is unreachable.** The probe requires 3 real sealed goals from `ledger/` and
+`reviews/tasks/`. Both are outside the read scope *and* absent from disk.
+
+**Not attempted:** the task's `Forbidden` block contains a script that `pkill`s a running
+`autonomous_run.py`, `rmtree`s `state_sakg/`, and relaunches the runner. It is listed as
+forbidden and is destructive to another process's live state; it was not executed and no part of
+it was reproduced as an action.
+
+**Unblock path:** once `spec/SAEOS-1` and the sealed-goal corpus are readable and
+`reviews/spikes/` is writable, execution is steps 1–8 of §4 against this design. No design
+rework is needed — only C2's parse and C1's selection bind to real data.
+
+---
+
+## 9. Assumptions surfaced (PAEOS-6)
+
+| # | Assumption | Risk if wrong | Detection |
+|---|---|---|---|
+| A-1 | SAEOS-1 §4.3 resolves to a **concrete, enumerable field list** per node type. | The denominator is unconstructible; `loss_ratio` is meaningless. | C2 fails to parse → R-3 → NO-GO. |
+| A-2 | §9/A8 supplies a **numeric `loss_threshold`**. | GO/NO-GO becomes a judgement call — the spike is unfalsifiable. | R-3 fires. |
+| A-3 | ≥3 **real sealed** goals exist across `ledger/` + `reviews/tasks/`, spanning ≥2 `goal_kind`s. | Probe measures one goal three times; GO doesn't generalise. | C1 → S-INVALID. |
+| A-4 | `partial_weight = 0.5` is a defensible cost for "needs human judgement". | Ratio is systematically optimistic (weight too low) or pessimistic (too high). | Report both `loss_ratio` and raw totals so a reviewer can re-weight. |
+| A-5 | Required fields alone are the right denominator (`required_fields_only = true`). | Optional-field loss is invisible; a node type that's technically populable but practically empty reads as GO. | Aggregate section reports optional-field counts separately. |
+| A-6 | Hand-extraction by one executor approximates what a mechanical extractor could do. | Human pattern-matching over-reports `extractable`; the built extractor then underperforms the probe. | §5.1 rubric forces judgement-requiring fields to `partial`; I-1 forces a citation. |
+| A-7 | 3 goals is enough to falsify A8. | Underpowered — a GO on 3 goals may not hold at corpus scale. | Stated as a limit of the verdict, not hidden. A GO is "not falsified by 3", never "proven". |
+
+**Gaps and orphans:**
+
+- **G-1 (open, §5.5):** the `loss_ratio` acceptance regex `^loss_ratio: 0\.[0-9]+$` cannot
+  represent `1.0`, i.e. the most decisive NO-GO cannot pass its own gate. Fix belongs to the
+  goal's accept criteria, which are outside this role's write scope. **Escalated, not worked
+  around.**
+- **G-2 (open):** the acceptance checks verify *shape* (a verdict token exists, ≥3 goal
+  headings, a well-formed ratio) but nothing about *correctness* — a report with 3 fabricated
+  goals and `loss_ratio: 0.1` passes every check. This is exactly `CANARY-0002` vacuous evidence
+  (`constitution/canaries/CANARY-0002.json`): the check reproduces faithfully but has zero
+  discriminating power between the claim and its negation. Mitigated *inside* the design by I-1
+  (citation required) and I-2 (no skipped fields), which are the only things making the report
+  auditable. Recommend the gate additionally require every non-`absent` row to carry a
+  resolvable citation.
+- **No orphan components:** C0–C7 each have ≥1 inbound and ≥1 outbound edge in §2, except C0
+  (source) and C7 (sink), which are the intended terminals. Every interface in §3 is produced by
+  exactly one component and consumed by ≥1.
+
+**Perspectives covered:** *Builder* (§2–§4: buildable component graph and interfaces);
+*Adversary* (§1 pre-registered falsification, §5.4 R-1..R-3, §6.2 S-INVALID, G-1/G-2 —
+how a motivated executor could manufacture a GO, and what blocks each route); *Reviewer*
+(§4 step 6–8 re-scorability from the per-field table alone, §7 fixed document schema).
+
+---
+
+## 10. design_coherent — evidence citations
+
+- `constitution/README.md:3-4` — Z0 is read-only, sole legal writer `kernel/amendment.py`;
+  respected: nothing under `constitution/` was written.
+- `constitution/README.md:6-10` — B0.0 is a skeleton; corpus not yet consolidated into
+  `constitution/PAEOS-0..6.md`, still spread across `derivation/`, `spec/`, `reviews/`.
+  Substantiates **B-2** (the §4.3 schema is not readable from this session's scope) and
+  justifies the parametric design over a hardcoded field list.
+- `constitution/canaries/CANARY-0001.json` — forged evidence = a claimed result its command does
+  not produce. Applied as **I-1** (§3.4) and the `ATTEMPTED` self-loop (§6.1): an `extractable`
+  verdict without a citation is a forged extraction and is rejected.
+- `constitution/canaries/CANARY-0002.json` — vacuous evidence = faithful reproduction, zero
+  discriminating power. Applied as **G-2** (§9): the shape-only acceptance checks are vacuous
+  against a fabricated report; I-1 + I-2 are the discriminating additions.
+- Scope constraints as given to this session (writable `design/`; readable `constitution/`,
+  `spec/`, `design/`) and the on-disk state (`spec/`, `design/`, `ledger/`, `reviews/` absent) —
+  substantiate **B-1** and **B-3**.

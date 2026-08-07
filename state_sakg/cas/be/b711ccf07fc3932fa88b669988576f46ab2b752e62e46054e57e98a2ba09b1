@@ -1,0 +1,176 @@
+# F-ENVELOPE — Assumptions (PAEOS-6 surfacing)
+
+Every premise this design rests on that I could not verify from readable artifacts. Each carries a
+**blast radius** (what breaks if it is wrong) and a **falsifier** (the concrete observation that
+settles it). Assumptions are ranked by blast radius, largest first.
+
+## 1. The root assumption
+
+### A0 — §4.2's text is unavailable; the field set is reconstructed
+
+**Status:** CONFIRMED-UNAVAILABLE (not an assumption about the world — a fact about this session).
+
+**Citation:** `constitution/README.md:6-10` —
+
+> **B0.0 status:** directory skeleton only. Population is a later task:
+> `PAEOS-0..6.md` — copied read-only from the source corpus (task **B0.3**...). *(Note: the source
+> corpus currently lives across `derivation/`, `spec/`, and `reviews/`...)*
+
+My read scope was `constitution/`, `spec/`, `design/`. `spec/` and `design/` did not exist;
+`constitution/` contained `README.md`, `canaries/README.md`, `CANARY-0001.json`,
+`CANARY-0002.json`, and two `.gitkeep` files. Nothing in that set names a node envelope, a field
+list, a status enum, or a §4.2.
+
+**Blast radius:** total, for *names*. Every field identifier, every enum spelling, and the section
+numbering in this package is invented. **Not** total for *structure*: the layering decision (§2 of
+`design.md`), the append-only/tombstone topology, the derived-confidence discipline, and the
+fixture-corpus architecture are derived from the goal statement's own invariant list and from the
+constitution's canary conventions, and hold regardless of naming.
+
+**Falsifier:** read §4.2. It exists somewhere in `derivation/`, `spec/`, or `reviews/` per the
+citation above.
+
+**Mitigation:** §7 of `design.md` defines a reconciliation gate. `schema_version` is `1.0.0` and the
+schema is *not* to be treated as frozen (in the Z0 amend-only sense) until that gate passes — see
+A1 below.
+
+---
+
+## 2. Assumptions with wide blast radius
+
+### A1 — "Freeze" means schema-version freeze, not Z0 sealing
+
+**Assumed:** `sakg/schema/envelope.schema.json` lands in a mutable-until-ratified zone, and "freeze"
+means *no backward-incompatible change without a version bump*, not *immutable like
+`constitution/`*.
+
+**Why I believe it:** `constitution/README.md:1-4` scopes Z0 immutability to `constitution/` and
+names `kernel/amendment.py` as its only legal writer. `sakg/` is not under `constitution/`.
+
+**Blast radius:** if wrong, F-ENVELOPE must route through the amendment path and requires a human
+ratifier + Adversary review before the file can exist at all (`constitution/README.md:15-16`), which
+changes who executes IMPLEMENT, not what it produces.
+
+**Falsifier:** the TCB-diff gate configuration — does it cover `sakg/schema/`?
+
+### A2 — The envelope is universal *because* payload is opaque to it
+
+**Assumed:** "universal node envelope" = the fields **every** node kind carries, with kind-specific
+structure held in an opaque `content` object that the envelope schema constrains only as
+`{"type": "object", "minProperties": 1}`.
+
+**Why I believe it:** that is the only reading under which one schema covers all kinds. The
+alternative — a discriminated union over `kind` — would make the schema non-universal and would
+require the kind catalogue to be frozen simultaneously, which the goal does not ask for.
+
+**Blast radius:** moderate. If §4.2 instead specifies per-kind payload schemas, `content` gains a
+`$dynamicRef` or an `allOf` dispatch on `kind`; the 33 fixtures survive but each needs a
+kind-conformant payload.
+
+**Falsifier:** does §4.2 enumerate payload fields, or only wrapper fields?
+
+**Successor goal (prevents orphan):** **F-NODE-KINDS** — per-kind content schemas keyed by `kind`.
+
+### A3 — The status enum has exactly these seven values
+
+**Assumed:** `PROPOSED, CANDIDATE, ACTIVE, DEPRECATED, SUPERSEDED, RETRACTED, QUARANTINED`.
+
+**Why I believe it:** the goal requires fixtures for "every status value" and names a promotion
+mechanism, so there is a ladder (≥2 pre-active states) and at least one terminal state. `RETRACTED`
+is forced by the deleted-node invariant — a system that forbids deletion needs a tombstone status.
+`QUARANTINED` is forced by the canary corpus: `CANARY-0001` (forged evidence) and `CANARY-0002`
+(vacuous evidence) describe nodes whose *evidence* is bad while the claim's truth is undetermined —
+that state is neither ACTIVE nor RETRACTED. `SUPERSEDED` and `DEPRECATED` are distinguished because
+supersession names a replacement and deprecation does not.
+
+**Blast radius:** high on fixture count (one valid fixture per status is mandated), low on
+architecture. The state machine's shape — a promotion ladder, an absorbing tombstone, and a
+side-excursion for integrity holds — is what matters; adding or removing a rung is a table edit in
+`$defs.legal_transition`.
+
+**Falsifier:** §4.2's status enum.
+
+### A4 — Confidence is derived and structurally cannot be authored
+
+**Assumed:** `confidence` is an *object* recording a derivation (`value`, `method`, `inputs`,
+`computed_at`, `computed_by`), never a bare number, and `method` is a closed enum with no
+`authored`/`asserted` member.
+
+**Why I believe it:** the goal names "authored confidence" as an invariant *violation* requiring an
+invalid fixture. An invariant that must be violable by a fixture must be structurally expressible;
+the strongest structural expression is "there is no shape in which a hand-written scalar is
+well-formed."
+
+**Blast radius:** low-to-moderate and *self-limiting*. Even if §4.2 spells the sub-fields
+differently, the discipline (a confidence must carry its derivation) is exactly what the named
+invariant asks for.
+
+**Falsifier:** §4.2's confidence field type.
+
+### A5 — Promotion is evidence-gated and frequency is not evidence
+
+**Assumed:** `promotion.basis` is a closed enum of eight *epistemic* bases, none of which is a count;
+`promotion.evidence_refs` requires ≥1 entry; and `promotion` rejects unknown properties so a
+smuggled `observation_count` fails validation.
+
+**Why I believe it:** the goal names "frequency-based promotion" as a violation. Two independent
+encodings are used deliberately (closed enum **and** `unevaluatedProperties: false`) so that
+defeating one does not defeat the invariant — see `design.md` §5.3.
+
+**Blast radius:** low. Enum membership is a table edit.
+
+**Falsifier:** §4.2's promotion rules; also whether any legitimate basis is count-shaped (e.g. a
+quorum of independent ratifiers — note that is a *count of ratifications*, not a frequency of
+observation, and I have modelled it as `court_ratification` with N evidence refs rather than as a
+numeric threshold).
+
+---
+
+## 3. Assumptions with narrow blast radius
+
+| ID | Assumption | Why | Falsifier |
+|---|---|---|---|
+| A6 | Node ids are `sakg:<kind>:<ULID>` | ULID gives lexicographic = creation order, which an append-only store wants; the `kind` segment makes refs self-describing so a validator can reject an `evidence_ref` pointing at a non-evidence node without a store lookup | §4.2's id format |
+| A7 | Timestamps are RFC 3339 UTC with a literal `Z`, enforced by `pattern` not `format` | `format` is annotation-only in draft 2020-12 unless a format-assertion vocabulary is enabled; relying on it would make the schema's strictness depend on validator configuration, which is non-deterministic across runners | §4.2's timestamp rule; also the project's chosen validator config |
+| A8 | `content_hash` is `sha256:<64 hex>` over RFC 8785 canonical JSON of `content` alone | Hashing `content` alone keeps the identity of the *knowledge* stable across lifecycle transitions — otherwise every promotion rewrites the hash and dedup breaks | §4.2's hash definition |
+| A9 | `trust_zone` is `Z0..Z3` | `constitution/README.md:1` says "Trust Zone 0"; a zone numbering exists. The upper bound is a guess | the trust-zone taxonomy in PAEOS-8 §1 |
+| A10 | `actor_role` ⊇ `{builder, adversary, doc, court, founder}` | All five appear in readable text: `constitution/canaries/README.md:8-9` ("authored by the Builder + Doc and ratified by the founder"), `:4-5` ("the Verification Court, the Adversary") | the role catalogue |
+| A11 | `evidence_refs` may be empty **only** for `PROPOSED` | A node that has left PROPOSED did so via a promotion, and promotions require evidence (A5); an evidenced promotion into an evidence-free node is incoherent | §4.2 |
+| A12 | The test module is `tests/sakg/test_envelope_schema.py` and uses `jsonschema`'s `Draft202012Validator` | The acceptance command names the module; `jsonschema` is the reference Python implementation with 2020-12 support | the project's dependency set — if `jsonschema` is absent, `uv add jsonschema` is an IMPLEMENT prerequisite |
+
+---
+
+## 4. Reconciliation checklist (run before declaring the schema frozen)
+
+When §4.2 becomes readable, walk this list. Each row is a decision the design has already
+pre-committed to a shape for, so reconciliation is a rename-or-adjust, not a redesign.
+
+1. **Field roster** — diff §4.2's field list against `envelope-fields.md` §2. For each field in
+   §4.2 but not here: add it, add its `$defs` entry, and extend fixture `V02-proposed-full` (the
+   all-fields fixture) plus one `I-*` fixture if it carries an invariant. For each field here but
+   not in §4.2: delete it and its fixture rows.
+2. **Status enum** — replace `$defs.status.enum`, then regenerate `$defs.legal_transition.anyOf`
+   from the transition table (`design.md` §4.2). The coverage test
+   (`test_every_status_has_valid_fixture`) will fail loudly until a fixture exists per value; that
+   failure *is* the reconciliation signal, so do not weaken it.
+3. **Confidence methods / promotion bases** — replace both enums. Confirm no member of either is
+   count- or frequency-shaped; if one is, escalate rather than admitting it, because it collides
+   head-on with a named invariant (A5).
+4. **Invariant roster** — §4.2 may state invariants beyond the three named in the goal. For each,
+   decide Layer 1 vs Layer 2 using the test in `design.md` §2.3, and register it in
+   `traceability.md` §3 even if it lands in Layer 2, so it is not orphaned.
+5. **Freeze semantics** — settle A1. If `sakg/schema/` is inside the TCB-diff gate's scope, the
+   IMPLEMENT stage needs a human ratifier + Adversary review before merge
+   (`constitution/README.md:15-16`).
+
+## 5. What I did *not* assume
+
+Stated explicitly so absence is read as a decision, not an oversight:
+
+- **Edge/relationship schema.** The goal says *node* envelope. Inter-node structure beyond
+  `derived_from` and `superseded_by` is deferred to **F-EDGES**.
+- **Storage format, ordering, or transport.** Deferred to **F-STORE**.
+- **Confidence arithmetic.** The schema records *that* a method was used and *what* it consumed; it
+  does not verify the number. Deferred to **F-CONFIDENCE**.
+- **Referential integrity.** No JSON Schema can check that `superseded_by` resolves. Deferred to
+  **F-INVARIANTS** (Layer 2), and enumerated — not merely gestured at — in `traceability.md` §3.

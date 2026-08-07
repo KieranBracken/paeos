@@ -1,0 +1,368 @@
+# Design — S-PROBE instrument for SAEOS-1 §9/A8 extraction feasibility
+
+status: BLOCKED — instrument designed, probe NOT executed
+role: PLANNER
+stage: DESIGN
+target_deliverable: reviews/spikes/sakg-s1-extraction-probe.md (NOT writable from this session)
+
+---
+
+## 0. Blocking report (read this first)
+
+This session was asked to produce `reviews/spikes/sakg-s1-extraction-probe.md`. It cannot, for two
+independent reasons. Neither is recoverable by working harder inside this session.
+
+### B1 — Inputs absent and out of read scope
+
+The probe is defined as a hand-extraction of **3 real sealed goals** drawn from `ledger/` and
+`reviews/tasks/`, mapped into the **SAEOS-1 §4.3** node types, in order to falsify **SAEOS-1 §9/A8**.
+
+| Input needed | Purpose | Read scope | Exists on disk |
+|---|---|---|---|
+| `ledger/` | source of sealed goals | **not granted** | no |
+| `reviews/tasks/` | source of sealed goals | **not granted** | no |
+| `spec/` → SAEOS-1 §4.3 | the node types to extract *into* | granted | **no** |
+| `spec/` → SAEOS-1 §9/A8 | the claim under falsification | granted | **no** |
+| `constitution/` | — | granted | yes (7 files) |
+| `backlog/research/` | optional consult | not granted | no |
+
+Total readable content in this workspace: `constitution/README.md`, `constitution/canaries/README.md`,
+`CANARY-0001.json`, `CANARY-0002.json`, two `.gitkeep`, one `.DS_Store`. None of these contain sealed
+goals, the §4.3 node types, or the §9/A8 assertion.
+
+There is no partial-credit path. The probe has exactly one epistemic function — to test whether the
+§4.3 schema survives contact with goals it was not designed against. Substituting invented goals
+inverts that function: a synthetic goal authored by the same agent that reads the schema will extract
+cleanly by construction, producing `verdict: GO` with **identical probability whether §4.3 is sound or
+worthless**. That is a null-discriminator, the defect class `constitution/canaries/CANARY-0002.json`
+exists to catch ("identical result whether the artifact is applied or not"). Emitting it would be
+forged evidence under `CANARY-0001` framing and would corrupt the very gate this probe feeds.
+
+### B2 — Output path outside write capability
+
+Write capability for this session is `design/` only; the objective states anything else "is discarded
+and is a violation." All four accept predicates bind to `reviews/spikes/`:
+
+```
+test -f reviews/spikes/sakg-s1-extraction-probe.md
+rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+Writing `design/sakg-s1-extraction-probe.md` does not satisfy `test -f reviews/spikes/...`. The gate
+fails on path regardless of content quality. **B2 alone is sufficient to block**, independent of B1.
+
+### B3 — Role/stage mismatch (root cause)
+
+The session header assigns `PLANNER @ DESIGN` with the boilerplate "produce the system design
+(component graph, interfaces, data flow, state machines)", but the goal objective is an **S-PROBE**:
+an empirical falsification spike. These are different deliverable classes with different capability
+needs. A probe needs read on the corpus under test and write on `reviews/spikes/`. The dispatch
+granted DESIGN capabilities to a PROBE objective. B1 and B2 are both symptoms of this.
+
+### Remediation (for the orchestrator)
+
+Re-dispatch as `PROBE` (or equivalent) with:
+- read: `spec/`, `ledger/`, `reviews/tasks/`, `constitution/`, `design/`
+- write: `reviews/spikes/`
+- precondition check: `spec/` populated with SAEOS-1 (§4.3 and §9/A8 present) before dispatch
+
+Section 4 below is a fill-in-the-blanks instrument; a correctly-scoped worker can execute it
+mechanically without redoing this design.
+
+### B4 — Defect in the accept criteria themselves
+
+`rg -q '^loss_ratio: 0\.[0-9]+$'` matches only values in `(0.0, 1.0)` written with a leading `0.`.
+It **rejects the two most decision-relevant outcomes**:
+
+- perfect extraction → `loss_ratio: 0` or `1.0` fidelity → gate fails
+- total extraction failure → `loss_ratio: 1` → gate fails, *even though this is the strongest possible
+  NO-GO signal and exactly what a falsification probe is hunting for*
+
+A probe whose acceptance test rejects its own most informative result is miscalibrated. Suggested
+replacement: `^loss_ratio: (0(\.[0-9]+)?|1(\.0+)?)$`. Section 4 pins `loss_ratio` to 3 decimal places
+(`0.000`–`1.000`) so it satisfies both the current and the corrected regex — but the criterion should
+still be fixed, since the current form silently converts a decisive NO-GO into a gate error.
+
+---
+
+## 1. Assumptions surfaced (PAEOS-6)
+
+Every assumption below is load-bearing and **unverified in this session** — `spec/` is absent, so none
+could be checked against source. They are recorded so the executing worker can falsify them cheaply
+rather than inherit them silently.
+
+| # | Assumption | If false |
+|---|---|---|
+| A1 | SAEOS-1 §4.3 enumerates a *closed, finite* set of node types, each with a *named field list*. | Per-field scoring (§3) has no denominator; instrument needs redesign, not reparameterization. |
+| A2 | §9/A8 asserts something of the form "sealed goals are losslessly (or near-losslessly) extractable into the §4.3 node graph". This is the proposition the probe falsifies. | The probe tests the wrong claim. **Worker must quote §9/A8 verbatim into the output before scoring** (§4, step 1). |
+| A3 | "Sealed goal" is a determinate, queryable state — one can enumerate sealed goals and pick 3 without judgement calls. | Sample selection becomes a researcher-degree-of-freedom; pre-registration (§3.4) is void. |
+| A4 | ≥3 sealed goals exist across `ledger/` + `reviews/tasks/`. | Probe cannot reach n=3; report `NO-GO` with reason `insufficient-corpus` rather than padding. |
+| A5 | Extraction is judgeable per-field as a 3-valued verdict (extractable / partial / absent) by one reader. | Needs a second rater + agreement statistic; single-rater loss ratio is not defensible. |
+| A6 | Loss ratio is intended as *unweighted* mean field fidelity. The objective does not define it. | Aggregate is meaningless if fields differ in criticality — mitigated by the veto rule (§3.3), which is why that rule exists. |
+| A7 | The 3 goals should be *heterogeneous* (different shape/size/age), not 3 easy cases. | A homogeneous sample inflates fidelity and manufactures a GO. Selection rule pinned in §3.4. |
+
+**A2 and A7 are the two that most plausibly silently invalidate the probe.** A2 because the probe can
+faithfully measure the wrong proposition; A7 because it is the natural, unforced way an honest agent
+produces a false GO.
+
+---
+
+## 2. Component graph and data flow
+
+Static instrument. No runtime services; every node is an act performed by the executing worker.
+
+```
+   spec/SAEOS-1 §4.3            spec/SAEOS-1 §9/A8
+   (node types + fields)        (claim under test)
+            │                            │
+            ▼                            │
+   ┌──────────────────┐                  │
+   │ C1 SchemaLoader  │                  │
+   │ → FieldMatrix F  │                  │
+   └────────┬─────────┘                  │
+            │                            │
+ ledger/ ───┼──► ┌──────────────────┐    │
+ reviews/   │    │ C2 GoalSelector  │    │
+ tasks/ ────┘    │ → G = {g1,g2,g3} │    │
+                 └────────┬─────────┘    │
+                          │              │
+                          ▼              │
+                 ┌──────────────────┐    │
+                 │ C3 Extractor     │    │  hand-extraction, per (goal × node × field)
+                 │ → Verdict cells  │    │
+                 └────────┬─────────┘    │
+                          ▼              │
+                 ┌──────────────────┐    │
+                 │ C4 Scorer        │    │
+                 │ → fidelity,      │    │
+                 │   loss_ratio,    │    │
+                 │   veto set       │    │
+                 └────────┬─────────┘    │
+                          ▼              ▼
+                 ┌─────────────────────────────┐
+                 │ C5 VerdictGate              │
+                 │ pre-registered rule (§3.4)  │
+                 │ → GO | NO-GO                │
+                 └────────┬────────────────────┘
+                          ▼
+        reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+### Interfaces
+
+| Component | Input | Output | Contract |
+|---|---|---|---|
+| **C1** SchemaLoader | §4.3 text | `F = [(node_type, field)]` | Every field in §4.3 appears exactly once. `|F|` is the per-goal denominator. No invented fields; no dropped fields. |
+| **C2** GoalSelector | `ledger/`, `reviews/tasks/` | `G`, `|G| = 3` | Selection rule §3.4 applied and *recorded* before extraction begins. |
+| **C3** Extractor | `g ∈ G`, `F` | verdict ∈ {extractable, partial, absent} per cell, + evidence span | Every cell carries a pointer into the source goal or the literal `—` for `absent`. No cell left blank. |
+| **C4** Scorer | verdict cells | `fidelity`, `loss_ratio`, `veto_fields` | Pure function of §3.1–3.3. No judgement. |
+| **C5** VerdictGate | scorer output | `GO` \| `NO-GO` | Pure function of §3.4. **Rule is fixed before C3 runs.** |
+
+**Directionality is the integrity property.** C5 must not be able to reach back and revise C2's sample
+or C3's cells. If the verdict is disliked, the correct move is to record it and open a follow-up — not
+to re-select goals. Re-running C2 after seeing a C5 output invalidates the probe and must be disclosed
+in the output as `sample_reselected: true`.
+
+---
+
+## 3. Scoring and the pre-registered verdict rule
+
+### 3.1 Cell scoring
+
+| Verdict | Score | Meaning |
+|---|---|---|
+| `extractable` | 1.0 | Field populated from the goal with no invention and no meaning loss. |
+| `partial` | 0.5 | Field populated only by inference, lossy compression, or with a judgement call a second rater could reasonably make differently. |
+| `absent` | 0.0 | Nothing in the goal maps to this field. |
+
+`partial` is the honest default under doubt. If a cell requires an argument to justify `extractable`,
+it is `partial`.
+
+### 3.2 Aggregate
+
+```
+fidelity   = Σ score(cell) / (|G| × |F|)
+loss_ratio = 1 − fidelity          # emit to 3 dp, e.g. 0.417
+```
+
+### 3.3 Veto rule (structural absence)
+
+> Any field `f ∈ F` scoring `absent` for **all three** goals is a **structural absence**: the schema
+> asks for something the corpus does not carry. Such a field enters `veto_fields`.
+
+This exists because §3.2 is an average and averages launder critical failures. A schema with 20 fields
+where 3 load-bearing fields are universally absent scores `loss_ratio = 0.15` — a comfortable GO — while
+being unimplementable. The veto is the instrument's main defence against a false GO, and it is the
+single most likely reason this probe returns NO-GO on real data.
+
+### 3.4 Pre-registered decision rule — fixed now, before any data is seen
+
+```
+GO      iff  loss_ratio ≤ 0.30  AND  veto_fields = ∅
+NO-GO   otherwise
+```
+
+Sample selection rule (C2), also pre-registered, discharging A7:
+
+1. Enumerate all sealed goals in `ledger/` + `reviews/tasks/`.
+2. Order by sealing timestamp.
+3. Take **oldest**, **median**, **newest**. Ties → lowest id.
+4. If any is unreadable/malformed, take the next by timestamp and **record the substitution**.
+
+Deterministic, spans the corpus's evolution, and removes the worker's discretion to pick easy cases.
+
+Pre-registration is the whole point: after seeing the cells, *every* threshold looks arguable. Fixing
+0.30 and the veto here — in a document written before the data was touched — is what makes a GO from
+this instrument mean anything. A worker who reaches §5 and wants to move the threshold should instead
+emit NO-GO and state the case for a different threshold as a finding.
+
+---
+
+## 4. Output template (fills the accept criteria)
+
+Executing worker writes `reviews/spikes/sakg-s1-extraction-probe.md`. Line-start fields are exact —
+the accept regexes are anchored.
+
+```markdown
+---
+probe: sakg-s1-extraction
+claim_under_test: "<verbatim quote of SAEOS-1 §9/A8>"   # discharges A2 — do this FIRST
+schema_source: spec/<file>#4.3
+field_count: <|F|>
+goals_sampled: 3
+sample_reselected: false
+---
+
+verdict: GO
+loss_ratio: 0.000
+fidelity: 1.000
+veto_fields: []
+
+## goal: <goal-id-1>
+source: ledger/<path>
+selection: oldest
+
+| node_type | field | verdict | evidence |
+|---|---|---|---|
+| <type> | <field> | extractable | <pointer into goal> |
+| <type> | <field> | partial | <what was inferred / what was lost> |
+| <type> | <field> | absent | — |
+
+subtotal: <n_extractable> / <n_partial> / <n_absent>
+
+## goal: <goal-id-2>
+source: reviews/tasks/<path>
+selection: median
+...
+
+## goal: <goal-id-3>
+source: <path>
+selection: newest
+...
+
+## analysis
+<why fields failed; whether failures cluster by node type or by goal age;
+ whether §9/A8 survives — state plainly which way the evidence cuts>
+
+## veto analysis
+<each structural absence, and whether the field is load-bearing for SAKG>
+```
+
+Notes:
+- `## goal: ` — exactly three occurrences at line start (accept requires `≥ 3`).
+- `verdict:` and `loss_ratio:` at column 0, own line, no leading whitespace.
+- `loss_ratio` at 3 dp keeps it inside the current regex for all values in `(0,1)`; see **B4** for the
+  `0` / `1` boundary defect that still needs fixing upstream.
+- The template shows `GO` / `0.000` as *format illustration only*. These are placeholders, not a
+  predicted result, and must be overwritten by computed values.
+
+---
+
+## 5. State machine (probe execution)
+
+```
+                  ┌─────────────┐
+                  │   INIT      │
+                  └──────┬──────┘
+                         │ spec/ readable, §4.3 + §9/A8 located
+                         ▼
+                  ┌─────────────┐   §4.3 missing/open-ended (¬A1)
+                  │ SCHEMA_LOAD ├──────────────────────────────────► ABORT(schema-undefined)
+                  └──────┬──────┘
+                         │ F built, |F| recorded
+                         ▼
+                  ┌─────────────┐   < 3 sealed goals (¬A4)
+                  │ SELECT      ├──────────────────────────────────► NO-GO(insufficient-corpus)
+                  └──────┬──────┘
+                         │ G fixed and recorded — LOCKED
+                         ▼
+                  ┌─────────────┐
+                  │ EXTRACT     │◄──┐ per cell
+                  └──────┬──────┘   │
+                         └──────────┘
+                         │ all |G|×|F| cells filled
+                         ▼
+                  ┌─────────────┐
+                  │ SCORE       │  pure; no judgement
+                  └──────┬──────┘
+                         ▼
+                  ┌─────────────┐
+                  │ VERDICT     │  apply §3.4 as written
+                  └──┬───────┬──┘
+            GO       │       │      NO-GO
+                     ▼       ▼
+                  ┌─────────────┐
+                  │ EMIT        │ → reviews/spikes/sakg-s1-extraction-probe.md
+                  └─────────────┘
+```
+
+Terminal states: `EMIT(GO)`, `EMIT(NO-GO)`, `ABORT(schema-undefined)`.
+
+`ABORT` is distinct from `NO-GO`. NO-GO is a *result* — the probe ran and §9/A8 failed. ABORT means the
+probe could not be run and carries **no** evidential weight about §9/A8. **This session is neither**: it
+is a pre-INIT capability failure. Recording it as NO-GO would be a false falsification of §9/A8;
+recording it as GO would be fabricated evidence.
+
+Once `SELECT` completes, `G` is locked (§2, directionality).
+
+---
+
+## 6. Coverage — perspectives and gaps
+
+| Perspective | Covered | Where |
+|---|---|---|
+| Builder — is the instrument executable as written? | yes | §4 template, §5 state machine |
+| Adversary — can it manufacture a false GO? | yes | §3.3 veto, §3.4 pre-registration, §2 directionality lock |
+| Doc — is the output legible and gate-parseable? | yes | §4, regexes checked against accept criteria |
+| Verification Court — is the evidence discriminating? | yes | §0 B1 refusal to run on synthetic goals; every cell carries an evidence pointer |
+| Founder/orchestrator — what unblocks this? | yes | §0 remediation, §0 B4 |
+
+**Orphans / gaps — stated, not hidden:**
+
+- **G1** The §4.3 node types are *not enumerated here.* `spec/` is absent and I will not invent a
+  schema. `F` is a hole C1 fills at execution time. Everything downstream is parameterized over `|F|`,
+  so no rework is implied — but this document does not and cannot tell you what the node types are.
+- **G2** The 0.30 threshold is a judgement, not a derivation. It is pre-registered so it cannot be
+  moved post-hoc, but it is not itself evidence-backed. A reviewer may substitute a different value —
+  **before** execution, in writing.
+- **G3** Single-rater extraction (A5). No inter-rater agreement statistic. For a spike this is
+  acceptable; if the result is used to justify building SAKG, a second rater on ≥1 goal is warranted.
+- **G4** n=3 is fixed by the objective. It supports a NO-GO (one structural absence is a real finding)
+  far better than a GO (3 clean goals is weak evidence the schema generalizes). **An asymmetry the
+  reader of the eventual GO must hold onto.**
+
+---
+
+## 7. What this session did and did not produce
+
+**Produced:** the probe instrument — component graph, interfaces, data flow, state machine, scoring
+function, pre-registered verdict rule, output template, and surfaced assumptions.
+
+**Not produced:** `reviews/spikes/sakg-s1-extraction-probe.md`; any `verdict:`; any `loss_ratio:`; any
+extraction of any goal.
+
+**Gate status:** all four accept criteria **FAIL** — the target file is outside this session's write
+capability (B2), and its inputs were outside read capability and absent from disk (B1). No workaround
+exists within the granted scope. Re-dispatch per §0 remediation.

@@ -31,20 +31,23 @@
 - [ ] **L14 Independent Audit** — **different model family** · slop/mocks/dead-code/violations/security/regression hunted · **GATE** → `clean / findings`
 
 ## Integration *(always)*
-- [ ] **L15 Documentation & Ledger** — atlas · roadmaps · diagrams · knowledge graph · decision logs · **traceable to origin**
+- [ ] **L15 Documentation & Ledger** — `docs/IMPLEMENTATION_ATLAS.md` updated · roadmaps · diagrams · knowledge graph · decision logs · **traceable to origin**
 - [ ] **L16 Promotion Decision** — `merge / seal / reject / research-only / dormant` · single-threaded integrate · **GATE (founder if founder-work)**
 
 ## Learning & Evolution *(Trace-B full; Trace-A on trigger)*
 - [ ] **L17 Retrospective** — what slowed/failed/repeated · which prompts improved · what should be policy
-- [ ] **L17 Constitutional Review (MANDATORY, CER-4)** — answered in writing: (a) weaknesses discovered · (b) assumptions invalidated · (c) parts of PAEOS strengthened · (d) Proposals created · (e) Debt recorded · (f) strategy change? **← task is NOT done without this**
+- [ ] **L17 Constitutional Review (MANDATORY, CER-4)** — governed by `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md` and saved to `reviews/tasks/<task_id>_review.md`: (a) weaknesses discovered · (b) assumptions invalidated · (c) parts of PAEOS strengthened · (d) Proposals created · (e) Debt recorded · (f) strategy change? **← task is NOT done without this**
 - [ ] **L18 Knowledge Extraction** — new pattern/protocol/skill/template/invariant/heuristic (scarred + falsifiable)
 - [ ] **L19 Constitutional Evolution** *(if triggered)* — Incident · Amendment (delta + scar + falsifier + evidence spec) · **founder GATE for kernel-surface**
 
-## Constitutional Execution Rules — active every task (CER, v1.1)
+## Constitutional Execution Rules — active every task (CER, v1.3)
 - [ ] **CER-1** attempted to *falsify* the architecture (not just accept it) — weaknesses/complexity/assumptions/abstractions/TCB/verification/determinism/portability
 - [ ] **CER-2** every discovered improvement → `proposals/PAEOS-IP-NNNN.md` (recommended, not silently applied)
-- [ ] **CER-3** every deliberate non-ideal choice → `ledger/debt/DEBT-NNNN.md`
-- [ ] **CER-5** nothing kernel/lifecycle/authority/invariant changed without founder ratification (runtime recommended, never legislated)
+- [ ] **CER-3** every non-ideal choice → `ledger/debt/DEBT-NNNN.md` (recorded compromise)
+- [ ] **CER-4** finished with mandatory Constitutional Review (`reviews/tasks/<task_id>_review.md`)
+- [ ] **CER-5** separation of powers respected — recommended, did NOT legislate (founder ratifies)
+- [ ] **CER-6** no un-derived architecture invented — ambiguity/gap triggered immediate HALT to an Improvement Proposal
+- [ ] **Global Rule 19** `docs/IMPLEMENTATION_ATLAS.md` registered/updated for this workload component
 
 ## Global rules — verify on every transition
 - [ ] evidence present at this transition (no evidence = invalid)

@@ -1,0 +1,496 @@
+# F-ENVELOPE — Implementation Plan (work units)
+
+**Goal:** Freeze the universal node envelope schema + fixture corpus.
+
+**Stated deliverables:**
+- `sakg/schema/envelope.schema.json` — JSON Schema draft 2020-12, every §4.2 field
+- `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` — every field, every status value, every
+  §4.2 invariant violation (authored confidence, frequency-based promotion, deleted node)
+
+**Acceptance commands (verbatim, from the goal statement):**
+
+```
+A1  uv run python -c "import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())"
+A2  uv run pytest tests/sakg/test_envelope_schema.py -q
+A3  test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12
+A4  test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8
+```
+
+---
+
+## 0. Scope call: three enabling artifacts not named in the goal statement
+
+The goal names two deliverables. Executing acceptance command **A2** requires three more files, and
+IMPLEMENT should treat them as in scope rather than improvising them:
+
+| Artifact | Why it is unavoidable | Design ref |
+|---|---|---|
+| `sakg/schema/__init__.py` | A2 runs a test module; the module needs a loader and a `Violation` mapper to assert *why* a fixture was rejected | `design.md` §3.1 |
+| `tests/sakg/test_envelope_schema.py` | named by A2 itself | `design.md` §6 |
+| `tests/sakg/fixtures/envelope/manifest.json` | holds the `(pointer, keyword, invariant)` expectations; cannot live inside the fixture dirs without breaking A3/A4 | `fixture-corpus.md` §1 |
+
+Nothing else is added. In particular `sakg/schema/invariants.py` (Layer 2) is **not** built here —
+it belongs to F-INVARIANTS (`design.md` §2.2, `traceability.md` §3-4).
+
+---
+
+## 1. Work-unit DAG
+
+```
+W0 preflight ──► W1 reconciliation gate ──► W2 skeleton+primitives ──► W3 $defs objects
+                                                                            │
+                                            W4 legal_transition + promotion ◄┘
+                                                       │
+                                            W5 top level + conditionals
+                                                       │
+                                            W6 loader + Violation mapper
+                                                       │
+                        ┌──────────────────────────────┼───────────────────────────┐
+                        ▼                              ▼                           │
+              W7 valid corpus V01-V16      W11 test module (parallel track,         │
+                        │                      RED until corpus lands)              │
+                        ▼                              │                            │
+              W8 CLOSE THE WORLD ─────────────────────►│                            │
+                        │                              │                            │
+                        ▼                              │                            │
+              W9 invalid corpus I01-I23 ───► W10 manifest closure ──────────────────┘
+                                                       │
+                                                       ▼
+                                            W12 acceptance run + freeze record
+```
+
+**Parallel track.** W11 may begin any time after W6 and *should* — the coverage tests of
+`design.md` §6.4 read the schema, so they can be written and run RED against an empty corpus. Their
+failures are the authoring worklist for W7/W9. W11's **done** condition still requires W10.
+
+**Sizing.** S = under an hour of focused work, M = a half-day, L = a day.
+W0 S · W1 M · W2 S · W3 M · W4 L · W5 L · W6 M · W7 L · W8 S · W9 L · W10 S · W11 L · W12 S.
+
+---
+
+## 2. Work units
+
+Each unit declares: **intent · depends · inputs · outputs · steps · done-when (evidence id) ·
+rollback**. Evidence ids `E*` are defined in [`evidence-plan.md`](evidence-plan.md); rollback
+procedures `R*` in [`rollback.md`](rollback.md).
+
+---
+
+### W0 — Preflight and scaffold  *(S)*
+
+**Intent.** Make the two blocking environment facts true and visible before any design decision is
+committed to bytes.
+
+**Depends.** —
+**Inputs.** `assumptions.md` A12 (jsonschema dependency), A1 (freeze semantics);
+`constitution/README.md:15-16` (TCB-diff gate).
+**Outputs.** `sakg/__init__.py`, `sakg/schema/__init__.py` (empty placeholder),
+`tests/sakg/__init__.py`, `tests/sakg/fixtures/envelope/{valid,invalid}/` (empty dirs),
+`pyproject.toml` dependency entry, a recorded answer to the A1 question.
+
+**Steps.**
+1. `uv add jsonschema` — A12 names this an IMPLEMENT prerequisite; A2 fails at import without it.
+   Record the resolved version; the `unevaluatedProperties` and `$dynamicRef` behaviour of 2020-12
+   is implementation-sensitive and a version pin makes a future regression attributable.
+2. Create the package/test tree above. Empty directories do not survive git — add `.gitkeep` to both
+   fixture dirs, and **remove them in W7/W9** so they cannot be mistaken for fixtures. They are not
+   `*.json`, so they never inflate A3/A4.
+3. Confirm `uv run pytest tests/sakg/ -q` collects 0 tests and exits clean (collection errors here
+   are cheap to fix; the same error inside W11 looks like a schema bug).
+4. **Answer A1.** Inspect the CI TCB-diff gate configuration: does its path scope cover
+   `sakg/schema/`? Record the answer in the branch's first commit message. If **yes**, W12's merge
+   step requires a human ratifier + Adversary review (`constitution/README.md:15-16`) — this changes
+   *who signs off*, never what W2–W11 produce.
+
+**Done when.** E1.
+**Rollback.** R0 (`uv remove jsonschema`; delete the created trees). No external state touched.
+
+---
+
+### W1 — Reconciliation gate  *(M)* — **BLOCKING**
+
+**Intent.** Settle A0 before the field roster is baked into 39 fixtures. This is the largest open
+risk in the package (`traceability.md` §5) and the cheapest moment to close it.
+
+**Depends.** W0.
+**Inputs.** `assumptions.md` A0 and §4 (the five-item reconciliation checklist);
+`constitution/README.md:6-10` (the corpus "currently lives across `derivation/`, `spec/`, and
+`reviews/`"); `design.md` §7 (the gate).
+**Outputs.** A recorded verdict — one of two branches below.
+
+**Steps.**
+1. Attempt to locate §4.2 in `derivation/`, `spec/`, `reviews/` — the three directories the
+   constitution itself names as the corpus's current home. Time-box this; it is a search, not a
+   research project.
+2. **Branch RECONCILED** — §4.2 found: walk `assumptions.md` §4 items 1–5 in order.
+   - Item 3 carries an **abort condition**: if any §4.2 promotion basis or confidence method *is*
+     count- or frequency-shaped, do not admit it into the enum. Escalate — it collides head-on with
+     a named goal invariant (A5). See `rollback.md` §5.
+   - Item 2: after replacing `$defs.status.enum`, regenerate `$defs.legal_transition.anyOf` from the
+     transition table. The coverage tests will fail until a fixture exists per value; **do not
+     weaken them** — that failure is the reconciliation signal (`assumptions.md` §4 item 2).
+   - Item 4: any §4.2 invariant beyond the roster gets an L1/L2 verdict via `design.md` §2.3 and a
+     row in `traceability.md` §2 or §3, even if it lands in L2. An unregistered invariant is an
+     orphan.
+   - Record the diff (fields added / removed / renamed) in the branch history.
+3. **Branch UNRECONCILED** — §4.2 still unavailable: W2 must write a top-level
+   `"$comment": "UNRECONCILED: field roster reconstructed per design/F-ENVELOPE/assumptions.md A0;
+   not yet diffed against §4.2"` into the schema, and the package README's warning stands.
+   This is a **legitimate outcome** (`design.md` §7): the goal is executable without §4.2 and a
+   corpus encoding the three named invariants is worth having now. What is illegitimate is shipping
+   with no marker and letting a reader assume reconciliation happened.
+
+**Done when.** E2.
+**Rollback.** R1 — if §4.2 surfaces *after* W2–W9 have landed, the recovery path is the rename
+procedure of `assumptions.md` §4, **not** a revert. The design's structure (layering, topology,
+corpus architecture) survives field renames; only names change.
+
+---
+
+### W2 — Schema skeleton and `$defs` primitives  *(S)*
+
+**Depends.** W1.
+**Inputs.** `envelope-fields.md` §1 (nine primitive `$defs`) and §7 steps 1–2; `design.md` §3.2
+(`$id`).
+**Outputs.** `sakg/schema/envelope.schema.json` — header + `$defs` primitives only.
+
+**Steps.**
+1. Header: `$schema` (2020-12), `$id: https://sakg.dev/schema/envelope/1.0.0.json`, `title`,
+   `description`, `type: "object"`. Plus the `UNRECONCILED` `$comment` if W1 took that branch.
+2. `$defs`: `node_id`, `evidence_ref`, `timestamp`, `sha256`, `status`, `basis`,
+   `confidence_method`, `trust_zone`, `actor_role` — encodings verbatim from `envelope-fields.md` §1.
+3. **Three mechanics that must not be silently substituted** (`design.md` §2.5):
+   - `pattern`, not `format`, for `timestamp` and `sha256`. Format assertion is opt-in in 2020-12;
+     a validator with formats off accepts `"created_at": "yesterday"`. Keep `format` alongside as
+     documentation only (A7).
+   - `$defs` + `$ref` for every repeated shape. `status` is referenced four times; one definition,
+     four refs, so a reconciliation edit has one target.
+   - `unevaluatedProperties`, never `additionalProperties`, at any level carrying `allOf`/`if`/`then`
+     — deferred to W5/W8 but decided here.
+4. Run `Draft202012Validator.check_schema` now, on primitives alone.
+
+**Done when.** E3 (partial: A1 + `check_schema`).
+**Rollback.** R2 — single-file revert.
+
+---
+
+### W3 — `$defs` composite objects  *(M)*
+
+**Depends.** W2.
+**Inputs.** `envelope-fields.md` §3 (`confidence`), §5 (`provenance`), §6 (`retraction`,
+`quarantine`, `deprecation`); `design.md` §5.1 (authored-confidence defences D1–D4).
+**Outputs.** same file, `$defs` extended.
+
+**Steps.**
+1. `provenance` (incl. nested `source`), `confidence`, `retraction`, `quarantine`, `deprecation` —
+   encodings verbatim from the cited sections.
+2. Carry each `$comment` **exactly as written**. The `INV-*` ids inside them are not decoration:
+   `Violation.invariant` lifts them and `test_every_invariant_has_invalid_fixture` closes the loop
+   (`design.md` §3.1). A dropped `$comment` silently removes an invariant from coverage.
+3. Note the two deliberate asymmetries so they are not "fixed" later:
+   - `confidence.inputs` has `minItems: 1` **unconditionally**, including for `PROPOSED` — a
+     PROPOSED node's confidence derives from its own provenance attestation
+     (`envelope-fields.md` §3). Making this status-dependent turns `INV-CONF-3` from a hard rule
+     into a soft one.
+   - `quarantine` has **no** evidence requirement while `retraction` has `minItems: 1`. Raising a
+     quarantine is a suspicion; requiring proof to raise one suppresses exactly the alarms the canary
+     corpus exists to trigger (`constitution/canaries/README.md:4-6`).
+4. Re-run `check_schema`.
+
+**Done when.** E3 (partial).
+**Rollback.** R2.
+
+---
+
+### W4 — `legal_transition` and `promotion`  *(L)*
+
+**Depends.** W3.
+**Inputs.** `design.md` §4.2 (the 19-row transition table — **normative source**), §4.4 (encoding),
+§5.3 (frequency defences D1–D4); `envelope-fields.md` §4.
+**Outputs.** same file: `$defs.legal_transition`, `$defs.promotion`.
+
+**Steps.**
+1. `$defs.legal_transition` — `anyOf` over 19 `{from: const, to: const}` branches, generated
+   row-by-row from `design.md` §4.2. Carry `$comment: "INV-FSM-1: ..."`.
+2. **Do not add a `RETRACTED` branch.** `RETRACTED` appears in no `from` position; absence *is* the
+   absorbing property. An explicit "no outbound" rule is not expressible and not needed
+   (`design.md` §4.4).
+3. `$defs.promotion` — required set, properties, and the `allOf` carrying `legal_transition` plus the
+   `INV-FSM-2` basis↔transition binding clauses (`if (from,to) then basis ∈ {...}`), one per row of
+   §4.2's third column.
+4. Cross-check the generated branch count: **19**, and the basis binding clause count matches the
+   number of rows with a restricted basis set. A 18- or 20-row table is the single most likely
+   transcription error in this unit and is invisible to `check_schema`.
+
+**Done when.** E3 (partial) + E4 (transition-table transcription check).
+**Rollback.** R2.
+
+---
+
+### W5 — Top level: properties, required, conditionals  *(L)*
+
+**Depends.** W4.
+**Inputs.** `envelope-fields.md` §2 (19 fields), §2.1 (lifecycle-detail family), §7 steps 6–9;
+`fixture-corpus.md` §4 (the `INV-PROMO-3` asymmetry).
+**Outputs.** same file: `properties`, `required`, `allOf`.
+
+**Steps.**
+1. `properties` for all 19 top-level fields; `required` for the 11 `R` rows.
+2. Four lifecycle-detail `allOf` clauses (`superseded_by`, `retraction`, `quarantine`,
+   `deprecation`), each a **strict iff**: `then: {required: [...]}`, `else: {not: {required: [...]}}`.
+   The `else` is what makes a half-deleted node (`ACTIVE` carrying a `retraction`) fail —
+   `design.md` §5.4 D5, fixture `I13`.
+3. **The promotion clause is the one exception and is one-directional — no `else`.**
+   `if status != PROPOSED then required: [promotion]`. A *demoted* node is `PROPOSED` **and** carries
+   a promotion (`V13`); an `else: {not: {required: ["promotion"]}}` would reject it
+   (`fixture-corpus.md` §4). `V01` and `V13` pin both directions of this asymmetry.
+4. **Every `if` carries `"required": ["status"]` alongside its `properties` check** — all five
+   clauses. Without it, an instance *missing* `status` vacuously satisfies the `if`, gets pushed down
+   `then`, and produces an error cascade instead of one clean `required: status` failure
+   (`envelope-fields.md` §2.1).
+5. `INV-EV-1` clause: `evidence_refs` `minItems: 1` conditional on `status != PROPOSED` (A11).
+6. `INV-TZ-1` clause: `trust_zone == "Z0"` requires `provenance.actor_role == "founder"` — this
+   encodes `constitution/README.md:3` ("its only legal writer is `kernel/amendment.py`") as a
+   structural rule.
+7. **Stop here.** Do not add `unevaluatedProperties: false` at the top level yet — that is W8.
+
+**Done when.** E3 (full: `check_schema` + `$ref` resolution + `$id`/`schema_version` correspondence
++ the `additionalProperties` static guard).
+**Rollback.** R2.
+
+---
+
+### W6 — Loader and `Violation` mapper  *(M)*
+
+**Depends.** W5.
+**Inputs.** `design.md` §3.1 (the interface, verbatim), §4.4 (the `anyOf` normalisation note).
+**Outputs.** `sakg/schema/__init__.py`.
+
+**Steps.**
+1. `ENVELOPE_SCHEMA_PATH` via `importlib.resources`, **not** `__file__`-relative — the latter breaks
+   under a zip/wheel install and the failure surfaces far from its cause.
+2. `ENVELOPE_SCHEMA_VERSION` read from the schema itself, not duplicated as a literal.
+3. `load_envelope_schema()`, `envelope_validator()` (cached; construct the `Draft202012Validator`
+   once), `validate_envelope(obj) -> list[Violation]`.
+4. `validate_envelope` returns **all** violations, ordered by pointer depth then document order.
+   Not the first — several fixtures legitimately trip more than one rule, and returning the first
+   makes the test order-dependent on the validator's internal iteration (`design.md` §3.1).
+5. **Lift `INV-*` ids with `re.findall(r"INV-[A-Z]+-\d+", comment)`, never a `^`-anchored match.**
+   JSON forbids duplicate keys, so `promotion`'s single `$comment` declares both `INV-PROMO-2` and
+   `INV-PROMO-4`. An anchored match makes the second id in every such comment invisible to the
+   coverage test — **a gap that looks exactly like coverage** (`design.md` §3.1).
+6. **Normalise `anyOf` failures under `/$defs/legal_transition`** to pointer `/promotion`, keyword
+   `anyOf`. The manifest expectations for `I11` and `I17` are written against that form; without the
+   mapper those fixtures fail with a branch-dependent deep pointer — correctly, because the
+   interface promised a stable pointer (`fixture-corpus.md` §3.3).
+
+**Done when.** E5.
+**Rollback.** R3 — delete the module body; W7–W11 all depend on it, so a rollback here cascades
+forward. Nothing behind it is affected.
+
+---
+
+### W7 — Valid corpus V01–V16  *(L)*
+
+**Depends.** W6.
+**Inputs.** `fixture-corpus.md` §6 (the base document, verbatim), §4 (the 16-row matrix), §5 (the
+authoring method).
+**Outputs.** `tests/sakg/fixtures/envelope/valid/V01..V16.json` + their `manifest.json` entries.
+
+**Steps.**
+1. Author `V04-active-court-ratified.json` **first**, from `fixture-corpus.md` §6. Verify it
+   against the schema before writing anything else. Every other fixture is an explicit, **minimal**
+   mutation of it.
+2. Author V01–V03, V05–V16 per the §4 matrix. Write each fixture's `manifest.json` entry at the same
+   time as the fixture — a manifest written afterwards is a transcription of what the fixture
+   *became*, not a statement of what it was *for*.
+3. **Fixtures are checked-in literal JSON, never generated at test time.** A generator would make the
+   corpus and the schema share an author's misunderstanding — the fixtures could not contradict the
+   schema because they would be derived from the same belief. Literal files can be read by a human
+   ratifier, which is the point of a calibration corpus
+   (`constitution/canaries/README.md:8-9`: canaries are "authored by the Builder + Doc and ratified
+   by the founder").
+4. **Do not attempt an all-fields fixture.** The four lifecycle-detail blocks are mutually exclusive
+   and a genuinely `PROPOSED` node has no promotion to annotate. Full-field coverage is a property of
+   the corpus *union* — an implementer who builds one maximal envelope will produce something the
+   schema correctly rejects (`fixture-corpus.md` §4).
+5. Delete `valid/.gitkeep`.
+
+**Done when.** E6 (valid corpus accepted) + A3.
+**Rollback.** R4 — per-file; the corpus is additive and no fixture depends on another at runtime.
+
+---
+
+### W8 — Close the world  *(S)* — **isolate this commit**
+
+**Intent.** Add the closed-world keywords last and alone, so that over-rejection has exactly one
+suspect.
+
+**Depends.** W7.
+**Inputs.** `envelope-fields.md` §7 step 10; `design.md` §2.5.1, §5.3 D2, §5.4 D2.
+**Outputs.** same schema file: top-level `"unevaluatedProperties": false`, and confirmation that
+every composite `$def` carries it.
+
+**Steps.**
+1. Add `"unevaluatedProperties": false` at the top level. Confirm `promotion`, `confidence`,
+   `provenance`, `provenance.source`, `retraction`, `quarantine`, `deprecation` each already carry
+   it from W3/W4.
+2. **Re-run the entire valid corpus.** This keyword is the one most likely to over-reject, and it is
+   added last precisely so a failure here blames it and nothing else (`envelope-fields.md` §7
+   step 10). A `V*` fixture that passed in W7 and fails now means either the fixture has a stray key
+   or a conditional branch's evaluated properties are not being seen — the second is the
+   `additionalProperties` composition bug and its symptom is *silent over-rejection*.
+3. Confirm no `additionalProperties: false` appears at any level that also has `allOf`/`if`. This is
+   asserted statically in W11 §6.1; check it by hand here too, because the static guard is itself
+   new code at this point.
+
+**Done when.** E6 re-run passes unchanged + E3's static guard.
+**Rollback.** R5 — revert this one commit. It touches only keyword additions, so the revert is
+total and returns the schema to a known-good state that passed the full valid corpus minutes
+earlier. This is the single most valuable rollback boundary in the plan.
+
+---
+
+### W9 — Invalid corpus I01–I23  *(L)*
+
+**Depends.** W8. (Not W7 — `I06` and `I09` are *only* rejectable once the world is closed.)
+**Inputs.** `fixture-corpus.md` §3.1–§3.5 (the five grouped tables, normative for every
+`(pointer, keyword, invariant)` triple); `design.md` §5.
+**Outputs.** `tests/sakg/fixtures/envelope/invalid/I01..I23.json` + manifest entries.
+
+**Steps.** Each fixture is a **minimal single mutation** of a valid base (`fixture-corpus.md` §5).
+A fixture that differs in two places may satisfy its manifest assertion by coincidence.
+
+- **Authored confidence (5):** `I01` `I02` `I03` `I04` `I21`.
+  `I03` (`inputs: []`, method left legal) is the load-bearing one — a syntactically well-formed
+  derivation that derives from nothing. A corpus with only `I01`/`I02` leaves the invariant
+  defeatable by anyone who learned the required shape without understanding it
+  (`fixture-corpus.md` §3.1).
+- **Frequency-based promotion (4):** `I05` `I06` `I07` `I17`.
+  `I05` and `I06` are the honest and dishonest spellings of one violation and **must trip different
+  keywords on different pointers** — that is the observable consequence of the independent defences
+  in `design.md` §5.3. **Author `I06` with a non-empty `evidence_refs`**, or it also trips `minItems`
+  and stops isolating `INV-PROMO-4`; a fixture that trips two rules cannot tell you which one is
+  still working (`fixture-corpus.md` §3.2).
+- **Deleted node (6):** `I08` `I09` `I10` `I11` `I12` `I13`. Six angles on one idea, because "no node
+  ever leaves the graph" has the most ways to be violated: naming the state, flagging it, erasing
+  without a record, undoing a tombstone, orphaning a replacement, half-deleting.
+  `I11` depends on W6 step 6; without the mapper its pointer is branch-dependent.
+- **Lifecycle / evidence / trust-zone (5):** `I18` `I19` `I20` `I22` `I23`.
+- **Structural (3, `"invariant": null`):** `I14` `I15` `I16`. These prove the plumbing
+  (required/pattern/enum) works at all, which is what makes a *passing* invariant fixture meaningful.
+
+Delete `invalid/.gitkeep`.
+
+**Done when.** E7 (each rejected at the declared pointer by the declared keyword) + A4.
+**Rollback.** R4.
+
+---
+
+### W10 — Manifest closure  *(S)*
+
+**Depends.** W9.
+**Inputs.** `fixture-corpus.md` §2 (format).
+**Outputs.** `tests/sakg/fixtures/envelope/manifest.json`, complete and reconciled.
+
+**Steps.**
+1. Entries were written per-fixture in W7/W9; this unit reconciles the set against the filesystem in
+   both directions.
+2. **`manifest.json` stays one level above `valid/` and `invalid/`. Do not move it.** Inside a
+   fixture dir it would be counted by A3/A4 and the number would stop meaning "fixtures"; as an
+   `x-expect` key inside a fixture it would make every valid fixture invalid under
+   `unevaluatedProperties: false` (`fixture-corpus.md` §1 — both alternatives were considered and
+   rejected).
+3. Confirm no other `*.json` exists in either fixture directory.
+
+**Done when.** E8.
+**Rollback.** R4.
+
+---
+
+### W11 — Test module  *(L)* — parallel track from W6
+
+**Depends.** W6 to start; W10 to complete.
+**Inputs.** `design.md` §6.1–§6.4 (four test groups).
+**Outputs.** `tests/sakg/test_envelope_schema.py`.
+
+**Steps.**
+1. **Group 1 — schema self-tests** (`design.md` §6.1): parses as JSON; `check_schema` passes; every
+   `$ref` resolves and no `$defs` entry is unreferenced; `$id`'s version segment ==
+   `properties.schema_version.const`; **no `additionalProperties: false` at any level that also has
+   `allOf`/`if`** — a static guard whose symptom is otherwise silent over-rejection.
+2. **Group 2 — valid corpus** (§6.2): parametrised over `sorted(valid/*.json)`, each must produce
+   `validate_envelope(obj) == []`. On failure print the `Violation` list; a valid fixture that fails
+   is usually a schema bug and the pointer says where.
+3. **Group 3 — invalid corpus** (§6.3): parametrised over `sorted(invalid/*.json)`; for each, assert
+   (a) rejected, (b) some violation matches the manifest's `pointer` **and** `keyword`, (c) that
+   violation's `invariant` matches. **(b) and (c) are the whole point** — `assert not valid` alone
+   passes for a fixture rejected because of a typo'd `created_at`, which is a fixture with zero
+   discriminating power for the invariant it claims to test. That is `CANARY-0002`'s exact defect
+   class transplanted into a fixture corpus (`constitution/canaries/CANARY-0002.json:4`: "zero
+   discriminating power (the same PASS for the claim and its negation)").
+4. **Group 4 — coverage tests** (§6.4), all of which read the **schema**, not a hardcoded list, so
+   the corpus cannot drift from the artifact: `test_every_status_has_valid_fixture`,
+   `test_every_field_appears_in_valid_corpus` (walks `properties` *and* each `$defs` object's
+   `properties`, so `quarantine.canary_id` and `promotion.note` are in scope),
+   `test_every_invariant_has_invalid_fixture`, `test_every_legal_transition_has_valid_fixture`,
+   `test_manifest_matches_filesystem`, `test_corpus_size_floors`.
+5. `test_corpus_size_floors` re-asserts A3/A4's floors **inside pytest**, so the floor breaks in CI
+   rather than only in a shell.
+6. `test_every_legal_transition_has_valid_fixture` asserts a floor of **≥12 of 19** edges plus
+   **mandatory** coverage of the five safety-critical edges (`*→RETRACTED`, `*→QUARANTINED`,
+   `QUARANTINED→ACTIVE`, `ACTIVE→SUPERSEDED`, `CANDIDATE→ACTIVE`), named explicitly in the test so
+   they cannot silently drop out. The five uncovered edges are listed in `fixture-corpus.md` §4.1 —
+   an uncovered edge is a visible decision, not an omission.
+
+**Done when.** E9 (A2 green) + E10 (discrimination probe).
+**Rollback.** R6.
+
+---
+
+### W12 — Acceptance run and freeze record  *(S)*
+
+**Depends.** W11.
+**Inputs.** the four acceptance commands; `design.md` §7 (the fifth, human-adjudicated criterion).
+**Outputs.** captured evidence bundle (`evidence-plan.md` §4), merge decision.
+
+**Steps.**
+1. Run A1–A4 verbatim from a clean checkout, in order, capturing stdout and exit codes.
+2. Run E10 (the discrimination probe) and revert its mutations. **Verify the working tree is clean
+   afterwards** — the probe deliberately breaks the schema and a forgotten revert ships a disarmed
+   invariant.
+3. Record the W1 verdict in the merge description: RECONCILED (with the field diff) or UNRECONCILED
+   (with the schema's `$comment` quoted). `design.md` §7 makes this a fifth exit criterion the four
+   commands **cannot** reach — they verify the artifact parses, its tests pass, and the corpus meets
+   its floors; they cannot verify that the fields are §4.2's fields.
+4. If W0 step 4 answered **yes**, route to a human ratifier + Adversary review before merge
+   (`constitution/README.md:15-16`).
+
+**Done when.** all of E1–E10 discharged.
+**Rollback.** R7.
+
+---
+
+## 3. Plan-level risk → closing unit
+
+Carried from `design.md` §9; each row names the unit that closes it, so no risk is left to vigilance.
+
+| Risk | Severity | Closed by |
+|---|---|---|
+| Field roster is a reconstruction (A0) | **High** | W1 (gate) + W12 step 3 (recorded verdict). Not closable by any command. |
+| `jsonschema` absent from the dependency set (A12) | Medium | W0 step 1 |
+| `unevaluatedProperties` misapplied as `additionalProperties` | Medium | W8 (isolated commit) + W11 §6.1 static guard |
+| Stray `*.json` inflating A3/A4 | Medium | W10 step 3 + `test_manifest_matches_filesystem` |
+| `anyOf` errors unusable for transition failures | Low | W6 step 6 |
+| Corpus grows without coverage | Low | W11 group 4 (schema-derived, so a new field/status/invariant fails until covered) |
+| A fixture passes without discriminating power | **High** | W11 group 3 `(pointer, keyword, invariant)` + E10 probe |
+| Merge blocked by TCB scope (A1) | Medium | W0 step 4 (answered early, so it surprises nobody at W12) |
+
+## 4. Definition of done
+
+1. A1–A4 pass verbatim from a clean checkout (E9).
+2. E1–E10 all discharged, artifacts captured (`evidence-plan.md` §4).
+3. The W1 verdict is recorded, and if UNRECONCILED the schema carries the `$comment` marker
+   (`design.md` §7).
+4. Working tree clean — no residue from the E10 probe.
+5. If `sakg/schema/` is in TCB scope: ratifier + Adversary sign-off obtained.

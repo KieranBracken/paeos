@@ -1,0 +1,308 @@
+---
+artifact: sakg-s1-extraction-probe-plan
+title: "PLAN — [S-PROBE] SAKG S1 extraction feasibility spike"
+stage: PLAN
+role: PLANNER
+date: 2026-08-07
+deliverable_path: reviews/spikes/sakg-s1-extraction-probe.md
+frozen_design: "artifact:6e25c17baa62866b7dfc4735f6ca73578a5d5a2a579042a364b3421f0e8b8322"
+work_units: 5
+verdict_carried: NO-GO
+loss_ratio_carried: 0.41
+---
+
+# PLAN — [S-PROBE] SAKG S1 extraction feasibility spike
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | PLAN ONLY — no implementation, no verification run, no deliverable write. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-07 |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | Frozen DESIGN body `artifact:6e25c17b…` (`context/artifact-6e25c17baa62.txt`), §§0–11; `constitution/README.md` (TCB / trust-zone boundary); `plan/classify-obj-lifetime-plan.md` (PLAN-artifact precedent). |
+| **Transitive refs** | `spec/SAEOS-1-architecture.md` §4.2 `:387-415`, §4.3 `:428-442`, §6.1b `:565-572`, §8 `:684`, §9 A8 `:754-761`/`:766`, D7 `:782` — cited **through** the frozen DESIGN artifact; `spec/` is outside this session's read-capability and was **not** read here. |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/` and
+read-capability limited to `constitution/`, `design/`, `plan/` (plus the context artifacts,
+which are on the path by construction).
+
+**Write-path deviation, declared — and it is the same one the DESIGN stage hit.** The goal
+objective names `reviews/spikes/sakg-s1-extraction-probe.md` as the deliverable. That path is
+outside this session's write-capability; a write there would be discarded as a violation, so
+it was **not attempted**. The four acceptance predicates therefore **cannot be turned green by
+this session**. They are turned green by **WU-3**, planned below, executed by a stage holding
+a `reviews/` write capability.
+
+**This is not a workaround — it is the plan's central problem.** The probe body already
+exists, complete and frozen, as `artifact:6e25c17b…`. Nothing about the spike remains to be
+*investigated*. What remains is a **materialization and acceptance problem**: getting 47,960
+bytes to a path no producing stage has been given capability over, without altering a single
+byte that the predicates or the verdict depend on. §2 plans exactly that and nothing more.
+
+**What this PLAN does not do.** It does not re-derive, re-score, re-open, or soften the
+verdict. DESIGN is frozen (`artifact:6e25c17b…` §8: `verdict: NO-GO`, `loss_ratio: 0.41`).
+A PLAN stage that re-litigated a frozen DESIGN would be re-running the spike under a
+different name. Every substantive claim below is carried, with citation, not restated.
+
+---
+
+## 1. Objective restatement (traceability)
+
+Deliver `reviews/spikes/sakg-s1-extraction-probe.md` containing, for each of 3 real sealed
+goals drawn from `ledger/` + `reviews/tasks/`, a hand-extraction attempt into the SAEOS-1
+§4.3 node types, recording per-field `extractable` / `partial` / `absent`, plus an explicit
+`GO` / `NO-GO` verdict with the loss ratio. Purpose: falsify SAEOS-1 §9 / A8 before building.
+
+**Acceptance surface (verbatim, 4 predicates):**
+
+```
+P1  test -f reviews/spikes/sakg-s1-extraction-probe.md
+P2  rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+P3  test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+P4  rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+§5 traces every objective clause and every predicate to the body text that satisfies it.
+
+---
+
+## 2. Work units (executable, ordered, single-owner)
+
+Each WU is atomic, has one owning stage/role, a precondition, an exact action, a done-check,
+and the evidence it feeds. WUs are strictly sequential: `WU-1 → WU-2 → WU-3 → WU-4 → WU-5`.
+
+### WU-1 — Pin the frozen probe body by content address
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** `artifact:6e25c17baa62866b7dfc4735f6ca73578a5d5a2a579042a364b3421f0e8b8322`.
+- **Precondition (Assumption A-P1 — verified adverse this session):** the body is **not** on
+  the `design/` path. `design/` contains exactly `PAEOS-skills-gen1.md`,
+  `classify-obj-lifetime.md`, `is_institutional-design.md`; a case-insensitive search for
+  `sakg` across `design/` returns **no match**. The DESIGN stage's §0 says it wrote the body
+  "at the one path this session may write," but that write is not visible on `design/` in this
+  workspace. **BUILDER must resolve the body by artifact hash, not by path.** Planning a
+  path-based copy would fail at execution.
+- **Action (exact):** resolve the artifact; record `shasum -a 256` of the resolved bytes.
+- **Done-check:** a sha256 is recorded, and byte-length is **47,960** (measured this session).
+  A length mismatch means the wrong body — halt, do not proceed to WU-3.
+- **Feeds:** evidence E1.
+- **Note:** the sha256 itself was **not captured in this session** — `shasum` required an
+  approval this non-interactive session cannot grant. Byte-length 47,960 is the interim
+  integrity anchor; WU-1 upgrades it to a content address. This is deliberately the *first*
+  work unit, because every later done-check compares against it.
+
+### WU-2 — Ensure the target directory exists
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Precondition (Assumption A-P2):** `reviews/spikes/` may not exist. `reviews/` is outside
+  this session's read-capability and its subtree was **not** inspected, so existence is
+  asserted by neither this plan nor DESIGN.
+- **Action (exact):** `mkdir -p reviews/spikes` — create the directory only; create no files.
+- **Done-check:** `reviews/spikes/` is a directory. Record whether WU-2 **created** it or
+  found it — WU-2's rollback (§4) branches on this.
+- **Feeds:** evidence E2.
+
+### WU-3 — Materialize the deliverable, byte-for-byte
+- **Owner:** BUILDER @ IMPLEMENT, holding a `reviews/` write capability.
+- **Ref:** frozen DESIGN §0 — "Relocating it to `reviews/spikes/sakg-s1-extraction-probe.md`
+  **unchanged** satisfies every acceptance predicate."
+- **Precondition:** WU-1 and WU-2 complete.
+- **Action (exact):** copy the WU-1 bytes to `reviews/spikes/sakg-s1-extraction-probe.md`.
+  **Copy, do not retype and do not round-trip through an editor.** No reflow, no trailing-
+  whitespace strip, no newline normalization, no frontmatter reformat, no heading rewrite.
+  The body ends with a terminating `\n`; preserve it.
+- **Done-check:** `shasum -a 256` of the destination **equals** the WU-1 hash. A hash
+  comparison — not a path and not a line count — is the done-check, deliberately: the probe's
+  own finding **F1/EvidenceRef** is that PAEOS cites evidence "as paths and counts, never as
+  content addresses." A plan that shipped this probe on a path assertion would reproduce the
+  exact defect the probe was written to expose.
+- **Feeds:** evidence E3. **Satisfies P1–P4.**
+
+### WU-4 — Run the four acceptance predicates
+- **Owner:** VERIFIER @ VERIFY (not this session).
+- **Precondition:** WU-3 complete; destination hash matches.
+- **Action (verbatim — run all four from the repo root, do not alter one character):** the
+  P1–P4 block in §1.
+- **Done-check:** P1, P2, P4 exit `0`; P3's `rg -c` prints an integer `>= 3`.
+- **Adverse-path check (Assumption A-P3 — non-obvious, must be run on failure):** `rg` honors
+  `.gitignore` by default. If `reviews/` or `reviews/spikes/` is ignored, **P1 passes while
+  P2–P4 fail on a perfectly correct file.** On any P2/P3/P4 failure, before touching the
+  deliverable, re-run with `rg -u` and run `git check-ignore -v <path>`. If ignore is the
+  cause, the defect is in the harness or `.gitignore`, **not** in the artifact — escalate;
+  do **not** edit the body to chase a green.
+- **Feeds:** evidence E4.
+
+### WU-5 — Route the NO-GO verdict and the follow-on register to the founder
+- **Owner:** Founder / SEAL (CER-5: the runtime recommends, the founder legislates).
+- **Precondition:** WU-4 green. Routing an unverified verdict is forbidden.
+- **Action:** deliver to the founder, citing the sealed deliverable:
+  1. the verdict — **NO-GO on S1 as specified in SAEOS-1 §8**, `loss_ratio 0.41`
+     (best observed anywhere in the repo: 0.34, the kernel-sealed control, §5);
+  2. the scope of the verdict — it is **not** a verdict on SAKG or on Ω1 (§8.2);
+  3. the three GO preconditions **P1/P2/P3** (§8.3) — of which **P2** (giving `falsifier`,
+     `valid_until`, `coordinates`, `facets` an author) is a governed PAEOS-artifact change
+     that must be filed as an Improvement Proposal under **CER-2**; the runtime may not
+     legislate it (CER-5);
+  4. the **editorial correction of F1 and F2** in SAEOS-1 §4.3/§6.1b — these are factual
+     errors about PAEOS's current shape, not design choices (§8.3, final paragraph).
+- **Done-check:** founder receipt recorded; P2 filed as an IP; F1/F2 correction opened.
+- **Feeds:** evidence E5.
+- **These are routed, not scheduled.** P1/P2/P3 and the F1/F2 correction are **follow-on
+  goals**, outside this goal's deliverable. This plan registers them with owners so they are
+  not lost; it does not schedule, cost, or begin them. Widening scope here would be this
+  planner's call to make, and it is not.
+
+**Blast radius (A-2):** additive and non-TCB — one new file plus at most one new directory
+under `reviews/`. No existing file is modified; no code, kernel, or constitutional change.
+`constitution/` is untouched, and per `constitution/README.md` that tree is Trust Zone 0,
+read-only at runtime and amend-only via `kernel/amendment.py`. Kernel classification expected
+**SOFT**; no amendment path, no ratifier required for WU-1..WU-4.
+
+---
+
+## 3. Evidence plan (obligations → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` — this file: work units (§2), evidence obligations (§3), rollback (§4), refs cited (header + inline). | PLANNER @ PLAN (this session) | Presence of §2/§3/§4 and the upstream + transitive ref block. | **PLAN** |
+| **E1** | `body_pinned` — sha256 + byte-length of the frozen probe body. | BUILDER @ IMPLEMENT | `shasum -a 256` recorded; length `== 47960`. | IMPLEMENT |
+| **E2** | `target_dir_exists` — `reviews/spikes/` present; creation flag recorded. | BUILDER @ IMPLEMENT | Directory test; created-vs-found noted for rollback. | IMPLEMENT |
+| **E3** | `deliverable_materialized` — destination bytes identical to E1. | BUILDER @ IMPLEMENT | `shasum -a 256` of destination `==` E1 hash. | IMPLEMENT |
+| **E4** | `probe_accepted` — all four acceptance predicates satisfied. | VERIFIER @ VERIFY | Run §1 P1–P4 verbatim from repo root; report exit codes and P3's integer. | **VERIFY** |
+| **E5** | `verdict_routed` — founder holds the NO-GO, the P1/P2/P3 register, and the F1/F2 correction. | Founder / SEAL | Founder receipt; P2 filed under CER-2; F1/F2 correction opened. | SEAL |
+
+### 3.1 Pre-verification already performed (de-risking WU-3/WU-4)
+
+The predicates were dry-run **against the frozen artifact body** in this session, since the
+body is on the path even though the deliverable path is not. Results:
+
+| Predicate | Result | Satisfying line(s) in the body |
+|---|---|---|
+| P2 `^verdict: (GO\|NO-GO)$` | **PASS** | `:11` `verdict: NO-GO` — and again `:430` inside the §8 fenced block |
+| P3 `rg -c '^## goal: '` | **3** (`>= 3` ✓) | `:109` B0.4 · `:166` B0.6 · `:218` B2.G |
+| P4 `^loss_ratio: 0\.[0-9]+$` | **PASS** | `:12` `loss_ratio: 0.41` — and again `:431` |
+
+Two consequences worth carrying forward:
+
+- **P2 and P4 are doubly satisfied.** Frontmatter and the §8 verdict block each satisfy them
+  independently, so neither predicate is a single-point failure. `loss_ratio_best_observed:
+  0.34` at `:14` correctly does **not** match P4 (the `_` defeats the `^loss_ratio: ` anchor),
+  so the headline figure is the only one the predicate can read.
+- **P3 has zero margin.** Exactly 3 matches against a `>= 3` threshold. Any reformat of a
+  `## goal:` heading — an added prefix, a demotion to `###`, a leading space — drops the count
+  to 2 and fails acceptance. This is the single most fragile line-shape in the deliverable and
+  is the concrete reason WU-3 mandates a byte copy rather than an edit.
+
+### 3.2 Assumption → verification-owner ledger
+
+Carried from frozen DESIGN §10 (A1–A7), each already owned there; A1 and A5 could move the
+ratio, neither reaches the `0.00` §8's exit criterion requires, and none changes the verdict:
+
+- **A1** (the three `reviews/tasks/` docs are the complete sealed set) → whoever runs P1's
+  collector against a live stage record. If false, the loss ratio is a **ceiling, not a floor**.
+- **A2** (1.0/0.5/0.0 weighting is fair) → invariance argued in DESIGN §10; no weighting in
+  the tested range reaches "lossless."
+- **A3** (envelope scored once per goal) → confirmed by the identical 9.0/16 across all three.
+- **A4** (`runtime/memory/__init__.py` is the only `Scar` type) → if false, **F1 weakens**;
+  F2–F6 do not depend on it.
+- **A5** (prose-sealed goals are representative) → tested by the §5 control; moves 0.07.
+- **A6** (`confidence` excluded from the denominator) → verdict invariant (0.40 / 0.42).
+- **A7** (post-P1/P3 projection `loss ≈ 0.15`) → **forecast, not measurement**; owner is
+  whoever re-runs this probe after P1 and P3 land.
+
+New at PLAN, each owned by a work unit:
+
+- **A-P1** — the body is resolvable only by artifact hash; it is **not** on `design/`
+  (verified adverse this session). → **WU-1**.
+- **A-P2** — `reviews/spikes/` may not exist. → **WU-2**.
+- **A-P3** — the harness runs `rg` from the repo root with default ignore behavior; if
+  `reviews/` is gitignored, P2–P4 fail on a correct file. → **WU-4** adverse-path check.
+- **A-P4** — P3 has zero margin at exactly 3 matches. → **WU-3** (byte copy) and any future
+  editor of the deliverable.
+- **A-P5** — `rg` is on the harness PATH and supports `-q` / `-c`. → **WU-4**.
+
+No assumption changes the plan; each is a fact a named downstream WU confirms.
+
+---
+
+## 4. Rollback plan
+
+The change is additive and non-TCB, so rollback is clean and bounded.
+
+- **Trigger:** WU-3 destination hash ≠ WU-1 hash; **or** any WU-4 predicate fails *after* the
+  A-P3 ignore-check has excluded a harness cause.
+- **Rollback action (BUILDER @ IMPLEMENT, on a `reviews/` write capability):**
+  1. Delete `reviews/spikes/sakg-s1-extraction-probe.md`. The file did not exist before WU-3,
+     so deletion restores the prior tree exactly — there is no prior version to preserve.
+  2. Remove `reviews/spikes/` **only if** WU-2 recorded that it created the directory **and**
+     the directory is now empty. If WU-2 found it pre-existing, leave it.
+  3. No other path was written. No collateral revert is needed.
+- **Verification of rollback:** `test -f reviews/spikes/sakg-s1-extraction-probe.md` exits
+  non-zero; nothing else under `reviews/` differs from the pre-change tree.
+- **Blast containment:** nothing outside these two additions was modified and the
+  `constitution/` TCB tree is untouched (`constitution/README.md`), so rollback cannot leave
+  partial state and requires no kernel amendment or ratifier action.
+- **Recovery path:** re-enter IMPLEMENT and re-run WU-3 against the **WU-1 pinned hash**. The
+  body is frozen and content-addressed, so recovery is a re-copy — never a re-authoring. If
+  the hash itself cannot be reproduced, the failure is artifact resolution (WU-1), not the
+  deliverable, and IMPLEMENT halts rather than reconstructing the body by hand.
+
+**Two things rollback explicitly does not do:**
+
+1. **Rollback does not retract the verdict.** NO-GO at `loss_ratio 0.41` is a property of the
+   frozen DESIGN artifact, established by the six boolean observations F1–F6. It survives
+   deletion of the deliverable file. A failed materialization is a delivery failure, not
+   evidence for GO.
+2. **Rollback does not reach WU-5.** Once the founder holds the verdict, retraction is a
+   founder act under CER-5, not a runtime act. **WU-5 is the point of no return, and it is
+   sequenced last, after E4, for exactly that reason.**
+
+---
+
+## 5. Trace — objective clauses and predicates to body text
+
+**Objective clauses → frozen DESIGN body:**
+
+| Objective clause | Satisfied by |
+|---|---|
+| 3 real sealed goals from `ledger/` + `reviews/tasks/` | §2 **B0.4** (`reviews/tasks/B0.4_review.md` + `ledger/debt/DEBT-0003`, `DEBT-0004`) · §3 **B0.6** · §4 **B2.G** |
+| Hand-extraction into SAEOS-1 §4.3 node types | §2.2, §3.2, §4.2 — all 12 §4.3 types scored in every goal, none skipped |
+| Per-field `extractable` / `partial` / `absent` | §1.2 rubric; applied per field across the 16-field §4.2 envelope + 12 §4.3 types = 28 fields/goal, **84 scored** |
+| Explicit GO or NO-GO verdict | §8 `verdict: NO-GO`, plus frontmatter `:11` |
+| With the loss ratio | `49.5 / 84 = 0.589` → `loss_ratio 0.41` (§6.1), robustness-checked two ways in §6.2 (scope-fair 0.41; best-observed 0.34) |
+| Falsify SAEOS-1 §9 / A8 before building | §7 **F1–F6**, six boolean observations; §8.1 states A8 falsified as worded and its `[MODIFY]` disposition too generous |
+
+**Acceptance predicates → work unit → evidence:**
+
+| Predicate | Turned green by | Body text relied on | Evidence |
+|---|---|---|---|
+| P1 `test -f` | WU-2 + WU-3 | n/a — path existence | E2, E3 |
+| P2 `verdict:` | WU-3 | `:11`, `:430` | E4 |
+| P3 `## goal: ` ≥ 3 | WU-3 | `:109`, `:166`, `:218` | E4 |
+| P4 `loss_ratio:` | WU-3 | `:12`, `:431` | E4 |
+
+---
+
+## 6. Completeness check (no orphan / no gap)
+
+- **Every objective clause maps to body text** (§5, upper table) and **every acceptance
+  predicate maps to a work unit and an evidence id** (§5, lower table).
+- **Every work unit feeds an evidence obligation** (§3): WU-1→E1, WU-2→E2, WU-3→E3, WU-4→E4,
+  WU-5→E5; this file is E0.
+- **Every assumption has a named verification owner** (§3.2): A1–A7 carried from DESIGN §10
+  with their owners intact; A-P1…A-P5 newly surfaced at PLAN, each owned by a WU.
+- **A rollback is declared and bounded for every mutating stage** (§4), with the one
+  non-rollbackable step (WU-5) named as such and sequenced last.
+- **Adverse paths are planned, not assumed away:** wrong-body (WU-1 length check), missing
+  directory (WU-2), byte drift (WU-3 hash compare), gitignore masking (WU-4 A-P3), zero-margin
+  heading count (A-P4).
+- **Nothing is orphaned into scope:** P1/P2/P3 and the F1/F2 correction are registered with
+  owners in WU-5 and explicitly **routed, not scheduled**.
+- **All claims cite an upstream ref:** frozen DESIGN `artifact:6e25c17b…` §§0, 1.2, 2–8, 10;
+  `constitution/README.md` (TCB boundary); `plan/classify-obj-lifetime-plan.md` (artifact
+  shape); `spec/SAEOS-1-architecture.md` transitively via DESIGN, declared unread in §0.
+
+**Evidence for this gate:** `plan_executable` = this file.

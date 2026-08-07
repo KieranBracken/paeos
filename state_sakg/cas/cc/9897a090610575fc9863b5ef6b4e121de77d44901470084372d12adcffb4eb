@@ -1,0 +1,433 @@
+# PLAN — `[S-PROBE]` SAKG S1 extraction feasibility spike
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | PLAN ONLY — no goal selected, no cell adjudicated, no spike report written. Frozen input to the downstream `EXECUTE` stage. |
+| **Date** | 2026-08-07 |
+| **Required evidence (this gate)** | `plan_executable` (CITATION) — work units + evidence obligations + rollback declared; refs cited. |
+| **Falsification target** | `SAEOS-1 §9/A8` — "PAEOS artifacts are too unstructured to extract losslessly" |
+| **Target deliverable (downstream)** | `reviews/spikes/sakg-s1-extraction-probe.md` |
+| **Upstream refs** | **DESIGN** — `[S-PROBE]` SAKG S1 extraction feasibility spike, supplied as context artifact `e47a88874457…` (self-cited path `design/sakg-s1-extraction-probe-design.md`); §§1–8 cited throughout. Also: `constitution/README.md` (TCB / trust-zone boundary); `plan/classify-obj-lifetime-plan.md` (house plan form); `SAEOS-1` §§4.2, 4.3, 5.1, 6.1b, 7, 8, 9, 10; `PAEOS-9` §5, §8.2, §8.3; `PAEOS-6` (assumption surfacing); `PAEOS-7.6` §3, §4 (stage/role separation). |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/` and
+read-capability limited to `constitution/`, `design/`, `plan/`. The goal objective names
+three actions this stage **does not and must not perform**; each is planned below as a
+downstream work unit, not executed:
+
+1. **Read `reviews/tasks/*_review.md`** — outside read-capability. This plan therefore
+   binds the *procedure* over the corpus, never the corpus itself. Every statement about
+   what the reviews contain is inherited from DESIGN §6 as a surfaced assumption with a
+   downstream owner (§5 below), not asserted as fact.
+2. **Write `reviews/spikes/sakg-s1-extraction-probe.md`** — a `reviews/` write, outside
+   write-capability; any such write is discarded as a violation. Planned as **WU-7**.
+3. **Run the four acceptance assertions** — they presuppose the deliverable exists and
+   produce `EXECUTE`-stage evidence. Running them now would fail (no file) and would
+   misrepresent execute-stage evidence as plan output. Planned as **WU-8**.
+
+The four-tuple transition contract (PAEOS-7.6 §4) keeps these powers separated. That
+separation is not merely procedural here: DESIGN §5.3 froze the GO/NO-GO thresholds
+*before* any stage able to read the corpus exists, so the pre-registration boundary and the
+capability boundary are the same line. This plan inherits that discipline and **adds no
+threshold, relaxes none, and reinterprets none**.
+
+Evidence emitted by *this* session is `plan_executable` (this file) — **not** the spike
+report, and **not** a verdict.
+
+---
+
+## 1. Objective restatement (traceability)
+
+Produce `reviews/spikes/sakg-s1-extraction-probe.md`: for each of **3 real sealed goals**
+from `reviews/tasks/`, a hand-extraction attempt into the `SAEOS-1 §4.3` node types,
+recording per-field `extractable` / `partial` / `absent`, terminating in an explicit
+**GO** or **NO-GO** verdict with the loss ratio.
+
+The instrument is fully specified by DESIGN and is **not re-derived here**:
+
+- **Field inventory (frozen):** DESIGN §2.2 — 7 in-bundle node types × (6 scored envelope
+  fields + type-specific content fields) = **71 cells/goal**, **213 total**; 29 content
+  fields × 3 goals = **87** (the G5 floor). 10 synthesized envelope fields are excluded from
+  the denominator; 5 out-of-bundle §4.3 types are annex-only (DESIGN §2.3).
+- **Dispositions (frozen):** DESIGN §3.2 — `extractable` (1.0) · `partial` (0.5) ·
+  `absent` (0.0) in the denominator; `n/a-synthesized` · `n/a-auto-discharged` excluded,
+  each with a stated justification.
+- **Scoring (frozen):** DESIGN §5.1 — `loss_ratio = 1 − (Σ s)/N`, 2 dp, half-up.
+- **Decision rule (frozen, pre-registered):** DESIGN §5.3 — `GO` iff G1 ∧ G2 ∧ G3 ∧ G4 ∧ G5.
+- **Report schema (frozen):** DESIGN §3.4, including the emission invariants that the
+  acceptance regexes depend on.
+
+This restates DESIGN without adding, relaxing, or reinterpreting any requirement.
+
+### 1.1 The pre-registered conditions, carried verbatim (DESIGN §5.3)
+
+Reproduced here so this plan is executable standalone. **The executing stage may not amend
+any of them** (§6, rollback trigger R1).
+
+| id | Condition |
+|----|-----------|
+| **G1** | `absent_ratio ≤ 0.25` |
+| **G2** | `loss_ratio ≤ 0.40` |
+| **G3** | `absent_ratio(Decision content) ≤ 0.15` — 18 Decision content cells ⇒ at most **2** absent |
+| **G4** | No in-bundle type has `absent_ratio == 1.00` |
+| **G5** | `N ≥ 87` |
+
+Qualifiers (`insufficient-sample`, `trace-a-only`, `reduced-matrix`) go in `verdict_scope`,
+**never** folded into `verdict:` — the acceptance regex admits exactly `GO` or `NO-GO`.
+
+---
+
+## 2. Work units (executable, ordered, single-owner)
+
+Each work unit is atomic, has one owning stage/role, a precondition, an exact action, a
+done-check, and the evidence it feeds. Strictly sequential:
+`WU-0 → WU-1 → WU-2 → WU-3 → WU-4 → WU-5 → WU-6 → WU-7 → WU-8`, with one declared
+short-circuit (`WU-2` → `INSUFFICIENT` → `WU-6`).
+
+All of WU-0…WU-8 are owned by **EXECUTOR @ EXECUTE** (not this session), holding read on
+`reviews/tasks/` and write on `reviews/spikes/`.
+
+### WU-0 — Bind the frozen pre-registration source
+- **Ref:** DESIGN §0, §5.3; PAEOS-7.6 §4.
+- **Precondition:** none — this is the first action of the stage.
+- **Action:** resolve the DESIGN artifact to a citable identifier and record it. Report §0
+  MUST cite it by a form a third party can resolve: the artifact digest
+  `e47a88874457…` and, **if and only if** the file has been materialised at that path by
+  then, `design/sakg-s1-extraction-probe-design.md`. Do **not** cite a path that does not
+  resolve at execution time (Assumption **P1**, §5).
+- **Done-check:** report §0 names the frozen source and states verbatim that no threshold
+  was changed after extraction began.
+- **Feeds:** E1.
+
+### WU-1 — Enumerate and characterise the candidate corpus
+- **Ref:** DESIGN §2.1, §6/A1–A3.
+- **Precondition:** WU-0 complete.
+- **Action:** list `reviews/tasks/*_review.md`. For each, record `task_id`, `review_path`,
+  `sealed` (L16 reached — PAEOS-9 §8.2), `ceremony_depth` ∈ {`TRACE_A`, `TRACE_B`,
+  `UNKNOWN`}, and `linked` sibling artifacts the review cites. **Do not select yet** — this
+  unit only observes. `UNKNOWN` depth is recorded as such, not guessed.
+- **Done-check:** every file in `reviews/tasks/` appears exactly once in the candidate table
+  with all five fields populated (`UNKNOWN` is a populated value; blank is not).
+- **Feeds:** E2. Confirms/refutes **A1**, **A3**.
+
+### WU-2 — Select the three goals (`SEL`)
+- **Ref:** DESIGN §2.1 selection rules 1–5, §4.1 `SELECTING`.
+- **Precondition:** WU-1 complete.
+- **Action:** apply the selection rules **in order**:
+  1. Admit only sealed (L16) goals — the exhaust contract fires post-seal (SAEOS-1 §6.1b
+     rule 1).
+  2. Maximise ceremony diversity: if ≥1 sealed `TRACE_B` goal exists, **at least one**
+     selection MUST be `TRACE_B`. `UNKNOWN` counts as `TRACE_A` for this test and may not
+     be used to satisfy it.
+  3. Subject to (1)–(2), prefer shape diversity (weight class / touch-set).
+  4. `B0.0 / B0.1 / B0.2` are the objective's **example, not a mandate** — they are the
+     default only if they satisfy (1)–(3).
+  5. If fewer than three sealed goals exist, or rule 2 cannot be satisfied: **do not
+     substitute.** Enter `INSUFFICIENT` and short-circuit to **WU-6** with a forced
+     `verdict: NO-GO`, `verdict_scope: insufficient-sample`.
+- **Done-check:** exactly three `GoalRef`s bound, each with a written one-line justification
+  naming which rule admitted it; or `INSUFFICIENT` declared with the failing rule named.
+- **Feeds:** E3. Confirms/refutes **A1**, **A2**.
+
+### WU-3 — Fix the matrix variant and instantiate every cell
+- **Ref:** DESIGN §2.2, §5.4; §5.3 G5.
+- **Precondition:** WU-2 bound three `GoalRef`s.
+- **Action:** choose **`full` (213 cells)** or **`reduced` (105 cells)** — 87 content cells
+  plus the 6 envelope fields scored once per goal — and record the choice in frontmatter
+  `matrix_variant` and report §0. Then instantiate every cell in state `UNSEEN`.
+  **The choice is made here, before any extraction, and is not revisitable** (§6, R2).
+- **Decision rule for the variant (binding):** choose `reduced` **only if** WU-1 shows every
+  selected goal at `TRACE_B`. Rationale — G5's floor (`N ≥ 87`) is unchanged by the
+  reduction, so the reduction spends exclusion headroom: `full` tolerates 126 exclusions,
+  `reduced` tolerates only 18. Trace-A auto-discharge (PAEOS-9 §8.3) prunes L03–L11, which
+  produce Option / TradeOff / Constraint / Component content — up to 15 content cells per
+  goal. Two Trace-A goals therefore exceed `reduced`'s headroom and force a G5 NO-GO that
+  `full` would not have produced. This is a real sensitivity of the verdict to a
+  presentation choice; it is resolved **before** the data is seen, which is the only place
+  it can be resolved honestly.
+- **Done-check:** `n_cells_instantiated` equals 213 (`full`) or 105 (`reduced`); the variant
+  and its justification are recorded.
+- **Feeds:** E4.
+
+### WU-4 — Extract and adjudicate every cell (`EX` → `ADJ`)
+- **Ref:** DESIGN §3.2, §3.3, §4.2 (the disposition FSM), §2.3.
+- **Precondition:** WU-3 complete; every cell `UNSEEN`.
+- **Action:** for each `(goal × node_type × field)` cell, run the §4.2 machine in its
+  **normative order**:
+  1. **Exclusion tests first.** Field ∈ the §2.2 synthesized set ⇒ `n/a-synthesized`.
+     Producing L-stage auto-discharged by ceremony depth ⇒ `n/a-auto-discharged`.
+     *Ordering is normative:* exclusion runs **before** search, so a Trace-A-pruned field is
+     never scored `absent`. Reversing it silently converts a triage decision into evidence
+     about extractability — DESIGN names this the single most likely cause of a spurious
+     NO-GO.
+  2. Otherwise `SEARCHING` → `LOCATED` (⇒ `extractable` if unambiguous and mechanically
+     addressable, else `partial`) or `NOT_FOUND` (⇒ `absent`).
+  - **Locus obligation (mandatory, DESIGN §3.3):** every `extractable`/`partial` cell
+    carries a section anchor or ≤120-char quotation; every `absent` cell carries a
+    `searched:` note naming where it was looked for; every exclusion carries its
+    justification. A cell without one **may not leave `LOCATED`**. This mirrors SAEOS-1
+    §5.1 rule 2 — an unsourced `extractable` is unfalsifiable optimism, an unsearched
+    `absent` unfalsifiable pessimism, and either silently decides the verdict.
+  - Record the out-of-bundle annex (`Problem`, `Objective`, `Mechanism`, `Pattern`,
+    `Outcome`) present/absent **at type granularity only**. `Outcome` MUST NOT enter the
+    denominator: §4.3 permits its creation long after its subject and §6.1b rule 3 sources
+    it from L17/L19, so a sealed review structurally cannot contain it. Charging it as loss
+    would manufacture a false NO-GO.
+- **Done-check:** **zero** cells remain `UNSEEN`. An incomplete matrix is not a low score —
+  it is not a result at all (DESIGN §4.1), and it may not be emitted (§6, R3).
+- **Feeds:** E5. Confirms/refutes **A2**, **A5**; carries **A7**.
+
+### WU-5 — Score (`SCORE`) and run the mandatory self-checks
+- **Ref:** DESIGN §5.1, §5.2, §2.4, §6/A6.
+- **Precondition:** WU-4 done-check passed.
+- **Action:** compute `Metrics` — `n_scored (N)`, `n_extractable`, `n_partial`, `n_absent`,
+  `loss_ratio`, `absent_ratio`, `partial_ratio`, `per_type`, `per_goal`. Then:
+  - **Arithmetic self-check (MUST appear in report §2):**
+    `loss_ratio == absent_ratio + 0.5 × partial_ratio` (±0.01 rounding) **and**
+    `n_extractable + n_partial + n_absent == N`.
+  - **A6 sensitivity (MUST appear in report §2):** recompute and report `loss_ratio` at
+    `partial ∈ {0.25, 0.50, 0.75}`. If the verdict flips across that range, **that fact
+    outranks the verdict itself** and is stated as such in report §4.
+  - **§5.5 clamp, only if triggered:** if `loss_ratio ≥ 0.995`, render `0.99` in
+    frontmatter, add `loss_ratio_note: clamped-from-<exact>`, and state the exact value in
+    report §2. Clamping is declared, never silent.
+- **Done-check:** both identities hold; all three sensitivity values recorded; clamp applied
+  and annotated, or demonstrably not triggered.
+- **Feeds:** E6.
+
+### WU-6 — Adjudicate the verdict (`GATE`)
+- **Ref:** DESIGN §2.4, §5.3, §4.1 `ADJUDICATED`.
+- **Precondition:** WU-5 complete, **or** `INSUFFICIENT` from WU-2.
+- **Action:** evaluate G1–G5 (§1.1) as a **pure predicate over `Metrics`** — no free
+  parameters, no discretion. `verdict = GO` iff all five hold; otherwise `NO-GO` listing
+  every failing id in `failing_conditions`. On the `INSUFFICIENT` path, force
+  `NO-GO` / `verdict_scope: insufficient-sample` without an extraction. Show the arithmetic
+  for each condition in report §3.
+- **Done-check:** `verdict` ∈ {`GO`, `NO-GO`}; `failing_conditions` empty **iff** `GO`;
+  every G1–G5 evaluation shown with its numbers; any qualifier in `verdict_scope`, never in
+  `verdict`.
+- **Feeds:** E7. **A NO-GO is not a failure of this work unit** — a falsification test that
+  falsifies has succeeded (DESIGN §4.1); it routes to the §7 remand.
+
+### WU-7 — Emit the report (`EMIT`)
+- **Ref:** DESIGN §3.4 (document schema + emission invariants).
+- **Precondition:** WU-6 complete.
+- **Action:** write `reviews/spikes/sakg-s1-extraction-probe.md` to the §3.4 schema:
+  frontmatter, then §0 pre-registration, §1 method and exclusions, three `## goal: <id>`
+  sections, §2 aggregate matrix, §3 verdict derivation, §4 findings against A8, §5 residual
+  risks. **Emission invariants are acceptance-critical:**
+  - `verdict:` and `loss_ratio:` appear **exactly once each, at column 0**, in frontmatter.
+    Every illustrative or per-goal repetition MUST be indented ≥2 spaces or fenced, or it
+    also matches `^verdict: …$` and makes the document self-contradicting to the harness.
+  - Per-goal verdicts use the key `goal_verdict:` — never `verdict:`.
+  - Exactly three lines match `^## goal: `, with the id immediately following
+    (`## goal: B0.0`).
+  - `loss_ratio` renders as `0.dd` — two decimals, leading zero, always (`0.00` not `0`;
+    `0.40` not `0.4`).
+  - Report §1 lists all ten synthesized fields with their assignment rules, so the
+    denominator exclusion is auditable rather than silent.
+- **Done-check:** file exists; a manual read confirms each of the four invariants above
+  before WU-8 is run.
+- **Feeds:** E8.
+
+### WU-8 — Run the acceptance harness (`ACC`)
+- **Ref:** DESIGN §7.
+- **Precondition:** WU-7 complete.
+- **Action (verbatim — do not alter one character):**
+  ```sh
+  test -f reviews/spikes/sakg-s1-extraction-probe.md
+  rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+  test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+  rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+  ```
+- **Done-check:** all four exit `0`. Report each exit code back to the court.
+- **Feeds:** E9 (terminal).
+- **Standing caveat:** the harness is a **shape** check — it cannot distinguish a rigorous
+  probe from a fabricated one. The substantive guarantees are the locus obligation (WU-4),
+  the frozen thresholds (WU-0/§1.1), and the arithmetic self-check (WU-5), all internal to
+  the report and all re-derivable by a reviewer from the matrix alone. Passing WU-8 is
+  necessary, never sufficient.
+
+**Blast radius (DESIGN §8, A-2):** read-only over `reviews/tasks/`, additive under
+`reviews/spikes/`. No TCB path, no `constitution/` write (see `constitution/README.md` —
+that tree is amend-only and is untouched), no runtime behaviour, no schema change. Expected
+**SOFT**. The probe gates a *build decision*, not a promotion — consistent with FPL-3:
+nothing SAKG-related may become a gate.
+
+---
+
+## 3. Evidence plan (obligations → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` — this file: work units, evidence obligations, rollback declared, refs cited. | PLANNER @ PLAN (this session) | Presence of §2 (WU-0…WU-8), §3 (this table), §6 (rollback), §5 (assumption ledger), and upstream refs (header + inline). | **PLAN** |
+| **E1** | Pre-registration bound: report §0 cites the frozen DESIGN by a resolvable identifier and attests no post-hoc threshold change. | EXECUTOR @ EXECUTE | Read report §0; cross-check the five thresholds against §1.1 of this plan, character for character. | EXECUTE |
+| **E2** | Candidate corpus table: every `reviews/tasks/*_review.md` with `sealed` and `ceremony_depth`. | EXECUTOR @ EXECUTE | Table row count equals file count; no blank field. | EXECUTE |
+| **E3** | Three `GoalRef`s with per-goal admitting-rule justification — or a declared `INSUFFICIENT` naming the failing rule. | EXECUTOR @ EXECUTE | Rule 2 satisfied if any sealed `TRACE_B` exists; no substitution on shortfall. | EXECUTE |
+| **E4** | `matrix_variant` fixed pre-extraction, with the WU-3 decision rule applied. | EXECUTOR @ EXECUTE | Frontmatter `matrix_variant`; instantiated cell count = 213 or 105. | EXECUTE |
+| **E5** | Complete matrix: every cell holds a disposition; locus/searched/justification present on every non-`UNSEEN` cell. | EXECUTOR @ EXECUTE | Zero `UNSEEN`; spot-audit — sample 10 cells and confirm each carries its obligation. | EXECUTE |
+| **E6** | `Metrics` + both §5.2 identities + the three-weight A6 sensitivity. | EXECUTOR @ EXECUTE | Recompute `loss_ratio` from the published matrix; both identities hold within ±0.01. | EXECUTE |
+| **E7** | Verdict: `GO`\|`NO-GO`, `failing_conditions`, `verdict_scope`, with G1–G5 arithmetic shown. | EXECUTOR @ EXECUTE | Re-evaluate the §1.1 predicate against E6's `Metrics`; must agree exactly. | EXECUTE |
+| **E8** | `reviews/spikes/sakg-s1-extraction-probe.md` conforming to DESIGN §3.4 incl. emission invariants. | EXECUTOR @ EXECUTE | Structural read against the §3.4 schema before the harness runs. | EXECUTE |
+| **E9** | All four acceptance assertions exit `0`. | EXECUTOR @ EXECUTE | Run WU-8 verbatim; report each exit code. | **EXECUTE (terminal)** |
+
+**Replayability property.** E6 and E7 are *recomputable by any third party from E5 alone* —
+`score` is a pure function over the matrix and `adjudicate` a pure predicate over `Metrics`
+(DESIGN §2.4). A reviewer who doubts the verdict does not need to re-run the probe; they
+re-run the arithmetic. This is what makes E9's shape-only weakness tolerable.
+
+---
+
+## 4. Deliverable ↔ acceptance traceability
+
+| Acceptance assertion | Produced by | Guarded by |
+|---|---|---|
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | WU-7 | E8 |
+| `rg -q '^verdict: (GO\|NO-GO)$'` | WU-6 (closed-set value) + WU-7 (column-0, once, repetitions indented) | E7, E8 |
+| `rg -c '^## goal: ' ≥ 3` | WU-2 (three `GoalRef`s) + WU-7 (three `## goal: <id>` sections) | E3, E8 |
+| `rg -q '^loss_ratio: 0\.[0-9]+$'` | WU-5 (value) + WU-7 (`0.dd` rendering, §5.5 clamp if ever needed) | E6, E8 |
+
+Each assertion has exactly one producing work unit and one guarding evidence obligation.
+No assertion is satisfied incidentally.
+
+**Carried defect in the gate (DESIGN §5.5, surfaced not worked around).** The regex
+`^loss_ratio: 0\.[0-9]+$` admits `[0.00, 0.99]` and **cannot express `1.00`** — total
+extraction failure, the strongest possible falsification of A8, is unrepresentable by the
+gate that commissioned the probe. Handling, in priority order: (1) `1.00` is unreachable
+whenever G5 holds and PAEOS emits anything at all, and if `N = 0` then G5 fails first and
+the verdict is already NO-GO; (2) if the computed value lands ≥ 0.995, clamp per WU-5 with
+`loss_ratio_note` and the exact value in the body; (3) report the defect to the gate author
+in report §4. Fabricating a representable number without saying so is the one failure mode
+that would make the whole probe untrustworthy, and it is forbidden.
+
+---
+
+## 5. Assumption ledger (DESIGN §6, carried forward + plan-local)
+
+Inherited from DESIGN §6, each with the work unit that confirms or refutes it:
+
+- **A1** (≥3 sealed L16 reviews exist in `reviews/tasks/`) → **WU-1/WU-2**. Falsified ⇒
+  `INSUFFICIENT` → NO-GO, scope `insufficient-sample`. Not an error state — a defined path.
+- **A2** (a `_review.md` records or links the goal's decision content, not only an
+  adversarial verdict) → **WU-2/WU-4**. Falsified ⇒ pull in `linked` artifacts per DESIGN
+  §2.1; if content is still absent, **A2's failure *is itself* the A8 finding** and is
+  reported as such in report §4 rather than treated as a blocked probe.
+- **A3** (B0.x goals ran at ceremony depth ≥ Trace-A and depth is recoverable) → **WU-1**.
+  Falsified ⇒ depth `UNKNOWN` → treated as `TRACE_A` (conservative) → likely G5 failure →
+  NO-GO with the ceremony confound named explicitly.
+- **A4** (the seven §6.1b types are the correct S1 target; the other five are annex-only) →
+  owned by DESIGN, not re-opened here. A ratified change to §6.1b's bundle list would
+  require re-freezing DESIGN §2.2 and re-running from WU-0.
+- **A5** (the 29 content fields faithfully operationalise §4.3's roles) → **WU-4**, and it
+  is **the largest discretionary choice in the probe**: Decision/Scar/EvidenceRef are
+  grounded verbatim, but Option/Constraint/TradeOff/Component fields are DESIGN's
+  operationalisation. Falsifier: a reviewer shows a field that moves `loss_ratio` by > 0.05
+  either way. Owner: L09/L10 review of the DESIGN artifact, **before** WU-3.
+- **A6** (`partial = 0.5` is defensible) → **WU-5**, discharged by the mandatory
+  three-weight sensitivity report.
+- **A7** (a single adjudicator's `extractable` vs `partial` calls are reproducible) → **not
+  eliminated.** Mitigated by the locus obligation (WU-4), which makes every call
+  re-checkable. Carried as a residual in report §5.
+- **A8′** (three goals from one bootstrap epoch generalise to PAEOS exhaust at large) →
+  **not eliminated**; SAEOS-1 A4's corpus-bias residual inherited one level down. MUST be
+  carried in report §5. **A GO from this probe authorises S1, not the programme.**
+
+Plan-local assumptions introduced by this stage:
+
+- **P1** — The DESIGN artifact is reachable by the executing stage at a citable identifier.
+  *Observed:* it is supplied as context artifact `e47a88874457…`, and its own §3.4 cites the
+  path `design/sakg-s1-extraction-probe-design.md`, **which does not currently exist in
+  `design/`** (that tree holds `classify-obj-lifetime.md`, `is_institutional-design.md`,
+  `PAEOS-skills-gen1.md` only). *Falsifier:* WU-0 cannot resolve either identifier.
+  *Owner:* EXECUTOR at WU-0 — cite the digest, and the path only if it resolves then.
+  Materialising that file is outside this session's write-capability (`plan/` only).
+- **P2** — `reviews/spikes/` is writable and creatable by the executing stage, and the
+  target file does not already exist. *Falsifier:* a pre-existing file at the target path.
+  *Owner:* EXECUTOR at WU-7 — see rollback trigger **R5**; do not silently overwrite.
+- **P3** — The research backlog imposes no binding constraint on this probe. *Basis:*
+  `backlog/research/` was consulted; RB-0004 (knowledge-acquisition-engine) and RB-0005
+  (mission-zero SAKG discovery) are **downstream consumers** of SAKG, not prerequisites of
+  the probe, and none of RB-0001…RB-0009 constrains the instrument. *Falsifier:* a ratified
+  RB item that binds S1's extraction target. *Owner:* EXECUTOR at WU-0.
+
+No assumption changes this plan; each is a fact a downstream work unit confirms, and every
+one of A1–A3 falsifies to a **defined verdict path** rather than to an undefined state.
+
+---
+
+## 6. Rollback plan
+
+The probe writes exactly one additive file in a non-TCB tree, and its expensive artifact
+(the matrix) is separable from its cheap artifact (the report). That asymmetry sets the
+rollback strategy: **the matrix is durable, the report is a recomputable projection of it.**
+Most rollbacks re-emit from the retained matrix rather than re-extracting.
+
+| id | Trigger | Rollback action | Re-entry point |
+|----|---------|-----------------|----------------|
+| **R1** | A G1–G5 threshold was adjusted, reinterpreted, or "clarified" in flight. | **Void the verdict.** Adjusting a pre-registered bar after seeing the data destroys the falsification (SAEOS-1 §10 D7; PAEOS Δ3). Delete the emitted report; retain the matrix; **remand to DESIGN** for re-ratification of the threshold — never edit it in place. | DESIGN → WU-0 |
+| **R2** | `matrix_variant` was switched after extraction began, or applied selectively per goal. | Void the run. A variant switch made after `N` is visible is a post-hoc threshold adjustment wearing a different name (see WU-3 rationale). Discard the matrix — it is variant-contaminated — and restart at WU-3 with the variant re-declared. | WU-3 |
+| **R3** | The report was emitted from a matrix with any `UNSEEN` cell. | **Delete the report immediately.** An incomplete matrix is not a low score; it is not a result (DESIGN §4.1), and the shape-only harness would pass it. Complete the outstanding cells, then re-emit. | WU-4 |
+| **R4** | The §4.2 ordering was violated — search ran before the exclusion tests, so ceremony-pruned fields were scored `absent`. | Re-adjudicate only the affected cells (a triage decision was mis-scored as evidence). Recompute `Metrics` and the verdict — both are pure over the matrix, so no re-extraction of unaffected cells is needed. Re-emit. | WU-4 (affected cells) → WU-5 |
+| **R5** | A file already exists at `reviews/spikes/sakg-s1-extraction-probe.md`. | **Do not overwrite.** Inspect it first; if it is a prior probe run, preserve it (rename or record its digest) before writing. Silently replacing a prior falsification record destroys evidence. | WU-7 |
+| **R6** | An acceptance assertion fails at WU-8. | Diagnose against the WU-7 emission invariants — the overwhelmingly likely cause is an unindented `verdict:`/`loss_ratio:` repetition matching at column 0, or `loss_ratio` rendered `0.4` instead of `0.40`. Fix the **rendering only**; the verdict and metrics are unchanged and MUST NOT be touched to satisfy a regex. Re-emit and re-run. | WU-7 |
+| **R7** | Post-hoc review falsifies **A5** (a missing content field moves `loss_ratio` by > 0.05). | Remand to DESIGN to re-freeze §2.2, then re-run from WU-3. The prior report is retained, not deleted, and superseded explicitly — a falsified instrument is itself a finding. | DESIGN → WU-3 |
+
+**Full-abort path.** If the probe is abandoned mid-extraction: delete any partial report and
+**leave `reviews/spikes/` without the target file.** Do not emit a partial-matrix report to
+"show progress" — the harness is a shape check and would pass it, converting an abandoned
+run into an apparently-completed one. Absence is honest; a passing shell over an incomplete
+matrix is not.
+
+**Blast containment.** The probe touches no TCB path, no `constitution/` tree, no runtime
+behaviour, and no schema. Rollback of *any* trigger above reduces to deleting or re-emitting
+one additive file under `reviews/spikes/`, leaves no partial state anywhere else, and
+requires no kernel amendment and no ratifier action. `reviews/tasks/` is opened read-only
+throughout and is never modified by any work unit.
+
+**What a NO-GO is *not*.** A NO-GO verdict is **not** a rollback trigger. It is the probe
+working. Its consequence is the DESIGN §4.1 remand — to SAEOS-1 §6.1b / §8, with A8's
+carried risk recorded as realised — and the report is retained as the evidence of that
+finding, not reverted.
+
+---
+
+## 7. Downstream consequence of the verdict (hand-off)
+
+- **GO** ⇒ S1 build authorised (SAEOS-1 §8). Report §5 must still carry the A7 and A8′
+  residuals; the authorisation covers **S1 only**, not the SAKG programme.
+- **NO-GO** ⇒ remand to SAEOS-1 §6.1b / §8, naming the failing conditions and, per G4, any
+  bundle type PAEOS cannot produce at all — that is a §6.1b **spec defect**, not an
+  extractor gap, and must be fixed before S1 regardless of the aggregate.
+- **Either way** ⇒ report §4 states what A8 got right and what it got wrong. The probe's
+  purpose is to answer that, not to clear a gate.
+
+---
+
+## 8. Completeness check (no orphan / no gap)
+
+- Every objective clause (§1) maps to a work unit: 3 sealed goals → WU-1/WU-2; hand
+  extraction into §4.3 node types → WU-3/WU-4; per-field
+  `extractable`/`partial`/`absent` → WU-4; explicit GO/NO-GO → WU-6; loss ratio → WU-5;
+  the deliverable file → WU-7.
+- Every work unit feeds exactly one evidence obligation (§3): WU-0→E1 … WU-8→E9; this file
+  is E0. No work unit is evidence-orphaned; no evidence obligation lacks a producer.
+- Every acceptance assertion has one producing work unit and one guarding obligation (§4).
+- Every DESIGN §6 assumption has a named downstream owner and a defined falsification path
+  (§5); three plan-local assumptions (P1–P3) are added with the same discipline.
+- Every mutating step has a rollback trigger with a re-entry point (§6); the only mutating
+  work unit is WU-7, and the only mutated tree is `reviews/spikes/`.
+- Every branch of the DESIGN §4.1 lifecycle is planned: `SELECTING`→`EXTRACTING` (WU-2→WU-4),
+  `SELECTING`→`INSUFFICIENT`→`ADJUDICATED` (WU-2 short-circuit → WU-6), `SCORED`→
+  `ADJUDICATED`→`EMITTED` (WU-5→WU-6→WU-7). No state is unreachable and none is terminal
+  without a verdict.
+- All claims cite an upstream ref: the DESIGN artifact (§§1, 2.1, 2.2, 2.3, 2.4, 3.2, 3.3,
+  3.4, 4.1, 4.2, 5.1–5.5, 6, 7, 8), `constitution/README.md` (TCB boundary),
+  `plan/classify-obj-lifetime-plan.md` (house form), `SAEOS-1` §§4.2/4.3/5.1/6.1b/7/8/9/10,
+  `PAEOS-9` §5/§8.2/§8.3, `PAEOS-6`, `PAEOS-7.6` §3/§4.
+
+**Evidence for this gate:** `plan_executable` = this file.

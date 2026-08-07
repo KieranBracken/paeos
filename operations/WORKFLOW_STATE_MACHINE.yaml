@@ -35,13 +35,18 @@ constitutional_execution_rules:
     fields: [compromise, reason, ideal_solution, repayment_conditions, priority, estimated_impact]
     kernel_mapping: recorded compromise / open incident (K7)
   CER-4_end_of_task_constitutional_review:
-    rule: "Every completed task MUST end with a Constitutional Review (produced at L17)."
+    rule: "Every completed task MUST end with a Constitutional Review (produced at L17; operations/IMPLEMENTATION_REVIEW_PROTOCOL.md)."
     questions: [weaknesses_discovered, assumptions_invalidated, parts_of_paeos_strengthened,
                 proposals_created, debt_recorded, should_strategy_change]
   CER-5_separation_of_powers: >
     Proposals NEVER auto-modify PAEOS. Only a founder-ratified amendment may change
     kernel/lifecycle/authority/invariants/law (§14.5, K7, D2). The runtime MAY recommend;
     it MUST NEVER legislate. This makes CER-1..CER-4 safe.
+  CER-6_constitutional_derivation: >
+    Before introducing any new architectural concept, interface, abstraction, module,
+    namespace, service, or kernel responsibility, the Builder MUST demonstrate its explicit
+    derivation from existing constitutional artifacts (Z0, spec/, derivation/). If no derivation
+    exists, implementation MUST halt and emit an Improvement Proposal rather than invent architecture.
 
 artifact_sinks:                         # where CER outputs persist (not lifecycle states)
   proposals: proposals/PAEOS-IP-NNNN.md   # CER-2
@@ -234,12 +239,12 @@ states:
     role: planner
     recommended_model: opus
     entry: "L10 ratified"
-    required_artifacts: [affected_files, forbidden_files, rollback_plan, acceptance_criteria, test_strategy, dependencies]
+    required_artifacts: [affected_files, forbidden_files, rollback_plan, acceptance_criteria, test_strategy, dependencies, derivation_refs] # CER-6
     produced_evidence: [implementation_contract]
     exit: "implementation contract approved"
     gate: plan_freeze
     transitions: {L12: "contract approved"}
-    failure: "ambiguous contract -> incident (ambiguity = incident)"
+    failure: "ambiguous contract OR un-derived architecture -> incident (ambiguity = incident / CER-6 halt)"
 
   L12:
     name: Branch Implementation
@@ -248,54 +253,55 @@ states:
     recommended_model: sonnet
     entry: "approved contract on isolated branch/worktree (A-16)"
     required_artifacts: [implementation, commits_referencing_contract]
-    produced_evidence: [implementation_artifacts, execution_self_report]  # NOT promoting evidence (X6)
-    exit: "approved scope built and runs (executed); no scope creep"
-    transitions: {L13: "executed"}
-    failure: "scope creep OR cap-overrun -> incident (A-12)"
+    produced_evidence: [branch_commits]
+    exit: "runnable code matches contract"
+    transitions: {L13: "implementation complete"}
+    failure: "cannot satisfy contract without un-derived architecture -> HALT (CER-6), emit proposal"
 
   L13:
     name: Verification
     phase: IV-Engineering
-    role: [auditor, adversary]
-    recommended_model: [local, sonnet, opus]
-    order: [compile, lint, unit, integration, simulation, replay, performance]
-    entry: "executed implementation from L12"
-    required_artifacts: [evidence_records, test_logs, coverage]
-    produced_evidence: [signed_execution_evidence, test_logs, coverage, perf]   # EXEC-emitted, signed (A-09)
-    exit: "acceptance criteria satisfied by live signed independent evidence; no live refutation; flaky != refutation (Ω-01)"
-    transitions: {L14: "verification passed", L19: "refuted -> incident"}
-    failure: "any refutation -> regress + incident"
+    role: builder
+    recommended_model: sonnet
+    entry: "L12 complete"
+    required_artifacts: [executable_test_results, signed_exec_evidence] # A-09
+    produced_evidence: [exec_evidence_object]
+    exit: "all evidence specs satisfied + signed"
+    transitions: {L14: "evidence signed"}
+    failure: "failing tests -> iterate in L12; forged evidence -> immediate halt"
 
   L14:
     name: Independent Audit
     phase: IV-Engineering
     role: auditor
-    recommended_model: [opus, gemini]   # MUST differ from L12 builder family (A-08)
-    hunts: [ai_slop, hidden_mocks, fake_implementations, dead_code, architecture_violations, security_flaws, regression]
-    entry: "L13 passed"
-    required_artifacts: [audit_report]
-    produced_evidence: [independent_audit_report]
-    exit: "audit clean"
+    recommended_model: gemini    # MUST differ from builder family (A-08)
+    entry: "L13 signed evidence"
+    required_artifacts: [independent_audit_report, static_analysis, type_check_report]
+    produced_evidence: [audit_verdict]
+    exit: "audit verdict = PASS"
     gate: audit_gate
-    transitions: {L15: "audit clean", L12: "findings -> rebuild"}
-    failure: "slop/mock/violation -> back to L12"
+    transitions:
+      L15:  "audit verdict = PASS"
+      L12:  "audit verdict = FAIL (findings returned to builder)"
+    failure: "unresolved audit findings -> back to L12"
 
   L15:
     name: Documentation & Ledger
     phase: V-Integration
-    role: [runtime, builder]
+    role: builder
     recommended_model: sonnet
-    entry: "L14 clean"
-    required_artifacts: [inventory_atlas, roadmaps, architecture_diagrams, knowledge_graph, decision_logs]
-    produced_evidence: [ledger_deltas, traceability_links]
-    exit: "institutional records synchronized; traceable to origin"
-    transitions: {L16: "ledger updated"}
-    failure: "stale ledger -> incident (undocumented change)"
+    entry: "L14 passed"
+    required_artifacts: [doc_updates, ledger_entry, changelog_entry, implementation_atlas] # docs/IMPLEMENTATION_ATLAS.md
+    produced_evidence: [documentation_commit, updated_atlas_row]
+    exit: "docs + atlas + ledger current"
+    transitions: {L16: "docs complete"}
+    failure: "missing docs / stale atlas -> back to L15"
+
 
   L16:
     name: Promotion Decision
     phase: V-Integration
-    role: [runtime, founder]
+    role: integrators   # single-threaded integration (I9/K8)
     recommended_model: opus
     entry: "L15 complete; artifact verified"
     required_artifacts: [final_disposition]  # merge | seal | reject | research_only | dormant
@@ -311,12 +317,12 @@ states:
     role: [auditor, runtime]
     recommended_model: opus
     entry: "L16 complete OR any failure"
-    required_artifacts: [lessons_learned, workflow_amendments, constitutional_review]  # CER-4
+    required_artifacts: [lessons_learned, workflow_amendments, constitutional_review]  # CER-4 / operations/IMPLEMENTATION_REVIEW_PROTOCOL.md
     constitutional_review_questions: [weaknesses_discovered, assumptions_invalidated,
-                                      parts_of_paeos_strengthened, proposals_created,
-                                      debt_recorded, should_strategy_change]
-    produced_evidence: [lessons_record, constitutional_review, proposal_links, debt_links]
-    exit: "Constitutional Review written (CER-4); every lesson discarded-with-reason or converted to L18/L19/Proposal/Debt"
+                                       parts_of_paeos_strengthened, proposals_created,
+                                       debt_recorded, should_strategy_change]
+    produced_evidence: [lessons_record, constitutional_review_artifact, proposal_links, debt_links] # reviews/tasks/<task_id>_review.md
+    exit: "Constitutional Review written to reviews/tasks/<task_id>_review.md (CER-4); every lesson discarded-with-reason or converted to L18/L19/Proposal/Debt"
     transitions: {L18: "lessons exist", L19: "workflow/policy change implied"}
     failure: "repeated mistake, no lesson -> meta-failure (Ω-11); no Constitutional Review -> task not done (CER-4)"
 

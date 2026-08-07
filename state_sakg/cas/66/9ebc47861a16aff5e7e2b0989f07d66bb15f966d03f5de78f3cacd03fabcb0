@@ -1,0 +1,32 @@
+# F-ENVELOPE — Design Package Index
+
+**Goal:** Freeze the universal node envelope schema + fixture corpus.
+**Stage:** DESIGN (PLANNER). No implementation artifacts are produced here; this package is the
+input contract for the IMPLEMENT stage.
+
+| Document | Contains |
+|---|---|
+| [`design.md`](design.md) | Component graph, interfaces, data flow, lifecycle state machine, layering decisions |
+| [`envelope-fields.md`](envelope-fields.md) | Field-by-field §4.2 envelope specification + JSON Schema encoding for each field |
+| [`fixture-corpus.md`](fixture-corpus.md) | Valid/invalid fixture matrix (16 + 23), manifest format, coverage-test design |
+| [`assumptions.md`](assumptions.md) | **PAEOS-6 assumption surfacing** — every unverifiable premise, its blast radius, and its falsifier |
+| [`traceability.md`](traceability.md) | Orphan/gap matrix: field → schema clause → fixture → acceptance command |
+
+## Read this first
+
+The single most important fact about this design: **the source text of §4.2 was not readable from
+this session.** `constitution/README.md:6-10` states the corpus "currently lives across
+`derivation/`, `spec/`, and `reviews/`" and that consolidation into `constitution/PAEOS-0..6.md` is
+a later (B0.3) task. My read scope was `constitution/`, `spec/`, `design/`; only `constitution/`
+exists, and it contains a skeleton README plus two canaries.
+
+Consequently the field set in [`envelope-fields.md`](envelope-fields.md) is a **reconstruction**,
+derived from the three invariant violations named in the goal statement (authored confidence,
+frequency-based promotion, deleted node) plus the constitution's own vocabulary. It is designed to
+be *reconciled*, not trusted. [`assumptions.md`](assumptions.md) lists each assumed field with the
+evidence that would confirm or refute it, and §7 of `design.md` defines the reconciliation gate that
+IMPLEMENT must pass before the schema is declared frozen.
+
+If §4.2 becomes readable before IMPLEMENT starts, run the reconciliation checklist
+([`assumptions.md`](assumptions.md) §4) first. The component graph, layering, state machine
+topology, and fixture-corpus architecture survive field renames; only the names change.

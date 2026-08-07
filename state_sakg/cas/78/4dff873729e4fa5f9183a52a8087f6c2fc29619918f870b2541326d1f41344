@@ -1,0 +1,94 @@
+# Constitutional Implementation Review: [B0.7]
+
+**Date**: 2026-07-27
+**Task**: B0.7 — Evidence: binding, kernel reproduction, stale-replay defense (PAEOS-7.6 §6 / 7.5 T2)
+**Reviewer Role**: Auditor / Builder Self-Adversarial (Adversary pass = T2)
+
+## Summary of Findings
+
+- **BLOCKER**: 0
+- **MAJOR**: 0
+- **MINOR**: 0
+- **OBSERVATION**: 3 (1 recorded as DEBT-0005)
+
+Deliverable: `kernel/evidence.py` — `Evidence`/`EvidenceKind`/`Determinism`/`EvidenceProducer`
+types (7.6 §6) + `verify_binding`, `reproduce`, `verify_deterministic`, `verify_two_producers`.
+Evidence: 15 tests in `tests/kernel/test_evidence.py`; 98 kernel tests total; ruff clean;
+pyright 0 errors (strict); F1 1283/20000.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Implements all four 7.5 §T2 hardenings: (1) binding + stale-replay rejection (SI-4),
+(2) deterministic evidence *always* kernel-reproduced, (3) non-deterministic ⇒ two independent
+producers within tolerance, (4) attestation is a kernel field (A-5; verification is B0.8/B0.9).
+`Evidence` transcribes 7.6 §6 verbatim.
+
+### 2. Architectural Drift
+**PASS.** One derived representation: the reproduced `result` is `{"exit_code", "stdout"}`. The
+spec says `result: any // structured outcome`, so the runtime must choose *a* structure for a
+shell-command's outcome; exit-code + stdout is the minimal faithful choice, not an invented
+abstraction. Recorded as Observation 2.
+
+### 3. Duplication of Mechanisms
+**PASS.** Reuses `Hash`/`Role`/`Sig` (types, B0.4) and `JsonValue` (ledger, B0.1) for the
+`result` universe rather than a new JSON type. `types.py` kept a leaf (no evidence types added
+there); the `Evidence` type lives with its logic in `evidence.py`.
+
+### 4. Bypassing Mechanisms
+**PASS.** No validation bypassed. `verify_deterministic` enforces binding *before* re-running
+(tested), so a stale forgery cannot reach the re-run path.
+
+### 5. Simpler Implementation Possible
+**PASS / minimal.** Pure functions + stdlib `subprocess`/`shlex`. No framework. `_within_tolerance`
+is 4 lines and handles the bool-is-int trap explicitly.
+
+### 6. Better Derivation
+**PASS.** The four functions map 1:1 onto the four 7.5 T2 hardenings; nothing is composed that
+the spec did not separate.
+
+### 7. Hidden Technical Debt
+**PASS (surfaced).** `reproduce` runs commands without an OS sandbox → **DEBT-0005** (7.5 §T2/EXEC
+requires it). Not hidden: recorded, with interim mitigations (no shell, hard timeout) and a
+bounded Phase-0 exposure (evidence commands are founder/Builder-authored until Phase 1).
+
+### 8. Security Implications
+**PASS with DEBT-0005.** This *is* the T2 defense — the highest-impact runtime threat. The kernel
+re-runs and decides the result, so a forged `result`/`exit_code` is caught (both tested). Residual:
+sandboxing (DEBT-0005). Command parsing is shell-free (`shlex.split`), so no shell-injection.
+`_within_tolerance` closes the bool-as-1/0 corroboration bypass (tested).
+
+### 9. Runtime Implications
+**PASS.** `reproduce` blocks on a subprocess with a mandatory timeout; timeout/OS errors are
+caught and surfaced as `NotReproducible` (no unbounded hang, no leaked exception).
+
+### 10. Future Extensibility
+**PASS.** The sandbox lands behind `reproduce` (DEBT-0005) without touching the verification
+logic. B0.6 gates and B0.9 seal consume these functions as-is.
+
+## Adversary pass (T2 — the load-bearing threat)
+
+1. **Forge a passing `stdout`** (`echo real`, claim `"FORGED\n"`) → `ReproductionMismatch` (tested). ✓
+2. **Forge a passing `exit_code`** (`false`, claim exit 0) → `ReproductionMismatch` (tested). ✓
+3. **Stale replay** (evidence bound to another artifact) → `StaleEvidence`, enforced *before* re-run
+   (tested). ✓
+4. **Collude with self** (same session as both "independent" producers) → `TwoProducerViolation`
+   (tested). ✓
+5. **Corroboration via bool/int confusion** (`True` vs `False` under a wide tolerance) → rejected
+   by exact bool compare (tested). ✓
+6. **Boundary honesty:** signature *verification* of `attestation` is out of scope here (B0.8/B0.9);
+   `reproduce` executes without a sandbox (DEBT-0005). Both named, not silently assumed safe.
+
+## OBSERVATIONS
+
+1. **Tolerance is not in the schema.** 7.5 T2 says producers agree "within declared tolerance,"
+   but 7.6 §6 `Evidence` carries no tolerance field. `verify_two_producers` takes it as a caller
+   parameter. If a future gate needs a per-evidence tolerance, that is a small 7.6 §6 amendment —
+   flagged, not yet a proposal (no current consumer needs it).
+2. **`result` structure** for reproducible commands is `{"exit_code","stdout"}` (derived; §2 above).
+3. **DEBT-0005** — reproduction sandbox deferred.
+
+## Action Items & Proposals
+- [x] DEBT-0005 filed (reproduction sandbox).
+- [ ] **Founder**: ratify B0.7 → merge, remote CI, tag `b0.7`.
+- [ ] **B0.8 (Capability broker)** next: `attestation`/token *verification* + reference monitor.

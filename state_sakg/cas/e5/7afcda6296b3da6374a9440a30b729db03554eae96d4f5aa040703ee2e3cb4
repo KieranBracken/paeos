@@ -1,0 +1,267 @@
+# F-ENVELOPE — Fixture Corpus Design
+
+**Layout:**
+
+```
+tests/sakg/fixtures/envelope/
+├── manifest.json            ← expectations. NOT inside valid/ or invalid/.
+├── valid/    V01..V16.json  (16 files — acceptance floor is 12)
+└── invalid/  I01..I23.json  (23 files — acceptance floor is 8)
+```
+
+## 1. Why the manifest sits outside the fixture directories
+
+Two rejected alternatives, both of which break an acceptance command:
+
+- **Expectation keys inside the fixture** (`"x-expect": {...}`) — the envelope schema carries
+  `unevaluatedProperties: false`, so an `x-expect` key makes every *valid* fixture invalid, and makes
+  every *invalid* fixture fail for the wrong reason. Self-defeating.
+- **Sibling `<name>.expect.json` files** — `ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l`
+  (acceptance command 4) counts `*.json`, so sibling files would double the count and the number
+  would stop meaning "fixtures". The valid/invalid loaders would also try to validate them as
+  envelopes.
+
+`manifest.json` one level above both directories is invisible to both globs and to both loaders.
+**Do not move it.** (`design.md` §9, risk row 4.)
+
+## 2. Manifest format
+
+```jsonc
+{
+  "schema_version": "1.0.0",
+  "valid": {
+    "V01-proposed-minimal.json": {
+      "purpose": "smallest legal envelope; PROPOSED is the only status with no promotion record",
+      "status": "PROPOSED",
+      "transition": null,
+      "covers": ["INV-PROMO-3-negative", "INV-EV-1-negative"]
+    }
+  },
+  "invalid": {
+    "I05-promotion-basis-frequency.json": {
+      "purpose": "promotion justified by how often the claim was observed",
+      "invariant": "INV-PROMO-1",
+      "pointer": "/promotion/basis",
+      "keyword": "enum",
+      "note": "the honest spelling of the frequency violation; I06 is the dishonest one"
+    }
+  }
+}
+```
+
+The test asserts on `(pointer, keyword, invariant)` — see `design.md` §6.3 for why rejection alone
+is not enough.
+
+---
+
+## 3. Invalid corpus (23)
+
+Grouped by the goal's three named invariants, then structural.
+
+### 3.1 Authored confidence (5)
+
+| Fixture | Mutation from a valid base | Pointer | Keyword | Invariant |
+|---|---|---|---|---|
+| `I01-confidence-authored-scalar` | `"confidence": 0.9` | `/confidence` | `type` | `INV-CONF-1` |
+| `I02-confidence-method-authored` | `method: "authored"` | `/confidence/method` | `enum` | `INV-CONF-2` |
+| `I03-confidence-inputs-empty` | `inputs: []`, method left legal | `/confidence/inputs` | `minItems` | `INV-CONF-3` |
+| `I04-confidence-value-out-of-range` | `value: 1.4` | `/confidence/value` | `maximum` | `INV-CONF-5` |
+| `I21-confidence-computed-by-human` | `computed_by: "kieran"` | `/confidence/computed_by` | `pattern` | `INV-CONF-4` |
+
+`I03` is the important one: it is a *syntactically well-formed derivation* that derives from nothing.
+A corpus that only contained `I01` and `I02` would leave the invariant defeatable by anyone who
+learned the required shape without understanding it.
+
+### 3.2 Frequency-based promotion (4)
+
+| Fixture | Mutation | Pointer | Keyword | Invariant |
+|---|---|---|---|---|
+| `I05-promotion-basis-frequency` | `basis: "frequency"` | `/promotion/basis` | `enum` | `INV-PROMO-1` |
+| `I06-promotion-observation-count` | legal basis + `observation_count: 47` | `/promotion` | `unevaluatedProperties` | `INV-PROMO-4` |
+| `I07-promotion-no-evidence` | `evidence_refs: []` | `/promotion/evidence_refs` | `minItems` | `INV-PROMO-2` |
+| `I17-basis-transition-mismatch` | `ACTIVE→SUPERSEDED` with `basis: "deterministic_evidence"` | `/promotion/basis` | `enum` | `INV-FSM-2` |
+
+`I05` and `I06` are the honest and dishonest spellings of the same violation, and they trip
+*different keywords on different pointers*. That is the observable consequence of the redundant
+defences in `design.md` §5.3: if a future edit disarms one, exactly one of these two fixtures starts
+passing, and the corpus tells you which defence broke.
+
+`I06` also trips `minItems` if authored with an empty `evidence_refs`. Author it with a **non-empty**
+`evidence_refs` so it isolates `INV-PROMO-4` — a fixture that trips two rules cannot tell you which
+one is still working.
+
+### 3.3 Deleted node (6)
+
+| Fixture | Mutation | Pointer | Keyword | Invariant |
+|---|---|---|---|---|
+| `I08-status-deleted` | `status: "DELETED"` | `/status` | `enum` | `INV-DEL-1` |
+| `I09-deleted-flag` | valid ACTIVE node + `"deleted": true` | `""` | `unevaluatedProperties` | `INV-DEL-4` |
+| `I10-retracted-without-tombstone` | `status: RETRACTED`, no `retraction` | `""` | `required` | `INV-DEL-3` |
+| `I11-transition-retracted-to-active` | `promotion.from: RETRACTED, to: ACTIVE` | `/promotion` | `anyOf` | `INV-FSM-1` |
+| `I12-superseded-without-successor` | `status: SUPERSEDED`, no `superseded_by` | `""` | `required` | `INV-DEL-2` |
+| `I13-active-carrying-retraction` | `status: ACTIVE` + a `retraction` block | `""` | `not` | `INV-DEL-3` |
+
+Six angles on one idea, because "no node ever leaves the graph" is the invariant with the most ways
+to be violated: by naming the state (`I08`), by flagging it (`I09`), by erasing without a record
+(`I10`), by undoing a tombstone (`I11`), by orphaning a replacement (`I12`), and by half-deleting
+— `ACTIVE` to one reader, retracted to another (`I13`).
+
+`I11` requires the normalised `anyOf` error mapping from `design.md` §4.4. If the mapper is not
+implemented, this fixture's pointer will be a deep `/promotion/from`-ish path from whichever branch
+the validator reported last, and the assertion will fail — correctly, because the interface promised
+a stable pointer.
+
+### 3.4 Lifecycle, evidence, and trust-zone invariants (5)
+
+| Fixture | Mutation | Pointer | Keyword | Invariant |
+|---|---|---|---|---|
+| `I18-active-without-promotion` | `status: ACTIVE`, `promotion` absent | `""` | `required` | `INV-PROMO-3` |
+| `I19-active-empty-evidence-refs` | `status: ACTIVE`, top-level `evidence_refs: []` | `/evidence_refs` | `minItems` | `INV-EV-1` |
+| `I20-z0-non-founder` | `trust_zone: "Z0"`, `actor_role: "builder"` | `/provenance/actor_role` | `enum` | `INV-TZ-1` |
+| `I22-quarantined-without-block` | `status: QUARANTINED`, no `quarantine` | `""` | `required` | `INV-QUAR-1` |
+| `I23-deprecated-without-block` | `status: DEPRECATED`, no `deprecation` | `""` | `required` | `INV-DEP-1` |
+
+`I20` encodes `constitution/README.md:3` — the sealed layer's "only legal writer is
+`kernel/amendment.py`", i.e. a builder-authored Z0 node is structurally illegitimate.
+
+### 3.5 Structural (3, no `INV-*` id)
+
+| Fixture | Mutation | Pointer | Keyword |
+|---|---|---|---|
+| `I14-missing-content-hash` | delete `content_hash` | `""` | `required` |
+| `I15-content-hash-malformed` | `"content_hash": "deadbeef"` (no prefix, wrong length) | `/content_hash` | `pattern` |
+| `I16-trust-zone-unknown` | `trust_zone: "Z9"` | `/trust_zone` | `enum` |
+
+Their manifest entries set `"invariant": null`. The coverage test
+(`test_every_invariant_has_invalid_fixture`) walks INV ids → fixtures, not the reverse, so
+`null`-invariant fixtures are permitted; they exist to prove the plumbing (required/pattern/enum)
+works at all, which is what makes a *passing* invariant fixture meaningful.
+
+---
+
+## 4. Valid corpus (16)
+
+Every status value appears (column 2). Transition coverage is 14 of 19 legal edges.
+
+| Fixture | Status | Transition | Notably exercises |
+|---|---|---|---|
+| `V01-proposed-minimal` | `PROPOSED` | — | required fields only; `promotion` absent (legal); `evidence_refs: []` (legal only here) |
+| `V02-proposed-full` | `PROPOSED` | — | every *status-compatible* optional field: `derived_from`, `labels`, `source.type: observation`, `confidence.method: decay_adjusted`. **Not** `promotion.note` — see note below |
+| `V03-candidate-from-proposed` | `CANDIDATE` | `PROPOSED→CANDIDATE` | `basis: deterministic_evidence`; first non-empty `evidence_refs` |
+| `V04-active-court-ratified` | `ACTIVE` | `CANDIDATE→ACTIVE` | `basis: court_ratification`; `confidence.method: court_ratified` |
+| `V05-active-deterministic` | `ACTIVE` | `CANDIDATE→ACTIVE` | `basis: deterministic_evidence`; `confidence.method: evidence_weighted`; 3 evidence refs |
+| `V06-deprecated` | `DEPRECATED` | `ACTIVE→DEPRECATED` | `deprecation` block incl. `prefer_instead` |
+| `V07-superseded-from-active` | `SUPERSEDED` | `ACTIVE→SUPERSEDED` | `superseded_by`; `basis: supersession` |
+| `V08-superseded-from-deprecated` | `SUPERSEDED` | `DEPRECATED→SUPERSEDED` | second inbound edge to a near-terminal state |
+| `V09-retracted-from-active` | `RETRACTED` | `ACTIVE→RETRACTED` | `retraction` block; `basis: falsification` |
+| `V10-retracted-from-quarantined` | `RETRACTED` | `QUARANTINED→RETRACTED` | the quarantine-confirms-bad path; `retraction.successor` |
+| `V11-quarantined` | `QUARANTINED` | `ACTIVE→QUARANTINED` | `quarantine` block incl. `canary_id: "CANARY-0001"`; `basis: integrity_alarm` |
+| `V12-quarantine-cleared` | `ACTIVE` | `QUARANTINED→ACTIVE` | `basis: adversary_cleared` — the reversibility property (`design.md` §4.3 P3) |
+| `V13-demotion` | `PROPOSED` | `CANDIDATE→PROPOSED` | `basis: evidence_withdrawn`; the only downward non-terminal edge; **a `PROPOSED` node that does have a `promotion`**; carries `promotion.note` |
+| `V14-reinstated` | `ACTIVE` | `DEPRECATED→ACTIVE` | `basis: court_ratification` on a recovery edge |
+| `V15-z0-constitution-node` | `ACTIVE` | `CANDIDATE→ACTIVE` | `trust_zone: Z0` + `actor_role: founder` (`INV-TZ-1` positive); `kind: constitution_clause`; `basis: founder_ratification` |
+| `V16-derived-multi-ancestor` | `ACTIVE` | `CANDIDATE→ACTIVE` | `derived_from` × 3; `confidence.method: ancestor_min` |
+
+**`V13` is the fixture that keeps `INV-PROMO-3` honest.** The invariant is "promotion required iff
+status != PROPOSED" — but a *demoted* node is `PROPOSED` **and** has a promotion record. If the
+clause were written as a strict iff with an `else: {not: {required: ["promotion"]}}`, `V13` would be
+rejected. It is therefore written one-directional:
+
+```jsonc
+{ "if":   { "properties": { "status": { "not": { "const": "PROPOSED" } } }, "required": ["status"] },
+  "then": { "required": ["promotion"] } }
+```
+
+No `else`. A `PROPOSED` node *may* carry a promotion (it was demoted) but need not (it is new).
+This asymmetry is real and easy to get wrong; `V01` and `V13` together pin both directions.
+
+**This is also why no single fixture is "the maximal envelope".** The four lifecycle-detail blocks
+are mutually exclusive (`envelope-fields.md` §2.1), so `superseded_by`, `retraction`, `quarantine`,
+and `deprecation` can never co-occur, and a genuinely `PROPOSED` node has no promotion to annotate.
+Full-field coverage is therefore a property of the corpus *union*, not of any one file — which is
+exactly how `test_every_field_appears_in_valid_corpus` computes it (`design.md` §6.4). An
+implementer who tries to build one all-fields fixture will produce something the schema correctly
+rejects.
+
+### 4.1 Uncovered transitions (5 of 19) — a recorded decision, not an omission
+
+`PROPOSED→QUARANTINED`, `PROPOSED→RETRACTED`, `CANDIDATE→QUARANTINED`, `CANDIDATE→RETRACTED`,
+`DEPRECATED→QUARANTINED`.
+
+All five are structurally identical to covered edges (`ACTIVE→QUARANTINED` in `V11`,
+`ACTIVE→RETRACTED` in `V09`) — same basis, same required detail block, differing only in the `from`
+const. Covering them would add five near-duplicate files and no discriminating power. The floor
+assertion in `test_every_legal_transition_has_valid_fixture` is `>= 12` of 19, with the five
+safety-critical edges named explicitly in the test so they cannot silently drop out
+(`design.md` §6.4).
+
+`SUPERSEDED→RETRACTED` is *not* in the uncovered list — it is a distinct safety path (retracting an
+already-replaced node) and should be added as `V17` if the corpus grows.
+
+---
+
+## 5. Authoring method: one base, N mutations
+
+All 39 fixtures derive from a single hand-written base document. IMPLEMENT should author `V04` first
+(a fully-populated `ACTIVE` node), verify it against the schema, then produce every other fixture as
+an explicit, minimal mutation of it.
+
+Two reasons this matters:
+
+1. **Isolation.** A fixture that differs from the base in one place fails for one reason. The
+   manifest's `(pointer, keyword)` assertion is only meaningful if the mutation is minimal —
+   otherwise the assertion passes on a coincidence.
+2. **Maintainability.** When §4.2 reconciliation renames a field (`assumptions.md` §4), the base
+   changes once and the mutations are re-applied.
+
+Fixtures are **checked-in literal JSON**, not generated at test time. A generator would mean the
+corpus and the schema share an author's misunderstanding — the fixtures would encode whatever the
+generator believed, and could not contradict it. Literal files can be read by a human ratifier,
+which is the point of a calibration corpus (`constitution/canaries/README.md:8-9`).
+
+## 6. Base document (`V04-active-court-ratified.json`)
+
+```json
+{
+  "schema_version": "1.0.0",
+  "id": "sakg:claim:01J9ZQK7RTQ8VXCM3N5PWB2HDE",
+  "kind": "claim",
+  "status": "ACTIVE",
+  "content": {
+    "statement": "The envelope schema rejects authored confidence values.",
+    "subject": "sakg.schema.envelope"
+  },
+  "content_hash": "sha256:3b8f2c1d9a4e6072b5c8d1f3a7e920468bd35c7f1e0a49d26b8c3f5710ade924",
+  "created_at": "2026-08-06T09:14:22Z",
+  "updated_at": "2026-08-06T11:02:57Z",
+  "provenance": {
+    "actor": "agent:builder-r4",
+    "actor_role": "builder",
+    "run_id": "run:01J9ZQK7RTQ8VXCM3N5PWB2HDF",
+    "source": { "type": "derivation", "ref": "design/F-ENVELOPE/design.md#5.1" },
+    "recorded_at": "2026-08-06T09:14:22Z"
+  },
+  "confidence": {
+    "value": 0.94,
+    "method": "court_ratified",
+    "inputs": ["sakg:evidence:01J9ZQK7RTQ8VXCM3N5PWB2HDG"],
+    "computed_at": "2026-08-06T11:02:57Z",
+    "computed_by": "sakg.confidence.court_verdict"
+  },
+  "evidence_refs": ["sakg:evidence:01J9ZQK7RTQ8VXCM3N5PWB2HDG"],
+  "promotion": {
+    "from": "CANDIDATE",
+    "to": "ACTIVE",
+    "at": "2026-08-06T11:02:57Z",
+    "basis": "court_ratification",
+    "evidence_refs": ["sakg:evidence:01J9ZQK7RTQ8VXCM3N5PWB2HDG"],
+    "actor": "court:verification"
+  },
+  "trust_zone": "Z2"
+}
+```
+
+Note what is *absent*: `derived_from`, `labels`, `superseded_by`, and all four lifecycle-detail
+blocks. The base is the minimal `ACTIVE` node. Field coverage is completed by the union of the
+corpus, not by any single fixture (§4 above) — `test_every_field_appears_in_valid_corpus`
+(`design.md` §6.4) is what verifies the union is complete.

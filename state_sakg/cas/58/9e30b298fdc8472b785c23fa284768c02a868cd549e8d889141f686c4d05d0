@@ -1,0 +1,301 @@
+# F-ENVELOPE — Field Specification
+
+Normative field roster for `sakg/schema/envelope.schema.json`.
+
+> **Reconstructed, not read.** §4.2's text was unavailable (`assumptions.md` A0). Names here are
+> designed to be reconciled. Structure is load-bearing; spelling is not.
+
+---
+
+## 1. Primitive definitions (`$defs`)
+
+| `$def` | Encoding | Rationale |
+|---|---|---|
+| `node_id` | `{"type":"string","pattern":"^sakg:[a-z_]+:[0-9A-HJKMNP-TV-Z]{26}$"}` | ULID (Crockford base32) → lexicographic order == creation order, which an append-only store wants. The `kind` segment makes a ref self-describing, so a validator can reject `evidence_refs: ["sakg:claim:…"]` without a store lookup. (A6) |
+| `evidence_ref` | `{"type":"string","pattern":"^sakg:evidence:[0-9A-HJKMNP-TV-Z]{26}$"}` | Narrowed `node_id`. Evidence is a node kind, so evidence is itself versioned, quarantinable, and retractable — the `CANARY-0001` forged-evidence case needs somewhere to record the catch. |
+| `timestamp` | `{"type":"string","format":"date-time","pattern":"^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}` | Literal `Z` only. Offsets like `+00:00` are the same instant but a different byte string, which breaks canonical hashing and makes string sort ≠ time sort. `pattern` asserts; `format` is annotation-only in 2020-12 (A7). |
+| `sha256` | `{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}` | Algorithm-prefixed so a future migration to another digest is expressible without ambiguity. Lowercase hex fixed for canonicality. |
+| `status` | enum of the 7 values (`design.md` §4.1) | Referenced 4×; one definition (`design.md` §2.5.3). |
+| `basis` | enum of the 8 values (§4 below) | Closed. `INV-PROMO-1`. |
+| `confidence_method` | enum of the 4 values (§3 below) | Closed. `INV-CONF-2`. |
+| `trust_zone` | `{"enum":["Z0","Z1","Z2","Z3"]}` | `constitution/README.md:1` establishes Z0 exists; the ceiling is assumed (A9). |
+| `actor_role` | `{"enum":["builder","adversary","doc","court","founder","ingestor"]}` | Five of six appear in `constitution/canaries/README.md:4-9`; `ingestor` covers externally-sourced nodes (A10). |
+| `legal_transition` | `anyOf` over 19 const pairs | `design.md` §4.4. `INV-FSM-1`. |
+
+---
+
+## 2. Top-level fields (19)
+
+`R` = always required · `C` = conditionally required · `O` = optional
+
+| # | Field | Req | Type | Invariants |
+|---|---|---|---|---|
+| 1 | `schema_version` | R | `{"const":"1.0.0"}` | must equal `$id`'s version segment (§6.1 self-test) |
+| 2 | `id` | R | `$ref: node_id` | — |
+| 3 | `kind` | R | `{"type":"string","pattern":"^[a-z_]+$"}` | `INV-ID-1`: must equal `id`'s middle segment → **L2** (cross-field string compare) |
+| 4 | `status` | R | `$ref: status` | `INV-DEL-1`: no `DELETED` member |
+| 5 | `content` | R | `{"type":"object","minProperties":1}` | opaque (A2); an empty payload is a node asserting nothing |
+| 6 | `content_hash` | R | `$ref: sha256` | `INV-HASH-1`: `= sha256(JCS(content))` → **L2** (recompute) |
+| 7 | `created_at` | R | `$ref: timestamp` | — |
+| 8 | `updated_at` | R | `$ref: timestamp` | `INV-TIME-1`: `>= created_at` → **L2** (compare) |
+| 9 | `provenance` | R | `$ref: provenance` | §5 |
+| 10 | `confidence` | R | `$ref: confidence` | §3 |
+| 11 | `evidence_refs` | R | `{"type":"array","items":{"$ref":"evidence_ref"},"uniqueItems":true}` | `INV-EV-1`: `minItems: 1` unless `status == PROPOSED` (A11) |
+| 12 | `promotion` | C | `$ref: promotion` | `INV-PROMO-3`: required iff `status != PROPOSED`; forbidden when `status == PROPOSED` |
+| 13 | `derived_from` | O | array of `node_id`, `uniqueItems` | `INV-LIN-1`: all resolve, no cycle → **L2** |
+| 14 | `trust_zone` | R | `$ref: trust_zone` | `INV-TZ-1`: `Z0` requires `provenance.actor_role == "founder"` (only the founder may author into the sealed layer, `constitution/README.md:3`) |
+| 15 | `labels` | O | `{"type":"object","additionalProperties":{"type":"string"},"propertyNames":{"pattern":"^[a-z][a-z0-9_.]*$"}}` | free-form; the one deliberately open field, so producers have an escape valve that does not require schema amendment |
+| 16 | `superseded_by` | C | `$ref: node_id` | `INV-DEL-2`: required iff `status == SUPERSEDED`; forbidden otherwise |
+| 17 | `retraction` | C | `$ref: retraction` | `INV-DEL-3`: required iff `status == RETRACTED`; forbidden otherwise |
+| 18 | `quarantine` | C | `$ref: quarantine` | `INV-QUAR-1`: required iff `status == QUARANTINED`; forbidden otherwise |
+| 19 | `deprecation` | C | `$ref: deprecation` | `INV-DEP-1`: required iff `status == DEPRECATED`; forbidden otherwise |
+
+Top level carries **`"unevaluatedProperties": false`** — `INV-DEL-4` (rejects a `deleted: true`
+flag) and the general closed-world guarantee. Not `additionalProperties` (`design.md` §2.5.1).
+
+### 2.1 The lifecycle-detail family (16-19)
+
+Fields 16-19 are mutually exclusive and jointly determined by `status`. The **iff** in each
+invariant is deliberate: the `then` branch requires the matching block and the `else` branch
+*forbids* it, so a node can neither omit the block its status demands nor carry one its status
+contradicts (`design.md` §5.4 D5). Four parallel `allOf` members, one per block:
+
+```jsonc
+{
+  "$comment": "INV-DEL-3: RETRACTED iff tombstone present; no node leaves the graph silently",
+  "if":   { "properties": { "status": { "const": "RETRACTED" } }, "required": ["status"] },
+  "then": { "required": ["retraction"] },
+  "else": { "not": { "required": ["retraction"] } }
+}
+```
+
+> The `"required": ["status"]` inside `if` is not redundant. Without it, an instance *missing*
+> `status` vacuously satisfies the `if` and gets pushed down the `then` branch, producing a
+> confusing cascade of errors instead of one clean `required: status` failure. Apply this to all
+> four clauses and to the promotion clause (field 12).
+
+---
+
+## 3. `confidence` — derived, never authored
+
+```jsonc
+"confidence": {
+  "$comment": "INV-CONF-1: confidence is a derivation record, never an authored scalar",
+  "type": "object",
+  "required": ["value", "method", "inputs", "computed_at", "computed_by"],
+  "properties": {
+    "value":       { "$comment": "INV-CONF-5: a confidence outside [0,1] is not a probability",
+                     "type": "number", "minimum": 0, "maximum": 1 },
+    "method":      { "$ref": "#/$defs/confidence_method",
+                     "$comment": "INV-CONF-2: no authored/asserted member exists" },
+    "inputs":      { "$comment": "INV-CONF-3: a derivation with no inputs is authoring in disguise",
+                     "type": "array", "minItems": 1, "uniqueItems": true,
+                     "items": { "anyOf": [ {"$ref":"#/$defs/evidence_ref"},
+                                           {"$ref":"#/$defs/node_id"} ] } },
+    "computed_at": { "$ref": "#/$defs/timestamp" },
+    "computed_by": { "$comment": "INV-CONF-4: a component computed this, not a person",
+                     "type": "string", "pattern": "^sakg\\.confidence\\.[a-z_]+$" }
+  },
+  "unevaluatedProperties": false
+}
+```
+
+`confidence_method` enum — all four name a *procedure*:
+
+| Method | Meaning |
+|---|---|
+| `court_ratified` | The Verification Court's verdict set the value |
+| `evidence_weighted` | Computed from the weights of `inputs` |
+| `ancestor_min` | `min()` over `derived_from` — a derived claim is no more certain than its weakest premise |
+| `decay_adjusted` | A prior value aged by a time-decay model |
+
+There is no `authored`, `asserted`, `estimated`, or `expert_judgement` member, and adding one is the
+single edit that would disarm `INV-CONF-2`. A founder judgement enters as a `court_ratified` value
+whose `inputs` cite the ratification node — the judgement becomes evidence rather than bypassing it.
+
+**Even a `PROPOSED` node has ≥1 input.** Its confidence derives from its own provenance record (the
+run that produced it), so `inputs: ["sakg:evidence:<the provenance attestation>"]`. This keeps
+`minItems: 1` unconditional, which is what makes `INV-CONF-3` a hard rule rather than a
+status-dependent one.
+
+---
+
+## 4. `promotion` — evidence-gated, never frequency-gated
+
+```jsonc
+"promotion": {
+  "$comment": "INV-PROMO-2: every transition is evidenced and epistemically based; INV-PROMO-4: no property beyond this set — blocks a smuggled observation_count",
+  "type": "object",
+  "required": ["from", "to", "at", "basis", "evidence_refs", "actor"],
+  "properties": {
+    "from":  { "$ref": "#/$defs/status" },
+    "to":    { "$ref": "#/$defs/status" },
+    "at":    { "$ref": "#/$defs/timestamp" },
+    "basis": { "$ref": "#/$defs/basis",
+               "$comment": "INV-PROMO-1: basis is epistemic; no count is a basis" },
+    "evidence_refs": { "type": "array", "minItems": 1, "uniqueItems": true,
+                       "items": { "$ref": "#/$defs/evidence_ref" } },
+    "actor": { "type": "string", "minLength": 1 },
+    "note":  { "type": "string" }
+  },
+  "unevaluatedProperties": false,
+  "allOf": [ { "$ref": "#/$defs/legal_transition" },
+             /* … basis↔transition binding clauses, INV-FSM-2 … */ ]
+}
+```
+
+`basis` enum (8):
+
+| Basis | Meaning | Legal on |
+|---|---|---|
+| `deterministic_evidence` | A reproducible command produced the claimed result (the `CANARY-0001` mechanism, `constitution/canaries/README.md:40-42`) | promotion edges |
+| `court_ratification` | The Verification Court ruled | promotion edges, `ACTIVE→DEPRECATED` |
+| `adversary_cleared` | The Adversary reviewed a quarantine and found no defect | `QUARANTINED→*` |
+| `founder_ratification` | Human override | every edge |
+| `supersession` | A named replacement exists | `*→SUPERSEDED`, `ACTIVE→DEPRECATED` |
+| `falsification` | The claim was shown false | `*→RETRACTED` |
+| `integrity_alarm` | Evidence or provenance is suspect; truth undetermined | `*→QUARANTINED` |
+| `evidence_withdrawn` | Supporting evidence was itself retracted | `CANDIDATE→PROPOSED` |
+
+**No member is a count.** `frequency`, `observation_count`, `consensus_count`, `repetition`,
+`seen_n_times` are all absent, and `unevaluatedProperties: false` means none of them can ride along
+as a sibling property either. The two defences are independent by construction
+(`design.md` §5.3).
+
+> **A near-miss worth recording.** "N independent ratifiers agreed" looks count-shaped. It is
+> modelled as `court_ratification` with N entries in `evidence_refs`, *not* as a numeric threshold
+> field. The distinction that matters: each ratification is an addressable, retractable artifact,
+> whereas a tally is not — you cannot retract a number. If a ratification is later found forged
+> (`CANARY-0001`), the promotion that leaned on it is traceable through `evidence_refs`. A counter
+> would have erased that link. (`assumptions.md` A5.)
+
+---
+
+## 5. `provenance`
+
+```jsonc
+"provenance": {
+  "type": "object",
+  "required": ["actor", "actor_role", "run_id", "source", "recorded_at"],
+  "properties": {
+    "actor":       { "type": "string", "minLength": 1 },
+    "actor_role":  { "$ref": "#/$defs/actor_role" },
+    "run_id":      { "type": "string", "pattern": "^run:[0-9A-HJKMNP-TV-Z]{26}$" },
+    "source": {
+      "type": "object",
+      "required": ["type", "ref"],
+      "properties": {
+        "type": { "enum": ["derivation", "observation", "ingestion", "ratification"] },
+        "ref":  { "type": "string", "minLength": 1 }
+      },
+      "unevaluatedProperties": false
+    },
+    "recorded_at": { "$ref": "#/$defs/timestamp" }
+  },
+  "unevaluatedProperties": false
+}
+```
+
+`actor_role` is what `INV-TZ-1` keys on: only `founder` may produce a `Z0` node, matching
+`constitution/README.md:3` ("its only legal writer is `kernel/amendment.py`").
+
+---
+
+## 6. Lifecycle detail blocks
+
+All four carry `unevaluatedProperties: false`.
+
+```jsonc
+"retraction": {
+  "$comment": "the tombstone: deletion is only expressible as a retraction with attribution",
+  "type": "object",
+  "required": ["reason", "retracted_at", "retracted_by", "evidence_refs"],
+  "properties": {
+    "reason":        { "type": "string", "minLength": 1 },
+    "retracted_at":  { "$ref": "#/$defs/timestamp" },
+    "retracted_by":  { "type": "string", "minLength": 1 },
+    "evidence_refs": { "type": "array", "minItems": 1, "uniqueItems": true,
+                       "items": { "$ref": "#/$defs/evidence_ref" } },
+    "successor":     { "$ref": "#/$defs/node_id" }
+  },
+  "unevaluatedProperties": false
+},
+
+"quarantine": {
+  "type": "object",
+  "required": ["reason", "raised_at", "raised_by", "detector"],
+  "properties": {
+    "reason":    { "type": "string", "minLength": 1 },
+    "raised_at": { "$ref": "#/$defs/timestamp" },
+    "raised_by": { "type": "string", "minLength": 1 },
+    "detector":  { "$comment": "which detector fired — mirrors the canary detection_signature convention",
+                   "type": "string", "minLength": 1 },
+    "canary_id": { "type": "string", "pattern": "^CANARY-\\d{4}$" }
+  },
+  "unevaluatedProperties": false
+},
+
+"deprecation": {
+  "type": "object",
+  "required": ["reason", "deprecated_at"],
+  "properties": {
+    "reason":         { "type": "string", "minLength": 1 },
+    "deprecated_at":  { "$ref": "#/$defs/timestamp" },
+    "prefer_instead": { "$ref": "#/$defs/node_id" }
+  },
+  "unevaluatedProperties": false
+}
+```
+
+`retraction.evidence_refs` has `minItems: 1`: you may not retract a node on a hunch, for the same
+reason you may not promote one on a hunch. `quarantine` has **no** evidence requirement — raising a
+quarantine is a *suspicion*, and requiring proof to raise one would suppress exactly the alarms the
+`CANARY` corpus exists to trigger (`constitution/canaries/README.md:5-6`: a miss "is an alarm").
+`quarantine.canary_id` lets a calibration miss point at the specific canary, matching the corpus's
+"a miss points at the exact detector to fix" intent (`constitution/canaries/README.md:28-29`).
+
+---
+
+## 7. Skeleton assembly order
+
+For IMPLEMENT, build the file in this order — each step is independently checkable:
+
+1. `$schema`, `$id`, `title`, `description`, `type: "object"`
+2. `$defs` primitives (§1) — then run `check_schema`
+3. `$defs` objects: `provenance`, `confidence`, `retraction`, `quarantine`, `deprecation`
+4. `$defs.legal_transition` — 19 `anyOf` branches generated from `design.md` §4.2's table
+5. `$defs.promotion` incl. the `INV-FSM-2` binding clauses
+6. Top-level `properties` (§2) + `required` (the 11 `R` rows)
+7. The five conditional `allOf` clauses: promotion-presence + four lifecycle-detail clauses
+8. `INV-EV-1` clause (`evidence_refs` `minItems` conditional on status)
+9. `INV-TZ-1` clause
+10. `"unevaluatedProperties": false` — **last**, and re-run the full corpus after adding it; this
+    keyword is the one most likely to over-reject, and adding it last isolates the blame
+
+---
+
+## 8. Field → invariant → fixture index
+
+| Field | L1 invariants | Valid fixtures | Invalid fixtures |
+|---|---|---|---|
+| `schema_version` | const | all | `I14` (omitted) |
+| `id` | pattern | all | — |
+| `kind` | pattern | all | — |
+| `status` | enum, `INV-DEL-1` | V01-V16 (all 7 values) | `I08` |
+| `content` | minProperties | all | — |
+| `content_hash` | pattern | all | `I15` |
+| `created_at` / `updated_at` | pattern | all | — |
+| `provenance.*` | required, enums, patterns | all | `I14` |
+| `confidence.*` | `INV-CONF-1..5` | all | `I01`, `I02`, `I03`, `I04`, `I21` |
+| `evidence_refs` | `INV-EV-1` | V01 (empty), V03-V16 | `I19` |
+| `promotion.*` | `INV-PROMO-1..4`, `INV-FSM-1..2` | V03-V16 | `I05`, `I06`, `I07`, `I11`, `I17`, `I18` |
+| `derived_from` | pattern, unique | V02, V16 | — |
+| `trust_zone` | enum, `INV-TZ-1` | all; V15 = Z0 | `I16`, `I20` |
+| `labels` | propertyNames | V02, V15 | — |
+| `superseded_by` | `INV-DEL-2` | V07, V08 | `I12` |
+| `retraction.*` | `INV-DEL-3` | V09, V10 | `I10`, `I13` |
+| `quarantine.*` | `INV-QUAR-1` | V11 | `I22` |
+| `deprecation.*` | `INV-DEP-1` | V06 | `I23` |
+| *(top level)* | `INV-DEL-4` | — | `I09` |
+
+Full matrix with per-fixture pointers: [`traceability.md`](traceability.md).

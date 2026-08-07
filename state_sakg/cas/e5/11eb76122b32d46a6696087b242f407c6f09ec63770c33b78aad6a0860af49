@@ -1,0 +1,92 @@
+# Constitutional Implementation Review: [B2.E — Amendment Path (hard-loop, human-gated)]
+
+**Date**: 2026-07-30
+**Task**: Amendment path wired + human-gated (Phase 2 / PAEOS-7 §7.4, FR-2 / PAEOS-8 §12)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverables:
+- `runtime/amendment.py` — `AmendmentProposal`, `AmendmentPath`/`prepare_amendment`,
+  `RatificationPacket`, `AmendmentStatus`, `parse_proposal`.
+- `cli/paeos.py` — `amend` subcommand (live isolated ratification adversary; never applies).
+- `tests/runtime/test_amendment.py` — 8 tests (HARD→await, constitution→HARD, SOFT→not-an-amendment,
+  incomplete-adversary→blocked, empty-paths→fail-safe HARD, parse).
+
+Evidence: **289 passed** (7 new); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT: `runtime/` + `cli/` + `tests/` only).
+
+## What this delivers
+
+The last remaining Phase-2 exit criterion: "amendment/hard loop **wired but human-gated**"
+(playbook §158, PAEOS-7 §7.4). A change to the frozen kernel or constitution may not merge on
+Builder+Verifier alone. `AmendmentPath.prepare` runs the automated part of the hard loop and then
+**halts at the human gate**:
+
+1. **(a) the kernel classifies** blast radius (`classify_paths`), not the proposer's claim (A-2);
+2. **(b) an isolated Adversary attacks the safety-invariant diff specifically** (FR-2 / PAEOS-3.5),
+   reusing the B1.D `InformationBarrierManager` + `ReviewHarness` unchanged;
+3. **(c) HALT** — it assembles a `RatificationPacket` (classification + captured adversary review)
+   and stops. The founder reads the adversary report and signs; the runtime applies nothing.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** §7.4's non-negotiable boundary — "the runtime cannot autonomously amend its own
+constitution … nothing autonomous may substitute for the human sign-off (FR-2)" — is honored by
+**construction**: `RatificationPacket.applied` is always `False`, and there is **no code path** in
+the module that writes `kernel/` or `constitution/` (verified: no filesystem write, no TCB path).
+Crucially, the runtime does **not** auto-decide "the adversary broke it / passed"; it *runs* the
+adversarial attack, captures the report, and leaves the ratification decision to the human — the
+correct reading of §7.4(b)+(c), and it avoids inventing an autonomous verdict that could stand in
+for the human gate.
+
+### 2. Architectural Drift
+**PASS.** Reuses the kernel classifier and the B1.D barrier/review harness verbatim. `AmendmentPath`
+composes the same `AgentDispatcher` wiring as `SoftLoop`. No new mechanism, no new authority.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** No duplication of the review harness. **Derivation-honest at the fork that mattered:** the
+spec does not define a machine-readable "adversary verdict," so rather than *invent* one (which would
+violate CER-6 and, worse, let an autonomous signal substitute for the human gate), the module
+captures the adversary *report* for the human. `NOT_AN_AMENDMENT` (SOFT classification) routes
+non-TCB work back to the soft loop — the amendment path can neither be bought for non-TCB work nor
+escaped for TCB work, because the *kernel* classifies. No hidden debt.
+
+### 8. Security Implications
+**PASS.** This is a T4 (unsafe self-modification) control. Fail-closed: empty/unresolvable target
+paths classify **HARD** (fail-safe, tested); an adversary session that does not COMPLETE yields
+`ADVERSARY_INCOMPLETE` — not ready for the gate (tested). The adversary is isolated by the B1.D
+barrier (bundle-only context, report-only write scope, constitution MCP only). No key is handed to
+any agent; the founder's signature is out-of-band.
+
+### 9–10. Runtime / Extensibility
+**PASS.** `prepare_amendment` injects `signing_key`/`cas`/`adversary_runtime`, so tests script the
+adversary and the CLI wires the live `ClaudeCodeRuntime`. `parse_proposal` gives a stable JSON
+intake. A future ledgered `amendment_proposed` event and the founder's counter-signed application
+drop in behind the packet without changing the boundary.
+
+## Adversary / property pass
+
+1. **TCB change halts at the human gate** — a `kernel/`/`constitution/` proposal is HARD, the
+   adversary attacks the diff, status is `AWAITING_RATIFICATION`, `applied` is False (tested).
+2. **Non-TCB change is not an amendment** — a `runtime/` proposal is SOFT → `NOT_AN_AMENDMENT`, no
+   adversary dispatched (tested).
+3. **Fail-closed** — empty target paths → HARD; an incomplete adversary → blocked (tested).
+4. **Never applies** — `applied` is structurally False; no TCB write path exists (verified).
+
+## OBSERVATIONS
+
+1. **Application + ledgering are the founder's out-of-band steps (by design).** The packet stops at
+   the human gate; the founder applies the amendment by signing and committing to `constitution/`
+   (a HARD-LOOP action), and that ratification is itself ledgerable. Wiring an `amendment_proposed`
+   ledger event and a founder counter-signature verification is a natural follow-on — it strengthens
+   the audit trail but is **not** required for "wired + human-gated": the boundary (runtime prepares,
+   founder ratifies, runtime never applies) is complete and enforced by construction.
+
+## Action Items
+- [ ] **Founder**: ratify B2.E (F2-SOFT) → merge ff-only, remote CI green, tag `b2.e`.
+- [ ] **Phase-2 seal**: with the amendment path landed, Phase 2's remaining item is the founder/ops-
+      gated **live R4 run** (per `docs/R4-SELF-HOSTING-RUNBOOK.md`). On its acceptance, Phase 2 seals.

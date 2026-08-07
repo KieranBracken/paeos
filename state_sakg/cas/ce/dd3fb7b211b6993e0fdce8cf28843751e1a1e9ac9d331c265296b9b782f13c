@@ -1,0 +1,88 @@
+# F-ENVELOPE — Rollback Plan
+
+## 1. Why rollback is cheap here, stated precisely
+
+F-ENVELOPE writes to exactly two trees — `sakg/schema/` and `tests/sakg/` — plus one dependency
+entry. It performs **no migration, writes no data, publishes nothing, and calls no external
+service.** There is no consumer of `envelope.schema.json` yet: the Layer 2 module
+(`sakg/schema/invariants.py`) belongs to F-INVARIANTS and the store to F-STORE
+(`design.md` §2.2, `traceability.md` §4). Nothing downstream can have been built against a version
+that is then withdrawn.
+
+Consequence: **every rollback in this plan is a file-tree revert with no coordination step.** That
+is a property worth stating rather than assuming, because it is exactly what stops being true the
+moment F-INVARIANTS starts importing this schema — after which a schema rollback becomes a
+`schema_version` bump, not a revert (see §6).
+
+## 2. Granularity: one work unit, one commit
+
+Branch `goal/F-ENVELOPE`, one commit per work unit W0–W12, unit id in the subject line. This is not
+bookkeeping — three specific units are commit-isolated *because* their failure mode is silent:
+
+| Unit | Why isolated |
+|---|---|
+| **W8** (close the world) | Its symptom is silent **over**-rejection. Isolation makes `git revert <W8>` a total, blame-free recovery to a schema that passed the full valid corpus minutes earlier. |
+| **W4** (transition table) | A miscounted table is invisible to `check_schema` (E4). Isolation makes the 19-branch block re-generatable without touching anything else. |
+| **W6** (Violation mapper) | An anchored regex here produces a green suite with a missing invariant (E5). Isolation lets the mapper be replaced without disturbing schema or corpus. |
+
+## 3. Per-unit rollback procedures
+
+| Id | Unit | Trigger | Procedure | Cascade |
+|---|---|---|---|---|
+| **R0** | W0 | Dependency conflict; `jsonschema` unavailable or lacking 2020-12 support | `uv remove jsonschema`; delete the created package/test trees | None. Nothing exists yet. |
+| **R1** | W1 | §4.2 surfaces **after** W2–W9 have landed | **Not a revert.** Walk `assumptions.md` §4 items 1–5 as a rename-and-adjust pass. The layering, state-machine topology, and corpus architecture survive field renames; only names change (`assumptions.md` A0, blast radius). Re-run E6/E7 after. | Touches schema + all 39 fixtures + manifest. Bounded but wide — which is precisely why W1 is sequenced first. |
+| **R2** | W2, W3, W4, W5 | `check_schema` fails; a `$ref` does not resolve; E4's count is wrong | `git revert` the unit commit. Single file, no other artifact depends on it yet. | None — W6 onward has not started. |
+| **R3** | W6 | Interface does not meet `design.md` §3.1; E5's id counts disagree | Revert the module; the schema is untouched | **Forward cascade**: W7–W11 all depend on it. Nothing behind it is affected. |
+| **R4** | W7, W9, W10 | A fixture is wrong, non-minimal, or trips two rules | Per-file. Delete or re-author the individual fixture **and its manifest entry together** — E8 fails on either alone, which is the intended coupling. | None. Fixtures have no runtime dependency on each other. |
+| **R5** | W8 | A `V*` fixture that passed in W7 fails after closing the world | `git revert <W8>`. Then diagnose: either the fixture carries a stray key (fix the fixture, re-apply W8) **or** a conditional branch's evaluated properties are not being seen — the `additionalProperties` composition bug (`design.md` §2.5.1), fix the schema, re-apply W8. | None. The revert restores a state that passed E6 in full. |
+| **R6** | W11 | Tests are wrong rather than the artifact | Revert the test module. **Do not weaken a coverage test to make it pass** — see §4. | None. |
+| **R7** | W12 | Acceptance fails from a clean checkout; or E10 leaves residue | Do not merge. `git status` must be clean; if the E10 probe was applied in place, `git checkout -- sakg/schema/envelope.schema.json` before anything else. | None — nothing merged. |
+
+## 4. The rollback that is forbidden
+
+**Weakening a failing coverage test is not a rollback.** Three named cases:
+
+- `test_every_status_has_valid_fixture` failing after a reconciliation status-enum change **is the
+  reconciliation signal** — `assumptions.md` §4 item 2 says in terms: do not weaken it. Author the
+  fixture.
+- `test_every_invariant_has_invalid_fixture` failing means an invariant was added to the schema with
+  no fixture claiming it. Author the fixture or remove the invariant; deleting the `INV-*` id from
+  the `$comment` removes the invariant from the roster while leaving the (now unexercised) rule in
+  place — a gap that looks exactly like coverage (`design.md` §3.1).
+- E7's `(pointer, keyword, invariant)` assertion failing means the fixture is not rejected for the
+  reason it claims. Relaxing the assertion to `assert not valid` reproduces `CANARY-0002`'s defect
+  class verbatim — "the same PASS for the claim and its negation"
+  (`constitution/canaries/CANARY-0002.json:4`).
+
+Each of these is a rule the corpus exists to enforce, being disabled by the thing it caught. If one
+of them blocks progress, that is the plan working.
+
+## 5. Abort criteria — stop, do not roll back
+
+Two conditions where the correct action is to halt and escalate rather than revert or work around:
+
+1. **A count-shaped basis or confidence method appears in the real §4.2** (found during W1). It
+   collides head-on with the goal's "frequency-based promotion" invariant. `assumptions.md` §4
+   item 3: *escalate rather than admitting it*. Admitting it would make `I05`/`I06` unauthorable and
+   silently redefine the goal.
+2. **W0 step 4 answers that `sakg/schema/` is inside the TCB-diff gate scope** (A1). Building
+   continues; **merging** requires a human ratifier + Adversary review first
+   (`constitution/README.md:15-16`). Do not merge on the assumption that it is out of scope.
+
+A third, weaker case: if §4.2 is found mid-flight and the diff is large enough that R1's rename pass
+exceeds the cost of re-running W2–W10 from the corrected roster, prefer the rebuild. The design
+package is unchanged either way — that is what A0's "blast radius: total for *names*, not for
+*structure*" means in practice.
+
+## 6. What changes once F-INVARIANTS lands
+
+Recorded so the next goal inherits an accurate assumption rather than this one:
+
+The moment `sakg/schema/invariants.py` or any store imports `envelope.schema.json`, §1's "no
+coordination step" stops holding. From then on a backward-incompatible schema change is a
+`schema_version` bump and a new `$id` path segment served alongside `1.0.0` — which is the reason
+`$id` is versioned and the reason a self-test asserts `$id`'s version segment matches
+`properties.schema_version.const` (`design.md` §3.2). Rollback becomes *supersession*, and the
+envelope's own `SUPERSEDED` semantics are the model for it.
+
+Until then, and for this goal only, revert is sufficient.

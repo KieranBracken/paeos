@@ -1,13 +1,36 @@
 # PAEOS-9 — Runtime Bootstrap Architecture
 
-> Status: architecture (design, not implementation). The **runtime entrypoint**: every
-> implementation session executes this bootstrap before any engineering work begins. Its job
-> is to transform the constitutional corpus (30–50 markdown files) into **one authoritative,
-> executable engineering context** that the worker consumes instead of the raw documents.
+> Status: **RATIFIED** 2026-07-21 (lawful execution architecture; three editorial
+> clarifications C1/C2/C3 applied — ratification review: `reviews/9-ratification-paeos-9.md`).
+> Architecture (design, not implementation). The **runtime entrypoint**: every implementation
+> session executes this bootstrap before any engineering work begins. Its job is to transform
+> the constitutional corpus (30–50 markdown files) into **one authoritative, executable
+> engineering context** that the worker consumes instead of the raw documents.
 > **This does not modify the constitution.** The raw corpus remains the source of truth; the
 > compiled context is the *executable interface* between the constitution and the AI worker.
 
+## Terminology — the three contexts (normative · C1)
+
+"Context" names three distinct things. They are not interchangeable, and no fourth meaning is
+permitted:
+
+- **Kernel Context** — PAEOS-4-v1.1 §6.3: what *one agent* receives for *one goal*
+  (`{manifest, rendered, truncation}`), produced by the kernel `compile()`. Per-goal, per-agent.
+- **CompiledContext** — this document §2 output: the *session-scope artifact* at
+  `.runtime/compiled_context.*` — the corpus compiled into one content-hashed snapshot. A
+  scaffold artifact (see scaffold note, C2).
+- **RuntimeContext** — this document §3: the *in-memory object* held during a session. It is a
+  **projection that composes existing objects** (Goal, EvidenceReq, roles, package, scars,
+  proposals, debt) together with the CompiledContext. It adds no kernel object and redefines
+  nothing — a view, not a new primitive.
+
+At self-hosting (S3+), Kernel Context is authoritative; CompiledContext and the scaffold that
+builds it fall away (C2).
+
 ## §0 Framing — what the bootstrap is, and what it reuses
+
+> **Non-normative (C3).** This section explains the runtime and its lineage; it is not
+> constitutional behaviour. Normative execution begins at §1.
 
 **The problem it kills (the Sentium scar):** AI workers ignored, forgot, or inconsistently
 applied constitutional documents *because those documents were passive markdown competing for
@@ -49,6 +72,13 @@ silent drift.
 ---
 
 ## §1 Repository Loading
+
+> **Scaffold-only (C2).** This section operates on the pre-store *markdown corpus* because the
+> typed store and kernel `compile()` do not yet exist. File-loading here, and the SUMMARY /
+> INDEX / EXTRACT digestion in §2, are **genesis-scaffold mechanisms**: at self-hosting (S3+)
+> the kernel `compile()` operates on typed store objects — where K10 (capped constitution) and
+> trigger-loaded skills make corpus digestion unnecessary — and this apparatus **vanishes**. It
+> is not permanent constitutional law; it traces to the PAEOS-3 genesis hand-compilation.
 
 The loader produces a **Load Manifest**: an ordered list of `(slot, path, sha256, load_mode)`.
 Load order **is precedence order** (§0), highest first, so contradictions resolve
@@ -102,6 +132,12 @@ mandatory file, hash mismatch on a mandatory file, or lineage mismatch ⟹ **BOO
 ---
 
 ## §2 Context Compiler
+
+> **Scaffold note (C2):** the SUMMARY / INDEX / EXTRACT digestion in stages 4–5 is
+> genesis-scaffold-only (see §1 banner); it exists to fit the pre-store markdown corpus to
+> budget and vanishes at S3+ when kernel `compile()` uses typed objects. The permanent
+> mechanisms here — precedence resolution, amendment overlay, contradiction→COMPILE_FAILURE,
+> determinism, content_hash — persist because they are kernel concepts (§0/§9.4/§6.2/§6.1).
 
 `compile_context(load_manifest, task) → CompiledContext`. Pure, deterministic. Workers **never
 individually decide what documents matter** — the compiler decides, once, mechanically.
@@ -362,6 +398,9 @@ never a decision, never a scar, never work — because those were written as the
 
 ## §9 Runtime Health (diagnostics)
 
+> **Non-normative (C3).** Observability, not execution. A read-only projection introducing no
+> new state; execution proceeds without it. Retained because it answers §7's "why blocked."
+
 A read-only projection of RuntimeContext, answerable at any instant (`paeos status`):
 ```
 HealthReport {
@@ -385,6 +424,9 @@ condition — never "I'm not sure." If `blocked_reason = stale_context`, the fix
 ---
 
 ## §10 Adversarial Review (attack the bootstrap, then harden)
+
+> **Non-normative (C3).** Self-review, not execution. It records how the design was hardened
+> (per CER-1); it defines no runtime behaviour.
 
 Per CER-1 / the PAEOS-3.5 method, run on the bootstrap itself.
 

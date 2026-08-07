@@ -203,11 +203,11 @@ produced.** Owning role and recommended model class in the header line.
 #### L17 — Retrospective + Constitutional Review · *Auditor + Runtime · model: Opus*
 - **Purpose:** improve engineering itself, and **improve PAEOS itself** — what slowed us, what failed, what repeated, which prompts improved, what should become policy.
 - **Entry:** L16 complete (or a failure at any state).
-- **Required artifacts:** lessons learned; workflow amendments; and the **mandatory Constitutional Review** (CER-4) answering, in writing: (a) what architectural weaknesses were discovered? (b) what assumptions were invalidated? (c) which parts of PAEOS became stronger? (d) which Improvement Proposals were created (proposals/, CER-2)? (e) which Architectural Debt items were recorded (ledger/debt/, CER-3)? (f) should future implementation strategy change?
-- **Exit:** the Constitutional Review is written; every lesson is either discarded-with-reason or converted to an L18/L19 input, a Proposal, or a Debt entry. A task without a Constitutional Review is **incomplete** (CER-4).
+- **Required artifacts:** lessons learned; workflow amendments; and the **mandatory Constitutional Review** (CER-4 / `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md`) evaluating the 10-point checklist: (a) what architectural weaknesses were discovered? (b) what assumptions were invalidated? (c) which parts of PAEOS became stronger? (d) which Improvement Proposals were created (proposals/, CER-2)? (e) which Architectural Debt items were recorded (ledger/debt/, CER-3)? (f) should future implementation strategy change? Output saved to `reviews/tasks/<task_id>_review.md`.
+- **Exit:** the Constitutional Review is written (`reviews/tasks/<task_id>_review.md`); every lesson is either discarded-with-reason or converted to an L18/L19 input, a Proposal, or a Debt entry. A task without a Constitutional Review is **incomplete** (CER-4).
 - **Approval:** none (Steward-owned, continuous, with teeth). The review **recommends**; it never legislates (CER-5).
 - **Failure:** a repeated mistake with no lesson → the meta-failure (Ω-11); a completed task with no Constitutional Review → the task is not done.
-- **Evidence produced:** lessons-learned record; the Constitutional Review; links to any Proposals/Debt created.
+- **Evidence produced:** lessons-learned record; the Constitutional Review (`reviews/tasks/<task_id>_review.md`); links to any Proposals/Debt created.
 
 #### L18 — Knowledge Extraction · *Auditor (Steward) · model: Opus*
 - **Purpose:** generalize reusable knowledge.
@@ -231,9 +231,9 @@ produced.** Owning role and recommended model class in the header line.
 
 ---
 
-## Constitutional Execution Rules (Engineering Lifecycle v1.1 — Founder-Ratified 2026-07-21)
+## Constitutional Execution Rules (Engineering Lifecycle v1.2 — Founder-Ratified 2026-07-27)
 
-> These five rules **govern every state** without adding any state or changing any ordering.
+> These six rules **govern every state** without adding any state or changing any ordering.
 > They are the canonical definition; all other implementation documents reference them, they
 > are not restated. Constitutional grounding: this is PAEOS-0 falsificationism (challenge
 > every assumption; no rule without a scar) applied continuously to PAEOS itself, and the
@@ -266,8 +266,8 @@ produced.** Owning role and recommended model class in the header line.
   compromise / open incident (K7). See `ledger/debt/README.md`.
 
 - **CER-4 — End-of-Task Constitutional Review.** Every completed task MUST finish with the
-  Constitutional Review defined in **L17** above. It is mandatory; a task without it is not
-  done.
+  Constitutional Review defined in **L17** above and governed by `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md`.
+  It is mandatory; a task without it is not done.
 
 - **CER-5 — Separation of Powers.** Improvement Proposals NEVER automatically modify PAEOS.
   Only a **founder-ratified constitutional amendment** may change the kernel, lifecycle,
@@ -276,11 +276,18 @@ produced.** Owning role and recommended model class in the header line.
   thinking and proposal generation, zero unauthorized change. It reinforces the existing
   Founder-only authority boundary; it grants no new power to any agent.
 
+- **CER-6 — Constitutional Derivation.** Before introducing any new architectural concept,
+  interface, abstraction, module, namespace, service, or kernel responsibility, the Builder
+  MUST demonstrate its explicit derivation from existing constitutional artifacts (`Z0`, `spec/`,
+  `derivation/`). If no derivation exists, implementation MUST halt and produce an Improvement
+  Proposal (`proposals/PAEOS-IP-NNNN.md`) rather than invent architecture. Implementation MAY
+  refine constitutional intent; implementation MAY NOT create constitutional intent.
+
 ## Global Constitutional Rules (apply across every state)
 
 1. No direct transition from Intake to Implementation.
 2. Every transition requires evidence (K1).
-3. Implementation never creates architecture (L12 is bound to the L11 contract).
+3. Implementation never creates architecture (L12 is bound to the L11 contract and CER-6 derivation).
 4. Architecture never creates policy (L08 → policy only via L19).
 5. Policy changes require constitutional review (L10/L19, §14.5).
 6. Every implementation must survive an independent audit (L14, decorrelated model, A-08).
@@ -293,14 +300,18 @@ produced.** Owning role and recommended model class in the header line.
 13. Every task MUST attempt to falsify the current architecture; acceptance is never sufficient (CER-1).
 14. Every discovered improvement MUST become a formal Proposal, never a silent change (CER-2).
 15. Every deliberate non-ideal choice MUST be recorded as Architectural Debt (CER-3).
-16. Every completed task MUST end with a Constitutional Review (CER-4).
+16. Every completed task MUST end with a Constitutional Review (CER-4 / `IMPLEMENTATION_REVIEW_PROTOCOL.md`).
 17. Only the founder may ratify changes to kernel/lifecycle/authority/invariants; the runtime recommends, never legislates (CER-5).
+18. Implementation MUST NOT invent architecture; un-derived concepts trigger an immediate HALT and Improvement Proposal (CER-6).
+19. Every workload, system, or product built by PAEOS MUST maintain a living `Implementation Atlas` (`docs/IMPLEMENTATION_ATLAS.md`) tracking all components, trust zones, constitutional origins, statuses, and evidence anchors (L15).
 
 ## Versioning
 
-This is **v1.1** (Constitutional Execution Rules amendment, founder-ratified 2026-07-21;
-adds CER-1..CER-5 and enriches L17; adds no state, changes no ordering, modifies no kernel
-invariant). Amendments to the lifecycle are L19 events on this document — scarred,
-falsifiable, founder-ratified. The machine-executable form is
+This is **v1.3** (Universal Implementation Atlas amendment, founder-ratified 2026-07-27;
+adds Global Rule 19, mandates `docs/IMPLEMENTATION_ATLAS.md` across all PAEOS-governed workloads;
+adds no state, changes no ordering, modifies no kernel invariant). Amendments to the lifecycle are
+L19 events on this document — scarred, falsifiable, founder-ratified. The machine-executable form is
 `operations/WORKFLOW_STATE_MACHINE.yaml`; roles are in `operations/ROLE_RESPONSIBILITIES.md`;
 per-state prompts are in `operations/PROMPT_TEMPLATES.md`.
+
+

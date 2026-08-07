@@ -4,7 +4,7 @@ Validates that:
     - Clean seals produce no friction records.
     - Each known remand/halt pattern classifies to the correct category.
     - Leverage scoring (Primitive 4) computes substrate, recurrence, and threshold flags.
-    - Confidence assessment & auto-promotion (Primitive 5) downgrades recurring SOFT DEBT to INTAKE_FIX.
+    - Confidence assessment (Primitive 5) downgrades recurring SOFT DEBT to INTAKE_FIX.
     - Recurring TCB-implicated failures generate PROPOSAL (PAEOS-IP-XXXX.md) items.
     - High leverage friction (>= 5.0) generates immediate queue repair Intakes.
     - Disk recording writes well-formed DEBT, RB, and IP markdown files with leverage notes.
@@ -17,10 +17,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from runtime.friction import (
-    ConfidenceAssessment,
     FrictionCategory,
-    FrictionRecord,
-    LeverageScore,
     assess_confidence,
     classify_friction,
     record_friction,

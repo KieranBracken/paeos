@@ -23,7 +23,9 @@ __all__ = [
     "ONTOLOGY",
     "LifetimeClass",
     "LifetimeInfo",
+    "classify_obj",
     "classify_type",
+    "is_institutional",
     "may_promote",
 ]
 
@@ -103,6 +105,31 @@ def classify_type(type_name: str) -> LifetimeClass:
         raise KeyError(
             f"artifact type {type_name!r} has no declared lifetime_class (IP-0006 §5)"
         ) from None
+
+
+def classify_obj(obj: object) -> LifetimeClass:
+    """The lifetime class of a live artifact *instance* by its runtime type name (IP-0006 §4).
+
+    Convenience over `classify_type`: derives the type name from `type(obj).__name__` so callers
+    holding an object need not name its class. Raises KeyError for an unregistered type, as
+    `classify_type` does — an undeclared artifact type is a conformance gap, never a default."""
+    return classify_type(type(obj).__name__)
+
+
+# The durable/institutional classes (IP-0006 §2): those whose owner is not the transient
+# Worker/Runtime tier. L3 (Institutional Memory), L4 (Constitutional Knowledge) and L5 (Historical
+# Truth) all persist across runs; L0/L1/L2 are scratch, ephemeral, or a rebuildable cache.
+_INSTITUTIONAL: frozenset[LifetimeClass] = frozenset(
+    {LifetimeClass.L3, LifetimeClass.L4, LifetimeClass.L5}
+)
+
+
+def is_institutional(cls: LifetimeClass) -> bool:
+    """True iff `cls` is one of the durable/institutional classes L3, L4 or L5 (IP-0006 §2).
+
+    L0/L1/L2 (Scratch / Ephemeral Execution Context / Runtime Projection) are transient or a
+    rebuildable cache and return False; the L3+ classes persist across runs and return True."""
+    return cls in _INSTITUTIONAL
 
 
 # Promotions permitted between lifetime classes, each keyed to the verified transition that allows

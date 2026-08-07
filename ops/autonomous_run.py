@@ -23,14 +23,14 @@ import threading
 import uuid
 from pathlib import Path
 
-# RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
-from runtime.friction import FrictionCategory, classify_friction, record_friction
-
 from kernel.cas import CAS, FilesystemCasStore
 from kernel.keystore import load_or_create_signing_key
 from kernel.ledger import Ledger
 from kernel.ledger_sqlite import SqliteLedgerStore
 from runtime.evolution import EvolutionLayer
+
+# RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
+from runtime.friction import FrictionCategory, classify_friction, record_friction
 from runtime.integrations import ClaudeCodeRuntime
 from runtime.orchestrator import Intake, RunOutcome, RunStatus, SoftLoop
 from runtime.scheduler import (
@@ -98,7 +98,8 @@ def build_scheduler(
                 outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
             )
         # RB-0008: autonomous friction detection — classify and record structural gaps.
-        has_matching_scar = bool(loop.scar_store.match_scars(intake.goal_signature)) if intake.goal_signature else False
+        sig = intake.goal_signature
+        has_matching_scar = bool(loop.scar_store.match_scars(sig)) if sig else False
         friction = classify_friction(
             outcome, intake.changed_paths, has_matching_scar=has_matching_scar
         )
@@ -127,7 +128,8 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not 2 <= len(argv) <= 4:
         print(
-            "usage: python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency] [max_runs]",
+            "usage: python ops/autonomous_run.py <backlog.json> <state_dir> "
+            "[max_concurrency] [max_runs]",
             file=sys.stderr,
         )
         return 64

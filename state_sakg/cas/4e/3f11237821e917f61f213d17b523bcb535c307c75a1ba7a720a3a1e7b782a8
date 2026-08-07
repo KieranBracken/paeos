@@ -1,0 +1,75 @@
+---
+evidence_id: design_coherent
+kind: CITATION
+stage: DESIGN
+role: PLANNER
+goal: S-PROBE — SAKG/SAEOS-1 extraction feasibility spike
+subject: design/S-PROBE-sakg-s1-extraction-probe.md
+determinism: DETERMINISTIC
+verification: resolve each cited line range against the subject and confirm it carries the sub-claim
+reproducible_command: "sed -n '54p;62p;301p;338p;387p;488p;502p;506p;512p;522p' design/S-PROBE-sakg-s1-extraction-probe.md"
+reproducible_command_note: >-
+  prints the representative anchor line of each sub-claim below (ASM-1, ASM-9, the upgrade rule,
+  the tie-break, the NO-GO-is-success statement, the producer/consumer table, the single-entry
+  argument, the state-coverage argument, RISK-1, GAP-1). It resolves citations; it does not
+  adjudicate coherence — that requires reading them.
+---
+
+# Evidence — `design_coherent`
+
+Claim: the design at `design/S-PROBE-sakg-s1-extraction-probe.md` surfaces its assumptions
+(PAEOS-6), covers the required perspectives, and contains no orphan artifact or unstated gap.
+Each sub-claim below cites the location that discharges it, so a reviewer can check the citation
+rather than the assertion. (Cf. `constitution/canaries/CANARY-0002.json`: a citation that resolves
+but does not exercise the claim is vacuous — every citation here names the specific passage that
+carries the burden, not the document as a whole.)
+
+## 1. Assumptions surfaced (PAEOS-6)
+
+| Sub-claim | Citation |
+|---|---|
+| Assumptions are enumerated in a table with, per row: the assumption, why it matters, how to resolve or falsify it, and whether it blocks | `design/S-PROBE-sakg-s1-extraction-probe.md:47-63` (§3) |
+| Nine assumptions recorded, `ASM-1`…`ASM-9`; five marked blocking | `…:54-62` |
+| The load-bearing one is explicit: SAEOS-1 §4.3 was **not readable** from this stage, so node types are bound at execution time and never invented | `…:54` (`ASM-1`), restated as a constraint at `…:38-45` (§2) and as `GAP-1` at `…:522` |
+| Judgment calls are labelled as judgment, not derivation — the partial-weight 0.5 (`ASM-6`) and the 0.20 threshold (`ASM-7`) | `…:59-60`; rationale at `…:379-384` |
+| Sensitivity to the judgment call is made computable rather than argued: strict/lenient brackets are reported alongside the headline ratio | `…:59` (`ASM-6`), `…:363-366` (§8.4) |
+| An assumption that falsifies part of the goal's own acceptance criteria is surfaced rather than absorbed (`ASM-9` → `RISK-1`) | `…:62`, `…:512-514` |
+
+## 2. Perspectives covered
+
+| Perspective | What the design gives it | Citation |
+|---|---|---|
+| Builder | byte-level output contract + ordered mechanical procedure | `…:389-455` (§10), `…:232-253` (§6) |
+| Adversary | a dedicated downgrade-only component, conservative tie-break, named illegal transitions to police | `…:289-308` (SM-3), `…:338-343` (§8.3), `…:273-281` |
+| Doc | citation + one-sentence rule required per label; `absent_reason` roll-up as the durable output | `…:189-203` (§5.4), `…:476-477`, `…:439-440` |
+| Court / Verifier | verdict is recomputable from the report alone (pure C6→C9 tail); `spec_sha` and corpus closure pin what was probed | `…:110-113` (§4), `…:478-480` (§12) |
+| Founder / ratifier | one line to read, one number to check, failed predicates named | `…:456-463` (§11), `…:224-231` (§5.6) |
+| Downstream consumer | a NO-GO hands over the specific missing seal-time instrumentation | `…:483-485`, `…:439-440` |
+
+All six are enumerated together at `…:469-485` (§12).
+
+## 3. No orphan, no gap
+
+| Sub-claim | Citation |
+|---|---|
+| Producer/consumer table covers all nine artifacts; none produced-and-unread, none read-and-unproduced | `…:488-504` (§13) |
+| Each external input enters through exactly one component (C1/C2/C3), so corpus closure has no side door | `…:502-504` |
+| Every state has entry and exit; `BLOCKED` returns to its prior state, `REPORTED` is the sole terminal | `…:506-508` |
+| Each of the four acceptance commands maps to a named component and a named artifact field | `…:456-463` (§11) |
+| Residual gaps are stated, not papered over: RISK-1 (gate regex cannot express total loss), RISK-2 (extractor disagreement near threshold), RISK-3 (n=3 cannot support a positive claim), GAP-1 (nested node types), GAP-2 (sealed-detection may be conventional) | `…:512-528` |
+| A shell hazard in the goal's own acceptance command is flagged with the mitigation | `…:465-467` |
+| The deliverable path is outside this stage's write scope; the design says so plainly and hands off rather than claiming completion | `…:28-45` (§2), `…:530-535` (§14) |
+
+## 4. Falsifiability of the design itself
+
+The spike is designed so it can fail: thresholds are frozen before the sample is drawn
+(`…:257-272`, SM-1), re-freezing after seeing data is an enumerated illegal transition
+(`…:273-281`), verdict downgrades are cheap while upgrades require a new in-closure citation
+(`…:301-302`), and ties resolve toward `ABSENT` (`…:338-343`). A NO-GO is recorded as a successful
+outcome, not a failure (`…:387`).
+
+## 5. Scope-compliance note
+
+Written this stage: `design/S-PROBE-sakg-s1-extraction-probe.md`,
+`design/evidence/design_coherent.md`. Both under `design/`. Nothing written outside it; `ledger/`,
+`reviews/` and `spec/` were not written, and `ledger/` and `reviews/` were not read.

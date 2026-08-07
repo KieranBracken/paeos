@@ -1,0 +1,75 @@
+# Constitutional Implementation Review: [R5.2 — ClaudeCliWorkerTransport]
+
+**Date**: 2026-07-31
+**Task**: Wrap the `claude` CLI behind `WorkerTransport` so an autonomous run's evidence comes *from
+the agent* (Phase 3 / R5). **Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverables:
+- `runtime/transports/claude_cli.py` — `ClaudeCliWorkerTransport`: the worker is a live `claude`
+  session (behind the `AgentRuntime` seam). `run` **executes** the session and **captures the
+  evidence it declares** (a JSONL `evidence.jsonl` the session writes) into a per-run pool; served via
+  `receive`/`evidence_for`. Satisfies `AgentRuntime` + `WorkerTransport` + `EvidenceSource`.
+- `pyproject.toml` — drop the stale `mcp` package entry (a follow-up to the R5.1 rename).
+
+Evidence: **327 passed** (+2); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT, kernel untouched).
+
+## What this delivers
+
+The autonomous-evidence flow, now vendor-shaped: one `ClaudeCliWorkerTransport` is used by the
+`SoftLoop` as **both** `agent_runtime` (it runs the sessions) **and** `evidence_source` (the agent's
+own declared evidence). Running the IMPLEMENT session captures the evidence the session wrote —
+**no pre-declared backlog evidence** — which then passes the full gauntlet (B2.I binding → B2.N
+probative court → B2.O vacuous gate → B2.K adversary gate). Tested: the loop seals autonomously on
+agent-declared evidence.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** The agent produces its own evidence; the runtime never authors it. Submissions are inert
+until adjudicated (SI-2). Evidence is bound to the real artifact by B2.I (the declaration's
+`artifact_hash` may be a placeholder), and is probative/adversary-gated as always.
+
+### 2. Architectural Drift
+**PASS.** `ClaudeCliWorkerTransport` lives under `runtime/transports/` (a vendor transport) and wraps
+the existing `AgentRuntime` seam. The core loop depends on `AgentRuntime`/`WorkerTransport`/
+`EvidenceSource`, never on this class — the R5.1 invariant holds.
+
+### 3–7. Duplication / Simplicity / Derivation / Debt
+**PASS.** Reuses `FileCourtEvidencePool` for storage; the evidence-declaration parse mirrors the
+backlog parse (`selfhost`). One object satisfies three protocols by composition, no duplication.
+
+### 8. Security Implications
+**PASS.** The vendor `claude` CLI is isolated behind the transport; a compromised/churning CLI cannot
+reach the core runtime. Captured evidence still faces the whole verification/adversary gauntlet, so
+an agent cannot seal on non-probative or forged evidence it declares.
+
+### 9–10. Runtime / Extensibility
+**PASS.** R5.3 (`McpWorkerTransport`) is now a sibling: the official MCP SDK (namespace freed in R5.1)
+behind the same `WorkerTransport`, zero core-runtime change.
+
+## Adversary / property pass
+
+1. **Capture** — running the IMPLEMENT session captures the declared `evidence.jsonl` into the pool;
+   `receive`/`evidence_for` return it (tested).
+2. **Autonomous seal** — the `SoftLoop` (transport as both executor + evidence source) seals with
+   **no** pre-declared evidence (tested).
+3. **Vendor isolation** — the transport lives under `runtime/transports/`; the core loop imports only
+   the abstractions.
+
+## OBSERVATION
+
+1. **The live wiring is deployment.** Tests drive a scripted inner `AgentRuntime`; a live run injects
+   `ClaudeCodeRuntime` and requires the live `claude` session to actually *write* `evidence.jsonl`
+   within its write scope (so B2.I collection keeps it) — a prompt/convention + the usual live-agent
+   iteration (the R4 seal journey). The transport, capture, and autonomous seal are proven; the live
+   session producing the declaration is the deploy step.
+
+## Action Items
+- [ ] **Founder**: ratify R5.2 (F2-SOFT) → merge ff-only, remote CI green, tag `r5.2`.
+- [ ] **R5.3**: `McpWorkerTransport` — add the official MCP SDK (F3) behind `WorkerTransport`; a
+      `CourtServer` writing into `FileCourtEvidencePool`. Zero core-runtime change.

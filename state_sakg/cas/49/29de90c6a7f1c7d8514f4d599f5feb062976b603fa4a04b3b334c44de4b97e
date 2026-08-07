@@ -1,0 +1,71 @@
+# Constitutional Implementation Review: [B2.A — Live Agent Adapter]
+
+**Date**: 2026-07-30
+**Task**: Live `AgentRuntime` adapter (Phase 2 start / PAEOS-8 §12 R3→R4)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 2
+
+Deliverable: `runtime/integrations/__init__.py` — `ClaudeCodeRuntime` (implements the B1.B
+`AgentRuntime`), `build_prompt`, `claude_cli_invoker`, `SessionSpec`/`SessionResult`. Evidence: 6
+tests in `tests/runtime/test_live_adapter.py`; **277 total**; ruff clean (clean-cache); pyright 0
+errors (strict on kernel); F1 2644/20000. **F2-SOFT** (`runtime/integrations/`).
+
+## What this unblocks
+
+`SoftLoop(agent_runtime=ClaudeCodeRuntime(...))` runs **live agents** instead of scripts — the R3
+frontier and the prerequisite for a self-hosting run (R4). The adapter turns each `TaskPackage` into
+a scoped Claude Code session and its result back into a `RunOutput`, exactly the shape the DEBT-0002
+spike validated.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** The prompt is **compiled from the package** (K5 — generated, never handwritten): objective,
+scoped write/read paths, context refs (design/plan/scars), required evidence, forbidden list. The
+session runs in an **isolated workspace**; the adapter collects only the files it wrote, **filtered to
+`write_scopes`** (a write outside scope is dropped before it can become an artifact — belt-and-braces
+with the dispatcher's `ScopeViolation`). Cost is parsed from the transcript, never fabricated
+(unparseable ⇒ zero, tested).
+
+### 2. Architectural Drift
+**PASS.** Implements the *existing* `AgentRuntime` seam — no change to `SoftLoop`/dispatcher. The live
+`claude` CLI call sits behind the `CliInvoker` seam, so no live dependency is imported at module load.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** Reuses `within_scopes` (traversal-safe) for write filtering; workspace is a temp dir cleaned
+up in `finally` (tested). No hidden debt — the live boundary is explicit (Observation 1).
+
+### 8. Security Implications
+**PASS.** The session's authority is only its capability + the tool allow-list derived from
+`mcp_servers` + scoped `Write`. Out-of-scope writes are discarded; the workspace is isolated and
+removed. The adapter never holds a kernel key. The `claude` CLI is invoked shell-free (arg list), and
+the compiled prompt states the scope rules explicitly (defense in depth with capability enforcement).
+
+### 9. Runtime Implications
+**PASS.** Per-package temp workspace; the live call has the package's wallclock timeout; workspace is
+always cleaned up.
+
+### 10. Future Extensibility
+**PASS.** The invoker can swap CLI → Claude Agent SDK; a git-worktree workspace (repo read access) is
+a drop-in for `claude_cli_invoker` (Observation 2).
+
+## OBSERVATIONS
+
+1. **The live model call is the deployment boundary — not unit-tested here.** `claude_cli_invoker`
+   runs the real `claude` CLI, which needs **auth + the target agent-runtime environment**; it is not
+   (and cannot be) exercised by deterministic unit tests. The adapter *logic* (prompt, isolation, write
+   collection/filtering, cost/cleanup) is complete and tested against a fake session; a true live
+   end-to-end run — and the **R4 self-hosting run** (PAEOS sealing a change to its own `runtime/` via
+   its own lifecycle, §12 R3→R4 exit) — is the founder/ops-gated deployment step.
+
+2. **Workspace = temp dir; repo read access via the real invoker.** The isolated workspace captures
+   writes; giving the live session scoped *read* access to the repo (git worktree / `--add-dir` filtered
+   by `read_scopes`) is a detail of `claude_cli_invoker`, tunable without touching the adapter.
+
+## Action Items
+- [ ] **Founder**: ratify B2.A (F2-SOFT) → merge, remote CI, tag `b2.A`.
+- [ ] **R4 self-hosting run** (Observation 1): with the live adapter + auth in the target env, drive one
+      intake through `SoftLoop` to a *real* sealed change to PAEOS's own `runtime/` — the §12 R3→R4 exit.

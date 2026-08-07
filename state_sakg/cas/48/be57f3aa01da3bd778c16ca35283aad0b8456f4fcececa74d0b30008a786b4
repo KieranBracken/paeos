@@ -1,0 +1,535 @@
+---
+artifact: design
+goal: S-PROBE — SAKG/SAEOS-1 extraction feasibility spike
+stage: DESIGN
+role: PLANNER
+target_deliverable: reviews/spikes/sakg-s1-extraction-probe.md
+---
+
+# Design — S-PROBE: extraction feasibility spike (falsify SAEOS-1 §9/A8)
+
+## 1. Purpose and falsification target
+
+The goal is a **spike**, not a build. Its job is to *try to break* the claim that the SAEOS-1
+knowledge graph can be reconstructed from artifacts that are **already sealed**, before anyone
+spends build effort on it.
+
+**Falsification target (FT).** SAEOS-1 §9 / A8 assert (paraphrase — see `ASM-1`, the verbatim text
+is not readable from this stage) that the §4.3 node types can be populated by extraction from the
+sealed record, with no new instrumentation at seal time.
+
+**The probe refutes FT if** hand-extraction of three real sealed goals loses too much of the
+required field surface, per the pre-registered predicate in §9.
+
+A spike that cannot fail is not a spike. Every rule below is written to bias *toward* refutation:
+conservative tie-breaks (§8.3), an adversary pass that may only downgrade (§7.3), and thresholds
+frozen before any data is seen (§7.1).
+
+## 2. Scope boundary of this DESIGN stage
+
+| | |
+|---|---|
+| Writable here | `design/` only |
+| Readable here | `constitution/`, `spec/`, `design/` |
+| Deliverable path | `reviews/spikes/sakg-s1-extraction-probe.md` — **outside** this stage's write scope |
+| Probe inputs | `ledger/`, `reviews/tasks/`, `spec/SAEOS-1.md` — **not readable** from this stage |
+
+Consequence: **this design does not and cannot produce the deliverable.** The four acceptance
+commands belong to the goal, and are satisfied by the downstream stage that holds write capability
+on `reviews/`. This document is the executable specification for that stage: §10 gives the report
+template at byte level, §11 maps each acceptance command to the component that satisfies it.
+
+Observed workspace state at design time: `constitution/` contains a skeleton only
+(`README.md`, `canaries/CANARY-0001..0002.json`, `classifier_rules/.gitkeep`). `spec/` and
+`design/` did not exist. So SAEOS-1 §4.3, §9 and A8 were **not** available to read. This is the
+single largest risk to the design and is tracked as `ASM-1`.
+
+## 3. Assumptions surfaced (PAEOS-6)
+
+Blocking assumptions must be resolved by the executing stage **before** entering `EXTRACTING`
+(SM-1, §7.1). Non-blocking ones are recorded so a reader can tell where judgment entered.
+
+| ID | Assumption | Why it matters | Resolution / falsification | Blocking |
+|----|-----------|----------------|----------------------------|----------|
+| ASM-1 | SAEOS-1 §4.3 defines a closed, enumerable set of node types, each with named fields carrying a required/optional marker and a declared type. | The entire scoring denominator is the §4.3 required-field set. If §4.3 is prose without field-level structure, the loss ratio is undefined. | C1 reads `spec/SAEOS-1.md` §4.3 and emits `FieldMatrix` (§5.1). If the fields are not enumerable, **abort to BLOCKED** and escalate — do not invent fields. | **YES** |
+| ASM-2 | §9/A8 state a feasibility claim about extraction from sealed artifacts. | The probe must refute *the actual claim*, not a paraphrase of it. | C1 quotes §9/A8 verbatim into the report's `## falsification target` section. If they say something else, re-scope the spike before extracting. | **YES** |
+| ASM-3 | `ledger/` marks goals with a terminal *sealed* state that is machine-detectable. | The sample must be "3 real sealed goals", not 3 convenient ones. | C2 filters on the sealed marker; the selection record (§5.2) names the filter used. | **YES** |
+| ASM-4 | A sealed goal's artifacts are reachable from its ledger entry (task file, evidence, review) by a stated traversal. | Extraction operates on a *closed corpus*; an open-ended search would let the extractor find anything and inflate the result. | C3 defines corpus closure (§5, C3). Anything outside the closure is `ABSENT` by construction. | **YES** |
+| ASM-5 | At least 3 sealed goals exist, with enough shape diversity to stratify (§5.2). | 3 near-identical goals would make the result unrepresentative even if the arithmetic is clean. | C2's stratification rule. If <3 sealed goals exist, **abort to BLOCKED** — do not substitute unsealed goals. | **YES** |
+| ASM-6 | Weights `extractable=0.0 / partial=0.5 / absent=1.0` fairly price a partial. | A partial field is a real cost (needs a fallback) but not a total loss. 0.5 is a judgment call, not a derivation. | Report also carries `loss_ratio_strict` (partial counted as 1.0) and `loss_ratio_lenient` (partial as 0.0) so a reader can see whether the verdict is weight-sensitive (§8.4). | no |
+| ASM-7 | The GO threshold `loss_ratio ≤ 0.20` is the right line. | It sets the verdict. It is a pre-registered engineering judgment (§9 rationale), not a measured constant. | Frozen at PREREGISTERED. Changing it after data is seen is an integrity violation (§7.1, illegal transition). | no |
+| ASM-8 | Scoring unit is `(goal, node_type, field)`, worst-instance-wins, not per node instance. | Per-instance scoring lets a goal with many easy instances drown out a hard node type. | Stated in §8.2; per-type table in the report makes the alternative computable by a reader. | no |
+| ASM-9 | The acceptance regex `^loss_ratio: 0\.[0-9]+$` can express the measured value. | It **cannot** express `1.00` (total loss) or any value ≥ 1. A maximally-falsifying result would fail its own gate. | Tracked as `RISK-1` (§13). Do **not** round a ≥1.0 result down to fit the regex; escalate to amend the criterion to `^loss_ratio: [01]\.[0-9]+$`. | no |
+
+## 4. Component graph
+
+```
+      spec/SAEOS-1.md                    ledger/ , reviews/tasks/
+            │                                      │
+            ▼                                      ▼
+     ┌─────────────┐                        ┌─────────────┐
+     │ C1 SpecBinder│                       │ C2 GoalSampler│
+     └──────┬──────┘                        └──────┬──────┘
+            │ FieldMatrix                          │ GoalSample + SelectionRecord
+            │ ClaimQuote                           │
+            │                                      ▼
+            │                               ┌──────────────┐
+            │                               │C3 CorpusResolver│  ← reviews/, ledger/ (traversal)
+            │                               └──────┬───────┘
+            │                                      │ GoalCorpus ×3 (closed)
+            └──────────────┬───────────────────────┘
+                           ▼
+                   ┌────────────────┐
+                   │ C4 HandExtractor│  ← the only human/agent-judgment step
+                   └────────┬───────┘
+                            │ FieldVerdict[] (with citations)
+                            ▼
+                   ┌────────────────┐
+                   │ C5 Challenger   │  downgrade-only adversary pass
+                   └────────┬───────┘
+                            │ FieldVerdict[] (settled)
+                            ▼
+                   ┌────────────────┐
+                   │ C6 Scorer       │  pure function, no judgment
+                   └────────┬───────┘
+                            │ ScoreSheet
+                            ▼
+                   ┌────────────────┐
+                   │ C7 Adjudicator  │  applies frozen predicate D1..D5
+                   └────────┬───────┘
+                            │ Verdict
+                            ▼
+                   ┌────────────────┐
+                   │ C8 ReportWriter │ → reviews/spikes/sakg-s1-extraction-probe.md
+                   └────────┬───────┘
+                            ▼
+                   ┌────────────────┐
+                   │ C9 GateChecker  │  runs the 4 acceptance commands
+                   └────────────────┘
+```
+
+The graph is a DAG with one judgment node (C4), one adversarial node (C5), and a pure-function
+tail (C6→C9). Everything after C5 is mechanically reproducible from `FieldVerdict[]` — that is
+deliberate: the verdict must not depend on who ran the arithmetic.
+
+**Component responsibilities**
+
+- **C1 SpecBinder** — read `spec/SAEOS-1.md`; emit `FieldMatrix` (every §4.3 node type × field,
+  with required/optional and declared type) and `ClaimQuote` (verbatim §9 and A8). Resolves
+  `ASM-1`, `ASM-2`. Fails to `BLOCKED` rather than guessing.
+- **C2 GoalSampler** — enumerate sealed goals; select 3 by the stratification rule (§5.2); emit
+  `SelectionRecord` *before* any extraction. Resolves `ASM-3`, `ASM-5`.
+- **C3 CorpusResolver** — for each selected goal, compute the **closed corpus**: the ledger entry,
+  its task file under `reviews/tasks/`, and every artifact those two reference by path, transitively,
+  restricted to files that existed at seal time. Emit the file list into the report. Anything not in
+  the closure is out of bounds for C4. Resolves `ASM-4`.
+- **C4 HandExtractor** — for each `(goal, node_type, field)`, attempt extraction from the closed
+  corpus only; emit a `FieldVerdict` with label + citation + extraction rule. May not consult
+  session memory, the authoring agent, or files outside the closure.
+- **C5 Challenger** — independent pass over every `EXTRACTABLE` and `PARTIAL` verdict; may downgrade
+  (§7.3) but may never upgrade without producing a new in-closure citation. Mirrors the R4 Adversary
+  role that produced `CANARY-0002` (vacuous evidence) — the same failure mode applies here: a
+  citation that technically resolves but carries none of the field's meaning.
+- **C6 Scorer** — pure: `FieldVerdict[] → ScoreSheet`. No judgment, no thresholds.
+- **C7 Adjudicator** — evaluate D1–D5 (§9) against `ScoreSheet`; emit `Verdict` naming every failed
+  predicate. Threshold values are read from the frozen pre-registration, not restated here.
+- **C8 ReportWriter** — render §10's template. Owns the acceptance-critical byte format.
+- **C9 GateChecker** — run the four acceptance commands and paste their output into the report's
+  gate section (self-verification, not self-assertion).
+
+## 5. Interfaces
+
+Schemas are given as YAML shapes; they are contracts between components, not a storage format.
+
+### 5.1 `FieldMatrix` (C1 → C4, C6)
+
+```yaml
+spec_ref: spec/SAEOS-1.md
+spec_sha: <sha256 of the file read>          # pins which text was probed
+node_types:
+  - name: <§4.3 node type name>
+    is_required_by_claim: true|false          # does §9/A8 depend on this type?
+    identity_fields: [<field names that key the node>]
+    edge_fields: [<field names that reference another node>]
+    fields:
+      - name: <field>
+        required: true|false
+        declared_type: <type as §4.3 states it>
+```
+
+### 5.2 `SelectionRecord` (C2 → report)
+
+Written and frozen **before** extraction. Stratification rule: pick 3 sealed goals that differ on
+as many axes as possible — (a) goal kind (build vs review vs spike vs amendment), (b) artifact
+volume (smallest / median / largest sealed goal by corpus file count), (c) age (earliest vs recent
+seal). Ties broken by lowest goal id, so the choice is reproducible.
+
+```yaml
+sealed_filter: <the exact predicate used to identify "sealed">
+candidate_count: <n>
+selected:
+  - goal_id: <id>
+    stratum: <kind / volume / age rationale>
+    seal_ref: <ledger path + anchor>
+excluded_notable: [<any sealed goal deliberately not chosen, with reason>]
+frozen_at: <timestamp, before EXTRACTING>
+```
+
+### 5.3 `GoalCorpus` (C3 → C4)
+
+```yaml
+goal_id: <id>
+closure:
+  - path: <file>
+    role: ledger_entry | task | evidence | review | referenced
+    in_closure_because: <the reference that pulled it in>
+closure_size: <n files>
+```
+
+### 5.4 `FieldVerdict` (C4/C5 → C6) — the atom of the probe
+
+```yaml
+goal_id: <id>
+node_type: <name>
+field: <name>
+label: EXTRACTABLE | PARTIAL | ABSENT | NOT_APPLICABLE
+citation: <path:line or path#anchor>        # REQUIRED unless ABSENT/NOT_APPLICABLE
+extraction_rule: <one sentence; must generalize across goals>
+partial_reason: P1|P2|P3|P4                  # required iff PARTIAL (§8.1)
+absent_reason: <what would have to exist for this to be extractable>
+challenged: true|false
+challenge_outcome: upheld | downgraded_to_<label>
+```
+
+### 5.5 `ScoreSheet` (C6 → C7, C8)
+
+```yaml
+totals:
+  required_fields_scored: <n>                # denominator, excludes NOT_APPLICABLE
+  extractable: <n>
+  partial: <n>
+  absent: <n>
+loss_ratio: <0.NN>
+loss_ratio_strict: <0.NN>                    # partial = 1.0
+loss_ratio_lenient: <0.NN>                   # partial = 0.0
+loss_ratio_all_fields: <0.NN>                # required + optional
+per_node_type:
+  - node_type: <name>
+    loss_ratio: <0.NN>
+    identity_extractable: true|false
+    vacant_in_all_goals: true|false
+edge_field_loss_ratio: <0.NN>
+```
+
+### 5.6 `Verdict` (C7 → C8)
+
+```yaml
+verdict: GO | NO-GO
+failed_predicates: [D1, D3, ...]             # empty iff GO
+rationale: <≤3 sentences, referencing the numbers, not vibes>
+```
+
+## 6. Data flow
+
+1. **Freeze.** Protocol, thresholds (D1–D5), weights and the stratification rule are written down
+   and timestamped. Nothing downstream may edit them. → `PREREGISTERED`
+2. **Bind.** C1 reads `spec/SAEOS-1.md`; `FieldMatrix` + `ClaimQuote` produced and pinned by sha.
+   → `BOUND`
+3. **Sample.** C2 enumerates sealed goals, selects 3, writes `SelectionRecord`. → `SAMPLED`
+4. **Close.** C3 computes each `GoalCorpus`. The closure list goes into the report so a reviewer can
+   re-run the extraction against the same bytes.
+5. **Extract.** C4 walks the full cross-product `3 goals × node types × fields`, emitting one
+   `FieldVerdict` per cell. Empty cells are `NOT_APPLICABLE`, never silently skipped.
+   → `EXTRACTING`
+6. **Challenge.** C5 reviews every non-`ABSENT` verdict; downgrades stand unless a new in-closure
+   citation is produced. → `CHALLENGED`
+7. **Score.** C6 computes `ScoreSheet` deterministically. → `SCORED`
+8. **Adjudicate.** C7 applies D1–D5. → `ADJUDICATED`
+9. **Report.** C8 writes the deliverable; C9 runs the gate commands and pastes their output.
+   → `REPORTED`
+
+The one-way pinch point is between steps 3 and 5: once the sampler has named the goals, the
+thresholds are unreachable. That is what makes the result a falsification test rather than a
+narrative.
+
+## 7. State machines
+
+### 7.1 SM-1 — probe run
+
+| From | Event | To |
+|------|-------|-----|
+| `DRAFT` | protocol + D1–D5 + weights + sampling rule frozen | `PREREGISTERED` |
+| `PREREGISTERED` | §4.3 field matrix bound, §9/A8 quoted | `BOUND` |
+| `PREREGISTERED` | §4.3 not enumerable (ASM-1 fails) | `BLOCKED` |
+| `BOUND` | 3 goals selected, `SelectionRecord` frozen | `SAMPLED` |
+| `BOUND` | <3 sealed goals (ASM-5 fails) | `BLOCKED` |
+| `SAMPLED` | corpora closed, extraction started | `EXTRACTING` |
+| `EXTRACTING` | all cells have a `FieldVerdict` | `CHALLENGED` |
+| `CHALLENGED` | challenge pass complete, no contested cells | `SCORED` |
+| `SCORED` | D1–D5 evaluated | `ADJUDICATED` |
+| `ADJUDICATED` | report written, gate commands pass | `REPORTED` |
+| `BLOCKED` | missing input supplied | (prior state) |
+
+**Illegal transitions** — attempting any of these voids the run:
+
+- `EXTRACTING | CHALLENGED | SCORED → PREREGISTERED` — re-freezing thresholds after seeing data.
+  This is goalpost-moving; it is the same defect class the constitution's canaries exist to catch
+  (a detector that can be retuned until it passes detects nothing).
+- `SAMPLED → SAMPLED` with a different `SelectionRecord` — re-rolling the sample after a bad
+  early read.
+- `EXTRACTING → REPORTED` — skipping the challenge and scoring passes.
+
+### 7.2 SM-2 — per goal
+
+`PENDING → CORPUS_CLOSED → EXTRACTING → EXTRACTED → SETTLED`
+plus `→ BLOCKED` from any state when the corpus cannot be closed (`ASM-4` failure for that goal).
+A `BLOCKED` goal may **not** be quietly replaced; either unblock it or record the substitution and
+the reason in `SelectionRecord.excluded_notable`.
+
+### 7.3 SM-3 — per field verdict (monotone downgrade)
+
+```
+UNSCORED ──find candidate──► CANDIDATE ──apply §8.1 rules──► EXTRACTABLE
+    │                            │                                │
+    │                            └────────────────────────────► PARTIAL
+    └──no candidate in closure───────────────────────────────► ABSENT
+                                                                  ▲
+   EXTRACTABLE ──challenge upheld──► PARTIAL ──challenge upheld──►┘
+```
+
+Rules:
+- Downgrade (`EXTRACTABLE → PARTIAL → ABSENT`) requires only a sustained challenge.
+- Upgrade requires a **new citation inside the closure**, recorded in `challenge_outcome`.
+- A cell may not leave `NOT_APPLICABLE` once set, except by C1 correcting the `FieldMatrix`
+  (which forces a return to `BOUND` and a full re-run).
+
+The asymmetry is the point: cheap to lose a field, expensive to win one back.
+
+## 8. Scoring
+
+### 8.1 Label decision rules
+
+**EXTRACTABLE** — all three hold:
+- **E1** a specific location in the closed corpus contains the value (citation required);
+- **E2** a reader following the stated one-sentence `extraction_rule` recovers the same value, and
+  that rule contains no goal-specific special-casing;
+- **E3** the recovered value matches the `declared_type` and cardinality from `FieldMatrix`.
+
+**PARTIAL** — E1 holds, but exactly one bounded failure:
+- **P1** value present but coarser than declared (free prose where an enum/ref is declared);
+- **P2** ambiguous, resolvable to ≤3 candidates without author input;
+- **P3** cardinality under-covered (some required instances present, not all);
+- **P4** the extraction rule needs goal-specific special-casing — it worked here, it will not generalize.
+
+**ABSENT** — no location in the closed corpus carries the value. Recovery would need author memory,
+re-derivation, or new instrumentation at seal time. `absent_reason` must name what would have to
+exist — that list *is* the design input for SAEOS-1's next revision, and is the most valuable
+output of the spike regardless of verdict.
+
+**NOT_APPLICABLE** — the node type has no instance in this goal. Excluded from the denominator, but
+counted for the vacancy check (D5).
+
+### 8.2 Scoring unit
+
+One score per `(goal, node_type, field)`. Where a goal has several instances of a node type and they
+disagree, **the worst label wins** (`ASM-8`). Optional fields are scored and reported but excluded
+from the headline denominator.
+
+### 8.3 Tie-break
+
+When a scorer is genuinely torn between two labels, take the **lower** one
+(`ABSENT < PARTIAL < EXTRACTABLE`). A spike that rounds its uncertainty upward cannot falsify
+anything.
+
+### 8.4 Loss ratio
+
+```
+loss(EXTRACTABLE) = 0.0
+loss(PARTIAL)     = 0.5
+loss(ABSENT)      = 1.0
+
+loss_ratio = Σ loss(label) over required, applicable cells
+             ─────────────────────────────────────────────
+             count of required, applicable cells
+```
+
+Rounded half-up to 2 decimals and rendered with a leading zero and exactly two decimal places
+(`0.00` … `0.99`) so the acceptance regex `^loss_ratio: 0\.[0-9]+$` matches. See `RISK-1` for the
+`≥ 1.00` case — which must be escalated, not rounded away.
+
+Worked example: 3 goals × 4 node types × 5 required fields = 60 cells; 6 are `NOT_APPLICABLE` → 54
+scored. 34 extractable, 12 partial, 8 absent → `(0 + 6.0 + 8.0) / 54 = 0.259…` → `loss_ratio: 0.26`.
+
+`loss_ratio_strict` (0.37) and `loss_ratio_lenient` (0.15) bracket it; here the verdict flips across
+the bracket, so the report must say the result is weight-sensitive and the partial-heavy fields must
+be named individually.
+
+## 9. Decision rule (pre-registered — freeze before extracting)
+
+**GO** iff *all* of:
+
+- **D1** `loss_ratio ≤ 0.20`
+- **D2** no single node type has a per-type loss ratio `> 0.50`
+- **D3** every node type has at least one `EXTRACTABLE` identity field (without a key, nodes cannot
+  be deduplicated or joined across goals — a bag of unkeyed records is not a graph)
+- **D4** `edge_field_loss_ratio ≤ 0.30` (edges are the graph; unextractable edges make the node work
+  moot)
+- **D5** no node type that `§9/A8` depends on is vacant across all 3 goals
+
+Otherwise **NO-GO**, and `failed_predicates` must name every predicate that failed.
+
+Rationale for D1's 0.20: above one lost field in five, every extracted node carries a hole, and each
+hole needs a downstream fallback path. At that density it is cheaper to change what gets recorded at
+seal time than to build extraction on top of the current format — which is exactly the decision the
+spike exists to inform. The threshold is engineering judgment (`ASM-7`), pre-registered so it cannot
+be moved to fit the data.
+
+A NO-GO is a **successful** spike: it costs three hand-extractions and saves the build.
+
+## 10. Output contract
+
+`C8` writes `reviews/spikes/sakg-s1-extraction-probe.md`. Acceptance-critical lines are marked ★ —
+they are matched by regex at column 0 and must appear exactly as shown.
+
+```markdown
+---
+spike: SAKG / SAEOS-1 extraction feasibility
+date: <YYYY-MM-DD>
+spec_sha: <sha256 of spec/SAEOS-1.md as read>
+verdict: GO                          ★ literally `GO` or `NO-GO`
+loss_ratio: 0.26                     ★ exactly two decimals, leading zero
+loss_ratio_strict: 0.37
+loss_ratio_lenient: 0.15
+loss_ratio_all_fields: 0.31
+edge_field_loss_ratio: 0.22
+---
+
+# S-PROBE — SAEOS-1 §9/A8 extraction feasibility
+
+## falsification target
+<verbatim quote of SAEOS-1 §9 and A8>
+
+## protocol (pre-registered)
+<thresholds D1–D5, weights, stratification rule, frozen_at timestamp>
+
+## selection record
+<SelectionRecord, §5.2>
+
+## goal: <goal-id-1> — <title>        ★ `^## goal: ` — three of these
+corpus closure: <file list>
+| node type | field | required | label | citation | rule / reason |
+|---|---|---|---|---|---|
+...
+per-goal loss ratio: 0.NN
+
+## goal: <goal-id-2> — <title>        ★
+...
+
+## goal: <goal-id-3> — <title>        ★
+...
+
+## score sheet
+<ScoreSheet, §5.5 — including the per-node-type table>
+
+## verdict
+verdict: GO                           (restated in prose here; the ★ line is the frontmatter one)
+failed predicates: <none | D1, D3>
+rationale: <≤3 sentences citing the numbers>
+
+## what would have to change (absent_reason roll-up)
+<the union of absent_reason values — the input to SAEOS-1's next revision>
+
+## gate self-check
+<pasted output of the four acceptance commands>
+```
+
+Format hazards C8 must respect:
+
+- `## goal: ` headings appear **only** for the three real goals. Any example, template or
+  appendix line starting `## goal: ` inflates `rg -c` and makes the count lie.
+- `verdict:` and `loss_ratio:` must be at column 0 (frontmatter), unindented, single space after
+  the colon, nothing trailing.
+- The prose restatement in `## verdict` is intentionally not at column 0 as a bare `verdict:` line —
+  if it were, it would double-count harmlessly for `rg -q`, but it invites drift between the two.
+  Keep the frontmatter line authoritative.
+
+## 11. Traceability — acceptance criteria → components
+
+| Acceptance command | Satisfied by | Artifact |
+|---|---|---|
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | C8 | the report |
+| `rg -q '^verdict: (GO\|NO-GO)$'` | C7 → C8 | `Verdict.verdict` in frontmatter |
+| `test $(rg -c '^## goal: ') -ge 3` | C2 → C3 → C4 → C8 | three `## goal:` sections |
+| `rg -q '^loss_ratio: 0\.[0-9]+$'` | C6 → C8 | `ScoreSheet.loss_ratio` in frontmatter |
+
+Note for C9: `rg -c` exits non-zero and prints nothing on zero matches, so
+`test $(rg -c …) -ge 3` becomes `test -ge 3` — a shell syntax error rather than a clean failure.
+C9 should run `rg -c … || echo 0` when self-checking, while reporting the criterion as written.
+
+## 12. Perspectives covered
+
+- **Builder** — gets a byte-level output contract (§10) and a mechanical procedure (§6); no design
+  decisions are left to extraction time.
+- **Adversary** — gets a dedicated component (C5) with downgrade-only power (§7.3), a conservative
+  tie-break (§8.3), and named illegal transitions (§7.1) to police. The vacuous-evidence failure
+  mode from `CANARY-0002` maps directly onto a citation that resolves but carries no field meaning.
+- **Doc** — every label carries a citation and a one-sentence rule; the `absent_reason` roll-up
+  (§10) is the durable output.
+- **Court / Verifier** — the tail C6→C9 is a pure function of `FieldVerdict[]`, so the verdict is
+  recomputable from the report alone; `spec_sha` and the corpus closure pin what was probed.
+- **Founder / ratifier** — one frontmatter line to read (`verdict`), one number to check
+  (`loss_ratio`), and a named list of failed predicates; the weight-sensitivity bracket (§8.4) shows
+  whether the call was close.
+- **Downstream consumer (the SAKG builder)** — a NO-GO hands over a specific list of what seal-time
+  instrumentation is missing, not just a refusal.
+
+## 13. Coherence check — orphans and gaps
+
+**Every artifact has a producer and a consumer:**
+
+| Artifact | Produced by | Consumed by |
+|---|---|---|
+| `FieldMatrix` | C1 | C4 (cells), C6 (denominator), C7 (D3/D5) |
+| `ClaimQuote` | C1 | C8 (§ falsification target), C7 (D5 scope) |
+| `SelectionRecord` | C2 | C3, C8 |
+| `GoalCorpus` | C3 | C4, C8 (closure list) |
+| `FieldVerdict[]` | C4, C5 | C6, C8 (per-goal tables) |
+| `ScoreSheet` | C6 | C7, C8 |
+| `Verdict` | C7 | C8 |
+| report | C8 | C9, ratifier |
+| gate output | C9 | report `## gate self-check` |
+
+No artifact is produced and unread; no component reads an artifact nobody produces. Every external
+input (`spec/SAEOS-1.md`, `ledger/`, `reviews/tasks/`) enters through exactly one component
+(C1, C2, C3 respectively), so the corpus-closure guarantee has no side door.
+
+**Every state has an entry and an exit** — SM-1's `BLOCKED` returns to its prior state; `REPORTED`
+is the sole terminal. SM-3's `ABSENT` is terminal-by-design (upgrade requires a new citation, which
+re-enters `CANDIDATE`).
+
+**Known gaps, stated rather than papered over:**
+
+- **RISK-1** (from `ASM-9`) — the acceptance regex cannot express `loss_ratio ≥ 1.00`. A total-loss
+  result, the strongest possible falsification, would fail its own gate. Escalate to amend the
+  criterion to `^loss_ratio: [01]\.[0-9]+$`. **Do not round down to pass.**
+- **RISK-2** — C4 is a judgment step; two extractors may disagree. Mitigated by C5 and §8.3, not
+  eliminated. If the result lands within ±0.03 of the D1 threshold, the report must say so and a
+  second independent extraction of the closest node type should be run before the verdict is
+  ratified.
+- **RISK-3** — `n=3` cannot support a claim about the whole ledger. The probe can *refute* FT
+  strongly (a loss found in 3 of 3 is real) but a GO is only "not refuted at n=3". §10's verdict
+  rationale must say this in the GO case.
+- **GAP-1** — §4.3 was unreadable at design time (`ASM-1`). If the real §4.3 has nested or
+  polymorphic node types, `FieldMatrix` needs a nesting path per field and §8.2's scoring unit must
+  extend to `(goal, node_type, field_path)`. C1 must flag this on binding rather than flattening
+  silently.
+- **GAP-2** — "sealed" is assumed machine-detectable (`ASM-3`). If sealing is conventional rather
+  than marked, C2's filter becomes a judgment call and must be recorded verbatim in
+  `SelectionRecord.sealed_filter`.
+
+## 14. Handoff
+
+The next stage needs write capability on `reviews/spikes/` and read capability on `spec/`,
+`ledger/`, `reviews/tasks/`. It should execute §6 in order, resolve every blocking assumption in §3
+first, and abort to `BLOCKED` — not improvise — if `ASM-1`, `ASM-2`, `ASM-3`, `ASM-4` or `ASM-5`
+fails.

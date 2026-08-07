@@ -1,0 +1,529 @@
+# System Design — S-PROBE: SAKG S1 Extraction Feasibility Probe
+
+Status: DESIGN ONLY — no implementation, no probe run. Stage: L08 DESIGN (`StageId DESIGN`, PAEOS-9 §8).
+Role: PLANNER. Date: 2026-08-07.
+Spec under test: `spec/SAEOS-1-architecture.md` §9/A8 — *"Ω1 (self-population) … assumes PAEOS emits
+clean structured decisions. Does it?"* — carried as **"the specification's single largest untested
+assumption"** and ratified as a falsification test by D7 (§10).
+
+Scope of this artifact: the design of the probe *as a system* — component graph, interfaces, data
+flow, state machines, and the frozen adjudication protocol. The probe's own output artifact
+(`reviews/spikes/sakg-s1-extraction-probe.md`) is written at **L12 IMPLEMENT** and is outside this
+stage's write capability by construction (this worker may write only `design/`). DESIGN precedes
+IMPLEMENT on the operational spine (PAEOS-9 §8: L08 → L11 → L12).
+
+---
+
+## 1. Goal restatement (acceptance surface)
+
+Produce, at IMPLEMENT, one report: `reviews/spikes/sakg-s1-extraction-probe.md`, containing a
+hand-extraction attempt against **3 real sealed goals** drawn from `ledger/` and `reviews/tasks/`,
+targeting the SAEOS-1 §4.3 node types, grading every field `extractable` / `partial` / `absent`, and
+closing with an explicit **GO** or **NO-GO** and a loss ratio.
+
+The four machine checks bind the report's *byte-level shape*, so they are treated here as interface
+requirements, not as afterthoughts:
+
+| # | Check | What it binds |
+|---|-------|---------------|
+| AC-1 | `test -f reviews/spikes/sakg-s1-extraction-probe.md` | Path is exact; directory `reviews/spikes/` must exist at emit time. |
+| AC-2 | `rg -q '^verdict: (GO\|NO-GO)$'` | A line-anchored `verdict:` key, exactly one of two tokens, **no trailing whitespace**, no other decoration. |
+| AC-3 | `test $(rg -c '^## goal: ') -ge 3` | ≥3 lines matching `^## goal: `. `rg -c` counts *lines*, and exits 1 with no match — a zero-match file makes `test` receive an empty operand and error, so the emitter must guarantee ≥3. |
+| AC-4 | `rg -q '^loss_ratio: 0\.[0-9]+$'` | A line-anchored `loss_ratio:` key whose value **must begin `0.`** — see §9.3, this regex cannot express a total loss of `1.0`. |
+
+**Emitter hazard (binds §4.2):** because AC-2/AC-3/AC-4 are line-anchored greps over the whole file,
+any *illustrative* occurrence of `## goal: `, `verdict: `, or `loss_ratio: ` at column 0 — including
+inside a fenced code block — counts. The report must indent all schema examples by two spaces and use
+distinct keys for per-goal values (`goal_verdict:`, `goal_loss_ratio:`) so that exactly one
+authoritative `verdict:` line and exactly one `loss_ratio:` line exist.
+
+---
+
+## 2. Falsification target and scope decisions
+
+A8's charge is specific: PAEOS *produces* the required artifacts (L06 matrices, L08 design sets, L11
+contracts, decision-graph records, scars) **as prose documents, not as typed emission bundles**. The
+probe must therefore be scoped to exactly the emission set that SAEOS-1 §6.1b claims is derivable
+from a sealed goal — not to all twelve §4.3 types, and not to a hand-picked easy subset.
+
+Every §4.3 node type is given an explicit disposition. There are no unassigned types (§12 orphan audit).
+
+| §4.3 type | Disposition | Basis |
+|---|---|---|
+| **Decision** | **In scope — headline** | §6.1b: from the decision-graph. §4.3 calls it *the central node*. |
+| **Option** | **In scope — headline** | §6.1b: from L04 candidates, *including rejected ones*. |
+| **Constraint** | **In scope — headline** | §6.1b: from the L11 implementation contract. |
+| **TradeOff** | **In scope — headline** | §6.1b: from the L06 trade-off matrix. |
+| **Component** | **In scope — headline** | §6.1b: from the L08 architecture artifact set. |
+| **Scar** | **In scope — headline** | §6.1b: from the scar-graph root-cause bundle (A-10). |
+| **EvidenceRef** | **In scope — headline** | §6.1b: hashes only; evidence never leaves PAEOS. |
+| **Outcome** | **Excluded — deferred by design** | §4.3: *"the only node type that may be created long after its subject"*; §8 assigns it to slice **S3**. Counting it as loss at seal time would manufacture a failure the spec already anticipates. |
+| **Problem** | Secondary census (reported, not counted) | Not in the §6.1b emission list. |
+| **Objective** | Secondary census | Not in the §6.1b emission list. |
+| **Mechanism** | Secondary census | Not in the §6.1b emission list. |
+| **Pattern** | Secondary census | Not in the §6.1b emission list. |
+
+**Headline `loss_ratio` is computed over the seven in-scope types only.** The four secondary types are
+graded and reported as `secondary_loss_ratio:` so that excluding them is *visible* rather than silent
+— the same discipline §5.1 imposes on projections via `omitted: n`.
+
+**Edges (§4.4) — secondary census.** The objective names node types, so edges stay out of the
+headline. But S1's exit criterion in §8 is *"round-trip is lossless"*, which is meaningless without
+the Decisional and Consequential families. Leaving edges entirely unmeasured would be a genuine gap,
+so the report carries `edge_loss_ratio:` over the Decisional family (`decides`, `considered`,
+`rejected`, `rationale_for`, `constrained_by`, `optimizes_for`) as a reported-but-uncounted census.
+
+---
+
+## 3. Component graph
+
+```
+       ledger/                    reviews/tasks/
+   (SealRecord §10,             (TaskPackage §5,
+    transition events)           review verdicts)
+          │                             │
+          └──────────────┬──────────────┘
+                         ▼
+              ┌──────────────────────┐
+              │ C1 Sample Selector   │  deterministic, pre-registered rule (§7.1)
+              └──────────┬───────────┘  emits SampleSet{3 × (goal_id, seal_ref, ceremony)}
+                         ▼
+              ┌──────────────────────┐
+              │ C2 Source Resolver   │  goal_id → resolvable artifact locators
+              └──────────┬───────────┘  emits SourceSet per goal
+                         │
+   ┌─────────────────────┴──────────────────────┐
+   │                                            │
+   ▼                                            ▼
+┌────────────────────┐                ┌──────────────────────┐
+│ C3 Census Schema   │───(fixed)─────▶│ C4 Extraction Attempt│  hand, per (goal × type × field)
+│ (§4.2 envelope ×   │                └──────────┬───────────┘  emits Cell{grade?, locator, note}
+│  §4.3 facets) §4.1 │                           ▼
+└────────────────────┘                ┌──────────────────────┐
+                                      │ C5 Grader/Adjudicator│  frozen rubric §7.2, worse-of tie-break
+                                      └──────────┬───────────┘  emits GradedMatrix
+                                                 ▼
+                                      ┌──────────────────────┐
+                                      │ C6 Aggregator        │  §7.3 arithmetic
+                                      └──────────┬───────────┘  emits Ratios{loss, per-goal, secondary, edge}
+                                                 ▼
+                                      ┌──────────────────────┐
+                                      │ C7 Verdict Function  │  §7.4, pure + total, zero discretion
+                                      └──────────┬───────────┘  emits GO | NO-GO
+                                                 ▼
+                                      ┌──────────────────────┐
+                                      │ C8 Report Emitter    │  §4.2 schema; satisfies AC-1..AC-4
+                                      └──────────┬───────────┘
+                                                 ▼
+                              reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+- **C1–C2 are read-only over `ledger/` and `reviews/tasks/`.** The probe never writes into either, and
+  never re-runs a goal — consistent with §6.1b rule 1 (one-way, post-seal, pull-based). A probe that
+  mutates its corpus measures its own footprint.
+- **C3 is frozen input, not a component that evolves during the run.** This is the anti-motivated-
+  reasoning guard (§6, SM-1): the field matrix and the threshold are fixed *before* any cell is
+  attempted, so a disappointing result cannot be rescued by narrowing the schema.
+- **C7 has no human input.** The verdict is *computed* from the graded matrix, never *decided* after
+  seeing it.
+
+---
+
+## 4. Interfaces
+
+### 4.1 C3 — the census schema (the fixed extraction target)
+
+Two layers, per SAEOS-1 §4.2 (universal envelope) and §4.3 (type facets).
+
+**Envelope, extraction obligations (9 fields, graded for every in-scope type):**
+`label`, `summary`, `provenance.origin`, `provenance.author_kind`, `provenance.source_hash`,
+`evidence[]`, `valid_from`, `falsifier`, `coordinates`.
+
+**Envelope, system-assigned at ingest (8 fields, graded `n/a`, excluded from the denominator):**
+`id` (minted `sakg://…`), `type`, `namespace` (set at emission by the producing project, §6.1b rule 4),
+`facets` (container), `provenance.ingested_at`, `status` (lands `candidate` by §6.1b), `confidence`
+(**derived, never authored** — §4.2 invariant), `valid_until`.
+
+Excluding these is not leniency: grading a field the spec forbids anyone to author would inflate loss
+with cells that were never an extraction obligation.
+
+**Type facets (35 fields), with their claimed PAEOS source:**
+
+| Type | Facet fields | Claimed source |
+|---|---|---|
+| Decision | `problem_ref`, `options[]`, `chosen`, `rationale`, `constitutional_basis`, `decided_by_role` | decision-graph, PAEOS-9 §5.11 (`context, options[], chosen, rationale, constitutional_basis`; edges *decided-by-role*, *for-goal*) |
+| Option | `label`, `description`, `considered_at`, `rejected`, `rejection_rationale` | L04 Ideation candidate set (PAEOS-9 §8.4) |
+| Constraint | `kind`, `statement`, `source`, `binding_scope` | L11 frozen contract: affected files, forbidden files, acceptance criteria, rollback (PAEOS-9 §4.3, §8.4) |
+| TradeOff | `axis`, `side_a`, `side_b`, `resolution`, `decision_ref` | L06 trade-off matrix (PAEOS-9 §8.4, "decision axes explicit") |
+| Component | `name`, `kind`, `interfaces`, `owns_data` | architecture-graph / L08 artifact set (PAEOS-9 §5.4) |
+| Scar | `failure_class`, `root_cause`, `detection_signature`, `guard_action`, `severity`, `origin_run` | scar-graph (PAEOS-9 §5.8) — **1:1 field parity with §4.3** |
+| EvidenceRef | `hash`, `uri`, `kind`, `reverification_instructions`, `binding` | Evidence contract PAEOS-7.6 §6 (`hash, kind, artifact_hash, environment_hash, reproducible_command`) |
+
+**Matrix size.** 7 types × 9 envelope obligations = 63, plus 35 facet fields = **98 cells per goal**,
+294 across the sample, before `n/a` exclusions. Tractable by hand; large enough that a single
+convenient grade cannot move the ratio.
+
+**Grading granularity — one grade per (goal × type × field).** Where a goal contains several instances
+of a type (e.g. four Options), the cell takes the **worst grade observed across instances**.
+*Rejected alternative:* per-instance grading — a goal with twenty trivially-extractable Options would
+swamp the denominator and let sample shape, not extractability, set the result.
+
+### 4.2 C8 — the report schema (binds AC-1..AC-4)
+
+Frontmatter (exactly one `verdict:` line, exactly one `loss_ratio:` line in the whole file):
+
+```
+  ---
+  artifact: sakg-s1-extraction-probe
+  spec_under_test: SAEOS-1 §9/A8
+  protocol_frozen_at: <L11 plan artifact hash>
+  sample_rule: <the §7.1 rule, verbatim>
+  verdict: NO-GO
+  loss_ratio: 0.42
+  secondary_loss_ratio: 0.71
+  edge_loss_ratio: 0.55
+  ---
+```
+
+Per-goal section, repeated ≥3 times (each header is the AC-3 match):
+
+```
+  ## goal: <goal_id>
+  seal_ref: <seal_hash>
+  ceremony: trace_a | trace_b
+  sources: [ledger/<...>, reviews/tasks/<...>, ...]
+  goal_loss_ratio: 0.51
+  goal_verdict: contributes-NO-GO
+
+  | node_type | field | grade | locator | note |
+  |---|---|---|---|---|
+  | Decision | chosen | extractable | reviews/tasks/<f>#<anchor> | verbatim |
+  | TradeOff | axis | absent | — | L06 auto-discharged (trace_a stub) |
+```
+
+Every non-`absent` cell **must** carry a locator. A grade without a locator is not a measurement, and
+C5 rejects it (§6, SM-2 invariant).
+
+Closing sections: aggregation arithmetic (§7.3 shown, not just stated), the threshold check with each
+clause evaluated, secondary and edge censuses, and any incidents raised (§9).
+
+---
+
+## 5. Data flow
+
+```
+ledger/ ─────┐
+             ├─▶ C1 select ─▶ SampleSet ─▶ C2 resolve ─▶ SourceSet ─┐
+reviews/tasks/┘        (deterministic)         (read-only)          │
+                                                                    ▼
+                                          C3 CensusSchema ──▶ C4 attempt (hand)
+                                              (frozen)              │
+                                                                    ▼ Cell{grade, locator, note}
+                                                            C5 grade/adjudicate
+                                                                    │ GradedMatrix (294 cells max)
+                                                                    ▼
+                                                            C6 aggregate ──▶ Ratios
+                                                                    │
+                                                                    ▼
+                                                            C7 verdict (pure) ──▶ GO | NO-GO
+                                                                    │
+                                                                    ▼
+                                                            C8 emit ──▶ reviews/spikes/…md
+```
+
+**Direction is strictly one-way.** No arrow returns from C6/C7 to C3 or C1 — that absence *is* the
+protocol. A back-edge (re-sampling after seeing ratios, or re-scoping the schema after seeing the
+verdict) is the failure mode this design exists to prevent, and SM-1 makes it a terminal `VOID`.
+
+Nothing on this path is durable substrate: no ledger append, no CAS write, no goal transition. The
+probe produces one markdown artifact and one set of incidents. It holds **no authority** — mirroring
+§3.3 and §6.4's "one write path, zero authority" posture toward SAKG itself.
+
+---
+
+## 6. State machines
+
+### SM-1 — Probe protocol lifecycle
+
+```
+  FROZEN ──▶ SAMPLED ──▶ EXTRACTED ──▶ GRADED ──▶ AGGREGATED ──▶ ADJUDICATED ──▶ EMITTED
+     │           │            │            │            │              │
+     └───────────┴────────────┴────────────┴────────────┴──────────────┴──────▶ VOID
+                       (protocol violation, from any state)
+```
+
+| Transition | Guard |
+|---|---|
+| `→ FROZEN` | C3 matrix + §7.1 sample rule + §7.4 threshold are recorded in the L11 plan and hashed. Entry condition for the whole probe. |
+| `FROZEN → SAMPLED` | ≥3 sealed goals resolvable (§9.1); sample chosen by the frozen rule with no discretion. |
+| `SAMPLED → EXTRACTED` | Every in-scope cell has been attempted (no cell left `UNATTEMPTED`). |
+| `EXTRACTED → GRADED` | Every non-`absent`, non-`n/a` cell carries a locator. |
+| `GRADED → AGGREGATED` | Denominator excludes only cells graded `n/a` under a rule named in §7.2. |
+| `AGGREGATED → ADJUDICATED` | C7 evaluated; no human input accepted at this edge. |
+| `ADJUDICATED → EMITTED` | Report satisfies AC-1..AC-4 *and* the §4.1 emitter hazard rules. |
+| `any → VOID` | The matrix, sample, or threshold changed after `FROZEN`; or the sample was swapped after `SAMPLED`; or a grade was raised without a new locator. **A VOID probe proves nothing and must be re-run from FROZEN with a new plan hash.** |
+
+### SM-2 — Cell grade lifecycle
+
+```
+  UNATTEMPTED ──▶ ATTEMPTED ──▶ { EXTRACTABLE | PARTIAL | ABSENT | NA }
+                                        │
+                                        ▼
+                                   CHALLENGED ──▶ REGRADED
+```
+
+**Invariant (bias control).** A **downward** regrade (`extractable → partial → absent`) requires no
+justification. An **upward** regrade requires a *new locator* recorded in the cell. The asymmetry is
+deliberate: the probe's whole value is its ability to return NO-GO, so the cheap direction must be the
+pessimistic one.
+
+### SM-3 — Verdict function
+
+Not a state machine but a **pure, total function** over the graded matrix: same matrix ⇒ same verdict,
+recomputable by any reader from the published table. `ADJUDICATED` therefore has exactly one outgoing
+edge per matrix, and the verdict cannot drift between the table and the frontmatter.
+
+---
+
+## 7. The frozen protocol
+
+### 7.1 Sample selection rule (C1)
+
+Deterministic, recorded verbatim in the report's `sample_rule:` field:
+
+1. Enumerate goals with a `SealRecord` (PAEOS-7.6 §10) in `ledger/`, ordered by `ledger_head` ascending.
+2. **Stratify by ceremony depth.** Take at least one `trace_b` (full-ceremony) goal and at least one
+   `trace_a` (auto-discharged) goal if both exist.
+3. Fill remaining slots with the **most recent** seals — most recent, not most convenient.
+4. Record the enumeration and the exclusions, so the reader can verify no cherry-picking occurred.
+
+**Why stratification is load-bearing.** PAEOS-9 §2.3/§8.3: Trace-A **auto-discharges L03–L11**, each
+state emitting only an evidence stub `{result: auto_pass, reason: trace_a, by: runtime}`. L04, L06,
+L08 and L11 are exactly the claimed sources for Option, TradeOff, Component and Constraint. If the
+sample is all Trace-A, four of seven in-scope types have *no source document at all* — and the probe
+would report a catastrophic loss ratio that says nothing about full-ceremony goals. If the sample is
+all Trace-B, it says nothing about the majority path. **The probe must report loss stratified by
+ceremony depth, and must state explicitly when its sample cannot support a claim about the other
+stratum.** This is the probe's most likely genuine finding: §6.1b's emission contract is written as
+though every sealed goal were full-ceremony.
+
+### 7.2 Grading rubric (C5) — frozen
+
+| Grade | Definition | Test |
+|---|---|---|
+| `extractable` | A deterministic rule over a named source yields the value with only mechanical transformation (field rename, type coercion, hashing). | A second person, given the rule and the source, produces the same value. |
+| `partial` | The information is present but requires human judgment over prose, **or** only part of the field's required structure exists (e.g. `Option` present but `rejection_rationale` absent). | Value obtainable, but not reproducibly, or not completely. |
+| `absent` | No source in the sealed record contains the information. Producing it would require re-running the goal or inventing it. | — |
+| `n/a` | Not an extraction obligation: system-assigned envelope fields (§4.1), or a type that genuinely does not apply. | Must cite the naming rule below. |
+
+**Tie-break: when a cell is arguable between two grades, take the worse one.** A falsification probe
+that grades optimistically is worthless.
+
+**`n/a` adjudication rules (the only permitted exclusions):**
+- The 8 system-assigned envelope fields of §4.1.
+- **`Scar`** is `n/a` for a goal iff the ledger shows no incident, remand, reject, or quarantine event
+  for that goal. Otherwise a missing scar is `absent`.
+- Decision, Option, Constraint, TradeOff, Component, EvidenceRef are **never** `n/a` for a sealed goal:
+  every sealed goal traversed L08, L11 and L13/L14.
+
+**The sharpest rule in this design: an auto-discharge evidence stub is `absent`, never `n/a`.** A
+Trace-A stub records that a stage was *discharged*, not what it *decided*. Grading those cells `n/a`
+would let the probe pass by declaring the missing content out of scope — which is precisely the
+failure A8 predicts and precisely how a lenient grader would hide it.
+
+### 7.3 Loss ratio arithmetic (C6)
+
+```
+  X = count(extractable)   P = count(partial)   A = count(absent)      (n/a excluded)
+
+  loss_ratio = (A + 0.5·P) / (X + P + A)          rounded half-up to 2 dp, emitted as 0.NN
+```
+
+`partial` at 0.5 encodes its real meaning: the information exists but a build step must add
+structure — half the work of a present field, half the cost of an absent one.
+
+*Rejected alternative:* weighting cells by node-type importance. Any weight vector is unjustifiable
+from the corpus and would be chosen — consciously or not — after the shape of the result was visible.
+Unweighted counting is contestable but not steerable.
+
+Reported alongside the headline: `goal_loss_ratio` per goal, loss by ceremony stratum, loss by node
+type, `secondary_loss_ratio` (Problem/Objective/Mechanism/Pattern), and `edge_loss_ratio` (Decisional
+family). Per §2, these are the visible form of what the headline excludes.
+
+### 7.4 Verdict function (C7) — pre-registered before extraction
+
+**GO iff all four clauses hold; otherwise NO-GO.**
+
+- **G1** `loss_ratio ≤ 0.30`.
+- **G2** Decision facets `chosen`, `rationale`, `options[]`, `constitutional_basis` grade ≥ `partial`
+  on all 3 goals and `extractable` on ≥2 of 3. *(§4.3: Decision is the central node; a GO without it
+  is not a GO.)*
+- **G3** `Option.rejected` **and** `Option.rejection_rationale` grade ≥ `partial` on ≥2 of 3 goals.
+  *(§4.3: rejected options are "the corpus's scarcest, most valuable knowledge"; §6.1b names them
+  explicitly. Losing them makes `tradeoff_precedents` — the S2 method — hollow.)*
+- **G4** `EvidenceRef.hash` and `EvidenceRef.binding` grade `extractable` on all 3 goals. *(§6.1b rule
+  2: evidence never leaves PAEOS, only hashes cross. If the hashes aren't mechanically extractable,
+  the boundary contract cannot be honoured at all.)*
+
+**Why 0.30, stated before the data is seen.** §8's S1 exit criterion says *"round-trip is lossless"*,
+whose strict reading is 0.00 — but that would fail S1 on any prose-derived field and is not what A8
+asks. A8 asks whether the artifacts *exist in extractable form*, allowing an emission-time build step
+to structure them. 0.30 therefore means: **≤30% of required cells need new structuring work — S1 is a
+bounded build.** Above 0.30, the "emission contract" is really an *authoring* contract, PAEOS is being
+asked to produce knowledge it does not currently hold, and Ω1's self-population claim is overstated —
+which is exactly A8's charge.
+
+*Rejected thresholds:* **0.00** (strict-lossless — tests document formatting, not the assumption);
+**0.50** (a coin-flip corpus would pass, and a majority-loss "GO" would not survive its own review).
+
+The conjunctive G2–G4 clauses exist so that a low aggregate cannot buy a GO while the load-bearing
+nodes are missing — the aggregate is necessary, not sufficient.
+
+### 7.5 Pre-registered hypothesis (recorded before extraction)
+
+From the source mapping in §4.1, the design predicts: **Scar** and **EvidenceRef** near-1:1
+(field parity with PAEOS-9 §5.8 and PAEOS-7.6 §6); **Decision** strong-but-prose (§5.11 has the right
+field names, ADR bodies are narrative); **Constraint** mixed (L11 has affected/forbidden files and
+acceptance criteria structurally, but "constraint" framing is implicit); **Option**, **TradeOff**,
+**Component** weakest, and near-total on Trace-A goals. Predicted band: `loss_ratio` **0.35–0.60**,
+i.e. a predicted **NO-GO** driven mainly by G1 and G3.
+
+Recording this now serves two purposes: a result far outside the band is itself information worth
+investigating, and a result suspiciously *exactly* at the threshold invites scrutiny of the grading.
+
+---
+
+## 8. Probe failure and degradation behaviour
+
+| Condition | Behaviour |
+|---|---|
+| **Fewer than 3 sealed goals resolvable** | **Halt. Emit nothing. Raise an incident and remand to intake.** Writing three `## goal:` sections when only two real goals exist would satisfy AC-3 while lying. Insufficient corpus is itself an A8-relevant finding: Ω1 cannot self-populate from a corpus that does not exist yet. |
+| **A sampled goal's referenced artifacts are unresolvable** | Do **not** silently substitute. Record the goal, grade its unresolvable cells `absent`, and note the resolution failure — an unresolvable artifact *is* extraction loss. |
+| **Sample is single-stratum (all Trace-A or all Trace-B)** | Proceed, but the report must state that its verdict does not generalize to the other stratum, and `sample_rule:` must show why no goal of the other kind existed. |
+| **Grader uncertainty on a cell** | Worse-of tie-break (§7.2). Record the ambiguity in the cell's `note`. |
+| **Protocol violated after FROZEN** | `VOID` (SM-1). The probe proves nothing; re-run from a new frozen plan. |
+| **`loss_ratio` computes to exactly 1.00** | See §9.3 — the acceptance contract cannot express it. Report the true value, raise the incident, verdict stays NO-GO. **Do not emit `0.99`.** |
+
+---
+
+## 9. Assumptions surfaced (PAEOS-6)
+
+Each assumption is stated with the observation that would refute it.
+
+- **A1 — ≥3 goals in `ledger/` carry a `SealRecord` (PAEOS-7.6 §10) and are resolvable to their
+  artifacts.** *Falsifier:* fewer than 3 → the probe halts per §8; the goal's AC-3 cannot be met
+  honestly and the objective must be re-scoped (fewer goals, or wait for corpus growth). This is the
+  single most likely blocker and should be checked **first** at IMPLEMENT, before any extraction work.
+- **A2 — `reviews/tasks/` holds `TaskPackage`-shaped records (PAEOS-7.6 §5) plus review verdicts, and
+  these are the practical carriers of objective, permissions, `required_evidence`, and `context_refs`.**
+  *Falsifier:* the directory holds free-form review prose with no package structure → the Constraint
+  and EvidenceRef source mappings in §4.1 are wrong and C2 must be re-derived before grading. Neither
+  `ledger/` nor `reviews/tasks/` is inside this DESIGN stage's read capability, so **§4.1's
+  source-column mapping is derived from spec, not from inspection, and is itself a prediction the
+  probe tests.**
+- **A3 — AC-4's regex `^loss_ratio: 0\.[0-9]+$` cannot express `1.0`.** Total loss is therefore
+  unrepresentable in the acceptance contract, which is a defect biased *toward* the outcome the probe
+  is meant to be able to reject. *Falsifier:* none — this is a reading of the given regex.
+  **Disposition:** L11 PLAN should escalate a widening to `^loss_ratio: [01]\.[0-9]+$`. Until then, if
+  the true ratio is 1.00 the probe reports it honestly, fails AC-4, and raises an incident (PAEOS-9
+  global rule 9: an ambiguity in the contract is an incident, never a silent fudge). The probability is
+  low — G4's EvidenceRef cells alone are predicted extractable — but the escape hatch must be
+  pre-declared, because the moment to decide how to handle an inconvenient number is *before* it appears.
+- **A4 — Trace-A auto-discharge means the L04/L06/L08/L11 sources for Option, TradeOff, Component and
+  Constraint may not exist as content.** *Falsifier:* Trace-A stubs turn out to carry substantive
+  content → §7.1's stratification is unnecessary and the predicted loss band (§7.5) is too pessimistic.
+- **A5 — Hand-extraction by a single agent is subjective.** Mitigated, not eliminated, by: the frozen
+  rubric (§7.2), the worse-of tie-break, the mandatory per-cell locator, and publishing the full matrix
+  so any reader can regrade. *Falsifier:* an independent regrade of the published matrix moves
+  `loss_ratio` across the 0.30 threshold → the probe is under-determined and needs a second grader.
+- **A6 — `Outcome` is legitimately excluded (§2).** *Falsifier:* a sealed goal in the sample already
+  carries realized-outcome records → Outcome is extractable at seal for some goals and its exclusion
+  understates what S1 could achieve.
+- **A7 — `confidence` and `status` are correctly `n/a`.** Direct from §4.2 ("`confidence` is derived,
+  never authored") and §6.1b ("nodes land as `candidate`"). *Falsifier:* a spec clause requiring the
+  producer to author either field.
+- **A8 — `reviews/spikes/` may not exist yet.** *Falsifier:* trivially checkable; IMPLEMENT creates the
+  directory before emitting, or AC-1 fails on a technicality unrelated to the probe's finding.
+- **A9 — "PAEOS-6" is cited by the evidence requirement but is not present in this stage's readable
+  scope** (`constitution/`, `spec/`, `design/` contain no PAEOS-6 artifact). This section therefore
+  applies the ordinary meaning carried by the corpus — explicit, falsifiable assumption surfacing (K6)
+  — consistent with the precedent in `design/is_institutional-design.md` §6. *Falsifier:* a PAEOS-6
+  document specifying a different assumption-disclosure format.
+
+---
+
+## 10. Perspectives covered
+
+- **Epistemic / falsifiability.** The threshold, sample rule and field matrix are frozen before
+  extraction (SM-1); the verdict is computed, not chosen (SM-3); a hypothesis is pre-registered (§7.5).
+  The probe is built so that it *can* return NO-GO — which is the only property that makes a GO
+  meaningful.
+- **Adversarial (how would one fake a GO?).** Four attacks and their blocks: narrow the schema after
+  seeing results → `VOID` (SM-1); grade auto-discharge stubs `n/a` → forbidden by name (§7.2); grade
+  optimistically → worse-of tie-break plus locator-required-to-raise (SM-2); pick three easy goals →
+  deterministic stratified sampling with published exclusions (§7.1). A fifth — pad to three goals to
+  satisfy AC-3 — is blocked by §8's halt rule.
+- **Sampling / statistics.** n=3 is small by mandate. Stratification (§7.1) buys coverage of the two
+  ceremony paths rather than precision, and §8 requires the report to state where its sample cannot
+  generalize. The probe reports a *direction*, not an estimate.
+- **Correctness of the measure.** The denominator excludes only cells the spec forbids anyone to
+  author (§4.1); the numerator's 0.5 for `partial` is stated, not assumed; the arithmetic is published
+  so the ratio is recomputable from the table.
+- **Contract / interface hygiene.** All four acceptance checks are traced to an emitter rule (§1, §4.2),
+  including the line-anchored-grep hazard that would otherwise be discovered at VERIFY.
+- **Economic.** ≤294 hand-graded cells, read-only over two directories, one output file, no substrate
+  writes. Cheap enough to justify running *before* S1 is built — which is the entire point of a spike
+  (§8: "knowable in one slice instead of nine phases").
+- **Scope discipline.** This stage writes only `design/`. The probe report, the directory creation, and
+  the extraction itself are deferred to L12 IMPLEMENT; the freeze of §7's protocol is L11 PLAN's job.
+- **Constitutional posture.** The probe holds no authority, mutates nothing, and cannot advance a goal
+  — the same non-authority stance SAEOS-1 §3.3/§6.4 requires of SAKG itself. Its output is an input to
+  a founder/court decision about S1, not a decision.
+
+---
+
+## 11. Handoff
+
+**To L11 PLAN — freeze these four things (they become `protocol_frozen_at`):**
+1. The C3 field matrix (§4.1) — 9 envelope obligations, 8 `n/a` envelope fields, 35 facet fields.
+2. The sample rule (§7.1), including the stratification requirement.
+3. The grading rubric (§7.2), including the `n/a` naming rules and the auto-discharge-is-`absent` rule.
+4. The verdict function (§7.4) with its threshold and the G2–G4 clauses.
+
+Plan should also carry the A3 escalation (widen AC-4's regex) and the A1 precondition check.
+
+**To L12 IMPLEMENT — execution order:**
+1. Verify A1 (≥3 resolvable sealed goals). If it fails, **halt and remand** — do not pad.
+2. Ensure `reviews/spikes/` exists.
+3. Run C1 → C2 → C4 → C5 in order, filling every cell with a grade and (where not `absent`/`n/a`) a
+   locator. Do not compute ratios until the matrix is complete — seeing the running total while
+   grading is exactly the contamination SM-1 exists to prevent.
+4. Compute §7.3, evaluate §7.4, emit per §4.2 with the emitter-hazard rules honoured.
+5. Self-check AC-1..AC-4 verbatim before declaring the stage complete.
+
+**Out of scope for the whole goal:** building the emission bundle, writing any SAKG code, amending
+SAEOS-1. The probe informs D7's accepted risk; it does not discharge it.
+
+---
+
+## Evidence: `design_coherent`
+
+- **Assumptions surfaced (PAEOS-6):** §9, A1–A9, each with an explicit falsifier. Three are
+  consequential and flagged for PLAN: **A1** (corpus sufficiency — the probe's precondition), **A2**
+  (the §4.1 source mapping is spec-derived, since `ledger/` and `reviews/tasks/` are outside this
+  stage's read capability — so it is itself a hypothesis the probe tests), and **A3** (AC-4's regex
+  cannot express total loss, a defect biased toward the outcome the probe must be able to reject).
+- **Perspectives covered:** §10 — epistemic/falsifiability, adversarial, sampling, measure-correctness,
+  contract hygiene, economic, scope discipline, constitutional posture.
+- **No orphan:** every component C1–C8 has a named producer and a named consumer on the §5 data flow;
+  every acceptance check AC-1..AC-4 maps to an emitter rule (§4.2); every one of the twelve §4.3 node
+  types carries an explicit disposition (§2) — headline, deferred-by-design, or secondary census.
+- **No gap:** the four checks that constitute the goal's acceptance are each satisfied by a specified
+  artifact section; the §8 S1 "lossless round-trip" criterion, which nodes alone cannot cover, is
+  closed by the edge census (§2); the case where the corpus cannot support the probe is specified
+  rather than left to improvisation (§8); the case where the true result is inexpressible in the
+  acceptance contract is specified (§9 A3) rather than fudged.
+- **Constraints tightened only (D2):** this design narrows the probe (frozen protocol, pessimistic
+  tie-break, halt-rather-than-pad) and loosens nothing in SAEOS-1 or the goal's acceptance surface.
+
+Design is coherent and complete for handoff to L11 PLAN, which freezes §7 and escalates A3.

@@ -1,0 +1,138 @@
+# F-ENVELOPE — Traceability (orphan/gap closure)
+
+Four closure claims, each backed by a matrix below:
+
+1. **No field is unschematised** — every §4.2 field (as reconstructed) has a schema clause. (§1)
+2. **No invariant is unexercised** — every L1 invariant has ≥1 invalid fixture. (§2)
+3. **No deferred rule is lost** — every L2 invariant is named and assigned a successor goal. (§3)
+4. **No acceptance command is unaddressed** — each of the four maps to a design decision. (§5)
+
+---
+
+## 1. Field → clause → fixture
+
+19 top-level fields, all schematised, all populated by ≥1 valid fixture.
+
+| Field | Schema clause | Valid coverage | Invalid coverage |
+|---|---|---|---|
+| `schema_version` | `properties.schema_version.const` | all 16 | `I14`† |
+| `id` | `$ref: node_id` | all 16 | — |
+| `kind` | `properties.kind.pattern` | all 16 (V15 = `constitution_clause`) | — |
+| `status` | `$ref: status` | **all 7 values** across V01-V16 | `I08` |
+| `content` | `minProperties: 1` | all 16 | — |
+| `content_hash` | `$ref: sha256` | all 16 | `I14`, `I15` |
+| `created_at` | `$ref: timestamp` | all 16 | — |
+| `updated_at` | `$ref: timestamp` | all 16 | — |
+| `provenance` | `$ref: provenance` (5 sub-fields) | all 16; `source.type` variants in V02, V15 | `I20` |
+| `confidence` | `$ref: confidence` (5 sub-fields) | all 16; all 4 methods — V04 `court_ratified`, V05 `evidence_weighted`, V16 `ancestor_min`, V02 `decay_adjusted` | `I01`-`I04`, `I21` |
+| `evidence_refs` | conditional `minItems` | V01 empty; V03-V16 non-empty | `I19` |
+| `promotion` | `$ref: promotion` (7 sub-fields) | V03-V16 (14 edges); `note` in V13 | `I05`-`I07`, `I11`, `I17`, `I18` |
+| `derived_from` | array of `node_id` | V02, V16 | — |
+| `trust_zone` | `$ref: trust_zone` | Z2 base; Z0 in V15 | `I16`, `I20` |
+| `labels` | `propertyNames.pattern` | V02, V15 | — |
+| `superseded_by` | `$ref: node_id`, `INV-DEL-2` | V07, V08 | `I12` |
+| `retraction` | `$ref: retraction` (5 sub-fields) | V09, V10 (`successor` in V10) | `I10`, `I13` |
+| `quarantine` | `$ref: quarantine` (5 sub-fields) | V11 (`canary_id` present) | `I22` |
+| `deprecation` | `$ref: deprecation` (3 sub-fields) | V06 (`prefer_instead` present) | `I23` |
+
+† `I14` deletes `content_hash`; `schema_version`'s own omission is covered by the same `required`
+clause and the same keyword, so a separate fixture would add no discriminating power.
+
+**Mechanised by:** `test_every_field_appears_in_valid_corpus` (`design.md` §6.4) walks
+`properties` **and** each `$defs` object's `properties`, so nested fields like
+`quarantine.canary_id` and `promotion.note` are in scope. A field added to the schema without a
+fixture fails the suite.
+
+---
+
+## 2. L1 invariant → fixture (19 invariants, 0 orphans)
+
+| Invariant | Rule | Invalid fixture(s) | Valid counter-example |
+|---|---|---|---|
+| `INV-DEL-1` | `status` enum has no `DELETED` | `I08` | all |
+| `INV-DEL-2` | `superseded_by` iff `SUPERSEDED` | `I12` | V07, V08 |
+| `INV-DEL-3` | `retraction` iff `RETRACTED` | `I10`, `I13` | V09, V10 |
+| `INV-DEL-4` | no unknown top-level property | `I09` | all |
+| `INV-CONF-1` | `confidence` is an object | `I01` | all |
+| `INV-CONF-2` | `method` ∈ closed enum, no authored member | `I02` | V04, V05, V16 |
+| `INV-CONF-3` | `inputs` `minItems: 1` | `I03` | all |
+| `INV-CONF-4` | `computed_by` names a component | `I21` | all |
+| `INV-CONF-5` | `value` ∈ [0,1] | `I04` | all |
+| `INV-PROMO-1` | `basis` ∈ closed epistemic enum | `I05` | V03-V16 |
+| `INV-PROMO-2` | `promotion.evidence_refs` `minItems: 1` | `I07` | V03-V16 |
+| `INV-PROMO-3` | `promotion` required iff `status != PROPOSED` | `I18` | V01 (absent), V13 (present on PROPOSED) |
+| `INV-PROMO-4` | `promotion` rejects unknown properties | `I06` | all |
+| `INV-FSM-1` | `(from,to)` is a legal edge; `RETRACTED` absorbing | `I11` | V03-V16 |
+| `INV-FSM-2` | `basis` permitted on that edge | `I17` | V03-V16 |
+| `INV-EV-1` | `evidence_refs` non-empty unless `PROPOSED` | `I19` | V01, V03-V16 |
+| `INV-QUAR-1` | `quarantine` iff `QUARANTINED` | `I22` | V11 |
+| `INV-DEP-1` | `deprecation` iff `DEPRECATED` | `I23` | V06 |
+| `INV-TZ-1` | `Z0` requires `actor_role: founder` | `I20` | V15 |
+
+**Mechanised by:** `test_every_invariant_has_invalid_fixture` scans every `$comment` in the schema
+with `re.findall(r"INV-[A-Z]+-\d+", ...)` — not an anchored match, because `promotion`'s single
+`$comment` declares both `INV-PROMO-2` and `INV-PROMO-4` (`design.md` §3.1) — and asserts each id
+found is claimed by ≥1 manifest entry. Adding an invariant
+to the schema without a fixture fails the suite. This is the mechanism that makes "every §4.2
+invariant violation is exercised" a *checked* claim.
+
+**Also mechanised:** every invariant row has a valid counter-example. A rule that only ever appears
+in rejections might be rejecting everything; the paired valid fixture proves the rule discriminates
+rather than merely blocks — the `CANARY-0002` concern applied to the schema itself
+(`constitution/canaries/CANARY-0002.json:4`: "the same PASS for the claim and its negation").
+
+---
+
+## 3. L2 invariants — deferred, named, not orphaned
+
+Each is undecidable in JSON Schema (`design.md` §2.3). Fixture ids are **reserved** so the corpus
+can grow into them without renumbering.
+
+| Invariant | Rule | Why L1 can't | Successor goal | Reserved fixtures |
+|---|---|---|---|---|
+| `INV-ID-1` | `kind` == `id`'s middle segment | cross-field string compare | F-INVARIANTS | `I30` |
+| `INV-HASH-1` | `content_hash` == `sha256(JCS(content))` | requires hashing | F-INVARIANTS | `I31` |
+| `INV-TIME-1` | `updated_at >= created_at`; `promotion.at >= created_at`; `confidence.computed_at >= created_at` | value comparison | F-INVARIANTS | `I32`-`I34` |
+| `INV-EV-2` | `promotion.evidence_refs ⊆ evidence_refs` | subset of a sibling array | F-INVARIANTS | `I35` |
+| `INV-LIN-1` | every `derived_from` resolves; lineage is acyclic | cross-document | F-INVARIANTS | `I36` |
+| `INV-REF-1` | `superseded_by` / `retraction.successor` / `deprecation.prefer_instead` resolve | cross-document | F-INVARIANTS | `I37` |
+| `INV-REF-2` | every `evidence_ref` resolves to an existing, non-`RETRACTED` evidence node | cross-document | F-INVARIANTS | `I38` |
+| `INV-SEQ-1` | the stored transition *history* is a legal path (L1 checks one hop; a path needs the log) | cross-document | F-STORE | `I39` |
+| `INV-DUP-1` | two `ACTIVE` nodes may not share a `content_hash` | cross-document | F-DEDUP | `I40` |
+| `INV-CONF-6` | `value` is the number `method` would actually produce from `inputs` | requires the confidence engine | F-CONFIDENCE | `I41` |
+
+`INV-CONF-6` is the most important deferral and should be stated plainly: **L1 proves a confidence
+was derived, not that it was derived correctly.** The schema makes authoring structurally
+impossible; it does not make lying arithmetically impossible. That is F-CONFIDENCE's job, and
+`CANARY-0001`'s "re-run and compare" mechanism (`constitution/canaries/CANARY-0001.json:6`) is the
+model for how it should work.
+
+---
+
+## 4. Successor goals named by this design
+
+Named here so that every deferral in this package resolves to something, rather than trailing off.
+
+| Goal | Scope | Referenced from |
+|---|---|---|
+| **F-NODE-KINDS** | per-`kind` `content` schemas | `assumptions.md` A2 |
+| **F-INVARIANTS** | `sakg/schema/invariants.py`, L2 rules | `design.md` §2.2, §3 above |
+| **F-STORE** | append-only store, transition history | §3 above |
+| **F-CONFIDENCE** | the derivation engine behind `confidence.method` | §3 above |
+| **F-DEDUP** | `content_hash` collision policy | §3 above |
+| **F-EDGES** | inter-node relationships beyond lineage | `assumptions.md` §5 |
+
+---
+
+## 5. Acceptance commands → design decisions
+
+| # | Command | Satisfied by | Risk of a false pass |
+|---|---|---|---|
+| 1 | `json.loads(sakg/schema/envelope.schema.json)` | the file exists and is valid JSON | **High** — a syntactically valid but semantically empty `{}` passes. Closed by §6.1's `check_schema` + `$ref`-resolution + `$id`/`schema_version` self-tests, which command 1 alone does not reach. |
+| 2 | `uv run pytest tests/sakg/test_envelope_schema.py -q` | groups 1-4 (`design.md` §6) | **High if the tests are weak** — this is the command the whole design is built to make meaningful. §6.3's `(pointer, keyword, invariant)` assertion and §6.4's schema-derived coverage tests are what convert it from "some tests passed" to "the corpus covers the artifact". |
+| 3 | `ls valid/*.json \| wc -l >= 12` | 16 authored | **Medium** — a count is not coverage. Closed by `test_every_status_has_valid_fixture` and `test_every_field_appears_in_valid_corpus`; the count floor is also re-asserted inside pytest (`test_corpus_size_floors`) so it breaks in CI rather than only in a shell. |
+| 4 | `ls invalid/*.json \| wc -l >= 8` | 23 authored | **Medium**, plus a *specific* trap: any `*.json` in that directory inflates the count. `manifest.json` is deliberately placed one level up (`fixture-corpus.md` §1), and `test_manifest_matches_filesystem` fails if a non-fixture `.json` appears in either directory. |
+
+**Beyond the four:** the reconciliation gate (`design.md` §7). The commands cannot detect that the
+field roster is a reconstruction rather than §4.2's actual roster — that is `assumptions.md` A0, the
+largest open risk in this package, and it needs a human, not a command.

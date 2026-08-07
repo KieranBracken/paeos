@@ -1,0 +1,599 @@
+# DESIGN — `[S-PROBE]` SAKG S1 extraction-feasibility probe
+
+| | |
+|---|---|
+| **Artifact** | System design for the hand-extraction spike that falsifies SAEOS-1 §9 A8 |
+| **Stage / Role** | `DESIGN` / `PLANNER` (PAEOS-7.6 §3, L08) |
+| **Status** | DESIGN ONLY — no probe executed, no verdict asserted. Frozen input to the downstream execution stage. |
+| **Date** | 2026-08-07 |
+| **Target artifact** | `reviews/spikes/sakg-s1-extraction-probe.md` (written by the downstream stage, not here) |
+| **Required evidence** | `design_coherent` — assumptions surfaced (PAEOS-6), perspectives covered, no orphan/gap. |
+
+---
+
+## 0. Scope boundary (read first)
+
+This worker session is **PLANNER @ DESIGN** with write-capability limited to `design/` and
+read-capability limited to `constitution/`, `spec/`, `design/`. The goal objective names
+one deliverable — `reviews/spikes/sakg-s1-extraction-probe.md` — and four acceptance
+predicates over it. Both lie outside this session's capability:
+
+1. **Writing `reviews/spikes/…`** is a `reviews/`-tree write. Any such write from this
+   session is discarded as a violation. It is owned by the downstream execution stage.
+2. **Reading `reviews/tasks/B0.*_review.md`** — the probe's source corpus — is outside
+   read-capability. Their *contents* are therefore an assumption of this design (§6 A1–A3),
+   not an input to it.
+
+*Disclosure:* a bounded directory listing of `reviews/` and `reviews/tasks/` was performed
+to confirm the named goals exist as files. **No file content was read.** The listing
+confirmed `B0.0_review.md`, `B0.1_review.md`, `B0.2_review.md` and 30+ siblings exist, and
+that `reviews/spikes/` already exists containing one prior spike
+(`DEBT-0002-spawnability-spike.md`, contents unread).
+
+This document is therefore the **executable specification of the probe**: it fixes the
+hypothesis, the corpus, the slot inventory, the scoring rubric, the loss-ratio arithmetic,
+the pre-registered verdict rule, and the byte-level shape of the output artifact — with
+enough precision that the execution stage performs the extraction mechanically and the four
+acceptance predicates pass by construction (§8).
+
+**Evidence emitted by this session:** `design_coherent` = this file. **Not** a GO/NO-GO
+verdict. A DESIGN stage that pre-announced the verdict would destroy the falsification it
+is designing.
+
+---
+
+## 1. What is being falsified (the hypothesis under test)
+
+SAEOS-1 §9 **A8** is the specification's self-declared *"single largest untested
+assumption"*, and §9's residual list records it as **"load-bearing for the entire delivery
+path"**. Verbatim disposition:
+
+> **[MODIFY]** Partially. PAEOS *produces* all the required artifacts (L06 matrices, L08
+> design sets, L11 contracts, decision-graph records, scars), but as prose documents, not
+> as typed emission bundles. Slice S1 (§8) exists precisely to build and test that
+> extraction. **Carried:** if L15 artifacts prove too unstructured to extract losslessly,
+> S1 fails and Ω1's value is overstated.
+
+SAEOS-1 §8 **S1** states the exit criterion as: *"A sealed PAEOS goal produces a valid
+bundle; round-trip is lossless."* SAEOS-1 §10 **D7** ratified A8's risk *"scoped: S1 is
+explicitly a falsification test."*
+
+**H0 (the claim under test).** For a sealed PAEOS goal, the SAKG Emission Bundle defined in
+SAEOS-1 §6.1b can be assembled from that goal's existing artifacts by extraction alone —
+without inventing content — at a fidelity sufficient for slice S2.
+
+**The probe is a falsification attempt, not a demonstration.** It is designed to *fail* if
+H0 is false. Three properties make it falsifiable rather than confirmatory:
+
+| Property | Mechanism | Section |
+|---|---|---|
+| The threshold cannot be chosen after seeing the data | Verdict rule is **pre-registered** and frozen before extraction begins; amending it after `EXTRACT` starts voids the probe | §5, §4 |
+| The rubric cannot be subjective | One goal is extracted **twice, independently**; agreement below floor ⇒ NO-GO on methodological grounds | §5.3 |
+| Exclusions cannot be used to launder loss | Every denominator exclusion requires a spec citation *and* a stated default policy; unbacked exclusions revert to counted loss | §3.4 |
+
+**This probe deliberately tests a threshold weaker than §8 S1's stated `lossless`.** That is
+a finding in its own right (§7.3): if extraction is useful but not lossless, S1's exit
+criterion as ratified is unachievable, and the correct output is a **proposal to amend
+§8 S1**, routed to ratification — never a unilateral reinterpretation (CER-5; SAEOS-1 §9
+A6 precedent: *"it cannot fix it… routes it to the founder"*).
+
+---
+
+## 2. Component graph
+
+```mermaid
+flowchart TD
+    subgraph SRC["Source corpus (read-only)"]
+        RV["reviews/tasks/B0.N_review.md<br/>ENTRY POINT / index"]
+        AUX["Goal's other sealed artifacts<br/>L06 matrix · L08 design · L11 contract<br/>decision record · scar · ledger entry"]
+    end
+
+    subgraph FROZEN["Pre-registration (frozen before EXTRACT)"]
+        PR["§3 slot inventory<br/>§3.4 exclusion set + default policies<br/>§5 verdict rule + thresholds"]
+    end
+
+    LOC["LOCATE — resolve goal → artifact set"]
+    EXT["EXTRACT — hand-map into §4.3 node types"]
+    EXT2["EXTRACT' — independent 2nd pass<br/>(goal 3 only)"]
+    LED["FIELD LEDGER — one row per (node_instance, slot)"]
+    AGR["AGREEMENT CHECK — §5.3"]
+    SCO["SCORE — E / P / A rubric §3.3"]
+    AGG["AGGREGATE — loss arithmetic §4"]
+    VER["VERDICT — apply frozen rule §5"]
+    OUT["reviews/spikes/sakg-s1-extraction-probe.md<br/>§6 schema"]
+
+    RV --> LOC
+    AUX --> LOC
+    LOC --> EXT
+    LOC --> EXT2
+    PR -.->|"governs, never revised downstream"| EXT
+    PR -.-> SCO
+    PR -.-> VER
+    EXT --> LED
+    EXT2 --> AGR
+    LED --> AGR
+    LED --> SCO
+    SCO --> AGG
+    AGR --> VER
+    AGG --> VER
+    VER --> OUT
+```
+
+**Rationale for the `LOCATE` node** (the design's single most consequential component).
+The goal objective names `reviews/tasks/B0.N_review.md` as the corpus. But A8's claim is
+about the artifact set PAEOS produces across **L06, L08, L11, the decision graph, and the
+scar graph** (SAEOS-1 §6.1b lists exactly which node type comes from which stage). A review
+document is one artifact class, most plausibly the L10/L14 verdict. Extracting from review
+documents *alone* would score `Constraint` (L11), `Component` (L08) and `TradeOff` (L06) as
+absent for a reason that has nothing to do with prose being unstructured — producing a
+**false NO-GO** that would kill a viable S1.
+
+`LOCATE` therefore treats the review document as the **entry point and index**, and resolves
+outward to whatever else the goal sealed. Slots unreachable after a logged locate attempt
+are scored `absent-out-of-corpus` (§3.3), which counts as loss but is *attributed* separately
+so the verdict can distinguish *"PAEOS's prose is too unstructured"* (fatal to Ω1) from
+*"the bundle needs a multi-artifact assembler"* (an S1 work item, not a falsification).
+
+**No orphan:** every node above has an inbound and outbound edge; `PR` is deliberately
+inbound-only to `EXTRACT`/`SCORE`/`VERDICT` and has no inbound edge — it is frozen input.
+
+---
+
+## 3. Interface contract — what a "field" is and how it is scored
+
+### 3.1 Node types in scope
+
+SAEOS-1 §4.3 defines twelve types. §6.1b's emission bundle names seven. The probe scores
+all twelve but partitions them, and **only the in-bundle partition enters the denominator**:
+
+| Partition | Types | Denominator |
+|---|---|---|
+| **In-bundle (7)** | `Decision`, `Option`, `Constraint`, `TradeOff`, `Component`, `Scar`, `EvidenceRef` | ✅ counted |
+| **Out-of-bundle (4)** | `Problem`, `Objective`, `Mechanism`, `Pattern` | ❌ excluded — not in §6.1b; recorded as an **opportunistic** observation ("was it *incidentally* extractable?"), which is upside evidence only |
+| **Impossible-at-seal (1)** | `Outcome` | ❌ excluded — §4.3: *"The only node type that may be created long after its subject."* SAEOS-1 §6.1b rule 3 routes it to L17/L19; §8 routes it to slice **S3**. Scoring it at S1 would guarantee loss that is not extraction failure. |
+
+### 3.2 Slot inventory (the unit of measurement)
+
+A **slot** is one (node_instance, field) pair. Three classes:
+
+**(a) Construction slots — excluded from the denominator.** Derivable from the *act* of
+emission, never from the source prose. Nine, per SAEOS-1 §4.2 and §6.1b:
+`id`, `type`, `namespace` (§6.1b rule 4: set at emission by the producing project),
+`provenance.origin`, `provenance.author_kind` (= `ingest`), `provenance.ingested_at`,
+`provenance.source_hash`, `status` (= `candidate`, §6.1b), `valid_from` (= seal timestamp).
+
+**(b) Ingest-derived slots — excluded, but each requires a stated default policy (§3.4).**
+`valid_until` (§4.2: `null` = open), `falsifier` (§4.2/Ω4), `coordinates` (✓8).
+`confidence` is excluded outright: §4.2 invariant — *"`confidence` is **derived**, never
+authored."* Extracting it would violate the schema.
+
+**(c) Extraction slots — the denominator.** Three envelope slots per node instance —
+`label`, `summary` (≤280 chars, §4.2), `evidence[]` (EvidenceRef pointers, §3.3.3 — hashes
+only) — plus the type facets:
+
+| Type | Facet slots | Source stage (§6.1b) | n |
+|---|---|---|---|
+| `Decision` | `context`, `options_ref[]`, `chosen`, `rationale`, `constitutional_basis` | decision graph (PAEOS-9 §5.11 node shape — an exact field-for-field match) | 5 |
+| `Option` | `description`, `rejected`, `rejection_reason` | L04 candidates, **including rejected** | 3 |
+| `Constraint` | `kind`, `bound`, `source_stage` | L11 implementation contract | 3 |
+| `TradeOff` | `axis`, `side_a`, `side_b`, `resolution` | L06 trade-off matrix | 4 |
+| `Component` | `name`, `kind`, `interfaces[]` | L08 architecture artifact set | 3 |
+| `Scar` | `failure_class`, `root_cause`, `detection_signature`, `guard_action`, `severity`, `origin_run` | scar graph (PAEOS-9 §5.8 node shape — again an exact match) | 6 |
+| `EvidenceRef` | `hash`, `uri`, `kind`, `reverify_instruction` | evidence graph, hashes only | 4 |
+
+`Decision` and `Scar` are the two types whose PAEOS-side node shape is already *typed*
+(PAEOS-9 §5.11, §5.8) rather than prose. SAEOS-1 §4.3 predicts the Scar case explicitly
+(*"scars round-trip losslessly (Ω1)"*). **These are the probe's two sharpest tests: they are
+where Ω1 should be strongest, so weakness here is disproportionately damaging to H0** — which
+is why §5.1 gives each its own hard gate rather than letting a good average hide a bad spine.
+
+### 3.3 Scoring rubric (three-valued, with attributed absence)
+
+| Score | Weight | Definition — the operative test is **reproducibility by a second extractor** |
+|---|---|---|
+| `extractable` | **0.0 loss** | Value is present as a literal or is mechanically derivable by a stated rule. Two independent extractors produce the **same value**. |
+| `partial` | **0.5 loss** | Value is recoverable only by judgment, paraphrase, or summarization; or present but incomplete (a truncated list, one of several axes). Two extractors agree on **meaning** but may differ in **wording**. |
+| `absent` | **1.0 loss** | No basis in the corpus. Producing a value requires **invention**. Every `absent` carries a mandatory attribution: |
+| ↳ `absent-in-source` | 1.0 | The artifact exists and was read; the content is not in it, or is too unstructured to recover. **This is the class that falsifies A8.** |
+| ↳ `absent-out-of-corpus` | 1.0 | The bearing artifact was not locatable for this goal after a **logged** locate attempt. Counts as loss; attributed separately (§2). |
+| ↳ `absent-by-construction` | **excluded** | Slot is in class (a) or (b), or belongs to an excluded type (§3.1). Never contributes to numerator or denominator. |
+
+**Anti-rationalization rule.** If an extractor writes a value it could not point to in the
+corpus, the slot is `absent`, not `partial`. Plausible reconstruction is invention; SAEOS-1
+✓4/×5 admit nothing to canonical status on plausibility.
+
+### 3.4 The exclusion discipline (guard against a rigged denominator)
+
+Excluding slots is exactly how a spike is rigged to say GO. Two constraints bind it:
+
+1. Every excluded slot must cite the spec clause that makes it non-extractable **and**, for
+   class (b), state the default the ingest stage will synthesize. Proposed defaults, to be
+   confirmed or rejected during the probe:
+   - `valid_until` → `null` (§4.2: null = open; decay policy applies).
+   - `falsifier` → for a `Decision`: *"an `Outcome` of kind `reverted` or `caused-incident`
+     binds to this Decision"*; for a `Scar`: its `detection_signature` firing. Both are
+     mechanically derivable, so neither is extraction.
+   - `coordinates` → derived from `namespace` + the goal's touch-set path prefixes (✓8:
+     flat, multi-valued, never hierarchical).
+2. **A slot whose default policy is not defensible reverts to class (c) and counts as loss.**
+   The exclusion set is frozen at pre-registration; it may only ever *shrink* during
+   execution, never grow.
+
+---
+
+## 4. Data flow and the loss arithmetic
+
+```
+for each goal g in {G1, G2, G3 [, G4]}:
+    artifacts(g) := LOCATE(reviews/tasks/<g>_review.md)      # entry point → full sealed set
+    nodes(g)     := EXTRACT(artifacts(g))                     # instantiate §4.3 in-bundle types
+    for each node n in nodes(g):
+        for each slot s in extraction_slots(type(n)):          # §3.2 class (c)
+            ledger += row(g, n, s, score ∈ {E,P,A}, attribution, quote_or_locate_log)
+
+D  := |ledger|                                    # denominator: extraction slots only
+N  := 0.5·|{rows: P}| + 1.0·|{rows: A}|           # numerator: weighted loss
+loss_ratio := round(N / D, 2)                     # HEADLINE — the honest, semantic number
+```
+
+Two secondary ratios are reported for transparency, and **neither drives the verdict**:
+
+- `loss_ratio_all_slots` = the same arithmetic with construction + ingest-derived slots
+  folded back into `D`. It is always **lower** (those slots are free). It is published
+  precisely so the dilution is visible and cannot be quietly substituted for the headline.
+- `loss_ratio_in_source` = recomputed counting only `absent-in-source`, treating
+  `absent-out-of-corpus` as excluded. This is the number that speaks **directly** to A8's
+  wording (*"too unstructured to extract"*).
+
+### 4.1 Format constraints on `loss_ratio` (derived from the acceptance predicate)
+
+The acceptance predicate is `rg -q '^loss_ratio: 0\.[0-9]+$'`. It admits only values in
+**[0.0, 1.0)** written with a leading `0.` and at least one decimal digit. Binding rules for
+the execution stage:
+
+- Always emit exactly two decimals: `0.00` … `0.99`. `0`, `.4`, `1.0` all fail the predicate.
+- **`loss_ratio = 1.00` is not representable.** It is also structurally near-impossible: for
+  any instantiated node, `label` is derivable from the artifact's own title, so at least one
+  row scores better than `absent`. It is not, however, *impossible*, and §6.3 specifies the
+  escalation rather than a fudge.
+- **`D = 0` (no node instantiated across all goals) is the one genuinely unsatisfiable case.**
+  There is then no honest value to write. See §6.3 — the correct action is to fail the gate
+  and remand, never to emit `0.00`.
+
+---
+
+## 5. Pre-registered verdict rule (frozen before `EXTRACT`)
+
+### 5.1 The rule
+
+```
+verdict := GO  iff  ALL of:
+  C1  loss_ratio ≤ 0.35
+  C2  SPINE — for all 3 goals, a Decision node is instantiated and both
+      `chosen` and `rationale` score extractable or partial
+  C3  SCAR — for every Scar present in the corpus, all 6 facet slots score
+      extractable  (Ω1's strongest claim, §4.3: "round-trip losslessly")
+  C4  AGREEMENT — inter-extractor slot agreement on the double-extracted goal ≥ 0.80 (§5.3)
+otherwise:
+  verdict := NO-GO
+```
+
+### 5.2 Why these thresholds (justification is pre-registered, not post-hoc)
+
+- **C1 = 0.35** is derived from what slice **S2** must do, not chosen for comfort. S2's exit
+  criterion (§8) is *"Returns a real precedent from a real prior goal, within budget, with
+  `why`."* A `tradeoff_precedents` result is a `{node_summary, score, why}` triple (§5.1).
+  The minimum viable precedent needs `Decision.label`, `Decision.summary`,
+  `Decision.chosen`, `Decision.rationale`, `TradeOff.axis`, `TradeOff.resolution`,
+  provenance, and one `EvidenceRef.hash`. At a third of slots lost, a SUMMARY-tier
+  projection still carries a recognizable precedent; beyond that the summary degrades below
+  the point where a consumer could act on it, and **FPL-4**'s budget-bounded projection has
+  nothing worth spending budget on.
+- **C2** encodes ✓1 (*Decision is the central object*). A bundle without a Decision that
+  states what was chosen and why is not a bundle; §4.4's entire Decisional edge family has
+  no anchor. This is a hard gate because a good *average* across many easy `Component` slots
+  could otherwise mask a dead spine.
+- **C3** is the sharpest available test of Ω1 and the only place SAEOS-1 claims *lossless*
+  by name. PAEOS-9 §5.8 already stores scars as typed records with exactly the six fields
+  §4.3 requires. If **this** is lossy, the "PAEOS already emits what SAKG needs" thesis is
+  in serious trouble. **If no scar appears in any of the goals, C3 is vacuously true and the
+  probe must record `scar_roundtrip: untested`** — a carried, un-discharged claim, not a
+  silent pass.
+- **C4 = 0.80** exists because a single-pass hand-extraction is unfalsifiable: one extractor
+  cannot distinguish "the corpus is structured" from "I read structure into it." PAEOS
+  constructs independence this way throughout (A-08 decorrelation; PAEOS-9 §0.4 note 2: the
+  same separated power invoked twice). Below 0.80 the rubric — not the corpus — is the
+  problem, and the loss ratio is not evidence of anything.
+
+### 5.3 Independent second pass
+
+Goal **G3** is extracted twice by decorrelated extractors, each blind to the other's ledger
+until both are frozen.
+
+```
+agreement_rate := |{slots where both passes assigned the same score}| / |slots scored by both|
+```
+
+`partial` vs `extractable` counts as **disagreement** (the rubric's boundary is what is under
+test). Slot sets that differ in *which nodes were instantiated* are reconciled by scoring the
+union, with a node missing from one pass treated as all-`absent` in that pass — node
+discovery is part of extraction, and hiding a missed node would flatter the rate.
+
+### 5.4 Attributed NO-GO
+
+`verdict` is exactly `GO` or `NO-GO` (the acceptance predicate admits nothing else). Nuance
+lives in `verdict_basis`, which must name the failing conditions and, on NO-GO, classify:
+
+| Basis | Meaning | Consequence for SAEOS-1 |
+|---|---|---|
+| `no-go/unstructured` | driven by `absent-in-source` | **A8 falsified.** Ω1's value is overstated; §8 S1 and the §6.1b exhaust contract need rework before S2 is justified. |
+| `no-go/corpus-assembly` | >50% of loss is `absent-out-of-corpus` | A8 **not** falsified. The bundle needs a multi-artifact assembler — an S1 work item. Remand to corpus assembly and re-run. |
+| `no-go/method` | C4 failed | Nothing is learned about A8. The rubric must be sharpened and the probe re-run. **Not** evidence against H0. |
+| `no-go/spine` | C2 or C3 failed | A8 falsified at its strongest claim, regardless of the aggregate ratio. |
+
+---
+
+## 6. Output artifact schema (`reviews/spikes/sakg-s1-extraction-probe.md`)
+
+### 6.1 Skeleton — byte-level, so the acceptance predicates pass by construction
+
+```markdown
+---
+spike: sakg-s1-extraction-probe
+falsification_target: SAEOS-1 §9 A8 (+ §8 S1 exit criterion)
+date: <YYYY-MM-DD>
+extractors: [<id-1>, <id-2>]
+pre_registration_frozen_at: <timestamp before first EXTRACT>
+verdict: GO
+verdict_basis: <one of §5.4, or "go/all-conditions-met">
+loss_ratio: 0.NN
+loss_ratio_all_slots: 0.NN
+loss_ratio_in_source: 0.NN
+agreement_rate: 0.NN
+scar_roundtrip: lossless | lossy | untested
+slots_scored: <D>
+---
+
+# S-PROBE — SAKG S1 extraction feasibility
+
+## 1. Hypothesis and pre-registration
+<H0 verbatim from §1; the frozen §5.1 rule; the frozen §3.4 exclusion set>
+
+## goal: B0.0
+### corpus located
+| artifact | path | found |
+### nodes instantiated
+| node_id | type | label |
+### field ledger
+| node | slot | score | attribution | evidence (quote / locate log) |
+### per-goal roll-up
+| slots | E | P | A(in-source) | A(out-of-corpus) | loss_ratio |
+
+## goal: B0.1
+<same five blocks>
+
+## goal: B0.2
+<same five blocks>
+
+## 2. Aggregate
+<the §4 arithmetic, shown, with D and N explicit>
+
+## 3. Agreement check (§5.3)
+## 4. Verdict against the frozen rule (§5.1)
+<C1..C4 each marked pass/fail, then the verdict>
+
+## 5. Findings for SAEOS-1
+<§7.3: proposals routed, never applied>
+```
+
+### 6.2 Acceptance-predicate conformance
+
+| Predicate | Satisfied by | Trap the execution stage must avoid |
+|---|---|---|
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | §6.1 | — |
+| `rg -q '^verdict: (GO\|NO-GO)$'` | frontmatter `verdict:` | Must be column 0, exact case, no trailing space, no quotes, no `**bold**`. `NO GO`/`No-Go` fail. |
+| `rg -c '^## goal: ' … -ge 3` | three `## goal: ` headings | Exactly `## ` + `goal: ` + name. `### goal:` or `## Goal:` fail. A 4th goal (§7.1) only helps. |
+| `rg -q '^loss_ratio: 0\.[0-9]+$'` | frontmatter `loss_ratio:` | Two decimals, leading `0.`, value < 1.0 (§4.1). The sibling keys `loss_ratio_all_slots` / `loss_ratio_in_source` do **not** match this anchored pattern, so they cannot satisfy it by accident. |
+
+Self-test the execution stage runs before claiming done:
+
+```
+test -f reviews/spikes/sakg-s1-extraction-probe.md \
+  && rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md \
+  && test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3 \
+  && rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md \
+  && echo s-probe-conformant
+```
+
+### 6.3 The one unsatisfiable branch, handled honestly
+
+If `D = 0` — no in-bundle node instantiable from any goal — there is **no honest value** for
+`loss_ratio` in the required format. Total extraction failure is exactly the outcome A8
+warns about, and the acceptance criteria cannot express it.
+
+**Specified behaviour: do not fabricate.** Write the artifact with the full ledger, set
+`verdict: NO-GO`, omit `loss_ratio` entirely, add `loss_ratio: undefined-D-zero` as prose in
+§2, and **report the gate as failed with the reason** — the acceptance predicate is
+unsatisfiable, not unsatisfied. Emitting `0.00` (which reads as *zero loss*, the strongest
+possible GO signal) to make a grep pass would invert the probe's meaning. Judged low
+probability (§4.1), specified because it is the one branch where the incentive is to lie.
+
+---
+
+## 7. Corpus selection and validity threats
+
+### 7.1 Selection rule (pre-registered, so it cannot be cherry-picked)
+
+**G1 = `B0.0_review.md`, G2 = `B0.1_review.md`, G3 = `B0.2_review.md`** — the three
+lowest-numbered sealed goals, named in the objective. Lowest-numbered is a rule fixed before
+inspection, not a choice made after.
+
+**Diversity guard.** `constitution/README.md` records B0.0 as *"directory skeleton only"*.
+Three consecutive scaffolding goals may carry almost no decision content — which would
+depress the loss ratio for a reason unrelated to prose structure (few decisions to lose) and
+make the sample unrepresentative in both directions. Therefore: **if `LOCATE` finds that all
+three of G1–G3 are pure-scaffolding goals with no L06 trade-off matrix, the execution stage
+MUST add G4** — the lowest-numbered goal in `reviews/tasks/` that has one — and report all
+four. The acceptance predicate (`-ge 3`) accommodates this. Adding G4 is the *only*
+permitted corpus change after pre-registration, it may only ever *add*, and the trigger is
+stated here in advance.
+
+### 7.2 Threats to validity, carried
+
+| Threat | Effect on the verdict | Mitigation |
+|---|---|---|
+| **Sample bias** — 3 B0 bootstrap goals are not representative of mature PAEOS goals | Both directions: simpler artifacts may extract more cleanly *and* contain less to extract | §7.1 diversity guard; explicit carry in the artifact. This is SAEOS-1 §9 **A4** inherited one level down. |
+| **Extractor knows the hypothesis** — motivated to find structure | Inflates `extractable` | §5.3 blind second pass; §3.3 anti-rationalization rule; every `extractable` requires a quotable locus |
+| **Review docs ≠ full artifact set** | False NO-GO | §2 `LOCATE`; `absent-out-of-corpus` attribution; §5.4 `no-go/corpus-assembly` basis |
+| **Hand-extraction ≠ automated extraction** | A GO here does **not** license "an automated extractor will work" | The verdict claims only **feasibility**, never *automatability*. An LLM-or-parser extractor is a separate, later falsification. Must be stated in the artifact's §5. |
+| **Ratio hides distribution** | A good mean over easy slots masking a dead spine | C2/C3 are hard gates independent of C1 |
+
+### 7.3 Findings this probe may produce (routed, never applied)
+
+The probe writes to `reviews/spikes/` only. Any consequence for SAEOS-1 is a **proposal**:
+
+1. **§8 S1's `lossless` exit criterion.** If `0.00 < loss_ratio ≤ 0.35`, S1 as ratified is
+   unachievable while S1 as *useful* is achievable. Propose restating the criterion as a
+   measured threshold. Ratified text is not edited by a spike (CER-5).
+2. **§6.1b bundle completeness.** If `Problem`/`Objective` prove incidentally extractable
+   (§3.1), propose adding them — that is upside, and §4.3's extension rule requires a
+   demonstrated need, which this would be.
+3. **§4.2 default-policy confirmation.** The §3.4 class-(b) defaults are proposals; the probe
+   either confirms each or reverts the slot to counted loss.
+4. **Ω1 re-weighting.** On `no-go/unstructured`, SAEOS-1's claim that the population problem
+   is *"largely already solved, for free"* requires downgrading, and §8's ordering — where
+   *"S1 and S2 are the whole bet"* — needs re-planning before any further SAKG spend.
+
+---
+
+## 8. Probe state machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> PRE_REGISTER
+    PRE_REGISTER --> LOCATE: §3 inventory + §3.4 exclusions + §5.1 rule frozen
+    LOCATE --> EXTRACT: artifact set resolved per goal (found/not-found logged)
+    LOCATE --> DIVERSITY_ADD: all of G1-G3 are pure scaffolding (§7.1)
+    DIVERSITY_ADD --> LOCATE: add G4
+    EXTRACT --> SECOND_PASS: G1,G2 done; G3 first pass frozen
+    SECOND_PASS --> AGREEMENT: G3 second pass frozen (blind)
+    AGREEMENT --> SCORE: agreement_rate computed
+    SCORE --> AGGREGATE: D, N computed (§4)
+    AGGREGATE --> VERDICT: apply frozen §5.1 rule
+    VERDICT --> EMIT: GO or NO-GO
+    EMIT --> [*]: §6.1 artifact + §6.2 self-test
+
+    AGGREGATE --> BLOCKED: D = 0 (§6.3)
+    BLOCKED --> [*]: gate reported FAILED, no fabricated ratio
+
+    EXTRACT --> VOID: pre-registration amended after EXTRACT began
+    SECOND_PASS --> VOID: second extractor saw the first ledger
+    VOID --> [*]: probe discarded, re-run from PRE_REGISTER
+
+    note right of VOID
+      The falsifiability guard. A probe whose
+      threshold or rubric moved after seeing
+      data proves nothing about A8 and must
+      not be reported as if it did.
+    end note
+```
+
+Every state has an entry and an exit; `VOID` and `BLOCKED` are terminal by design, and both
+route to a re-run rather than to a reported verdict.
+
+---
+
+## 9. Assumptions surfaced (PAEOS-6)
+
+Each is falsifiable and has a downstream owner. **None changes the design** — each is a fact
+the execution stage confirms, and the probe is correct under every stated assumption because
+§3.3's attribution classes absorb the failure of A1–A4 without corrupting the verdict.
+
+| id | Assumption | Falsifier / owner |
+|---|---|---|
+| **A1** | `reviews/tasks/B0.{0,1,2}_review.md` exist and correspond to **sealed** goals (L16 reached, lattice `integrated`). | Existence confirmed by directory listing (§0); *sealed* status is **not** confirmed. Falsifier: a goal is un-sealed → it is not an S1 emission subject (§6.1b: *"one-way, post-seal"*) and must be replaced by the next lowest-numbered sealed goal. Owner: `LOCATE`. |
+| **A2** | These review documents are the L10/L14 review verdict, i.e. **one** artifact class, not the goal's full sealed set. | Falsifier: a review doc turns out to embed the full L06/L08/L11 content → `LOCATE` collapses to a single-file read and `absent-out-of-corpus` goes to zero. Design unaffected: §2 already treats the review as an entry point. Owner: `LOCATE`. |
+| **A3** | The goal's other sealed artifacts (design, plan, trade-off matrix, decision record, scar, ledger entry) are locatable from the review document or by goal id. | Falsifier: nothing resolves → all non-`Decision` slots score `absent-out-of-corpus`, `verdict_basis = no-go/corpus-assembly` (§5.4), and the finding is that the emission bundle needs an assembler. **This is a supported outcome, not a broken probe.** Owner: `LOCATE`. |
+| **A4** | B0-series goals contain at least one real decision each (not pure mechanical scaffolding). | `constitution/README.md` describes B0.0 as *"directory skeleton only"* — this assumption is **weak for G1 specifically**. Falsifier: no `Decision` instantiable → C2 fails. §7.1's diversity guard is the designed response. Owner: `EXTRACT`. |
+| **A5** | The `Decision` record shape in PAEOS-9 §5.11 (`context, options[], chosen, rationale, constitutional_basis`) is what sealed B0 goals actually carry, rather than an aspiration of the spec. | **This is A8 restated at field level, and it is the probe's whole point.** Not confirmed here; confirming or refuting it *is* the deliverable. Owner: `EXTRACT`. |
+| **A6** | The four acceptance predicates are evaluated by `rg` with default settings (no `-i`, no multiline) against the file as written. | Falsifier: a different matcher or flags → §6.2 conformance reasoning must be re-derived. Mitigated by the §6.2 self-test running the literal predicates. Owner: execution stage. |
+| **A7** | The execution stage has write capability on `reviews/spikes/` and read capability on `reviews/tasks/`. | This DESIGN session has neither (§0). Falsifier: it does not → the goal is undeliverable as scoped and must be re-scoped, not worked around. Owner: capability broker at dispatch. |
+| **A8'** | Two decorrelated extractors are available for §5.3. | Falsifier: only one → C4 is unevaluable, `verdict_basis = no-go/method` (§5.4), because a single-pass ratio is not evidence. Do **not** silently drop C4. Owner: execution stage. |
+| **A9** | `reviews/spikes/DEBT-0002-spawnability-spike.md` establishes a house spike format that §6.1 may diverge from. | Its contents were **not** read (§0). Falsifier: a conflicting house format exists → adopt it for presentation, keeping §6.1's frontmatter keys intact, since those are what the acceptance predicates bind to. Owner: execution stage. |
+
+---
+
+## 10. Perspectives covered (multi-perspective critique input, L09)
+
+- **Correctness.** The verdict is a pure function of the frozen §5.1 rule over the field
+  ledger; §4's arithmetic is total over `D > 0` and the `D = 0` branch is specified (§6.3).
+  Every score maps to exactly one weight, and every slot to exactly one class (§3.2) — the
+  partition is disjoint and exhaustive. ✔
+- **Falsifiability (K6, Δ3).** The probe can fail, and four distinct failure modes are named
+  in advance with distinct consequences (§5.4). Pre-registration + the `VOID` transitions
+  (§8) close the retrofit-the-threshold hole that makes most spikes unfalsifiable. ✔
+- **Adversarial / anti-rigging.** Three independent rigging vectors are closed: denominator
+  laundering (§3.4), single-extractor confirmation bias (§5.3), and average-hides-spine
+  (C2/C3 as hard gates). The `0.00` fabrication incentive is named and forbidden (§6.3). ✔
+- **Non-authority (FPL-3).** The probe reads sealed artifacts and writes one spike document.
+  It gates nothing, promotes nothing, and mints no evidence. Its findings are **proposals**
+  routed to ratification (§7.3), never edits to SAEOS-1 — CER-5, and the same restraint
+  SAEOS-1 §9 A6 exercises on the dual-constitution problem. ✔
+- **Separation of powers / scope discipline.** DESIGN writes only `design/`; the probe
+  artifact, the corpus read, and the verdict all belong to the downstream stage (§0). This
+  document deliberately withholds any prediction of the outcome. ✔
+- **Cost.** Bounded by construction: 3 goals (+1 conditional), 7 node types, ~3+n slots per
+  node instance, one double pass. No tooling to build; nothing here presumes a parser exists
+  — the spike is *why* we do not yet build one. ✔
+- **Sequencing.** SAEOS-1 §8 makes S1+S2 *"the whole bet"* and §9 makes A8 load-bearing for
+  the entire delivery path. Running this before S1 implementation is the cheapest possible
+  falsification point; every later one costs more (Δ8's lesson — serializing risk to the end
+  guarantees maximum sunk cost before first falsification). ✔
+- **What a GO does *not* license.** Feasibility of *hand* extraction, on 3–4 B0 goals only.
+  Not automatability, not generalization to mature goals, not §8 S1's `lossless`. Stated in
+  the artifact so a GO cannot be over-read downstream (§7.2). ✔
+
+---
+
+## 11. Execution hand-off checklist
+
+1. Freeze pre-registration: copy §3.2 slot inventory, §3.4 exclusion set + defaults, and the
+   §5.1 verdict rule into the artifact's §1 **before** opening any source file. Record
+   `pre_registration_frozen_at`.
+2. `LOCATE` for G1–G3: resolve each review doc to the goal's full sealed artifact set; log
+   every artifact as found/not-found (the not-found log is required evidence for
+   `absent-out-of-corpus`).
+3. Apply the §7.1 diversity guard; add G4 if and only if it triggers.
+4. `EXTRACT` + `SCORE` per goal into the §6.1 field-ledger table. One row per
+   (node_instance, slot). Every `extractable` carries a quotable locus.
+5. Second, blind extraction of G3; compute `agreement_rate` (§5.3).
+6. Compute `D`, `N`, `loss_ratio`, `loss_ratio_all_slots`, `loss_ratio_in_source` (§4); show
+   the arithmetic.
+7. Evaluate C1–C4 individually, then the verdict. Set `verdict_basis` per §5.4.
+8. Write `reviews/spikes/sakg-s1-extraction-probe.md` to the §6.1 schema; run the §6.2
+   self-test; report its actual output.
+9. Record §7.3 findings as proposals. **Do not edit `spec/SAEOS-1-architecture.md`.**
+
+---
+
+## Evidence: `design_coherent`
+
+- **Assumptions surfaced (PAEOS-6):** §9 (A1–A9), each with an explicit falsifier and a named
+  downstream owner. A5 is flagged as the load-bearing one — it *is* A8 at field level, and
+  the design deliberately does not resolve it, because resolving it is the probe's job.
+- **Perspectives covered:** §10 — correctness, falsifiability, adversarial/anti-rigging,
+  non-authority, separation of powers, cost, sequencing, and the boundary of what a GO
+  licenses.
+- **No orphan / no gap:**
+  - *Component graph* (§2): every node has an inbound and outbound edge; `PR` is
+    intentionally source-only (frozen input); `OUT` is intentionally sink-only (the artifact).
+  - *Slots* (§3.2): every §4.2 envelope field and every in-bundle §4.3 facet is assigned to
+    exactly one of three classes — construction, ingest-derived, or extraction. None
+    unassigned, none double-counted.
+  - *Node types* (§3.1): all twelve §4.3 types are partitioned, with the two exclusions
+    (`Outcome`; out-of-bundle) each carrying a spec citation.
+  - *State machine* (§8): every state has an entry and an exit; `VOID` and `BLOCKED` are
+    terminal and both route to re-run, not to a reported verdict.
+  - *Acceptance* (§6.2): each of the four predicates is mapped to the artifact element that
+    satisfies it, with its failure trap named; the one unsatisfiable branch is specified
+    rather than papered over (§6.3).

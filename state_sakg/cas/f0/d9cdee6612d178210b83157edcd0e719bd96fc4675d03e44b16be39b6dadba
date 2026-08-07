@@ -1,0 +1,88 @@
+# Constitutional Implementation Review: [B2.H — Lifetime-Class Ontology (L0–L5)]
+
+**Date**: 2026-07-30
+**Task**: Runtime conformance to the Constitutional Knowledge Lifetime Ontology (PAEOS-IP-0006 §5)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 2
+
+Deliverables:
+- `runtime/lifetime.py` — the L0–L5 `LifetimeClass`, the `ONTOLOGY` facts (IP-0006 §2), the
+  type→class `classify_type` registry (§4), and the `may_promote` promotion rule (§5).
+- `runtime/evolution.py` — a `may_promote` guard at the Stage-17 memory-authoring site, so the
+  promotion rule is *enforced* where L1→L3 actually happens (not merely declared).
+- `tests/runtime/test_lifetime.py` — 5 tests (classification, unknown-type gap, all six classes,
+  L1→L3-only-at-17, deny-by-default promotions).
+
+Evidence: **302 passed** (5 new); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT: `runtime/` + `tests/` only).
+
+## What this delivers — and the F2 boundary it respects
+
+IP-0006 §5 requires every artifact to **declare** its `lifetime_class`. B2.H implements that
+**kernel-safely**. The naïve reading — stamp a `lifetime_class` field onto every dataclass — would
+mutate **kernel** L5/L4 types (`Evidence`, `Event`, `SealRecord`, constitution), an **F2 HARD-LOOP**
+change that must route through the amendment path (B2.E), not a unilateral edit. Instead, following
+the founder's own precedent (`ExecutionContext` declares L1 by *type identity*, not a field), B2.H
+provides a **single runtime-side declaration**: a registry that classifies each artifact *type* to
+its class. This satisfies "declare" for the whole ontology while touching **zero kernel code**.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** The registry transcribes IP-0006 §2/§4 verbatim (owners, persistence, the type mapping).
+`may_promote` encodes §5's promotion rule — deny-by-default, with the single sanctioned exception
+(L1→L3 at Stage 17) the founder named. The Evolution Layer now checks it at the one promotion site,
+so the constitutional rule is enforced, not just documented.
+
+### 2. Architectural Drift
+**PASS.** A pure declaration module + one guard call. No new authority, no mutation of existing
+types. `classify_type` is a lookup; `may_promote` is a table check.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** Terminology and mappings are **not invented** — they are IP-0006's own (L0–L5, the §4
+falsification mapping, the L1→L3-via-Stage-17 rule). The registry is the *single* source for
+lifetime classification (no per-dataclass duplication). No hidden debt.
+
+### 8. Security Implications
+**PASS.** `may_promote` is deny-by-default: any unlisted promotion, or one attempted at the wrong
+stage, is refused — the machine-checkable form of the T3 defense that run-local L1 state cannot
+become an L3 standing guard except through the Evolution Layer at Stage 17. `classify_type` **raises**
+on an unregistered type rather than defaulting, so a new artifact kind cannot silently escape the
+ontology.
+
+### 9–10. Runtime / Extensibility
+**PASS.** New artifact types register with one line; new sanctioned promotions add one table entry
+keyed to their verified stage. The registry is the queryable substrate future GC / retention /
+authority checks (IP-0006 §1) will consult.
+
+## Adversary / property pass
+
+1. **Every concrete type is classified** — ExecutionContext→L1, TaskPackage→L2, Scar→L3,
+   AmendmentProposal→L4, Evidence/SealRecord→L5 (tested).
+2. **Unknown type is a conformance gap** — `classify_type` raises rather than defaulting (tested).
+3. **Promotion is stage-locked** — L1→L3 only at Stage 17; the loop's VERIFY/IMPLEMENT stages are
+   refused (tested).
+4. **Deny-by-default** — L1→L4, L3→L5, L0→L3 all refused (tested).
+5. **Enforced at the site** — the Evolution Layer's Stage-17 authoring calls `may_promote`; the
+   whole self-improvement suite still passes with the guard in place.
+
+## OBSERVATIONS
+
+1. **Literal `lifetime_class` *fields* on kernel L4/L5 types are deferred to the amendment path.**
+   B2.H declares the classes centrally (F2-SOFT). If the founder wants a machine-readable
+   `lifetime_class` field *on* the kernel `Evidence`/`Event`/`SealRecord`/constitution types, that is
+   an **F2 HARD-LOOP** change and should be filed as an amendment proposal and run through B2.E — not
+   folded into this F2-SOFT task. The registry already gives those types their declared class today.
+2. **Surfacing Evolution IMPROVE_RUNTIME proposals through the CLI remains a small follow-on.**
+   `run_backlog` authors proposals but returns only outcomes; wiring them to the `self-host` CLI
+   output (feeding the B2.E `amend` gate) is a minor reporting change, still open.
+
+## Action Items
+- [ ] **Founder**: ratify B2.H (F2-SOFT) → merge ff-only, remote CI green, tag `b2.h`.
+- [ ] **If desired**: file an amendment proposal for literal `lifetime_class` fields on kernel L4/L5
+      types (HARD-LOOP, via B2.E); surface Evolution proposals through the `self-host` CLI.
+- [ ] **Phase-2 seal**: the remaining item is the founder/ops-gated **live R4 run**
+      (`docs/R4-SELF-HOSTING-RUNBOOK.md`); Phase 3 (B3.A) is gated on that seal.

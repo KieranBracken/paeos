@@ -1,0 +1,162 @@
+---
+artifact: preregistration
+goal: S-PROBE — SAKG/SAEOS-1 extraction feasibility spike
+stage: PLAN
+role: PLANNER
+state: PREREGISTERED
+frozen_at: 2026-08-06T22:07:20Z
+frozen_by_capability: this stage could read only constitution/, design/, plan/ — not spec/, ledger/, reviews/
+design_ref: design/S-PROBE-sakg-s1-extraction-probe.md
+mutable_after_freeze: false
+---
+
+# Frozen protocol — S-PROBE (D1–D5, weights, sampling, labels)
+
+This file is the **pre-registration** required by the design at
+`design/S-PROBE-sakg-s1-extraction-probe.md:234-236` (§6 step 1) and by SM-1's
+`DRAFT → PREREGISTERED` transition (`…:261`). It is frozen at the timestamp above.
+
+**Why the freeze is credible.** The PLAN stage that wrote this file held read capability on
+`constitution/`, `design/` and `plan/` only. `spec/SAEOS-1.md`, `ledger/` and `reviews/tasks/`
+were **not readable** here. The freeze therefore provably precedes any contact with the data —
+it is enforced by capability, not by an author's promise. This is the property that makes the
+probe a falsification test rather than a narrative (`…:251-253`).
+
+**Mutation rule.** Any change to a value in this file after WU-2 completes voids the run
+(rollback class `R-VOID`, plan §5). Re-freezing thresholds after seeing data is an enumerated
+illegal transition (`…:275-277`) and is the same defect class the constitution's canaries exist
+to catch: a detector that can be retuned until it passes detects nothing
+(`constitution/canaries/README.md:3-6`).
+
+---
+
+## 1. Decision rule D1–D5 (design §9, `…:367-379`)
+
+**GO** iff *all five* hold. Otherwise **NO-GO**, and `failed_predicates` must name every
+predicate that failed.
+
+| ID | Predicate | Frozen value |
+|----|-----------|--------------|
+| D1 | `loss_ratio ≤ T_D1` | **T_D1 = 0.20** |
+| D2 | no single node type has per-type loss ratio `> T_D2` | **T_D2 = 0.50** |
+| D3 | every node type has ≥1 `EXTRACTABLE` identity field | (boolean, no threshold) |
+| D4 | `edge_field_loss_ratio ≤ T_D4` | **T_D4 = 0.30** |
+| D5 | no node type that §9/A8 depends on is vacant across all 3 goals | (boolean, no threshold) |
+
+D1's 0.20 is engineering judgment (`ASM-7`, `…:60`), not a measured constant; its rationale is
+at `…:381-385`. D3's justification: without an extractable key, nodes cannot be deduplicated or
+joined across goals, and a bag of unkeyed records is not a graph (`…:373-374`).
+
+## 2. Loss weights (design §8.4, `…:346-354`)
+
+```
+loss(EXTRACTABLE)   = 0.0
+loss(PARTIAL)       = 0.5
+loss(ABSENT)        = 1.0
+loss(NOT_APPLICABLE)= excluded from numerator and denominator
+```
+
+```
+loss_ratio = Σ loss(label) over required, applicable cells
+             ─────────────────────────────────────────────
+             count of required, applicable cells
+```
+
+The 0.5 partial weight is a judgment call, not a derivation (`ASM-6`, `…:59`). It is therefore
+bracketed, not defended: the report must also carry `loss_ratio_strict` (partial = 1.0) and
+`loss_ratio_lenient` (partial = 0.0). If the verdict differs across the bracket, the result is
+**weight-sensitive** and the report must say so and name the partial-heavy fields individually
+(`…:363-365`).
+
+## 3. Rendering rule (design §8.4, `…:356-358`)
+
+Every ratio is rounded **half-up to 2 decimals** and rendered with a leading zero and exactly
+two decimal places. `loss_ratio` appears in the report frontmatter at column 0, single space
+after the colon, nothing trailing.
+
+**A `loss_ratio ≥ 1.00` must be written as `1.00` and escalated, never rounded down to fit the
+acceptance regex** (`RISK-1`, `…:512-514`).
+
+## 4. Scoring unit (design §8.2, `…:332-336`)
+
+One score per `(goal, node_type, field)`. Where a goal has several instances of a node type and
+they disagree, **the worst label wins** (`ASM-8`, `…:61`). Optional fields are scored and
+reported but excluded from the headline denominator.
+
+Conditional extension (`GAP-1`, `…:522-525`): if the real §4.3 has nested or polymorphic node
+types, the unit becomes `(goal, node_type, field_path)`. This extension is pre-authorised here so
+that taking it is not a post-hoc protocol change; C1 must flag the nesting at binding time rather
+than flattening silently.
+
+## 5. Label decision rules (design §8.1, `…:310-330`)
+
+**EXTRACTABLE** — all three of:
+- **E1** a specific location in the closed corpus contains the value (citation required);
+- **E2** a reader following the stated one-sentence `extraction_rule` recovers the same value,
+  and that rule contains no goal-specific special-casing;
+- **E3** the recovered value matches the `declared_type` and cardinality from `FieldMatrix`.
+
+**PARTIAL** — E1 holds, but exactly one bounded failure:
+- **P1** value present but coarser than declared (free prose where an enum/ref is declared);
+- **P2** ambiguous, resolvable to ≤3 candidates without author input;
+- **P3** cardinality under-covered (some required instances present, not all);
+- **P4** the rule needs goal-specific special-casing — it worked here, it will not generalise.
+
+**ABSENT** — no location in the closed corpus carries the value. `absent_reason` must name what
+would have to exist for it to be extractable.
+
+**NOT_APPLICABLE** — the node type has no instance in this goal. Excluded from the denominator,
+counted for D5's vacancy check.
+
+## 6. Tie-break (design §8.3, `…:338-342`)
+
+When genuinely torn between two labels, take the **lower** one:
+`ABSENT < PARTIAL < EXTRACTABLE`. A spike that rounds its uncertainty upward cannot falsify
+anything.
+
+## 7. Verdict monotonicity (design §7.3, `…:300-306`)
+
+- Downgrade (`EXTRACTABLE → PARTIAL → ABSENT`) requires only a sustained challenge.
+- Upgrade requires a **new citation inside the closure**, recorded in `challenge_outcome`.
+- Cheap to lose a field, expensive to win one back. The asymmetry is deliberate.
+
+## 8. Sampling and stratification rule (design §5.2, `…:162-165`)
+
+Select 3 sealed goals differing on as many axes as possible:
+(a) goal kind (build / review / spike / amendment),
+(b) artifact volume (smallest / median / largest),
+(c) age (earliest vs recent seal).
+**Ties broken by lowest goal id**, so the choice is reproducible.
+
+Volume proxy (frozen here because C3 runs after C2 — see plan `PLAN-DEC-1`): artifact volume is
+measured as the **count of distinct artifact paths referenced by the ledger entry plus its task
+file**, not by full corpus closure. Full closure of all candidates before selection would let the
+sampler see corpus contents and prefer the easy goals.
+
+## 9. Illegal transitions — voiding (design §7.1, `…:273-281`)
+
+Attempting any of these voids the run:
+
+1. `EXTRACTING | CHALLENGED | SCORED → PREREGISTERED` — re-freezing thresholds after seeing data.
+2. `SAMPLED → SAMPLED` with a different `SelectionRecord` — re-rolling the sample after a bad
+   early read.
+3. `EXTRACTING → REPORTED` — skipping the challenge and scoring passes.
+
+## 10. Blocking assumptions that must be resolved before `EXTRACTING`
+
+`ASM-1`, `ASM-2`, `ASM-3`, `ASM-4`, `ASM-5` (`…:54-58`). On failure: **abort to `BLOCKED` and
+escalate — do not improvise, do not invent fields, do not substitute unsealed goals**
+(`…:530-535`).
+
+## 11. Pre-committed statements
+
+These are frozen now so that they cannot be omitted later when they are inconvenient:
+
+- **On a GO:** the rationale must state that `n=3` cannot support a positive claim about the
+  whole ledger; a GO means "not refuted at n=3" (`RISK-3`, `…:519-521`).
+- **On a near-threshold result:** if `loss_ratio` lands within ±0.03 of T_D1, the report must say
+  so, and a second independent extraction of the closest node type runs before ratification
+  (`RISK-2`, `…:515-518`).
+- **On a NO-GO:** a NO-GO is a **successful** spike outcome, not a failure — it costs three
+  hand-extractions and saves the build (`…:387`). The `absent_reason` roll-up is the deliverable
+  in that case (`…:325-327`, `…:439-440`).

@@ -1,0 +1,344 @@
+---
+artifact: plan
+stage: PLAN
+role: PLANNER
+goal: "[S-PROBE] Extraction feasibility spike — falsify SAEOS-1 §9/A8 before building"
+plans: reviews/spikes/sakg-s1-extraction-probe.md
+design_ref: artifact:074ef48548042c2bcdf08bebd65f83ed6e883e5c2fab751accf16ddd9ff24cda
+status: PLAN-COMPLETE / EXECUTION-BLOCKED-ON-W0
+work_units: 14
+blocking_preconditions: [W0.1, W0.2, W0.3, W0.4]
+---
+
+# S-PROBE — Implementation Plan
+
+## 0. Scope of this document
+
+This is the **PLAN** artifact. It decomposes the DESIGN (`artifact:074ef485…`, §2 component
+graph C0–C7) into executable work units, binds an evidence obligation to each, and declares the
+rollback path for each. It does **not** execute the probe and does **not** contain probe results.
+
+The design is `DESIGN-COMPLETE / EXECUTION-BLOCKED` on three blockers (design §8: B-1 write
+scope, B-2 `spec/SAEOS-1 §4.3` unreadable, B-3 corpus unreachable). **This plan's first four work
+units are the unblock units.** Everything after W0 is a mechanical pass over the design; no
+design rework is scheduled, consistent with design §8 *Unblock path*.
+
+Write scope of this session is `plan/`; read scope is `constitution/`, `design/`, `plan/`. On
+disk only `constitution/` and the supplied context artifact exist. This plan therefore schedules
+work for *later* sessions with different scopes, and states each required scope grant explicitly
+(W0.1–W0.3) rather than assuming it.
+
+---
+
+## 1. Critical path
+
+```
+W0.1 schema readable ┐
+W0.2 corpus readable ├─► W1 freeze config ─► W2 select ─┐
+W0.3 write scope     │        ▲                          ├─► W4 seed ─► W5.1..W5.3 extract
+W0.4 threshold       ┘        │                W3 load schema ┘              │
+                              │                      │                       ▼
+                    (frozen; any change ─► S-INVALID) │              W6 citation audit
+                                                      └──────────────────────┤
+                                                                             ▼
+                                        W10 escalate G-1 ◄── W9 report ◄── W8 gate ◄── W7 score
+```
+
+Serial spine: **W0 → W1 → {W2, W3} → W4 → W5 → W6 → W7 → W8 → W9**. W2 and W3 are independent of
+each other and may run in parallel. W5.1–W5.3 are independent per goal and may run in parallel,
+but all three must reach `SCORED` before W6. W10 (G-1 escalation) is independent of W5–W9 and
+should be raised as early as W0.3, because it changes the goal's accept criteria, not the probe.
+
+**Sequencing constraint (load-bearing):** W1 freezes `ProbeConfig` *before* W2 reads any goal.
+Selecting first and freezing after is the failure mode where the threshold is fitted to the data
+(design §6.2, `S-INVALID` trigger 2). The plan's ordering is the enforcement.
+
+---
+
+## 2. Work units
+
+Legend — **DoD** = definition of done. **Ev** = evidence obligation (detailed in §3). **RB** =
+rollback (detailed in §4). All artifact paths are relative to the repo root.
+
+### W0 — Preconditions (unblock)
+
+| id | title | depends_on | blocking |
+|---|---|---|---|
+| W0.1 | Make SAEOS-1 §4.3 readable | — | yes |
+| W0.2 | Make sealed-goal corpus readable | — | yes |
+| W0.3 | Grant write scope `reviews/spikes/` | — | yes |
+| W0.4 | Resolve `loss_threshold` from §9/A8 | W0.1 | yes |
+
+**W0.1 — Make SAEOS-1 §4.3 readable.**
+*Inputs:* none. *Outputs:* an executor session whose read scope includes the file containing
+SAEOS-1 §4.3; the resolved path recorded in the report frontmatter as `schema_source`.
+*DoD:* `§4.3` resolves to a concrete, enumerable field list per node type (design A-1).
+*Note:* `constitution/README.md:6-10` records that at B0.0 the corpus "currently lives across
+`derivation/`, `spec/`, and `reviews/`" and consolidation into `constitution/PAEOS-0..6.md` is
+task **B0.3**. Until B0.3 lands, W0.1 is satisfied by granting read scope to the *current*
+location, not by waiting for consolidation. Do not copy the spec into `constitution/` — that
+directory is Z0, read-only, sole legal writer `kernel/amendment.py` (`constitution/README.md:3-4`).
+*Ev:* E-0.1. *RB:* none (scope grant, no artifact written).
+
+**W0.2 — Make sealed-goal corpus readable.**
+*Inputs:* none. *Outputs:* read scope covering `ledger/` and `reviews/tasks/`.
+*DoD:* ≥3 goals with `state == SEALED` are enumerable, spanning ≥2 distinct `goal_kind`
+(design §3.1 `SelectionRule`, A-3). If fewer than 3 exist, or all share one kind, **stop**: the
+probe enters `S-INVALID` (design §6.2) — the corpus cannot support the spike. That is a reportable
+outcome, not a reason to substitute synthetic goals.
+*Ev:* E-0.2. *RB:* none.
+
+**W0.3 — Grant write scope `reviews/spikes/`.**
+*Inputs:* none. *Outputs:* executor session may write
+`reviews/spikes/sakg-s1-extraction-probe.md` (design §8 B-1).
+*DoD:* path writable; no other write scope requested (least privilege).
+*Ev:* E-0.3. *RB:* none.
+
+**W0.4 — Resolve `loss_threshold` from SAEOS-1 §9/A8.**
+*Inputs:* W0.1 output. *Outputs:* a numeric `loss_threshold`, or the finding that §9/A8 states
+none. *DoD:* threshold recorded verbatim with its §9/A8 locator, **or** R-3 declared.
+*Branch:* if no numeric threshold exists, A8 is unfalsifiable as written → the probe short-circuits
+to `verdict: NO-GO`, `blocking_rules: ["R-3"]` (design §5.4 R-3, A-2). W1–W8 are then skipped and
+W9 still executes — a NO-GO is a successful probe (design §6.2, `GATED → REPORTED` emits for both
+verdicts). **The executor must not invent a threshold.**
+*Ev:* E-0.4. *RB:* none.
+
+### W1–W9 — Probe execution
+
+| id | title | component | depends_on |
+|---|---|---|---|
+| W1 | Freeze `ProbeConfig` | C0 | W0.1–W0.4 |
+| W2 | Select 3 sealed goals | C1 | W1 |
+| W3 | Load §4.3 → `NodeTypeSchema[]`, fix denominator | C2 | W1 |
+| W4 | Seed cross-product as `absent` | C4 | W2, W3 |
+| W5.1–W5.3 | Hand-extract, one unit per goal | C3 | W4 |
+| W6 | Citation audit (I-1) + completeness audit (I-2) | C4 | W5.* |
+| W7 | Compute `loss_ratio` | C5 | W6 |
+| W8 | Apply R-1..R-3 → verdict | C6 | W7 |
+| W9 | Write deliverable + run accept checks | C7 | W8 |
+
+**W1 — Freeze `ProbeConfig`.**
+*Inputs:* W0.4 threshold. *Outputs:* `ProbeConfig{loss_threshold, partial_weight: 0.5,
+required_fields_only: true, selection_rule, frozen_at}` (design §3.1), recorded verbatim in the
+report frontmatter. *DoD:* `frozen_at` timestamped; values published before W2 begins.
+*Ev:* E-1. *RB:* RB-1.
+
+**W2 — Select 3 sealed goals.**
+*Inputs:* `ledger/`, `reviews/tasks/`. *Outputs:* `Goal[3]` — `goal_id`, `goal_kind`,
+`sealed_at`, `artifacts: ArtifactRef[]` (design §3.2). *DoD:* filter `state == SEALED`; stratify
+by `goal_kind` (the 3 MUST NOT share one kind); tiebreak lexicographic by `goal_id`; **pointers
+only — no artifact content read during selection**, so selection cannot be biased by
+extractability (design §2 C1). *Ev:* E-2. *RB:* RB-2.
+
+**W3 — Load schema, fix denominator.**
+*Inputs:* SAEOS-1 §4.3. *Outputs:* `NodeTypeSchema[]`; `denominator = Σ_goals Σ_nodetypes
+|required fields|` (design §4 step 3). *DoD:* denominator is *derived* from the parsed schema,
+never hand-authored. Parse failure → R-3 → NO-GO (design §5.4). *Ev:* E-3. *RB:* RB-2.
+
+**W4 — Seed cross-product.**
+*Inputs:* W2, W3. *Outputs:* one `FieldVerdict` per `(goal_id, node_type, field)` triple,
+pre-populated `verdict: absent` (design §3.4 I-2). *DoD:* row count == `3 × Σ|fields|`; no triple
+missing. *Rationale:* a silently skipped field is the failure mode that turns a NO-GO into a GO,
+so `absent` is the default and moving off it requires an affirmative attempt. *Ev:* E-4. *RB:* RB-2.
+
+**W5.1 / W5.2 / W5.3 — Hand-extract (one work unit per goal).**
+*Inputs:* one `Goal`'s `artifacts`, the seeded rows for that goal. *Outputs:* every row for that
+goal in state `SCORED` with `verdict ∈ {extractable, partial, absent}`, `citation` (non-null
+unless `absent`), and `note`. *DoD:*
+- rubric applied per design §5.1 — **"needs a human to decide" is `partial`, not `extractable`**;
+- every non-`absent` row carries an artifact path + locator;
+- every `absent` row's `note` names what was searched for (so the miss is auditable);
+- unattempted at freeze → `SCORED(absent)` (design §6.1 default-on-timeout), never `extractable`.
+*Ev:* E-5. *RB:* RB-3.
+
+**W6 — Citation and completeness audit.**
+*Inputs:* all `FieldVerdict[]`. *Outputs:* audit result. *DoD:* I-1 holds
+(`verdict != "absent" ⇒ citation != null`) **and** every cited path resolves on disk; I-2 holds
+(row count matches the cross-product). Any violation sends the offending rows back to W5.*
+(design §6.1 `ATTEMPTED → ATTEMPTED` self-loop) — it is not waived. *Ev:* E-6. *RB:* RB-3.
+
+**W7 — Score.**
+*Inputs:* audited `FieldVerdict[]`. *Outputs:* `loss_ratio = (absent + 0.5 × partial) /
+denominator`, plus raw totals. *DoD:* pure function of W6 output; recomputable by a reviewer from
+the per-field table alone (design §4, re-scorability). Report raw totals alongside the ratio so a
+reviewer can re-weight (design A-4). *Ev:* E-7. *RB:* RB-4.
+
+**W8 — Gate.**
+*Inputs:* `loss_ratio`, `FieldVerdict[]`, `ProbeConfig`. *Outputs:* `verdict ∈ {GO, NO-GO}`,
+`blocking_rules[]`. *DoD:* all three rules evaluated and their outcome recorded, including the
+ones that did not fire —
+- **R-1** `loss_ratio > loss_threshold` → NO-GO;
+- **R-2** any node type whose *every* required field is `absent` across all 3 goals → NO-GO
+  regardless of ratio (an aggregate can hide one unpopulable node type behind several easy ones);
+- **R-3** no threshold in §9/A8, or §4.3 does not resolve to a concrete field list → NO-GO.
+A GO is recorded as "not falsified by 3 goals", never "proven" (design A-7). *Ev:* E-8. *RB:* RB-4.
+
+**W9 — Write deliverable and run acceptance.**
+*Inputs:* everything above. *Outputs:* `reviews/spikes/sakg-s1-extraction-probe.md` in the exact
+schema of design §7. *DoD:* all four accept commands pass (§5), **and** the hard formatting
+requirements hold at column 0: `verdict:` token exactly `GO` or `NO-GO`; `loss_ratio:` with a
+leading `0.` and ≥1 decimal; one `## goal: ` heading per goal, ≥3.
+*Exception (do not work around):* if the true `loss_ratio` is exactly `1.0`, emit `1.0`, let the
+accept check fail, and escalate via W10. Rounding `1.0` down to `0.999` to pass the gate is
+forged evidence in the sense of `CANARY-0001` — a claimed result the underlying computation does
+not produce. *Ev:* E-9. *RB:* RB-5.
+
+### W10 — Escalate G-1 (accept-criteria defect)
+
+*Inputs:* design §5.5 / §9 G-1. *Outputs:* an escalation to the owner of the goal's accept
+criteria recommending `^loss_ratio: (0(\.[0-9]+)?|1(\.0+)?)$`.
+*Why:* the current check `^loss_ratio: 0\.[0-9]+$` cannot match `1.0`, so the most decisive NO-GO
+available — nothing extractable at all, the exact outcome the spike exists to detect — cannot be
+reported in a form that passes its own gate. *DoD:* escalation raised and acknowledged; the regex
+is **not** edited by the probe executor (accept criteria are outside both this role's and the
+executor's write scope). *Ev:* E-10. *RB:* none (advisory artifact).
+
+---
+
+## 3. Evidence plan
+
+Each obligation names what is produced, how it is verified, and — per `CANARY-0002` — what makes
+it **discriminating**: a check that returns the same result whether the claim or its negation
+holds is vacuous, however faithfully it reproduces (`constitution/canaries/CANARY-0002.json`).
+
+| id | unit | evidence | kind | verification | discriminating because |
+|---|---|---|---|---|---|
+| E-0.1 | W0.1 | resolved path of §4.3 + the parsed node-type list | DETERMINISTIC | `rg -n '4\.3' <schema_source>` returns the node-type section | a wrong/absent path yields no node types → R-3 fires, so the check separates "schema readable" from "schema assumed" |
+| E-0.2 | W0.2 | enumeration of sealed goals with kinds | DETERMINISTIC | corpus listing filtered to `state == SEALED`, grouped by `goal_kind` | if <3 sealed or all one kind, the listing shows it → `S-INVALID`; a fabricated corpus fails path resolution in E-6 |
+| E-0.3 | W0.3 | write probe on `reviews/spikes/` | DETERMINISTIC | a create+delete of a scratch file in the target dir | a denied write is observable, not inferred |
+| E-0.4 | W0.4 | verbatim §9/A8 quote + locator, or "no threshold stated" | ATTESTED (quote) | quote must match the source at the cited locator | forces R-3 to be *found* rather than argued around; an invented threshold has no locator |
+| E-1 | W1 | `ProbeConfig` with `frozen_at`, published pre-W2 | DETERMINISTIC | frontmatter of the report reproduces the frozen values byte-for-byte | any post-hoc tuning shows as a mismatch between the published config and the one used in W7 |
+| E-2 | W2 | `Goal[3]` records: id, kind, sealed_at, artifact paths | DETERMINISTIC | re-running the selection rule (sealed filter → stratify → lexicographic tiebreak) reproduces the same 3 ids | a deterministic rule makes cherry-picking visible: a different set means the rule was not followed |
+| E-3 | W3 | `NodeTypeSchema[]` + computed `denominator` | DETERMINISTIC | `denominator == 3 × Σ_nodetypes |required fields|`, recomputed from the parsed schema | a hand-authored denominator won't match the parse — this is the arithmetic that makes `loss_ratio` meaningful |
+| E-4 | W4 | seeded row count | DETERMINISTIC | row count in the report == cross-product size from E-3 | catches silently skipped fields (I-2), the single highest-yield route from NO-GO to GO |
+| E-5 | W5.* | per-field table: verdict + citation + note | ATTESTED (hand extraction) | rubric §5.1 applied; each row independently re-judgeable from its citation | the citation lets a reviewer re-run the judgement call; without it, `extractable` is unfalsifiable |
+| E-6 | W6 | audit report: I-1 + I-2 + citation resolution | DETERMINISTIC | every non-`absent` row has a citation **and** the cited path exists; row count matches | this is the check that separates a real report from a fabricated one — the G-2 gap the shape-only accept checks leave open |
+| E-7 | W7 | `loss_ratio` + raw totals `{extractable, partial, absent, denominator}` | DETERMINISTIC | recompute `(absent + 0.5 × partial)/denominator` from the published table | anyone can re-derive it; the ratio cannot drift from the table |
+| E-8 | W8 | R-1/R-2/R-3 evaluation, including non-firing rules | DETERMINISTIC | per-node-type rollup shown explicitly in the `## aggregate` section | R-2 is invisible in the aggregate ratio; showing the rollup is what makes it checkable |
+| E-9 | W9 | the deliverable + accept-check transcript | DETERMINISTIC | the four commands in §5, run and their output recorded | shape-only (see §5 caveat) — E-6 carries the substantive weight |
+| E-10 | W10 | escalation record + recommended regex | ATTESTED | acknowledgement from the accept-criteria owner | — |
+
+**Anti-forgery discipline (CANARY-0001).** `constitution/canaries/CANARY-0001.json` defines forged
+evidence as a claimed result its `reproducible_command` does not produce; the detection signature
+is a kernel re-run yielding a different result. Applied here: E-1, E-3, E-4, E-6, E-7 are all
+*recomputations* from published inputs. Every number in the report must survive re-derivation by a
+reader who did not run the probe.
+
+**Anti-vacuity discipline (CANARY-0002).** The design's G-2 stands: the four accept checks verify
+shape only — a report with 3 fabricated goals and `loss_ratio: 0.1` passes all four. E-6 is the
+mitigation, and it is a **required** obligation, not an optional strengthening: it is the only
+evidence in this plan that references the artifacts under review rather than the report's own
+formatting.
+
+---
+
+## 4. Rollback plan
+
+**Blast radius.** The probe writes exactly one file: `reviews/spikes/sakg-s1-extraction-probe.md`.
+No writes to `constitution/` (Z0 is read-only; sole legal writer `kernel/amendment.py`,
+`constitution/README.md:3-4`). No writes to `ledger/` or `reviews/tasks/` — the corpus is read-only
+input; mutating a sealed goal to make it more extractable would corrupt the very evidence the
+probe measures. No process management, no state directories touched (see §7).
+
+| id | trigger | action | recovery point |
+|---|---|---|---|
+| RB-1 | `ProbeConfig` mutated after `frozen_at` | Declare `S-INVALID` (design §6.2). Discard **all** `FieldVerdict[]` — they were scored against a moved threshold. Restart from W1 with a new `frozen_at` and a note recording the invalidated run. | W1 |
+| RB-2 | <3 sealed goals, or all share one `goal_kind`, or §4.3 fails to parse | Declare `S-INVALID` (corpus/schema cannot support the spike). Do **not** substitute synthetic goals or hand-author a field list. Emit a NO-GO report citing R-3 where the schema is at fault; otherwise report the corpus shortfall and stop. | W0.1 / W0.2 |
+| RB-3 | W6 audit fails (missing citation, unresolvable path, missing row) | Return only the offending rows to W5.* (design §6.1 self-loop). Rows that passed stay scored. If a row cannot be substantiated on retry, it reverts to the seed value `absent` — never to `extractable`. | W5.* (partial) |
+| RB-4 | Arithmetic or rule-application error found in W7/W8 | Recompute from the published `FieldVerdict[]`. W7 and W8 are pure functions of W6's output, so no extraction is redone. | W7 |
+| RB-5 | Deliverable written but accept checks fail | If the failure is formatting → fix formatting, rewrite the file, re-run. If the failure is `loss_ratio: 1.0` vs. the regex → **do not alter the number**; leave the file as written, mark the run `BLOCKED-ON-G-1`, escalate via W10. | W9 |
+
+**Global abort.** At any point before W9, aborting leaves the repo unchanged — every unit
+W1–W8 produces in-session records, not files. After W9, rollback is deletion of the single
+deliverable file. There is no partial-write hazard: the report is written once, complete, at W9.
+
+**Irreversibility check.** Nothing in this plan is hard to reverse. The one genuinely
+irreversible act available to the executor is *publishing a GO that was manufactured* — by
+skipping fields (blocked by I-2/E-4), by scoring inferences as `extractable` (blocked by §5.1
+rubric + I-1/E-6), or by moving the threshold after seeing the data (blocked by W1-before-W2 +
+RB-1). Those three are the rollback plan's real subject.
+
+---
+
+## 5. Acceptance mapping
+
+| accept check | satisfied by | caveat |
+|---|---|---|
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | W9 (requires W0.3) | — |
+| `rg -q '^verdict: (GO\|NO-GO)$' …` | W8 → W9 frontmatter | token must be at column 0, exactly `GO`/`NO-GO` |
+| `test $(rg -c '^## goal: ' …) -ge 3` | W2 → W9 goal sections | heading form `## goal: <id>` exactly |
+| `rg -q '^loss_ratio: 0\.[0-9]+$' …` | W7 → W9 frontmatter | **cannot match `1.0`** — G-1, see W10 |
+
+All four are *shape* checks (design G-2). The plan's substantive acceptance is **E-6**: every
+non-`absent` row carries a citation that resolves. Recommend the gate adopt E-6 as a fifth check.
+
+---
+
+## 6. Assumption → work unit coverage
+
+Every assumption surfaced in design §9 has an owning unit and a detection path; none is left
+unmonitored.
+
+| assumption | owning unit | detection |
+|---|---|---|
+| A-1 §4.3 is a concrete enumerable field list | W3 | parse fails → R-3 (RB-2) |
+| A-2 §9/A8 supplies a numeric threshold | W0.4 | not found → R-3, short-circuit to NO-GO |
+| A-3 ≥3 sealed goals, ≥2 kinds | W0.2, W2 | shortfall → `S-INVALID` (RB-2) |
+| A-4 `partial_weight = 0.5` defensible | W1, W7 | raw totals published so a reviewer can re-weight |
+| A-5 required-fields-only denominator | W3, W8 | optional-field counts reported separately in `## aggregate` |
+| A-6 hand extraction ≈ mechanical extractor | W5.*, W6 | §5.1 forces judgement-requiring fields to `partial`; I-1 forces a citation |
+| A-7 3 goals is enough to falsify A8 | W8 | stated as a limit of the verdict: a GO is "not falsified by 3" |
+
+---
+
+## 7. Excluded from this plan
+
+The task's `Forbidden` block contains a script that `pkill`s a running `autonomous_run.py`,
+`rmtree`s `state_sakg/`, and relaunches the runner. It is listed as forbidden and is destructive
+to another process's live state. No work unit in this plan performs, schedules, or depends on any
+part of it, and no part of it was executed in producing this plan — consistent with the design's
+same finding (design §8, *Not attempted*).
+
+---
+
+## 8. plan_executable — evidence citations
+
+- **Work units declared:** §2, W0.1–W0.4 (preconditions) and W1–W10 (execution), each with
+  inputs, outputs, DoD, and `depends_on`; dependency order in §1.
+- **Evidence obligations declared:** §3, E-0.1–E-10, one per work unit, each with kind,
+  verification method, and its discriminating property.
+- **Rollback declared:** §4, RB-1–RB-5 with triggers, actions, and recovery points, plus global
+  abort and blast radius.
+
+Refs:
+
+- `artifact:074ef48548042c2bcdf08bebd65f83ed6e883e5c2fab751accf16ddd9ff24cda` (DESIGN) §2 —
+  component graph C0–C7; each work unit W1–W9 binds to exactly one component, so the plan covers
+  the design without inventing components.
+- DESIGN §3.1/§3.4 — `ProbeConfig` freeze and invariants I-1/I-2; realised as W1 (+RB-1),
+  W4 (+E-4), W6 (+E-6).
+- DESIGN §5.4 — blocking rules R-1/R-2/R-3; realised as W8 with E-8 requiring non-firing rules to
+  be shown too.
+- DESIGN §5.5 / §9 G-1 — the `^loss_ratio: 0\.[0-9]+$` regex cannot express `1.0`; realised as
+  W10 (escalate) and RB-5 (do not fudge the number to pass).
+- DESIGN §6.2 — `S-INVALID` triggers (fewer than 3 sealed goals; config mutated after freeze);
+  realised as RB-1 and RB-2.
+- DESIGN §8 B-1/B-2/B-3 — the three execution blockers; realised as W0.3, W0.1, W0.2 respectively,
+  scheduled ahead of the serial spine.
+- `constitution/README.md:3-4` — Z0 is read-only at runtime, sole legal writer
+  `kernel/amendment.py` (PAEOS-7 §7.4). Substantiates §4 *Blast radius*: no work unit writes under
+  `constitution/`, and W0.1 explicitly forbids copying the spec there.
+- `constitution/README.md:6-10` — B0.0 is a skeleton; the source corpus still lives across
+  `derivation/`, `spec/`, and `reviews/`, with consolidation deferred to task **B0.3**.
+  Substantiates W0.1's instruction to grant read scope to the current location rather than block
+  on B0.3.
+- `constitution/canaries/CANARY-0001.json` — forged evidence = a claimed result the
+  `reproducible_command` does not produce; detected by re-running. Applied as the recomputation
+  requirement on E-1/E-3/E-4/E-6/E-7 and as W9's prohibition on rounding `1.0` to `0.999`.
+- `constitution/canaries/CANARY-0002.json` — vacuous evidence = faithful reproduction with zero
+  discriminating power (same PASS for the claim and its negation). Applied as the *discriminating
+  because* column in §3 and as §5's finding that all four accept checks are shape-only, with E-6 as
+  the required substantive check.
+- `constitution/canaries/README.md:3-6` — a detector that fails to catch a canary is
+  miscalibrated, and that is an alarm. Applied as the reason E-6 is a required obligation rather
+  than a recommendation.
