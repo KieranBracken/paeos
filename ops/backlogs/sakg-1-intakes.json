@@ -3,7 +3,8 @@
     "objective": "[S-PROBE] Extraction feasibility spike — falsify SAEOS-1 §9/A8 before building. Deliverables: reviews/spikes/sakg-s1-extraction-probe.md — for each of 3 real sealed goals from reviews/tasks/ (e.g. B0.0_review.md, B0.1_review.md, B0.2_review.md), a hand-extraction attempt into the SAEOS-1 §4.3 node types, recording per-field: extractable / partial / absent. Explicit verdict GO or NO-GO with the loss ratio.\n. Accept: ['test -f reviews/spikes/sakg-s1-extraction-probe.md', \"rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md\", \"test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3\", \"rg -q '^loss_ratio: 0\\\\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md\"]",
     "changed_paths": [
       "tests/sakg/",
-      "reviews/"
+      "reviews/",
+      "spec/"
     ],
     "plan_write_scopes": [
       "tests/sakg/",
