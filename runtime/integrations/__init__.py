@@ -262,15 +262,11 @@ def _materialize_context(
 
 
 def _seed_workspace(workspace: Path, source: Path, write_scopes: tuple[str, ...]) -> None:
-    """Copy the current repo files at the write scopes into the session workspace, so an *edit*
-    objective has the content to modify (B2.I). Scopes with no existing file (new files, or
-    directory/glob prefixes) are skipped — the session creates those from scratch."""
-    for scope in write_scopes:
-        src = source / scope
-        if src.is_file():
-            dst = workspace / scope
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
+    """Copy the current repo files into the session workspace, skipping heavy build/temp dirs."""
+    ignore = shutil.ignore_patterns(
+        ".git", ".venv", "state_*", ".pytest_cache", "__pycache__", ".claude", "*.pyc", "*.pyo"
+    )
+    shutil.copytree(source, workspace, ignore=ignore, dirs_exist_ok=True)
 
 
 def _is_build_byproduct(rel: str) -> bool:
