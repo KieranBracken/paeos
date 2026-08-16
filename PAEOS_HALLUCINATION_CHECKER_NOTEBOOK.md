@@ -1578,6 +1578,15 @@
 3. **Empirical Verification:**
    * `uv run pytest` executed $\rightarrow$ **398 / 398 passed in 11.96s** (100% pass rate maintained).
 
+### Entry 112 — 2026-08-16 22:49 UTC: Fixed 60-Minute Schedule & Quota Reset Resumption Protocol
+
+1. **Fixed 60-Minute Oversight Schedule Enforced:**
+   * User Directive: Maintain fixed 60-minute check-in frequency. Do NOT double check-in intervals during quota events.
+   * Quota Reset Policy: On 429 session/quota limit encounters, wait for reset window and resume execution immediately at 60-minute intervals.
+
+2. **Guidelines Updated:**
+   * Updated [`AGENTS.md`](file:///Users/bob/GitHub/paeos/AGENTS.md) Section 1.1 to formalize the fixed 60-minute oversight schedule and immediate quota reset resumption protocol.
+
 ---
 
 

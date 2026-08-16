@@ -14,7 +14,8 @@
    * Performs periodic forensic audits, Court non-vacuity verifications (CANARY-0002), AST anti-pattern checks (`check_ast()`), and system health audits.
    * Logs all findings, open anomalies (`[CRITICAL-xxx]`), Court remand root causes (`DEBT-xxx`), and model configuration tuning exclusively in [`PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`](file:///Users/bob/GitHub/paeos/PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md).
    * **Strict Auditor Precision Rule**: Must compute exact empirical statistics (e.g. `Sealed: X | Remanded: Y | Remediated: Z`). NEVER claim "100% zero-remand execution" if any remands or debt items were recorded in the session window.
-   * Dynamically schedules dynamic audit timers (`schedule`) between 15m and 60m based on system stability.
+   * **Fixed 60-Minute Oversight Schedule**: Schedules hourly audit timers (`schedule`) at 60m (3,600s). On quota reset/429 limits, resumes immediately when quota resets without doubling or altering the check-in frequency.
+
 
 
 2. **Overseer Agent Ingestion Protocol (Execution Chat)**:
