@@ -1,0 +1,419 @@
+# PLAN — F-ENVELOPE: universal node envelope schema + fixture corpus
+
+| | |
+|---|---|
+| **Goal** | **F-ENVELOPE** — Freeze the universal node envelope schema + fixture corpus (SAEOS-1 §4.2, delivery slice S2) |
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | PLAN ONLY — no implementation, no verification run. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-08 |
+| **Required evidence (this gate)** | `plan_executable` (CITATION) — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | `artifact:dd690e12e01c…` = *DESIGN — F-ENVELOPE: universal node envelope schema + fixture corpus* (frozen DESIGN, evidence `design_coherent`, 2026-08-08) — cited throughout as **D§n**. `constitution/README.md` (Z0 / TCB boundary, B0.0 skeleton status). `constitution/canaries/README.md`, `CANARY-0001`, `CANARY-0002` (evidence probativity calibration, PAEOS-7 §5.3). House format: `plan/classify-obj-lifetime-plan.md`. |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN**, write-capability `plan/`, read-capability
+`constitution/`, `design/`, `plan/`. The goal objective names four artifacts and four
+acceptance commands that this stage **does not and must not produce or run**:
+
+| Named in objective | Owning stage / role | Why not here |
+|---|---|---|
+| `sakg/schema/envelope.schema.json` | `IMPLEMENT` / BUILDER | `sakg/` tree write, outside this session's write-capability — planned as **WU-1** |
+| `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` | `IMPLEMENT` / BUILDER | `tests/` tree write, outside capability — **WU-3**, **WU-4** |
+| `tests/sakg/test_envelope_schema.py` | `IMPLEMENT` / BUILDER | ditto — **WU-5** |
+| the four acceptance commands | `VERIFY` / VERIFIER | they presuppose the artifacts exist; running them now would fail and would misrepresent VERIFY evidence as PLAN output — **WU-7** |
+
+The four-tuple transition contract (PAEOS-7.6 §4) keeps these powers separated. Evidence
+emitted by *this* session is `plan_executable` (this file) — **not** any acceptance token.
+
+**Read-capability note.** `sakg/`, `tests/`, `spec/`, `pyproject.toml` and
+`backlog/SAKG-1-backlog.yaml` are outside this session's read-capability, so this plan makes
+no claim about their present contents. Every fact about them is carried as a **precondition
+a named work unit confirms** (§4 ledger), never as an assertion. `backlog/research/` is
+readable per the mission preamble; nothing in it is a prerequisite for this goal, so no
+backlog item is pulled into scope.
+
+---
+
+## 1. Objective restatement (traceability)
+
+Deliver, and freeze, three things:
+
+1. **`sakg/schema/envelope.schema.json`** — one JSON Schema draft 2020-12 file covering
+   every SAEOS-1 §4.2 field, with two profiles in one document: `#stored` (root) and
+   `#ingest` (the producer-submitted restriction). Normative text: **D§2.3**, transcribed
+   verbatim.
+2. **`tests/sakg/fixtures/envelope/valid/*.json`** — ≥12 required, **16 authored**
+   (**D§6.1**), exercising every declared field, every enum member of every enum, and all
+   four `status` values.
+3. **`tests/sakg/fixtures/envelope/invalid/*.json`** — ≥8 required, **16 authored**
+   (**D§6.2**), one per §4.2 invariant violation, explicitly including the three the
+   objective names: **authored confidence** (fixtures 01, 02, 03), **frequency-based
+   promotion** (04, 05, 06, 07), **deleted node** (10, 11, 12).
+
+Plus the oracle that makes them mean something: **`tests/sakg/test_envelope_schema.py`**,
+tests T1–T8 (**D§7**).
+
+Acceptance is the four commands in §4/E6 exiting `0`. This restates the design without
+adding, relaxing, or reinterpreting any requirement.
+
+---
+
+## 2. Design ambiguities resolved at PLAN (binding on BUILDER)
+
+The design is mechanically realizable except at three points, each of which would otherwise
+be resolved by BUILDER improvisation. Resolved here so the frozen artifact is not decided by
+an implementer's guess.
+
+**C-1 — T8's literal reading is contradictory; use the `envelope_base` reading.**
+D§7 T8 says every ingest-profile valid fixture "also validates against the stored profile."
+Taken literally this can never pass: `#stored` **requires** `confidence` +
+`confidence_derivation` (D§2.3 `stored_envelope`), and `#ingest` **forbids** both (D§2.3
+`ingest_envelope`, DD-7 branches). The intent is stated in the same line — *"`#ingest`
+accepts ⊆ what `envelope_base` accepts (restriction, not divergence)"*. **Binding reading:**
+T8 asserts that every `ingest`-profile valid fixture validates against
+`{"$ref": "#/$defs/envelope_base"}`, i.e. the ingest profile is a restriction of the shared
+base and not a divergent sibling. T8 must **not** validate ingest fixtures against
+`stored_envelope`.
+
+**C-2 — normative precedence inside the design.** Where D§5's prose and D§2.3's schema text
+disagree, **D§2.3 and the D§6.2 pointer column govern.** Specifically: D§5 INV-1 describes
+`#ingest` as setting `"confidence": false` / `"confidence_derivation": false`; that is
+pre-DD-7 shorthand. The schema text uses `{"not": {"required": [...]}}` branches, and the
+D§6.2 pointer for fixture 03 (`allOf/2/not`) depends on it. Transcribe **D§2.3**.
+
+**C-3 — pointer column: re-derive, never weaken.** The D§6.2 `absolute_schema_path` values
+were observed in-design (D§2.4) against representative documents, on the design session's
+`jsonschema` build. Path prefixes emitted around a root-level `$ref` are a library detail,
+not a schema property. **Binding rule:** if the observed pointers differ under the version
+actually installed at WU-2, BUILDER **re-derives the column and records the diff in the
+IMPLEMENT report**; BUILDER must **not** relax T3 to substring/prefix matching, to
+`validator` name matching, or to "≥1 error" — that would destroy exactly the anti-false-
+positive property T3 exists for (D§7 note 3, D§6.2 closing note). Any re-derivation is
+reported, because the pointer column is also what pins the schema text against silent
+re-encoding.
+
+---
+
+## 3. Work units (executable, ordered, single-owner)
+
+Each work unit is atomic, has one owning stage/role, a precondition, an exact action, a
+done-check, and the evidence it feeds.
+
+**Dependency graph.**
+
+```
+WU-0 ──► WU-1 ──► WU-3 ──┐
+  │        │             ├──► WU-5 ──► WU-6 ──► WU-7
+  └──► WU-2 ──► WU-4 ────┘
+WU-8 (independent, non-blocking, may run at any point after WU-1)
+```
+
+`WU-1` and `WU-2` are independent of each other and may be done in either order. Everything
+downstream of `WU-5` is strictly sequential.
+
+### WU-0 — Preflight reconciliation against the real tree
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** D§9 A1, A2, A3; D§12.6.
+- **Precondition:** none.
+- **Action:** confirm, by reading the real tree: (a) whether `sakg/` and `sakg/schema/`
+  exist and whether an envelope schema is already present (**A1**); (b) whether
+  `jsonschema>=4.18` is already a dev dependency (**A2**); (c) whether `tests/sakg/` exists
+  and whether another `test_envelope_schema.py` basename exists anywhere under `tests/`
+  (**A3**). Record all three findings in the IMPLEMENT report. Write nothing.
+- **Contingencies (pre-authorized, no design change):** if a prior envelope schema exists,
+  this design supersedes it and the prior file becomes evidence, not law (D§9 A1) — record
+  it, do not silently overwrite. If a basename collision exists, add `tests/sakg/__init__.py`
+  in WU-5 (D§9 A3).
+- **Done-check:** all three findings recorded.
+- **Feeds:** E-PRE.
+
+### WU-1 — Create the schema file
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** **D§2.3** (normative text), D§2.2 DD-1…DD-7, D§12.1; C-2 above.
+- **Precondition:** WU-0 complete.
+- **Action (exact):** create `sakg/schema/envelope.schema.json` containing the **D§2.3 text
+  verbatim**. Do **not** reformat `pattern` values (backslashes are JSON-escaped as
+  written). Do **not** reorder, rename, inline, or collapse any `$defs` member, `allOf`
+  branch, or `if/then` clause — the D§6.2 pointer column addresses these by position (C-3).
+  Do **not** substitute `additionalProperties` for `unevaluatedProperties` at either profile
+  root (DD-3) or vice-versa on the leaf objects. Add no field not in D§2.1.
+- **Done-check:** file parses as JSON; `Draft202012Validator.check_schema()` raises nothing;
+  every `$ref` target resolves; `$schema` is the 2020-12 URI.
+- **Feeds:** E1.
+
+### WU-2 — Add the test-only dependency
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D§9 A2, D§12.2; D§1 ("`jsonschema` is a *test* dependency only").
+- **Precondition:** WU-0 complete; WU-0(b) says it is absent.
+- **Action (exact):** add `jsonschema>=4.18` to the **dev/test dependency group only** —
+  never to the runtime dependency set — and refresh the lockfile with the project's normal
+  `uv` sync. Change no other dependency, no version pin of any other package, and nothing
+  else in the project manifest.
+- **Done-check:** `uv run python -c "import jsonschema; print(jsonschema.__version__)"`
+  exits `0` and prints `>= 4.18`; the manifest diff is one added line in the dev group plus
+  the lockfile delta it forces, and nothing else.
+- **Feeds:** E2. **Note:** this is the only work unit that touches a pre-existing shared
+  file — see §5 blast radius and §6 rollback.
+
+### WU-3 — Author the valid corpus (16 files)
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** **D§6.1** (one row per file), D§6 filename grammar, D§12.3.
+- **Precondition:** WU-1, WU-2 complete.
+- **Action (exact):** create `tests/sakg/fixtures/envelope/valid/` with the 16 files named
+  **exactly** as in the D§6.1 table (`<NN>-<profile>-<slug>.json`), each a **pure node
+  document** — no wrapper object, no metadata key, no comment field (D§7 note 6; this is
+  what keeps the `ls | wc -l` acceptance counts meaningful). Each file must exercise the
+  content its D§6.1 row declares. Files 01–03 are `ingest` profile; 04–16 are `stored`.
+  Non-negotiable content points, because they are what T4/T5 measure: fixture 04 carries
+  **every** declared property and every declared leaf (incl. `origin.stage`,
+  `environment_hash`, `review_priority`) with a `summary` of **exactly 280 characters**;
+  fixture 05 carries `review_priority.reference_count: 47` and **no** `promotion` while
+  remaining `candidate`; the 12 `node_type` members appear one per file across 01–16; all 4
+  `author_kind`, all 3 `promotion.basis`, all 5 `confidence_derivation.method`, and all 4
+  `status` values each appear at least once.
+- **Done-check:** 16 files present; every one validates with zero errors against the profile
+  named in its filename; the coverage predicates T4/T5 pass.
+- **Feeds:** E3.
+
+### WU-4 — Author the invalid corpus (16 files)
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** **D§6.2** (one row per file, incl. the rejecting-clause column), D§12.4; C-3.
+- **Precondition:** WU-1, WU-2 complete.
+- **Action (exact):** create `tests/sakg/fixtures/envelope/invalid/` with the 16 files named
+  exactly as in the D§6.2 table (`<NN>-<profile>-<rule>-<slug>.json`). **Each file must be
+  a valid document in every respect except the one violation its row declares** — an
+  incidentally-malformed fixture would still "fail", which is precisely the false positive
+  the pointer column exists to prevent. Derive each by taking the nearest valid fixture and
+  applying exactly one mutation. Confirm each rejects **at its declared
+  `absolute_schema_path`**, not merely that it rejects. The five rule tokens
+  `inv1…inv5` must each appear in ≥1 filename.
+- **Done-check:** 16 files present; each produces ≥1 error whose `absolute_schema_path`
+  equals its D§6.2 pointer (or the re-derived pointer per C-3, with the diff reported).
+- **Feeds:** E4.
+
+### WU-5 — Author the test module (T1–T8)
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** **D§7** (contract + implementation notes 1–6), D§12.5; C-1, C-3.
+- **Precondition:** WU-3, WU-4 complete.
+- **Action (exact):** create `tests/sakg/test_envelope_schema.py` implementing T1–T8 with
+  the D§7 assertions, transcribing the D§6.2 rejecting-clause column verbatim into the T3
+  expectation table. Honour all six D§7 implementation notes, in particular: collect **all**
+  errors via `iter_errors` (never stop at the first); assert on `absolute_schema_path`,
+  never `absolute_path` or `validator` (note 3); assert **membership** of the declared
+  pointer in the error set, **never the error count** — an already-invalid document makes
+  `unevaluatedProperties` report every key, so 2–5 errors per fixture is correct behaviour
+  (note 4); resolve `#ingest` by `$ref` within the same document, **never** by copying the
+  subschema out (note 2 — a copy drifts, which is the failure DD-3 exists to prevent).
+  T8 implements the **C-1** reading. Add `tests/sakg/__init__.py` only if WU-0(c) found a
+  collision.
+- **Done-check:** the module collects and all eight tests pass.
+- **Feeds:** E3, E4, E5, E6.
+
+### WU-6 — BUILDER self-check (pre-hand-off)
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D§11; `constitution/canaries/CANARY-0001` (do not claim a result the command does
+  not produce).
+- **Precondition:** WU-1…WU-5 complete.
+- **Action:** run the four §4/E6 acceptance commands **verbatim** and capture exit code and
+  output for each. If any fails, return to the owning WU and fix; do not hand off amber.
+- **Done-check:** all four exit `0`, with captured output.
+- **Feeds:** the IMPLEMENT report only. This is a self-check, **not** VERIFY evidence — the
+  gate evidence is WU-7's independent run.
+
+### WU-7 — Acceptance run (the oracle)
+- **Owner:** **VERIFIER @ VERIFY** (not BUILDER, not this session).
+- **Ref:** D§11; the goal objective's `Accept` list.
+- **Precondition:** WU-1…WU-6 complete and committed.
+- **Action (verbatim — do not alter one character, do not add `-x`, `-k`, or any filter):**
+  ```bash
+  uv run python -c "import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())"
+  uv run pytest tests/sakg/test_envelope_schema.py -q
+  test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12
+  test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8
+  ```
+- **Done-check:** all four exit `0`. Report the **actual** exit codes and the pytest summary
+  line back to the court, not a paraphrase (CANARY-0001: forged evidence is a claimed result
+  the command does not produce).
+- **Feeds:** E1, E5, E6.
+
+### WU-8 — File the CER-2 amendment proposal (non-blocking)
+- **Owner:** BUILDER @ IMPLEMENT (proposal authorship), routed to the ratification path.
+- **Ref:** D§2.2 DD-1, D§9 A7, D§12.7.
+- **Precondition:** WU-1 complete (the proposal cites the frozen schema text).
+- **Action:** file the CER-2 proposal to amend SAEOS-1 §4.2 with the four added fields
+  (`confidence_derivation`, `promotion`, `lifecycle`, `review_priority`), stating the DD-1
+  argument: each exists to make exactly one §4.2 invariant mechanically checkable, and each
+  is a **strict tightening** — it can only reject documents the base would have accepted,
+  never widen (D2).
+- **Done-check:** proposal filed and referenced from the IMPLEMENT report.
+- **Explicitly does NOT block WU-2…WU-7.** D§9 A7: because the fields are strict
+  tightenings, S2 proceeds regardless. If ratification is **denied**, the fallback is the
+  stated one — demote the four fields into registered `facets` keys; every invariant check
+  survives at a different path. That fallback is a **re-entry to DESIGN**, not a rollback of
+  this goal (§6).
+- **Feeds:** E7.
+
+---
+
+## 4. Evidence plan (obligation → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` (CITATION) — this file: work units, evidence obligations, rollback declared, refs cited. | PLANNER @ PLAN (this session) | Presence of §3 (WU-0…WU-8), §4 (this table), §6 (rollback), and cited upstream refs (header + inline D§n / constitution citations). | **PLAN** |
+| **E-PRE** | Preflight findings A1/A2/A3 recorded against the real tree. | BUILDER @ WU-0 | Three findings stated in the IMPLEMENT report. | IMPLEMENT |
+| **E1** | Schema exists, is parseable JSON, and is a valid draft 2020-12 schema. | BUILDER @ WU-1 | Acceptance cmd 1 (parse) **and** T1 (`check_schema` + `$schema` URI). Cmd 1 alone is necessary, not sufficient. | IMPLEMENT / **VERIFY** |
+| **E2** | `jsonschema>=4.18` available as a **test-only** dependency; runtime dependency set unchanged. | BUILDER @ WU-2 | `import jsonschema` succeeds under `uv run`; manifest diff confined to the dev group + lockfile. | IMPLEMENT |
+| **E3** | Valid corpus: 16 files, all accept, and coverage is complete — every declared property, every enum member, all 4 statuses. | BUILDER @ WU-3, asserted by WU-5 | **T2** (all accept, per-fixture profile from filename), **T4** (every declared property path appears ≥1×), **T5** (every enum member appears ≥1×). | IMPLEMENT / **VERIFY** |
+| **E4** | Invalid corpus: 16 files, each rejecting **at its declared clause**, covering all five invariant classes — incl. the three the objective names. | BUILDER @ WU-4, asserted by WU-5 | **T3** (declared `absolute_schema_path` ∈ error set), **T6** (`inv1…inv5` each ≥1×). Authored confidence → 01/02/03; frequency-based promotion → 04/05/06/07; deleted node → 10/11/12. | IMPLEMENT / **VERIFY** |
+| **E5** | The suite is green. | VERIFIER @ WU-7 | Acceptance cmd 2 exits `0`; report the pytest summary line. | **VERIFY** |
+| **E6** | Corpus floors met: ≥12 valid, ≥8 invalid. | VERIFIER @ WU-7 | Acceptance cmds 3 and 4 exit `0`; **T7** mirrors both inside the suite so a deletion fails the run before it fails the gate (D§11). | **VERIFY** |
+| **E7** | CER-2 proposal for the SAEOS-1 §4.2 amendment filed. | BUILDER @ WU-8 | Proposal referenced from the IMPLEMENT report. **Non-blocking** for E1–E6 (D§9 A7). | IMPLEMENT (advisory) |
+
+### 4.1 Probativity control (why the count commands are not the evidence)
+
+`constitution/canaries/CANARY-0002` defines **vacuous evidence**: a command that reproduces
+faithfully but "never references, imports, or executes the artifact under review — zero
+discriminating power (the same PASS for the claim and its negation)."
+
+Acceptance commands 3 and 4 have exactly that shape. `ls … | wc -l` counts files; it never
+opens one. Twenty-four files containing `{}` pass both commands. Command 1 is barely
+stronger — it proves the schema is JSON, not that it is a schema, and not that it constrains
+anything. **Therefore:**
+
+- **Command 2 is the load-bearing oracle.** All discriminating power in this goal lives in
+  T1–T8. Commands 1, 3 and 4 are floor checks, and are recorded as such.
+- **T3 is the anti-false-positive control.** Without the declared-clause assertion, an
+  invalid fixture could pass by being malformed for an unrelated reason — the corpus would
+  then measure nothing about the invariants it names. This is why C-3 forbids weakening T3
+  to substring or "≥1 error" matching under schedule pressure.
+- **T4/T5/T6 are the anti-vacuity control on the corpus.** They are what make "exercises
+  every field, every status value, every invariant" a *test* rather than a claim (D§10,
+  correctness perspective).
+- **T7 is the anti-drift control.** It re-asserts the count floors inside the suite, so the
+  floors cannot be satisfied by files the suite never loads.
+- **Reporting rule (CANARY-0001, forged evidence).** WU-6 and WU-7 report actual exit codes
+  and actual output. A claimed result the command does not produce is a caught defect, not a
+  pass.
+
+### 4.2 Assumption → verification-owner ledger (D§9, carried forward)
+
+| id | Assumption (D§9) | Confirmed at | If false |
+|---|---|---|---|
+| **A1** | `sakg/` does not yet exist; this goal creates `sakg/schema/`. | **WU-0(a)** | Prior schema becomes evidence, not law; this design supersedes it. No design change. |
+| **A2** | `jsonschema>=4.18` available or addable to the dev group. | **WU-0(b)** / **WU-2** | Acceptance cmd 2 fails at import; WU-2 is the fix. |
+| **A3** | `tests/sakg/test_envelope_schema.py` collects without `__init__.py` (no basename collision). | **WU-0(c)** / **WU-5** | Add `tests/sakg/__init__.py`. No design change. |
+| **A4** | ULID is canonical uppercase Crockford. | **WU-3/WU-4** (fixtures 01–16, invalid 14) | Only the `node_id` pattern changes; nothing else does. |
+| **A5** | `ProjectRef` is a lowercase DNS-label-ish string. | **WU-3** | Slice S5 may widen it; widening never invalidates existing fixtures. |
+| **A6** | `EvidenceKind` is PAEOS-7.6 §6 verbatim (8 members). | **WU-3** (T5 covers all 8) | If PAEOS-7.6 amends the enum, this schema follows. |
+| **A7** | The four DD-1 fields are acceptable as a §4.2 amendment. | **WU-8** (routed, non-blocking) | Fallback: demote to registered `facets` keys — checks survive, paths change. Re-entry to DESIGN, not rollback. |
+| **A8** | `summary ≤ 280` is a **character** count. | **WU-3** (fixture 04 = 280) / **WU-4** (invalid 13 = 281) | If the budget becomes token-based, `maxLength` is a proxy, not the authority. |
+| **A9** | Timestamps are RFC3339 UTC with a literal `Z`. | **WU-3/WU-4** (`timestamp` pattern) | A producer emitting `+01:00` fails GATE 1 loudly — intended. |
+| **A10** | Sibling goals exist for the ingest validator, transition guard, edge schema, TMS propagation (D§8 R1–R8 owners). `backlog/SAKG-1-backlog.yaml` was not read at DESIGN, and is outside **this** session's read-capability too — so still no goal ids are cited. | **deferred — see below** | If an owner is missing, D§8 is the list of goals to file. |
+
+**A10 is the one open item this plan cannot close.** D§9 A10 assigns it to "PLANNER at the
+next stage"; this session has the same read restriction, so it is passed forward explicitly
+rather than silently dropped: **the first session with `backlog/` read-capability must
+reconcile D§8 R1–R8 against the real backlog and file any missing goal.** It does not block
+F-ENVELOPE — D§8 items are, by construction, checks a single-document schema cannot carry,
+so none of them is in this goal's acceptance surface.
+
+---
+
+## 5. Blast radius and kernel classification
+
+- **New paths only:** `sakg/schema/envelope.schema.json`, `tests/sakg/fixtures/envelope/**`
+  (32 files), `tests/sakg/test_envelope_schema.py`, optionally `tests/sakg/__init__.py`.
+  Nothing pre-existing is modified by WU-1, WU-3, WU-4, WU-5.
+- **One shared-file edit:** WU-2's dev-dependency line plus the lockfile delta it forces.
+  This is the entire mutating surface outside the new trees.
+- **Non-TCB:** `constitution/` is untouched. Per `constitution/README.md`, that tree is Z0,
+  amend-only, and gated by the CI TCB-diff gate; this goal never approaches it.
+- **No runtime path touched.** The schema is inert JSON; `jsonschema` is test-only (D§1).
+  The whole deliverable can be deleted with zero correctness impact on PAEOS (D§10, ×6).
+
+**Classification caveat — do not infer SOFT from silence.** `constitution/classifier_rules/`
+is presently **empty** (directory skeleton only, per `constitution/README.md`: population is
+task B0.11/B0.14). An additive non-TCB change of this shape would normally classify **SOFT**,
+and that is the expectation — but with no rules populated there is no authority in-tree to
+say so, and the dev-dependency edit (WU-2) is the one item a stricter rule set could treat
+as supply-chain surface. **BUILDER submits the change to `kernel/classifier.py` at IMPLEMENT
+and takes the kernel's answer**; absence of a rule is not a SOFT verdict.
+
+---
+
+## 6. Rollback plan
+
+The change is almost entirely additive and non-TCB, so rollback is clean and bounded.
+
+**Triggers (any one):**
+1. WU-7 acceptance command 1, 3 or 4 exits non-zero.
+2. WU-7 command 2 fails — any of T1–T8 red.
+3. WU-2 regresses an unrelated dependency, alters the runtime dependency set, or breaks any
+   pre-existing test suite.
+4. Kernel classifies the change **HARD** without the required ratifier/Adversary review
+   (§5).
+
+**Rollback actions** (BUILDER @ IMPLEMENT, on the corresponding write capability):
+
+| Undo | Action | Post-condition |
+|---|---|---|
+| WU-1 | Delete `sakg/schema/envelope.schema.json`; delete `sakg/schema/` and `sakg/` **only if this goal created them** (WU-0(a) finding decides this — never remove a pre-existing tree). | No schema file; any pre-existing tree intact. |
+| WU-3, WU-4, WU-5 | Delete `tests/sakg/` **only if this goal created it**; otherwise delete only `tests/sakg/fixtures/envelope/`, `tests/sakg/test_envelope_schema.py`, and `tests/sakg/__init__.py` **if WU-5 added it**. | No F-ENVELOPE test artifacts; any pre-existing `tests/sakg/` content intact. |
+| WU-2 | Remove the added `jsonschema>=4.18` dev-group line and restore the lockfile to its pre-change state (revert the manifest + lock together, never one alone). | Manifest and lockfile byte-identical to pre-change. |
+| WU-8 | Withdraw or mark the CER-2 proposal as superseded. Independent of the above; a rollback of the code artifacts does **not** require withdrawing the proposal, and vice-versa. | Proposal state explicit. |
+
+**Verification of rollback:** the four acceptance commands fail at command 1 (no schema
+file); the pre-existing test suite passes unchanged; `git status` shows no residue under
+`sakg/` or `tests/sakg/`; the manifest/lockfile diff is empty.
+
+**Blast containment.** Because WU-1/WU-3/WU-4/WU-5 only create files in new trees, partial
+failure cannot corrupt pre-existing state — the worst case is orphan files, removed by
+deletion. The only revert requiring care is WU-2, which touches two coupled shared files;
+they are reverted as a pair. No kernel amendment or ratifier action is needed to roll back,
+because nothing under `constitution/` was written.
+
+**Recovery paths (choose by failure mode):**
+- **T2/T3 fail on specific fixtures** → do **not** roll back the schema. Re-enter IMPLEMENT
+  at WU-3/WU-4 and fix those fixtures. The schema is the frozen artifact; a fixture that
+  disagrees with it is a defect in the fixture unless the schema is shown wrong.
+- **T3 pointers systematically wrong** → C-3: re-derive the column, record the diff, keep
+  T3's strength. Do not weaken the assertion.
+- **T1 fails / a `$ref` does not resolve** → transcription defect in WU-1. Re-transcribe
+  D§2.3 verbatim; do not hand-repair.
+- **The schema is shown wrong on the merits** (a §4.2 field cannot be expressed, or a
+  clause rejects a document SAEOS-1 requires) → this is **not** a rollback; it is a
+  **re-entry to DESIGN**, because D§2.3 is a frozen design output, not an implementation
+  detail. Roll back the artifacts, then re-open DESIGN.
+- **CER-2 denied (A7)** → re-entry to DESIGN for the facets-demotion fallback. The shipped
+  artifacts stay; they are a strict tightening either way.
+
+---
+
+## 7. Completeness check (no orphan / no gap)
+
+- **Every objective deliverable maps to a work unit** (§3): schema → WU-1; valid corpus →
+  WU-3; invalid corpus → WU-4; test module → WU-5; the four acceptance commands → WU-7.
+- **Every work unit feeds a declared evidence obligation** (§4): WU-0→E-PRE, WU-1→E1,
+  WU-2→E2, WU-3→E3, WU-4→E4, WU-5→E3/E4/E5/E6, WU-6→IMPLEMENT report, WU-7→E1/E5/E6,
+  WU-8→E7. This file is E0.
+- **Every named acceptance invariant has a fixture and an asserting test:** authored
+  confidence → invalid 01/02/03 (T3); frequency-based promotion → invalid 04/05/06/07 (T3);
+  deleted node → invalid 10/11/12 (T3); every field → T4; every status value → T5.
+- **Every acceptance command has an owner and a stated probative weight** (§4.1) — no
+  command is treated as evidence it cannot bear (CANARY-0002).
+- **Every design assumption has a named confirmation site** (§4.2), and the one that cannot
+  be closed here (A10) is passed forward explicitly with its owner and its non-blocking
+  rationale.
+- **Every design ambiguity found at PLAN is resolved and binding** (§2, C-1…C-3) rather than
+  left to implementer discretion.
+- **A rollback is declared and bounded for every mutating work unit** (§6), including the
+  one shared-file edit, with recovery paths separated from rollback.
+- **All claims cite an upstream ref:** the frozen DESIGN (`artifact:dd690e12e01c…`, cited as
+  D§0–§12), `constitution/README.md` (Z0/TCB boundary, classifier_rules skeleton status),
+  `constitution/canaries/README.md` + `CANARY-0001` + `CANARY-0002` (evidence probativity),
+  and the goal objective's own `Accept` list.
+
+**Evidence for this gate:** `plan_executable` = this file.

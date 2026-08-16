@@ -1,0 +1,27 @@
+# DEBT-0019 — Autonomous Evidence Path Blocked in Headless Builder Sessions
+
+**Status**: RESOLVED (fixed 2026-08-02)
+**Filed**: 2026-08-02
+**Priority**: High
+**Category**: Integration Gap / Live Autonomy
+
+---
+
+## 1. Compromise
+In [runtime/integrations/__init__.py](file:///Users/bob/GitHub/paeos/runtime/integrations/__init__.py), `_allowed_tools()` granted a live builder session only `["Read", "Write", "Edit"]` (+ one entry per MCP server). The invoker runs `claude -p … --permission-mode acceptEdits`, and `acceptEdits` auto-approves **file edits only** — it does **not** auto-approve `Bash`. A headless `claude -p` session has no human to answer the approval prompt, so **every command execution is declined** ("This command requires approval"). The IMPLEMENT/VERIFY builder could therefore make the code edit but could **not run** its reproduction command (nor `shasum` the artifact), so it never obtained a probative `exit_code`/`stdout` and never called the court's `submit_evidence` MCP tool.
+
+## 2. Reason
+Surfaced by the first genuine live multi-goal concurrent self-hosting run (Phase 3 M3, 2026-08-02). Both goals were honestly REMANDED — *"no evidence submitted to the court for this run"* — with 0 seals. The builder sessions reported the block directly:
+
+> *"I've completed the code change … every Bash invocation is returning 'This command requires approval' … I cannot capture the exit code / stdout that the court requires, nor compute the artifact sha256."*
+
+The allow-list predated the autonomous evidence path (R5.3): earlier builders only *wrote* artifacts and the human/scripted layer supplied evidence. When evidence submission moved into the session (the builder runs a probative command and submits via MCP), the allow-list was never widened to permit command execution. This is the anti-forgery invariant working — no evidence, no seal; the system refused to fabricate — but it left the autonomous path non-functional end-to-end.
+
+## 3. Ideal Solution
+Grant the session `Bash` on its explicit tool allow-list so a headless builder can run its reproduction command and hash the artifact. This does **not** widen authority: (a) the session runs in an isolated, ephemeral workspace seeded only with in-scope files + the constitution; (b) writes are filtered to `write_scopes` before becoming artifacts; (c) the **court's independent kernel re-run (T2) is the real anti-forgery reference monitor** — a forged or vacuous command is caught there regardless of what the builder was permitted to run. The grant is a scoped allow-list entry, not the blanket `--dangerously-skip-permissions`.
+
+## 4. Repayment Conditions
+Repaid in this change: `Bash` added to `_allowed_tools`, covered by a failing-first test (`test_builder_session_is_granted_bash_to_produce_court_evidence` in `tests/runtime/test_live_adapter.py`). A follow-up live run is required to confirm a genuine seal now lands end-to-end.
+
+## 5. Estimated Impact
+High while open: the fully-autonomous self-hosting loop could produce **zero seals** — every goal remands for missing evidence — even when the builder makes the correct change. The mechanism (concurrency, K8 ledger, budget metering, staged pipeline) is unaffected; only the evidence-submission step was blocked.

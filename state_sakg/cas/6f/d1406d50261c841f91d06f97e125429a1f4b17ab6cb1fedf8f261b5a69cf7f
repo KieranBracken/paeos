@@ -1,0 +1,24 @@
+# DEBT-0075 — Quadruplicated High-Leverage Repair Queue Prepending Mechanism
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-scheduler** (touches `runtime/scheduler.py`, `runtime/selfhost.py`, `ops/autonomous_run.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+The logic for inspecting `outcome.high_leverage_intake` and prepending it to the active execution queue (`queue.appendleft(outcome.high_leverage_intake)` / `pending.appendleft(...)`) is manually duplicated across four distinct sites:
+1. `ContinuousScheduler.run` (`runtime/scheduler.py`)
+2. `ConcurrentScheduler.run` (`runtime/scheduler.py`)
+3. `run_backlog` (`runtime/selfhost.py`)
+4. `run_one` wrapper (`ops/autonomous_run.py`)
+
+Duplicating queue mutation mechanics across multiple schedulers and operational wrappers leads to divergent behavior, maintenance drift, and inconsistent friction handling across execution modes.
+
+## 2. Root Cause
+
+Incremental addition of RB-0008 high-leverage immediate repair handling into existing scheduling loops without unifying queue mutation into a shared scheduling primitive.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Consolidate high-leverage intake queue insertion into a single shared helper or queue manager method used by all scheduler implementations.
+- **Long-term:** Maintain strict DRY invariants for runtime scheduling and workflow state transitions.

@@ -1,0 +1,14 @@
+I have completed the task. 
+
+I reviewed the `PAEOS_REASONING_CONTINUITY_RB_v0.1.md` requirements specification and extracted the core architectural constraints, entities, and behaviors. Using this information, I created the system design artifact in the requested location:
+[RCL_SYSTEM_DESIGN.md](file:///var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-t-3c78cf23e16f-bridge-9c996rs6/design/RCL_SYSTEM_DESIGN.md)
+
+The artifact includes:
+1. **Overview:** A high-level description of the RCL's purpose.
+2. **Component Graph:** A Mermaid graph outlining the primary components (State Store, Context Engine, Handoff Manager).
+3. **Data Models:** A class diagram mapping the entities like Mission, Checkpoint, Decision, Evidence, and ContextPackage.
+4. **Interfaces:** Python class definitions defining the API boundary.
+5. **Data Flow:** A Mermaid sequence diagram describing how session handoff/model switching operates.
+6. **State Machines:** Diagrams representing the lifecycle of Decisions and Facts (Epistemic Promotion).
+
+No files outside of the sandbox directory were modified.

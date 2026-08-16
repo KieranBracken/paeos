@@ -1,0 +1,540 @@
+# DESIGN — S-PROBE: SAKG S1 extraction feasibility spike (falsify SAEOS-1 §9/A8)
+
+| | |
+|---|---|
+| **Artifact** | System design for the S1 extraction-feasibility probe over sealed PAEOS goals |
+| **Stage / Role** | `DESIGN` / `PLANNER` (PAEOS-7.6 §3 `StageId.DESIGN`, `Role.PLANNER`) |
+| **Status** | DESIGN ONLY — no probe executed, no probe report authored. Frozen input to the executing stage. |
+| **Date** | 2026-08-08 |
+| **Target under falsification** | SAEOS-1 §9 **A8** — *"Ω1 (self-population) … assumes PAEOS emits clean structured decisions. Does it?"* — carried as **"the specification's single largest untested assumption"** and ratified as a scoped falsification test by **D7** (§10). |
+| **Required evidence** | `design_coherent` — assumptions surfaced (PAEOS-6), perspectives covered, no orphan/gap. |
+
+---
+
+## 0. Scope boundary (read first)
+
+This worker session is **PLANNER @ DESIGN**, write-capability `design/`, read-capability
+`constitution/`, `spec/`, `design/`. The goal objective names a deliverable and a method
+that sit outside both:
+
+1. **Write `reviews/spikes/sakg-s1-extraction-probe.md`** — a `reviews/`-tree write.
+   Outside this session's write-capability; any such write is discarded as a violation.
+2. **Hand-extract from `reviews/tasks/B0.0_review.md`, `B0.1_review.md`, `B0.2_review.md`** —
+   a `reviews/`-tree read, outside this session's read-capability. The source artifacts
+   are therefore **unread** here, and no cell of the extraction matrix is scored by this
+   document. Scoring them from an unread source would fabricate evidence — the exact
+   failure PAEOS K1 exists to prevent (*"passing evidence, not assertion"*).
+
+**Consequence for the goal's accept assertions.** All four accept checks target
+`reviews/spikes/sakg-s1-extraction-probe.md`. None of them can pass on this session's
+output, and that is a capability fact, not a shortfall of this design. This document is
+the **hand-off spec**: it fixes the source set, the field census, the scoring rubric, the
+aggregation arithmetic, the verdict rule, and the byte-level output format, so that a
+stage holding `reviews/` read+write capability produces the probe report mechanically and
+**replayably** — no further design judgment required. §10 maps every accept assertion onto
+the design element that satisfies it.
+
+Evidence emitted by this session is `design_coherent` (this file), **not** the probe
+verdict.
+
+---
+
+## 1. Component graph
+
+The probe is a **procedure**, not code: hand-extraction performed by an agent under a
+fixed rubric. The components below are procedural stages with typed hand-offs, specified
+to the same standard as software components so the run is reproducible by a second
+operator (§5.1 rule 3's reproducibility ethos applied to the probe itself).
+
+```mermaid
+flowchart TD
+    SEL["C1 Goal Selector<br/>picks 3 sealed goals"]
+    SRC["C2 Source Resolver<br/>review artifact + 1 citation hop"]
+    CEN["C3 Field Census<br/>frozen §3.2 matrix — 12 types, 3 bands"]
+    EXT["C4 Type Extractors ×11<br/>one per scored §4.3 node type"]
+    LED["C5 Cell Ledger<br/>append-only ProbeCell records"]
+    SCO["C6 Scorer<br/>content_score + anchor + recoverable_elsewhere"]
+    AGG["C7 Aggregator<br/>band ratios, type presence, veto set"]
+    ADJ["C8 Adjudicator<br/>VETO check then ratio check"]
+    EMI["C9 Report Emitter<br/>frontmatter + per-goal sections"]
+
+    SEL -->|"GoalRef[3]"| SRC
+    SRC -->|"SourceSet per goal"| EXT
+    CEN -->|"ScorableCell[] (denominator)"| EXT
+    CEN -->|"veto field set"| ADJ
+    EXT -->|"raw finding per cell"| SCO
+    SCO -->|"ProbeCell"| LED
+    LED -->|"all cells"| AGG
+    AGG -->|"ProbeAggregate"| ADJ
+    ADJ -->|"Verdict + carries"| EMI
+    LED -->|"per-goal cells"| EMI
+    AGG -->|"ratios"| EMI
+    EMI -->|"reviews/spikes/sakg-s1-extraction-probe.md"| OUT["accept assertions (§10)"]
+```
+
+**Placement rationale.** The census (C3) is separated from the extractors (C4) so the
+**denominator is fixed before any source is read**. If the extractor defined its own field
+list per goal, the loss ratio would be self-selecting — an extractor that only looks for
+what it finds always reports zero loss. Freezing C3 in this document, ahead of C2, is what
+makes the probe a falsification test rather than a demonstration. This is the probe-level
+analogue of SAEOS-1 §4.1's design rule (derive backwards from a ratified consumer, not
+forwards from what happens to be available).
+
+**No orphan:** every component has at least one inbound and one outbound edge except C1
+(entry) and C9 (exit); C3 is a pure source consumed by C4 and C8.
+
+---
+
+## 2. Source set contract (C1, C2)
+
+### 2.1 Goal selection (C1)
+
+| Rule | Value |
+|---|---|
+| **Designated set** | `B0.0`, `B0.1`, `B0.2` — the bootstrap tasks defined in PAEOS-8 §4 and sequenced in PAEOS-9 §12.1 (`B0.0` repo+CI+gates, `B0.1` ledger, `B0.2` CAS). |
+| **Admission test** | The goal must be **real and sealed** — a `StageId.SEAL` transition committed to the ledger. A goal still open, or one that never ran, is not admissible evidence about L15 exhaust. |
+| **Substitution** | If a designated goal fails the admission test, substitute the lowest-numbered sealed `B0.*` goal not already selected, and record the substitution in the report's `source_set` block with the reason. |
+| **Minimum** | Exactly **3** goals. Fewer ⇒ the probe does not run; it emits `INSUFFICIENT_SOURCE` (§6.1) rather than a verdict on a smaller sample. |
+
+### 2.2 Source resolution (C2) — and why it is wider than the objective's literal text
+
+The objective names `reviews/tasks/<goal>_review.md` as the source. SAEOS-1 §6.1b sources
+the emission bundle from a **different, wider** artifact set: the decision-graph
+(PAEOS-9 §5.11), the L06 trade-off matrix, L04 candidates, the L11 implementation
+contract, the L08 architecture artifact set (PAEOS-9 §5.4), and the scar-graph (§5.8).
+
+Probing the review artifact **alone** therefore tests a strictly harsher proposition than
+A8 states, and would bias the probe toward a false NO-GO. Probing the whole L15 artifact
+set tests A8 exactly but is unbounded work. The resolution:
+
+> **SourceSet(goal) = the goal's review artifact, plus one citation hop into any in-repo
+> artifact that artifact names by path or hash.**
+
+One hop is the right cut because it is what an ingest process would do anyway: the
+envelope's `provenance.source_hash` (§4.2) is a content address, so following a named
+artifact reference *is* the ingest path, not extra credit. Two hops would let the probe
+wander the whole repo and stop being a bounded measurement.
+
+**Both bounds are reported.** Every cell records which hop satisfied it, yielding:
+
+- `loss_ratio` — **headline**, Band A, over the full one-hop SourceSet. This is the number
+  that adjudicates A8.
+- `loss_ratio_review_only` — Band A restricted to hop 0. The pessimistic bound.
+
+If the two diverge by more than `0.15`, the report must carry a finding: the review
+artifact is not a viable sole ingest source and §6.1b's multi-artifact sourcing is
+load-bearing.
+
+---
+
+## 3. Interfaces
+
+### 3.1 Record schemas (language-neutral, PAEOS-7.6 §1 notation)
+
+```
+GoalRef      = { goal_id: string, sealed: bool, seal_ref: Hash|null }
+
+SourceSet    = { goal_id: GoalRef.goal_id,
+                 hop0: Path,            // reviews/tasks/<goal>_review.md
+                 hop1: [Path] }         // artifacts cited by hop0, in-repo only
+
+Band         = enum{ A, B, C }          // A = §6.1b emission set (scored, headline)
+                                        // B = §4.3 remainder available at seal (scored, informational)
+                                        // C = architecturally deferred (NOT scored)
+
+ScorableCell = { node_type: NodeType,   // §4.3
+                 field:     string,     // §3.2 census
+                 band:      Band,
+                 veto:      bool }      // member of the §6.2 veto set
+
+ContentScore = enum{ extractable=1.0, partial=0.5, absent=0.0, n_a=excluded }
+Anchor       = enum{ stable, weak, none, n_a }
+Recoverable  = enum{ yes, no, unknown, n_a }
+
+ProbeCell    = ScorableCell
+             + { goal_id:              string,
+                 content_score:        ContentScore,
+                 anchor:               Anchor,       // machine-extractability, §4.3
+                 hop:                  0 | 1 | null, // where it was found; null if absent
+                 recoverable_elsewhere: Recoverable, // believed present in a §6.1b source not in SourceSet
+                 note:                 string }      // <= 200 chars; REQUIRED for partial/absent/n_a
+
+TypeReport   = { node_type, instances_found: int, cells: [ProbeCell] }
+GoalReport   = { goal_id, source_set: SourceSet, types: [TypeReport],
+                 band_a_loss: float, band_b_loss: float }
+
+ProbeAggregate = { band_a_loss, band_b_loss, loss_ratio_review_only,
+                   anchor_loss_ratio, type_presence: {NodeType: int},
+                   veto_failures: [ {field, goals_absent: int} ] }
+
+Verdict      = enum{ GO, NO_GO }        // serialized as "GO" | "NO-GO"
+ProbeReport  = { verdict: Verdict, loss_ratio: float, basis: string,
+                 aggregate: ProbeAggregate, goals: [GoalReport], carries: [string] }
+```
+
+**Invariants.**
+- A `ProbeCell` with `content_score ∈ {partial, absent, n_a}` **must** carry a `note`. An
+  unexplained loss is unauditable and is a probe defect — the probe-level form of §5.1
+  rule 2 (*"an unexplainable result is a defect"*).
+- `anchor = n_a` iff `content_score = n_a`. Otherwise `anchor` is always populated.
+- `hop = null` iff `content_score = absent`.
+- Cells are **append-only**. A revised judgment appends a superseding cell with a note;
+  it never edits the prior one (§4.2's supersession-not-deletion invariant).
+
+### 3.2 The field census (C3) — frozen denominator
+
+Node types are all twelve of SAEOS-1 §4.3. Envelope fields are SAEOS-1 §4.2. Type-specific
+facet fields are **derived here** by the same rule SAEOS-1 §4.1 uses — backwards from what
+the §5.2 traversals need — because §4.3 states each type's *role*, not its field list. This
+derivation is Assumption **A4** (§7).
+
+**Envelope field disposition** (applies to every node type unless overridden):
+
+| Envelope field | Class | Scored? | Why |
+|---|---|---|---|
+| `id`, `type`, `namespace` | MINTED | ✗ | Generated by ingest; `namespace` set at emission (§6.1b rule 4). |
+| `provenance.{origin, author_kind, ingested_at, source_hash}` | MINTED | ✗ | `author_kind = ingest`; the rest are properties of the ingest run. |
+| `status` | MINTED | ✗ | `= candidate` by §6.1b. |
+| `confidence` | DERIVED | ✗ | §4.2 invariant: *derived, never authored*. |
+| `valid_from` | MINTED | ✗ | `= seal time`. |
+| `valid_until` | DEFERRED (Band C) | ✗ | `null` at emission; decay policy is later. |
+| `label` | EXTRACTED | ✓ | |
+| `summary` (≤280 chars) | EXTRACTED | ✓ | The SUMMARY-tier projection unit (Ω3). |
+| `evidence[]` (EvidenceRef list) | EXTRACTED | ✓ | |
+| `falsifier` | EXTRACTED | ✓ | Required by Ω4/K6; PAEOS prose plausibly carries it. |
+| `coordinates` | EXTRACTED | ✓ | Flat, multi-valued (✓8). |
+
+⇒ **5 scored envelope fields per node type.** Excluding minted/derived fields is what makes
+the ratio measure *A8's claim* (is the content in the prose?) rather than the trivially
+true claim that a pipeline can stamp its own timestamps.
+
+**Per-type facet fields and cell counts:**
+
+| Band | Node type | Facet fields | Env | Facets | Cells/goal |
+|---|---|---|---|---|---|
+| **A** | `Decision` | `context`, `chosen`, `rationale`, `constitutional_basis`, `decided_by_role` *(PAEOS-9 §5.11 node shape)* | 5 | 5 | **10** |
+| **A** | `TradeOff` | `axis_a`, `axis_b`, `resolution` *(§4.3: "the axis and the resolution")* | 5 | 3 | **8** |
+| **A** | `Option` | `description`, `disposition` (chosen\|rejected), `rejection_reason` | 5 | 3 | **8** |
+| **A** | `Constraint` | `kind`, `bound`, `source` | 5 | 3 | **8** |
+| **A** | `Component` | `kind` (service\|module\|interface\|data store), `interface`, `owns_data` *(PAEOS-9 §5.4)* | 5 | 3 | **8** |
+| **A** | `Scar` | `failure_class`, `root_cause`, `detection_signature`, `guard_action`, `severity`, `origin_run` *(§4.3 + PAEOS-9 §5.8)* | 5 | 6 | **11** |
+| **A** | `EvidenceRef` | `hash`, `uri`, `kind`, `reverification_instructions` | 2¹ | 4 | **6** |
+| | **Band A subtotal** | | | | **59 / goal · 177 total** |
+| **B** | `Problem` | `statement`, `trigger`, `success_condition` | 5 | 3 | **8** |
+| **B** | `Objective` | `property`, `direction` (max\|min), `metric` | 5 | 3 | **8** |
+| **B** | `Mechanism` | `how_it_works`, `applicability` | 5 | 2 | **7** |
+| **B** | `Pattern` | `structure`, `is_anti_pattern` | 5 | 2 | **7** |
+| | **Band B subtotal** | | | | **30 / goal · 90 total** |
+| **C** | `Outcome` | `disposition` (held\|degraded\|reverted\|caused-incident), `observation_window`, `measurement` | — | — | **not scored** |
+
+¹ `EvidenceRef` scores only `label` + `summary`. `evidence[]`, `falsifier` and
+`coordinates` on a pointer node are degenerate and are marked `n_a` **by schema**, not by
+extraction failure — recorded so the exclusion is auditable rather than silent.
+
+**Band C is excluded from every ratio by construction.** §4.3 states `Outcome` is *"the
+only node type that may be created long after its subject"*; it is emitted by L17/L19
+(§6.1b rule 3), not at seal. Counting its absence as extraction loss would score the
+architecture's own design as a defect. The consequential edge family
+(`resulted_in`/`caused`/`regressed`) and `valid_until` are excluded for the same reason.
+Band C is reported as **S3 debt**, not as loss.
+
+All twelve §4.3 types are assigned a band. **No type is orphaned.**
+
+### 3.3 Edge extraction (secondary band)
+
+The objective scopes the probe to node types, so edges stay out of the headline ratio. But
+a node set with no `considered`/`rejected` edges cannot serve `tradeoff_precedents` or
+`pattern_retrieval` at all, so the probe **must** record, per goal, presence/absence of the
+Decisional family (`decides`, `considered`, `rejected`, `rationale_for`,
+`constrained_by`, `optimizes_for`) as a plain present/absent list. This feeds the veto
+check (§6.2), not the ratio.
+
+---
+
+## 4. Data flow
+
+```
+C1 ── GoalRef[3] ──▶ C2 ── SourceSet[3] ──┐
+                                          ▼
+C3 ── ScorableCell[] (177 A + 90 B) ────▶ C4  for each (goal × type × field)
+                                          │      locate value in SourceSet
+                                          ▼
+                                         C5 ── raw finding ──▶ C6
+                                          │
+                            C6 assigns  content_score · anchor · hop
+                                        · recoverable_elsewhere · note
+                                          ▼
+                                         C5 Cell Ledger  (append-only ProbeCell[])
+                                          │
+                        ┌─────────────────┴─────────────────┐
+                        ▼                                   ▼
+                  C7 Aggregator                       C9 per-goal sections
+                        │
+             band ratios · type_presence · veto_failures · anchor_loss_ratio
+                        ▼
+                  C8 Adjudicator ── Verdict + carries ──▶ C9 ──▶ report file
+```
+
+### 4.1 Aggregation arithmetic (C7) — exact
+
+For a band `X` over all three goals:
+
+```
+scored(X)     = { cells in band X with content_score ≠ n_a }
+achieved(X)   = Σ content_score over scored(X)          # extractable 1.0, partial 0.5, absent 0.0
+loss(X)       = 1 − achieved(X) / |scored(X)|
+```
+
+- `loss_ratio` (headline, frontmatter) = `loss(A)` over the full one-hop SourceSet.
+- `loss_ratio_review_only` = `loss(A)` counting only cells with `hop = 0` as achieved.
+- `band_b_loss` = `loss(B)`.
+- `anchor_loss_ratio` = `1 − (Σ anchor_weight) / |scored(A)|` where
+  `stable = 1.0`, `weak = 0.5`, `none = 0.0`.
+- Rounding: **half-up to 2 decimal places**, at the final step only. Never round
+  intermediates.
+
+### 4.2 `n_a` versus `absent` — the discipline that decides the number
+
+This single rule moves the ratio more than any other, so it is fixed here rather than left
+to the extractor:
+
+| Situation | Score | Rationale |
+|---|---|---|
+| The goal genuinely produced no instance of the type, and the source **positively evidences** that (e.g. `B0.1` records a clean run, so no `Scar` exists) | `n_a` — excluded | Nothing existed to extract. Absence of a scar is not a failure to extract a scar. |
+| An instance exists but the field is missing or unstated | `absent` | Real extraction loss. |
+| An instance exists and the field is inferable but not stated verbatim | `partial` | Recoverable with judgment; a parser probably cannot. |
+| Ambiguous whether an instance existed | **`absent`** | **Fail-safe.** Matches PAEOS-8 §4 `B0.11`'s ratified conservative default (*unknown ⇒ HARD, fail-safe*). Never resolve ambiguity in the probe's own favour. |
+
+Type-level absence is **not** hidden by `n_a`: `type_presence[T]` counts how many of the
+three goals instantiated `T`, and is reported in its own table. A Band-A type present in
+0 of 3 goals is a first-class finding regardless of the ratio.
+
+### 4.3 The `anchor` dimension — the second-order signal that actually bears on S1
+
+A hand extraction proves **the information is present in the artifact**. It does *not*
+prove a deterministic extractor can find it — an agent reading prose recovers things no
+parser will. Conflating the two would let the probe return GO on a proposition S1 cannot
+deliver. So each cell also records:
+
+| `anchor` | Meaning |
+|---|---|
+| `stable` | A parser could target it: a heading, table cell, YAML key, or fenced block with a fixed name. |
+| `weak` | Present but positionally/lexically unstable — recoverable only by reading. |
+| `none` | Recovered only by inference across the document. |
+
+`anchor_loss_ratio` does **not** change the GO/NO-GO token (§6.2). It selects between two
+S1 designs, and the report must state which:
+
+- `anchor_loss_ratio ≤ 0.50` ⇒ **retro-parse is viable**: S1 may extract from existing
+  artifacts.
+- `anchor_loss_ratio > 0.50` ⇒ **mandatory carry**: S1 must emit the bundle *at authoring
+  time* (L15 writes typed fields alongside the prose) rather than parse prose after the
+  fact. This is a GO with a redesign obligation, not a NO-GO — the content is there;
+  only the retro-parse route is closed.
+
+---
+
+## 5. Extraction procedure (C4) — per cell
+
+Deterministic, so two operators produce the same ledger:
+
+1. Read `hop0` in full. Enumerate instances of the node type. Record `instances_found`.
+2. If `instances_found = 0`: apply §4.2 row 1 (`n_a` with positive evidence) or row 4
+   (`absent`, fail-safe). Note required. Stop.
+3. For each census field, search `hop0` for the value. If found, score and set `hop = 0`.
+4. If not found in `hop0`, search `hop1` (artifacts `hop0` names by path or hash). If
+   found, score and set `hop = 1`.
+5. If found in neither, score `absent`, `hop = null`, and set `recoverable_elsewhere`
+   from the §6.1b source that *would* carry it (`yes` if a named §6.1b source exists and
+   plainly holds this field, `no` if no PAEOS artifact produces it at all, else `unknown`).
+6. Assign `anchor` from §4.3.
+7. Append the `ProbeCell`. Never overwrite.
+
+**Multiple instances of one type in one goal.** Score the field **once per goal**, taking
+the **best** score across instances, and note the spread (e.g. *"3 Decisions; rationale
+stated for 1"*). Rationale: the probe asks *can this field be extracted from this kind of
+artifact*, not *how consistently*. Consistency is a distinct S1 quality question and is
+carried in the note rather than smeared into the ratio.
+
+---
+
+## 6. State machines
+
+### 6.1 Probe run
+
+```mermaid
+stateDiagram-v2
+    [*] --> SELECT
+    SELECT --> RESOLVE: 3 sealed goals admitted
+    SELECT --> INSUFFICIENT_SOURCE: fewer than 3 sealed goals
+    RESOLVE --> EXTRACT: SourceSet built for all 3
+    RESOLVE --> INSUFFICIENT_SOURCE: a review artifact is missing/unreadable
+    EXTRACT --> EXTRACT: next (goal, type, field) cell
+    EXTRACT --> SCORE: census exhausted (267 cells enumerated)
+    SCORE --> AGGREGATE: every cell has content_score + anchor + note-where-required
+    SCORE --> EXTRACT: a cell lacks a required note (defect; re-open)
+    AGGREGATE --> ADJUDICATE: ratios + type_presence + veto_failures computed
+    ADJUDICATE --> EMIT: verdict fixed
+    EMIT --> [*]: report written
+    INSUFFICIENT_SOURCE --> [*]: report written with verdict NO-GO, basis = insufficient_source
+```
+
+`INSUFFICIENT_SOURCE` terminates as **NO-GO**, never as a missing file. A8 asks whether
+PAEOS's exhaust is extractable; an exhaust that cannot be located is a stronger negative
+answer than one that is merely lossy. Every state has an entry and an exit.
+
+### 6.2 Verdict adjudication (C8)
+
+```mermaid
+stateDiagram-v2
+    [*] --> VETO
+    VETO --> NO_GO: any veto field absent in >= 2 of 3 goals
+    VETO --> RATIO: veto set clears
+    RATIO --> NO_GO: loss_ratio > 0.30
+    RATIO --> GO: loss_ratio <= 0.30
+    GO --> [*]: verdict GO (+ anchor carry per §4.3 if applicable)
+    NO_GO --> [*]: verdict NO-GO
+```
+
+**The veto set** — the minimum fields without which SAEOS-1 §8's S2 exit criterion
+(*"returns a real precedent from a real prior goal, within budget, with `why`"*) is
+unreachable via `tradeoff_precedents`:
+
+| Veto field | Why it is load-bearing |
+|---|---|
+| `Decision.label`, `Decision.rationale`, `Decision.chosen` | Without these the central node (✓1) is an empty shell; `why` (§5.1 rule 2) is unconstructible. |
+| `TradeOff.axis_a`, `TradeOff.axis_b`, `TradeOff.resolution` | `tradeoff_precedents(axes)` matches on axes and returns the resolution. No axes ⇒ no method. |
+| `Option.disposition` | §4.3: rejected options are *"the corpus's scarcest, most valuable knowledge"*. If chosen and rejected are indistinguishable, the Option corpus is noise. |
+| `EvidenceRef.hash` **or** `EvidenceRef.uri` (either satisfies) | §3.3.3: SAKG emits pointers, never evidence. With no resolvable pointer the non-authority guarantee has nothing to point at. |
+| Decisional edge family present (§3.3) | A Decision unlinked to its Options/TradeOffs is unreachable by every §5.2 traversal. |
+
+**Threshold `0.30`.** Above 30%, more than one field in three across a node is missing or
+degraded. §5.1 rule 2 requires every projection result carry an explainable `why`; a node
+whose differentiating fields are mostly gone yields results that are formally explainable
+but substantively empty — inadmissible under §3.3.2's untrusted-advisory framing, because
+a consumer cannot tell a thin precedent from a wrong one. The threshold is a **judgment**,
+carried as Assumption **A3** with its own falsifier, and the report publishes enough
+detail (`band_a_loss`, `loss_ratio_review_only`, `band_b_loss`, `anchor_loss_ratio`,
+per-cell ledger) that a founder can re-adjudicate at a different threshold **without
+re-running the probe**. That property is deliberate: the threshold, not the measurement,
+is the soft part.
+
+**Veto precedes ratio, and is not a ratio.** A high aggregate score assembled from
+peripheral fields must not outvote a missing `TradeOff.resolution`. This is the same
+structure as PAEOS's gates: an aggregate cannot buy off a missing invariant.
+
+---
+
+## 7. Assumptions surfaced (PAEOS-6)
+
+| id | Assumption | Falsifier | Verification owner |
+|----|------------|-----------|--------------------|
+| **A1** | `reviews/tasks/B0.0_review.md`, `B0.1_review.md`, `B0.2_review.md` exist, are readable, and correspond to **sealed** goals. | `test -f` fails, or no `SEAL` transition is on the ledger for the goal. | Executing stage, at C1/C2. Routes to `INSUFFICIENT_SOURCE` (§6.1) or substitution (§2.1). |
+| **A2** | The review artifact plus one citation hop is a fair proxy for the §6.1b emission sources. | `loss_ratio_review_only − loss_ratio > 0.15`, i.e. hop 1 is carrying the result ⇒ the review artifact alone is not a viable ingest source. | Executing stage; the divergence is computed and reported either way (§2.2). |
+| **A3** | `loss_ratio ≤ 0.30` is the right GO bar. | A GO at 0.29 that still fails SAEOS-1 §8's S2 exit criterion on a real query, or a NO-GO at 0.31 whose gaps are all peripheral. | Founder / S2. Mitigated structurally: all sub-ratios and the full cell ledger are published, so re-adjudication needs no re-run. |
+| **A4** | The per-type facet fields in §3.2 are the right ones. SAEOS-1 §4.3 gives each type's **role**, not its field list; these were derived backwards from §5.2 traversals per §4.1's own design rule, anchored to PAEOS-9 §5.4/§5.8/§5.11 node shapes where those exist. | An S2 implementation needs a field not in the census, or never reads one that is. | S2 build. The census is versioned in this document; a change re-dates the probe. |
+| **A5** | Three `B0.*` bootstrap goals generalize to PAEOS goals at large. | A probe over a feature-shaped or `SUBSTANTIAL`-weight goal returns a materially different ratio. | Carried, **not** eliminated. `B0.0`–`B0.2` are infrastructure tasks of similar shape and probably ran at low ceremony (PAEOS-9 §2.3 Trace-A auto-discharges L03–L11 with evidence *stubs*) — which would systematically **understate** available richness for full-ceremony Trace-B goals. This is SAEOS-1 §9 A4's sample-bias residual, inherited. The report **must** state each goal's weight class and trace, and must not claim generality beyond the sample. |
+| **A6** | Hand extraction is a valid proxy for machine extraction. **It is not, on its own.** | Any cell scored `extractable` with `anchor = none`. | Structurally mitigated, not assumed away: the `anchor` dimension (§4.3) measures exactly this gap and produces a distinct S1 design obligation. A GO here means *the information exists*; it does not by itself mean *a parser can get it*. |
+| **A7** | A downstream stage holds `reviews/` read+write capability. | No role in PAEOS-7.6 §3 is mintable with that scope for this goal. | Kernel / Capability Broker (PAEOS-9 §5.5). If unmintable, the goal cannot be discharged as specified and must be re-scoped. |
+| **A8′** | `0.00 ≤ loss_ratio < 1.00`, so the accept regex `^loss_ratio: 0\.[0-9]+$` can express the true value. | A measured `loss_ratio` of exactly `1.00` — total loss — which the regex **cannot** express. | Executing stage. **Resolution: report the true value (`loss_ratio: 1.00`) and let the accept assertion fail.** Do not write a false number to satisfy a gate; a failing gate is the correct signal at total loss, and the verdict is NO-GO regardless. Practically near-impossible (`Decision.label` and `EvidenceRef.hash` are trivially present in any review artifact), but the rule is fixed here so nobody improvises it under gate pressure. `0.00` is expressible and needs no special case. |
+
+None of A1–A8′ changes the design. A3 and A5 are genuine carried risks and are surfaced in
+the report; A6 is converted into a measured dimension rather than left as an assumption.
+
+---
+
+## 8. Perspectives covered (multi-perspective critique input, L09)
+
+- **Correctness / arithmetic:** the denominator is frozen before any source is read (§1,
+  §3.2); the aggregation is closed-form (§4.1); `n_a` versus `absent` is decided by rule,
+  not by extractor discretion (§4.2). ✔
+- **Falsifiability (the point of the exercise):** the probe can return NO-GO by two
+  independent routes — veto and ratio — and `INSUFFICIENT_SOURCE` also terminates NO-GO.
+  A design in which only GO is reachable would not test A8. Δ3's requirement that every
+  SAEOS spec carry a mechanically checkable conformance assertion is met by the four
+  accept checks (§10). ✔
+- **Adversarial:** the main attack on a spike like this is denominator-shopping — quietly
+  excluding fields that would score badly. Countered by freezing the census here, by
+  requiring a `note` on every non-`extractable` cell, by publishing `type_presence`
+  alongside the ratio so type-level absence cannot hide inside `n_a`, and by the fail-safe
+  ambiguity rule. ✔
+- **Non-authority (FPL-3):** the probe reads sealed artifacts and writes one review
+  document. It creates no node, mints no evidence, touches no gate, and cannot advance any
+  goal. A NO-GO does not delete SAEOS-1 — it routes §8's S1 to redesign, exactly as D7
+  ratified. ✔
+- **Blast radius (A-2):** additive, non-TCB (`reviews/`, not `constitution/` or `kernel/`).
+  Expected **SOFT**. This design document itself is `design/`-only and touches nothing. ✔
+- **Context economy (FPL-4):** 267 enumerated cells across 3 goals is bounded and fits one
+  worker session. The per-cell ledger is the bulk of the report; the frontmatter carries
+  the decision, so a reader who needs only the verdict pays 2 lines. ✔
+- **Governance (×3, CER-5):** the probe recommends; it does not legislate. A NO-GO is
+  routed to the founder as an S1 redesign trigger, not applied as a spec amendment. ✔
+- **Sample validity:** addressed and *not* resolved — A5 is carried openly, with the
+  Trace-A stub caveat that plausibly biases the sample toward understatement. ✔
+- **Reproducibility:** a second operator running §5 against the same SourceSet should
+  produce the same ledger; divergence is itself a finding about artifact ambiguity. ✔
+
+---
+
+## 9. Hand-off to the executing stage
+
+**Capability required:** read `reviews/tasks/`, write `reviews/spikes/`. This design
+session holds neither (§0).
+
+**Output path:** `reviews/spikes/sakg-s1-extraction-probe.md`.
+
+**Required structure** (exact line forms; the accept assertions are anchored regexes):
+
+| Element | Exact form | Constraint |
+|---|---|---|
+| Frontmatter open | `---` | Line 1. |
+| Verdict | `verdict: GO` **or** `verdict: NO-GO` | Exactly one such line; nothing before or after on the line. |
+| Loss ratio | `loss_ratio: 0.NN` | 2 decimals, half-up. Band A, one-hop SourceSet. See A8′ for the `1.00` case. |
+| Supporting keys | `loss_ratio_review_only`, `band_b_loss`, `anchor_loss_ratio`, `basis`, `probed_goals`, `design_ref` | `design_ref` cites this file. |
+| Frontmatter close | `---` | |
+| Per-goal section | a level-2 heading of the form `## goal: ` followed by the goal id | **Exactly one per probed goal, ≥ 3 total.** |
+
+**Body per goal section:** the `SourceSet` used (with hop-1 paths), weight class and trace
+(A5), `instances_found` per node type, the full `ProbeCell` table
+(`type · field · band · score · anchor · hop · recoverable_elsewhere · note`), and the
+goal's `band_a_loss`.
+
+**Then, once:** the aggregate tables (`type_presence`, `veto_failures`, all ratios), the
+adjudication trace through §6.2, and the carries — minimally A3, A5, A6/anchor, plus the
+A2 divergence finding if triggered.
+
+> **Format trap — read this before drafting.** The accept check is
+> `rg -c '^## goal: '`, which counts **every** line starting with that string, including
+> lines inside fenced code blocks. Do **not** paste a section template containing a literal
+> `## goal:` heading into the report; it will inflate the count and decouple it from the
+> number of goals actually probed. Describe the heading inline (as this table does) or in a
+> `|`-prefixed table row. Also note `rg -c` exits non-zero and prints nothing when there
+> are no matches, which makes `test $(rg -c …) -ge 3` a shell error rather than a clean
+> failure — one more reason the headings must be real.
+
+**Execution order:** §2.1 → §2.2 → §5 (per cell) → §4.1 → §6.2 → emit. Do not compute any
+ratio before the census is fully enumerated; a partial denominator produces a wrong number
+that looks right.
+
+---
+
+## 10. Traceability — accept assertions to design elements
+
+| Goal accept assertion | Satisfied by | Owner |
+|---|---|---|
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | §9 output path; C9 Report Emitter | Executing stage (A7) |
+| `rg -q '^verdict: (GO\|NO-GO)$' …` | §6.2 verdict machine; §9 exact line form | Executing stage |
+| `test $(rg -c '^## goal: ' …) -ge 3` | §2.1 exactly 3 goals; §9 heading form + format trap | Executing stage |
+| `rg -q '^loss_ratio: 0\.[0-9]+$' …` | §4.1 arithmetic; §9 2-decimal form; A8′ for the inexpressible case | Executing stage |
+| *(implied)* "per-field: extractable / partial / absent" | §3.1 `ContentScore`; §3.2 census; §4.2 scoring discipline | Executing stage |
+| *(implied)* "explicit verdict GO or NO-GO **with the loss ratio**" | §6.2 + §4.1; both emitted in frontmatter | Executing stage |
+
+---
+
+**No orphan / no gap.** Every component in §1 has a producer and a consumer. Every record
+in §3.1 is produced by a named component and consumed by another. All twelve SAEOS-1 §4.3
+node types are assigned to a band in §3.2, with Band C's exclusion justified from the spec
+rather than by omission. Every state in §6.1 and §6.2 has an entry and an exit, including
+both failure terminals. Every assumption in §7 has a falsifier and a named verification
+owner. Every accept assertion in §10 maps to a design element. Evidence for this gate:
+`design_coherent` = this file.

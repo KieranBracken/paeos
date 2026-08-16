@@ -1,0 +1,186 @@
+# IdeationSet — L07 Trade-off Mitigation (`StageId.MITIGATION`) as a gate-routed SoftLoop stage
+
+- **Stage:** L04 Ambitious Ideation · role PLANNER · produced evidence: `candidate_set`
+- **Goal under ideation:** construct canonical layer L07 `MITIGATION` as a real, gate-routed stage between `TRADEOFF` (L06) and `DESIGN` (L08).
+- **Output contract satisfied here** (`operations/WORKFLOW_STATE_MACHINE.yaml:145-152`): `alternative_architectures` (§3, four decorrelated candidates) · `idealized_solution` (§4) · `failure_modes` (§3, per candidate; §5 cross-cutting).
+- **Machine-readable companion:** `ideation/L07_MITIGATION_CANDIDATE_SET.json`.
+- **Non-binding:** selection belongs to L06 (trade-off matrix) and the judge downstream. §6 records a lean, not a decision.
+
+---
+
+## 1. Derivation constraints this ideation is grounded in
+
+Every candidate below is derived from these, and anything not derivable from them is cargo cult (`derivation/PAEOS-0-foundations.md:13`).
+
+| Ref | Constraint | Source | Bearing on L07 |
+|---|---|---|---|
+| **DC-1** | Generation is cheap; verification and judgment are scarce. | PAEOS-0 §first-principles.1 | Writing a mitigation catalogue is cheap. Knowing the catalogue is *adequate* is the scarce good. The design effort belongs in the check, not the prose. |
+| **DC-2** | Model context is ephemeral; the filesystem is durable. Every agent must be killable and restartable from files alone. | PAEOS-0 §first-principles.2, §"Context management dies" | The catalogue MUST be a CAS artifact, not a returned string. BC-4. |
+| **DC-3** | Errors within one model/framing are correlated; across stances they are less correlated. *The only rigorous justification for multi-agent anything.* | PAEOS-0 §first-principles.3 | A single PLANNER authoring both hazards and safeguards is a correlated-error channel. This is the whole of open question (a). |
+| **DC-4** | **Any rule not enforced mechanically decays.** Prose is a suggestion; only executable checks are invariants. | PAEOS-0 §entropy-law | `required_evidence=()` is decay already shipped (`_RESEARCH`/`_CRITIQUE`/`_TRADEOFF`). BC-3 and BC-5 are direct applications. |
+| **DC-5** | Route, don't pipeline: ceremony depth from verifiability × reversibility. | PAEOS-0 §"route, don't pipeline"; PAEOS-9 §8.3 | Trace-A auto-discharges L03–L11 — but auto-discharge ≠ skip. Open question (c). |
+| **DC-6** | Every component ships with its own falsifier; a plan that cannot fail is a vibe. | PAEOS-0 §therefore.3, §"Planning survives" | The acceptance test must fail with the change reverted (CANARY-0002). |
+| **DC-7** | The terminal value is **low cost of change**, not architectural elegance. | PAEOS-0 §"Even maximize architectural quality" | Weighs heavily for candidate C, against candidate C's own generality risk. |
+| **DC-8** | Hard minimality budget; the kernel taxes every prompt. | PAEOS-0 §therefore.4 | Favours zero kernel/constitution edits (already a binding constraint). |
+| **DC-9** | The four-tuple is the only legal state change; the gate is the only legal exit from a state; deterministic evidence is re-run by the kernel, never trusted. | PAEOS-7.6 §4, PAEOS-9 §8.5 | Fixes the *shape* of the L07 exit for every candidate. |
+| **DC-10** | Maximum leverage per founder intervention; every escalation ends by amending an artifact so that class never escalates again. | PAEOS-0 §"Minimize founder intervention" | Governs the irreversible-accepted-risk escalation (`ENGINEERING_LIFECYCLE.md:111`) that BC-5 knowingly admits. |
+
+---
+
+## 2. Cross-cutting constraints all candidates inherit
+
+These are not options. They are consequences of the corpus, and two of them contradict things currently written down. Each candidate is scored against them in §3.
+
+**CC-1 — L07 is unconditional in the kernel, and the state machine says otherwise.**
+`operations/WORKFLOW_STATE_MACHINE.yaml:179` gives L06 two exits: `{L07: "matrix has material risks", L08: "no material risk"}`. The kernel lattice does not: the intake records `is_legal(TRADEOFF, DESIGN, SUBSTANTIAL) == False`. The YAML's "no material risk" bypass is **unimplementable without a kernel edit**, which is forbidden. Therefore *every* candidate must execute L07 on every substantial run, including runs with an empty risk set, and must emit a catalogue artifact in the empty case (an attested "no high-severity trade-offs" record). A candidate that keeps a conditional-skip path is non-conforming. This also means the acceptance test's "NO direct TRADEOFF→DESIGN edge" is not merely a preference — it is the only legal walk.
+
+**CC-2 — Trace-A auto-discharge still needs a real artifact to bind to.**
+`PAEOS-9:745` and `ENGINEERING_LIFECYCLE.md:29` require an `{auto_pass, trace_a, runtime}` stub *so every transition stays four-tuple-valid*. But SI-4 binding (`PAEOS-7.6 §6`) rejects evidence whose `artifact_hash` ≠ the artifact under review. A stub with no artifact has nothing to bind to. So even Trace-A must write a minimal catalogue object to the CAS and bind the stub evidence to its hash. This keeps the acceptance clause "emits a catalogue artifact with a bound `artifact_hash`" true on *every* run, not just Trace-B runs — a strictly better acceptance test than one that only holds on the deep path.
+
+**CC-3 — Coverage is not adequacy; that is where CANARY-0002 reappears.**
+BC-3 forbids an always-passing stage. The obvious fix (assert every high-severity row has a non-empty `safeguard` field) converts an always-pass into a *trivially satisfiable* pass: `safeguard: "TBD"` clears it. The detection signature of CANARY-0002 is "identical result whether the artifact is applied or not"; the trivially-satisfiable variant is "identical result whether the safeguard is real or a placeholder". Any candidate must state which of the two it defeats and admit the other as debt.
+
+**CC-4 — Judgment evidence needs two producers; deterministic evidence needs a re-runnable command.**
+`PAEOS-7.6 §6` gate rules: deterministic evidence is kernel-re-run; **non-deterministic evidence requires two independent producers within tolerance**. A single-session "the planner asserts the safeguards are adequate" is neither: it is unrepeatable *and* single-producer. This constrains how the obligation may be typed (`TEST` vs `CITATION`) and is the strongest structural argument for candidate B.
+
+**CC-5 — The escalation route is deliberately a stop.**
+`ENGINEERING_LIFECYCLE.md:111`: irreversible accepted-risks → founder Decision. `PAEOS-9 §8.4`: blocking is safe indefinitely, the clock is paused, `blocked` never alters `status` and never itself triggers BUDGET_EXCEEDED. BC-5 accepts this. Per DC-10 the escalation must terminate in an artifact amendment (a reusable accepted-risk policy), not a one-off answer, or L07 becomes a recurring interrupt generator.
+
+---
+
+## 3. Alternative architectures (four decorrelated candidates)
+
+Decorrelation axis: **where enforcement lives**. A puts it in a deterministic oracle; B puts it in role separation; C puts it in the topology substrate; D puts it in the hand-off data model. They are not four flavours of one design — they fail differently, and §5 shows they fail on different axes.
+
+---
+
+### Candidate A — Inline Gated Node with a Deterministic Coverage Oracle
+
+**Shape.** `StageId.MITIGATION` is inserted into the `SoftLoop._run_body` stage tuple between `TRADEOFF` and `DESIGN`. One PLANNER dispatch, write scope `mitigation/` only. The stage emits `mitigation_catalogue.json` to the CAS. The `required_evidence` obligation is a single `TEST`-kind, `DETERMINISTIC` claim whose `reproducible_command` is a checker script that loads the L06 matrix artifact and the L07 catalogue from the CAS and asserts structural coverage: every risk row at or above the severity threshold carries either a `safeguard` (with `kind ∈ {kill_switch, fallback, shadow_mode, safety_constraint}`, a `trigger`, an `owner_artifact_ref`) or an `accepted_risk` (with `reversibility`, `rationale`, `decision_ref`). The kernel re-runs it (T2). Both edges go through `Gate.propose_transition`; failure takes REMAND. Severity is computed **inside L07** from the router's existing axes (verifiability × reversibility, `PAEOS-0 §route`) applied to each matrix row — no L06 amendment. Adversary is deferred to L09 and the weaker posture is recorded as debt.
+
+**Rationale.** Smallest conforming diff. The obligation is exactly the kind of evidence the kernel is built to re-run, so the enforcement is mechanical end-to-end (DC-4, DC-9) with no new trust in any agent's self-report. It is the only candidate that can plausibly be built, tested, and sealed inside one ADE cycle, which matters because L07 is the *first* of four ordered successor goals.
+
+**Trade-offs.** Buys sealability at the cost of adequacy. It defeats the always-passes failure mode and does not defeat the trivially-satisfiable one (CC-3). The severity computation is authored by the same session that authors the safeguards, so a planner can lower a severity rather than mitigate a risk — the oracle cannot see that, because both inputs are downstream of one mind (DC-3 violated in spirit).
+
+**Failure modes.**
+- *F-A1 (high, reversible):* placeholder safeguards clear the coverage oracle. Detection: mutation test — corrupt each safeguard to a placeholder and confirm the oracle still passes (it will). Partial containment: require `owner_artifact_ref` to resolve to a real CAS object, and require `trigger` to be a machine-evaluable predicate rather than prose.
+- *F-A2 (high, reversible):* self-marked severity. The planner sets `severity: low` on a risk it does not want to mitigate. No structural check can catch this within one session.
+- *F-A3 (medium, reversible):* the checker becomes the vacuity (CANARY-0002 proper) if it is written to reproduce faithfully without loading the artifact under review. Detection: the required negative test — revert the change, the acceptance test must fail.
+- *F-A4 (low, reversible):* empty-risk runs (CC-1) trip the oracle if it demands ≥1 row; the oracle must accept a well-formed empty catalogue while rejecting a *missing* one.
+
+---
+
+### Candidate B — Adversarial Dual-Session Node (Planner proposes, Adversary attacks, IBM between)
+
+**Shape.** As A for topology, but the stage runs two dispatches behind the `InformationBarrierManager`. Session 1: PLANNER, write scope `mitigation/`, produces the catalogue. Session 2: ADVERSARY, decorrelated model family (A-08), receives *only* an IBM bundle of `{L06 matrix hash, L07 catalogue hash}` — no planner rationale, no transcript — and attempts to falsify each safeguard, producing an attack report with per-safeguard verdicts. The gate's `ValidationClaim` carries two claims: `coverage` (deterministic `TEST`, as in A) and `adversary_survived` (`CITATION`, judgment, citing the catalogue and matrix hashes). Unsurvived high-severity safeguards → REMAND to `MITIGATION` under a remand cap (SI-9/T5), then escalation.
+
+**Rationale.** This is the only candidate that implements the lifecycle as written: L07 is specified `Planner + Adversary` (`ENGINEERING_LIFECYCLE.md:105`), and `operations/ROLE_RESPONSIBILITIES.md:57` names L07 explicitly as one of the three Adversary stations ("attack mitigations"). It is the only candidate that answers CC-4 honestly — judgment evidence gets a second independent producer — and the only one that attacks F-A1/F-A2 rather than documenting them. It is the direct application of DC-3, the axiom that is the *sole* justification for spending tokens on more than one session.
+
+**Trade-offs.** Roughly 2× the per-run cost of L07 and materially more runtime surface: the IBM is currently exercised at stage boundaries, and this puts it *inside* one stage. It also raises an unverified kernel question (OPEN-VERIFY-3): the capability token's `bound_to` includes `role`, so two roles in one stage need two tokens for the same `(goal, run, stage)`, and SI-3's separation-of-powers check runs per `(goal, run)`. If either is unsupported, B degrades to A plus a deferred adversary — which is a survivable degradation, not a dead end.
+
+**Failure modes.**
+- *F-B1 (high, reversible):* remand oscillation — an adversary that always finds something turns L07 into a non-terminating loop and burns the goal budget. Containment: hard remand cap plus a rule that the Nth remand escalates rather than retries.
+- *F-B2 (medium, reversible):* adversarial theatre — the adversary produces findings with no failing case, satisfying the claim without discriminating. Same shape as CC-3, one level up. Containment: the adversary's finding format must carry `violated-principle · evidence · severity · smallest-amendment` (the 3.5/5.5 court format already used at L10, `ENGINEERING_LIFECYCLE.md:139`).
+- *F-B3 (medium, reversible):* epistemic leakage — if the IBM bundle defaults to full inclusion, the adversary sees the planner's rationale and its errors re-correlate. This is precisely the second adversarial threat the canonical verdict says MUST be patched (`PAEOS_CANONICAL_EXECUTION_VERDICT.md`, Self-Consistency/Epistemic Leakage).
+- *F-B4 (low, irreversible-ish):* cost. Two Opus sessions per L07 on every substantial run is a standing tax; EVAD-style bounding is the named mitigation in the same verdict.
+
+---
+
+### Candidate C — Declarative Policy-Table Stage Driver (Architecture D as a reusable primitive)
+
+**Shape.** Rather than hand-writing L07 into `_run_body`, introduce a declarative `StageSpec` table (stage → role, write scopes, `required_evidence`, next stage) and a single generic `run_gated_stage(spec)` driver that mints the package via `open_stage`, dispatches, collects artifacts, and presents the four-tuple to `Gate.propose_transition`. `MITIGATION` is registered as the table's first entry; every other stage keeps running on the existing imperative path until later cycles migrate it. The table's legal-edge column is *derived from* `kernel/lifecycle.py`, never authored in parallel.
+
+**Rationale.** The ratified verdict (`PAEOS_CANONICAL_EXECUTION_VERDICT.md`) is that topology must be owned by Kernel Gates and Policy, not by an imperative script, and that this is the same defect as F2 (the orchestrator never calls `propose_transition`). A and B fix F2 at one node by hand; C fixes the *mechanism* by which nodes can go missing. Against DC-7 (low cost of change as the terminal value) it is the strongest candidate by a wide margin: the three successor goals — L15, full-walk gating, L18 — become table rows plus a checker each, instead of three more hand-written insertions. It is also the only candidate that makes "a layer went missing silently" mechanically detectable, since the table can be diffed against the lattice.
+
+**Trade-offs.** It generalizes from one data point. The adversarial critique of Architecture D warns of exactly this: policy logic that becomes intractable or deadlocks "because the system lacks an imperative fallback" (`CRITIQUE_INDEPENDENT.md`, Model D / Governance). Building the general driver while the specific stage is still unbuilt inverts the usual order and risks a driver shaped by a stage nobody has run yet. Blast radius in `runtime/orchestrator/` is the largest of the four, on the layer the whole loop depends on.
+
+**Failure modes.**
+- *F-C1 (high, reversible):* policy/lattice divergence — the table says an edge is legal, the kernel disagrees, and the loop halts at a node the table thinks is fine. Containment: derive the table's edges from `is_legal` at load time; never duplicate.
+- *F-C2 (high, reversible):* the driver breaks the currently-working stages during migration. Containment: register only `MITIGATION` in this cycle; leave the imperative path untouched for everything else (this is what makes C's first increment survivable).
+- *F-C3 (medium, reversible):* premature abstraction — the driver's interface is wrong for L15 (which needs `ledger/` write authority) and has to be redesigned at the first reuse, so the generality was never banked.
+- *F-C4 (medium, reversible):* two orchestration paths coexist for several cycles; readers cannot tell which one governs a given stage. This is the F3 false-positive shape (a plausible-looking mechanism beside a real one) at the orchestrator level rather than the module level.
+
+---
+
+### Candidate D — Upstream-Typed Risk Register (contract-first at L06; L07 becomes a thin join)
+
+**Shape.** Close open question (b) at its source. Amend L06's output contract to emit a typed `risk_register` — each row carrying `id`, `axis`, `severity`, `reversibility`, `verifiability` — alongside the existing trade-off matrix. L07 then does no severity inference at all: it joins the register on `severity >= HIGH` and produces one catalogue entry per row. The gate obligation becomes a referential-integrity check (every HIGH row in register `H_matrix` has exactly one catalogue entry bound to it) plus schema validation. Composes with A or B for the dispatch shape.
+
+**Rationale.** It removes F-A2 structurally rather than by inspection: severity is set by L06, whose role set is `[planner, reviewer]` (`WORKFLOW_STATE_MACHINE.yaml:173`) — a *different* session from the one authoring safeguards. The self-marking problem is then only half-present (the planner still marks its own safeguards, but no longer marks its own severities). It also makes the L07 obligation a genuine join over two independently-produced artifacts, which is far harder to satisfy vacuously than a self-consistency check on one artifact. Per DC-4, a typed field is enforced mechanically; a severity implied by prose is not.
+
+**Trade-offs.** It touches a working adjacent layer. The intake flags that `_TRADEOFF`'s spec mandates no severity axis, so this is an adjacent-layer amendment — small, but it modifies a stage that currently runs, and a regression there costs more than L07's absence does. There is also a doctrinal question: `ENGINEERING_LIFECYCLE.md` is FROZEN v1.0, and amending a frozen document's state contract is arguably an L19 action, not something an L07 intake may do unilaterally. That question needs answering before D is picked, and answering it is not free.
+
+**Failure modes.**
+- *F-D1 (high, reversible):* regressing L06. A working orchestrated layer breaks and the loop loses ground it already held.
+- *F-D2 (medium, irreversible-ish):* scope creep across the frozen-document boundary — an L07 goal quietly performing an L19 amendment is the exact authority-boundary defect that got L15 and L18 deferred in the first place.
+- *F-D3 (medium, reversible):* the register and the matrix drift apart; L07 joins on a stale register (SI-4 catches this only if both are bound to the same `produced_against` hash).
+- *F-D4 (low, reversible):* severity thresholds become a negotiation surface at L06 instead of L07 — the self-marking problem moves rather than dies, if L06's reviewer stance is not genuinely independent.
+
+---
+
+## 4. Idealized solution (ignore practicality; this is the target the candidates project onto)
+
+L07 as it would exist if cost were free:
+
+1. The whole 19-state walk is a policy-driven, event-sourced machine (Architecture D, ratified). No stage is reachable except through `propose_transition`; a missing stage is a lattice violation the loop *cannot* execute past, not a silent omission.
+2. L06 emits a typed, severity-bearing risk register produced under a planner+reviewer split; L07 consumes it as a contract.
+3. L07 runs Planner and Adversary as two sessions in decorrelated model families behind a semantically-filtering IBM (rationale stripped, artifacts passed), with adversary invocation bounded by EVAD so the second session is spent only where task risk justifies it.
+4. The mitigation catalogue is machine-checkable: each safeguard carries a machine-evaluable trigger predicate and an executable falsifier, so the checker can *mutate* the catalogue (blank a safeguard, weaken a trigger) and assert the oracle fails — adequacy tested by mutation, not by coverage (MUTATION is already an `EvidenceKind`, `PAEOS-7.6 §6`).
+5. Irreversible accepted-risks escalate to a batched founder decision queue, and each answer terminates in an amended accepted-risk policy so that class never escalates again (DC-10).
+6. Trace-A discharges the whole thing in one pass with a bound stub artifact, so the cheap path and the deep path are the same machine at different ceremony depths.
+
+Candidate C is (1). Candidate D is (2). Candidate B is (3). Candidate A is the floor of (4). No candidate reaches (4) fully — the mutation-tested adequacy oracle is the piece none of them buy, and §6 recommends carrying it as named debt rather than pretending coverage is adequacy.
+
+---
+
+## 5. Decorrelation check and convergence honesty
+
+Per the L04 failure clause ("degenerate space → collapse to a single approach, note it"): the candidates are **not** degenerate, but they do converge on a shared core, and it is worth stating exactly where.
+
+**Converged (forced by BC-1..BC-7 and CC-1..CC-2, not by ideation):** stage inserted between TRADEOFF and DESIGN; PLANNER RoleSpec with write scope `mitigation/` only; a non-empty `required_evidence` obligation; a catalogue artifact in the CAS carried to DESIGN over `planner_artifacts`; both edges through `Gate.propose_transition`; REMAND on failure; `runtime/mitigation.py` deleted or fully replaced. Anything that varies these is non-conforming, so ideation had no freedom there and correctly spent none.
+
+**Genuinely decorrelated — the four fail on different axes:**
+
+| | A (oracle) | B (stance) | C (substrate) | D (data model) |
+|---|---|---|---|---|
+| Enforcement lives in | a re-runnable checker | role separation | the topology table | the hand-off schema |
+| Defeats always-passes (BC-3) | yes | yes | yes | yes |
+| Defeats placeholder safeguards (CC-3) | no | partly (adversary attacks them) | no | no |
+| Defeats self-marked severity (F-A2) | no | partly | no | **yes** |
+| Satisfies CC-4 two-producer rule | n/a (deterministic only) | **yes** | n/a | n/a |
+| Reduces recurrence of F2 systemically | no | no | **yes** | no |
+| Blast radius | smallest | medium | largest | medium, on a *working* layer |
+| Cost per run | 1 session | 2 sessions | 1 session | 1–2 sessions |
+| Sealable this cycle | very likely | likely | uncertain | likely, if the frozen-doc question resolves |
+
+The important structural observation: **A, C and D all leave adequacy unchecked; only B attacks it.** And **only C reduces the probability that the *next* layer goes missing.** Those two properties are orthogonal, which is why the composite in §6 is worth L06's attention rather than a straight pick.
+
+---
+
+## 6. Preliminary lean (input to L06, not a decision)
+
+**B∘C, staged; A as the guaranteed floor.**
+
+Rationale in one line each: C is the only candidate that pays down the cause rather than the instance (DC-7), B is the only one that honours the axiom that justifies multi-agent spend at all (DC-3), and A is the only one certain to seal this cycle — and a sealed L07 is a precondition for the three successor goals, so shipping *something* enforcing dominates shipping the ideal late.
+
+Concretely, if L06/L07 rank the risks the way §3 suggests: build C's `run_gated_stage` driver with `MITIGATION` as its only registered row (bounding F-C2 by construction), give it A's deterministic coverage oracle as the mandatory obligation, and add B's adversary session **behind a feature-gated second claim** only if OPEN-VERIFY-3 clears. Record F-A1/F-A2 (placeholder safeguards, self-marked severity) as explicit debt with D named as the scheduled repair, rather than claiming adequacy the oracle does not deliver — per CC-3 and DC-6, a check whose limits are stated is an invariant; a check whose limits are implied is a vibe.
+
+---
+
+## 7. Open questions carried forward
+
+**To DESIGN, as delegated by the intake:**
+
+- **(a) Who plays Adversary.** Candidates: B answers it in-stage (second dispatch behind the IBM); A/C/D defer to L09 and record the weaker posture as debt. Note for the record that deferral is not free — `ROLE_RESPONSIBILITIES.md:57` names L07 as an Adversary station, so deferral is a documented departure from the role model, not merely an unbuilt nicety.
+- **(b) How high-severity is determined.** Candidates: computed inside L07 from the router's verifiability × reversibility axes (A/C — no adjacent-layer edit, but self-marked), or a typed severity field emitted by L06 (D — structurally sound, but touches a working layer and possibly a frozen document). §3-D's frozen-document question must resolve first.
+- **(c) Trace-A behaviour.** Answered structurally by CC-2 and unchanged across candidates: emit a minimal catalogue object to the CAS and bind the `{auto_pass, trace_a, runtime}` stub to its hash. Auto-discharge is not skip, and a stub with nothing to bind to fails SI-4.
+
+**New — verification items DESIGN must clear before committing (none checkable from this stage's read scope; all cheap):**
+
+- **OPEN-VERIFY-1 (blocking the acceptance test as written).** The acceptance test asserts `is_legal(TRADEOFF, MITIGATION, wc)` and `is_legal(MITIGATION, DESIGN, wc)` for **all** `WeightClass` values. The intake asserts both edges are legal but cites only the SUBSTANTIAL case for the illegal `TRADEOFF→DESIGN` edge. If the lattice restricts either MITIGATION edge for any weight class, the acceptance test fails and repairing it would require a kernel edit — which BC-1..BC-7 forbid, and which would invalidate the "only candidate the current loop can seal" premise. Check `kernel/lifecycle.py` before design freeze.
+- **OPEN-VERIFY-2 (affects all candidates).** `propose_transition` step 4 asserts "producer role != any conflicting role already used this (goal, run)" (SI-3, `PAEOS-7.6 §4`). L06 and L07 are both PLANNER on the same goal and run. Confirm PLANNER-after-PLANNER is not a conflicting pair, or the first gated MITIGATION transition denies on separation-of-powers and the loop halts at the node this goal exists to build.
+- **OPEN-VERIFY-3 (blocking for B only).** Does `mint_capability` support two tokens for the same `(goal, run, stage)` under different roles, given `bound_to` is immutable and stage-scoped? If not, B degrades to A-plus-deferred-adversary.
+- **OPEN-VERIFY-4 (affects the acceptance test's coverage).** Confirm which weight classes actually reach TRADEOFF in the live `SoftLoop`; if ROUTINE runs never enter the cognitive pipeline, the Trace-A stub path (CC-2) is currently untestable end-to-end and must be tested at unit level instead.
+- **OPEN-VERIFY-5 (documentation debt, non-blocking).** `WORKFLOW_STATE_MACHINE.yaml:179` describes a L06→L08 bypass the kernel does not permit (CC-1). Whoever owns that file should be told; it is a live doc/kernel divergence of the same species as Finding 4 in the gaps register, and it will mislead the next reader of the state machine.
+
+**Note on the read scope of this stage.** This IdeationSet was produced under IDEATE read scopes (`constitution/ spec/ derivation/ reviews/ ledger/ backlog/ docs/ architecture/ operations/`). `runtime/` and `kernel/` were **not** read. Every claim about code in this document is either quoted from the intake or marked as an OPEN-VERIFY item; none of it is a first-hand code observation, and it should not be treated as one.

@@ -1,0 +1,23 @@
+# DEBT-0011 — Evolution Engine Stage-17 Memory Update Bypasses Kernel Gate & Reference Monitor
+
+**Status**: OPEN  
+**Filed**: 2026-07-30  
+**Priority**: High  
+**Category**: Architectural Deviation / Gate Bypass  
+
+---
+
+## 1. Compromise
+In [runtime/evolution.py](file:///Users/bob/GitHub/paeos/runtime/evolution.py), Stage 17 (`_memory_update`) mutates institutional memory (`ScarStore`) directly by invoking `propose_scar(draft)`. It does not mint capability tokens, invoke `Gate.propose_transition()`, or record a `scar_committed` event to the kernel ledger.
+
+## 2. Reason
+The Evolution Layer was built in B2.F as a standalone runtime module operating post-run over a `RunOutcome`. To allow scars to accumulate across backlog runs in `SelfHostRunner`, `EvolutionLayer` was wired directly to `ScarStore` without setting up a full kernel transition gate for each scar injection.
+
+## 3. Ideal Solution
+Route Stage 17 institutional memory mutations through a formal kernel gate transition (`StageId.MEMORY_UPDATE`) authorized by capability tokens and committed to the single-writer ledger as a `scar_committed` event.
+
+## 4. Repayment Conditions
+Repay during Phase 3 Evolution Layer hardening prior to multi-agent self-hosting.
+
+## 5. Estimated Impact
+High. Allowing runtime code to mutate institutional memory out-of-band bypasses TCB Reference Monitor governance (PAEOS-7 §4.4, PAEOS-7 §7), violating the core requirement that all state transitions must be gate-verified.

@@ -1,0 +1,20 @@
+# DEBT-0070 — Dead Parameter `remand_count` in `classify_friction` Signature
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-friction** (touches `runtime/friction.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+In `runtime/friction.py`, `classify_friction(outcome, changed_paths=(), *, has_matching_scar=False, remand_count=1)` defines `remand_count: int = 1`.
+
+Following commit `62fac40` (which removed the rigid 2-remand override in favor of multi-signal `BlockageAnalysis`), `remand_count` is completely unused inside `classify_friction`.
+
+## 2. Root Cause
+
+The 2-remand logic was removed from `classify_friction` during the RB-0009 refactor, but the parameter was left in the function signature as dead code.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Remove `remand_count` from `classify_friction` signature and update any legacy callers or test references.
+- **Long-term:** Maintain strict parameter hygiene during refactoring to prevent signature cruft.

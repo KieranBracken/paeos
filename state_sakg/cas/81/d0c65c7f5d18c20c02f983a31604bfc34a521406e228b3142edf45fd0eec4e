@@ -1,0 +1,20 @@
+# DEBT-0061 — Substrate Path Domain Split vs Kernel Path Classifier
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-friction** (touches `runtime/friction.py` & `kernel/classifier.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`runtime/friction.py` defines `_SUBSTRATE_PREFIXES = ("runtime", "kernel", "ops", "cli", "mcp")` to score friction leverage (3.0× multiplier for substrate paths). However, `kernel/classifier.py` (`classify_paths`) is the designated sovereign authority for path classification (HARD vs SOFT blast radius).
+
+Defining hardcoded substrate path lists at the runtime layer creates a split domain model between Kernel Path Classifier and Runtime Substrate Classifier.
+
+## 2. Root Cause
+
+Friction leverage scoring introduced a separate notion of "substrate paths" outside `kernel/classifier.py` without updating `kernel/classifier.py` or `constitution/classifier_rules/`.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Retain `_SUBSTRATE_PREFIXES` in `runtime/friction.py` for ROI leverage calculations.
+- **Long-term:** Unify path domain classification within `kernel/classifier.py` and `constitution/classifier_rules/`, exposing substrate classification as a kernel query to preserve a single source of truth for repository path taxonomy.

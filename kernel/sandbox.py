@@ -18,6 +18,7 @@ import contextlib
 import resource
 import shlex
 import subprocess
+
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -78,7 +79,11 @@ def run_sandboxed(
     args = shlex.split(command)
     if not args:
         raise SandboxError("empty command")
-    env = {"PATH": "/usr/bin:/bin:/usr/local/bin", "LC_ALL": "C"}  # minimal, no inherited secrets
+    home_cargo = str(Path.home() / ".cargo" / "bin")
+    home_local = str(Path.home() / ".local" / "bin")
+    allowlisted_path = f"{home_cargo}:{home_local}:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    env = {"PATH": allowlisted_path, "LC_ALL": "C"}
+
     try:
         proc = subprocess.run(
             args,

@@ -1,0 +1,508 @@
+# PLAN — F-ENVELOPE: universal node envelope schema + fixture corpus
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan (the L11 implementation contract) |
+| **Backlog node** | `SAKG-1 / F-ENVELOPE` (slice S1, wave 0, `deps: []`, actor `fable`, role `Planner`) — `backlog/SAKG-1-backlog.yaml` L91–108 |
+| **Stage / Role** | `PLAN` / `PLANNER` — L11 Formal Planning (`operations/ENGINEERING_LIFECYCLE.md` §L11) |
+| **Clause** | SAEOS-1 §4.2, §4.3; K4§2. Supporting: §3.3.3, §5.1, §6.1b, ×5, Δ6, Ω4, Ω5 |
+| **Status** | PLAN ONLY — no implementation, no verification run. This file is the artifact L12 is bound to. |
+| **Date** | 2026-08-08 |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited |
+| **Upstream refs** | DESIGN artifact `be1de3267633…` = `context/artifact-be1de3267633.txt` ("DESIGN — F-ENVELOPE", frozen, 2026-08-08); `backlog/SAKG-1-backlog.yaml` (node, conventions, `dag_properties`); `operations/ENGINEERING_LIFECYCLE.md` (L11–L15); `backlog/packages/wave-0/SPEC-CLARIFICATIONS.md` (HALT rule); `ledger/debt/DEBT-0026…0155` (73 open scar entries, §8 RK-4); `backlog/research/RB-0008` (friction-handler provenance of those entries) |
+
+Throughout, **"design §N"** refers to sections of the frozen DESIGN artifact above.
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/` and
+read-capability limited to `constitution/`, `design/`, `plan/`, `reviews/`, `ledger/`,
+`backlog/`, `docs/`, `architecture/`, `operations/`. The F-ENVELOPE deliverables name
+actions this stage **does not and must not perform**; each is planned below as a work unit
+with a named downstream owner, not executed:
+
+1. **Write `sakg/schema/envelope.schema.json`** — a `sakg/`-tree write owned by
+   **BUILDER @ IMPLEMENT (L12)**. Outside this session's write-capability. Planned as **WU-3**.
+2. **Write `tests/sakg/**`** — a `tests/`-tree write, same owner. Planned as **WU-5…WU-8**.
+3. **Run the four `accept` commands** — they presuppose the artifacts exist and produce
+   L13 VERIFY evidence, owned by **VERIFIER @ VERIFY**. Running them now would fail red and
+   would misrepresent verify-stage evidence as plan output. Planned as **WU-1** (recorded red
+   baseline, pre-implementation) and **WU-10** (the acceptance run).
+4. **Record `DBT-1` / `DBT-2` in `ledger/debt/`** — an L15 Documentation & Ledger write.
+   Planned as **WU-11**.
+
+Evidence emitted by *this* session is `plan_executable` (this file) — nothing else.
+
+**Pre-gate note (carried from design §0).** F-ENVELOPE is wave 0 with `deps: []`, deliberately
+*not* downstream of the founder gate `G-S1-GO`. Freezing a contract is authorised pre-gate.
+**No node that consumes this schema (`I-STORE`, `I-INGEST`, `F-BUNDLE`, `F-PROJ`) may start
+before `G-S1-GO` records `PROCEED`** (`backlog/SAKG-1-backlog.yaml` L110–128). If `S-PROBE`
+returns NO-GO, this node is reverted with the slice, not extended — see §7 rollback trigger RB-c.
+
+---
+
+## 1. Objective restatement (traceability)
+
+Produce two frozen artifacts and their harness:
+
+1. `sakg/schema/envelope.schema.json` — JSON Schema **draft 2020-12** covering **every §4.2
+   field** (17: 13 top-level + 4 nested under `provenance`), in three `$defs` profiles
+   (`envelope_base`, `authored_node`, `stored_node`), with rules R1–R16.
+2. `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` exercising **every field, every
+   status value, and every §4.2 invariant violation** — authored confidence, frequency-based
+   promotion, deleted node.
+
+**Acceptance (verbatim from `backlog/SAKG-1-backlog.yaml` L104–108; a node is `verified`
+only when every command exits 0):**
+
+```
+uv run python -c "import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())"
+uv run pytest tests/sakg/test_envelope_schema.py -q
+test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12
+test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8
+```
+
+Expected margins at completion (design §10): **14 valid, 19 invalid**, 8 test functions with
+T2/T3 parametrised to 33 test ids.
+
+This restates design §§2, 5, 6, 11 without adding, relaxing, or reinterpreting any
+requirement. **No requirement in this plan originates here**; every one carries a design or
+backlog reference.
+
+---
+
+## 2. Dependencies and entry conditions
+
+| Kind | Item | State required before WU-3 |
+|---|---|---|
+| Backlog deps | `deps: []` | none — F-ENVELOPE is a DAG root (`dag_properties.roots: [S-PROBE, F-ENVELOPE]`) |
+| Stage entry | L11 contract approved | this file; L12 is bound to it (`ENGINEERING_LIFECYCLE.md` §L11 exit) |
+| Isolation | isolated branch/worktree (A-16) | `ENGINEERING_LIFECYCLE.md` §L12 entry; also the cheapest rollback lever (§7) |
+| Write capability | `sakg/schema/`, `tests/sakg/`, conditionally `pyproject.toml` | verified at **WU-2** — HALT if absent (RK-4) |
+| Toolchain | `uv run pytest` works from repo root | assumption A3; probed at WU-1 |
+| Library | `jsonschema >= 4.18` (Draft202012Validator + `FORMAT_CHECKER`) | assumption A5; ensured at **WU-4** |
+| Spec input | SAEOS-1 §4.2/§4.3, RATIFIED 2026-08-06 (`backlog/SAKG-1-backlog.yaml` meta) | read-only; **never edited** (§3 forbidden) |
+
+**Downstream consumers (none may start here):** `F-BUNDLE` (`deps: [F-ENVELOPE]`),
+`F-PROJ` (`deps: [F-ENVELOPE]`), `I-STORE` (`deps: [F-ENVELOPE, G-S1-GO]`), `I-INGEST`.
+All are unstarted, so this node currently has **zero live consumers** — which is what makes
+the rollback in §7 total rather than partial.
+
+---
+
+## 3. Affected files (exhaustive) and forbidden files
+
+L11 requires both lists to be explicit (`ENGINEERING_LIFECYCLE.md` §L11 "Required artifacts:
+affected files; **forbidden files**; rollback plan; acceptance criteria; test strategy;
+dependencies").
+
+### 3.1 Affected — created (36 new files, + 1 conditional)
+
+| # | Path | Count | WU |
+|---|---|---|---|
+| 1 | `sakg/schema/envelope.schema.json` | 1 | WU-3 |
+| 2 | `tests/sakg/fixtures/envelope/valid/V01…V14-*.json` | 14 | WU-5 |
+| 3 | `tests/sakg/fixtures/envelope/invalid/I01…I19-*.json` | 19 | WU-6 |
+| 4 | `tests/sakg/fixtures/envelope/manifest.json` | 1 | WU-7 |
+| 5 | `tests/sakg/test_envelope_schema.py` | 1 | WU-8 |
+| 6 | `tests/sakg/__init__.py` — **only if** pytest collection fails (A2) | 0 or 1 | WU-8 |
+
+Exact filenames are fixed by design §5.1 (V01–V14) and §5.2 (I01–I19). The manifest sits
+**above** `valid/` and `invalid/` so it is outside the two `ls */*.json` gate globs
+(design §1); `tests/sakg/__init__.py` likewise sits above `fixtures/`.
+
+### 3.2 Affected — modified (at most **one** pre-existing file, **one** line)
+
+| Path | Change | Condition | WU |
+|---|---|---|---|
+| `pyproject.toml` | add `jsonschema>=4.18` to the **dev dependency group** — one line, nothing else | only if the dependency is absent (A5) | WU-4 |
+
+### 3.3 Affected — append-only ledger (L15)
+
+| Path | Change | WU |
+|---|---|---|
+| `ledger/debt/DEBT-<next>.md` ×2 | new records for `DBT-1`, `DBT-2` (design §8), citing `SAKG-1/F-ENVELOPE`. Next free ids are **≥ DEBT-0157** (highest observed at plan time: `DEBT-0156`, filed 2026-08-08) | WU-11 |
+
+### 3.4 Forbidden — writing any of these is scope creep and fails L12/L14
+
+| Path | Owner / reason |
+|---|---|
+| `spec/**` (incl. SAEOS-1) | RATIFIED input. The schema **transcribes** §4.2; it never edits it. A change here is an amendment, not an implementation (CER-6). |
+| `constitution/**` | TCB, amend-only. Untouched — this node is Zone 2 throughout (`backlog` `trust_zone`; SAEOS-1 §3.3: SAKG is never in the TCB). |
+| `runtime/**` | PAEOS side. `runtime/emission/outbox.py` is `I-OUTBOX`; and `runtime` MUST NOT import `sakg` (T-NONAUTH). |
+| `sakg/store.py`, `sakg/ingest.py`, any `sakg/**/*.py` | `I-STORE` / `I-INGEST`. This node ships **data + a harness**, no runtime code. |
+| `sakg/schema/bundle.schema.json`, `sakg/schema/projection.schema.json` | `F-BUNDLE`, `F-PROJ`. |
+| `pyproject.toml` `[tool.hatch.build.targets.wheel].packages` | Explicitly `I-STORE`'s deliverable (`backlog` L180; design §11.6). The dev-dependency line is the **only** permitted pyproject edit. |
+| `tests/sakg/fixtures/extract/**`, any other `tests/**` module | `F-EXTRACT-FIX` and other nodes. |
+| `backlog/SAKG-1-backlog.yaml` | **The gate must not grade itself.** The four `accept` commands are the contract; an implementer weakening them would pass by construction. Any change here is an amendment through the backlog owner. |
+| `README`, `.gitkeep`, or any non-`.json` file inside `valid/` or `invalid/` | A4 / design §11.2–3: the gate counts `*.json`; directory purity is enforced by T4. |
+
+---
+
+## 4. Work units (executable, ordered, single-owner)
+
+Each WU is atomic, has one owning stage/role, a precondition, an exact action, a done-check,
+and the evidence it feeds. Order is strict: **WU-1 → WU-11**. Every prefix leaves a consistent
+state (§7.4).
+
+### WU-1 — Record the red baseline
+- **Owner:** VERIFIER @ VERIFY (may be run by the runtime), **before any write**.
+- **Ref:** `backlog/SAKG-1-backlog.yaml` `conventions.accept` — "Commands are executable BEFORE
+  the node starts (they fail red first) — this is the K3 mechanical-adversary property."
+- **Precondition:** repo at pre-change state; `uv` available (A3).
+- **Action:** run all four §1 commands from the repo root; capture exit code and output of each.
+- **Done-check:** **all four exit non-zero.** If any exits 0 before implementation, the gate is
+  not measuring this node — **HALT** and report (a green pre-baseline means either the artifacts
+  already exist or a command is vacuous).
+- **Feeds:** **E1**. This recording is also the rollback oracle (§7.3).
+
+### WU-2 — Capability probe + directory scaffold (scar-derived gate)
+- **Owner:** BUILDER @ IMPLEMENT (L12).
+- **Ref:** RK-4 (§8); `ledger/debt/DEBT-0026…DEBT-0155` — **73 open entries**, all titled
+  *"Builder Produced No Artifact — Write-Scope or Agent Failure"*, all implicating
+  `tests/sakg/` and `sakg/`, filed 2026-08-06 → 2026-08-08 by the RB-0008 friction handler.
+  This is the single most frequent observed failure mode for work of exactly this shape.
+- **Precondition:** WU-1 recorded; L12 running on an isolated branch/worktree (A-16).
+- **Action:** as the **first** act of L12, create `sakg/schema/`,
+  `tests/sakg/fixtures/envelope/valid/`, `tests/sakg/fixtures/envelope/invalid/`.
+- **Done-check:** all four directories exist. **If any creation is rejected or discarded,
+  HALT immediately and report the missing capability** — do **not** proceed to author content
+  that will be silently dropped, and do **not** substitute a different path. A halted run with
+  a named cause is a correct outcome; a run that produces no artifact and no cause is the
+  73-entry failure.
+- **Feeds:** **E2**.
+
+### WU-3 — Author `sakg/schema/envelope.schema.json`
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** design §2.3 (17-field table, 9 canonical regexes, skeleton), §2.2 (profiles),
+  R14/R15/R16; design §11.1.
+- **Precondition:** WU-2 done.
+- **Action:** transcribe design §2.3 exactly: `$schema` = draft 2020-12,
+  `$id` = `urn:sakg:schema:envelope:1.0.0`, root `$ref` → `#/$defs/stored_node`, and `$defs`
+  = `timestamp`, `origin_ref`, `evidence_ref`, `envelope_base`, `authored_node`,
+  `stored_node`. All properties declared **once**, inside `envelope_base`, alongside its
+  `additionalProperties: false`. Timestamps carry **both** `format: date-time` **and** the
+  RFC-3339-`Z` `pattern` (DD-3 — `format` is annotation-only by default in draft 2020-12).
+  No `$ref` outside `#/`; no network reference.
+- **Constraint:** transcription only. Any regex, bound, or enum that differs from design §2.3
+  is an unratified amendment — **HALT** per §6.3 rather than adjust locally.
+- **Done-check:** file parses as JSON (accept command 1 passes in isolation) **and**
+  `Draft202012Validator.check_schema` accepts it (this is T1, run at WU-9).
+- **Feeds:** **E3**, and accept command 1.
+
+### WU-4 — Ensure the `jsonschema` dev dependency
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** design §11.6, A5.
+- **Precondition:** WU-3 done.
+- **Action:** if `jsonschema >= 4.18` is not already available, add exactly one line to the
+  **dev dependency group** of `pyproject.toml`. **Do not** touch
+  `[tool.hatch.build.targets.wheel].packages` (that is `I-STORE`'s deliverable), and do not
+  reformat, reorder, or upgrade any other dependency.
+- **Done-check:** `Draft202012Validator` and `Draft202012Validator.FORMAT_CHECKER` import
+  under `uv run`; `git diff pyproject.toml` (where available) shows **at most one added line**.
+- **Feeds:** **E4**. *This is the only pre-existing file the node modifies — see §7.2.*
+
+### WU-5 — Author the 14 valid fixtures
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** design §5.1 (the V01–V14 table with type / status / profile / author_kind /
+  purpose), §3 (data-sensitivity rules).
+- **Precondition:** WU-3 done (the contract exists before its witnesses).
+- **Action:** write the 14 documents into `valid/` under the exact filenames of design §5.1.
+  Six of them are **parents** of §5.2's mutations — V02 (13 of the 19), then V01, V03, V04,
+  V06, V10 — so author those first and keep them literal; every invalid fixture is a copy of
+  its parent with one field changed. Fixtures carry
+  **no real evidence payloads, hashes, URIs, or customer namespaces** (§3.3.3, Ω5): use
+  synthetic-but-well-formed values and the synthetic namespaces `paeos`, `orca-strator`,
+  `fixture-ns`.
+- **Done-check:** exactly 14 `*.json` files and **nothing else** in `valid/`; coverage closure
+  of design §5.1 holds by inspection (12 types, 4 statuses, 4 author_kinds, 3 evidence kinds,
+  both profiles, both nullable fields in both states) — mechanically re-asserted by T5 at WU-9.
+- **Feeds:** **E5**, and accept command 3 (14 ≥ 12).
+
+### WU-6 — Author the 19 invalid fixtures
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** design §5.2 (I01–I19 table: layer, rule, mutation, invariant), §2.4 (X1–X3).
+- **Precondition:** WU-5 done (each invalid fixture is defined as a delta from a *named* valid
+  sibling).
+- **Action:** write the 19 documents into `invalid/`. **Each differs from its named valid
+  sibling by exactly one mutation** — no incidental second defect, or the rejection reason
+  becomes ambiguous and T3 cannot pin it. I17–I19 are **Layer-1-clean by construction**: they
+  must validate against the schema and fail only the harness's X1–X3 checks.
+- **Done-check:** exactly 19 `*.json` files and nothing else in `invalid/`; the three §4.2
+  invariants named in the deliverable each have ≥ 2 dedicated fixtures — authored confidence
+  (I01), frequency promotion (I02, I03), deleted node (I04, I05) — plus I06 for the falsifier
+  invariant.
+- **Feeds:** **E6**, and accept command 4 (19 ≥ 8).
+
+### WU-7 — Author `manifest.json`
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** design §2.5, DD-8.
+- **Precondition:** WU-5 and WU-6 done.
+- **Action:** one entry per fixture at `tests/sakg/fixtures/envelope/manifest.json`
+  (**above** `valid/`/`invalid/`). Valid entries: `file`, `profile`, `covers`. Invalid
+  entries: `file`, `profile`, `layer` ∈ {1,2}, `rule`, `invariant`, `expect_error_path`
+  (JSON Pointer). Expectations live **only** in the manifest, never inside fixture documents —
+  `additionalProperties: false` would make an annotated fixture fail on its annotation instead
+  of its target rule, contaminating the signal being measured (design §2.5).
+- **Done-check:** 33 entries; manifest ↔ filesystem bijection (re-asserted by T4 at WU-9);
+  every `invariant` string drawn from the closed list of design §12 (re-asserted by T8).
+- **Feeds:** **E7**.
+
+### WU-8 — Author `tests/sakg/test_envelope_schema.py`
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** design §6 (T1–T8 + structure notes), §2.4 (Layer 2).
+- **Precondition:** WU-7 done.
+- **Action:** implement T1–T8 as described in design §6. One module-scope fixture builds the
+  schema and both profile validators once; T2/T3 parametrise over the manifest so pytest
+  reports one id per fixture file. `Draft202012Validator` is constructed with
+  `format_checker=Draft202012Validator.FORMAT_CHECKER`. Layer 2 is three **module-level pure
+  functions** `check_x1/x2/x3(doc) -> str | None` returning the violated rule id — importable,
+  because `I-STORE` must import them rather than reimplement them (DBT-1 repayment path,
+  RK-3). No network, no `$ref` outside `#/`, no fixture generation at test time.
+- **Contingency (A2):** if pytest cannot collect `tests/sakg/`, add `tests/sakg/__init__.py`
+  and nothing more. The accept command is unchanged either way.
+- **Done-check:** the module imports; 8 test functions exist; T3 asserts rejection **at
+  `manifest.layer`, by `manifest.rule`, at `expect_error_path`** — not merely "some error"
+  (design §4.3: the third Fail edge is what makes this a conformance test rather than "some
+  JSON is bad").
+- **Feeds:** **E8**, and accept command 2.
+
+### WU-9 — Builder self-report run (not evidence)
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** `ENGINEERING_LIFECYCLE.md` §L12 — exit is "the scope is built and runs"; approval
+  "none (the Builder self-reports; it **may NOT self-verify** — X6)".
+- **Precondition:** WU-8 done.
+- **Action:** run the four §1 commands locally; additionally confirm directory purity
+  (`valid/` and `invalid/` contain only `.json`) and that the diff touches **only** the paths
+  in §3.1–3.3.
+- **Done-check:** all four exit 0; diff is within scope. Any red result is fixed **inside the
+  frozen scope** or escalated per §6.3 — never by editing fixtures to match the code, and
+  never by editing the backlog's accept commands.
+- **Feeds:** **E9** (a self-report; it does **not** promote the node).
+
+### WU-10 — Acceptance run + evidence submission
+- **Owner:** VERIFIER @ VERIFY (L13), decorrelated from the Builder (A-08).
+- **Ref:** design §10; `ENGINEERING_LIFECYCLE.md` §L13 (exit: "live, signed, independent
+  evidence (A-09), repeatability-aware (flaky ≠ refutation, Ω-01)").
+- **Precondition:** WU-9 self-report received.
+- **Action:** run the four §1 commands **verbatim, unaltered**, from the repo root; record
+  exit code and output for each; **submit the evidence to the court**.
+- **Done-check:** four exit-0 results, with the observed margins (14 valid, 19 invalid, 33
+  parametrised ids) reported alongside. Evidence submitted, not merely produced —
+  `ledger/debt/DEBT-0050`, `DEBT-0124`, `DEBT-0156` record the "No Evidence Submitted to Court
+  MCP" failure class on these same paths (RK-5).
+- **Feeds:** **E10** — the node's promoting evidence.
+
+### WU-11 — Record the debt candidates (L15)
+- **Owner:** whoever holds `ledger/debt/` write capability at L15 Documentation & Ledger
+  (Runtime + Builder).
+- **Ref:** design §8 (DBT-1, DBT-2 with full CER-3 fields), §11.7.
+- **Precondition:** WU-10 green.
+- **Action:** append two records at the next free ids (**≥ DEBT-0157**), citing
+  `SAKG-1/F-ENVELOPE`, carrying compromise / reason / ideal / repayment condition / priority /
+  impact verbatim from design §8: **DBT-1** (conformance split across schema + harness;
+  repaid when `I-STORE` imports `check_x1/x2/x3` behind one `validate_envelope()`; medium) and
+  **DBT-2** (status *transitions* unvalidated — GAP-1; repaid by `I-STORE`/`I-INGEST`
+  acceptance `test_frequency_never_promotes.py`, `test_promotion_requires_evidence_binding.py`;
+  **high**).
+- **Done-check:** both records exist and name their repayment conditions.
+- **Feeds:** **E11**.
+
+**Blast radius.** Additive: 36 new files in two new trees, at most one line changed in one
+pre-existing file, two append-only ledger records. Zone 2 throughout; TCB untouched; no
+runtime code; zero live consumers (§2). Kernel classification expected **SOFT**; no amendment
+path required.
+
+---
+
+## 5. Evidence plan (obligation → owner → oracle → gate)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|---|---|---|---|---|
+| **E0** | `plan_executable` — this file: work units, evidence obligations, rollback, refs cited | PLANNER @ PLAN (this session) | presence of §4 (WUs), §5 (this table), §7 (rollback), §3 (affected + forbidden files), §6 (test strategy), §2 (dependencies), with upstream refs in the header and inline | **PLAN (L11)** |
+| **E1** | Red baseline — all four accept commands exit non-zero pre-change | VERIFIER/runtime | four recorded non-zero exits (WU-1) | pre-L12 |
+| **E2** | Write capability confirmed for `sakg/schema/` + `tests/sakg/` | BUILDER @ L12 | the four directories exist after WU-2; otherwise a **named HALT** | L12 |
+| **E3** | Schema exists, is valid JSON, is a valid draft-2020-12 schema | BUILDER @ L12 | accept command 1; T1 (`check_schema`) | L12 → L13 |
+| **E4** | `jsonschema >= 4.18` available; ≤ 1 line changed in `pyproject.toml` | BUILDER @ L12 | import probe + diff inspection | L12 |
+| **E5** | 14 valid fixtures, `.json` only, coverage-closed | BUILDER @ L12 | accept command 3 (≥ 12); T2; T5 | L12 → L13 |
+| **E6** | 19 invalid fixtures, `.json` only, one mutation each | BUILDER @ L12 | accept command 4 (≥ 8); T3 | L12 → L13 |
+| **E7** | Manifest with `profile` / `layer` / `rule` / `invariant` / `expect_error_path` | BUILDER @ L12 | T4 (bijection); T8 (invariant closure) | L12 → L13 |
+| **E8** | Harness T1–T8 with importable `check_x1/x2/x3` | BUILDER @ L12 | accept command 2; T6; T7 | L12 → L13 |
+| **E9** | Builder self-report: scope built, runs, diff in scope | BUILDER @ L12 | local run + diff review — **not promoting evidence** (X6) | L12 exit |
+| **E10** | **Acceptance** — four commands exit 0, submitted to the court | VERIFIER @ L13 | verbatim run; exit codes + margins recorded and **submitted** | **VERIFY (L13)** |
+| **E11** | DBT-1 / DBT-2 recorded with repayment conditions | ledger owner @ L15 | two records ≥ DEBT-0157 citing `SAKG-1/F-ENVELOPE` | L15 |
+
+**The count gates are necessary, not sufficient.** Accept commands 3 and 4 count *files*, and
+14 empty files would satisfy them. What makes them meaningful is command 2: T2 forces every
+valid fixture to validate, T3 forces every invalid one to fail *for its stated reason*, and T4
+forbids a file that has no manifest entry. Padding the directories to pass the count therefore
+fails the suite. This is why WU-7 (manifest) is not optional bookkeeping.
+
+**Assumption → verification-owner ledger** (design §7, carried forward — no assumption changes
+the plan; each is a fact a named WU confirms):
+
+| id | Assumption | Confirmed at |
+|---|---|---|
+| A1 | `sakg/` does not exist; the schema is a new-file write; no `sakg/__init__.py` needed | **WU-2 / WU-3** (BUILDER) |
+| A2 | `tests/sakg/` does not exist; pytest collects it without `__init__.py` | **WU-8** (contingency stated) |
+| A3 | `uv run pytest` works from repo root | **WU-1** (probed by the red baseline) |
+| A4 | Only `.json` may live in `valid/`/`invalid/` (the gate globs) | **WU-5/WU-6** done-checks; T4 |
+| A5 | `jsonschema >= 4.18` available or addable | **WU-4** |
+| A6 | ULID = Crockford base32 (OQ-1) | frozen as designed; deviation ⇒ §6.3 HALT |
+| A7 | `id` type segment spelled exactly as the `type` enum value (OQ-1) | frozen as designed; X2/I18 depend on it |
+| A8 | `EvidenceRef.kind` closed to `{sealed_goal, benchmark, outcome}` (OQ-3) | frozen as designed; widening is an amendment |
+| A9 | A `candidate` node may carry a store-derived `confidence` (V07) | exercised by V07 at WU-5 |
+| A10 | `S-PROBE` will not falsify the §4.2 field set | **not confirmable here** — owner `G-S1-GO`; see RK-1 |
+
+**Open questions (design §7) are frozen by this contract with their shipping defaults:**
+OQ-1 (id segment conventions) → as designed; OQ-2 (should `refuted` also require an
+EvidenceRef?) → **no** (not stated in §4.2; requiring it would invent constitutional intent,
+CER-6), recommended as a candidate tightening to a later ratification; OQ-3
+(`EvidenceRef.kind` closed set) → as designed. L11's purpose is to freeze scope; these
+defaults are now contract, and changing one is an amendment, not an implementation choice.
+
+---
+
+## 6. Test strategy
+
+### 6.1 Layers and what each is for
+- **Layer 1 (schema, R1–R16)** — everything expressible in draft 2020-12 keywords; enforced by
+  any conforming validator, so downstream consumers inherit it for free.
+- **Layer 2 (harness, X1–X3)** — the three obligations requiring value-to-value comparison
+  (`id`↔`namespace`, `id`↔`type`, `valid_until` > `valid_from`). Draft 2020-12 cannot express
+  them; pretending otherwise would ship a schema that silently admits violations (design §2.1).
+  X4 (retention) is asserted structurally by T5.
+- **Conformance = Layer 1 ∧ Layer 2.** A consumer validating with Layer 1 alone under-checks —
+  recorded as **DBT-1**, repaid at `I-STORE` (WU-11).
+
+### 6.2 The eight tests (design §6) and what each guards
+T1 metaschema validity (a typo'd keyword silently becoming an ignored annotation) · T2 valid
+fixtures validate (over-tight schema) · T3 invalid fixtures rejected **at the stated layer, by
+the stated rule, at the stated path** (under-tight schema *and* false-pass fixtures) · T4
+manifest ↔ filesystem bijection (orphans, phantoms, gate padding) · T5 coverage closure
+(silent coverage regression) · T6 Layer 2 present and returning **named** rule ids (Layer 2
+being quietly dropped) · T7 format canary (the draft-2020-12 format-annotation trap) · T8 every
+named §4.2 invariant maps to ≥ 1 fixture (an invariant losing its test in refactor).
+
+### 6.3 Discipline rules binding L12
+1. **Red-first.** WU-1 precedes every write; a green pre-baseline is a HALT.
+2. **Fixtures are adversaries, not illustrations.** F-ENVELOPE is a `fable` node; every
+   consumer (`I-STORE`, `I-INGEST`) is `sonnet` — test author ≠ implementer, satisfying K3/A-08
+   by construction (`backlog` `decorrelation_note`). Fixtures are authored against an
+   implementation that does not exist yet.
+3. **Never make a test pass by weakening it.** Fixtures, manifest expectations, and the
+   backlog's accept commands are not editable to obtain green (§3.4).
+4. **HALT, do not resolve locally.** Any ambiguity discovered during L12 that design §2/§5 does
+   not settle **halts the task and is reported** — it is not resolved in-flight:
+   `backlog/packages/wave-0/SPEC-CLARIFICATIONS.md` L23–26 ("a new ambiguity found by a worker
+   HALTS that task and is reported, not resolved locally"), and `ENGINEERING_LIFECYCLE.md` §L11
+   failure mode ("ambiguous/incomplete contract → incident; every ambiguity is an incident").
+5. **A halt is a reportable outcome; silence is not.** See RK-4.
+
+---
+
+## 7. Rollback plan
+
+### 7.1 Triggers
+- **RB-a** — WU-10 acceptance red for a cause that cannot be fixed within the frozen scope
+  (i.e. the fix would require changing the schema's meaning, the fixture corpus's intent, or
+  the accept commands).
+- **RB-b** — L14 independent audit finds scope creep or a forbidden-path write (§3.4).
+- **RB-c** — **`S-PROBE` returns NO-GO → `G-S1-GO` records REVERT** → SAEOS-1 §7 falsifier
+  fires and the slice is reverted (`backlog` `dag_properties.kill_switches`). F-ENVELOPE is
+  reverted *with* the slice; this is anticipated and accepted (design RK-2 — a frozen contract
+  is the cheapest thing in S1 to discard).
+- **RB-d** — WU-2 capability HALT: nothing was written, so rollback is a **no-op**. Report the
+  missing capability; do not partially author.
+
+### 7.2 Actions, by artifact class
+1. **New trees** — delete `sakg/` and `tests/sakg/` (both are new per A1/A2; if `tests/sakg/`
+   pre-existed, delete only the six paths of §3.1). Because both trees are new, deletion
+   restores the pre-change state exactly; no collateral revert is needed.
+2. **`pyproject.toml`** — remove the single dev-dependency line added at WU-4, restoring the
+   file byte-for-byte. This is the **only** pre-existing file touched, which is what keeps the
+   revert mechanical.
+3. **`ledger/debt/` records (if WU-11 already ran)** — the ledger is **append-only; these are
+   not deleted**. Roll back by appending a superseding record marking DBT-1/DBT-2 WITHDRAWN
+   with the trigger as reason. (This mirrors the very invariant the node encodes: §4.2
+   invariant 4 — nothing is ever deleted, supersession only.)
+4. **Preferred mechanism where L12 ran on an isolated branch/worktree (A-16):** discard the
+   branch, which subsumes actions 1–2 in one step and eliminates partial-revert risk.
+
+### 7.3 Verification of rollback (checkable, not asserted)
+Re-run the four §1 commands and compare against the **recorded red baseline E1**: rollback is
+complete iff all four again exit non-zero with the same failure mode as WU-1, and
+`sakg/schema/envelope.schema.json` and `tests/sakg/test_envelope_schema.py` are absent. E1
+exists for exactly this purpose — without it, "we reverted" would be an unverifiable claim.
+
+### 7.4 Containment properties
+- **No partial-state hazard.** WU order is chosen so every prefix is consistent: the schema
+  without fixtures fails command 2 and is consumed by no one; fixtures without a manifest fail
+  T4; a manifest without a harness fails command 2. There is no window in which a downstream
+  node could bind to a half-frozen contract, because all four consumers are unstarted (§2) and
+  three of them are additionally gated behind `G-S1-GO`.
+- **No TCB, no runtime, no capability surface.** Zone 2 static data + a test module; no store
+  exists yet; nothing is executed at ingest time (design §3).
+- **Reverting is preferred over patching after freeze.** Once frozen, a fixture change is a
+  spec amendment in effect (fixtures are the conformance definition), so a defect found later
+  goes back to **L08 DESIGN** for re-ratification rather than being patched in place
+  (`ENGINEERING_LIFECYCLE.md` §L10 failure: "a proven contradiction/blocking finding → design
+  returns to L08"). Local repair of a frozen contract is an unratified amendment.
+
+### 7.5 Recovery path
+- **Transcription defect** (schema/fixture does not match design §2.3/§5): re-enter **L12**
+  against this same contract, correct the transcription, re-run WU-9 → WU-10.
+- **Design defect** (design §2/§5 is internally wrong or contradicts §4.2): rollback per §7.2,
+  return to **L08**, amend the design artifact, then re-plan. Do not repair at L12.
+- **Capability defect** (RB-d): restore the write scope for `sakg/` and `tests/sakg/`, then
+  re-enter at WU-2. No content rework is required because none was authored.
+
+---
+
+## 8. Risk register
+
+| id | Risk | Owner | Mitigation in this plan |
+|---|---|---|---|
+| **RK-1** | `S-PROBE` shows real PAEOS artifacts cannot supply every required field, so `authored_node.required` is unachievable at ingest (A10) | `G-S1-GO` | Blast radius already localised by DD-1 to `authored_node`'s `required` list; `stored_node` unaffected. Not resolvable pre-gate; do not pre-emptively weaken the schema. |
+| **RK-2** | Freezing before `G-S1-GO` means a NO-GO discards this work | accepted (backlog places F-ENVELOPE at wave 0, `deps: []`, deliberately) | Rollback trigger RB-c; total revert is cheap (§7.2). |
+| **RK-3** | Layer 2 drifts if `I-STORE` reimplements X1–X3 instead of importing them | `I-STORE` | WU-8 mandates importable `check_x1/x2/x3`; DBT-1 records the repayment condition (WU-11). |
+| **RK-4** | **Builder produces no artifact** — 73 open debt entries (`DEBT-0026…DEBT-0155`, 2026-08-06→08), all titled "Builder Produced No Artifact — Write-Scope or Agent Failure", all implicating `tests/sakg/` and `sakg/`: the dominant observed failure mode for this exact node shape | BUILDER @ L12 | **WU-2** makes directory creation the first act with an explicit HALT-and-report rule; **E2** makes capability a first-class evidence obligation; §6.3 rule 5 forbids silent no-op. |
+| **RK-5** | Green run produces evidence that never reaches the court (`DEBT-0050`, `DEBT-0124`, `DEBT-0156` — "No Evidence Submitted to Court MCP", same paths) | VERIFIER @ L13 | **WU-10** makes *submission*, not production, the done-check for E10. |
+| **RK-6** | Gate satisfied by padding `valid/`/`invalid/` with trivial files | VERIFIER @ L13 | T4 bijection + T2/T3 make the count gates non-vacuous (§5 note); §3.4 forbids non-`.json` files. |
+
+**Observation, not scope (flagged, not fixed).** Each of the 73 RK-4 entries self-classifies
+"Recurring: no" and "First occurrence — no prior scar match", while the class demonstrably has
+73 members over three days. That is a defect in the RB-0008 friction handler's recurrence
+detection, not in this node; it is named here because it is why the scar never escalated, and
+routed to the ledger/RB-0008 owner. **This plan does not touch it** — doing so would be scope
+creep against §3.4.
+
+---
+
+## 9. Completeness check (no orphan / no gap)
+
+- **Every deliverable clause (§1) maps to a work unit (§4):** schema → WU-3; valid fixtures →
+  WU-5; invalid fixtures → WU-6; manifest → WU-7; harness → WU-8; the four accept commands →
+  WU-1 (red) and WU-10 (green); debt records → WU-11.
+- **Every work unit produces or feeds an evidence obligation (§5):** WU-1→E1 … WU-11→E11;
+  this file is E0. No WU is evidence-free; no evidence id lacks a producing WU.
+- **Every §4.2 invariant named in the deliverable has fixtures and a test:** authored
+  confidence → I01 (T3, T8); frequency-based promotion → I02, I03 (T3, T8); deleted node →
+  I04, I05 (T3, T8) — with V03/V04 proving `superseded`/`refuted` are *retained* (T5).
+- **Every assumption (design §7) has a named confirming WU or an explicit non-confirmable
+  owner** (§5 ledger; A10 → `G-S1-GO`).
+- **Every open question is frozen with a default and an escalation route** (§5; §6.3 rule 4).
+- **Rollback is declared, triggered, actioned, and verifiable** for every mutating stage
+  (§7), including the append-only ledger case and the pre-gate NO-GO case.
+- **Affected and forbidden file sets are both exhaustive** (§3), satisfying L11's required
+  artifacts in full: affected files, forbidden files, rollback plan, acceptance criteria (§1),
+  test strategy (§6), dependencies (§2).
+- **Declared gaps carried forward unchanged from design §12, each with an owner:** GAP-1 status
+  transitions → `I-STORE`/`I-INGEST` (tracked as DBT-2); GAP-2 edges → `I-STORE`,
+  `I-TRAVERSE`; GAP-3 namespace disclosure policy → slice S5; GAP-4 confidence propagation →
+  slice S3. None is required for the four accept commands to be meaningful; none is silent.
+
+**Evidence for this gate:** `plan_executable` = this file (§4 work units, §5 evidence
+obligations, §7 rollback, refs cited in the header and inline throughout).

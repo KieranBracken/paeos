@@ -1,0 +1,23 @@
+# DEBT-0012 — Silent Zero-Cost Fallback in CLI Output Parser (`ClaudeCodeRuntime`)
+
+**Status**: OPEN  
+**Filed**: 2026-07-30  
+**Priority**: Low  
+**Category**: Hidden Coupling / Audit Violation  
+
+---
+
+## 1. Compromise
+In [runtime/integrations/__init__.py](file:///Users/bob/GitHub/paeos/runtime/integrations/__init__.py), `_parse_cost()` catches `JSONDecodeError` and `ValueError` when parsing `claude` CLI output, silently returning `Cost(tokens=0, wallclock_s=0.0)` if the stdout transcript is non-JSON or unparseable.
+
+## 2. Reason
+The `claude` CLI may produce plain text output, error tracebacks, or non-JSON content under failure conditions. Returning a zero-cost default prevented runtime crashes during early integration testing.
+
+## 3. Ideal Solution
+Raise an explicit `CostParseError` or record a fallback warning log when transcript parsing fails. Under-reporting resource usage violates PAEOS audit policies and distorts budget governance (PAEOS-7 §3).
+
+## 4. Repayment Conditions
+Repay during Phase 3 runtime integration polish.
+
+## 5. Estimated Impact
+Low. Unparseable CLI output results in under-reported token consumption in cost meters and ledger audit rows.

@@ -1,0 +1,19 @@
+# DEBT-0024 — Traceability Broken by Uncommitted PAEOS-9 Execution Architecture Dependency
+
+Status: **OPEN** · Filed: 2026-08-06 · Channel: CER-3
+Level: **specifications & traceability** (touches `spec/SAEOS-1-architecture.md` §1.1).
+Source: Mission 0 Census Audit (`SAEOS-1` §1.1).
+
+## 1. Observation
+
+`spec/SAEOS-1-architecture.md` (§1.1 and §11 Traceability) heavily cites `spec/PAEOS-9-execution-architecture.md` for consumption contracts, emission schemas, and non-authority guarantees (§10 of PAEOS-9).
+
+However, on `origin/main`, `spec/PAEOS-9-execution-architecture.md` does not exist — the remote repository only has `spec/PAEOS-9-runtime-bootstrap.md` or `spec/PAEOS-9A-runtime-bootstrap.md`. `spec/PAEOS-9-execution-architecture.md` exists only as uncommitted working-tree state in local checkouts.
+
+## 2. Risk & Impact
+
+Any reader cloning `origin/main` cleanly cannot resolve the primary specification citations in `SAEOS-1`, breaking full traceability (A-09 / K4§14).
+
+## 3. Remediation Strategy
+
+- Founder action required: Commit and push `spec/PAEOS-9-execution-architecture.md` to `origin/main`, or update `SAEOS-1` traceability pointers to reference `spec/PAEOS-9A-runtime-bootstrap.md`.

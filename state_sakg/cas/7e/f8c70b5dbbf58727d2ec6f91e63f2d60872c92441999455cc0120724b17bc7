@@ -1,0 +1,435 @@
+# PLAN — `S-PROBE` SAKG S1 extraction feasibility spike (`reviews/spikes/sakg-s1-extraction-probe.md`)
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` — L11 Formal Planning (`operations/ENGINEERING_LIFECYCLE.md` §L11) |
+| **Status** | PLAN ONLY — no `reviews/` write, no acceptance run. Frozen input to `IMPLEMENT` (BUILDER, L12) and `VERIFY` (VERIFIER, L13). |
+| **Date** | 2026-08-08 |
+| **Backlog node** | `S-PROBE` — `backlog/SAKG-1-backlog.yaml` lines 67–89 (slice S1, wave 0, `deps: []`) |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | Frozen DESIGN artifact `sha256:1dc49586e6b606a9e2d6dcd133c71cc8cb6f574780f15916c1f86b0524988907` (on the context path); `backlog/SAKG-1-backlog.yaml`; `operations/ENGINEERING_LIFECYCLE.md` §L11/§L12/§L13/§L15 + Global Rules 2, 3, 11, 19; `reviews/adversary-findings/CANARY-0002-vacuous-evidence.md`. |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/`. The
+`S-PROBE` deliverable lives at `reviews/spikes/sakg-s1-extraction-probe.md`, which is a
+**`reviews/`-tree write** — outside this session's write capability. Any such write from
+here is discarded as a violation.
+
+Two actions named by the goal objective are therefore **planned here, not performed**:
+
+1. **Create `reviews/spikes/sakg-s1-extraction-probe.md`** — owned by **BUILDER @ IMPLEMENT**
+   (L12). Planned as **WU-1**.
+2. **Run the four `S-PROBE.accept` commands** — these are acceptance oracles, owned by
+   **VERIFIER @ VERIFY** (L13); the Builder may not self-verify (X6, §L12 "Approval").
+   Planned as **WU-2**.
+
+The hand-extraction analysis itself — three sealed goals scored per field into the SAEOS-1
+§4.3 node types, with the verdict and loss ratio — **is already complete**. It was produced
+at the DESIGN stage and is carried on this session's context path as artifact
+`1dc49586e6b6…`. This plan does not re-derive it, does not edit it, and does not
+second-guess its numbers; doing so would be an L11 stage creating architecture, barred by
+Global Rule 3. This plan's whole job is to get those exact bytes to the canonical path under
+evidence, and to declare what the plan cannot close.
+
+Evidence emitted by *this* session is `plan_executable` = this file. Nothing else.
+
+---
+
+## 1. Objective restatement (traceability, no reinterpretation)
+
+`backlog/SAKG-1-backlog.yaml` `S-PROBE.deliverables`:
+
+> `reviews/spikes/sakg-s1-extraction-probe.md` — for each of 3 real sealed goals from
+> `ledger/` + `reviews/tasks/`, a hand-extraction attempt into the SAEOS-1 §4.3 node types,
+> recording per-field: extractable / partial / absent. Explicit verdict GO or NO-GO with the
+> loss ratio.
+
+`S-PROBE.accept` (four commands, verbatim from lines 86–89 — **the acceptance contract**):
+
+```
+test -f reviews/spikes/sakg-s1-extraction-probe.md
+rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+No requirement is added, relaxed, or reinterpreted below.
+
+---
+
+## 2. Pre-flight state — measured, not assumed
+
+Everything in this section was executed read-only from the repo root on 2026-08-08 and is
+reported as observed. It is what makes the work units small and the rollback trivial.
+
+### 2.1 The DESIGN artifact is not on disk anywhere
+
+| Probe | Result |
+|---|---|
+| `test -d design/spikes` | **MISSING** |
+| `test -f design/spikes/sakg-s1-extraction-probe.md` | **MISSING** |
+| `test -f reviews/spikes/sakg-s1-extraction-probe.md` | **MISSING** |
+| `ls reviews/spikes/` | directory **exists**, holds `DEBT-0002-spawnability-spike.md` |
+
+The DESIGN artifact's own §8 Handoff says *"the artifact is authored at
+`design/spikes/sakg-s1-extraction-probe.md` … promotion is a copy to the canonical path,
+with no edit required."* **That copy source does not exist on disk.** The DESIGN session's
+write was not persisted to the working tree; the document survives only as the pipeline
+context artifact. Any work unit written as "copy `design/spikes/…` → `reviews/spikes/…`"
+would fail at the first command. WU-1 is written against the real source instead.
+
+### 2.2 The frozen source bytes
+
+| Property | Value |
+|---|---|
+| Source | context artifact `1dc49586e6b6…` (materialized on the context path as `context/artifact-1dc49586e6b6.txt`) |
+| `sha256` | `1dc49586e6b606a9e2d6dcd133c71cc8cb6f574780f15916c1f86b0524988907` |
+| Size | 41 611 bytes |
+| Lines | 582, LF-terminated, final line newline-terminated |
+| Encoding | UTF-8, no BOM, no CR bytes; non-ASCII present and load-bearing (`§ · × — → Ω Δ ±`) |
+
+**The artifact id equals the sha256 of its bytes.** That is the integrity anchor: WU-1's
+done-check is a hash comparison against the id already recorded in this plan's header, so a
+truncated, re-encoded, or reflowed copy cannot pass silently.
+
+### 2.3 Three of the four accept commands already pass against those bytes
+
+Run against `context/artifact-1dc49586e6b6.txt`:
+
+| # | Command (path substituted) | Result | Evidence observed |
+|---|---|---|---|
+| 1 | `test -f …` | n/a pre-write | — |
+| 2 | `rg -q '^verdict: (GO\|NO-GO)$' …` | **PASS** | matches at line 3 (`verdict: GO`) and line 463 (`verdict: GO`) |
+| 3 | `test $(rg -c '^## goal: ' …) -ge 3` | **PASS** | `count=3` — lines 93 (`## goal: B0.0 …`), 174 (`## goal: B0.1 …`), 256 (`## goal: B0.2 …`) |
+| 4 | `rg -q '^loss_ratio: 0\.[0-9]+$' …` | **PASS** | matches at line 4 (`loss_ratio: 0.236`) |
+
+**Consequence: accept #1 is the only unsatisfied criterion, and the entire implementation is
+one byte-exact file creation.** No content authoring, no edit, no formatting pass.
+
+### 2.4 CANARY-0002 discrimination baseline (the accept suite is not vacuous)
+
+`reviews/adversary-findings/CANARY-0002-vacuous-evidence.md` defines the vacuous-evidence
+class: a command that "returns the same PASS for the claim and its negation." Its
+"mechanical detector this implies" section (proposed **B2.O**) prescribes the check — run the suite **without** the change and require a
+different result. Executed against the current (pre-write) tree:
+
+| # | rc | Verdict | Note |
+|---|---|---|---|
+| 1 | 1 | FAIL | clean assertion failure |
+| 2 | 2 | FAIL | `rg` IO error, file not found |
+| 3 | 2 | FAIL | `rg` IO error; **and** the shell reports `test: unknown condition: -ge` because `$(rg -c …)` expands to empty |
+| 4 | 2 | FAIL | `rg` IO error, file not found |
+
+All four fail without the artifact and all four pass with it (§2.3 + WU-1). **The suite
+discriminates; it is not vacuous under CANARY-0002.** Recorded as evidence E4.
+
+Observation carried, not fixed (out of `S-PROBE` scope, and the accept string is the
+ratified contract): accept #3 fails via a *shell syntax error* rather than a numeric
+comparison when the file is absent. It fails in the correct direction, so the gate is sound,
+but it is brittle. Routed to §8 as **D-1** rather than silently rewritten — amending a
+ratified `accept` string is a backlog edit this stage has neither the capability nor the
+authority to make (CER-5).
+
+### 2.5 Route classification
+
+Per `operations/ENGINEERING_LIFECYCLE.md` §"Router compatibility": **Trace-A** — the change
+is one new file in a documentation tree, fully reversible by deletion (§6), and cheaply
+verified by four commands that run in well under a second. No kernel code, no TCB, no
+schema, no dependency. The *content* feeds an irreversible founder gate (`G-S1-GO`, A4), but
+that gate is a separate node with its own approval; this node's write is not irreversible
+and does not require a founder Decision under §L11 "Approval" (Planner sign-off suffices).
+
+---
+
+## 3. File structure — affected and forbidden
+
+**Created (exactly one file):**
+
+| Path | Responsibility |
+|---|---|
+| `reviews/spikes/sakg-s1-extraction-probe.md` | The `S-PROBE` deliverable. 582 lines: §1 headline, §2 corpus, §3 scoring method, three `## goal:` sections (B0.0/B0.1/B0.2) each carrying a §4.2 envelope table and a §4.3 type-content table scored `extractable`/`partial`/`absent`, §4 aggregate, §5 findings F-1…F-8 + GAP-1…GAP-3, §6 verdict + conditions C1–C6, §7 gate evidence, §8 handoff. |
+
+**Modified:** none.
+
+**Forbidden files — do not touch (§L11 requires this list explicitly):**
+
+| Path | Why forbidden |
+|---|---|
+| `backlog/SAKG-1-backlog.yaml` | The `accept` strings are the contract being graded. Editing them to fit the artifact inverts the gate. Amendments route via CER-2/CER-5, not via L12. |
+| `spec/SAEOS-1-architecture.md` | §8's S1 exit criterion and §9's finding list are the *subject* of the probe. Conditions C1 and C4 propose amendments; only the founder ratifies them (CER-5, Global Rule 17). |
+| `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md`, `operations/ENGINEERING_LIFECYCLE.md` | Condition C3 proposes four new template fields and C2 a typed L06 record. Both are lifecycle amendments — L19 events, founder-ratified (Global Rules 5, 12, 17). Out of scope here. |
+| `docs/B0.{0,1,2}-constitutional-review.md`, `reviews/tasks/B0.{0,1,2}_review.md`, `ledger/debt/DEBT-000{2,3}.md` | The probed corpus. Editing a source to improve its extraction score would falsify the measurement. Condition C6 forbids backfill for the same reason. |
+| Any second copy of the deliverable (e.g. `design/spikes/…`) | Two byte-identical 41 KB copies of a frozen document drift. Provenance is carried by the sha256 (§2.2), not by duplication. Declared non-goal — see §7 R-4. |
+
+---
+
+## 4. Work units (executable, ordered, single-owner)
+
+Each work unit is atomic, has one owning stage/role, a precondition, an exact action, a
+done-check, and the evidence it feeds. Strictly sequential: `WU-1 → WU-2 → WU-3 → WU-4`.
+
+### WU-1 — Materialize the frozen probe at the canonical path
+
+- **Owner:** BUILDER @ IMPLEMENT (L12). **Not this session.**
+- **Required capability:** write access to `reviews/`. See §7 R-3 — if the IMPLEMENT session
+  is dispatched with this session's `plan/`-only allowlist, this WU is discarded as a
+  violation and the gate fails with no artifact. **Confirm the capability before starting.**
+- **Ref:** `S-PROBE.deliverables`; DESIGN artifact §8 "Path note"; §2.1–2.2 above.
+- **Preconditions (all measured true at plan time; BUILDER re-confirms):**
+  - [ ] `reviews/spikes/` exists → `test -d reviews/spikes` exits `0`. It does (§2.1); **no
+        `mkdir` is required**, and the directory already holds an unrelated file that must
+        survive.
+  - [ ] The target does not exist → `test ! -f reviews/spikes/sakg-s1-extraction-probe.md`
+        exits `0`. **This is a pure creation, not an overwrite.** If this check fails, STOP
+        and go to §6 "Pre-existing-file branch" — do not clobber.
+  - [ ] The source is intact → the context artifact hashes to
+        `1dc49586e6b606a9e2d6dcd133c71cc8cb6f574780f15916c1f86b0524988907`.
+- **Action (exact — no more):** write the 41 611 source bytes verbatim to
+  `reviews/spikes/sakg-s1-extraction-probe.md`.
+  - **Zero edits.** Not one character. Not the `## goal:` headings, not the `verdict:` or
+    `loss_ratio:` lines, not the tables, not the trailing newline.
+  - Do **not** run a markdown formatter, linter, prettier, or "cleanup" pass over it
+    (§7 R-2).
+  - Do **not** update the DESIGN artifact's §8 "Path note" to reflect the new location, even
+    though it is now stale. Editing a frozen upstream artifact is Global Rule 3 territory;
+    the staleness is recorded as **D-2** in §8 instead.
+  - Preserve UTF-8 without BOM, LF line endings, and the terminating newline.
+- **Done-check (run all three; all must pass):**
+  ```
+  test -f reviews/spikes/sakg-s1-extraction-probe.md
+  shasum -a 256 reviews/spikes/sakg-s1-extraction-probe.md
+  # expect: 1dc49586e6b606a9e2d6dcd133c71cc8cb6f574780f15916c1f86b0524988907
+  wc -c < reviews/spikes/sakg-s1-extraction-probe.md   # expect: 41611
+  ```
+  If the hash differs, do **not** hand-patch toward it. Delete the file (§6) and re-write
+  from source. A hash mismatch means the write path mangled the bytes; patching hides that.
+- **Feeds:** evidence E1.
+
+### WU-2 — Run the four `S-PROBE.accept` commands verbatim
+
+- **Owner:** VERIFIER @ VERIFY (L13). **Not the Builder** — X6 / §L12 "Approval": the Builder
+  self-reports and may not self-verify.
+- **Ref:** `backlog/SAKG-1-backlog.yaml` lines 86–89.
+- **Precondition:** WU-1 done-check passed. Run from the repo root (the accept strings use
+  repo-relative paths, so the working directory is load-bearing).
+- **Action (verbatim — do not alter one character, do not "improve" the quoting):**
+  ```
+  test -f reviews/spikes/sakg-s1-extraction-probe.md
+  rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+  test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+  rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+  ```
+- **Done-check:** each of the four exits `0`. Report **all four exit codes individually** —
+  not an aggregate "all pass". Per §2.3 the expected observations are: #1 file present;
+  #2 matches `verdict: GO`; #3 `rg -c` returns exactly `3`; #4 matches `loss_ratio: 0.236`.
+- **Feeds:** evidence E2 (the gate evidence for `S-PROBE`).
+
+### WU-3 — Re-run the CANARY-0002 discrimination check
+
+- **Owner:** VERIFIER @ VERIFY (L13).
+- **Ref:** `reviews/adversary-findings/CANARY-0002-vacuous-evidence.md` (proposed detector
+  **B2.O**: "run it **without** the change — if the result is identical with and without the
+  artifact, the evidence is non-discriminating").
+- **Precondition:** WU-2 passed, so the WITH-artifact leg is already recorded.
+- **Action:** compare against the WITHOUT-artifact baseline in §2.4 (rc `1,2,2,2` — all
+  FAIL). Do **not** delete the artifact to re-measure the baseline; the baseline was taken
+  before WU-1 and is recorded above. Assert the two legs differ.
+- **Done-check:** WITH = `0,0,0,0`; WITHOUT = `1,2,2,2`. Legs differ on all four commands →
+  the accept suite has discriminating power → **not CAUGHT** under CANARY-0002.
+- **Feeds:** evidence E4.
+- **Why this WU exists:** CANARY-0002 is DRAFT and its mechanical detector (B2.O) is not
+  built, so nothing in the toolchain performs this check automatically. `S-PROBE`'s accept
+  suite is unusually exposed to the vacuity class — three of its four commands are regex
+  matches over a document the same pipeline produced. Doing it by hand here is cheap and it
+  is exactly the falsification duty CER-1 and Global Rule 13 impose.
+
+### WU-4 — L15 institutional record
+
+- **Owner:** Runtime + BUILDER @ L15 Documentation & Ledger.
+- **Ref:** `operations/ENGINEERING_LIFECYCLE.md` Global Rule 11 (traceability to origin) and
+  Global Rule 19 (living `docs/IMPLEMENTATION_ATLAS.md`); §L15 exit — *"all institutional
+  records reflect the change; traceability to origin intact."*
+- **Honest scoping note:** this WU is **not required by `S-PROBE.accept`**. It is required by
+  the lifecycle's global rules, which apply to every state. It is listed so the omission is a
+  decision rather than an oversight; if the executing session lacks `docs/` write capability,
+  record it as skipped-with-reason rather than dropping it.
+- **Action:** record the artifact with its provenance — path
+  `reviews/spikes/sakg-s1-extraction-probe.md`, source digest
+  `sha256:1dc49586e6b6…0524988907` (which is also the DESIGN artifact id), origin node
+  `SAKG-1/S-PROBE`, evidence `E2` (four accept commands, all `0`), result `verdict: GO
+  (conditional on C1)`, `loss_ratio: 0.236`.
+- **Done-check:** the record names the node id, the path, the digest, and the conditionality
+  of the GO. **The word "conditional" must appear** — see §7 R-5.
+- **Feeds:** evidence E3.
+
+**Blast radius:** one new file in a documentation tree. No kernel, no TCB, no
+`constitution/`, no schema, no dependency, no executable code. Kernel gate classification
+expected **SOFT**; no amendment path required for the write itself.
+
+---
+
+## 5. Evidence plan (obligations → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` — this file: work units (§4), evidence obligations (§5), rollback (§6), refs cited (header + inline + §10). | PLANNER @ PLAN (this session) | Presence of §4, §5, §6, and a resolvable upstream ref for every claim. | **PLAN** |
+| **E1** | The deliverable exists at the canonical path and is byte-identical to the frozen DESIGN artifact. | BUILDER @ IMPLEMENT | `shasum -a 256` == `1dc49586e6b6…0524988907`; `wc -c` == `41611`. | IMPLEMENT |
+| **E2** | The four `S-PROBE.accept` commands each exit `0`. | VERIFIER @ VERIFY | Run §4/WU-2 verbatim from the repo root; report four individual exit codes. | **VERIFY (the `S-PROBE` gate)** |
+| **E3** | Institutional record written; provenance and GO-conditionality captured. | Runtime + BUILDER @ L15 | The record names node id, path, digest, evidence, and the word "conditional". | L15 |
+| **E4** | The accept suite is discriminating (not vacuous). | VERIFIER @ VERIFY | WITH-artifact `0,0,0,0` vs. WITHOUT-artifact `1,2,2,2` (§2.4) — legs differ on all four. | VERIFY (CER-1 / Global Rule 13) |
+
+**Assumption → verification-owner ledger.** The DESIGN artifact carries its own assumption
+register (PA-1…PA-7, its §7.1); those are assumptions of the *analysis* and are not
+re-litigated here. The assumptions this **plan** introduces are:
+
+- **PL-1** — The context artifact `1dc49586e6b6…` is byte-reachable by the IMPLEMENT session.
+  → Confirmed at **WU-1 precondition 3** by BUILDER. **If false, the plan is blocked, not
+  degraded:** the analysis exists nowhere on disk (§2.1) and cannot be reconstructed by
+  L12 without re-running the DESIGN stage. Escalate rather than re-derive — a Builder
+  re-deriving a 165-field hand-extraction is Global Rule 3 violation and A-08 correlation.
+- **PL-2** — The IMPLEMENT session holds `reviews/` write capability.
+  → Confirmed at **WU-1** before any action. See §7 R-3.
+- **PL-3** — `rg` and `shasum` are on PATH in the verifying environment, and `rg` honors the
+  default (non-`-F`) regex syntax the accept strings assume.
+  → Confirmed at **WU-2** by first execution. `rg` is already in use across this repo's
+  tooling, so this is low-risk; it is named because accept #2's alternation `(GO|NO-GO)` and
+  accept #4's `0\.[0-9]+` both fail silently-wrong under `-F`.
+- **PL-4** — No repo-wide markdown formatting step runs between WU-1 and WU-2.
+  → Confirmed at **WU-2** (the hash from WU-1 still holds). See §7 R-2.
+
+No assumption changes the work units; each is a fact a named downstream WU confirms or
+escalates.
+
+---
+
+## 6. Rollback plan
+
+The change is a single additive file creation in a documentation tree, so rollback is
+complete, bounded, and leaves no partial state.
+
+- **Triggers (any one):**
+  1. WU-1 hash mismatch — the written file is not byte-identical to the source.
+  2. Any of the four WU-2 accept commands exits non-zero.
+  3. WU-3 finds the accept legs do **not** differ (evidence vacuous under CANARY-0002).
+  4. The founder, at `G-S1-GO`, judges the probe's C1 unacceptable and fires SAEOS-1 §7's
+     falsifier. **Note this is *not* a rollback trigger for the file** — see "Non-trigger"
+     below.
+
+- **Rollback action (BUILDER @ IMPLEMENT, on a `reviews/` write capability):**
+  1. `rm reviews/spikes/sakg-s1-extraction-probe.md`
+  2. **Do not remove `reviews/spikes/`.** The directory pre-existed WU-1 and holds
+     `DEBT-0002-spawnability-spike.md`, which is unrelated and must survive (§2.1).
+  3. No other path was touched (§3 "Modified: none"), so there is no collateral revert.
+
+- **Verification of rollback:**
+  ```
+  test ! -f reviews/spikes/sakg-s1-extraction-probe.md   # exits 0
+  test -f reviews/spikes/DEBT-0002-spawnability-spike.md # exits 0 — bystander intact
+  ```
+  The tree is then byte-for-byte its pre-WU-1 state, and the §2.4 baseline (`1,2,2,2`) is
+  reproducible.
+
+- **Pre-existing-file branch (WU-1 precondition 2 fails).** Measured absent at plan time, so
+  this should not occur; if it does, something wrote the path out-of-band and clobbering it
+  would destroy evidence. Then: (a) do **not** write; (b) capture
+  `shasum -a 256` of the existing file; (c) if it already equals
+  `1dc49586e6b6…0524988907`, WU-1 is a no-op — skip to WU-2 and record the no-op; (d) if it
+  differs, HALT and escalate. Global Rule 9: every ambiguity is an incident.
+
+- **Non-trigger (important).** A founder REVERT at `G-S1-GO` does **not** roll back this
+  file. The probe is the *evidence for* that decision; deleting the evidence that justified a
+  REVERT would erase the reason the slice was killed and break Global Rule 11 traceability.
+  A REVERT stops downstream S1 nodes (`F-ENVELOPE`, `F-BUNDLE`, `I-EXTRACT`) and reverts
+  SAEOS-1 per its §7 falsifier; the probe document stays, as the scar.
+
+- **Recovery path:** after a triggers-1/2/3 rollback, re-enter IMPLEMENT, re-fetch the source
+  by digest, re-run WU-1 with a byte-preserving write path (no formatter, no editor
+  round-trip), then WU-2 and WU-3.
+
+---
+
+## 7. Risk register (plan-introduced risks, with mitigations)
+
+| id | Risk | Impact | Mitigation |
+|---|---|---|---|
+| **R-1** | A write path normalizes the trailing newline or re-encodes UTF-8, changing the sha256. | E1 fails; tempting to hand-patch toward the hash and thereby mask a mangling write path. | WU-1 done-check compares the hash *and* the byte count; the instruction on mismatch is delete-and-rewrite, explicitly **not** patch. |
+| **R-2** | A markdown formatter reflows the document. Lines 3 (`verdict: GO`), 4 (`loss_ratio: 0.236`) and the three `## goal:` headings are anchored with `^…$`; any reflow that indents them, folds them into the adjacent table, or merges the two bare lines breaks accept #2/#3/#4 **while the document still reads correctly to a human**. | Silent gate failure that looks like a content problem. | WU-1 forbids any formatting pass. PL-4 re-confirms at WU-2. If a repo-wide format step exists, exclude this path from it. |
+| **R-3** | The IMPLEMENT session is dispatched with this session's `plan/`-only write allowlist. | WU-1's write is discarded as a violation; the run appears to complete with **no artifact and no error visible to the Builder**. | WU-1 makes capability confirmation an explicit named precondition (PL-2) *before* any action, not a discovered failure after. |
+| **R-4** | Someone reads DESIGN §8 literally and creates a second copy at `design/spikes/…`. | Two 41 KB copies of a frozen document drift; a future reader cannot tell which is canonical. | §3 lists it as a forbidden file. Provenance is the sha256 (§2.2), which *is* the artifact id — duplication adds nothing it doesn't already carry. |
+| **R-5** | The accept suite matches `^verdict: GO$` mechanically and cannot see that the DESIGN artifact's §6 makes the GO **conditional on C1** (amending SAEOS-1 §8's "lossless" exit criterion). A reader of the gate result alone concludes "GO, unconditional." | `G-S1-GO` is decided on a materially incomplete summary — the exact failure the probe's own F-1 warns produces a false gate outcome. | WU-4's done-check requires the word "conditional" in the institutional record. Carried to §8 as the **first** handoff line, because no accept command can enforce it. **This is the residual risk this plan cannot close mechanically.** |
+| **R-6** | `S-PROBE` reads as "done" and the slice proceeds, but the probe's own §8 says `F-ENVELOPE` (wave 0, `deps: []`, therefore *appears runnable in parallel*) is blocked on C5 and freezing the envelope is irreversible. | An irreversible schema freeze lands on two undefined fields (GAP-1 `confidence`, GAP-2 `coordinates`). | §8 carries the block explicitly. Not closable from `plan/` — it is a backlog `deps:` edit, out of this session's capability and authority (CER-5). |
+
+---
+
+## 8. Downstream obligations — declared, not executed
+
+None of these are `S-PROBE` work units. They are recorded so the handoff is not lossy, and
+because Global Rule 9 makes an unrecorded ambiguity an incident. Each cites its origin in the
+frozen DESIGN artifact.
+
+**Carry first, above all else:** the verdict is **GO, conditional on C1**. The accept suite
+cannot express that (R-5).
+
+| Ref | Obligation | Owner / route | Blocks |
+|---|---|---|---|
+| **C1** | Amend SAEOS-1 §8's S1 exit from *"round-trip is lossless"* to a measured floor (proposed: loss ≤ 0.10 on forward-emitted goals, every `absent` field named). | Founder, via CER-2/ACP | S1 build start |
+| **C2** | L06 must emit a typed trade-off record `{axis, objective_a, objective_b, resolution}`. | Lifecycle amendment (L19) | S2 |
+| **C3** | Add 4 fields to the L17 close-out template: `falsifier`, enumerated `alternatives_considered` with dispositions, registered `coordinates`, `evidence_hashes`. | Lifecycle amendment (L19) | Ingest of forward goals |
+| **C4** | Specify §6.1b emission per ceremony depth (Trace-A vs Trace-B) and record **F-7** as a new SAEOS-1 §9 adversarial finding. | Founder / L19 | S1 design |
+| **C5** | Resolve GAP-1 (`confidence` derivation undefined) and GAP-2 (no `coordinates` dimension registry) **before** `F-ENVELOPE` freezes the schema. | Planner + founder | `F-ENVELOPE` — see R-6 |
+| **C6** | Historical goals ingest as `candidate`, never `canonical`, carrying their measured per-goal fidelity. No backfill. | Ingest design | Ingest |
+| **D-1** | `S-PROBE.accept` #3 fails via shell syntax error rather than numeric comparison when the file is absent (§2.4). Correct direction, brittle form. | Backlog amendment (CER-2/CER-5) | nothing |
+| **D-2** | The DESIGN artifact's §8 "Path note" is stale once WU-1 lands (it says the canonical copy does not exist yet). Left uncorrected by design — WU-1 forbids editing frozen upstream text. | L18 knowledge extraction | nothing |
+| **F-8** | The DESIGN artifact's F-8 finds `reviews/tasks/*_review.md` — the source named in `S-PROBE.deliverables` — is the *weaker* half of the pair and yields near-nothing beyond `status`; the real yield is `docs/*-constitutional-review.md` + `ledger/debt/`. **Any built extractor aimed at `reviews/tasks/` alone will measure a far worse loss ratio and produce a spurious NO-GO.** | `F-EXTRACT-FIX` / `I-EXTRACT` design | S1 extractor target selection |
+
+**Next node:** `G-S1-GO` (`backlog/SAKG-1-backlog.yaml` lines 110–128, wave 1,
+`deps: [S-PROBE]`) — the A4 founder gate. Its accept requires
+`^decision: (PROCEED|REVERT)$` in `ledger/decisions/SAKG-1-G-S1-GO.md`. Per the DESIGN
+artifact §8, the founder's question is not "GO or NO-GO" simpliciter but **"accept C1, or
+fire the §7 falsifier."**
+
+---
+
+## 9. Completeness check (no orphan, no gap)
+
+- **Every acceptance criterion maps to a work unit.** accept #1 → WU-1; accept #2/#3/#4 →
+  WU-2 (and pre-measured PASS against the source bytes in §2.3).
+- **Every deliverable clause maps to content already present in the artifact.** "3 real
+  sealed goals" → the three `## goal:` sections, sealed status corroborated in its §2;
+  "per-field extractable/partial/absent" → the six scoring tables; "explicit verdict" → §6;
+  "with the loss ratio" → line 4 and §4.
+- **Every work unit feeds a numbered evidence obligation.** WU-1→E1, WU-2→E2, WU-3→E4,
+  WU-4→E3; this file is E0.
+- **Every plan-introduced assumption has a named downstream verification owner** (§5,
+  PL-1…PL-4), and PL-1's failure mode is escalate-not-improvise.
+- **A rollback is declared and bounded for the only mutating stage** (§6), including the
+  bystander file, the pre-existing-file branch, and an explicit non-trigger.
+- **Every risk has a mitigation or is declared unclosable** (§7). R-5 and R-6 are declared
+  unclosable from this stage and routed to §8.
+- **No orphan conditions.** C1–C6 and F-8 each trace to a numbered finding in the frozen
+  DESIGN artifact; D-1 traces to §2.4 and D-2 to WU-1, both measured here.
+- **Declared gap.** This plan asserts nothing about the *correctness* of the probe's
+  0.236 measurement or its 165-field decomposition. Those are DESIGN-stage claims carrying
+  their own assumption register (PA-1…PA-7) and their own declared gaps (n=3, all Phase-0
+  bootstrap goals; no failed goal; no §4.4 edge scored). L11 freezes scope; it does not
+  re-audit upstream analysis, and re-deriving it here would violate Global Rule 3.
+
+**Evidence for this gate:** `plan_executable` = this file.
+
+---
+
+## 10. Traceability
+
+| This document | Derives from |
+|---|---|
+| Node definition, `deliverables`, the four `accept` strings, `G-S1-GO` / `F-ENVELOPE` / `F-EXTRACT-FIX` wiring | `backlog/SAKG-1-backlog.yaml` (lines 67–89, 91–108, 110–128, 148–166) |
+| The probe content, verdict, loss ratio, findings F-1…F-8, GAP-1…GAP-3, conditions C1–C6, assumption register PA-1…PA-7 | Frozen DESIGN artifact `sha256:1dc49586e6b606a9e2d6dcd133c71cc8cb6f574780f15916c1f86b0524988907` |
+| L11 required artifacts (affected files, forbidden files, rollback, acceptance criteria, dependencies), L12/L13 ownership split, X6 no-self-verify, Trace-A routing, Global Rules 2/3/9/11/13/17/19 | `operations/ENGINEERING_LIFECYCLE.md` §§L11–L15, "Router compatibility", "Global Constitutional Rules" |
+| CER-5 (recommend, never legislate) role boundary on C1–C6 and D-1 | `operations/ENGINEERING_LIFECYCLE.md` CER-5; `operations/ROLE_RESPONSIBILITIES.md` §CER-5 |
+| Vacuous-evidence class and the with/without discrimination detector (WU-3, E4) | `reviews/adversary-findings/CANARY-0002-vacuous-evidence.md` |
+| Plan artifact shape (§0 scope boundary, work units, evidence table, rollback, completeness check) | `plan/classify-obj-lifetime-plan.md` (prior `plan_executable` artifact) |
+| Pre-flight state §2.1–2.4 | Measured read-only from the repo root, 2026-08-08. Reproduce: `test -d design/spikes`; `test -f reviews/spikes/sakg-s1-extraction-probe.md`; `shasum -a 256` / `wc -c` / `wc -l` on the context artifact; the four accept commands against the artifact and against the pre-write tree. |

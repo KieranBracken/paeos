@@ -1,0 +1,55 @@
+# DEBT-0004 — Constitutional corpus not yet populated; clause-id scheme not yet ratified
+
+Status: **OPEN (founder-scoped at B0.3)** · Filed: 2026-07-27 · Channel: CER-3 · Priority: **MEDIUM-HIGH (load-bearing for genesis)**
+
+## Compromise
+
+B0.3 delivers the **Constitution accessor** (`kernel/constitution.py`: read-only
+`get_clause`/`query`/`lineage`, no write method — FR-1). It is proven against an in-repo
+fixture. **The real Z0 corpus is not populated**: `constitution/` holds only `README.md`,
+and no canonical **clause-id scheme** has been ratified for the constitutional documents.
+
+## Reason
+
+Choosing *which documents are the constitution* (`constitution/PAEOS-0..6.md`) and *how
+clauses are identified/tagged* is a constitutional-content act, not a Builder act. Under
+CER-5 only the founder legislates constitutional content. At B0.3 the founder explicitly
+scoped the task to the accessor only and deferred population (see review). Recording the
+compromise here per CER-3 rather than having the runtime author the constitution.
+
+## Ideal solution
+
+A founder-legislated **genesis act** that:
+1. Fixes the canon — which of `derivation/PAEOS-0..3.5`, `spec/PAEOS-4-v1.1`, and the
+   PAEOS-5/6 material become `constitution/PAEOS-0..6.md` (and at which versions).
+2. Ratifies the **clause-id scheme**. The accessor currently parses `[cN]` markers with id
+   `"<document>#c<n>"` (mirrors SC-05 clause tags and the ClauseRef `"<parent>#c<n>"` shape);
+   this is provisional and must be confirmed or replaced, because clause ids are a one-way
+   door — SC-05 `ClauseRef`/`serving_clause` reference them everywhere.
+3. Tags the corpus and freezes it, so PAEOS-4 §13.1 `constitutional_basis:[HASH]` can pin
+   real hashes at genesis (S0).
+
+## Repayment conditions
+
+**Before the vertical slice (B0.SLICE) and before genesis (S0).** The immediate next tasks
+are storage-agnostic of constitution *content*: B0.4 (core types) and B0.5 (lifecycle table)
+depend on B0.4, not on Z0; B0.6 (gates) uses the *accessor* (which works against an empty
+corpus). Real end-to-end gate/seal behaviour and genesis both need the populated corpus.
+
+## Priority
+
+MEDIUM-HIGH. Non-blocking for B0.4–B0.6 as code, but load-bearing for genesis and the slice;
+should be scheduled before Phase-0 close-out.
+
+## Estimated impact
+
+Low implementation risk (the accessor already serves whatever Z0 contains), but high
+*constitutional* significance: the clause-id scheme, once referenced by policies and goals,
+is expensive to change. Front-loading the founder decision here avoids a churn later.
+
+## Links
+
+Source: PAEOS-8 §10 (B0.3 row), PAEOS-7.6 (`constitution` server), SC-05 (clause tags /
+ClauseRef), PAEOS-4-v1.1 §13.1 (`constitutional_basis`). Accessor:
+`kernel/constitution.py`. Review: `docs/B0.3-constitutional-review.md`. Founder scope
+decision recorded 2026-07-27 (accessor now, population deferred).

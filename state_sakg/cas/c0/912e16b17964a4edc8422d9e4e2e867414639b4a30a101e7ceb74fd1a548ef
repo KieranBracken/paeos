@@ -1,0 +1,20 @@
+# DEBT-0025 — Parallel Backlog Format Duplication (YAML DAG vs JSON Intake List)
+
+Status: **OPEN** · Filed: 2026-08-06 · Channel: CER-3
+Level: **runtime-orchestration** (touches `runtime/selfhost.py` & `ops/autonomous_run.py`).
+Source: Autonomous SAKG run audit (CER-1).
+
+## 1. Observation
+
+PAEOS currently maintains two parallel, un-unified backlog representations:
+1. **Canonical YAML DAG Backlog (`backlog/*.yaml`)**: E.g., `backlog/PAEOS-5-backlog.yaml` and `backlog/SAKG-1-backlog.yaml`, defining DAG nodes, roles (`fable`/`sonnet`), waves, and explicit executable acceptance tests (`accept`).
+2. **JSON Intake List (`ops/backlogs/*.json`)**: E.g., `ops/backlogs/first-r4.json` and `ops/backlogs/sakg-1-intakes.json`, required by `parse_backlog()` in `runtime/selfhost.py` and `ops/autonomous_run.py`.
+
+## 2. Risk & Impact
+
+Converting a YAML DAG backlog into a JSON Intake list currently requires an ad-hoc translation step. If the DAG nodes change in YAML, the JSON intake file becomes stale, leading to divergence between the specification DAG and the autonomous runner execution queue.
+
+## 3. Remediation Strategy
+
+- Extend `parse_backlog()` in `runtime/selfhost.py` (or add `load_backlog(path: Path)`) to natively support reading `.yaml` DAG files directly.
+- Automatically construct `Intake` objects from YAML DAG nodes, eliminating `ops/backlogs/*.json` duplicate files.

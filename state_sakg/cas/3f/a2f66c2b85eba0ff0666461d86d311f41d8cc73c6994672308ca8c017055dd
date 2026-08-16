@@ -1,0 +1,238 @@
+# PLAN — SAKG-1/S-PROBE: S1 extraction feasibility probe (`reviews/spikes/sakg-s1-extraction-probe.md`)
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Backlog node** | `SAKG-1/S-PROBE` (`backlog/SAKG-1-backlog.yaml`), wave 0, slice S1, `deps: []` |
+| **Status** | PLAN ONLY — the deliverable is **not** written by this session. Frozen input to `IMPLEMENT` and `VERIFY`. |
+| **Date** | 2026-08-08 |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | DESIGN artifact `cd396700eee7` (frozen probe body, canonical_path `reviews/spikes/sakg-s1-extraction-probe.md`); `backlog/SAKG-1-backlog.yaml` node `S-PROBE`; `operations/ENGINEERING_LIFECYCLE.md` §L15–L18, CER-1/CER-2/CER-5; `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md`; `docs/IMPLEMENTATION_ATLAS.md`; `reviews/tasks/B0.{0,1,2,4}_review.md`; `ledger/debt/DEBT-000{2,3}.md`; `reviews/6-hidden-assumptions.md`. |
+
+---
+
+## 0. Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/`. The goal
+objective names one action this stage **does not and must not perform**:
+
+1. **Write `reviews/spikes/sakg-s1-extraction-probe.md`** — a `reviews/` write outside this
+   session's write-capability. Any such write is discarded as a violation. It is planned here
+   as **WU-2**, owned by the downstream IMPLEMENT stage.
+
+The four acceptance commands are likewise **VERIFY**-stage evidence (`spike_accepted`), not
+plan output; they are planned as **WU-3**. Evidence emitted by *this* session is
+`plan_executable` — this file.
+
+**What this session did do, within read-capability:** confirmed the acceptance oracle is
+currently red (K3 red-first), confirmed every cited source artifact resolves, and dry-ran all
+four acceptance regexes against the frozen DESIGN body. Results are recorded as **E-P1/E-P2**
+in §3 and are the reason WU-2 can be specified as a transcription rather than a re-analysis.
+
+---
+
+## 1. Objective restatement (traceability)
+
+Produce `reviews/spikes/sakg-s1-extraction-probe.md`: for ≥3 real sealed goals from
+`reviews/tasks/`, a hand-extraction attempt into the SAEOS-1 §4.3 node types recording
+per-field `extractable` / `partial` / `absent`, plus an explicit `GO` / `NO-GO` verdict with the
+loss ratio.
+
+Acceptance (verbatim from `backlog/SAKG-1-backlog.yaml`, node `S-PROBE`, `accept:`):
+
+```
+A1  test -f reviews/spikes/sakg-s1-extraction-probe.md
+A2  rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md
+A3  test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3
+A4  rg -q '^loss_ratio: 0\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md
+```
+
+The analytical content is **already frozen** by the DESIGN stage (artifact `cd396700eee7`,
+455 lines, `verdict: GO`, `loss_ratio: 0.39`, four `## goal:` sections covering B0.0, B0.1,
+B0.2, B0.4). This plan does not re-open, re-score, or re-verdict that analysis. It plans the
+transcription of the frozen body to its canonical path, its verification, and its rollback.
+
+**Sample-size note (not a deviation).** The objective says "3 real sealed goals (e.g. B0.0,
+B0.1, B0.2)"; the DESIGN sampled **four**, adding B0.4. A3 requires `-ge 3`, so four satisfies
+it. The fourth is load-bearing, not surplus: DESIGN §9 states the verdict is stable under
+excluding B0.4 (loss 0.45) and under excluding B0.2 (loss 0.35). Dropping to exactly three
+would destroy that stability argument. **WU-2 must carry all four.**
+
+---
+
+## 2. Work units (executable, ordered, single-owner)
+
+Strictly sequential: `WU-1 → WU-2 → WU-3`. Each has one owning stage/role, a precondition, an
+exact action, a done-check, and the evidence it feeds.
+
+### WU-1 — Confirm the cited artifact set resolves
+- **Owner:** BUILDER @ IMPLEMENT (not this session).
+- **Ref:** DESIGN §10 (Traceability table), §2 (Method / artifact set per goal).
+- **Precondition:** none.
+- **Action:** confirm every path named in DESIGN §10 exists and is readable. Six of eight were
+  confirmed by this session (E-P1). The two **unconfirmed** paths are:
+  - `proposals/PAEOS-IP-0002.md` — the sole source of B0.4's Decision/Option/rationale grades
+    (DESIGN §B0.4 rows B1, B2, B3, C1–C5). `proposals/` is outside PLAN read-capability.
+  - `spec/SAEOS-1-architecture.md` — the specification under test (§4.2, §4.3, §6.1b, §8, §9/A8).
+    `spec/` is outside PLAN read-capability.
+- **Done-check:** both paths exist. **If `proposals/PAEOS-IP-0002.md` is absent**, B0.4's score
+  of 19.5/25 has no substrate, the headline 0.39 is unsupported, and WU-2 **must halt** — this
+  is a REVERT-to-DESIGN condition (§4), not something to paper over (CER-1).
+- **Feeds:** E1.
+
+### WU-2 — Write the deliverable at its canonical path
+- **Owner:** BUILDER @ IMPLEMENT (not this session), on a `reviews/` write capability.
+- **Ref:** DESIGN header `canonical_path`; DESIGN §§1–10 (the body).
+- **Precondition:** WU-1 green. Target path does **not** exist (confirmed, E-P1) —
+  `reviews/spikes/` exists and holds only `DEBT-0002-spawnability-spike.md`, so this is a
+  **create**, never an overwrite. If the path exists at WU-2 time, halt and re-enter §4.
+- **Action (exact):** write the frozen DESIGN body to
+  `reviews/spikes/sakg-s1-extraction-probe.md` **verbatim**, including its YAML frontmatter.
+  Transcription only — no re-scoring, no re-verdict, no copy-editing of the four
+  acceptance-bearing line forms below, no renaming of headings.
+- **Format invariants (each maps to one acceptance command — violating any one turns a green
+  gate red):**
+  | Invariant | Guards |
+  |---|---|
+  | File is at exactly `reviews/spikes/sakg-s1-extraction-probe.md` | A1 |
+  | A line reading exactly `verdict: GO` — bare, column 0, no `**`, no trailing space | A2 |
+  | ≥3 lines beginning exactly `## goal: ` — two hashes, one space, lowercase `goal`, colon, space | A3 |
+  | A line reading exactly `loss_ratio: 0.39` — `0.NN` form, column 0, no `**`, no trailing space | A4 |
+- **Done-check:** `diff` of the written file against the frozen DESIGN body is empty; the four
+  format invariants hold; all four `## goal:` sections (B0.0, B0.1, B0.2, B0.4) are present.
+- **Feeds:** E2.
+
+### WU-3 — Run the acceptance oracle
+- **Owner:** VERIFIER @ VERIFY (not this session).
+- **Ref:** `backlog/SAKG-1-backlog.yaml` node `S-PROBE` `accept:`; §1 above.
+- **Precondition:** WU-2 complete.
+- **Action:** run A1–A4 **verbatim** from the repo root, in order. Report each exit code.
+- **Done-check:** all four exit `0`. Note for the operator: A3 is `test $(rg -c …) -ge 3`; if
+  `rg` matches nothing it prints nothing and `test` fails with `unary operator expected` rather
+  than a clean `1` — that is still a correct red, not a harness fault.
+- **Feeds:** E3 (`spike_accepted`).
+
+**Blast radius.** Additive, single new file, no existing file touched, non-TCB
+(`reviews/` is a Zone-1 record tree, not `constitution/` or `kernel/`). Nothing imports it;
+`S-PROBE` has `deps: []` and no code artifact depends on it. Expected kernel classification
+**SOFT**; no amendment path required.
+
+---
+
+## 3. Evidence plan (obligations → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle / how it is checked | Gate |
+|----|---------------------|-------------|----------------------------|------|
+| **E0** | `plan_executable` — this file: work units, evidence obligations, rollback, refs cited. | PLANNER @ PLAN (this session) | Presence of §2 (WUs), §3 (this table), §4 (rollback), §5 (assumption ledger), and cited upstream refs. | **PLAN** |
+| **E-P1** | Red-first + corpus-resolution pre-flight. | PLANNER @ PLAN (this session) | **Run.** `test -f reviews/spikes/sakg-s1-extraction-probe.md` → exit **1** (A1 red as required by K3). All six PLAN-readable cited sources resolve at the stated sizes: `reviews/tasks/B0.{0,1,2}_review.md` = 61 ln each, `B0.4_review.md` = 114 ln, `docs/IMPLEMENTATION_ATLAS.md` = 35 ln, `ledger/debt/DEBT-0002.md` = 76 ln, `DEBT-0003.md` = 91 ln, `reviews/spikes/DEBT-0002-spawnability-spike.md` present. Matches DESIGN §§B0.0–B0.4 headers exactly. | **PLAN** |
+| **E-P2** | Acceptance-oracle dry-run against the frozen DESIGN body. | PLANNER @ PLAN (this session) | **Run** against the DESIGN artifact file (not the target path, which does not yet exist): A2 exit **0**; A3 `rg -c '^## goal: '` = **4** (≥3); A4 exit **0**. Matching lines: `11:verdict: GO`, `12:loss_ratio: 0.39`, `79/118/156/194: ## goal: …`, `291:verdict: GO`, `292:loss_ratio: 0.39`. **A1 is not dry-runnable** — it is path existence, satisfied only by WU-2. | **PLAN** |
+| **E1** | Every DESIGN §10 source resolves, incl. `proposals/PAEOS-IP-0002.md` and `spec/SAEOS-1-architecture.md`. | BUILDER @ IMPLEMENT | `test -f` on each; halt on absence (WU-1 done-check). | IMPLEMENT |
+| **E2** | Deliverable exists at canonical path, byte-identical to the frozen DESIGN body, four format invariants hold. | BUILDER @ IMPLEMENT | Empty `diff` vs. frozen body; WU-2 invariant table. | IMPLEMENT |
+| **E3** | `spike_accepted` — A1–A4 all exit `0`. | VERIFIER @ VERIFY | Run §1 commands verbatim; report four exit codes. | **VERIFY** |
+| **E4** | *Semantic* validity of the verdict (see below). | BUILDER @ `SAKG-1/F-EXTRACT` (future) | DESIGN §8 falsifier: automated extractor `gap_ratio` over B0.{0,1,2,4} compared against 0.39; **> 0.55 refutes this GO**. | Deferred — `F-EXTRACT` |
+
+**Why E4 exists.** A1–A4 are *structural*: they prove a verdict line exists, not that it is
+right. `S-PROBE` is a `fable`/judgment node precisely because "no mechanical check exists" for
+its output (`backlog/SAKG-1-backlog.yaml` `assignment_rule`). Passing VERIFY therefore does
+**not** discharge CER-1. The DESIGN supplied its own falsifier (§8, threshold 0.55) and it is
+carried here as a standing obligation so the GO remains falsifiable after the gate closes.
+E4 is **not** a precondition of E3 and must not block WU-3.
+
+---
+
+## 4. Rollback plan
+
+The change is a single additive, non-TCB file. Rollback is clean and bounded, but the safe
+action **changes once the founder gate consumes it**.
+
+- **Triggers:**
+  1. WU-1 done-check fails (`proposals/PAEOS-IP-0002.md` or `spec/SAEOS-1-architecture.md` absent).
+  2. WU-2 `diff` non-empty, or any format invariant violated.
+  3. WU-3: any of A1–A4 exits non-zero.
+  4. E4 later reports `gap_ratio > 0.55` (the DESIGN's own falsifier fires).
+
+- **Rollback action — window 1: before `SAKG-1/G-S1-GO` is recorded** (owner: BUILDER @
+  IMPLEMENT, on a `reviews/` write capability):
+  1. Delete `reviews/spikes/sakg-s1-extraction-probe.md`.
+  2. Result: `reviews/spikes/` is byte-for-byte its prior state — it held exactly one unrelated
+     file (`DEBT-0002-spawnability-spike.md`, confirmed E-P1) and WU-2 touches nothing else.
+     No collateral revert is needed; no file was modified, only created.
+  3. **Verification of rollback:** `test -f reviews/spikes/sakg-s1-extraction-probe.md` exits
+     `1` — i.e. the acceptance oracle is restored to its pre-change red (E-P1).
+
+- **Rollback action — window 2: after `ledger/decisions/SAKG-1-G-S1-GO.md` cites this document**
+  (owner: Founder @ A4, per CER-5):
+  **Deletion is forbidden.** The founder decision cites this loss ratio by backlog contract
+  (`G-S1-GO` accept requires `^decision: (PROCEED|REVERT)$` on its evidence), and deleting the
+  cited artifact leaves a dangling reference in an append-only record tree. The correct action
+  is **supersession, not deletion**: write a superseding probe at a new path, and record the
+  reversal as a founder decision. This mirrors SAEOS-1 §4.2's append-only / supersede-never-delete
+  discipline that the probe itself is testing.
+
+- **Recovery path:** for triggers 1–2, re-enter IMPLEMENT and re-run WU-1/WU-2 against the real
+  sources. For trigger 3, fix only the violated format invariant (§2/WU-2 table) and re-run WU-3;
+  do not alter the analysis to satisfy a regex. For trigger 4, re-enter **DESIGN** — the probe's
+  conclusion, not its transcription, is what failed, and DESIGN §8 requires the probe be re-run
+  before any further S1 node proceeds.
+
+- **What rollback cannot undo:** if the founder has already acted on a GO that E4 later refutes,
+  downstream S1 nodes (`F-EXTRACT-FIX`, `I-STORE`, `I-OUTBOX`) may have started. Their revert is
+  governed by SAEOS-1 §7's falsifier and the backlog's `kill_switches`, not by this plan.
+
+---
+
+## 5. Assumption → verification-owner ledger
+
+DESIGN §8 registers six assumptions (P-01…P-06). Each is assigned an owner here; none changes
+this plan's work units.
+
+| # | Assumption (DESIGN §8) | Verification owner |
+|---|---|---|
+| P-01 | 4 wave-B0 goals represent the 42-artifact corpus | Deferred — `F-EXTRACT-FIX` (adds 2 adversarial cases: a remanded goal, a goal with no L06 matrix) |
+| P-02 | Equal-weight field counting proxies knowledge loss | Accepted as stated; DESIGN concedes a value-weighted ratio would be **worse** than 0.39, so the headline is not flattering the verdict. No further check. |
+| P-03 | Hand-extraction ≈ what the S1 extractor achieves | **E4** — this is the probe's own falsifier (threshold 0.55) |
+| P-04 | `docs/IMPLEMENTATION_ATLAS.md` stays L15-maintained | Owner: Runtime @ L15 (`operations/ENGINEERING_LIFECYCLE.md` §L15, global rule 19). DESIGN flags B0.5 sitting at *In-Progress* among Sealed rows as counter-evidence; if the Atlas drifts, headline loss rises to 0.41 — still GO. |
+| P-05 | `source_hash` is recoverable at emission time from VCS/CAS context | **Unverified and named by DESIGN as "the weakest link in the GO"** — the probe workspace is not a git repository (confirmed: this session's environment reports `Is a git repository: false`), so recoverability was reasoned from §6.1b, not observed. Owner: BUILDER @ `I-OUTBOX` / `F-ENVELOPE`. If false, constraint C2 collapses and falsifier F3 fires for real. **Recommend the founder be shown this explicitly at `G-S1-GO`.** |
+| P-06 | C4 (adding rejected options to the review protocol) is permissible | Owner: Founder @ A4 — it amends `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md`, which is PAEOS process, not SAKG's to change (CER-5). Requires a CER-2 Improvement Proposal. |
+
+**Plan-time finding (recommendation only, CER-5 — not actioned here).** Acceptance command A4,
+`^loss_ratio: 0\.[0-9]+$`, admits only the form `0.NN`. A probe measuring a loss ratio of
+exactly `0` or `1.0` would produce a *correct* result that **fails its own gate**. This does not
+affect the present run (`0.39` matches, E-P2), and the `accept:` list is frozen backlog content
+that this plan has no authority to edit. Recorded so it can be raised at `G-S1-GO` and fixed in
+`T-ROUNDTRIP`, whose oracle (`--assert-loss-ratio 0`) expects exactly the value A4 rejects.
+
+---
+
+## 6. Handoff (not work units of this plan)
+
+`S-PROBE` `deps: []`; it **feeds** `SAKG-1/G-S1-GO` — the founder A4 gate, whose own acceptance
+requires `ledger/decisions/SAKG-1-G-S1-GO.md` with `^decision: (PROCEED|REVERT)$` citing this
+loss ratio. Per CER-5 this plan and its deliverable **recommend**; they do not legislate. **No S1
+implementation node may start before that gate** — including the six GO-conditional constraints
+C1–C6 in DESIGN §6, which bind `F-ENVELOPE`, `F-BUNDLE` and `F-EXTRACT-FIX` if and only if the
+founder records PROCEED.
+
+---
+
+## 7. Completeness check (no orphan / no gap)
+
+- Every objective clause maps to a work unit: ≥3 goals with per-field grades → WU-2 (four
+  carried, §1); explicit verdict + loss ratio → WU-2 format invariants; file at canonical path
+  → WU-2; acceptance → WU-3; source validity → WU-1.
+- Every work unit produces or feeds an evidence obligation: WU-1→E1, WU-2→E2, WU-3→E3; this
+  file is E0; E-P1/E-P2 are this session's executed pre-flight; E4 is the deferred semantic
+  obligation.
+- Every acceptance command A1–A4 has a named guard in the WU-2 invariant table and a dry-run
+  result in E-P2 (A1 excepted, and stated as such).
+- Every DESIGN §8 assumption has a named verification owner (§5).
+- Rollback is declared, bounded, and **window-dependent** for the only mutating stage (§4).
+- All claims cite an upstream ref: DESIGN artifact `cd396700eee7` (§§1–10),
+  `backlog/SAKG-1-backlog.yaml` (`S-PROBE`, `assignment_rule`, `kill_switches`, `G-S1-GO`),
+  `operations/ENGINEERING_LIFECYCLE.md` (§L15–L18, CER-1/2/5, global rule 19),
+  `operations/IMPLEMENTATION_REVIEW_PROTOCOL.md` (C4 target), `docs/IMPLEMENTATION_ATLAS.md`,
+  `reviews/tasks/B0.{0,1,2,4}_review.md`, `ledger/debt/DEBT-000{2,3}.md`,
+  `reviews/6-hidden-assumptions.md` (assumption-register method).
+
+**Evidence for this gate:** `plan_executable` = this file.

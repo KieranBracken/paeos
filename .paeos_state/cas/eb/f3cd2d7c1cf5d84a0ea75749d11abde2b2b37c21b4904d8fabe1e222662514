@@ -1,0 +1,5 @@
+
+Traceback (most recent call last):
+  File "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-t-a84cabbcc809-vcc1vsd6/.agy_bootstrap.py", line 8, in <module>
+    from google.antigravity import Agent, LocalAgentConfig, CapabilitiesConfig, types
+ModuleNotFoundError: No module named 'google.antigravity'

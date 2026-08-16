@@ -1,0 +1,23 @@
+# PAEOS CRITIQUE Stage Transcript — Adversarial Evaluation of Architectural Prerequisites
+
+Adversarial evaluation of the 3 proposed candidates against architectural shortcuts, hidden coupling, and prerequisite order:
+
+---
+
+## Critique of Candidate 1: Reasoning Continuity Layer (RCL)
+- **Genuine Prerequisite vs. Premature Abstraction:** RCL is a genuine prerequisite. Without durable reasoning state, every session restart forces the agent to re-analyze the repository from scratch, risking context window exhaustion and decision drift. It is grounded in existing L03 (Context Compiler) and CAS primitives.
+- **Shortcut/Coupling Risks:** High risk if `ReasoningState` attempts to store raw model transcripts or vendor-specific state formats. 
+- **Required Constraint:** Must be strictly serialized as pure JSON data schemas (`kernel/types.py`), content-addressed via CAS, and compiled statelessly into `TaskPackage.context_refs`. It must NOT couple PAEOS to vendor SDKs or SAKG graph models.
+
+## Critique of Candidate 2: Dynamic Capability Discovery Engine
+- **Genuine Prerequisite vs. Premature Abstraction:** Premature abstraction. Attempting to build dynamic MCP tool registration before L17 Evolution Layer and L18 Skill Compilation are fully specified creates an un-audited, floating tool layer.
+- **Prerequisite Order:** False candidate for current milestone. Requires L03 reasoning continuity and L17 policy gates to exist first.
+
+## Critique of Candidate 3: Autonomous Technical Leadership & Triage
+- **Genuine Prerequisite vs. Premature Abstraction:** Partial overlap with current ADE bootstrap. Building an autonomous technical leader without durable memory (RCL) means the leader forgets prior triage decisions between runs, causing duplicate or conflicting intake generation.
+- **Prerequisite Order:** Requires RCL as a direct prerequisite.
+
+---
+
+## Verdict
+Candidate 1 (RCL) is the only candidate that is both a true prerequisite and free of premature abstractions, provided vendor-decoupled JSON serialization is enforced.

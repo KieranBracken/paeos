@@ -1,0 +1,76 @@
+"""Tests for InvestigationLoop (minimum native multi-branch reasoning)."""
+
+from __future__ import annotations
+
+from kernel.cas import CAS, InMemoryCasStore
+from kernel.ledger import InMemoryLedgerStore, Ledger
+from kernel.types import StageId
+from nacl.signing import SigningKey
+from runtime.claude_code import AgentWrite, RunOutput
+from runtime.task_package import Cost, TaskPackage, TaskStatus
+from runtime.investigation import InvestigationLoop
+
+class ScriptedInvestigationRuntime:
+    """A scripted stand-in for scoped Claude Code sessions."""
+    def __init__(self, writes_by_session: dict[str, tuple[AgentWrite, ...]]) -> None:
+        self._writes = writes_by_session
+        self.sessions_run: list[str] = []
+
+    def run(self, package: TaskPackage) -> RunOutput:
+        session = package.capability.bound_to.session
+        self.sessions_run.append(session)
+        return RunOutput(
+            status=TaskStatus.COMPLETE,
+            writes=self._writes.get(session, ()),
+            evidence=(),
+            trace=b"trace-" + session.encode(),
+            cost=Cost(tokens=500, wallclock_s=1.0, model_ver="model-x"),
+        )
+
+def _writes() -> dict[str, tuple[AgentWrite, ...]]:
+    return {
+        "branch_a": (AgentWrite("research/branch_a/proposal.md", b"Branch A says Event Sourcing."),),
+        "branch_b": (AgentWrite("research/branch_b/proposal.md", b"Branch B says DAG."),),
+        "critic": (AgentWrite("research/critique/review.md", b"Branch A wastes tokens. Branch B is rigid."),),
+        "synthesizer": (AgentWrite("research/synthesis/final.md", b"Event Sourcing with Capability Tokens."),),
+    }
+
+def test_investigation_loop_orchestrates_multi_branch() -> None:
+    runtime = ScriptedInvestigationRuntime(_writes())
+    loop = InvestigationLoop(
+        ledger=Ledger(InMemoryLedgerStore()), 
+        signing_key=SigningKey.generate(),
+        cas=CAS(InMemoryCasStore()), 
+        agent_runtime=runtime,
+    )
+    
+    result = loop.run_investigation(mission="Determine PAEOS Execution Model")
+    
+    assert result["status"] == "COMPLETED"
+    assert result["artifacts_a"] == 1
+    assert result["artifacts_b"] == 1
+    assert result["critiques"] == 1
+    assert result["synthesis"] == 1
+    assert result["spent_tokens"] == 2000  # 500 tokens * 4 runs
+    
+    # Verify exact topology sequence
+    assert runtime.sessions_run == ["branch_a", "branch_b", "critic", "synthesizer"]
+
+def test_investigation_loop_fails_on_scope_violation() -> None:
+    # If branch_a tries to write outside its scope ("research/branch_a/"), it should raise.
+    from runtime.claude_code import ScopeViolation
+    import pytest
+    
+    bad_writes = {
+        "branch_a": (AgentWrite("kernel/ledger.py", b"Malicious write!"),)
+    }
+    runtime = ScriptedInvestigationRuntime(bad_writes)
+    loop = InvestigationLoop(
+        ledger=Ledger(InMemoryLedgerStore()), 
+        signing_key=SigningKey.generate(),
+        cas=CAS(InMemoryCasStore()), 
+        agent_runtime=runtime,
+    )
+    
+    with pytest.raises(ScopeViolation):
+        loop.run_investigation(mission="Determine PAEOS Execution Model")

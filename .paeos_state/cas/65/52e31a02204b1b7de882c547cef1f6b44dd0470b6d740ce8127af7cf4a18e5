@@ -1,0 +1,90 @@
+# Constitutional Implementation Review: [B2.N — Probative Court Verification]
+
+**Date**: 2026-07-31
+**Task**: The Court verifies each `reproducible_command` against a workspace with the builder's change
+applied, so *probative* evidence can pass — closing the vacuous-evidence gap the live Adversary found.
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverables:
+- `runtime/verification.py` — `build_verification_workspace` (repo copy + the builder's produced
+  files applied at their real paths) + `workspace_runner` (a `reproduce` runner with `cwd` = the
+  workspace, wrapping `kernel.sandbox.run_sandboxed`).
+- `runtime/task_package.py` + `runtime/claude_code.py` — `TaskResult.written_paths` preserves each
+  write's `(path, hash)` so the change can be applied at its real path (paths were lost as bare refs).
+- `runtime/orchestrator/__init__.py` — `SoftLoop` gains `repo_root`; for a live run it adjudicates
+  with a **workspace court** (change applied); tests keep the injected court.
+- `cli/paeos.py` / `runtime/selfhost.py` — thread `repo_root=cwd` to the live run.
+- `reviews/adversary-findings/CANARY-0002-vacuous-evidence.md` — the Adversary's proposed canary,
+  captured as a DRAFT for founder ratification into Z0 (HARD-LOOP).
+- `ops/backlogs/first-r4.json` — retargeted to **probative** evidence (imports and asserts on
+  `classify_obj`), validated to discriminate: it fails (exit 1) when the function is absent.
+
+Evidence: **315 passed** (+2); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — **kernel untouched**, F2-SOFT).
+
+## What this delivers
+
+The live Adversary correctly refused a seal whose evidence was non-probative: the Court re-ran the
+command in a sandbox **without the change**, so only vacuous self-contained commands (`echo`) could
+pass. B2.N runs the command in a workspace **with the change applied**, so evidence that actually
+imports and exercises the change passes iff the change is real — and fails for its negation. Verified
+out-of-band: the sandboxed venv-python imports the package and runs a behaviour assertion in the
+workspace (exit 0 when the target exists, exit 1 when absent).
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** The T2 anti-forgery contract is unchanged: the Court still deterministically re-runs the
+`reproducible_command` and compares to the claimed result. B2.N only changes **where** it runs (a
+workspace with the change), which is what makes the check *probative* rather than vacuous — squarely
+serving FR-4 and the Adversary's finding.
+
+### 2. Architectural Drift
+**PASS.** `workspace_runner` **wraps** `kernel.sandbox.run_sandboxed` (a kernel function it *calls*,
+never modifies) — so the resource-limited sandbox and the reproduction contract are intact and the
+task stays **F2-SOFT** (kernel LOC unchanged). The workspace court is selected per-run behind a small
+helper; the default injected court is unchanged for tests.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** No duplication of the sandbox; `written_paths` is the minimal, path-preserving addition
+(bare `ArtifactRef` loses paths, and adding a path to the *kernel* `ArtifactRef` would be HARD-LOOP —
+avoided). The workspace is built + torn down per run (try/finally). No hidden debt.
+
+### 8. Security Implications
+**PASS.** The command still runs under the DEBT-0005 resource-limited sandbox (same limits, same
+minimal env), now with `cwd` = an isolated temp workspace that is a copy — never the live repo. The
+change is applied only inside that throwaway workspace; nothing touches the real tree.
+
+### 9–10. Runtime / Extensibility
+**PASS.** The workspace substrate enables the **B2.O** vacuous-evidence detector (run with *and*
+without the change; identical result ⇒ non-discriminating ⇒ CAUGHT), mechanising the Adversary's
+catch.
+
+## Adversary / property pass
+
+1. **Change applied** — the workspace has the builder's file at its real path over a repo copy
+   (tested).
+2. **Runner sees the change** — a command in the workspace observes the applied content, not the
+   original (tested).
+3. **Probative & discriminating** — the R4 evidence command passes only if `classify_obj` exists and
+   behaves; validated to exit 1 when absent (out-of-band).
+4. **No kernel change; no live-repo mutation** — F2-SOFT; workspace is a throwaway copy.
+
+## OBSERVATION
+
+1. **The probative command is environment-specific (the venv interpreter path).** The R4 backlog's
+   command hardcodes `.venv/bin/python` so the sandbox has the project's dependencies. A portable
+   evidence channel (the builder declares the interpreter, or the runtime injects it) is a follow-on;
+   for the R4 demo the explicit path is acceptable and honest.
+
+## Action Items
+- [ ] **Founder**: ratify B2.N (F2-SOFT) → merge ff-only, remote CI green, tag `b2.n`.
+- [ ] **Founder**: ratify **CANARY-0002** into Z0 (HARD-LOOP) per the captured draft; schedule **B2.O**
+      (with/without-artifact discrimination detector).
+- [ ] **Then**: execute the final R4 run — with probative evidence + the workspace court, a real
+      `classify_obj` change should pass the Court **and** the Adversary, producing a genuine seal
+      (or, honestly, whatever the Adversary rules).

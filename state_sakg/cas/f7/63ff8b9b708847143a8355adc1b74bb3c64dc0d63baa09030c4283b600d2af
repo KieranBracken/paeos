@@ -1,0 +1,571 @@
+---
+probe_id: SAKG-1/S-PROBE
+title: Extraction feasibility spike — falsification test of SAEOS-1 §9/A8
+authority: spec/SAEOS-1-architecture.md §9/A8, §10/D7, §8/S1; CER-1
+role: Planner (DESIGN); executed by hand, no tooling
+date: 2026-08-09
+corpus: 4 real PAEOS goals (B0.0, B0.1, B0.2, B2.G)
+graded_fields: 188
+verdict: GO
+loss_ratio: 0.16
+loss_ratio_type_applicable: 0.14
+gate_next: SAKG-1/G-S1-GO (founder A4; CER-5 — this document recommends, it does not legislate)
+---
+
+# S-PROBE — SAKG S1 Extraction Feasibility
+
+## §0 What is being falsified
+
+SAEOS-1 §9/A8 carries the specification's **single largest untested assumption**:
+
+> "Ω1 (self-population) … assumes PAEOS emits clean structured decisions. Does it?
+> **[MODIFY]** Partially. PAEOS *produces* all the required artifacts … but as prose
+> documents, not as typed emission bundles. **Carried:** if L15 artifacts prove too
+> unstructured to extract losslessly, S1 fails and Ω1's value is overstated."
+
+D7 ratified S1 as "explicitly a falsification test". This probe runs that test **before**
+any S1 code exists, per §10/D7 and the §7 falsifier.
+
+**Falsification condition, fixed before grading** (so the result cannot be rationalised):
+
+> **NO-GO** if either (a) aggregate field loss ≥ 0.35, or (b) any *load-bearing*
+> absent field is **A-lost** — i.e. the information was never produced anywhere in
+> the PAEOS process and cannot be recovered by changing the emitter.
+
+Both limbs were live. Limb (b) came close to firing on `Scar` (§4, F3).
+
+---
+
+## §1 Method
+
+### §1.1 Corpus selection (and its bias control)
+
+Four real goals, stratified — not the three cheapest. The `docs/*-constitutional-review.md`
+companion documents exist **only for B0.0–B0.3**, and `docs/IMPLEMENTATION_ATLAS.md` stops
+at B0.5 despite the L15 rule mandating a row per task. A probe drawn only from `B0.x` would
+therefore be **survivorship-biased toward the richest artifact surface in the repository**.
+B2.G is included as the control for that: a late runtime goal with a single review file,
+no CER-4 companion, and no Atlas row.
+
+| Goal | Kind | Artifact surface actually available |
+|---|---|---|
+| **B0.0** | Toolchain / repo skeleton | `reviews/tasks/B0.0_review.md` (10-point checklist), `docs/B0.0-constitutional-review.md` (CER-4 six questions + acceptance table), Atlas row `B0.0-TOOL`, `ledger/debt/DEBT-0002.md` |
+| **B0.1** | TCB module (ledger) | `reviews/tasks/B0.1_review.md`, `docs/B0.1-constitutional-review.md` (+ Adversary pass), Atlas row `B0.1-LEDGER`, `ledger/debt/DEBT-0003.md`, `tests/kernel/test_ledger.py` |
+| **B0.2** | TCB module (CAS) | `reviews/tasks/B0.2_review.md`, `docs/B0.2-constitutional-review.md` (+ Adversary pass + founder verdict), Atlas row `B0.2-CAS`, DEBT-0003 scope-narrowing section, `tests/kernel/test_cas.py` |
+| **B2.G** | Runtime behaviour change | `reviews/tasks/B2.G_review.md` **only** (+ `proposals/PAEOS-IP-0004/0005/0006.md` as the upstream decision record). No CER-4 companion. No Atlas row. |
+
+### §1.2 What is graded
+
+The **seven node types §6.1b actually emits at seal**: `Decision`, `TradeOff`, `Option`,
+`Constraint`, `Component`, `Scar`, `EvidenceRef`. `Outcome` is excluded — §6.1b rule 3
+defers it to L17/L19, so its absence at seal is by design, not loss. The other four §4.3
+types (`Problem`, `Objective`, `Mechanism`, `Pattern`) are **not in the bundle at all**;
+that is a specification gap, reported in §4/F5 rather than scored as extraction failure.
+
+Per goal, 47 fields:
+
+- **15 envelope fields** (§4.2), graded once per goal. `confidence` is excluded (§4.2
+  invariant: *derived, never authored* — grading it would be a category error). `facets`
+  is excluded (open extension map, no required v1 content).
+- **25 type-specific fields** across the seven bundle types.
+- **7 edge kinds** (§4.4): `decides`, `considered`, `rejected`, `rationale_for`,
+  `constrained_by`, `part_of`, `supported_by`. `resulted_in` is excluded as by-design
+  deferred (§6.1b r3).
+
+4 goals × 47 = **188 graded fields**.
+
+### §1.3 Grading scale
+
+| Grade | Score | Meaning |
+|---|---|---|
+| **extractable** | 1.0 | Present verbatim, or derivable by a deterministic rule over the artifact with no judgment |
+| **partial** | 0.5 | Recoverable, but only via judgment/compression — lossy, non-deterministic, or requiring a human/model call |
+| **absent** | 0.0 | Not present in any of the goal's artifacts |
+
+Every **absent** is further classified, because this is what decides the verdict:
+
+- **A-recoverable** — the information exists in the process or repository but not in the
+  artifact. Fixable by changing the *emitter* or the L15 template. Cheap.
+- **A-lost** — the information was never produced by the goal at all. Requires new
+  authoring work at L04/L06 time. Expensive, and cannot be retro-fitted to history.
+- **A-vacuous** — the node type does not apply to this goal (e.g. a config task with no
+  genuine objective exchange). Counted in the headline ratio, excluded from the
+  `loss_ratio_type_applicable` sensitivity figure.
+
+`loss_ratio = 1 − (Σ score ÷ 188)`.
+
+---
+
+## §2 Per-goal extraction
+
+## goal: B0.0 — Toolchain & Repository Skeleton
+
+**Envelope (13.0/15).** `id`/`type`/`namespace`/`status` are rule-assigned (mint ULID; type
+from the producing extraction rule; namespace = `paeos` per §6.1b r4; status = `candidate`
+per §6.1b). `label` verbatim from the title. `valid_from` from `**Date**: 2026-07-27`.
+`valid_until` correctly null. `ingested_at`/`source_hash` are emitter-side.
+`coordinates` from the Atlas row (`Zone 1 (TCB)`, `PAEOS-8 §3, §8`).
+— **partial ×4:** `summary` (≤280 chars requires generation, not extraction);
+`provenance.origin` (goal id `B0.0` present, **run id absent everywhere**);
+`provenance.author_kind` (`Role: Builder`, but the CER-4 doc states "humans play all roles
+at bootstrap" — human vs agent is genuinely undecidable from the artifact);
+`falsifier` (the acceptance table *is* a falsifier set, but selecting one refutation
+condition per node is a judgment call).
+
+**Decision (2.5/4).** One node: *lock the Python/uv/ruff/pyright/pytest toolchain and make
+the TCB boundary executable via `strict=["kernel"]` + F1/F2/F3 CI gates.*
+`rationale` **extractable** ("the first place the constitution *runs* rather than
+*describes*"); `constitutional_basis` **extractable** (PAEOS-8 §3/§8, PAEOS-7.5 §3/A-2);
+`context` **partial** (the need is implied, never stated as a problem);
+`alternatives_considered` **absent (A-recoverable-by-reference)** — the language/toolchain
+alternatives were weighed *upstream* in PAEOS-8 §3, not in this goal's artifacts. The
+extractor can emit a cross-reference edge instead of inventing options.
+
+**Option (3.0/3).** A real rejected option survives in prose: pyright's per-environment
+`typeCheckingMode`, tried and rejected ("unrecognized in this build") in favour of the
+top-level `strict` list. Description, disposition, and rejection rationale are all present.
+*Population note:* this is one option; §6.1b promises "L04 candidates, INCLUDING rejected
+ones" and there is no L04 candidate set for this goal.
+
+**Constraint (3.0/3).** `TCB ≤ 20k LOC (F1)`, `kernel/ change → HARD-LOOP (F2)`,
+`Python >=3.12`, `no committed key material (F3)` — kind, bound, and basis all present.
+Extracted from the acceptance table, **not** from an L11 contract (none exists as a file).
+
+**TradeOff (0.0/4) — absent, A-vacuous.** No trade-off matrix, and no genuine two-objective
+exchange in the artifacts. The nearest candidate (vendored `.agents` lint pollution) is a
+friction fix, not an exchange. Judgment: for a config-only goal, a `TradeOff` node is not
+warranted — this is why the sensitivity figure exists.
+
+**Component (4.0/4).** `pyproject.toml`, `.github/workflows/ci.yml`; Atlas row supplies
+kind, path, system, and trust zone.
+
+**Scar (1.0/3).** The `.tmp`-adjacent case does not arise here, but a defect class *was*
+found and guarded (lint scanning vendored `.agents/`, fixed by `extend-exclude`).
+`root_cause` **partial** and `guard_action` **partial** (both inferable from prose);
+`detection_signature` **absent (A-lost)** — nothing in the artifact says how this class
+would be recognised next time.
+
+**EvidenceRef (3.0/4).** `uri`, `kind`, and re-verification instructions are all present
+(`uv sync --locked`, `pytest`, the gate commands). **`hash` absent (A-recoverable).**
+
+**Edges (6.0/7).** `considered`, `rejected`, `rationale_for`, `constrained_by`, `part_of`,
+`supported_by` all reconstructible. **`decides` absent** — it binds Decision→Problem, and
+neither a Problem node nor a stated need exists here.
+
+**Goal total: 35.5/47 → loss 0.245.**
+
+## goal: B0.1 — Single-Writer Hash-Chained Ledger
+
+**Envelope (13.0/15).** Identical profile to B0.0; the envelope is structural, so it does
+not vary with artifact richness. Same four partials.
+
+**Decision (4.0/4).** *Prove the ledger algebra in-memory behind the `LedgerStore` narrow
+waist; defer the durable backend.* All four fields present: `context` (DEBT-0003 states the
+need explicitly), `alternatives_considered` (Postgres vs in-memory, later SQLite — each
+enumerated with reasons), `rationale` ("building the TCB's foundation blind against an
+un-runnable backend would be reckless"), `constitutional_basis` (PAEOS-4 §2, PAEOS-7.6 §2,
+FR-5, K9).
+
+**Option (3.0/3).** `PostgresLedgerStore` (deferred, reason: no docker daemon available),
+`InMemoryLedgerStore` (accepted as reference), `SqliteLedgerStore` (later, B1.B). Disposition
+and rejection rationale both explicit.
+
+**Constraint (3.0/3).** "no docker daemon available in the build environment", FR-5
+single-writer, TCB LOC budget (321 LOC).
+
+**TradeOff (2.5/4) — the informative case.** A real exchange *was* made and *is* reasoned in
+prose: durable-backend-now vs proven-algebra-now, resolved by the K9 waist. But it is
+narrative, not typed: `resolution` **extractable**, while `axis`, `side_a`, and `side_b` are
+each **partial** — nameable by a model, never authored. This is the shape of the TradeOff
+loss across the whole corpus (§4/F2).
+
+**Component (4.0/4).** `kernel/ledger.py`, the `LedgerStore` protocol,
+`InMemoryLedgerStore`; Atlas row supplies zone and authority.
+
+**Scar (0.5/3).** No scar authored. The honest boundary note ("`verify_chain` proves
+tamper-evidence for point mutations, not authenticity of the whole history") is a limitation,
+not a failure class: `root_cause` **partial**, `detection_signature` and `guard_action`
+**absent (A-lost)**.
+
+**EvidenceRef (3.0/4).** Named property tests, 1,000-event corpus, gate outputs — all
+present. **`hash` absent (A-recoverable).**
+
+**Edges (6.5/7).** Six extractable; `decides` **partial** — the need *is* stated, so a
+Problem node is constructible, but §6.1b's bundle has no `Problem` type to put it in
+(§4/F5).
+
+**Goal total: 39.5/47 → loss 0.160.**
+
+## goal: B0.2 — Immutable Content-Addressable Store
+
+**Envelope (13.0/15).** Same profile.
+
+**Decision (4.0/4).** *Content-address blobs on the filesystem behind a `CasStore` waist;
+no database.* All four fields present, including an explicitly weighed alternative
+("**B0.2 needs no database**: content-addressed files are durable on their own") and a
+`constitutional_basis` chain (PAEOS-4 §2, PAEOS-8 §10, K9).
+
+**Option (3.0/3).** database-backed CAS (rejected, with reason), `InMemoryCasStore`
+(accepted, reference), `FilesystemCasStore` (accepted, durable).
+
+**Constraint (3.0/3).** Atomic-write requirement, no-external-dependency, 174 LOC,
+hex-key validity.
+
+**TradeOff (2.5/4).** The DEBT-0003 scope narrowing is a genuine exchange — durability vs
+dependency weight, resolved to filesystem, and *founder-ratified* as a scope reduction.
+Same profile as B0.1: `resolution` extractable, axis and sides partial.
+
+**Component (4.0/4).** `kernel/cas.py`, `CAS`, `CasStore`, `InMemoryCasStore`,
+`FilesystemCasStore`.
+
+**Scar (2.5/3) — the best scar in the corpus.** The orphaned-`.tmp` enumeration defect,
+caught by the Adversary pass *before* review:
+`root_cause` **extractable** ("a crash mid-write leaves a `.tmp` file inside the shard
+directory, which the first cut of `iter_keys` would have yielded as a bogus key");
+`guard_action` **extractable** ("`iter_keys` yields only well-formed addresses
+(`is_valid_hash`)");
+`detection_signature` **partial** — a regression test name
+(`test_orphaned_temp_file_is_not_a_key`) is a *detector*, but not the tag-set signature the
+runtime `Scar` uses nor the §4.3 field.
+
+**EvidenceRef (3.0/4).** 31 tests, 10,000-blob scale corpus, both backends parametrized,
+re-verification commands present. **`hash` absent (A-recoverable)** — and note the irony
+recorded in §4/F1: *this is the goal that built the CAS.*
+
+**Edges (6.5/7).** As B0.1.
+
+**Goal total: 41.5/47 → loss 0.117.**
+
+## goal: B2.G — L1/L3 Memory-Lifetime Boundary
+
+The bias control: one review file, no CER-4 companion, no Atlas row.
+
+**Envelope (13.0/15).** `coordinates` still extractable — the review header carries the
+IP references and the trust zone inline ("F2-SOFT: `runtime/` + `tests/` only"), so the
+missing Atlas row does not cost a field here. Same four partials.
+
+**Decision (4.0/4).** *`SoftLoop.run` no longer authors an L3 scar on remand; the Evolution
+Layer becomes the sole L3 author.* `context` (the IP-0004 symptom — double-authoring causing
+false recurrence), `alternatives_considered` (a drafted `RemandNote` type, and "promote L1 in
+place", both rejected), `rationale` ("one L1 abstraction, no competing home"),
+`constitutional_basis` (IP-0004/0005/0006, K8, T3) — all extractable. Crucially the
+alternatives are here because the reviewer wrote a **Reconciliation note** describing work
+they *discarded*. That is precisely the §4.3 "scarcest, most valuable knowledge" — and it
+survived in prose.
+
+**Option (3.0/3).** `RemandNote` (drafted, rejected, reason given); `ExecutionContext`
+(accepted).
+
+**Constraint (3.0/3).** IP-0005 Axiom 1 ("operational execution SHALL NEVER author or commit
+institutional memory"), no-circular-import, F2-SOFT change budget.
+
+**TradeOff (2.5/4).** Explicit in OBSERVATION 1: completeness vs blast radius — the full
+per-artifact `lifetime_class` annotation was *deliberately not folded in* "to keep the
+boundary change tightly scoped", deferred to B2.H. `resolution` extractable; axis and sides
+partial. Same systematic profile.
+
+**Component (4.0/4).** `runtime/task_package.py`, `runtime/orchestrator/__init__.py`,
+`runtime/selfhost.py`, `runtime/evolution.py`. All four fields recoverable **from the review's
+Deliverables list**, not from the L08 architecture artifact set §6.1b names — and not from the
+Atlas, which has no row for any of them. The fields extract; the *source of truth the contract
+assumes* does not exist (§4/F6).
+
+**Scar (2.5/3).** `root_cause` extractable (double L3 authoring by the operational loop →
+false recurrence); `guard_action` extractable (`SoftLoop.run` has no `propose_scar` call;
+Evolution is the sole author); `detection_signature` partial (named tests, no signature).
+
+**EvidenceRef (3.0/4).** 297 passed, ruff clean, pyright 0 errors, F1 2644/20000, named test
+files. **`hash` absent (A-recoverable).**
+
+**Edges (6.5/7).** As B0.1/B0.2.
+
+**Goal total: 41.5/47 → loss 0.117.**
+
+---
+
+## §3 Aggregate result
+
+| Goal | Envelope /15 | Type-specific /25 | Edges /7 | Total /47 | Loss |
+|---|---|---|---|---|---|
+| B0.0 | 13.0 | 16.5 | 6.0 | 35.5 | 0.245 |
+| B0.1 | 13.0 | 20.0 | 6.5 | 39.5 | 0.160 |
+| B0.2 | 13.0 | 22.0 | 6.5 | 41.5 | 0.117 |
+| B2.G | 13.0 | 22.0 | 6.5 | 41.5 | 0.117 |
+| **All** | **52.0/60** | **80.5/100** | **25.5/28** | **158.0/188** | **0.160** |
+
+Grade distribution over 188 fields: **extractable 141 (75.0%) · partial 34 (18.1%) ·
+absent 13 (6.9%)**.
+
+Classification of the 13 absents: **A-recoverable 5** (4 × `EvidenceRef.hash`,
+1 × `Decision.alternatives_considered` recoverable by upstream reference) ·
+**A-lost 4** (3 × `Scar.detection_signature`, 1 × `Scar.guard_action`) ·
+**A-vacuous 4** (B0.0 `TradeOff`).
+
+Two secondary measures:
+
+- **Node-population yield: 25/28 (0.893).** Of the seven bundle types × four goals, three
+  cells yield no node (B0.0 `TradeOff`, B0.0 and B0.1 `Scar`).
+- **Sensitivity, excluding A-vacuous cells: `loss_ratio_type_applicable: 0.14`.**
+
+**The envelope score is identical across all four goals.** That is the single most important
+structural result: §4.2 envelope extraction is *goal-independent and rule-driven*, so all
+real variance lives in the type-specific facets. The consequence is that extraction yield
+does not degrade with artifact thinness the way A8 feared — B2.G, the deliberately
+disadvantaged control, scored **equal to the best B0.x goal**.
+
+---
+
+## §4 Findings
+
+Ordered by build impact. Severity is against S1/S2 delivery, not against the corpus.
+
+### F1 — `EvidenceRef.hash` is absent from every artifact · HIGH · A-recoverable
+Not one L15 artifact in the corpus records a content hash for the evidence it cites. Reviews
+cite test *names*, pass counts, and gate outputs. This is the highest-severity single field
+loss because §3.3.3 and §6.1b r2 make the hash load-bearing: "evidence never leaves PAEOS;
+re-verification requires going back to PAEOS's CAS". Without a hash there is nothing to go
+back *to*. The fix is trivial and deterministic — the emitter hashes the artifact file at
+seal time, and `kernel/cas.py` (built by B0.2, in this very corpus) already provides the
+addressing. **Fix before S1 ingest, not after.**
+
+### F2 — Trade-offs are reasoned in prose, never authored as typed axes · MEDIUM · partial
+Three of four goals contain a genuine objective exchange with a defensible resolution, and in
+all three `resolution` extracts cleanly while `axis`/`side_a`/`side_b` do not. §6.1b sources
+`TradeOff` from "the L06 trade-off matrix" — **no L06 trade-off matrix exists as a file
+anywhere in the repository**. Consequence: `tradeoff_precedents`, the *only* method S2
+delivers, would be matching on model-inferred axes. Two fixes, both needed: (a) add an axis
+line to the L06 template so future goals author it; (b) for history, accept model-inferred
+axes as `candidate` with an explicit `inferred` provenance marker — never `canonical`,
+per ×5.
+
+### F3 — Scar does not round-trip losslessly; Ω1's claim is false as built · HIGH · A-lost for history
+§4.3 states SAKG's `Scar` "mirrors PAEOS's scar-graph so scars round-trip losslessly (Ω1)".
+It does not. Two independent defects:
+
+1. **Schema mismatch.** The live `runtime/memory/__init__.py::Scar` is
+   `(id, signature, lesson, detection, severity)`. §4.3 requires
+   `(root_cause, detection_signature, guard_action)`. There is **no `root_cause` and no
+   `guard_action`** in the runtime type. Even a perfect emitter reading the live scar-graph
+   loses two of three required fields.
+2. **No durable scar-graph.** `ScarStore` holds `self._scars: dict[str, Scar]` in process
+   memory and is never persisted. Grep confirms no scar artifact on disk anywhere. For every
+   historical goal the "scar-graph" §6.1b pulls from **does not exist**; scars must be
+   reconstructed from prose, which is why `detection_signature` is the corpus's only
+   A-lost field.
+
+This is the finding that came closest to firing the NO-GO. It does not fire it because
+`root_cause` and `guard_action` *are* recoverable from CER-4 Adversary-pass prose in the two
+goals that had real defects (B0.2 scored 2.5/3), and because the runtime schema is a Zone-2
+type that can be extended cheaply. But **Ω1's "losslessly" must be struck or qualified**, and
+the runtime `Scar` type must gain the two fields before S3.
+
+### F4 — The seal event has no machine-readable predicate · HIGH · A-recoverable
+§6.1b's trigger is "PAEOS goal reaches L16 (Promotion) and seals". Nothing in the corpus
+makes that state machine-detectable. `ledger/decisions/` **does not exist**. B0.2's seal is
+the prose string "**Founder verdict (2026-07-27): B0.2 RATIFIED.**"; B2.G's is an *unticked*
+markdown checkbox (`- [ ] Founder: ratify B2.G`). An emitter cannot reliably answer "is this
+goal sealed?" and therefore cannot decide when to emit. Fix: L16 writes a structured
+disposition record (the `ledger/decisions/` path G-S1-GO already assumes) with an explicit
+status field.
+
+### F5 — §6.1b's bundle omits types two ratified methods traverse · HIGH · spec-internal gap
+The bundle emits 7 of the 12 §4.3 types. Missing: `Problem`, `Objective`, `Mechanism`,
+`Pattern` (and `Outcome`, correctly deferred). Cross-referencing §5.2:
+
+| Method (§5.2, fixed by PAEOS-9 §10.1) | Types it traverses | Servable from the S1 bundle? |
+|---|---|---|
+| `tradeoff_precedents` | TradeOff, **Objective**, Constraint, Decision, Outcome | **Partially** — TradeOff endpoints can only be Constraints |
+| `pattern_retrieval` | **Problem**, Option, **Mechanism**, **Pattern**, Scar | **No** — entry node type is not emitted |
+| `query_architectures` | Component, **Pattern**, Decision, Outcome | Partially |
+| `dependency_impact` | Component, Outcome | Yes (Outcome via S3) |
+| `memory_augment` | Scar + Similarity edges | No — Similarity edges are not emitted |
+
+This bites S2 directly: `tradeoff_precedents` is S2's only method and its `TradeOff` nodes
+cannot reach an `Objective`. `Objective` and `Problem` *are* extractable from PAEOS artifacts
+at roughly the quality of `Constraint` — acceptance criteria and the CER-4 "(c) which parts
+became stronger" answer encode them. The fix is to add both to the bundle in `F-BUNDLE`, and
+it is cheap **only if made before the bundle contract is frozen**. This finding alone
+justifies having run the probe before `F-ENVELOPE`/`F-BUNDLE`.
+
+### F6 — The named L15 sources do not exist; the real sources are different files · MEDIUM
+§6.1b names five producers. Actual state:
+
+| §6.1b source | Reality in this repository |
+|---|---|
+| decision-graph (ADR records) | No per-goal ADRs. Constitutional decisions live in `proposals/PAEOS-IP-*.md`; goal decisions live in review prose. |
+| L06 trade-off matrix | Does not exist (F2). |
+| L04 candidates | No candidate-set artifact; rejected options survive incidentally in prose. |
+| L11 implementation contract | Does not exist as a file; constraints come from the acceptance table. |
+| L08 architecture artifact set | `docs/IMPLEMENTATION_ATLAS.md` — but it stops at B0.5 despite the L15 rule mandating a row per task. |
+| scar-graph | In-memory only (F3). |
+
+Extraction still works because the *review documents* are unexpectedly good substitutes. But
+the S1 extractor must be written against `reviews/tasks/*.md`, `docs/*-constitutional-review.md`,
+`ledger/debt/*.md`, and `proposals/*.md` — **not** against the artifact names in §6.1b. §6.1b
+should be amended to name the real sources.
+
+### F7 — §8's "round-trip is lossless" is ambiguous and currently unpassable on one reading · MEDIUM
+S1's exit criterion reads "A sealed PAEOS goal produces a valid bundle; round-trip is
+lossless." On the reading *prose → bundle*, this probe proves it can never pass: 0.16 loss is
+irreducible against existing artifacts, and 4 fields are A-lost. On the reading *bundle →
+storage → bundle*, it is achievable and is the right conformance test. **Recommend §8 be
+clarified to the second reading**, with extraction yield measured separately against this
+probe's metric and a stated floor. Without the clarification S1 has a criterion it cannot
+satisfy, and the slice would fail for the wrong reason.
+
+### F8 — Two systematic envelope partials, both cheap · LOW
+`provenance.origin` carries a goal id but **no run id anywhere in the corpus** — emitters can
+supply it going forward, history cannot. `provenance.author_kind` is genuinely undecidable
+for bootstrap-era goals ("humans play all roles at bootstrap"); `unknown` is the honest value
+and the enum should admit it. `summary` requires generation, not extraction — acceptable,
+but the generated string must be written once and hashed into `corpus_hash`, or §5.1 r3
+reproducibility is compromised.
+
+---
+
+## §5 Verdict
+
+> **GO**, at an aggregate field loss ratio of **0.16** (machine-readable in the frontmatter:
+> `verdict` / `loss_ratio`).
+
+**A8 is not falsified.** The assumption it names — that PAEOS's L15 artifacts are structured
+enough to extract from — **holds**, for a reason A8 did not anticipate: PAEOS's artifacts are
+prose, but they are prose *written to stable templates* (the 10-point review checklist, the
+CER-4 six questions, the acceptance table, the Adversary pass). Template-shaped prose is
+extractable; free prose is not. 75% of fields extract deterministically and a further 18%
+extract with judgment.
+
+Against the pre-registered failure condition:
+
+- Limb (a), loss ≥ 0.35: **not met** (0.16, worst single goal 0.245).
+- Limb (b), a load-bearing A-lost field: **not met, narrowly**. The only A-lost fields are
+  `Scar.detection_signature` (×3) and `Scar.guard_action` (×1). `Scar` is load-bearing for
+  `memory_augment` — but that method is an S4 deliverable, is the first thing disabled under
+  §7 degradation, and its inputs are fixable prospectively by extending the runtime `Scar`
+  type. It is not load-bearing for S1 or S2.
+
+**A8's carried text should be revised, not deleted.** The accurate statement is: *extraction
+is feasible at ~0.84 fidelity; the residual is concentrated in fields absent from the L15
+template rather than absent from the process, and one claim in §4.3 — that scars round-trip
+losslessly — is false as built.*
+
+### §5.1 Conditions on the GO
+
+This is a GO for **building S1**, conditional on five changes landing **before** `F-ENVELOPE`
+and `F-BUNDLE` freeze their contracts. Freezing is irreversible; all five are cheap now and
+expensive later.
+
+| # | Condition | Blocks | From |
+|---|---|---|---|
+| C1 | Emitter computes and records `EvidenceRef.hash` via `kernel/cas.py` at seal time | `F-BUNDLE` | F1 |
+| C2 | Add `Problem` and `Objective` to the §6.1b emission bundle | `F-ENVELOPE`, `F-BUNDLE` | F5 |
+| C3 | Extend runtime `Scar` with `root_cause` and `guard_action`; strike or qualify "losslessly" in §4.3 | S3 (not S1) | F3 |
+| C4 | L16 writes a structured disposition record to `ledger/decisions/` with a machine-readable status | S1 emitter | F4 |
+| C5 | Clarify §8's S1 exit criterion to *bundle↔storage* round-trip; state extraction yield as a separate floor | S1 acceptance | F7 |
+
+Recommended extraction-yield floor for S1 acceptance, set from this probe's evidence:
+**≥ 0.80 field yield on any goal sampled, ≥ 0.84 aggregate.** The corpus already clears both.
+
+### §5.2 What this verdict does not decide
+
+CER-5: the runtime recommends, it never legislates. `SAKG-1/G-S1-GO` is the founder A4 gate,
+and D7 reserved the judgment of whether the loss ratio is fatal. This document supplies the
+number and the classification; the decision is not made here.
+
+---
+
+## §6 Assumptions surfaced (PAEOS-6)
+
+Required by the G-Design gate (PAEOS-7 §407). Each is stated with its refutation condition.
+
+**Ω-23 — "the load-bearing part of thinking is writable."** This probe *is* a measurement of
+Ω-23, whose register entry warns that "the derivation *defines this loss as zero* rather than
+measuring it." That is exactly A8's error mode. **0.16 is the first measured value for that
+loss in this repository.** It is not zero, and the register entry is vindicated: the missing
+16% is disproportionately the *unarticulated* material — the axis behind a trade-off, the
+signature behind a scar, the search path behind a rejection. *If false in the other
+direction:* the extractable 84% may itself be post-hoc rationalisation rather than the
+reasoning that actually occurred, in which case yield is high but fidelity is not. This probe
+measures presence, not truthfulness, and cannot distinguish them.
+
+**Ω-03 — "a shared interpretation function exists for natural-language claims."** Every
+`partial` grade in this document is an instance of Ω-03: it means *a model must interpret
+prose*. 34 of 188 fields depend on that interpretation being stable. **If false:** two
+extractor runs, or two model generations, produce different graphs from identical artifacts,
+and `corpus_hash` reproducibility (§5.1 r3) silently breaks. **Mitigation to carry into S1:**
+every field derived from a `partial` grade must be stamped with an `inferred` provenance
+marker and may never be promoted to `canonical` without evidence binding (×5).
+
+**Ω-11 — "failures are observable (scars are felt)."** F3's empty scar-graph is the direct
+consequence. Scars only exist for defects someone *noticed and wrote down*; the corpus
+contains exactly one well-formed scar (B0.2's `.tmp` defect), and it exists because an
+Adversary pass ran. **If false:** SAKG's scar corpus inherits PAEOS's observation bias
+wholesale, and the Ω-19 sharpening applies — the system evolves toward failures it cannot see.
+This compounds A4's carried sample bias rather than being independent of it.
+
+**Ω-16 — "justification graphs are well-founded."** Assumed by every edge grade. `decides`
+was gradeable only because the reviews name their constitutional basis; a goal citing no
+authority produces an unrooted Decision node.
+
+**Probe-local assumptions, stated so they can be attacked:**
+
+- **P1 — Four goals generalise to the corpus.** They may not. Mitigated by stratification
+  (§1.1) and by the control result (B2.G ties the best B0.x score), but n=4 is n=4.
+  *Refuted by:* a sampled goal scoring below 0.70.
+- **P2 — Field-equal weighting.** Every field counts 1.0. This is wrong in one direction that
+  matters: `EvidenceRef.hash` is worth more than `coordinates`. Weighted by load-bearingness
+  the loss would be **higher**, not lower. The headline figure is therefore optimistic, and
+  §4 orders findings by impact to compensate.
+- **P3 — The grader is not independent.** One role graded all four goals. K3/A-08 decorrelation
+  does not hold here. *Mitigation:* the failure condition was pre-registered in §0 before
+  grading, and every grade carries its quoted justification so a second grader can re-run the
+  scoring from §2 without re-reading the corpus.
+
+---
+
+## §7 Perspectives covered
+
+| Perspective | What it contributed |
+|---|---|
+| **Extractor / builder** | F1, F6 — the emitter must target the real files, and must hash |
+| **Consumer (PAEOS SCOPE)** | F5 — two of five ratified methods are unservable from the S1 bundle |
+| **Adversary** | Pre-registered failure condition (§0); P2's admission that weighting moves the number the *wrong* way; Ω-03 poisoning surface for every `partial` field |
+| **Data / schema** | F3's schema mismatch between the runtime `Scar` and §4.3 `Scar` |
+| **Operator / cost** | The 34 `partial` fields are model calls per goal; per-goal extraction is not free and must be metered against §6.1 r5's no-SAKG baseline |
+| **Governance (CER-5)** | §5.2 — this recommends; `G-S1-GO` decides |
+| **Historian** | §1.1's survivorship-bias control; the retro-fit/prospective split running through every A-recoverable classification |
+
+---
+
+## §8 Orphan / gap check
+
+- **No orphan findings.** Each of F1–F8 traces to a graded field in §2 and to a clause in
+  SAEOS-1 (§3.3.3, §4.2, §4.3, §5.2, §6.1b, §8).
+- **No orphan nodes.** Every node type instantiated in §2 has at least one recoverable edge
+  binding it to a Decision, except where the missing type is itself the finding (F5).
+- **Gap G1 — `Outcome` is untested by this probe.** Excluded by design (§6.1b r3). Its
+  extraction feasibility from L17/L19 is *unmeasured*, and S3's exit criterion depends on it.
+  **A second probe should run before S3**; this one supplies no evidence for it.
+- **Gap G2 — edge *confidence* and *context* are ungraded.** §4.4 makes every edge an object
+  carrying `confidence`, `evidence`, `context`, `valid_from/until`, `provenance`. This probe
+  graded edge *existence* only. Edge-level envelope extraction is likely to score below node
+  level and is **not** covered by the 0.16 figure.
+- **Gap G3 — no goal in the corpus is a design-only or research-only goal.** All four produced
+  code. Extraction from a Research-Only or Dormant disposition (§L16) is unmeasured.
+- **No dangling dependency.** S-PROBE has `deps: []` and blocks `G-S1-GO`; nothing else in
+  `SAKG-1-backlog.yaml` reads this document's output except that gate.
+
+---
+
+## §9 Traceability
+
+| This document | Derives from |
+|---|---|
+| Falsification target | `spec/SAEOS-1-architecture.md` §9/A8; §10/D7 |
+| Node types and envelope graded | SAEOS-1 §4.2, §4.3, §4.4 |
+| Emission contract probed | SAEOS-1 §6.1b |
+| Method coverage (F5) | SAEOS-1 §5.2; PAEOS-9 §10.1 |
+| Exit-criterion ambiguity (F7) | SAEOS-1 §8, S1 row |
+| Assumption register | `reviews/6-hidden-assumptions.md` Ω-03, Ω-11, Ω-16, Ω-19, Ω-23 |
+| Gate contract | `backlog/SAKG-1-backlog.yaml` S-PROBE, G-S1-GO |
+| Corpus | `reviews/tasks/{B0.0,B0.1,B0.2,B2.G}_review.md`; `docs/{B0.0,B0.1,B0.2}-constitutional-review.md`; `docs/IMPLEMENTATION_ATLAS.md`; `ledger/debt/DEBT-000{2,3}.md`; `proposals/PAEOS-IP-000{4,5,6}.md`; `runtime/memory/__init__.py` |

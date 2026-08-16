@@ -1,0 +1,19 @@
+# DEBT-0017: Ad-hoc Serialization of Evidence Bundles in Adversary Workspace Context
+
+## Compromise
+In Task B2.M (`runtime/orchestrator/__init__.py`), `_serialize_evidence()` manually constructs a dictionary structure for evidence items in the Adversary's context instead of using `kernel.evidence.Evidence.to_dict()`.
+
+## Reason
+Needed immediate materialization of human-readable evidence fields (claim ID, command, result, artifact hash) into CAS so the Adversary could inspect evidence details during live R4 self-hosting runs.
+
+## Ideal Solution
+Refactor `_serialize_evidence()` to serialize evidence bundles strictly via `kernel.evidence.Evidence` and formalize an `EvidenceBundle` schema in `kernel/evidence.py`.
+
+## Repayment Conditions
+Repay during Phase 3 when implementing live Court MCP evidence submission (R5).
+
+## Priority
+Low
+
+## Estimated Impact
+Potential schema drift between runtime serialized evidence dictionaries and canonical kernel `Evidence` objects if new fields are added to kernel types.

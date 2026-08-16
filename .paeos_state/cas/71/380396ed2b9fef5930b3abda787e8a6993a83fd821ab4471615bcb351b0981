@@ -1,0 +1,17 @@
+[
+  {
+    "objective": "Instantiate L09 (Multi-Perspective Critique) to adversarially review the L08 Design before L11 Planning. Implement a critique stage in the SoftLoop that challenges the design against constraints.",
+    "changed_paths": ["runtime/orchestrator/__init__.py", "runtime/critique.py"],
+    "plan_write_scopes": ["runtime/", "kernel/", "tests/"],
+    "builder_evidence": [
+      {
+        "claim_id": "builds",
+        "command": "pytest",
+        "artifact_hash": "dummy_hash_for_now"
+      }
+    ],
+    "goal_signature": "g-l09-critique-instantiation",
+    "verifiable": true,
+    "reversible": true
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "artifact_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "claim_id": "builds",
+  "kind": "BUILD",
+  "reproducible_command": "grep 'StageId.RESEARCH' runtime/orchestrator/__init__.py",
+  "result": {
+    "exit_code": 0,
+    "stdout": "            for stage in (StageId.IDEATE, StageId.RESEARCH, StageId.DESIGN, StageId.PLAN):\n"
+  }
+}

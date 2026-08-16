@@ -1,0 +1,59 @@
+# PAEOS ADE RESEARCH Stage Output — Canonical Layer Target Analysis
+
+## Implementation Matrix (verified against current runtime code)
+
+| Layer | Status | Evidence |
+|---|---|---|
+| L01 Intake | PARTIAL | `Intake` dataclass exists; `GOAL_CREATED` event |
+| L02 Triage | IMPLEMENTED | `triage()` called in `SoftLoop.run()` |
+| L03 RE_DERIVE | **IMPLEMENTED** | Orchestrated in `_run_body()` line 311 within planner loop |
+| L04 IDEATE | **MISSING** | Defined in `StageId` but absent from `_run_body()` |
+| L05 RESEARCH | MISSING | Defined in `StageId` but absent from `_run_body()` |
+| L06 TRADEOFF | MISSING | Defined in `StageId` but absent from `_run_body()` |
+| L07 MITIGATION | MISSING | Defined in `StageId` but absent from `_run_body()` |
+| L08 DESIGN | IMPLEMENTED | In `_run_body()` planner loop |
+| L09 CRITIQUE | MISSING | Absent from `_run_body()` |
+| L10 ADV_REVIEW | PARTIAL | Post-verification only, design-time review missing |
+| L11 PLAN | IMPLEMENTED | In `_run_body()` planner loop |
+| L12 IMPLEMENT | IMPLEMENTED | Builder session on isolated worktree |
+| L13 VERIFY | IMPLEMENTED | Court adjudication |
+| L14 Independent Audit | IMPLEMENTED | Information barrier adversary |
+| L15 LEDGER_SYNC | MISSING | Ledger appends occur but no explicit session |
+| L16 SEAL | IMPLEMENTED | `SealAuthority.seal()` |
+| L17 RETROSPECT | MISSING | Not in `_run_body()` |
+| L18 MEMORY_UPDATE | MISSING | Not in `_run_body()` |
+| L19 IMPROVE_RUNTIME | MISSING | Not in `_run_body()` |
+
+**CRITICAL CORRECTION**: The audit document `02_IMPLEMENTATION_MATRIX.md` lists L03 as MISSING, but the current runtime code has since been updated. L03 (RE_DERIVE) is now orchestrated in `_run_body()` at line 311 within the planner session loop `for stage in (StageId.RE_DERIVE, StageId.DESIGN, StageId.PLAN)`.
+
+## Dependency DAG: First Missing Layer
+
+```
+L01 ✅ → L02 ✅ → L03 ✅ → L04 ❌ (FIRST MISSING) → L05 ❌ → L06 ❌ → L07 ❌ → L08 ✅ → L09 ❌ → ...
+```
+
+## 3 Canonical Candidates
+
+### Candidate 1: L04 Ambitious Ideation (IDEATE) — PRIMARY
+- Prerequisites: L03 (RE_DERIVE) ✅
+- DAG position: First missing layer after L03
+- Self-hosting impact: Enables broad solution space exploration before design freezing
+- If deferred: Designs continue on narrow single-path assumptions
+- Clean implementation: Insert between RE_DERIVE and DESIGN in planner loop
+
+### Candidate 2: L09 Multi-Perspective Critique (CRITIQUE)
+- Prerequisites: L08 (DESIGN) ✅ — but canonically should consume L07 output
+- DAG position: Post-design, pre-plan
+- Self-hosting impact: Hardens designs before implementation contract freezing
+- If deferred: Defects discovered late at L13/L14, causing expensive remands
+- Risk: Critiquing un-ideated, un-traded-off single-candidate designs has limited value
+
+### Candidate 3: L17 Retrospective & CER (RETROSPECT)
+- Prerequisites: L16 (SEAL) ✅
+- DAG position: Entry to Evolution Loop (L17→L18→L19)
+- Self-hosting impact: Closes the learning loop (CER-2 through CER-5)
+- If deferred: System cannot learn from failures; scars remain static
+- Clean implementation: Invoke on exit paths in `_run_body()`
+
+## Recommendation
+L04 (IDEATE) is the first missing canonical layer with zero unmet prerequisites. It should be built next to maintain strict forward dataflow order in the Cognition Pipeline.

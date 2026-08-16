@@ -1,0 +1,589 @@
+# PLAN — F-ENVELOPE: universal SAKG node envelope schema + fixture corpus
+
+| | |
+|---|---|
+| **Artifact** | Formal implementation plan: work units + evidence plan + rollback plan |
+| **Backlog node** | `SAKG-1 / F-ENVELOPE` (`backlog/SAKG-1-backlog.yaml` L91–108; slice S1, wave 0, DAG root) |
+| **Stage / Role** | `PLAN` / `PLANNER` (PAEOS-7.6 §3; `operations/ENGINEERING_LIFECYCLE.md` L11) |
+| **Status** | PLAN ONLY — no schema, no fixtures, no test module, no acceptance run by this session. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-08 |
+| **Required evidence (this gate)** | `plan_executable` — work units + evidence obligations + rollback declared; refs cited. |
+| **Upstream refs** | `design/` F-ENVELOPE DESIGN artifact (frozen, 2026-08-08) — cited below as **D §n**; `backlog/SAKG-1-backlog.yaml` (node definition, `conventions`, `dag_properties`); `backlog/packages/wave-0/SPEC-CLARIFICATIONS.md` (SC-02, SC-04, SC-10); `backlog/packages/wave-0/F-SCHEMA.md` (enumeration-rule precedent); `backlog/packages/wave-0/COORDINATION.md` (ULID allocation table); `operations/ENGINEERING_LIFECYCLE.md` L11–L13. |
+
+---
+
+## §0 Scope boundary (read first — capability discipline)
+
+This worker session is **PLANNER @ PLAN** with write-capability limited to `plan/`. The
+F-ENVELOPE objective names four deliverable paths and four acceptance commands; **none of
+them may be produced or run here**:
+
+| Objective element | Owner stage/role | Planned as |
+|---|---|---|
+| `sakg/schema/envelope.schema.json` | `IMPLEMENT` / BUILDER | WU-2 |
+| `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` | `IMPLEMENT` / BUILDER | WU-5, WU-6 |
+| `tests/sakg/test_envelope_schema.py` | `IMPLEMENT` / BUILDER | WU-4 |
+| The four `accept:` commands | `VERIFY` / VERIFIER | WU-9 |
+
+Evidence emitted by *this* session is `plan_executable` (this file) — **not** the
+F-ENVELOPE acceptance evidence. Running the accept commands now would fail red (nothing
+exists) and would present VERIFY-stage evidence as PLAN output.
+
+**Ordering note.** L11 formally entries on an L10 RATIFY verdict. No L10 adversarial
+report exists for F-ENVELOPE; the DESIGN artifact carries an L09 seven-perspective
+self-critique (D §10) in its place. This plan is therefore **contingent**: if an L10 court
+pass is convened for SAKG-1 and returns amendments, WU-1 is the re-entry point. Recorded as
+risk **R-5** (§11), not silently assumed away.
+
+---
+
+## §1 Objective restatement (traceability)
+
+Freeze, as checked-in literal data:
+
+1. `sakg/schema/envelope.schema.json` — JSON Schema draft 2020-12 covering **every** field
+   of SAEOS-1 §4.2, with two profiles (`StoredNode`, `IngestNode`) and the conditional
+   block C1–C5 (D §2.2, §2.5).
+2. `tests/sakg/fixtures/envelope/valid/*.json` — **29** files (floor: 12).
+3. `tests/sakg/fixtures/envelope/invalid/*.json` — **37** files (floor: 8), exercising every
+   field, every `status` value, and every §4.2 invariant violation, explicitly including
+   authored confidence, frequency-based promotion, and deleted node.
+4. `tests/sakg/fixtures/envelope/manifest.json` — the corpus contract (D §6.3).
+5. `tests/sakg/test_envelope_schema.py` + `tests/sakg/__init__.py` — the ten tests of D §7.
+
+This restates D §13 (IMPLEMENT checklist) and the backlog `deliverables:` without adding,
+relaxing, or reinterpreting a requirement — **except** where §4 records a plan-level finding
+against the design; each such deviation is named, justified, and routed.
+
+---
+
+## §2 Dependencies and entry conditions
+
+| | |
+|---|---|
+| **Upstream node deps** | none — F-ENVELOPE is a DAG root (`dag_properties.roots: [S-PROBE, F-ENVELOPE]`). |
+| **Entry condition** | The frozen DESIGN artifact exists and §4's findings are dispositioned (see WU-1). |
+| **Founder gate** | `G-S1-GO` is **not** a dependency of F-ENVELOPE (it gates `I-STORE`, `F-EXTRACT-FIX`). F-ENVELOPE may land before the go/no-go because it is a frozen contract, not an implementation. A `REVERT` verdict at G-S1-GO makes this whole node revertible — see rollback trigger **T-4** (§10). |
+| **Downstream consumers** | `F-BUNDLE` (`$ref`s `#/$defs/IngestNode`), `F-PROJ`, `I-STORE`, `I-INGEST`, `T-ROUNDTRIP` (D §1, §3). |
+| **Toolchain** | `jsonschema` ≥ 4.26 with `Draft202012Validator`. Present in `uv.lock` at 4.26.0 but only as a **transitive** dep of `mcp` (D §7, A1) — WU-3 declares it. |
+| **Actor** | `fable` (backlog `assignment_rule`: the output *is* a frozen contract). Decorrelation is at the consumer: the `sonnet` nodes `I-STORE` / `I-INGEST` / `T-ROUNDTRIP` are graded against a corpus they did not author (`dag_properties.decorrelation_note`, K3/A-08). |
+
+---
+
+## §3 Write set and forbidden files (L11 required artifacts)
+
+### §3.1 Affected files — the complete write set
+
+| Path | Action | WU |
+|---|---|---|
+| `sakg/schema/envelope.schema.json` | create | WU-2 |
+| `pyproject.toml` → `[dependency-groups].dev` | append `jsonschema>=4.26` | WU-3 |
+| `tests/sakg/__init__.py` | create (empty) | WU-3 |
+| `tests/sakg/test_envelope_schema.py` | create | WU-4 |
+| `tests/sakg/fixtures/envelope/valid/*.json` | create ×29 | WU-5 |
+| `tests/sakg/fixtures/envelope/invalid/*.json` | create ×37 | WU-6 |
+| `tests/sakg/fixtures/envelope/manifest.json` | create | WU-7 |
+| `ledger/debt/DEBT-0137.md`, `ledger/debt/DEBT-0138.md` | create (next free IDs; DEBT-0136 is the current high-water mark) | WU-8 |
+
+Nothing else. No `sakg/__init__.py`, no `sakg/schema/__init__.py` — `sakg` is **not** an
+importable package at this node (D §1, A2); fixtures and schema are loaded by `pathlib`,
+matching accept command 1's own `pathlib.Path(...).read_text()`.
+
+### §3.2 Forbidden files (writing any of these is a scope violation, not a judgment call)
+
+- `spec/**` — any modification (F-SCHEMA precedent; a spec defect is an incident, not an edit).
+- `backlog/SAKG-1-backlog.yaml` — the four accept commands must pass **unchanged**; editing
+  the oracle to fit the artifact is the definition of theater.
+- `[tool.hatch.build.targets.wheel].packages` in `pyproject.toml` — **I-STORE owns it**
+  (backlog I-STORE deliverables). The `[dependency-groups].dev` key is disjoint, so WU-3
+  creates no merge-conflict surface.
+- `constitution/**`, `kernel/**`, `runtime/**` — out of node scope; `runtime/emission/` is
+  I-OUTBOX's.
+- `sakg/store.py`, `sakg/ingest.py`, `sakg/schema/bundle.schema.json`,
+  `sakg/schema/projection.schema.json` — I-STORE / I-INGEST / F-BUNDLE / F-PROJ.
+- Any `tests/` tree other than `tests/sakg/`.
+- Any regeneration script that *computes* fixtures. The corpus is checked-in literal JSON
+  (D §0, §6.4); a generator would recreate the author/verifier correlation this node exists
+  to break.
+
+---
+
+## §4 Plan-level findings against the DESIGN (routed, not silently patched)
+
+L11's failure mode is "ambiguous/incomplete contract → incident"
+(`operations/ENGINEERING_LIFECYCLE.md` L11). Three defects in the frozen design would each
+have surfaced as a mid-IMPLEMENT stall. All three were **confirmed empirically** in this
+session against `jsonschema` 4.26.0 / `Draft202012Validator` (read-only probes; no repo
+write, no artifact produced). Each carries a minimal correction that preserves every
+externally-named contract.
+
+### F-1 — `IngestNode` as specified is unsatisfiable (**blocking**)
+
+D §2.1 defines `IngestNode` as `{"$ref": "#/$defs/StoredNode"}` "with the required-list
+narrowed and the two overrides applied". In draft 2020-12, `$ref` **conjoins**; a sibling
+`required` cannot narrow the referenced schema's `required`. Since `StoredNode.required`
+contains `confidence` and the override sets `confidence` to a false schema, **no document
+can validate as `IngestNode`**:
+
+```
+IngestNode + {"confidence": 0.5} -> error (false schema)   # forbidden by the override
+IngestNode - "confidence"        -> error ('required', "") # required via the $ref
+```
+
+Uncorrected, all 4 `ingest-*` valid fixtures fail and `test_valid_fixtures_validate` cannot
+pass.
+
+**Minimal correction (adopted by this plan).** Factor the shared field set into
+`$defs.NodeCore` — permitted by D §2.1's own `$defs: {StoredNode, IngestNode, <named
+subschemas>}`:
+
+```jsonc
+"$ref": "#/$defs/StoredNode",                       // root, unchanged
+"$defs": {
+  "NodeCore":   { /* §2.2 fields, §2.3 lexical forms, additionalProperties:false,
+                     required = the 13 fields EXCEPT confidence, allOf C1–C4 */ },
+  "StoredNode": { "allOf": [ {"$ref":"#/$defs/NodeCore"}, {"required":["confidence"]} ] },
+  "IngestNode": { "allOf": [ {"$ref":"#/$defs/NodeCore"},
+                             {"properties":{"confidence":{"not":{}},
+                                            "status":{"const":"candidate"}}} ] }
+}
+```
+
+Every externally-named pointer survives: `#`, `#/$defs/StoredNode`, `#/$defs/IngestNode`.
+D §2.2's field table, D §2.3's lexical forms and D §2.5's C1–C5 are unchanged in content —
+only their location moves. **Confirmed working**: `check_schema` passes and all five
+profile cases produce the intended result (see §5/P-2 triples).
+
+**Route:** report to the DESIGN owner / Chief Implementation Architect as a design-defect
+note at IMPLEMENT entry (WU-1). It is a realizability correction, not a semantic change, so
+it does not halt the node.
+
+### F-2 — `"confidence": false` cannot be asserted against (**blocking for D §7's key test**)
+
+D §2.5 C5 pins the override as the boolean schema `false`. `Draft202012Validator` reports a
+false schema as `validator=None` at `absolute_path=[]` (root) — **not** `/confidence`. D
+§7's `test_invalid_fixtures_are_rejected_for_the_declared_reason` compares
+`error.validator == violates.keyword` and `error.absolute_path == violates.instance_path`;
+neither side has a usable value, and the manifest entry for INV-1 would be unwritable.
+
+**Minimal correction (adopted).** Use `{"not": {}}`, which JSON Schema 2020-12 core defines
+as *exactly equivalent* to `false`. Observed: `validator='not'`, `absolute_path='/confidence'`.
+This is a notational realization choice with identical semantics — C5 is preserved verbatim
+in meaning. No manifest sentinel is needed.
+
+### F-3 — INV-9 has no invalid fixture; D §7 test cannot pass (**blocking**)
+
+D §5.1 lists ten schema-enforced invariants and D §7 requires
+`test_every_invariant_has_an_invalid_fixture` (INV-1…INV-10 each appear in ≥1 `violates.id`).
+D §6.2's 36-file enumeration covers INV-1, 2, 3, 4, 5, 6a, 7, 8, 10 — **INV-9** ("ingested
+nodes land as `candidate`", §6.1b) has no fixture.
+
+**Minimal correction (adopted).** Add one file to class I-F:
+`invalid/ingest-status-not-candidate.json` (profile `IngestNode`, base
+`ingest-envelope-minimal.json`, `status: "canonical"`). Observed triple:
+`('const', '/status')`. Invalid corpus becomes **37**, which only widens the ≥8 floor.
+
+---
+
+## §5 Pinned realization decisions (removing judgment from IMPLEMENT)
+
+D §6 requires enumeration to be mechanical. Four choices it leaves open would otherwise be
+made by taste at IMPLEMENT; they are frozen here.
+
+### P-1 — Fixture naming
+
+D §6.1 names the 29 valid files. Invalid names are pinned in §5/P-2's table. Every fixture
+filename — valid **and** invalid — begins with `node-` or `ingest-`, because D §6.3's test
+asserts filename-prefix ⇔ `profile` consistency across the whole corpus. The manifest
+remains authoritative; names are for readability only.
+
+### P-2 — Pinned `violates` triples (empirically confirmed)
+
+Each invalid fixture's `violates.{keyword, instance_path}` is fixed below. These were
+**observed** from `Draft202012Validator.iter_errors`, so IMPLEMENT transcribes rather than
+guesses — but they are transcribed into the manifest *from this plan*, never harvested from
+a live run of the finished schema (harvesting would make the assertion tautological).
+`instance_path` is RFC 6901: `""` is the document root.
+
+**Class I-A — 14 root-field omissions.** Base: `node-envelope-minimal.json` (all 14 files).
+Triple for every one: `("SCH", "required", "")`.
+
+| File | Omitted field |
+|---|---|
+| `node-missing-id.json` | `id` |
+| `node-missing-type.json` | `type` |
+| `node-missing-namespace.json` | `namespace` |
+| `node-missing-facets.json` | `facets` |
+| `node-missing-label.json` | `label` |
+| `node-missing-summary.json` | `summary` |
+| `node-missing-provenance.json` | `provenance` |
+| `node-missing-evidence.json` | `evidence` |
+| `node-missing-status.json` | `status` |
+| `node-missing-confidence.json` | `confidence` — **profile-sensitive, see P-2.1** |
+| `node-missing-valid-from.json` | `valid_from` |
+| `node-missing-valid-until.json` | `valid_until` |
+| `node-missing-falsifier.json` | `falsifier` |
+| `node-missing-coordinates.json` | `coordinates` |
+
+**Class I-B — 4 `provenance` sub-field omissions.** Base: `node-envelope-minimal.json`.
+Triple for every one: `("SCH", "required", "/provenance")`.
+`node-missing-provenance-{origin,author-kind,ingested-at,source-hash}.json`.
+
+**Classes I-C … I-F.**
+
+| File | Class | Base | `violates.id` | keyword | instance_path |
+|---|---|---|---|---|---|
+| `node-enum-type-unknown.json` (`type: "Concept"`) | I-C | minimal | SCH | `enum` | `/type` |
+| `node-enum-status-deleted.json` (`status: "deleted"`) | I-C | minimal | **INV-3** | `enum` | `/status` |
+| `node-enum-author-kind-unknown.json` (`"system"`) | I-C | minimal | SCH | `enum` | `/provenance/author_kind` |
+| `node-lex-id-malformed.json` | I-D | minimal | SCH | `pattern` | `/id` |
+| `node-lex-id-type-mismatch.json` | I-D | `node-type-decision.json` | **INV-6a** | `pattern` | `/id` |
+| `node-lex-namespace-malformed.json` | I-D | minimal | SCH | `pattern` | `/namespace` |
+| `node-lex-source-hash-malformed.json` | I-D | minimal | SCH | `pattern` | `/provenance/source_hash` |
+| `node-lex-ingested-at-malformed.json` | I-D | minimal | SCH | `pattern` | `/provenance/ingested_at` |
+| `node-lex-summary-281.json` | I-D | minimal | SCH | `maxLength` | `/summary` |
+| `node-lex-confidence-out-of-range.json` (`1.4`) | I-D | minimal | SCH | `maximum` | `/confidence` |
+| `node-shape-coordinates-nested.json` | I-E | `node-coordinates-multivalue.json` | **INV-8** | `type` | `/coordinates/domain` |
+| `node-shape-facet-key-unnamespaced.json` | I-E | `node-facets-extension.json` | **INV-10** | `pattern` | `/facets` |
+| `node-shape-evidence-inline-object.json` | I-E | `node-envelope-maximal.json` | **INV-7** | `type` | `/evidence/0` |
+| `node-extra-property-deleted.json` (`"deleted": true`) | I-E | minimal | **INV-3** | `additionalProperties` | `""` |
+| `node-canonical-empty-evidence.json` | I-F | `node-frequency-not-promoted.json` | **INV-2** | `minItems` | `/evidence` |
+| `node-superseded-window-open.json` | I-F | `node-status-superseded.json` | **INV-5** | `type` | `/valid_until` |
+| `node-refuted-falsifier-null.json` | I-F | `node-status-refuted.json` | **INV-4** | `type` | `/falsifier` |
+| `ingest-authored-confidence.json` | I-F | `ingest-envelope-minimal.json` | **INV-1** | `not` | `/confidence` |
+| `ingest-status-not-candidate.json` (**F-3**) | I-F | `ingest-envelope-minimal.json` | **INV-9** | `const` | `/status` |
+
+14 + 4 + 3 + 7 + 4 + 5 = **37**.
+
+**P-2.1 — profile-sensitive fixtures (the trap).** Two fixtures are invalid *only under
+their declared profile* and would validate cleanly under the other:
+`node-missing-confidence.json` is a legal `IngestNode`; `ingest-authored-confidence.json` is
+a legal `StoredNode`. The manifest `profile` field is what makes them tests. IMPLEMENT must
+not "fix" either by switching profiles.
+
+**P-2.2 — conditionals must use `allOf` + `if/then` only.** Never `anyOf`/`oneOf`: those
+wrap child errors in a single context error, which destroys the `(validator, absolute_path)`
+pair the rejection test asserts on. `allOf`/`if-then` yield the failing keyword directly
+(confirmed: C1 surfaces as `('minItems', '/evidence')`, not as `('allOf', "")`).
+
+**P-2.3 — `pattern` on nullable fields is safe.** `{"type": ["string","null"], "pattern": …}`
+applies the pattern only to strings; `null` produces no error (confirmed). So `valid_until`
+and `falsifier` need no `oneOf` split — which is fortunate, given P-2.2.
+
+**P-2.4 — the root `id` pattern uses the 12-name alternation.** If it hard-coded one type,
+`node-lex-id-type-mismatch.json` would trip both the root `pattern` and C4, breaking the
+single-defect rule. Root `id` accepts any of the twelve; **C4** pins the specific one.
+
+### P-3 — Valid-fixture axis pins
+
+D §6.1's five axes leave a free `status`/`type` choice on several files. Pinned:
+
+- **V-A (12 type files):** `status: "candidate"` throughout, so C1 never fires and the only
+  varying axis is `type` (and its `id` type-segment, which is the point — C4's 12 branches).
+- **V-B (4 status files):** `type: "Decision"` throughout. `node-status-canonical.json`
+  carries `evidence` with ≥1 item (C1 positive branch); `node-status-superseded.json` and
+  `node-status-refuted.json` carry a non-null `valid_until` (C2 positive branch); the
+  refuted file carries a non-null `falsifier` (C3 positive branch).
+- **V-C minimal:** `status: "candidate"`, `facets: {}`, `coordinates: {}`, `evidence: []`,
+  `valid_until: null`, `falsifier: null`. This is the base for 21 of the 37 invalid files,
+  so every I-A/I-B omission is a single clean `required` failure with no conditional noise.
+- **V-C maximal:** `status: "superseded"` — every optional-valued field populated, and a
+  closed window on a terminal status is the semantically coherent reading (these fixtures
+  are reused as I-STORE round-trip inputs, D §3, where incoherent-but-legal data is a
+  liability). All four positive conditional branches are already covered by V-B.
+- **V-D `node-frequency-not-promoted.json`:** a high reference-count review facet **plus**
+  `evidence: []` **plus** `status: "candidate"`. Its I-F pair mutates *only* `status` →
+  `canonical`. That one-field delta is the ×5 test: frequency is legal as review priority
+  and illegal as a promotion basis (D §6.1).
+- **V-D `node-coordinates-multivalue.json`:** the dimension key is `domain` (pinned so
+  `node-shape-coordinates-nested.json`'s `instance_path` is exactly `/coordinates/domain`).
+
+### P-4 — Single-defect diff algorithm
+
+D §6.2's single-defect rule and D §7's `test_single_defect_rule` need a pinned comparison, or
+a subtree mutation counts as many differences. **Algorithm:** walk base and mutant in
+parallel from the root; at each node, if the two values differ in type or scalar value,
+record that JSON pointer and **stop descending**; if both are objects/arrays, recurse over
+the union of keys/indices (a key present on one side only is a difference at that pointer).
+Assert exactly one recorded pointer. Under this rule
+`node-shape-coordinates-nested.json` scores 1 (`/coordinates/domain`), not 3.
+
+---
+
+## §6 Work units (ordered, single-owner, atomic)
+
+Strictly sequential unless noted. Each has an owner, a ref, a precondition, an exact action,
+a done-check, and the evidence it feeds.
+
+### WU-1 — Disposition the §4 findings (gate, no code)
+- **Owner:** BUILDER @ IMPLEMENT, at entry, before any file is created.
+- **Ref:** §4 (F-1, F-2, F-3); D §11's halt-don't-resolve discipline.
+- **Action:** confirm F-1/F-2/F-3 and their corrections with the DESIGN owner / Chief
+  Implementation Architect. Also confirm D's assumption **A4** (that
+  `test_envelope_schema.py` is in scope though the backlog `deliverables:` prose omits it) —
+  D §9 requires this be flagged at IMPLEMENT entry, **not silently dropped**.
+- **Done-check:** a one-line disposition recorded per finding (ACCEPT correction / AMEND /
+  HALT). If any comes back HALT, this node stops here and files an incident; it does not
+  improvise a third option.
+- **Feeds:** E1.
+
+### WU-2 — `sakg/schema/envelope.schema.json`
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §2.1–§2.5, §13.1; corrections F-1, F-2; pins P-2.2, P-2.3, P-2.4.
+- **Precondition:** WU-1 dispositioned ACCEPT.
+- **Action:** author the schema: `$schema` draft 2020-12, `$id`
+  `sakg://schema/envelope/1.0.0`, root `$ref: "#/$defs/StoredNode"`, and
+  `$defs: {NodeCore, StoredNode, IngestNode}` per F-1's structure. `NodeCore` carries D
+  §2.2's 18 fields verbatim (14 root + 4 `provenance` sub-fields), D §2.3's lexical patterns,
+  `additionalProperties: false` at root **and** inside `provenance`, `required` = the 13
+  non-`confidence` root fields, and the `allOf` block C1–C4. `StoredNode` adds
+  `required: ["confidence"]`. `IngestNode` adds `confidence: {"not": {}}` and
+  `status: {"const": "candidate"}`. **Add no field SAEOS-1 §4.2 does not name.**
+- **Done-check:** accept command 1 exits 0 (file is parseable JSON) **and**
+  `Draft202012Validator.check_schema(...)` raises nothing.
+- **Feeds:** E2.
+
+### WU-3 — Test package skeleton + validator dependency
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §7 (validator dependency), §13.2; A3.
+- **Action:** create empty `tests/sakg/__init__.py` (all eight existing `tests/*`
+  subpackages have one). Append `jsonschema>=4.26` to `[dependency-groups].dev` in
+  `pyproject.toml`. **Do not touch** `[tool.hatch.build.targets.wheel].packages` (§3.2).
+- **Done-check:** `uv run python -c "import jsonschema"` exits 0 with `jsonschema` declared,
+  not merely transitively present.
+- **Feeds:** E3.
+
+### WU-4 — `tests/sakg/test_envelope_schema.py` (authored **before** the corpus)
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §7 (all ten tests), §13.6; pin P-4.
+- **Precondition:** WU-2, WU-3 complete.
+- **Action:** author the ten tests of D §7, parametrized off `manifest.json`. Import
+  `jsonschema` **unconditionally** — an `importorskip` would let accept command 2 exit 0
+  with the suite skipped (D §7). Include the RFC 6901 helper
+  (`"/" + "/".join(str(p) for p in error.absolute_path)`, root `""`) and P-4's diff
+  algorithm.
+- **Done-check (red, deliberate):** `uv run pytest tests/sakg/test_envelope_schema.py -q`
+  **fails** — the manifest does not exist yet. Record the failure. This is the K3
+  mechanical-adversary property the backlog `conventions` demand ("they fail red first");
+  a suite authored after its fixtures is a suite shaped by them.
+- **Feeds:** E4.
+
+### WU-5 — Valid corpus, 29 files
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §6.1 (axes V-A…V-E), §6.4 (determinism), §13.3; pin P-3.
+- **Action:** author 29 literal JSON files, **flat**, in
+  `tests/sakg/fixtures/envelope/valid/`: V-A 12 (`node-type-<lowercase-type>.json`), V-B 4,
+  V-C 2, V-D 9, V-E 2. Pinned values only — ULIDs `01J` + 20×`0` + `E01`…`E99` (D §6.4,
+  D-4); `valid_from` `2026-01-01T00:00:00.000Z`, `ingested_at` `2026-01-02T00:00:00.000Z`,
+  closures `2026-06-01T00:00:00.000Z`; SC-02 hash literals; namespaces `paeos` and
+  `sentium`. **Nothing computed at author time or test time.**
+- **Done-check:** `ls valid/*.json | wc -l` = 29; every file parses; no subdirectory exists
+  (accept command 3 globs exactly one level — a subdirectory is silently uncounted, D §1).
+- **Feeds:** E5.
+
+### WU-6 — Invalid corpus, 37 files
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §6.2 (classes I-A…I-F), §13.4; finding F-3; pins P-1, P-2, P-2.1.
+- **Precondition:** WU-5 complete (every invalid file is a one-mutation derivative of a
+  named valid base).
+- **Action:** author the 37 files of §5/P-2's table in
+  `tests/sakg/fixtures/envelope/invalid/`, flat. Exactly **one** mutation from the declared
+  base per file, per P-4's metric.
+- **Done-check:** `ls invalid/*.json | wc -l` = 37; every file parses.
+- **Feeds:** E6.
+
+### WU-7 — `manifest.json`
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §6.3 (Entry / Violation shape), §13.5; pin P-2.
+- **Action:** index all 66 fixtures. Every entry: `path`, `profile`, `valid`, `description`;
+  every invalid entry additionally `base` and `violates {id, keyword, instance_path}`,
+  transcribed **from §5/P-2's table** — not harvested from a run of the finished schema.
+- **Done-check:** manifest is a bijection with disk; every invalid entry carries a
+  `violates`; every `violates.id` is `SCH` or one of INV-1…INV-10; INV-1…INV-10 each appear
+  at least once.
+- **Feeds:** E7.
+
+### WU-8 — Red→green and downstream records
+- **Owner:** BUILDER @ IMPLEMENT.
+- **Ref:** D §11 (routed ambiguities), §13.7, §13.8.
+- **Action:** (a) re-run WU-4's suite; it must now pass. (b) Record the two D §11 items:
+  `supports` vs `supported_by` (SAEOS-1 §4.2 / §4.4 contradiction) as an **incident** goal
+  against the spec, owned before I-STORE implements edge families; DEF-3 (confidence
+  propagation is slice S3, unowned in SAKG-1) as a **debt** entry in `ledger/debt/` so M-S2
+  cannot read as if Δ6 were satisfied. Next free IDs are DEBT-0137 / DEBT-0138. (c) Record
+  for downstream, without implementing it: F-BUNDLE needs a `referencing.Registry` entry
+  mapping `sakg://schema/envelope/1.0.0` to the loaded schema (the `$id` is opaque and
+  cannot be dereferenced, D §3); I-STORE owns `sakg/__init__.py`, `sakg/schema/__init__.py`,
+  the `packages` entry, and must confirm hatchling ships the `.json` as package data.
+- **Done-check:** suite green; two ledger files exist; the hand-off note is recorded.
+- **Feeds:** E8.
+
+### WU-9 — Acceptance run (VERIFY)
+- **Owner:** VERIFIER @ VERIFY — **not** BUILDER (X6: the Builder may not self-verify;
+  `operations/ENGINEERING_LIFECYCLE.md` L12).
+- **Ref:** D §12; backlog `accept:` list.
+- **Action:** run the four commands of §7, verbatim, from the repo root.
+- **Done-check:** all four exit 0, **and** both anti-vacuity checks in §7 hold.
+- **Feeds:** E9 (the node's promoting evidence).
+
+---
+
+## §7 Acceptance criteria
+
+The four backlog commands, **unchanged** (`backlog/SAKG-1-backlog.yaml` L105–108):
+
+```
+uv run python -c "import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())"
+uv run pytest tests/sakg/test_envelope_schema.py -q
+test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12
+test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8
+```
+
+**Anti-vacuity conditions (D §12) — a green four without these is not acceptance:**
+
+1. **Command 2 must not be empty.** `-q` exits 0 if every test skips. VERIFIER confirms the
+   summary reports a non-zero **passed** count and **0 skipped**.
+2. **Commands 3 and 4 count files, not correctness.** Twelve empty `{}` files satisfy them.
+   They mean something only because `test_corpus_floors` and
+   `test_manifest_is_bijective_with_disk` ran inside command 2 — VERIFIER confirms both
+   appear in the run.
+3. **Command 1 proves parseability, not validity.** `check_schema` runs inside command 2 as
+   `test_schema_is_valid_draft_2020_12`; a malformed schema otherwise vacuously accepts
+   everything.
+
+---
+
+## §8 Evidence plan (obligation → owner → oracle)
+
+| id | Evidence obligation | Produced by | Oracle | Gate |
+|---|---|---|---|---|
+| **E0** | `plan_executable` — this file: work units (§6), evidence obligations (§8), rollback (§10), refs cited (header + inline). | PLANNER @ PLAN (this session) | Presence of §3 (write set + forbidden files), §6, §7, §8, §10; every claim carries a `D §n` / backlog / operations ref. | **PLAN** |
+| **E1** | §4 findings dispositioned; A4 flagged. | BUILDER @ IMPLEMENT | One recorded disposition per finding; HALT halts. | IMPLEMENT |
+| **E2** | Schema exists, parses, `check_schema` clean, two profiles resolvable. | BUILDER @ IMPLEMENT | Accept command 1 + `Draft202012Validator.check_schema`. | IMPLEMENT |
+| **E3** | `jsonschema` declared (not transitive); `tests/sakg/` is a package. | BUILDER @ IMPLEMENT | `[dependency-groups].dev` diff; `tests/sakg/__init__.py` present. | IMPLEMENT |
+| **E4** | Test module authored **before** the corpus and observed failing. | BUILDER @ IMPLEMENT | Recorded red run of command 2 at WU-4. | IMPLEMENT |
+| **E5** | 29 valid fixtures, flat, pinned values. | BUILDER @ IMPLEMENT | File count = 29; no subdirectory; grep finds no generated ULID/timestamp. | IMPLEMENT |
+| **E6** | 37 invalid fixtures, one mutation each from a named base. | BUILDER @ IMPLEMENT | File count = 37; `test_single_defect_rule` (P-4). | IMPLEMENT |
+| **E7** | Manifest bijective with disk; every invalid entry names its violated check; INV-1…INV-10 all covered. | BUILDER @ IMPLEMENT | `test_manifest_is_bijective_with_disk`, `test_every_invariant_has_an_invalid_fixture`. | IMPLEMENT |
+| **E8** | Suite green; the two D §11 items routed to ledger; downstream hand-off recorded. | BUILDER @ IMPLEMENT | Command 2 green; `ledger/debt/DEBT-0137.md`, `…0138.md` exist. | IMPLEMENT |
+| **E9** | All four accept commands exit 0 **with** §7's anti-vacuity conditions. | VERIFIER @ VERIFY | §7, run verbatim; exit codes + pytest summary reported. | **VERIFY** |
+
+**Assumption → verification-owner ledger** (D §9, carried forward; none changes the plan):
+
+| D §9 | Confirmed at |
+|---|---|
+| A1 `jsonschema` importable under `uv run` | WU-3 (and re-confirmed in this session: 4.26.0 with `Draft202012Validator`) |
+| A2 `sakg/` need not be an importable package here | WU-2 done-check (accept command 1 uses `pathlib`, not `import`) |
+| A3 `tests/sakg/__init__.py` required | WU-3 |
+| A4 the test module is in F-ENVELOPE scope | **WU-1** — flagged, not assumed |
+| A5 the twelve §4.3 type names, verbatim | WU-5 + `test_every_node_type_is_covered` |
+| A6 ULID form | WU-5 (pinned literals) |
+| A7 `ProjectRef` DNS-label shape | WU-2; a real namespace that violates it is an incident, not a local fix |
+| A8 `OriginRef` = `{system, run_id, goal_id}` | F-BUNDLE, at the §6.1b boundary |
+| A9 no golden JCS bytes at this node | scope-checked at WU-1 (goldens are F-BUNDLE's accept list) |
+| A10 SC-02/SC-04/SC-10 adopted deliberately | WU-1 disposition (CIA may convert to SAKG-1 SC entries) |
+
+---
+
+## §9 Test strategy
+
+- **Oracle location.** Correctness lives in `test_envelope_schema.py`, not in the accept
+  commands — three of the four are file-existence/count checks. The ten D §7 tests are the
+  real gate; §7's anti-vacuity conditions are what bind them to the accept list.
+- **Rejection for the *declared* reason.** The load-bearing test is
+  `test_invalid_fixtures_are_rejected_for_the_declared_reason`: an error must exist **whose
+  `validator` equals `violates.keyword` and whose `absolute_path` equals
+  `violates.instance_path`**. "Some error occurred" is not evidence — a fixture can be
+  rejected for an unintended second defect and the test would still pass.
+- **Red-first ordering.** WU-4 precedes WU-5/WU-6 and records a failing run. This is the
+  only decorrelation available *within* a single-author node.
+- **Decorrelation, honestly stated.** Author(schema) = author(fixtures) = author(tests) at
+  this node; K3/A-08 separation is at the **consumer** (`I-STORE`, `I-INGEST`,
+  `T-ROUNDTRIP` are `sonnet` nodes graded against this `fable` corpus,
+  `dag_properties.decorrelation_note`). The residual intra-node risk — a schema and a
+  manifest that agree with each other but not with §4.2 — is mitigated by P-2 (triples
+  pinned in this plan, transcribed rather than harvested) and by review against D §2.2's
+  field table.
+- **Coverage tests are structural, not statistical:** every field (18) in ≥1 valid fixture
+  and ≥1 omission fixture; all 4 `status` values; all 12 `type` values (⇒ all twelve C4
+  branches fire, else eleven are dead schema); all of INV-1…INV-10 in `violates.id`.
+- **Not tested here, by design (D §5.2).** DEF-1, DEF-2, DEF-4, DEF-5, DEF-6, DEF-8 are
+  I-STORE/I-INGEST obligations with existing acceptance hooks in the backlog; DEF-7 is the
+  consumer's. A fixture violating one of these would be **accepted** by the schema and would
+  break `test_invalid_fixtures_are_rejected` — so they must stay out of `invalid/`. DEF-3 is
+  out-of-slice debt (WU-8).
+
+---
+
+## §10 Rollback plan
+
+The node is **purely additive** — new files in `sakg/schema/` and `tests/sakg/`, plus one
+append to `pyproject.toml`'s dev dependency group. No existing file's behavior is modified;
+nothing in `constitution/`, `kernel/`, `runtime/` or `spec/` is touched (§3.2). Rollback is
+therefore clean, bounded, and needs no kernel amendment.
+
+**Triggers**
+
+| id | Trigger | Response |
+|---|---|---|
+| **T-1** | Any accept command exits non-zero at WU-9. | Do **not** relax the schema or edit the accept list. Re-enter IMPLEMENT at the WU that owns the failure (§6). |
+| **T-2** | §7's anti-vacuity conditions fail (skipped suite, empty fixtures). | Treat as failure even with four green exits; re-enter at WU-4. |
+| **T-3** | A §4 finding is dispositioned HALT, or a **new** ambiguity appears mid-IMPLEMENT. | Stop. File an incident (D §11 discipline; a worker halt is a success signal, `COORDINATION.md`). Do not resolve locally. |
+| **T-4** | `G-S1-GO` records `REVERT` (S-PROBE NO-GO → SAEOS-1 §7 falsifier fires). | Full-node revert per the steps below. F-ENVELOPE may land *before* this gate (§2), so this is a live trigger, not a theoretical one. |
+| **T-5** | A downstream consumer (`F-BUNDLE`, `I-STORE`) proves the frozen contract wrong. | Contract change = `$id` version bump to `1.1.0`/`2.0.0` **plus** a backlog amendment. Never an in-place silent edit — four nodes bind to this shape. |
+
+**Rollback action** (BUILDER @ IMPLEMENT, on a `sakg/` + `tests/` write capability)
+
+1. Delete `sakg/schema/envelope.schema.json` (and `sakg/schema/`, `sakg/` if empty — safe
+   because this node created no `__init__.py`; I-STORE owns those, §3.1).
+2. Delete `tests/sakg/` in full (module, `__init__.py`, `fixtures/envelope/`).
+3. Remove the `jsonschema>=4.26` line from `[dependency-groups].dev`, restoring the prior
+   list exactly. `[tool.hatch.build.targets.wheel].packages` was never touched, so there is
+   no collateral revert.
+4. Under **T-4** only: leave `ledger/debt/DEBT-0137.md` / `DEBT-0138.md` in place. They
+   record real findings against the *spec*, which survive the slice's reversion; deleting
+   them would destroy the incident trail the halt exists to produce.
+
+**Verification of rollback:** `ls sakg tests/sakg` reports absent; the full suite
+(`uv run pytest -q`) is green at its pre-change state; `git diff` against the pre-node commit
+is empty except (under T-4) the two ledger files.
+
+**Blast containment:** the corpus is atomic — **no partial merge** (F-SCHEMA precedent:
+"the corpus is atomic", `COORDINATION.md` merge discipline). Either all of WU-2…WU-8 land or
+none do, so rollback cannot leave downstream nodes bound to half a contract.
+
+---
+
+## §11 Risk register
+
+| id | Risk | Severity | Mitigation |
+|---|---|---|---|
+| **R-1** | Freezing the wrong contract — F-ENVELOPE is a DAG root; F-BUNDLE, F-PROJ, I-STORE, I-INGEST bind to it (D §10, Risk Officer). | High | D §8's decision register keeps every discretionary freeze reversible-by-decision; `$id` `1.0.0` makes a future break explicit (T-5); §4's corrections are minimal and pointer-preserving. |
+| **R-2** | Schema/manifest agree with each other but not with §4.2 (single-author node). | High | P-2 triples pinned in *this* plan and transcribed, never harvested; review against D §2.2's field table; consumer decorrelation at the `sonnet` nodes. |
+| **R-3** | Over-constraint (D-2 nullable-required, D-6 `[0,1]`, D-8 namespaced facets) rejects a legitimate future node. | Medium | Direction of error is the safe one — relaxing a schema is cheap, tightening it after consumers bind is not. Each is a named, contestable D §8 entry. |
+| **R-4** | Fixture combinatorics collapse into curation-by-taste (the F-SCHEMA risk, `COORDINATION.md` risk 2). | Medium | §5/P-1…P-4 remove every remaining judgment call; the reviewer diffs the file list against §5's tables, not against taste. |
+| **R-5** | No L10 adversarial pass for this design; L11 entry is nominally contingent on a RATIFY verdict. | Medium | Stated in §0 rather than assumed away; WU-1 is the re-entry point if a court pass is convened. |
+| **R-6** | `jsonschema` error surfaces shift on a future version, breaking P-2's pinned triples. | Low | Pin is `>=4.26` and the triples are all core-spec keywords (`required`, `enum`, `pattern`, `type`, `minItems`, `maximum`, `maxLength`, `const`, `not`, `additionalProperties`) — the one implementation-defined surface (boolean `false` → `validator=None`) was eliminated by F-2. |
+
+---
+
+## §12 Completeness check (no orphan / no gap)
+
+- Every objective deliverable (§1) maps to a work unit: schema → WU-2; valid corpus → WU-5;
+  invalid corpus → WU-6; test module → WU-4; manifest → WU-7; the three named invariant
+  violations → §5/P-2 (`ingest-authored-confidence`, `node-canonical-empty-evidence`,
+  `node-enum-status-deleted` + `node-extra-property-deleted`).
+- Every work unit feeds exactly one evidence obligation (§8): WU-1→E1 … WU-9→E9; this file
+  is E0.
+- Every D §5.1 invariant INV-1…INV-10 has ≥1 invalid fixture (§5/P-2) — the INV-9 gap is
+  closed by F-3. Every D §5.2 invariant is excluded from `invalid/` and names an owner (§9).
+- Every D §9 assumption has a named downstream confirmer (§8 ledger); A4 is escalated at
+  WU-1 rather than assumed.
+- L11's required artifacts are all present: affected files (§3.1), **forbidden files**
+  (§3.2), rollback plan (§10), acceptance criteria (§7), test strategy (§9),
+  dependencies (§2).
+- Three design defects are corrected minimally, justified, and routed rather than silently
+  patched (§4); two spec ambiguities remain routed, not resolved (WU-8).
+- Rollback is declared, triggered, and bounded for the only mutating stage (§10).
+
+**Evidence for this gate:** `plan_executable` = this file.

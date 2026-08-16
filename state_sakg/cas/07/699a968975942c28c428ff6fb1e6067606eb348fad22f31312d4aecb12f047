@@ -1,0 +1,20 @@
+# DEBT-0071 — Missing Boundary Validation for Concurrency and Batch Controls in `ops/autonomous_run.py`
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **ops** (touches `ops/autonomous_run.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`ops/autonomous_run.py` parses `max_concurrency` and `max_runs` using `int(argv[2])` and `int(argv[3])` without enforcing positive lower bounds (`> 0`).
+
+Passing non-positive integers (e.g. `0` or negative numbers) for `max_runs` or `max_concurrency` can cause the scheduler to halt immediately with unhelpful errors or behave non-deterministically.
+
+## 2. Root Cause
+
+Command-line argument parsing in `ops/autonomous_run.py` lacks defensive boundary checks for execution control limits.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Add explicit validation in `main()` ensuring `max_concurrency >= 1` and `max_runs >= 1`, exiting with a clear error message on invalid input.
+- **Long-term:** Consolidate CLI argument parsing for operational entry points using standard validation schemas.

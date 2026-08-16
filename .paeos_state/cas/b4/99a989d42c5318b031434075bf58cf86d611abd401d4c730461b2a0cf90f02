@@ -1,0 +1,430 @@
+{
+  "schema": "paeos.research.dossier/v1",
+  "stage": "RESEARCH",
+  "layer": "L05",
+  "role": "PLANNER",
+  "produced": "2026-08-13",
+  "goal": "Construct canonical layer L07 Trade-off Mitigation (StageId.MITIGATION) as a real, gate-routed stage of the autonomous SoftLoop.",
+  "narrative_artifact": "research/L07_MITIGATION_RESEARCH_DOSSIER.md",
+  "produced_evidence": "research_dossier",
+  "consumers": ["L06", "L08"],
+  "expiry": "K2 — bound to the corpus as read on 2026-08-13",
+
+  "read_scope_disclosure": {
+    "granted": ["constitution/", "spec/", "design/", "reviews/", "ledger/", "backlog/", "docs/", "architecture/", "operations/"],
+    "excluded": ["kernel/", "runtime/", "tests/", "proposals/"],
+    "consequence": "No line of the code under discussion was read first-hand. Code-level claims are resolved from reviews/tasks/*.md (contemporaneous first-hand implementation reviews) and marked [review-record], or left as residual with an exact one-line check.",
+    "structural_finding": "F-N9 — L03, L04 and L05 all run under a scope excluding the code, so no stage before L08 can discharge a code check."
+  },
+
+  "evidence_marking": {
+    "direct": "read first-hand this session, within read scope",
+    "review-record": "asserted by a repository constitutional implementation review; secondary but contemporaneous",
+    "inference": "derived from two or more of the above"
+  },
+
+  "blocker_resolution": [
+    {
+      "id": "BL-1",
+      "routed_as": "BLOCKING — classify_change blast radius; RC-12 claims HARD, voiding the goal premise",
+      "verdict": "RESOLVED — RC-12 FALSIFIED. Change set classifies SOFT.",
+      "confidence": "high",
+      "basis": [
+        "reviews/tasks/B0.11_review.md:21-23 [review-record] — rule is: top path segment in {kernel, constitution} => HARD; else SOFT; unresolvable => HARD",
+        "reviews/tasks/B0.11_review.md:39 [review-record] — 'No regex, no config' — the classifier does NOT read classifier_rules/, falsifying RC-12 premise 1",
+        "constitution/classifier_rules/ contains only .gitkeep, 0 bytes [direct] — real gap, but causally disconnected from the outcome",
+        "reviews/tasks/B1.C_review.md:13 [review-record] — F2-SOFT (runtime/agents/)",
+        "reviews/tasks/B1-SOFTLOOP_review.md:13 [review-record] — F2-SOFT (runtime/orchestrator/)",
+        "15 further F2-SOFT records across reviews/tasks/ for 'runtime/ + tests/ only' change sets [review-record]",
+        "ledger/debt/DEBT-0001.md:12, DEBT-0002.md:12 [direct] — 'Implicated paths' includes the bare directory kernel/, i.e. the run's READ scope, which alone forces HARD under the prefix rule"
+      ],
+      "reversal": "RC-12 premise 2 (both prior runs classified HARD) is true but mis-attributed: HARD is an artifact of the classifier's INPUT SET (implicated paths, containing kernel/), not of the change's blast radius.",
+      "caveats": [
+        {"id": "C1", "text": "Empty change set classifies HARD by fail-safe (B0.11_review.md:50,70). A run producing nothing is labelled HARD — may fully explain both prior HARD labels."},
+        {"id": "C2", "text": "Classification depends on what the caller passes; gate wiring is B0.12's composition step. The operative check is 'what path set does the autonomous driver hand classify_paths?'"},
+        {"id": "C3", "text": "Falsifiable prediction: this RESEARCH session's read scope includes constitution/ (a HARD prefix). If the implicated-paths hypothesis holds, THIS run will also be mislabelled HARD."}
+      ],
+      "discharges": "DERIV-L07 §10 Forbids clause: 'Proceeding to L08 with BL-1 unanswered (RC-12)'"
+    },
+    {
+      "id": "BL-2",
+      "routed_as": "BLOCKING for test validity — root cause of DEBT-0001/0002 ('no evidence submitted to the court for this run')",
+      "verdict": "RESOLVED — already root-caused on 2026-08-01; the system could not read its own diagnosis.",
+      "confidence": "high",
+      "basis": [
+        "reviews/phase3_m3_live_concurrency.md:155 [direct] — verbatim identical friction string; 'Court pool: empty — no submit_evidence call landed'",
+        "reviews/phase3_m3_live_concurrency.md:169-186 [direct] — root cause: runtime/integrations/__init__.py:113 _allowed_tools() omits Bash; headless claude -p under --permission-mode acceptEdits declines every command; builders made correct edits but could not run the verification command",
+        "reviews/phase3_m3_live_concurrency.md:193-197 [direct] — filed as DEBT-0019, fix scoped to 'the IMPLEMENT/VERIFY session'",
+        "ledger/debt/README.md [direct] — DEBT-0019 indexed RESOLVED; DEBT-0021 'Bash granted to non-Builder sub-sessions' RESOLVED (i.e. withdrawn); DEBT-0023 'write-scope coupling drops valid deliverable files' OPEN"
+      ],
+      "three_candidate_causes_for_the_recurrence": [
+        "regression of DEBT-0019 via DEBT-0021's narrowing of Bash to Builders",
+        "DEBT-0023 write-scope drop silently discarding deliverables — a direct hazard to BC-2's narrow mitigation/ scope",
+        "the friction string is a generic non-seal label emitted for any empty court pool"
+      ],
+      "design_consequence": {
+        "id": "R-BL2",
+        "text": "L07 is a PLANNER stage that must submit evidence — a combination never exercised. It does not need Bash (CAS put returns the hash; court.submit_evidence is MCP; the kernel re-runs the command under T2). It needs grants. _MITIGATION.mcp_servers MUST include court and artifacts. Check whether _RE_DERIVE/_IDEATE/_TRADEOFF do; if they omit court, no cognitive-pipeline stage can submit evidence at all, and that is the standing cause on L03-L07 runs."
+      },
+      "discriminator_for_RC11": "Inspect the court evidence pool (FileCourtEvidencePool, per R5.3_review.md). Pool empty => submission path broken => test invalid. Pool contains the coverage-check evidence AND the gate denied => the obligation discriminated. Never assert only 'outcome != COMMITTED'."
+    },
+    {
+      "id": "BL-3",
+      "routed_as": "Does L09 CRITIQUE execute in the live walk and receive planner artifacts?",
+      "verdict": "CONDITIONALLY RESOLVED — L09 almost certainly absent. RC-5's falsifier FIRES.",
+      "confidence": "medium",
+      "basis": [
+        "reviews/paeos-gaps/02_IMPLEMENTATION_MATRIX.md:23 [direct] — CRITIQUE MISSING (2026-08-10 snapshot; stale for L03-L06 rows, treated as current for L09)",
+        "reviews/paeos-gaps/07_CONSTRUCTION_SEQUENCE.md:19 [direct] — L09 scheduled as Step 1.4, AFTER L07's Step 1.3",
+        "intake arithmetic [inference] — the three remaining illegal edges consistent with the intake's own claims are DESIGN->PLAN (skips CRITIQUE), ADVERSARIAL_REVIEW->SEAL (skips LEDGER_SYNC), EVOLVE->IMPROVE_RUNTIME (skips MEMORY_UPDATE)",
+        "reviews/paeos-gaps/02_IMPLEMENTATION_MATRIX.md:24 + reviews/tasks/B1-SOFTLOOP_review.md:22 [direct/review-record] — the single ADVERSARIAL_REVIEW runs post-verification over the sealed evidence bundle (L14 impl-time), and does not receive planner artifacts"
+      ],
+      "consequence": "The catalogue is read by no adversarial stance anywhere in the current walk. 'Defer the adversary to L09' defers to a stage that does not exist and is scheduled after this one. This removes the deferral option from candidates A, C and D alike, BEFORE OPEN-VERIFY-3 (which gates B) has been checked.",
+      "trilemma": [
+        "A-in-stage: second ADVERSARY dispatch behind the IBM — contingent on unchecked OPEN-VERIFY-3",
+        "B'-honest-debt: PLANNER-only, adversary deferred to the L09 CONSTRUCTION GOAL, CER-3 debt with repayment condition 'L09 lands and receives planner_artifacts'. A documented departure from ROLE_RESPONSIBILITIES.md:57, which names L07 an Adversary station.",
+        "C-reorder: build L09 first — contradicts the intake and 07_CONSTRUCTION_SEQUENCE"
+      ],
+      "recommendation": "B'",
+      "settling_check": "grep CRITIQUE runtime/orchestrator/__init__.py"
+    },
+    {
+      "id": "BL-4",
+      "routed_as": "Incident — WORKFLOW_STATE_MACHINE.yaml L06->L08 'no material risk' bypass",
+      "verdict": "CONFIRMED. File the incident; do not fix here (CER-2/CER-5).",
+      "confidence": "certain",
+      "basis": [
+        "operations/WORKFLOW_STATE_MACHINE.yaml:180 [direct] — transitions: {L07: 'matrix has material risks', L08: 'no material risk'}",
+        "spec/PAEOS-7:364-378 [direct] — forward chain is consecutive pairs only, 'legal for every weight class'; ROUTINE adds ONLY TRIAGE->IMPLEMENT and RAW->INTAKE; 'Deny-by-default: any edge not listed is illegal (FR-4)'"
+      ],
+      "confirms": "RC-1 in its strong form. No TRADEOFF->DESIGN edge exists in ANY weight class.",
+      "design_consequence": "R-EMPTY — the empty catalogue is a first-class case with a bound hash, not an error path. A design handling only 'there are risks' deadlocks every goal with a clean L06 matrix."
+    },
+    {
+      "id": "BL-5",
+      "routed_as": "Incident candidate — required_evidence=() in _RESEARCH/_CRITIQUE/_TRADEOFF",
+      "verdict": "UNVERIFIABLE at this stage (needs runtime/). Cause explained by F-N7.",
+      "confidence": "n/a",
+      "note": "The three stages shipped with no constitutional implementation review — precisely the control (IMPLEMENTATION_REVIEW_PROTOCOL questions 3 and 4) that catches an empty obligation tuple. Remedy is process-level, not file-level. Must not be silently fixed inside this goal (CER-2)."
+    },
+    {
+      "id": "BL-6",
+      "routed_as": "Low-severity corpus divergence in state ordering",
+      "verdict": "CONFIRMED and MUCH LARGER — a contradiction between two NORMATIVE artifacts. Severity upgraded to BLOCKING for successor goal #2.",
+      "confidence": "certain",
+      "basis": [
+        "spec/PAEOS-7:367 [direct] — ratified lattice (PAEOS-IP-0003, 2026-07-27): RAW -> RE_DERIVE -> INTAKE -> TRIAGE -> IDEATE",
+        "spec/PAEOS-7:343-355 [direct] — StageId numbering: RE_DERIVE=0, INTAKE=1, TRIAGE=2, IDEATE=3",
+        "operations/ENGINEERING_LIFECYCLE.md:49-71 [direct] — FROZEN v1.0: L01 Intake -> L02 Triage -> L03 Re-Derivation",
+        "spec/PAEOS-9:723-725 [direct] — §8.2 state table: same doctrine order",
+        "spec/PAEOS-7:381 [direct] — 'RE_DERIVE is Trace-B only', explaining the lattice's RAW->INTAKE skip edge"
+      ],
+      "consequence": "Does not touch L07 (the gate sees only (from,to)). Lands on successor goal #2 'route the whole walk through Gate.propose_transition': if L03 was implemented per doctrine order (TRIAGE->RE_DERIVE), full-walk gating halts on an edge illegal BECAUSE TWO RATIFIED DOCUMENTS DISAGREE — a condition no code change repairs. Must be resolved before that goal, not during it."
+    }
+  ],
+
+  "open_verify_resolution": [
+    {
+      "id": "OPEN-VERIFY-1",
+      "question": "is_legal(TRADEOFF, MITIGATION, wc) and is_legal(MITIGATION, DESIGN, wc) for ALL WeightClass?",
+      "verdict": "RESOLVED — YES for all three.",
+      "confidence": "high",
+      "basis": [
+        "spec/PAEOS-7:364-378 [direct] — forward chain 'legal for every weight class', contains TRADEOFF -> MITIGATION -> DESIGN; ROUTINE is a strict superset",
+        "reviews/tasks/B0.5_review.md:21,28,87 [review-record] — is_legal is 'a direct transcription of the ratified PAEOS-7 §4.1 edge table', built from itertools.pairwise(_MAIN_CHAIN) + one cycle edge, with a '1323-combination enumeration test green' (21 x 21 x 3)"
+      ],
+      "derived": {
+        "is_legal(TRADEOFF, MITIGATION, *)": true,
+        "is_legal(MITIGATION, DESIGN, *)": true,
+        "is_legal(TRADEOFF, DESIGN, *)": false
+      },
+      "caveat": "Still must NOT gate the seal (RC-2) — it passes identically with the change reverted, which is CANARY-0002's own detector. Keep as a labelled precondition assertion."
+    },
+    {
+      "id": "OPEN-VERIFY-2",
+      "question": "Does propose_transition step 4 (SI-3) deny PLANNER-after-PLANNER?",
+      "verdict": "RESOLVED — NO. PLANNER is not in the conflicting set. Severity of the residual risk UPGRADED.",
+      "confidence": "high",
+      "basis": [
+        "spec/PAEOS-7.5:90 [direct] — 'no session holds two of {build, verify, adversary, seal}'",
+        "spec/PAEOS-9:675 [direct] — same set; 'The critic (Reviewer, L09) is deliberately NOT one of the separated powers'",
+        "spec/PAEOS-7:152 [direct] — AOL: 'two conflicting roles (builder/verifier/adversary/sealer)'",
+        "reviews/tasks/B0.SLICE_review.md:27 [review-record] — the SI-3 test is a cross-power case: 'session holds BUILDER, acts as RATIFIER'"
+      ],
+      "severity_upgrade": {
+        "finding": "F-N4",
+        "text": "reviews/tasks/B0.6_review.md:35 [review-record]: 'Separation-of-powers violation | QUARANTINE | SI-3 breach = escalation-class'. Not REMAND. Per spec/PAEOS-7:425 and PAEOS-9:759, QUARANTINE is a system freeze where only human release resumes. BC-5 priced in 'an unattended run becomes stoppable'; it did not price in 'frozen pending human release'."
+      },
+      "binding_constraint": {
+        "id": "R-OV2",
+        "text": "Inspect the SI-3 check in kernel/gates.py / kernel/permissions.py before the first gated MITIGATION transition runs unattended. Do NOT infer from past runs completing — if F2 holds and the orchestrator never calls propose_transition, no observed run is evidence about gate behaviour at all (RC-7's trap)."
+      }
+    },
+    {
+      "id": "OPEN-VERIFY-3",
+      "question": "Does mint_capability support two tokens for the same (goal, run, stage) under different roles?",
+      "verdict": "UNRESOLVED — needs kernel/capability.py.",
+      "confidence": "n/a",
+      "partial": [
+        "spec/PAEOS-7.6:219-226 [direct] — bound_to = {goal_id, run_id, stage, role, session}; 'session' is a component, so two tokens differing in role AND session are structurally expressible; nothing in the contract forbids it",
+        "reviews/tasks/B1.D_review.md:67 [review-record] — an ADVERSARY dispatch is already minted with read_scopes = the IBM bundle, so adversary minting works"
+      ],
+      "escalated_because": "BL-3 means failure no longer degrades B to 'A plus a deferred adversary that exists', but to 'A plus a debt entry'."
+    },
+    {
+      "id": "OPEN-VERIFY-4",
+      "question": "Which weight classes actually reach TRADEOFF?",
+      "verdict": "RESOLVED normatively. Confirms RC-9's two-behaviour split and settles open question (c).",
+      "confidence": "high",
+      "basis": [
+        "spec/PAEOS-7:373-383 [direct] — ROUTINE legal on the full chain AND on TRIAGE->IMPLEMENT; 'Auto-discharge stubs still populate the compressed states in the ledger'",
+        "spec/PAEOS-9:745, operations/ENGINEERING_LIFECYCLE.md:24-30 [direct] — Trace-A auto-discharges L03-L11; 'auto-discharge is not skip'",
+        "spec/PAEOS-7.6:210 [direct] — evidence whose artifact_hash != the artifact under review is rejected (SI-4)"
+      ],
+      "two_behaviours": [
+        {"path": "compression", "text": "ROUTINE takes TRIAGE->IMPLEMENT. MITIGATION is never entered; there is no transition and no four-tuple. The {auto_pass, trace_a, runtime} stub is a LEDGER RECORD for replay completeness."},
+        {"path": "full walk at low ceremony", "text": "A ROUTINE goal walking the full chain DOES transition TRADEOFF->MITIGATION->DESIGN, and the stub IS the Evidence element of a real four-tuple — and must bind to a real CAS object, or it fails SI-4."}
+      ],
+      "binding_constraint": {
+        "id": "R-OV4",
+        "text": "The acceptance clause 'the executed stage sequence contains TRADEOFF->MITIGATION->DESIGN' is UNDEFINED on the compression path and will report a false failure there. Qualify by weight class. Well-defined for this goal (Trace-B); not well-defined as a permanent regression test without the qualifier."
+      }
+    },
+    {
+      "id": "OPEN-VERIFY-5",
+      "question": "Documentation debt on WORKFLOW_STATE_MACHINE.yaml",
+      "verdict": "Same as BL-4 — CONFIRMED."
+    }
+  ],
+
+  "new_gap_found_this_stage": {
+    "id": "GAP-GATE-ID",
+    "text": "L07 has no named kernel gate. spec/PAEOS-7:402-416 [direct] names gates for 0->1, 1->2, 2->3, 8->9, 9->10, 10->11, 11->12, 12->13, 13->14, 18->kernel, 15->16, 17->18 — there is NO entry for 5->6 or 6->7. spec/PAEOS-9:729 [direct] fills it as '(auto; founder if irreversible)'. Not an obstacle (PAEOS-9:753: 'the gate is the only legal exit from a state'), but ValidationClaim.gate_id (PAEOS-7.6:85) is required and no canonical string exists. DESIGN must mint one (suggest 'G-Mitigate') and record it as a naming decision.",
+    "constraint_id": "R-GATE"
+  },
+
+  "u_table_status": [
+    {"id": "U1", "claim": "TRADEOFF/DESIGN adjacent in the _run_body tuple", "status": "RESIDUAL"},
+    {"id": "U2", "claim": "_RE_DERIVE/_IDEATE bind non-empty required_evidence", "status": "RESIDUAL"},
+    {"id": "U3", "claim": "_RESEARCH/_CRITIQUE/_TRADEOFF ship required_evidence=()", "status": "RESIDUAL (= BL-5); cause explained by F-N7"},
+    {"id": "U4", "claim": "runtime/mitigation.py is 9 lines, body pass", "status": "RESIDUAL; path appears in both DEBT entries' implicated set [direct]"},
+    {"id": "U5", "claim": "The orchestrator never calls Gate.propose_transition (F2)", "status": "RESOLVED — consistent with F2 [review-record]. No reviews/tasks/ entry describes the SoftLoop calling propose_transition; B1-SOFTLOOP_review.md describes gating via the COURT and the SEAL AUTHORITY. By contrast B0.12_review.md:39 records the CLI path explicitly: 'advance goes through Gate.propose_transition'. Two control planes, one gated and one not — indexed as DEBT-0015 'Control Plane Duplication Between In-Memory CLI and Self-Host Drivers'."},
+    {"id": "U6", "claim": "Exactly three illegal edges remain after the repair", "status": "PARTIAL — the three are almost certainly DESIGN->PLAN, ADVERSARIAL_REVIEW->SEAL, EVOLVE->IMPROVE_RUNTIME. But BL-6 suggests the count may be LOW BY UP TO TWO if L03 was inserted per doctrine order. Recount against PAEOS-7:367, not against the intake."},
+    {"id": "U7", "claim": "Step 4 does not deny consecutive same-role stages", "status": "RESOLVED normatively (OPEN-VERIFY-2); inspection now higher-priority because failure is QUARANTINE"},
+    {"id": "U8", "claim": "A blocked representation exists, distinct from REMAND", "status": "RESOLVED with high confidence: IT DOES NOT [review-record]. B1-SOFTLOOP_review.md:11,23,30 gives RunStatus as SEALED/REMANDED/HALTED; phase3-scheduler_review.md adds SOURCE_EXHAUSTED/BUDGET_EXHAUSTED as SCHEDULER stop reasons. No review in 25 mentions BLOCKED. Absence-of-evidence, so strong-but-not-certain. RC-8's falsifier FIRES: PAEOS-9:749's blocked (computed flag, clock paused) appears unimplemented."}
+  ],
+
+  "new_findings": [
+    {
+      "id": "F-N1",
+      "severity": "high",
+      "kind": "integrity",
+      "evidence": "direct",
+      "title": "The debt ledger's index and its contents disagree; two entries have been overwritten",
+      "detail": "ledger/debt/README.md indexes DEBT-0001..DEBT-0025 with specific subjects (DEBT-0001 'Provisional genesis parameters...', DEBT-0002 'B0.0 Day-1 spawnability spike (RESOLVED)'). The directory contains exactly three files: README.md, DEBT-0001.md, DEBT-0002.md — and the two present files are the 2026-08-13 autonomous friction entries titled 'No Evidence Submitted to Court MCP'. DEBT-0003..DEBT-0025 do not exist on disk. spec/PAEOS-9:810 classifies Debt as Append-only, retention Permanent; re-minting DEBT-0001 violates append-only on a permanent store.",
+      "consequences": [
+        "The 23 indexed-but-absent entries include the exact prior art for the current failure: DEBT-0019 (evidence path blocked), DEBT-0021 (Bash withdrawn from non-Builders), DEBT-0023 (write scope drops deliverables). This is THE MECHANISM by which BL-2 became 'to be investigated'.",
+        "The two on-disk entries do not conform to the six-field schema README.md mandates (Compromise/Reason/Ideal/Repayment/Priority/Impact); they carry Observation/Leverage/Confidence/RootCause/Remediation. Two writers, two schemas, one namespace."
+      ],
+      "benign_reading": "The 23 files may never have existed in this working tree (partial checkout). That does not rescue the consequence: the record the friction handler needed was absent, and the schema divergence is direct regardless. Overwrite is [inference]; divergence is [direct]."
+    },
+    {
+      "id": "F-N2",
+      "severity": "high",
+      "kind": "self-sealing-blindness",
+      "evidence": "direct",
+      "title": "The recurrence detector cannot detect recurrence",
+      "detail": "DEBT-0001 and DEBT-0002 are byte-identical except for the goal id — same title, same friction string, same implicated paths, same 'Leverage: 4.0x', and both assert 'Recurring: no'. The second occurrence of an identical failure signature was scored as non-recurring.",
+      "closed_loop": "Leverage 4.0x is recorded 'below immediate-queue threshold'; recurrence is the primitive that would raise it; recurrence is keyed on something that never matches. DERIV-L07 RC-11 expected 'a third recurrence would re-score its leverage' — it will not. DEBT-0003 will read 'Recurring: no', score 4.0x, and stay below threshold indefinitely. ENGINEERING_LIFECYCLE.md:297 ('Every repeated mistake becomes a Skill, Template, or Amendment') is unenforced for exactly the class it exists to catch. Compounded by F-N1: even a correct detector would find no history."
+    },
+    {
+      "id": "F-N3",
+      "severity": "high-value",
+      "kind": "reusable-precedent",
+      "evidence": "review-record",
+      "title": "vacuous_commands already exists — reuse, do not rebuild",
+      "detail": "reviews/tasks/B2.O_review.md records runtime/verification.py::vacuous_commands — 'run each command in a workspace WITH the change and a baseline WITHOUT it; a command whose result is IDENTICAL is vacuous' — built on build_verification_workspace + workspace_runner (B2.N), already wired into runtime/orchestrator/__init__.py to REMAND after a court PASS on vacuous evidence.",
+      "caveats": [
+        "The existing gate runs AFTER the court PASS, i.e. on builder evidence at L12/L13. L07's obligation is a PLANNER-stage obligation evaluated earlier, so it is NOT covered — reuse means CALLING it, not inheriting it.",
+        "It is 'skipped when repo_root is unset' (off in scripted tests). An acceptance test relying on it must set repo_root, or it silently proves nothing — itself a CANARY-0002 instance one level up."
+      ],
+      "constraint_id": "R-REUSE"
+    },
+    {
+      "id": "F-N4",
+      "severity": "high",
+      "kind": "risk-repricing",
+      "evidence": "review-record",
+      "title": "SI-3 failure routes to QUARANTINE, not REMAND",
+      "detail": "See OPEN-VERIFY-2. Raises the cost of the one unverified gate assumption from 'loop halts' to 'system freezes pending human release'."
+    },
+    {
+      "id": "F-N5",
+      "severity": "enabling",
+      "kind": "reusable-precedent",
+      "evidence": "review-record",
+      "title": "The live evidence path is MCP, it is tested, and it needs no Bash",
+      "detail": "reviews/tasks/R5.3_review.md (2026-08-01): worker calls the submit_evidence MCP tool -> CourtServer writes to FileCourtEvidencePool -> SoftLoop reads via McpWorkerTransport (an EvidenceSource) -> seals. Tested end-to-end in-process; 'the loop SEALS ON MCP-SUBMITTED EVIDENCE with no pre-declared backlog'. This is what makes R-BL2 (grant court + artifacts) sufficient rather than merely necessary."
+    },
+    {
+      "id": "F-N6",
+      "severity": "medium",
+      "kind": "precedent-and-anti-precedent",
+      "evidence": "review-record",
+      "title": "Planner write-scope precedent confirms BC-2; _EVOLVE is the anti-precedent",
+      "detail": "reviews/tasks/B1.C_review.md:26 records the Planner RoleSpec scoped to design//plan/, enforced by the dispatcher's write_scopes, with an adversary test: 'a DESIGN session writing kernel/evil.py -> ScopeViolation'. mitigation/ is the established pattern; ScopeViolation and NoRoleForStage already exist. By contrast the intake reports _EVOLVE carrying write_scopes=('runtime/','kernel/') on a PLANNER role — against classify_paths that is a planner authorised to write TCB, an SI-8/A-2 breach at the RoleSpec level, consistent with indexed DEBT-0009 and DEBT-0011.",
+      "constraint_id": "R-SCOPE"
+    },
+    {
+      "id": "F-N7",
+      "severity": "high",
+      "kind": "lapsed-control",
+      "evidence": "direct",
+      "title": "L03-L06 shipped with no constitutional implementation review",
+      "detail": "The newest file in reviews/tasks/ is dated 2026-08-01 (phase3-scheduler_review.md); the newest anywhere in reviews/ is the 2026-08-10/13 paeos-gaps audit, which is a gap analysis, not a task review. L03/L04/L05/L06 were built after that — this session's existence proves L03/L04/L05 run. No reviews/tasks/ entry exists for any of them. spec/PAEOS-9:769: 'Every completed task ends with the L17 Constitutional Review answering the six questions; a task without it is NOT DONE.'",
+      "causal_link": "IMPLEMENTATION_REVIEW_PROTOCOL question 4 ('bypassing mechanisms?') and question 3 ('duplication of mechanisms?') are precisely the questions that catch required_evidence=() (BL-5) and a stub module left beside a real one (BC-6/F3). This explains BL-5 as a consequence of a lapsed control, not a puzzling one-off.",
+      "constraint_id": "R-REVIEW"
+    },
+    {
+      "id": "F-N8",
+      "severity": "medium",
+      "kind": "standing-TCB-gap",
+      "evidence": "direct + review-record",
+      "title": "classifier_rules/ is empty and the classifier ignores it",
+      "detail": "spec/PAEOS-9:786 requires 'canary corpus + classifier rules live in Z0 (a system cannot edit its own alarms, A-1)'; spec/PAEOS-8:117 says kernel/classifier.py classifies 'from classifier_rules/'. The directory holds only .gitkeep, and B0.11_review.md:39 records the delivered classifier as 'No regex, no config' — B0.11 was explicitly a stub with full static analysis 'deferred to Phase 2'. Current behaviour is conservative and therefore safe, but combined with caveat C2 it means blast-radius classification rests entirely on which path list the caller passes.",
+      "ownership": "Not this goal's to fix. Record."
+    },
+    {
+      "id": "F-N9",
+      "severity": "structural",
+      "kind": "process-defect",
+      "evidence": "direct",
+      "title": "The pre-design pipeline cannot discharge code checks",
+      "detail": "L03, L04 and L05 have each now run under a read scope excluding kernel/ and runtime/. Each correctly refused to assume; each therefore emitted the same unresolved code checks. The eight U-table items accumulate not through carelessness but because the scope policy makes it impossible for any pre-design stage to close one. They all land on L08, whose own constraint (BC-7) is a code-level verification task.",
+      "proposed_remedy": "Grant L05 read-only kernel/ + runtime/. Research that may not read the system it researches is research in name. Worth a Proposal (CER-2); not fixed here."
+    }
+  ],
+
+  "candidate_rescoring": {
+    "note": "Deltas only. The L04 IdeationSet §5 convergent core is unchanged and confirmed.",
+    "material_changes": [
+      "BL-1's resolution un-blocks all four candidates. No candidate now needs a founder ratifier for blast-radius reasons.",
+      "BL-3 removes 'defer to L09' from A, C and D. Each must carry an HONEST debt entry naming the L09 construction goal as the repayment condition — not a claim that a downstream layer covers it.",
+      "BL-6 lands on C specifically: C's value proposition is that the successor goals become table rows, but successor goal #2 (full-walk gating) is blocked by a normative ordering contradiction no table resolves. C's generality is banked later than L04 assumed; F-C3 (premature abstraction) is more likely than scored."
+    ],
+    "lean_to_L06": {
+      "recommendation": "A + B'-honest-debt, with D deferred one cycle and C deferred to successor goal #2",
+      "A": "BL-1 clears it; F-N3 hands it the discrimination primitive already built; its blast radius has 15 F2-SOFT precedents. A sealed L07 is a precondition for three successor goals — shipping something that can deny dominates shipping the ideal late.",
+      "B_prime": "OPEN-VERIFY-3 is unchecked and BL-3 means B's alternative is 'A plus a debt entry', not 'A plus a deferred adversary that exists'. Wire the second dispatch only if OV-3 clears cheaply.",
+      "D": "Deferred, not dropped. RC-4 is right that severity must be assigned upstream or A's oracle is self-marked — the ONLY structural defence against F-A2, and BL-3 just removed the downstream backstop. But D touches a working layer and its frozen-document question is unresolved. Ship A with severity computed in L07 and the self-marking recorded as debt whose repayment is D.",
+      "C": "Deferred to successor goal #2, and only after BL-6 is resolved.",
+      "honesty_clause": "Per CC-3/DC-6: A defeats always-passes. It does NOT defeat placeholder safeguards or self-marked severity. Say so in the debt entry."
+    }
+  },
+
+  "revised_acceptance_test": {
+    "preconditions_must_not_gate_the_seal": [
+      {"id": "P1", "text": "is_legal(TRADEOFF, MITIGATION, wc) and is_legal(MITIGATION, DESIGN, wc) for all three WeightClass; is_legal(TRADEOFF, DESIGN, wc) == False for all three.", "why_not_a_gate": "Passes identically with the change reverted — CANARY-0002's own detector. It proves the change is legal to attempt, nothing more (RC-2)."}
+    ],
+    "discriminating_criteria_each_must_fail_with_the_change_reverted": [
+      {"id": "D1", "text": "On a Trace-B run, RunOutcome.stages_run contains TRADEOFF -> MITIGATION -> DESIGN and no direct TRADEOFF -> DESIGN. Explicitly NOT asserted on the ROUTINE compression path.", "source": "R-OV4"},
+      {"id": "D2", "text": "The MITIGATION stage emits a catalogue to the CAS and the transition's evidence carries an artifact_hash equal to that CAS hash — including on a clean matrix, where the catalogue is a well-formed EMPTY catalogue, not a missing one.", "source": "R-EMPTY / BL-4"},
+      {"id": "D3", "text": "With the obligation unmet, the transition REMANDs AND the court evidence pool is non-empty AND contains the coverage-check evidence with a false result. A test asserting only 'outcome != COMMITTED' does NOT discharge this criterion — it cannot distinguish a working gate from a broken submission path.", "source": "BL-2 / RC-11"},
+      {"id": "D4", "text": "The coverage check is run through a vacuous_commands-style with/without comparison and shown to discriminate. repo_root must be set, or the check is skipped and proves nothing.", "source": "F-N3"}
+    ],
+    "process_criterion": [
+      {"id": "D5", "text": "A reviews/tasks/ constitutional implementation review exists for the increment.", "source": "F-N7"}
+    ]
+  },
+
+  "constraints_for_design": [
+    {"id": "R-BL2", "priority": "do-this-first", "text": "_MITIGATION.mcp_servers MUST include court and artifacts. Check whether _RE_DERIVE/_IDEATE/_TRADEOFF do.", "source": "BL-2"},
+    {"id": "R-OV2", "priority": "blocking-before-unattended-run", "text": "Inspect the SI-3 check before the first gated MITIGATION transition runs unattended. Failure is QUARANTINE, not REMAND. Do not infer from past runs.", "source": "OPEN-VERIFY-2, F-N4"},
+    {"id": "R-BL1", "priority": "high", "text": "Confirm the autonomous driver passes classify_paths the CHANGE SET, not the run's implicated-paths set.", "source": "BL-1 C2"},
+    {"id": "R-OV4", "priority": "high", "text": "Weight-class-qualify the sequence assertion.", "source": "OPEN-VERIFY-4"},
+    {"id": "R-GATE", "priority": "medium", "text": "Mint and record a gate_id for the L07 transitions; none exists in the ratified table. Suggest 'G-Mitigate'.", "source": "GAP-GATE-ID"},
+    {"id": "R-EMPTY", "priority": "high", "text": "The empty catalogue is a first-class case with a bound hash, not an error path.", "source": "BL-4 / RC-1"},
+    {"id": "R-BLOCK", "priority": "high", "text": "No blocked representation appears to exist. Route irreversible accepted-risks to REMAND-with-explicit-reason plus a CER-3 debt entry. NEVER auto-approve.", "source": "U8 / RC-8"},
+    {"id": "R-SCOPE", "priority": "high", "text": "_MITIGATION copies the _DESIGN write-scope precedent (mitigation/ only). Never the _EVOLVE precedent.", "source": "F-N6"},
+    {"id": "R-KEY", "priority": "medium", "text": "Key the insertion on StageId identity ('after TRADEOFF, before DESIGN'), never an integer slot — the corpus carries four incompatible numberings.", "source": "RC-10"},
+    {"id": "R-REUSE", "priority": "high", "text": "Reuse vacuous_commands / build_verification_workspace; call it explicitly at L07 (existing wiring is post-court only).", "source": "F-N3"},
+    {"id": "R-DEBT", "priority": "high", "text": "File CER-3 debt for: deferred adversary (repayment = L09 lands and receives planner_artifacts); self-marked severity (repayment = candidate D / L06 typed register); missing blocked representation.", "source": "BL-3, candidate rescoring, U8"},
+    {"id": "R-REVIEW", "priority": "medium", "text": "Produce a reviews/tasks/ entry for the increment.", "source": "F-N7"}
+  ],
+
+  "incidents_to_file": [
+    {"ref": "BL-4", "text": "operations/WORKFLOW_STATE_MACHINE.yaml:180 L06->L08 'no material risk' bypass is denied by the ratified edge table"},
+    {"ref": "BL-5", "text": "required_evidence=() in three shipped stages (pending verification)"},
+    {"ref": "F-N1", "text": "Debt-ledger index/content divergence, append-only violation, and schema divergence"},
+    {"ref": "F-N2", "text": "RB-0008 recurrence detector scores identical failures as non-recurring"},
+    {"ref": "F-N6", "text": "_EVOLVE RoleSpec grants a PLANNER write scope kernel/ — SI-8/A-2 breach"},
+    {"ref": "F-N7", "text": "L03-L06 shipped with no constitutional implementation review; by PAEOS-9:769 they are not done"},
+    {"ref": "BL-6", "text": "RE_DERIVE ordering contradiction between PAEOS-7:367 and ENGINEERING_LIFECYCLE.md / PAEOS-9 §8.2 — BLOCKING for successor goal #2"}
+  ],
+
+  "residual_checks_for_design": [
+    {"id": "CHK-1", "for": "R-BL2", "command": "read runtime/agents/__init__.py — do _RE_DERIVE/_IDEATE/_TRADEOFF grant mcp_servers including 'court'?"},
+    {"id": "CHK-2", "for": "R-OV2", "command": "read the SI-3 check in kernel/gates.py / kernel/permissions.py — is role identity a conflict?"},
+    {"id": "CHK-3", "for": "BL-1 self-falsification", "command": "grep HARD_PREFIXES kernel/classifier.py — confirm the rule is unchanged since 2026-07-27"},
+    {"id": "CHK-4", "for": "BL-3", "command": "grep CRITIQUE runtime/orchestrator/__init__.py"},
+    {"id": "CHK-5", "for": "OPEN-VERIFY-3", "command": "read kernel/capability.py — does mint_capability refuse a second mint for the same (goal, run, stage)?"},
+    {"id": "CHK-6", "for": "U1/U4", "command": "read the _run_body stage tuple; wc -l runtime/mitigation.py"},
+    {"id": "CHK-7", "for": "U6/BL-6", "command": "walk the executed stage sequence against PAEOS-7:367 and recount the illegal edges — do not trust the intake's count of three"},
+    {"id": "CHK-8", "for": "R-BL1", "command": "find the caller of classify_paths in the autonomous driver — which path set does it pass?"},
+    {"id": "CHK-9", "for": "acceptance-test currency", "command": "list proposals/ — is there an IP superseding the 2026-07-27 ratified edge table? Neither L03 nor L05 could see this directory."}
+  ],
+
+  "falsification_pass": [
+    "The strongest case against this dossier is that BL-1 — the blocker that would have stopped the goal — was resolved in the goal's favour by a session with an interest in proceeding, using secondary evidence, without reading kernel/classifier.py. Defence: the resolution rests on a quoted rule, a quoted contradiction of RC-12's own premise ('No regex, no config'), and fifteen independent F2-SOFT records on the same paths — and it produces a falsifiable prediction (C3) that this very run will be mislabelled HARD. But if kernel/classifier.py has changed since 2026-07-27, §3.1 is wrong. CHK-3 settles it.",
+    "reviews/tasks/ entries are self-reviews by the builder ('Auditor / Builder Self-Adversarial'), so they are not independent. They are contemporaneous and specific (line numbers, test counts, adversary probes), which is why they are used, but a review saying PASS is weaker than the code saying so. Every claim resting on them is marked [review-record] so DESIGN can discount it.",
+    "BL-3 is the weakest resolution: a stale matrix, a construction plan, and arithmetic over the intake's own claim. If L09 was built in the last three days, BL-3 inverts and the L04 lean stands unchanged. CHK-4 settles it.",
+    "F-N1 admits a benign reading (partial checkout rather than overwrite). That does not rescue the consequence, and the claim is marked accordingly.",
+    "What this dossier cannot see: six residual U-items, OPEN-VERIFY-3, and proposals/ — exactly where an IP superseding the ratified edge table would live. OPEN-VERIFY-1 rests on that table. TWO CONSECUTIVE STAGES HAVE NOW RESTED A LOAD-BEARING CONCLUSION ON A TABLE NEITHER COULD CONFIRM IS CURRENT (CHK-9).",
+    "No external literature was consulted. None of the twelve open questions is a state-of-the-art question, and PROMPT_TEMPLATES.md:82 routes external ground truth through a Founder Inject. Manufacturing an external research question would be the scope-creep incident ENGINEERING_LIFECYCLE.md:93 names."
+  ],
+
+  "evidence_claim": {
+    "claim_id": "research_dossier",
+    "kind": "CITATION",
+    "statement": "The six blockers routed from DERIV-L07 §8 and the five OPEN-VERIFY items from the L04 IdeationSet §7 are resolved or explicitly bounded, each cited to file:line within this session's read scope and marked [direct], [review-record] or [inference]. BL-1 (blocking) is resolved and RC-12's conclusion falsified: the goal signature classifies SOFT, discharging DERIV-L07's prohibition on proceeding to L08. BL-2 is root-caused to a published 2026-08-01 diagnosis, yielding the discriminator RC-11 required. BL-3 fires RC-5's falsifier, removing 'defer to L09' as an honest option. OPEN-VERIFY-1, -2 and -4 are resolved normatively; -3 is bounded as residual. Nine findings not routed to this stage are recorded, two blocking on adjacent work. Twelve binding constraints and a corrected, discriminating acceptance test are handed to DESIGN.",
+    "cites": [
+      "spec/PAEOS-7-runtime-architecture.md:343-355,357-383,402-416,425,152",
+      "spec/PAEOS-7.5-runtime-threat-model.md:90,217",
+      "spec/PAEOS-7.6-runtime-interface-contracts.md:71,85,111,114-126,210,219-226,237-238",
+      "spec/PAEOS-9-execution-architecture.md:675,723-729,745,749,753,759,769,786,810",
+      "spec/PAEOS-8-runtime-implementation-playbook.md:117",
+      "operations/ENGINEERING_LIFECYCLE.md:24-30,49-71,93,105-112,116,296-297",
+      "operations/WORKFLOW_STATE_MACHINE.yaml:180,183-193",
+      "operations/ROLE_RESPONSIBILITIES.md:56-59",
+      "operations/PROMPT_TEMPLATES.md:78-88",
+      "operations/IMPLEMENTATION_REVIEW_PROTOCOL.md",
+      "constitution/canaries/CANARY-0002.json",
+      "constitution/classifier_rules/ (empty)",
+      "constitution/README.md:12",
+      "architecture/invariants.json:40-43",
+      "ledger/debt/README.md",
+      "ledger/debt/DEBT-0001.md:12,16,20,24",
+      "ledger/debt/DEBT-0002.md:12,16,20,24",
+      "reviews/tasks/B0.5_review.md:21,28,87",
+      "reviews/tasks/B0.6_review.md:29,35",
+      "reviews/tasks/B0.11_review.md:21-23,30,39,50-54,60-61,70,73-75",
+      "reviews/tasks/B0.12_review.md:39,82-84",
+      "reviews/tasks/B0.SLICE_review.md:27",
+      "reviews/tasks/B1.C_review.md:13,26,49",
+      "reviews/tasks/B1.D_review.md:49,67,73",
+      "reviews/tasks/B1-SOFTLOOP_review.md:11,13,22-30",
+      "reviews/tasks/B2.O_review.md",
+      "reviews/tasks/R5.3_review.md",
+      "reviews/tasks/phase3-scheduler_review.md",
+      "reviews/phase3_m3_live_concurrency.md:150-197",
+      "reviews/paeos-gaps/02_IMPLEMENTATION_MATRIX.md:21-24",
+      "reviews/paeos-gaps/06_COMPLETENESS_CRITERIA.md",
+      "reviews/paeos-gaps/07_CONSTRUCTION_SEQUENCE.md:16-19",
+      "backlog/research/PAEOS_CANONICAL_EXECUTION_VERDICT.md:14-16,20-28,31",
+      "backlog/research/CRITIQUE_INDEPENDENT.md (Model D)",
+      "artifact:c51f423772fe2269b62b454be8e1baa3531d2b5ed84a329b8e161b88412f9a70 (DERIV-L07)",
+      "artifact:cf218062dcf716344071a614908dc46e5488241234b2d30f95160cda38fe5fbb (L04 IdeationSet)",
+      "artifact:4e5f9cd13770a88e873b8306e22b2d501511ee23f8a4d6240487336392352271 (L04 candidate set JSON)"
+    ]
+  }
+}

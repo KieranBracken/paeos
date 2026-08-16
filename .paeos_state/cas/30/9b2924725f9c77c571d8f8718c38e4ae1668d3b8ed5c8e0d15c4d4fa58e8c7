@@ -1,0 +1,62 @@
+# Research Dossier: Next Canonical Layer Discovery (g-ade)
+
+**Date:** 2026-08-13
+**Stage:** RESEARCH
+**Role:** PLANNER
+**Objective:** Identify the next missing canonical layer to instantiate in the PAEOS SoftLoop, given that L05 (RESEARCH) is now implemented and sealed.
+
+## 1. Context & Criteria
+
+According to the canonical PAEOS 19-layer architecture, the system is designed to execute a strict dependency sequence. The SoftLoop currently bridges L01/L02 directly to L08 (Design), with L03-L05 recently implemented. The immediate gap lies between L05 (Research) and L08 (System Design). We must identify the next layer to build to push the system toward genuine self-hosting.
+
+### Self-Hosting Criteria
+1. What does PAEOS need to become genuinely self-hosting?
+2. Which missing canonical layers are direct prerequisites for that?
+3. Where does each candidate sit in the 19-layer dependency graph?
+4. What happens if a candidate is deferred?
+5. What becomes easier/harder if it is built first?
+6. Is the candidate itself dependent on missing PAEOS layers?
+7. Can it be implemented cleanly now without creating architectural shortcuts?
+
+## 2. The Candidates
+
+Based on the `IMPLEMENTATION_MATRIX.md` and `DEPENDENCY_DAG.md`, three missing canonical layers currently have all their upstream dependencies satisfied and are thus candidates for immediate construction:
+
+### Candidate A: L06 (Trade-off Analysis)
+- **Position in DAG:** Sits immediately after L05 (RESEARCH) and L04 (IDEATE). It provides the `Trade-off Matrix` for L07 (MITIGATION).
+- **Rationale:** The cognition pipeline is currently severed between RESEARCH and DESIGN. L06 forces the planner to explicitly articulate decision axes and trade-offs of the researched candidates.
+- **Dependency Status:** Depends on IDEATE and RESEARCH (both implemented). Zero missing upstream dependencies.
+
+### Candidate B: L17 (Retrospective)
+- **Position in DAG:** Sits at the start of the Evolution Loop, triggering after L16 (SEAL) or a terminal failure. It provides the outcome data for L18 (MEMORY_UPDATE).
+- **Rationale:** To be self-hosting, PAEOS must learn from its runtime failures (e.g., the friction seen in `ledger/debt/DEBT-0189.md` where Builders fail to produce artifacts). L17 enables the system to perform a Root Cause Analysis (CER-4) on these failures.
+- **Dependency Status:** Depends on SEAL (implemented). Zero missing upstream dependencies.
+
+### Candidate C: L09 (Multi-Perspective Critique)
+- **Position in DAG:** Sits after L08 (DESIGN). It provides the `Finding register` for L10 (ADVERSARIAL_REVIEW).
+- **Rationale:** Currently, the system jumps from DESIGN straight to PLAN or a monolithic Adversarial Review. L09 decomposes the critique into 7 distinct perspectives, catching design flaws earlier.
+- **Dependency Status:** Depends on DESIGN (implemented). Zero missing upstream dependencies.
+
+## 3. Candidate Evaluation
+
+| Criterion | L06 (Trade-off Analysis) | L17 (Retrospective) | L09 (Multi-Perspective Critique) |
+| :--- | :--- | :--- | :--- |
+| **Self-Hosting Need** | Safe, documented architectural choices | Autonomous root-cause analysis | Comprehensive design safety |
+| **If Deferred...** | Designs hallucinate constraints; debt accumulates | System repeats the same mistakes | Brittle designs fail in L10/L13 |
+| **If Built First...** | Forces L08 to justify decisions; stabilizes downstream | Enables primitive failure recovery | Strengthens design review |
+| **Has Missing Upstreams?** | No (L04, L05 exist) | No (L16 exists) | No (L08 exists) |
+| **Clean Implementation?** | Yes, fits perfectly into the newly formed L03->L05 chain | Yes, but lacks upstream cognition to fix the errors it finds | Yes, but critique will be noisy without L06/L07 matrices |
+
+## 4. Conclusion and Recommendation
+
+**Recommended Next Target: L06 (Trade-off Analysis)**
+
+*Rationale:* 
+The canonical construction sequence dictates that we must build upstream first to ensure strict dataflow integrity. While L17 and L09 are technically unblocked, they are downstream of the critical cognitive gap. Currently, the SoftLoop jumps from RESEARCH (L05) to DESIGN (L08). If L06 is deferred, the DESIGN layer lacks the formal `Trade-off Matrix` it expects, leading to hallucinated constraints and the exact Builder failures documented in the debt ledger.
+
+By implementing L06, PAEOS will formally evaluate the ideated candidates across explicit decision axes, producing a documented Trade-off Matrix. This sets the stage for L07 (Mitigation) and finally provides L08 (Design) with the canonical inputs required for safe, self-hosted engineering.
+
+*Next Steps for DESIGN Stage:*
+- Scaffold `StageId.TRADEOFF` in `runtime/orchestrator/__init__.py`.
+- Define the `TradeOffArtifact` contract (requiring explicit decision axes).
+- Link L05 output to L06 input in the Context Compiler.

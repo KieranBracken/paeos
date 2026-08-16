@@ -1,0 +1,23 @@
+# DEBT-0009 — Constitutional Amendment Hard-Loop Implemented in Runtime (Z2) Without Kernel (Z0/Z1) Gate or Ledger Persistence
+
+**Status**: OPEN  
+**Filed**: 2026-07-30  
+**Priority**: Medium  
+**Category**: Architectural Deviation / Layering Breach  
+
+---
+
+## 1. Compromise
+The constitutional amendment hard-loop process (`AmendmentPath`, `prepare_amendment`) is implemented inside [runtime/amendment.py](file:///Users/bob/GitHub/paeos/runtime/amendment.py) in Trust Zone 2 (Z2 runtime). Furthermore, `prepare_amendment` returns an in-memory `RatificationPacket` object without recording an `amendment_proposed` or `adversary_review_completed` event to the single-writer kernel ledger.
+
+## 2. Reason
+During Phase 2 (B2.E), the amendment preparation pathway needed to compose `InformationBarrierManager`, `ReviewHarness`, `AgentDispatcher`, and `ClaudeCodeRuntime` to execute the adversarial attack against proposed safety-invariant diffs. Because these review components were built in `runtime/`, the orchestrating module was placed in `runtime/amendment.py`.
+
+## 3. Ideal Solution
+Move amendment path enforcement into the kernel TCB (`kernel/amendment.py` or a dedicated kernel gate). Every amendment proposal, classification check, and adversarial review completion MUST emit a signed event to the single-writer kernel ledger, ensuring durable record keeping per PAEOS-0 Axiom A2 ("artifacts durable, context ephemeral").
+
+## 4. Repayment Conditions
+Repay during Phase 3 TCB hardening prior to enabling autonomous hard-loop execution.
+
+## 5. Estimated Impact
+Medium. If un-repaid, transient amendment preparation traces could be lost on process failure, and untrusted Z2 runtime code could bypass TCB monitoring during hard-loop proposal preparation.

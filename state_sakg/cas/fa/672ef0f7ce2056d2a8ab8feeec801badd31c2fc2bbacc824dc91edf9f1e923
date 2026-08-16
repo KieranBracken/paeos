@@ -1,0 +1,534 @@
+# System Design — `SAKG-1/G-S1-GO` Founder Gate (A4 go/no-go on the S1 build)
+
+Status: DESIGN ONLY — no implementation, **no decision recorded**. Stage: L08 System Design.
+Role: PLANNER. Date: 2026-08-08.
+Goal objective: `[G-S1-GO]` FOUNDER GATE — A4 go/no-go on the S1 build, on S-PROBE evidence
+(`backlog/SAKG-1-backlog.yaml` §nodes/G-S1-GO, wave 1, `deps: [S-PROBE]`).
+Authority chain: `spec/SAEOS-1-architecture.md` §10/D7 · CER-5 · L02 · L16 ·
+`spec/PAEOS-4-v1.1.md` §2.5 (`payload(decision)`), §2.6 (`class=external`), §3 (lattice).
+
+Write scope of this artifact: `design/` only. The deliverable the gate itself requires —
+`ledger/decisions/SAKG-1-G-S1-GO.md` — is **outside this stage's write capability by
+design** (DESIGN precedes the founder act; and the founder is the only legal author of the
+`decision:` line, per K4 §2.6 `class=external ⟹ author.actor=founder`). This document
+specifies that record exactly, byte-level, so the act is mechanical. See §11.
+
+---
+
+## 1. Goal restatement (acceptance surface)
+
+The gate is discharged when both ratified commands exit 0 from the repo root:
+
+```
+rg -q 'SAKG-1/G-S1-GO' ledger/decisions/*.md
+rg -q '^decision: (PROCEED|REVERT)$' ledger/decisions/SAKG-1-G-S1-GO.md
+```
+
+Verified behaviour of these two checks against this repository (run 2026-08-08):
+
+| Observation | Consequence for the design |
+|---|---|
+| `ledger/decisions/` does not exist; `bash -c "rg -q … ledger/decisions/*.md"` exits **2** (`No such file or directory`) | The directory **and** ≥1 `.md` file are both preconditions. Creating the directory is part of the act, not incidental. |
+| Check 2 is anchored `^…$`. `decision: PROCEED   # note` **does not match** | The `decision:` line MUST be exactly `decision: PROCEED` or `decision: REVERT` — column 0, no quotes, no inline comment, no trailing whitespace. This is the single most likely cause of a false remand (cf. `ledger/debt/DEBT-0023.md`, which already records G-S1-GO losing its deliverable to a scope/path mismatch). |
+| Check 1 matches the literal string anywhere in **any** `.md` under `ledger/decisions/` | It is satisfiable without any decision content — a low-discrimination check (CANARY-0002 class, `reviews/adversary-findings/CANARY-0002-vacuous-evidence.md`). Check 2 is the load-bearing one. §10.3 routes the strengthening. |
+| `ledger/` is not in `.gitignore`; `rg` indexes `ledger/**` (confirmed against `ledger/debt/`) | No ignore-file interference. Precondition holds. |
+
+**The gate's substance is not in the checks.** The checks verify *that a decision was
+recorded in the right shape*; they cannot verify that it was sound. Soundness at an A4 gate
+is non-mechanizable by construction (Ω-14 self-certification limit; H2 parchment clause —
+enforcement against the sovereign is detection and convention, not prevention). The design
+therefore maximises the *mechanically checkable* fraction of the record (§4.2 `probe_hash`,
+`loss_ratio_cited`) rather than pretending the rest is checked.
+
+---
+
+## 2. What this design is, and what it must not do
+
+**Is:** the mechanism that (a) presents S-PROBE evidence to the founder in decision-ready
+form, (b) captures the verdict as a durable machine-readable artifact, (c) makes that
+artifact the sole release authority for the S1 implementation subgraph, and (d) routes a
+`REVERT` into the SAEOS-1 §7 falsifier path.
+
+**Must not:** choose. CER-5 — *the runtime MAY recommend; it MUST NEVER legislate.* This
+document contains no recommended verdict, and deliberately specifies **no fatal loss-ratio
+threshold** (§8/A3): SAEOS-1 §10/D7 and the backlog both phrase the trigger as "a loss ratio
+**the founder judges** fatal". Inventing the number here would convert an A4 judgment into
+runtime policy — the exact failure CER-5 exists to prevent. What the design *does* require is
+that the record **state the threshold the founder applied**, so consecutive A4 gates are
+auditable for coherence (Ω-12: founder taste is assumed to be a coherent partial order;
+unstated thresholds are how that assumption fails silently).
+
+---
+
+## 3. Component graph
+
+```
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │ C1  reviews/spikes/sakg-s1-extraction-probe.md        [S-PROBE, wave 0, fable]│
+  │       verdict: GO|NO-GO · loss_ratio: 0.NN · ≥3 `## goal: ` extraction tables │
+  └───────────────────────────────┬──────────────────────────────────────────────┘
+                                  │ I1  read-only, content-hashed (no rewrite)
+                                  ▼
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │ C2  Decision Brief  (Runtime, GENERATE — recommends only, CER-5)             │
+  │       K4 §2.5 payload(decision) = {question, options[{label,argument}],       │
+  │                                    recommendation?}                          │
+  └───────────────────────────────┬──────────────────────────────────────────────┘
+                                  │ I2-in  brief is linked, `decision:` line ABSENT
+                                  ▼
+  ╔══════════════════════════════════════════════════════════════════════════════╗
+  ║ C3  FOUNDER  — environment (A4), not a role-in-system                        ║
+  ║      the ONLY legal author of `decision:` (K4 §2.6 class=external)           ║
+  ║      debits Budget.decisions — the A4 bandwidth gauge (K4 §10, Ω-22)         ║
+  ╚═══════════════════════════════┬══════════════════════════════════════════════╝
+                                  │ I2-out  resolution{choice, rationale, terminal}
+                                  ▼
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │ C4  ledger/decisions/SAKG-1-G-S1-GO.md   ← THE deliverable (durable, A2)     │
+  │     + ledger/decisions/README.md          ← sub-ledger convention (new)      │
+  └────────┬─────────────────────────────────────────────┬───────────────────────┘
+           │ I5                                          │ I3
+           ▼                                             ▼
+  ┌──────────────────────────┐              ┌──────────────────────────────────┐
+  │ C5 Evidence              │              │ C6 Gate verifier                 │
+  │   class=external         │              │   the 2 §1 commands              │
+  │   actor=founder          │              │   shape-only, deny-by-default    │
+  │   polarity=supports      │              └───────────────┬──────────────────┘
+  │   goal=G-S1-GO           │                              │ I4
+  └────────┬─────────────────┘                              ▼
+           │                    ┌───────────────────────────────────────────────┐
+           ▼                    │ C7 DAG resolver — S1 implementation subgraph  │
+  ┌──────────────────────┐      │   F-EXTRACT-FIX · I-STORE · I-OUTBOX  (wave 2)│
+  │ C8 Kernel lattice    │      │   → I-EXTRACT · I-INGEST (w3) → T-ROUNDTRIP   │
+  │   G-S1-GO: declared  │      │   (w4) → M-S1 (w5)                            │
+  │   → verified         │      └───────────────────────────────────────────────┘
+  │   → integrated (K8)  │                              │ decision: REVERT
+  └──────────────────────┘                              ▼
+                               ┌───────────────────────────────────────────────┐
+                               │ C9 Falsifier path — SAEOS-1 §7               │
+                               │   Goal(kind=amendment) reverting SAEOS-1;     │
+                               │   S1+S2 subgraph → abandoned;                 │
+                               │   pre-gate artifact disposition recorded (§7) │
+                               └───────────────────────────────────────────────┘
+```
+
+**Structural property (the reason this gate exists where it does).** G-S1-GO is a **cut
+vertex** over the S1 implementation subgraph: `F-EXTRACT-FIX`, `I-STORE` and `I-OUTBOX` all
+carry it in `deps`, and `I-EXTRACT`/`I-INGEST`/`T-ROUNDTRIP`/`M-S1` are transitively behind
+those. No implementation node in S1 is reachable without traversing C4. It sits at the head
+of the declared `critical_path` (`[S-PROBE, G-S1-GO, F-EXTRACT-FIX, …]`), so its latency is
+founder wall-clock, not compute (§9 Performance).
+
+**Deliberately *not* cut:** `S-PROBE` (w0), `F-ENVELOPE` (w0) and `F-BUNDLE` (w1) run
+pre-gate. That is correct — they are contract-freezing, and freezing a schema is what makes
+the probe's findings testable. It also creates real sunk-cost exposure on `REVERT`, which the
+design surfaces rather than hides (§7 gap G3, §9 Risk Officer).
+
+---
+
+## 4. Interfaces
+
+### I1 — Probe → Brief (read-only evidence surface)
+
+| Property | Contract |
+|---|---|
+| Source | `reviews/spikes/sakg-s1-extraction-probe.md`, produced by S-PROBE (actor `fable`, role Researcher) |
+| Direction | **Read-only.** The brief may quote and hash the probe; it may never rewrite, round, re-derive or reformat `loss_ratio`. |
+| Fields consumed | `verdict: GO\|NO-GO`; `loss_ratio: 0.NN`; the ≥3 `## goal: ` per-field extractable/partial/absent tables |
+| Binding | The probe's content hash is carried forward into C4 (`probe_hash`), pinning *which* evidence state the founder saw — the replay property (§9 Replay) |
+| Precondition | S-PROBE `verified`. Deciding on an absent probe is vacuous evidence by construction (CANARY-0002 class) and is forbidden — the correct move is deferral (§6 SM-1 `DRAFTED`), not a guess. |
+
+### I2 — The Decision Record (the deliverable interface)
+
+Path, exactly: `ledger/decisions/SAKG-1-G-S1-GO.md`. A YAML frontmatter block (machine
+surface) followed by prose (the A4 reasoning). Frontmatter is chosen over `ledger/debt/`'s
+prose-field style because check 2 needs `decision:` at column 0 and the header should be
+YAML-parseable as a whole; the divergence from the debt-ledger convention is why
+`ledger/decisions/README.md` is a co-deliverable (§11).
+
+```markdown
+---
+gate: SAKG-1/G-S1-GO                 # satisfies check 1 (literal 'SAKG-1/G-S1-GO')
+decision: PROCEED                    # satisfies check 2 — see the MUST rules below
+kind: decision                       # K4 §2.5; assignee_class MUST be founder
+authority: A4
+decided_by: founder
+decided_at: 2026-08-08T00:00:00Z     # RFC3339 UTC
+evidence_class: external             # K4 §2.6: class=external ⟹ author.actor=founder
+terminal: oneoff_record              # PROCEED ⇒ oneoff_record; REVERT ⇒ amendment_ref: <goal-id>
+probe: reviews/spikes/sakg-s1-extraction-probe.md
+probe_verdict: GO
+probe_hash: sha256:<64-hex>          # pins the evidence state actually seen
+loss_ratio_cited: 0.NN               # MUST be byte-identical to the probe's loss_ratio value
+fatal_threshold_applied: 0.NN        # the founder's own bar; unstated ⇒ unauditable (Ω-12)
+authorises: [F-EXTRACT-FIX, I-STORE, I-OUTBOX]
+supersedes: null
+superseded_by: null
+---
+```
+
+**MUST rules on the frontmatter** (each one closes a failure this repo has already seen or
+that the regexes make reachable):
+
+1. The file contains **exactly one** line matching `^decision: `. Two such lines make the
+   machine read ambiguous, and every ambiguity is an Incident (Global Rule 9). This is why
+   a change of mind is **never** an in-place edit — see rule 3.
+2. The `decision:` value is one of the two literals `PROCEED` / `REVERT`. Nothing else on
+   the line (verified: an inline comment breaks check 2).
+3. The record is **append-only and single-decision**. Reversal is a *new* decision goal with
+   its own record; this file gains only `superseded_by: <new-record>`. Mirrors SAEOS-1
+   §4.2 ("nothing is ever deleted; supersession only") and kernel X3 (no transition out of
+   a terminal state).
+4. `loss_ratio_cited` is named distinctly from the probe's `loss_ratio` so that a
+   repo-wide grep for either field never conflates producer with citation.
+5. `terminal` is asymmetric by kind, and the asymmetry is load-bearing (§8/A4):
+   `PROCEED` closes no rule class → `oneoff_record` (K7's escape clause, and therefore
+   Ω-27's shadow-common-law surface); `REVERT` changes a ratified specification → it
+   **must** be `amendment_ref` pointing at a real `Goal(kind=amendment)`, because reverting
+   SAEOS-1 is a policy change and only an amendment may make one (CER-5, K7, §14.5).
+
+**Required prose sections** (the part no regex can check, and therefore the part that must be
+written for a human auditor):
+
+| § | Content | Why required |
+|---|---|---|
+| 1 Decision | One sentence: PROCEED or REVERT. | L16 disposition |
+| 2 Evidence cited | Probe path + hash + verdict + loss ratio + a summary of the per-goal extractable/partial/absent tables. | The objective's "citing the S-PROBE loss ratio" |
+| 3 Reasoning | Why this loss ratio is (or is not) fatal, against `fatal_threshold_applied`. | CER-5: the judgment is the founder's, so it must be *the founder's words* |
+| 4 What this authorises | Exactly `F-EXTRACT-FIX`, `I-STORE`, `I-OUTBOX` (and what they transitively unblock). | Scope conservation |
+| 5 What this does **not** authorise | S2 continuation, S3–S6, any scope widening. Per SAEOS-1 §8 and M-S2's own rationale, continuation is a *fresh* founder decision, never an entitlement. | Prevents gate creep |
+| 6 Falsifier | What observation would make this decision wrong. A `PROCEED` here is a **budget release, not a commitment**: `T-ROUNDTRIP` (`--assert-loss-ratio 0`) still kills S1 downstream. | K6 — no rule without a falsifier |
+| 7 Terminal | `oneoff_record`, or the amendment goal id. | K7 |
+
+### I3 — Gate verifier
+
+The two §1 commands, unmodified, deny-by-default. Shape-only by construction (§1). It
+verifies: the sub-ledger exists, a record names this gate, and the pinned filename carries
+exactly one well-formed verdict line. It verifies nothing about soundness, and the design
+does not claim otherwise.
+
+### I4 — Release / abandon (DAG resolver)
+
+| `decision:` | Effect |
+|---|---|
+| `PROCEED` | `F-EXTRACT-FIX`, `I-STORE`, `I-OUTBOX` become dispatchable (their other deps — `F-BUNDLE`, `F-ENVELOPE` — being `integrated`). No other node is released. |
+| `REVERT` | The S1 implementation subgraph and all of S2 → `abandoned` (K4 §3.2: *parent withdrawn ∨ founder withdrawal (recorded)*). C9 fires. |
+
+### I5 — Kernel Evidence object
+
+```
+Evidence { goal: G-S1-GO
+           claim: "founder resolved SAKG-1/G-S1-GO as <PROCEED|REVERT> on S-PROBE loss_ratio <0.NN>"
+           polarity: supports
+           class: external                    # ⟹ author.actor = founder (K4 §2.6)
+           observation: { source: "ledger/decisions/SAKG-1-G-S1-GO.md" }
+           read_set: [(ledger/decisions/SAKG-1-G-S1-GO.md, <hash>),
+                      (reviews/spikes/sakg-s1-extraction-probe.md, <probe_hash>)]
+           basis: [<S-PROBE evidence hashes>]
+           cost: Budget{ decisions: 1, … } }
+```
+
+The probe in `read_set` is deliberate: if the probe is later revised, `live(e)` goes false
+(K4 §2.6 liveness: `head(o)=h` for every read-set entry), T1 regresses the gate, and the
+founder is re-asked. A decision made on evidence that has since changed does not silently
+continue to authorise work — that is K2 read-set binding doing its job at an A4 gate.
+
+---
+
+## 5. Data flow
+
+```
+S-PROBE artifact ──I1(read-only, hashed)──▶ Decision Brief ──▶ ║FOUNDER║ ──▶ Decision Record
+                                                                              │
+                                             ┌────────────────────────────────┤
+                                             ▼                                ▼
+                                   I5 Evidence(external)              I3 gate verifier
+                                             │                                │
+                                             ▼                                ▼
+                                   C8 lattice: verified            I4 release | abandon
+                                       → integrated (K8)                      │
+                                                                     ┌────────┴────────┐
+                                                                     ▼                 ▼
+                                                              wave-2 nodes        C9 §7 falsifier
+```
+
+Flow invariants:
+
+- **One-way.** Nothing downstream of C3 writes back to C1. The probe is evidence, not a
+  work product to be reconciled with the verdict.
+- **One writer per artifact** (K8/Ω10-discipline): Runtime writes the brief; the founder
+  writes `decision:`; the resolver writes only DAG state. No component writes another's
+  artifact.
+- **Single human cut.** Exactly one edge crosses the A4 boundary in each direction (evidence
+  in, resolution out). Adding a second would multiply founder-channel demand against a
+  constant-capacity channel (Ω-22).
+- **Cost.** One `decisions` budget unit. Zero `exec_seconds`. Non-fungible with every other
+  dimension (K4 §10, Ω-09) — no amount of compute substitutes for it.
+
+---
+
+## 6. State machines
+
+### SM-1 — Decision record lifecycle
+
+```
+  ABSENT ──brief compiled (S-PROBE verified)──▶ DRAFTED ──founder writes `decision:`──▶ DECIDED
+   │  no ledger/decisions/ dir                  │  file exists, sections 2–5 drafted,      │
+   │  both §1 checks red                        │  NO `^decision: ` line, checks still red │
+   │                                            │                                          │
+   │                                            │  ◀── REMAND to S-PROBE (need more evidence)
+   │                                            └── DRAFTED *is* the deferral state (§7/G1)│
+   │                                                                                       ▼
+   │                                                        both §1 checks green ──▶ SEALED (immutable)
+   │                                                                                       │
+   └───────────────────────────────────────────────── new decision goal ◀── superseded_by ──┘
+```
+
+- Guard `ABSENT→DRAFTED`: S-PROBE `verified`. Never earlier — a brief without a probe is a
+  prompt to guess.
+- Guard `DRAFTED→DECIDED`: founder authorship. Any other actor writing this line is a
+  capability-escalation attempt, not a shortcut.
+- Guard `DECIDED→SEALED`: both §1 commands exit 0.
+- No edge out of `SEALED` (X3). Reversal leaves via `superseded_by` into a new goal.
+
+### SM-2 — Gate goal lattice (`kind=decision`, K4 §3)
+
+```
+declared ──────────────────────────────────────────────▶ verified ──K8 Integrator──▶ integrated
+   │   entry: schema-valid Goal exists                      │  entry: evidence_spec satisfied
+   │                                                        │  by LIVE evidence, no live refutation
+   │                                                        │  (= I5 Evidence + both §1 checks)
+   └──founder withdrawal (recorded)──▶ abandoned            └──probe head moves──▶ T1 regression
+```
+
+`speculated`/`executed` are skipped legally: K4 §3.2 permits skipping intermediate states
+when a later state's conditions already hold, and a decision goal has no `class=execution`
+evidence to enter `executed` with. `provisional` is **forbidden** here — X4 restricts it to
+`kind=amendment`. Note the consequence: the founder's `PROCEED` is *not* provisional and
+carries no armed falsifier of its own; the falsifier lives downstream in `T-ROUNDTRIP`
+(`--assert-loss-ratio 0`). That asymmetry is why I2 prose §6 is mandatory.
+
+### SM-3 — S1 implementation subgraph, gated
+
+```
+                                     ┌── decision: PROCEED ──▶ RELEASED
+                                     │      F-EXTRACT-FIX · I-STORE · I-OUTBOX dispatchable
+   BLOCKED_ON_GATE ──────────────────┤      → I-EXTRACT · I-INGEST → T-ROUNDTRIP → M-S1
+     (all S1 implementation nodes)    │
+                                     └── decision: REVERT ───▶ ABANDONED
+                                            + Goal(kind=amendment) reverting SAEOS-1 (§7)
+                                            + disposition recorded for the pre-gate
+                                              artifacts of F-ENVELOPE / F-BUNDLE (§7/G3)
+
+   NOT GATED (run pre-decision, by design): S-PROBE (w0) · F-ENVELOPE (w0) · F-BUNDLE (w1)
+```
+
+---
+
+## 7. Intent-conservation audit (no orphan, no gap)
+
+**Deliverable → component coverage.** Every clause of the objective lands somewhere:
+
+| Objective clause | Where discharged |
+|---|---|
+| "A recorded founder decision (ledger entry)" | C4 / I2; path pinned by check 2 |
+| "PROCEED or REVERT" | I2 `decision:` enum + MUST rules 1–2 |
+| "citing the S-PROBE loss ratio" | I2 `loss_ratio_cited` + `probe_hash` + prose §2 |
+| "on S-PROBE evidence" | I1 read-only surface; I5 `read_set` binds the probe head |
+| "A4 go/no-go on the S1 build" | I4 release/abandon over the cut vertex; SM-3 |
+| SAEOS-1 §7 falsifier on NO-GO | C9; I2 MUST rule 5 (`terminal: amendment_ref`) |
+
+**Consumer → producer coverage.** Every node naming `G-S1-GO` in `deps`
+(`F-EXTRACT-FIX`, `I-STORE`, `I-OUTBOX`) is an edge out of I4. No dangling dependent; no
+component in §3 is unreachable from C1 or unread by C6/C7.
+
+**Gaps found and closed inside this design:**
+
+- **G1 — no legal "not yet".** The ratified `decision:` enum is binary, but the kernel
+  lattice admits `abandoned` (withdrawal) and the founder may legitimately need more
+  evidence. Closed by SM-1: deferral is the `DRAFTED` state — record present, `decision:`
+  line absent, checks red, REMAND to S-PROBE. An unfinished record is a *deliberate* state,
+  not a stalled node, and must not be mistaken for one.
+- **G2 — change of mind.** Closed by I2 MUST rules 1 and 3: exactly one `decision:` line
+  ever; reversal is a new goal + `superseded_by`. (Two `decision:` lines would satisfy check
+  2 while making the record ambiguous — a live way to pass the gate with an unreadable
+  verdict.)
+- **G3 — REVERT disposition of pre-gate work.** `F-ENVELOPE` and `F-BUNDLE` complete before
+  the gate; on `REVERT` their artifacts are sunk. Closed by requiring C9 to record an
+  explicit disposition (retain-as-evidence, per SAEOS-1 §10's "nothing is deleted", or
+  tombstone) rather than leaving frozen schemas orphaned in the tree.
+- **G4 — silent continuation on stale evidence.** Closed by I5's `read_set` including the
+  probe: a revised probe kills liveness and regresses the gate (T1) instead of leaving an
+  old authorisation standing.
+
+**Gaps found that cannot be closed at DESIGN** — routed, not swallowed (§10).
+
+---
+
+## 8. Assumptions surfaced (PAEOS-6)
+
+Register discipline per `reviews/6-hidden-assumptions.md`: an assumption is listed only if
+its falsity invalidates part of this design. Each carries a falsifier.
+
+- **A1 — S-PROBE has run and produced all four accept-checked fields.**
+  *Status: FALSE as of 2026-08-08* — `reviews/spikes/sakg-s1-extraction-probe.md` does not
+  exist (`reviews/spikes/` holds only `DEBT-0002-spawnability-spike.md`). The gate is
+  therefore currently at SM-1 `ABSENT` with no admissible evidence.
+  *Falsifier / consequence:* until the probe exists, any recorded `decision:` is
+  evidence-free — vacuous by CANARY-0002's own criterion (identical result whether the
+  evidence exists or not) and a K1 violation in spirit. The design's response is G1
+  deferral, never a guess.
+
+- **A2 — the probe's `loss_ratio` can express the outcomes the gate must be able to act on.**
+  *Falsified for the worst case.* S-PROBE's own accept regex is
+  `^loss_ratio: 0\.[0-9]+$`. Verified: `0.0` matches, `0.99` matches, **`1.0` does not**,
+  bare `0` does not. A probe finding *total* extraction loss — precisely the NO-GO the D7
+  falsification test exists to detect — **cannot mechanically satisfy the node that is
+  supposed to report it.** The probe author is pushed toward `0.99` or toward leaving
+  S-PROBE unverified, so the evidence channel is biased against its own kill switch.
+  *Falsifier:* run `printf 'loss_ratio: 1.0\n' | rg -q '^loss_ratio: 0\.[0-9]+$'` → exit 1.
+  *Routed:* §10.1. This design does not modify the ratified accept spec.
+
+- **A3 — a "fatal" loss-ratio threshold exists somewhere in the corpus.**
+  *False.* Neither SAEOS-1 §7/§10-D7 nor `backlog/SAKG-1-backlog.yaml` states one; both
+  defer to founder judgment. This design deliberately does not supply one (CER-5) and
+  instead makes the threshold a **required record field** (`fatal_threshold_applied`).
+  *Falsifier:* a ratified clause fixing a numeric threshold → the field becomes a
+  cross-check against that clause instead of a disclosure of taste.
+
+- **A4 — the two verdicts have symmetric constitutional weight.** *False, and load-bearing.*
+  `PROCEED` closes no rule class → K7 `oneoff_record`, which is exactly Ω-27's shadow-
+  common-law surface (one-offs are cheaper than amendments, are not Policy, and so never
+  load into compiled contexts). `REVERT` alters a ratified specification → it **must** be an
+  `amendment_ref`. *Falsifier:* a `REVERT` recorded with `terminal: oneoff_record` — a
+  ratified spec silently reverted without an amendment, i.e. the runtime legislating.
+
+- **A5 — `PROCEED` is a commitment to S1.** *False.* It is a budget release. `T-ROUNDTRIP`'s
+  `--assert-loss-ratio 0` and the declared kill switches still stand behind it, and M-S2's
+  own rationale states continuation is a fresh decision. *Falsifier:* any downstream node
+  citing this record as authority to skip `T-ROUNDTRIP` or to enter S3–S6.
+
+- **A6 — the gate verifier discriminates sound from unsound decisions.** *False by
+  construction* (Ω-14, H2 parchment). Check 1 in particular passes on any `.md` in the
+  sub-ledger containing the literal gate id. *Mitigation, not fix:* `probe_hash` +
+  `loss_ratio_cited` make the *citation* mechanically checkable even though the *judgment*
+  is not. *Falsifier:* a record whose `loss_ratio_cited` differs from the probe's value, or
+  whose `probe_hash` does not match the probe's content, and that still passes the gate —
+  which it will today, hence §10.2.
+
+- **A7 — founder channel capacity absorbs this decision.** Ω-22: the `decisions` budget
+  dimension is the A4 bandwidth gauge. This gate spends 1 unit at the head of the critical
+  path. *Falsifier:* chronic `decisions` exhaustion — the overdemand alarm; the failure mode
+  is silent starvation (the gate sits at `DRAFTED` indefinitely), not a loud block.
+
+- **A8 — the accept commands run from repo root, in a shell where a non-matching glob fails
+  non-zero, with `rg` on PATH and `ledger/` not ignored.** *Verified today* (§1 table).
+  *Falsifier:* a runner that `cd`s elsewhere, or `set +o nomatch` semantics that pass the
+  literal glob through — both reduce check 1 to a different assertion than intended.
+  `ledger/debt/DEBT-0023.md` already records this gate losing a deliverable to precisely a
+  path/scope mismatch, so the environment assumption is scarred, not theoretical.
+
+---
+
+## 9. Perspectives covered (the seven L09 stances)
+
+- **Builder.** The act is mechanical: create `ledger/decisions/`, write `README.md` and the
+  I2 record, keep `decision:` at column 0 with nothing after the literal, run the two §1
+  commands. Zero ambiguity left for the actor who performs it.
+- **Architect.** The gate is a cut vertex over all S1 implementation, one-way, with a single
+  human edge in each direction. It grants no authority to the runtime and mints no evidence
+  the founder did not author — consistent with SAKG's own non-authority posture (SAEOS-1
+  §3.3), applied here to the gate rather than to the graph.
+- **Risk Officer.** Live exposures, all surfaced not buried: A2 (the kill switch's own
+  regex cannot express total loss), A3 (no threshold), A4/Ω-27 (`PROCEED` as one-off),
+  G3 (sunk pre-gate schema work on `REVERT`), A6 (shape-only verification).
+- **Performance.** One `decisions` unit; zero compute. Because the gate heads the critical
+  path, total S1 latency is dominated by founder wall-clock — the queue to optimise is A4
+  attention, not execution.
+- **Security.** Only the founder may author `decision:` (K4 §2.6 `class=external ⟹
+  author.actor=founder`). A non-founder actor writing it is a capability-escalation attempt
+  and belongs in the quarantine class, not the remand class. Enforcement against the
+  sovereign remains detection + convention (H2) — hence the emphasis on *recorded,
+  hash-pinned citation* over unenforceable prohibition.
+- **Replay.** `probe_hash` + `loss_ratio_cited` + `decided_at` + I5's `read_set` let an
+  auditor reconstruct exactly what evidence state was in front of the founder. The judgment
+  is not reproducible; the *inputs to it* are, which is the strongest replay property
+  available at an A4 gate.
+- **Maintainer.** Exactly one `decision:` line, ever; append-only; reversal by supersession;
+  a `README.md` establishing the sub-ledger convention so the next decision record does not
+  re-invent the shape (this is the first entry in `ledger/decisions/`).
+
+---
+
+## 10. Findings routed outside this write scope
+
+Each is a real defect in something this stage may not write (`design/` only). None is
+silently absorbed; none blocks the design.
+
+1. **S-PROBE's `loss_ratio` regex cannot express total loss (A2).** Owner: the backlog
+   node's accept spec (`backlog/SAKG-1-backlog.yaml`). Suggested minimal amendment:
+   `^loss_ratio: (0(\.[0-9]+)?|1(\.0+)?)$`. Because this changes a ratified evidence spec,
+   it is a CER-2 Improvement Proposal (`proposals/PAEOS-IP-NNNN.md`) plus a founder
+   ratification — not a runtime edit.
+2. **Check 1 is low-discrimination (A6).** Suggested *tightening* (legal direction per D2 —
+   constraints tighten only) as a third accept command, cross-checking the citation against
+   the probe rather than trusting it:
+   `rg -q "^loss_ratio_cited: $(rg -N -o '(?<=^loss_ratio: ).*' reviews/spikes/sakg-s1-extraction-probe.md)$" ledger/decisions/SAKG-1-G-S1-GO.md`
+   Owner: same as (1) — it edits the backlog's accept list.
+3. **`ledger/decisions/README.md` does not exist.** The sub-ledger has no stated convention;
+   `ledger/debt/README.md` is the precedent to mirror (naming, required fields, index).
+   Owner: the founder act in §11, which is the first writer of that directory.
+4. **DEBT-0023 remains OPEN** and names this exact gate's write path. Its long-term fix
+   (`infer_write_scopes` from declared deliverables) is the durable guard against the
+   record being authored and then discarded as out-of-scope. Owner: `runtime/selfhost.py`.
+
+---
+
+## 11. Handoff — the exact founder act this design enables
+
+The gate's two accept commands are **red today and stay red until the founder acts**; this
+stage neither can nor should turn them green (a PLANNER writing `decision:` would be the
+runtime legislating, CER-5). Ordered handoff:
+
+1. **Blocked on S-PROBE** (A1): `reviews/spikes/sakg-s1-extraction-probe.md` must exist and
+   satisfy its four accept commands. Note A2 before authoring it: a total-loss finding
+   cannot pass that node's own regex as ratified.
+2. `mkdir -p ledger/decisions` and write `ledger/decisions/README.md` (mirror
+   `ledger/debt/README.md`: purpose, naming `ledger/decisions/<BACKLOG>-<NODE>.md`, required
+   fields = the I2 frontmatter, append-only + supersession rule, index).
+3. Runtime compiles the Decision Brief into `ledger/decisions/SAKG-1-G-S1-GO.md` **without**
+   a `decision:` line (SM-1 `DRAFTED`): frontmatter minus `decision:`, prose §§2, 4, 5, 6,
+   options and — at most — a recommendation (K4 §2.5 `payload(decision)`).
+4. **Founder** writes the single line `decision: PROCEED` or `decision: REVERT` (column 0,
+   nothing else on the line), fills prose §3 in their own words, and sets
+   `fatal_threshold_applied` and `terminal` per I2 MUST rule 5.
+5. Verify: both §1 commands exit 0.
+6. `REVERT` only: spawn `Goal(kind=amendment)` reverting SAEOS-1 per §7, set
+   `terminal: amendment_ref: <goal-id>`, mark the S1+S2 subgraph `abandoned`, and record the
+   G3 disposition for the `F-ENVELOPE`/`F-BUNDLE` artifacts.
+7. Either verdict: L17 Constitutional Review (CER-4) — the gate is a completed task.
+
+---
+
+## Evidence: `design_coherent`
+
+- **Assumptions surfaced (PAEOS-6):** §8, A1–A8, each with a falsifier. Three are *already
+  false or falsified* and stated as such rather than assumed away: A1 (the probe does not
+  exist yet), A2 (the probe's own regex cannot express total loss — verified by execution),
+  A3 (no fatal threshold exists in the corpus). A4 corrects a symmetry the objective's
+  phrasing invites but K7 forbids.
+- **Perspectives covered:** §9 — all seven L09 stances (Builder, Architect, Risk Officer,
+  Performance, Security, Replay, Maintainer), each with a concrete finding rather than an
+  assertion of coverage.
+- **No orphan / no gap:** §7 — every objective clause maps to a component; every node
+  naming `G-S1-GO` in `deps` is an edge out of I4; no §3 component is unreachable or
+  unread. Four gaps (G1 no-legal-deferral, G2 change-of-mind ambiguity, G3 REVERT sunk-cost
+  disposition, G4 stale-evidence continuation) were found and closed *within* the design;
+  four defects outside this write scope are routed with owners in §10 rather than absorbed.
+- **Constraints tightened only (D2):** the ratified accept spec is reproduced unchanged;
+  every addition (frontmatter fields, MUST rules, the §10.2 third check) tightens.
+- **CER-5 honoured:** the design specifies the decision's *shape*, evidence binding, and
+  consequences, and supplies **no verdict and no threshold**. Both remain the founder's.
+
+Design is coherent and complete for handoff to the founder act (§11), which is the only
+actor that can turn the gate's acceptance commands green.

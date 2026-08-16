@@ -1,0 +1,31 @@
+# PAEOS TRADEOFF Stage Output
+
+**Goal Signature:** `g-l06-tradeoff-instantiation`
+**Role:** PLANNER
+
+## Synthesis and Intake Generation
+Based on the provided research and critique outputs, the optimal approach to advance PAEOS toward canonical 19-layer self-hosting has been determined to be the instantiation of L06 (Trade-off Analysis).
+
+The critique correctly highlighted that while L06 is valid and necessary, it immediately requires L07 (Mitigation) to be built right after to prevent the corruption of L08 (Design).
+
+I have synthesized this debate into the intake payload and written a valid JSON array containing exactly one Intake JSON object to `ops/backlogs/ade_intake.json` within the sandboxed workspace.
+
+### Intake Payload (`ops/backlogs/ade_intake.json`)
+```json
+[
+  {
+    "objective": "Instantiate L06 (Trade-off Analysis) to advance PAEOS toward canonical 19-layer self-hosting. Note that L07 (Mitigation) must be built immediately after this to avoid corrupting L08 (Design).",
+    "changed_paths": [
+      "kernel/l06_tradeoff.py"
+    ],
+    "plan_write_scopes": [
+      "kernel/l06_tradeoff.py",
+      "tests/test_l06_tradeoff.py"
+    ],
+    "builder_evidence": "pytest tests/test_l06_tradeoff.py",
+    "goal_signature": "g-l06-tradeoff-instantiation",
+    "verifiable": true,
+    "reversible": true
+  }
+]
+```

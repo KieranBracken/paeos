@@ -1,0 +1,520 @@
+# DESIGN — SAKG universal node envelope schema + fixture corpus (`F-ENVELOPE`)
+
+| | |
+|---|---|
+| **Artifact** | System design for `sakg/schema/envelope.schema.json` and `tests/sakg/fixtures/envelope/**` |
+| **Backlog node** | `SAKG-1 / F-ENVELOPE` — *Freeze the universal node envelope schema + fixture corpus* (`backlog/SAKG-1-backlog.yaml` L91–L108) |
+| **Clause authority** | `SAEOS-1 §4.2` (envelope), `§4.3` (twelve types), `K4 §2` (kernel store/header conventions); supporting: `§3.3`, `§4.4`, `§5.1`, `§6.1b`, `§7`, `×5`, `Δ6`, `Ω4`, `Ω5`, `✓7`, `✓8` |
+| **Stage / Role** | `DESIGN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | DESIGN ONLY — no implementation. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-09 |
+| **Required evidence** | `design_coherent` — assumptions surfaced (PAEOS-6), perspectives covered, no orphan/gap. |
+
+---
+
+## 0. Scope boundary (read first)
+
+This worker session is **PLANNER @ DESIGN** with write-capability limited to `design/` and
+read-capability limited to `constitution/ spec/ design/ reviews/ ledger/ backlog/ docs/
+architecture/ operations/`. The F-ENVELOPE deliverables name three write targets that this
+stage **does not and must not produce**:
+
+1. `sakg/schema/envelope.schema.json` — a `sakg/`-tree write, owned by **BUILDER @ IMPLEMENT**.
+2. `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` — a `tests/`-tree write, same owner.
+3. `tests/sakg/test_envelope_schema.py` — implied by the accept command; same owner.
+
+Running the four `accept` commands is likewise **VERIFY**-stage work: they presuppose the
+artifacts exist. Running them now would fail and would misrepresent verification evidence as
+design output. The four-tuple transition contract (PAEOS-7.6 §4) exists to keep these powers
+separated.
+
+This document is therefore the **hand-off spec**: it specifies the schema field-by-field, the
+fixture corpus file-by-file, and the test module assertion-by-assertion, at a precision where
+IMPLEMENT is mechanical and VERIFY runs the accept commands unchanged. Evidence emitted by
+this session is `design_coherent` (this file) — **not** the F-ENVELOPE accept evidence.
+
+**Gate authorization.** `G-S1-GO` states *"No implementation node may start before this gate."*
+F-ENVELOPE is `wave: 0`, `deps: []`, `actor: fable`, `role: Planner` — a contract-freeze node
+and one of the two declared `roots: [S-PROBE, F-ENVELOPE]` (backlog L533). Designing it now is
+authorized; it is not an implementation node, and `ledger/decisions/` does not yet exist.
+
+---
+
+## 1. Component graph
+
+The envelope schema is a **single file, one `$id`, three referenceable subschemas**. It is the
+root contract of SAKG-1: four downstream backlog nodes `$ref` it and none of them may restate
+its field set.
+
+```mermaid
+flowchart TB
+    subgraph FILE["sakg/schema/envelope.schema.json — $id: sakg://schema/envelope/v1.0.0"]
+        ROOT["ROOT = stored envelope<br/>(the node as the graph holds it)"]
+        ING["$defs/ingest_envelope<br/>$anchor: ingest-envelope<br/>(what a producer may emit)"]
+        CORE["$defs/envelope_core<br/>(all §4.2 fields, shapes + ranges)"]
+        PRIM["$defs/ — node_id · node_type · namespace · timestamp<br/>sha256 · origin_ref · evidence_ref_id<br/>facets · coordinates · status · confidence"]
+        STATE["$defs/state_invariants<br/>(allOf of 4 if/then blocks, one per status)"]
+    end
+
+    CORE --> PRIM
+    ROOT -->|allOf| CORE
+    ROOT -->|allOf| STATE
+    ING  -->|allOf| CORE
+    ING  -->|"not: required[confidence]"| CORE
+    ING  -->|"const: status = candidate"| CORE
+
+    subgraph FIX["tests/sakg/fixtures/envelope/"]
+        MAN["MANIFEST.json — fixture → {profile, verdict, clause, expected keyword+path}"]
+        VAL["valid/*.json  (15)"]
+        INV["invalid/*.json (15)"]
+    end
+
+    TEST["tests/sakg/test_envelope_schema.py"]
+    TEST --> FILE
+    TEST --> MAN
+    MAN --> VAL
+    MAN --> INV
+
+    BUNDLE["F-BUNDLE — bundle.schema.json"] -->|"$ref #ingest-envelope"| ING
+    STORE["I-STORE — sakg/store.py"] -->|"validates writes vs ROOT"| ROOT
+    INGEST["I-INGEST — sakg/ingest.py"] -->|"validates reads vs #ingest-envelope"| ING
+    PROJ["F-PROJ — projection.schema.json"] -->|"node_summary $refs label+summary+id"| CORE
+```
+
+**Placement rationale.**
+
+- **One file, not three.** `envelope.schema.json` is named by the accept command (`json.loads`
+  on exactly that path). Splitting profiles across files would force `$ref` resolution across
+  file boundaries in every consumer and give three things to version instead of one.
+- **Root = stored envelope.** §4.2 describes the node *as the graph holds it* (`confidence` is
+  present and derived). Making the root the stored form means a naive `validate(doc, schema)`
+  by any future consumer checks the strongest form. The ingest profile is the deliberate
+  relaxation, reached only by explicit `$ref`.
+- **`MANIFEST.json` sits at `fixtures/envelope/`, not inside `valid/` or `invalid/`.** The
+  accept commands glob `valid/*.json` and `invalid/*.json`; a manifest inside either directory
+  would inflate those counts with a non-fixture. Placement is load-bearing, not cosmetic.
+- **No orphan:** every `$defs` entry in §2.2 is reached from `ROOT` or `#ingest-envelope`;
+  every fixture is reached from `MANIFEST.json`; the test asserts both directions (§6.4).
+
+---
+
+## 2. Interface contract — the schema
+
+### 2.1 Header
+
+```
+$schema : "https://json-schema.org/draft/2020-12/schema"     # draft 2020-12, per deliverable
+$id     : "sakg://schema/envelope/v1.0.0"
+title   : "SAKG universal node envelope"
+type    : "object"
+additionalProperties : false                                  # closed — see §2.4 D-4
+```
+
+Consumers `$ref` by anchor: `sakg://schema/envelope/v1.0.0#ingest-envelope`. Because the `$id`
+is a non-dereferenceable URI, every consumer must load the file into a local
+`referencing.Registry` keyed by that `$id` (IMPLEMENT note, §8 step 7).
+
+### 2.2 Field table — every §4.2 field, no additions, no omissions
+
+| §4.2 field | JSON type | Required (stored) | Required (ingest) | Constraint |
+|---|---|---|---|---|
+| `id` | string | ✔ | ✔ | `$defs/node_id`: `^sakg://(?<ns>[a-z0-9][a-z0-9._-]{0,62})/(?<t>Decision\|Problem\|Option\|Constraint\|Objective\|TradeOff\|Mechanism\|Pattern\|Component\|Outcome\|Scar\|EvidenceRef)/(?<ulid>[0-7][0-9A-HJKMNP-TV-Z]{25})$` |
+| `type` | string | ✔ | ✔ | `$defs/node_type`: `enum` of the **12** §4.3 names, verbatim TitleCase. Closed at v1. |
+| `namespace` | string | ✔ | ✔ | `$defs/namespace`: `^[a-z0-9][a-z0-9._-]{0,62}$` (ProjectRef; tenancy boundary, Ω5) |
+| `facets` | object | ✔ (may be `{}`) | ✔ (may be `{}`) | `propertyNames: ^[a-z][a-z0-9]*(\.[a-z][a-z0-9_]*)+$`; `additionalProperties: {type: object}`. Payloads **unvalidated** — see D-2. |
+| `label` | string | ✔ | ✔ | `minLength: 1`, `maxLength: 120` |
+| `summary` | string | ✔ | ✔ | `minLength: 1`, **`maxLength: 280`** (§4.2, SUMMARY-tier projection unit, Ω3) |
+| `provenance` | object | ✔ | ✔ | `$defs/provenance`, `additionalProperties: false`, required `[origin, author_kind, ingested_at, source_hash]` |
+| `provenance.origin` | object | ✔ | ✔ | `$defs/origin_ref`: `{system: string 1..64, goal_id: string\|null, run_id: string\|null}`, all three required, closed; **`anyOf`**: `goal_id` is a string **or** `run_id` is a string (an origin that identifies neither run nor goal is not provenance) |
+| `provenance.author_kind` | string | ✔ | ✔ | `enum: [human, agent, ingest, inferred]` — closed |
+| `provenance.ingested_at` | string | ✔ | ✔ | `$defs/timestamp` |
+| `provenance.source_hash` | string | ✔ | ✔ | `$defs/sha256`: `^sha256:[0-9a-f]{64}$` |
+| `evidence` | array | ✔ (may be `[]`) | ✔ (may be `[]`) | `items: $defs/evidence_ref_id` = `^sakg://<ns>/EvidenceRef/<ulid>$`; `uniqueItems: true`. **Strings only — never objects** (§3.2.3 / §3.3.3: references, never copies) |
+| `status` | string | ✔ | ✔ | `enum: [candidate, canonical, superseded, refuted]` — **closed, 4 members, no `deleted`** |
+| `confidence` | number | ✔ | **forbidden** | `minimum: 0.0`, `maximum: 1.0`. Derived, never authored (Δ6) — see §2.3 |
+| `valid_from` | string | ✔ | ✔ | `$defs/timestamp` |
+| `valid_until` | string \| null | ✔ (nullable) | ✔ (nullable) | `oneOf: [$defs/timestamp, {type: null}]`; `null` = open window, decay policy applies (Ω4) |
+| `falsifier` | string \| null | ✔ (nullable) | ✔ (nullable) | `oneOf: [{type: string, minLength: 1, maxLength: 500}, {type: null}]` (Ω4, K6) |
+| `coordinates` | object | ✔ (may be `{}`) | ✔ (may be `{}`) | `propertyNames: ^[a-z][a-z0-9_]*$`; values `{type: array, items: {type: string, minLength: 1, maxLength: 64}, uniqueItems: true}` — **flat, multi-valued, never hierarchical** (✓8) |
+
+`$defs/timestamp` := `{type: string, format: date-time, pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"}` — RFC 3339, **UTC `Z` only**. The `pattern` is normative; `format` is annotation-only in most validators and cannot be relied on alone.
+
+Eighteen rows — seventeen leaf fields plus the `provenance` container — and every §4.2 line is
+accounted for exactly once. **No field outside §4.2 is added
+to the envelope.** Extension goes through `facets` — the mechanism §4.3 reserves for exactly
+this (✓7).
+
+### 2.3 Invariant enforcement map
+
+The §4.2 invariants are the point of this node. Each is placed at exactly one enforcement layer,
+and the layer is stated rather than assumed.
+
+| # | §4.2 invariant | Mechanism | Layer | Fixture |
+|---|---|---|---|---|
+| **INV-1** | `confidence` is **derived, never authored** (Δ6) | `#ingest-envelope` applies `not: {required: [confidence]}`. Root requires it. Producers can only emit through the ingest profile (§6.1b), so every stored `confidence` is necessarily store-computed. | schema (ingest profile) + I-STORE single-writer (K8) | `X-01`, `V-15` |
+| **INV-2** | `candidate → canonical` requires an **evidence binding**, never a frequency threshold (×5) | `if {status: {const: canonical}} then {evidence: {minItems: 1}}`. The reserved facet `sakg.core.review_priority` is *legal* and carries frequency counters, but confers nothing. | schema (state invariant) + I-INGEST transition rule | `X-03`, `V-09` |
+| **INV-3** | A node whose `falsifier` is observed transitions to `refuted`; refuted nodes are **retained** (✓1, FPL-2) | `if {status: {const: refuted}} then {required: [falsifier], falsifier: {type: string}, valid_until: {type: string}}` — a refuted node is a complete, retained node with a non-null falsifier and a closed window. | schema (state invariant) | `X-09`, `V-04` |
+| **INV-4** | **Nothing is ever deleted; supersession only** (✓4) | Two teeth: `status` enum is closed at 4 (no `deleted`), and root `additionalProperties: false` rejects any tombstone field (`deleted_at`, `tombstone`, `is_deleted`). Deletion is unrepresentable. | schema (closed enum + closed object) | `X-04`, `X-05`, `V-03` |
+| **INV-5** | `superseded` implies a closed validity window | `if {status: {const: superseded}} then {valid_until: {type: string}}` | schema (state invariant) | `X-10`, `V-03` |
+| **INV-6** | Confidence recomputation **propagates** along `derived_from` and `supports` edges (the L2 IT-05 obligation) | **Not single-document expressible.** A JSON document shows one node; propagation is a graph operation. | **carried gap G-2** → I-STORE (edges) and Slice S3 (Truth Maintenance, Ω2) | — |
+| **INV-7** | `id`'s embedded `<namespace>`/`<type>` segments agree with the `namespace`/`type` fields (Ω5 tenancy) | **Not expressible in JSON Schema** — draft 2020-12 has no cross-field comparison. | **carried gap G-1** → I-STORE validator | `X-15` (gap-pinned) |
+
+Gaps G-1 and G-2 are pinned by tests rather than hidden: see §6.4 assertion A6 and §5 gap table.
+
+### 2.4 Design decisions and rejected alternatives
+
+| # | Decision | Rejected alternative | Why |
+|---|---|---|---|
+| **D-1** | The `id` type segment is the **verbatim** `type` enum value (`sakg://paeos/TradeOff/01J…`). | snake_case segment (`trade_off`) with a frozen TitleCase↔snake_case mapping table. | An identifier that requires a transform to relate to its own field creates a second source of truth and a case-folding defect surface. Mixed case is legal in an RFC 3986 path segment, and SAKG ids are opaque identifiers, not URLs. Cost accepted: G-1 still needs a store-level equality check either way. |
+| **D-2** | Facet **payloads are unvalidated** at v1; only facet *names* are constrained. | Per-node-type facet schemas inside `envelope.schema.json`. | ✓7's stated purpose is "extension without schema surgery"; §4.3 requires only *namespace registration* for new facets. Validating payloads here would re-import the ontology-inflation failure (Δ4) into the one file that must stay stable. Per-type facet contracts are S4 scope. |
+| **D-3** | `evidence` holds **EvidenceRef node ids (strings)**, not inline objects and not `{ref, role}` pairs. | `evidence: [{ref, role: supports\|refutes\|measures}]`. | Polarity already exists as the §4.4 Evidential edge family (`supported_by`, `contradicted_by`, `measured_by`). A parallel role field would be a second, un-reconciled encoding of the same fact. Strings also make §3.3.3 ("no evidence minting") a *type* error, not a review finding. |
+| **D-4** | Root and every nested object are `additionalProperties: false`. | Open objects with `unevaluatedProperties` warnings. | A closed envelope is what makes INV-4 structural: tombstones and smuggled fields are rejected by construction. The escape hatch is `facets`, which is open by design. |
+| **D-5** | `source_hash` is **prefixed** (`sha256:<64 hex>`). | Bare 64-hex. | Self-describing, gives algorithm agility without a schema change, and matches the content-addressing discipline of K4 §2.1. |
+| **D-6** | Ingest profile pins `status: {const: candidate}`. | Allow any status on ingest. | §6.1b: *"Nodes land as `candidate`."* A producer that could emit `canonical` would route around INV-2 — the ×5 poisoning surface. |
+| **D-7** | Supersession is an **edge** (`supersedes`, §4.4 Temporal), not an envelope field. | A `superseded_by` field on the envelope. | §4.4 already owns lineage; duplicating it in the envelope would create two places to break the retention guarantee. `V-03` therefore carries no successor pointer, and that is correct. |
+
+---
+
+## 3. Data flow
+
+Where an envelope is created, mutated, validated, and read — and which profile applies at each
+hop. The two ✅ gates are **mandatory**; they are the whole enforcement surface for INV-1.
+
+```mermaid
+flowchart LR
+    A["PAEOS goal seals<br/>L15/L16"] --> B["I-OUTBOX<br/>runtime/emission/outbox.py<br/>(no sakg import)"]
+    B --> C["Emission Bundle<br/>F-BUNDLE, append-only outbox"]
+    C -->|"pull, never push"| D{"✅ GATE 1<br/>validate vs<br/>#ingest-envelope"}
+    D -->|reject| E["ingest defect<br/>recorded, node dropped"]
+    D -->|accept| F["I-INGEST stamps derived fields:<br/>confidence ← derivation policy<br/>ingested_at ← now<br/>status ← candidate (already pinned)"]
+    F --> G{"✅ GATE 2<br/>validate vs ROOT<br/>(stored profile)"}
+    G -->|accept| H["I-STORE append-only write<br/>namespace-partitioned"]
+    H --> I["S3 Truth Maintenance<br/>confidence recompute<br/>→ re-validate vs ROOT"]
+    I --> H
+    H --> J["F-PROJ projection read<br/>node_summary = {id, label, summary}<br/>tier SUMMARY, trust untrusted"]
+```
+
+**Field lifecycle.** Which actor may write which field, and when:
+
+| Field | Producer (ingest) | I-INGEST | I-STORE / S3 recompute | Ever mutated after write? |
+|---|---|---|---|---|
+| `id`, `type`, `namespace` | writes | — | — | never (identity) |
+| `label`, `summary`, `facets`, `coordinates` | writes | — | — | never — a change is a **new node + `supersedes` edge** (D-7) |
+| `provenance.*` | writes `origin`, `author_kind`, `source_hash` | writes `ingested_at` | — | never |
+| `evidence` | writes (may be `[]`) | — | appends on evidence binding | append-only |
+| `status` | pinned `candidate` (D-6) | — | transitions per §4 | yes, per §4 table only |
+| `confidence` | **forbidden** (INV-1) | writes initial derived value | recomputes | yes, by recompute only |
+| `valid_from` | writes | — | — | never |
+| `valid_until` | writes (usually `null`) | — | closes on supersede/refute | `null → timestamp` only |
+| `falsifier` | writes (may be `null`) | — | — | never |
+
+**Data-flow completeness.** Every field in §2.2 has exactly one writer at each stage and at
+least one reader (GATE 1/2, or F-PROJ's `node_summary`). No field is produced and never
+consumed; no field is consumed and never produced. That is the "no gap" check for §3.
+
+---
+
+## 4. State machine — the `status` lattice
+
+The envelope schema pins the **state space** and the **per-state well-formedness invariant**.
+The **transition relation** is not expressible in a single-document schema (a document shows
+one state, never a pair) and is therefore frozen here as the normative input to `I-INGEST` and
+`I-STORE`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> candidate : ingest (§6.1b — the ONLY entry point)
+    candidate --> canonical : T1 · evidence binding (≥1 EvidenceRef)
+    candidate --> refuted : T2 · falsifier observed
+    candidate --> superseded : T3 · a newer node supersedes it
+    canonical --> superseded : T4
+    canonical --> refuted : T5 · falsifier observed
+    superseded --> refuted : T6 · later shown false
+    refuted --> [*] : terminal — RETAINED, never deleted
+```
+
+**Legal transitions.**
+
+| # | From → To | Precondition | Effect on fields |
+|---|---|---|---|
+| T1 | `candidate → canonical` | ≥1 `EvidenceRef` bound. **Frequency counters are never a precondition** (×5, INV-2). | `evidence` non-empty; `confidence` recomputed |
+| T2 | `candidate → refuted` | `falsifier` non-null **and observed** | `valid_until` ← observation time |
+| T3 | `candidate → superseded` | an incoming `supersedes` edge exists | `valid_until` ← supersession time |
+| T4 | `canonical → superseded` | as T3 | as T3 |
+| T5 | `canonical → refuted` | as T2 | as T2 |
+| T6 | `superseded → refuted` | as T2 | as T2 |
+
+**Forbidden transitions** (I-STORE validator; each closes a named failure):
+
+| Forbidden | Why |
+|---|---|
+| `* → candidate` | Demotion to candidate would erase an evidence binding. De-canonicalization is `refuted` or `superseded`, never a rewind. |
+| `superseded → canonical`, `refuted → canonical` | Resurrection. A reversal is a **new node** that `supersedes` the old one (D-7, ✓4). |
+| `refuted → *` | `refuted` is terminal at v1 — it is the retained, high-value record (FPL-2). |
+| `* → deleted` | No such state exists (INV-4). Unrepresentable, not merely forbidden. |
+| any transition into `canonical` justified by counters | ×5 in one line. Frequency raises **review priority** only (facet `sakg.core.review_priority`). |
+
+**Per-state well-formedness** (this part *is* in the schema, as `allOf` of four `if/then`):
+
+| State | Schema-enforced invariant | Rationale |
+|---|---|---|
+| `candidate` | no extra constraint; `evidence` may be `[]` | candidates are unproven by definition (✓6) |
+| `canonical` | `evidence: {minItems: 1}` | INV-2 |
+| `superseded` | `valid_until: {type: string}` (non-null) | INV-5 — a superseded node with an open window is incoherent |
+| `refuted` | `falsifier: {type: string}` **and** `valid_until: {type: string}` | INV-3 — you can only be refuted against a stated falsifier |
+
+Every state has an entry (ingest for `candidate`; T1–T6 for the rest) and an exit (`refuted` is
+the intentional terminal, and its exit is *retention*, not deletion). No unreachable state, no
+state without an invariant.
+
+---
+
+## 5. Fixture corpus — file-by-file specification
+
+Directory layout (the accept globs depend on it exactly):
+
+```
+tests/sakg/fixtures/envelope/
+├── MANIFEST.json          # NOT inside valid/ or invalid/ — would break the accept counts
+├── valid/                 # 15 files  (accept requires ≥ 12)
+└── invalid/               # 15 files  (accept requires ≥  8)
+```
+
+### 5.1 `MANIFEST.json` shape
+
+```json
+{
+  "schema_id": "sakg://schema/envelope/v1.0.0",
+  "fixtures": [
+    { "file": "valid/V-01-minimal-candidate.json",
+      "profile": "stored",
+      "verdict": "accept",
+      "clause": "SAEOS-1 §4.2",
+      "purpose": "required-only floor" },
+
+    { "file": "invalid/X-03-frequency-promotion-no-evidence.json",
+      "profile": "stored",
+      "verdict": "reject",
+      "rejected_by": "schema",
+      "expected_keyword": "minItems",
+      "expected_path": "/evidence",
+      "clause": "SAEOS-1 §4.2 / ×5",
+      "purpose": "INV-2 — frequency counters present, evidence absent" },
+
+    { "file": "invalid/X-15-id-namespace-mismatch.json",
+      "profile": "stored",
+      "verdict": "reject",
+      "rejected_by": "store-validator",
+      "schema_verdict": "accept",
+      "gap": "G-1",
+      "clause": "SAEOS-1 §4.2 / Ω5",
+      "purpose": "pins the documented cross-field gap" }
+  ]
+}
+```
+
+`rejected_by` has exactly two values: `schema` (14 cases) and `store-validator` (1 case, the
+pinned gap). Asserting `expected_keyword` + `expected_path` is what makes an invalid fixture a
+real verifier: without it, a fixture that fails because of an unrelated typo scores as a pass.
+
+### 5.2 Valid corpus — 15 files
+
+| # | File (`valid/`) | Node type | Status | `author_kind` | Exercises |
+|---|---|---|---|---|---|
+| V-01 | `V-01-minimal-candidate.json` | Decision | candidate | ingest | Required-only floor: `facets {}`, `evidence []`, `coordinates {}`, `valid_until null`, `falsifier null`, `confidence 0.0` (lower bound) |
+| V-02 | `V-02-maximal-canonical.json` | Decision | canonical | agent | Every optional populated: 2 facets, 2 evidence refs, 3 coordinate dimensions, non-null `falsifier`, non-null `valid_until`, `confidence 1.0` (upper bound) |
+| V-03 | `V-03-superseded-component.json` | Component | **superseded** | ingest | INV-5 closed window; INV-4 — superseded, not deleted; carries **no** `superseded_by` field (D-7) |
+| V-04 | `V-04-refuted-pattern.json` | Pattern (anti-pattern) | **refuted** | human | INV-3 — non-null falsifier, closed window, full payload **retained** (FPL-2) |
+| V-05 | `V-05-problem-human.json` | Problem | candidate | human | `author_kind: human`; minimal coordinates |
+| V-06 | `V-06-option-inferred.json` | Option | candidate | **inferred** | A *rejected* option retained as a node — rejection is the §4.4 `rejected` **edge**, never an envelope field |
+| V-07 | `V-07-constraint-multivalue-coords.json` | Constraint | canonical | ingest | ✓8 — one dimension with 4 values, three dimensions total, all flat |
+| V-08 | `V-08-objective-empty-extensions.json` | Objective | candidate | agent | `facets {}` **and** `coordinates {}` simultaneously legal |
+| V-09 | `V-09-tradeoff-evidence-bound.json` | TradeOff | canonical | agent | **INV-2 positive control** — canonical *with* an evidence binding |
+| V-10 | `V-10-mechanism-cross-domain.json` | Mechanism | canonical | ingest | ✓9 — `coordinates.domain` spans 3 domains |
+| V-11 | `V-11-outcome-late-arriving.json` | Outcome | canonical | ingest | Ω2 — `ingested_at` ≫ `valid_from`; the only type created long after its subject |
+| V-12 | `V-12-scar-roundtrip.json` | Scar | canonical | ingest | Ω1 — facet `sakg.core.scar` = `{root_cause, detection_signature, guard_action}`; lossless scar round-trip |
+| V-13 | `V-13-evidence-ref-node.json` | EvidenceRef | candidate | ingest | §3.3.3 — facet carries `{hash, uri, kind, reverify}`; `evidence []` (it *is* the pointer, it does not cite one) |
+| V-14 | `V-14-boundary-summary-280.json` | Decision | canonical | human | Boundaries: `summary` exactly 280 chars, `label` 120 chars, `confidence 0.5`, namespace at 63 chars |
+| V-15 | `V-15-ingest-profile.json` | Decision | candidate | ingest | **Profile: `ingest`.** No `confidence` key at all. Manifest records the dual expectation: accepted by `#ingest-envelope`, **rejected** by ROOT (`required`/`confidence`) — proving the profiles genuinely differ |
+
+**Coverage proof (the "no gap" argument for §5):**
+
+- **All 12 node types** (§4.3): Decision V-01/02/14/15 · Problem V-05 · Option V-06 · Constraint V-07 · Objective V-08 · TradeOff V-09 · Mechanism V-10 · Pattern V-04 · Component V-03 · Outcome V-11 · Scar V-12 · EvidenceRef V-13. ✔
+- **All 4 status values**: candidate V-01/05/06/08/13/15 · canonical V-02/07/09/10/11/12/14 · superseded V-03 · refuted V-04. ✔
+- **All 4 `author_kind` values**: human V-04/05/14 · agent V-02/08/09 · ingest V-01/03/07/10/11/12/13/15 · inferred V-06. ✔
+- **All 17 leaf fields** appear populated (non-empty, non-null) in ≥1 valid fixture — V-02 alone covers every one except the ingest-profile absence of `confidence` (V-15). ✔
+- **Both profiles** exercised: stored (V-01…V-14), ingest (V-15). ✔
+
+### 5.3 Invalid corpus — 15 files
+
+| # | File (`invalid/`) | Profile | Rejecting keyword @ path | §4.2 rule violated |
+|---|---|---|---|---|
+| X-01 | `X-01-authored-confidence.json` | **ingest** | `not` @ `` (root) | **INV-1 (named)** — producer supplied `confidence: 0.9` |
+| X-02 | `X-02-confidence-out-of-range.json` | stored | `maximum` @ `/confidence` | `confidence` bounded [0,1] (assumption A-3) |
+| X-03 | `X-03-frequency-promotion-no-evidence.json` | stored | `minItems` @ `/evidence` | **INV-2 (named)** — `status: canonical`, `evidence: []`, facet `sakg.core.review_priority = {reference_count: 5, domain_count: 3, confidence_pct: 78}` (verbatim L3 ADR-011 thresholds, ×5). The counters are *legal*; they simply confer nothing. |
+| X-04 | `X-04-deleted-status.json` | stored | `enum` @ `/status` | **INV-4 (named)** — `status: "deleted"` |
+| X-05 | `X-05-tombstone-field.json` | stored | `additionalProperties` @ `` (root) | **INV-4 (named), second flavour** — otherwise-valid node carrying `"deleted_at"` |
+| X-06 | `X-06-bad-ulid.json` | stored | `pattern` @ `/id` | `id` grammar — `…/Decision/not-a-ulid` |
+| X-07 | `X-07-unknown-node-type.json` | stored | `enum` @ `/type` | §4.3 closed set at v1 — `type: "Insight"` |
+| X-08 | `X-08-summary-281.json` | stored | `maxLength` @ `/summary` | 281 chars — the SUMMARY-tier budget (Ω3) |
+| X-09 | `X-09-refuted-without-falsifier.json` | stored | `type` @ `/falsifier` | **INV-3** — `status: refuted`, `falsifier: null` |
+| X-10 | `X-10-superseded-open-window.json` | stored | `type` @ `/valid_until` | **INV-5** — `status: superseded`, `valid_until: null` |
+| X-11 | `X-11-inline-evidence-payload.json` | stored | `type` @ `/evidence/0` | §3.3.3 / D-3 — `evidence: [{"kind":"log","content":"<raw bytes>"}]`. **No evidence minting.** |
+| X-12 | `X-12-hierarchical-coordinates.json` | stored | `type` @ `/coordinates/domain` | ✓8 — `{"domain": {"software": ["backend"]}}` is a hierarchy |
+| X-13 | `X-13-provenance-missing-origin.json` | stored | `required` @ `/provenance` | L7/✓4 — provenance without an origin |
+| X-14 | `X-14-naive-timestamp.json` | stored | `pattern` @ `/provenance/ingested_at` | `"2026-08-09 12:00:00"` — no `T`, no `Z` |
+| X-15 | `X-15-id-namespace-mismatch.json` | stored | **not schema-rejected** — `rejected_by: store-validator`, `gap: G-1` | Ω5 — `namespace: "paeos"` but `id: "sakg://other-tenant/Decision/<ulid>"` |
+
+**14 of 15 are schema-rejected** (accept requires ≥8). X-15 is the deliberate gap pin: the test
+asserts the schema *accepts* it and that `MANIFEST.json` names gap `G-1`, so the hole is visible
+and owned rather than silent. If I-STORE later closes G-1 in the schema layer, the fixture flips
+to `rejected_by: schema` and the manifest is the changelog.
+
+### 5.4 Carried gaps
+
+| Gap | Statement | Owner | Pinned by |
+|---|---|---|---|
+| **G-1** | JSON Schema draft 2020-12 cannot compare `id`'s embedded namespace/type segments against the `namespace`/`type` fields. A tenancy-mismatched id validates. | **I-STORE** (`sakg/store.py` write validator; Ω5 isolation is its named accept criterion `test_store_namespace_isolation.py`) | `X-15` + assertion A6 |
+| **G-2** | Confidence recomputation must propagate along `derived_from`/`supports` edges (the L2 IT-05 obligation, Δ6). A single-node document cannot express it. | **I-STORE** (edge model) + **Slice S3** (Truth Maintenance, Ω2) | §2.3 INV-6; no fixture is possible at node granularity |
+| **G-3** | Facet payloads are unvalidated (D-2). A malformed `sakg.core.scar` facet passes the envelope schema. | **F-BUNDLE** (bundle-level per-type checks) / **S4** (per-type facet contracts) | design record only — deliberate, not accidental |
+
+---
+
+## 6. Verifier design — `tests/sakg/test_envelope_schema.py`
+
+Authored under F-ENVELOPE (`actor: fable`) so that test author ≠ implementer for every
+downstream node that consumes the envelope (A-08 provenance decorrelation, exactly as the
+backlog's `assignment_rule` requires).
+
+| # | Assertion | Guards against |
+|---|---|---|
+| **A1** | `Draft202012Validator.check_schema(schema)` passes; `schema["$schema"]` is the draft 2020-12 URI. | A schema that is valid JSON but not a valid schema — the accept command's `json.loads` alone would not catch this. |
+| **A2** | Manifest ↔ filesystem **bijection**: every `valid/*.json` and `invalid/*.json` appears exactly once in `MANIFEST.json`, and every manifest entry resolves to an existing file. | Orphan fixtures (present, never asserted) and phantom entries (asserted, absent). This is the mechanical form of "no orphan". |
+| **A3** | Every `verdict: accept` fixture validates against its declared profile with **zero** errors. | Regression in the happy path. |
+| **A4** | Every `rejected_by: schema` fixture produces ≥1 error whose `validator` == `expected_keyword` **and** whose `json_path` == `expected_path`. | Fixtures that fail for the wrong reason — the classic false-green in a negative corpus. |
+| **A5** | `V-15` is accepted by `#ingest-envelope` **and** rejected by ROOT with `required` @ `/confidence`. | The two profiles collapsing into one, which would silently delete INV-1. |
+| **A6** | Every `rejected_by: store-validator` fixture is **accepted** by the schema and names a `gap` id present in this design's §5.4 table. | A carried gap quietly becoming a forgotten gap. |
+| **A7** | Coverage, computed **from the fixture documents themselves** (never from the manifest): the union of `type` over `valid/` == the 12-member enum; union of `status` == the 4-member enum; union of `provenance.author_kind` == the 4-member enum; every §2.2 leaf field is non-empty/non-null in ≥1 valid fixture. | The manifest claiming coverage the corpus does not have. Computing from the documents makes the claim unfakeable. |
+| **A8** | `status` enum length is exactly 4 and does not contain `"deleted"`; root `additionalProperties` is `false`. | Someone "helpfully" reopening the envelope and dissolving INV-4. |
+
+Parametrize A3/A4 per fixture (`pytest.mark.parametrize` over the manifest) so a failure names
+the offending file rather than a single opaque red test.
+
+---
+
+## 7. Assumptions surfaced (PAEOS-6)
+
+| id | Assumption | Why it is an assumption / verification owner |
+|----|------------|----------------------------------------------|
+| **A-1** | Neither `sakg/` nor `tests/sakg/` exists yet; both trees are created by this node. | `sakg/` and `tests/` are outside this session's **read**-capability. Inferred from `I-STORE`'s accept criterion, which registers `sakg` in `pyproject [tool.hatch.build.targets.wheel].packages` — a package that already existed would not need registering. IMPLEMENT confirms. |
+| **A-2** | `jsonschema` (with draft 2020-12 support, ≥4.18 for `referencing`) is available under `uv run`, or may be added as a dev dependency. | `pyproject.toml` is outside read-capability. The accept command `uv run pytest tests/sakg/test_envelope_schema.py` cannot pass without a validator. **IMPLEMENT owns**: add the dependency if absent. |
+| **A-3** | `confidence` is bounded **[0.0, 1.0] inclusive**. | §4.2 says `float` without a range. Inferred from §5.1's `filters.min_confidence` and §7's "nodes below `min_confidence` are withheld", both of which presuppose a common scale. Affects `X-02` only. **Founder/ratification owns** any change; IMPLEMENT applies as specified. |
+| **A-4** | `ProjectRef` (the `namespace` type) is a lowercase DNS-ish label, `^[a-z0-9][a-z0-9._-]{0,62}$`. | §4.2 names the type but the corpus never defines its grammar. Chosen to be case-insensitive-safe (tenancy comparisons must never depend on case folding, Ω5) and filesystem-safe (namespaces will become store partitions). |
+| **A-5** | The `<ulid>` segment is a canonical 26-char Crockford base32 ULID. | §4.2 writes `<ulid>` without a grammar. Standard ULID: `[0-7][0-9A-HJKMNP-TV-Z]{25}` (excludes I, L, O, U). Affects `X-06`. |
+| **A-6** | `sha256` is serialized **prefixed** as `sha256:<64 lowercase hex>` (D-5). | §4.2 names the algorithm, not the encoding. If PAEOS's CAS already emits bare hex, IMPLEMENT adjusts the one `$defs/sha256` pattern and `X-14` is unaffected. **I-EXTRACT owns** the round-trip check against real CAS hashes. |
+| **A-7** | All timestamps are RFC 3339 **UTC with a literal `Z`**; offsets like `+00:00` are rejected. | §4.2 says `timestamp`. Chosen because `as_of` time-travel (§5.1) and validity-window comparison must be byte-comparable without a timezone library. Affects `X-14`. |
+| **A-8** | `OriginRef` decomposes as `{system, goal_id, run_id}` with ≥1 of `goal_id`/`run_id` non-null. | §4.2 glosses it as "producing system + run/goal id" — the decomposition is read directly from that gloss. **F-BUNDLE owns** confirming it carries what §6.1b actually emits at L15/L16. |
+| **A-9** | The 12 `type` values are spelled **exactly** as §4.3's table (`TradeOff`, `EvidenceRef`, TitleCase). | The table is prose; no machine enum exists in the corpus. Verbatim adoption is the choice that adds zero interpretation to a ratified document (D-1). |
+| **A-10** | `uv` is the runner and `pytest` is configured to collect `tests/`. | Every accept command in `backlog/SAKG-1-backlog.yaml` is `uv run …`, and sibling suites live under `tests/`. IMPLEMENT confirms collection reaches `tests/sakg/`. |
+
+None of A-1…A-10 changes the design's structure. Each is a fact a downstream stage *confirms*,
+and the design is correct under every stated assumption. A-3, A-4, A-5, A-6, A-7 each localize
+to a single `$defs` entry — if one is wrong, the fix is one pattern and at most one fixture.
+
+---
+
+## 8. Perspectives covered (multi-perspective critique input, L09)
+
+- **Correctness / clause coverage.** Every one of the 17 §4.2 lines maps to a row in §2.2; every
+  §4.2 invariant maps to a row in §2.3 with a named enforcement layer (schema, store, or carried
+  gap). No §4.2 clause is unaccounted for and no schema field lacks a §4.2 warrant. ✔
+- **Security / trust-zone.** `sakg/` is Zone 2, never in the TCB (SAEOS-1 §3.3, backlog
+  `trust_zone`). The schema is data, not code; it grants no capability. The three
+  non-authority guarantees are *strengthened*: D-3 makes evidence minting a type error (§3.3.3),
+  D-6 makes producer-set `canonical` unrepresentable, and INV-1 makes producer-set confidence
+  unrepresentable — the ×5/T3e poisoning surface is closed at the schema, not by review. ✔
+- **Adversarial / poisoning (Ω6).** The strongest attack on a knowledge store is asserting
+  status and confidence rather than earning them. X-01 and X-03 are that attack, written down
+  and pinned red. Residual: a producer that fabricates a *real-looking* `EvidenceRef` id passes
+  INV-2; that is closed by re-verification against PAEOS's CAS (§3.3.3), owned by I-INGEST — an
+  honestly carried residual, matching §9/A4. ✔
+- **Blast radius (A-2).** Additive: two new trees (`sakg/schema/`, `tests/sakg/fixtures/`), no
+  edit to any existing file except a possible dev-dependency line (A-2). Non-TCB. No `runtime/`
+  write, no `constitution/` write, no PAEOS import direction violated (`sakg/` never imported by
+  `runtime/`, per T-NONAUTH). Kernel classification expected **SOFT**. ✔
+- **Verifiability (K3 / K1).** All four accept commands are executable and **fail red before**
+  the work starts: the `json.loads` fails on a missing file, pytest fails on collection, both
+  `ls | wc -l` counts are 0. That is the mechanical-adversary property the backlog's
+  `conventions.accept` demands. Assertion A4 (right-reason rejection) is what keeps the negative
+  corpus from decaying into a false green. ✔
+- **Freeze irreversibility (the reason this node is `actor: fable`).** Freezing is irreversible
+  and verifiers cannot be verified mechanically, so the design deliberately minimizes what is
+  frozen: 17 fields with no additions, closed enums, and **open facets** (D-2) as the single
+  sanctioned growth path. Everything genuinely uncertain (facet payloads, cross-field checks,
+  TMS propagation) is pushed to a named later owner rather than guessed at now. ✔
+- **Downstream coherence.** F-BUNDLE `$ref`s `#ingest-envelope`; I-STORE validates against ROOT
+  and owns G-1/G-2; I-INGEST owns the §4 transition table and lands everything `candidate`;
+  F-PROJ's `node_summary` reads `{id, label, summary}` and inherits the 280-char SUMMARY budget
+  from `maxLength`. Each of the four `deps: [F-ENVELOPE]` nodes has a defined interface into
+  this contract. No downstream node needs to restate a §4.2 field. ✔
+- **Maintainability / DRY.** One `$id`, one field table, one status enum. D-3 and D-7 both
+  refuse to duplicate §4.4's edge model inside the envelope, so evidence polarity and
+  supersession lineage each have exactly one home. ✔
+- **Cold start (Ω9) / degradation (§7).** The schema imposes nothing on an empty graph: an
+  empty corpus is zero fixtures' worth of nodes and remains a valid state. No envelope field is
+  required to be non-empty except identity, label, summary, and provenance — the minimum that
+  makes a node addressable, projectable, and attributable. ✔
+
+---
+
+## 9. Verification hand-off (for VERIFIER @ VERIFY — not run in this stage)
+
+The design is realized correctly iff these four commands, verbatim from
+`backlog/SAKG-1-backlog.yaml` L105–L108, all exit `0`:
+
+```
+uv run python -c "import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())"
+uv run pytest tests/sakg/test_envelope_schema.py -q
+test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12
+test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8
+```
+
+Margins under this design: **15 valid** (≥12 ✔, +3) and **15 invalid** (≥8 ✔, +7, of which 14
+are schema-rejected). Recorded here as the acceptance oracle; **not executed by this DESIGN
+session** (§0).
+
+---
+
+## 10. IMPLEMENT checklist (hand-off)
+
+1. Create `sakg/schema/` and `tests/sakg/fixtures/envelope/{valid,invalid}/`.
+2. Write `sakg/schema/envelope.schema.json` with the header of §2.1, the `$defs` primitives and
+   field constraints of §2.2, the four `if/then` state invariants of §4, and the
+   `$defs/ingest_envelope` profile (`$anchor: ingest-envelope`) applying `not: {required:
+   [confidence]}` and `status: {const: candidate}` over `envelope_core`.
+3. Set `additionalProperties: false` on the root, `provenance`, and `origin` (D-4). Leave
+   `facets` values open (D-2).
+4. Write the 15 valid fixtures of §5.2 and the 15 invalid fixtures of §5.3, using the exact
+   filenames given (the manifest and the accept globs both key on them).
+5. Write `MANIFEST.json` at `tests/sakg/fixtures/envelope/` — **not** inside `valid/` or
+   `invalid/`, which would inflate the accept counts.
+6. Write `tests/sakg/test_envelope_schema.py` implementing assertions A1–A8 (§6), parametrized
+   per fixture.
+7. Load the schema into a `referencing.Registry` keyed by `sakg://schema/envelope/v1.0.0` so the
+   `#ingest-envelope` anchor resolves without network access; export that helper for reuse by
+   F-BUNDLE and I-STORE.
+8. Add `jsonschema>=4.18` as a dev dependency if absent (A-2); add `tests/sakg/__init__.py` if
+   the repo's other suites use package-style test dirs (A-10).
+9. Change nothing under `runtime/`, `kernel/`, `constitution/`, or `spec/`.
+10. Hand to VERIFY to run the §9 commands unchanged.
+
+---
+
+**No orphan / no gap.** Every §4.2 field (§2.2) has a schema constraint, a writer, and a reader
+(§3). Every §4.2 invariant (§2.3) has an enforcement layer or a named carried gap with an owner
+(§5.4). Every `$defs` entry is reachable from ROOT or `#ingest-envelope` (§1). Every state has an
+entry, an exit, and a well-formedness invariant (§4). Every fixture is reachable from
+`MANIFEST.json`, and the bijection is asserted (A2). Every node type, status value, `author_kind`
+value, and leaf field is covered by the valid corpus, and coverage is computed from the documents
+rather than claimed (A7). Every assumption (§7) has a downstream verification owner. Evidence for
+this gate: **`design_coherent`** — this file.

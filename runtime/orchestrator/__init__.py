@@ -41,6 +41,7 @@ from runtime.review import (
     ReviewHarness,
     read_adversary_verdict,
 )
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, ExecutionContext, TaskResult
 from runtime.triage import BudgetExceeded, GoalBudget, TriageDecision, triage
 from runtime.verification import (
@@ -172,6 +173,7 @@ class SoftLoop:
         self._review = ReviewHarness(self._ibm, dispatcher)
         self._scars = scar_store if scar_store is not None else ScarStore()
         self._seal = SealAuthority(signing_key, ledger)
+        self._sidecar_scorer = SidecarStageScorer()
 
     @property
     def scar_store(self) -> ScarStore:
@@ -248,7 +250,7 @@ class SoftLoop:
             # only a generic role objective and the Builder had nothing concrete to implement.
             goal_detail = f"Goal objective: {objective}"
             planner_artifacts: list[ArtifactRef] = []
-            for stage in (StageId.DESIGN, StageId.PLAN):
+            for stage in (StageId.MITIGATION, StageId.DESIGN, StageId.CRITIQUE, StageId.PLAN):
                 scars = self._scar_refs(goal_signature, stage)
                 result = self._playbook.run_stage(
                     goal_id=goal_id, run_id=run_id, stage=stage, session="planner",
@@ -257,6 +259,7 @@ class SoftLoop:
                 )
                 budget.charge(result.cost)
                 planner_artifacts.extend(result.artifacts)
+                self._sidecar_scorer.score_stage(run_id=run_id, stage=stage, artifact_content=goal_detail)
 
             # --- Builder: IMPLEMENT on the plan scopes, with design + plan as context (B2.J) ---
             build = self._playbook.run_stage(
@@ -265,6 +268,7 @@ class SoftLoop:
                 context_refs=tuple(planner_artifacts), detail=goal_detail,
             )
             budget.charge(build.cost)
+            self._sidecar_scorer.score_stage(run_id=run_id, stage=StageId.IMPLEMENT, artifact_content=goal_detail)
             if not build.artifacts:
                 return RunOutcome(RunStatus.REMANDED, goal_id, "builder produced no artifact")
             artifact = build.artifacts[0]
@@ -275,8 +279,10 @@ class SoftLoop:
         # run (via the court MCP) instead of the pre-declared backlog. Empty ⇒ REMAND — the agent
         # must produce its own probative evidence, not have it authored for it.
         if evidence_source is not None:
-            builder_evidence = evidence_source.evidence_for(run_id)
-            if not builder_evidence:
+            submitted = evidence_source.evidence_for(run_id)
+            if submitted:
+                builder_evidence = submitted
+            elif not builder_evidence:
                 return RunOutcome(
                     RunStatus.REMANDED, goal_id, "no evidence submitted to the court for this run"
                 )
@@ -355,6 +361,7 @@ class SoftLoop:
             adversary_outcome = read_adversary_verdict(self._cas.get(adversary.artifacts[0].hash))
         else:
             adversary_outcome = AdversaryOutcome.BLOCK
+
         if adversary_outcome is AdversaryOutcome.BLOCK:
             context = ExecutionContext(
                 retry_hints=("the adversary filed a blocking dissent — fix the defect, re-review",),

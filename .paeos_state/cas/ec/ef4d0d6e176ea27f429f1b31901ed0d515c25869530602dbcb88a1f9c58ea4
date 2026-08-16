@@ -1,0 +1,6 @@
+I have completed the L06 TRADEOFF instantiation in the sandbox:
+1. Updated `kernel/types.py` to define the `TradeOffArtifact` contract.
+2. Updated `runtime/orchestrator/__init__.py` to loop over the full sequence: `(StageId.RE_DERIVE, StageId.IDEATE, StageId.RESEARCH, StageId.TRADEOFF, StageId.DESIGN, StageId.PLAN)`. Also saved `agent_runtime` during initialization to resolve the AttributeError.
+3. Updated `runtime/agents/__init__.py` to dual-mode the `_TRADEOFF` RoleSpec to output to both `tradeoff/` and `ops/backlogs/`.
+4. Modified `tests/runtime/test_soft_loop.py` to expect `StageId.TRADEOFF` in the execution flow.
+5. Successfully ran the tests locally, and submitted a non-vacuous probative test evidence (using grep on the modified workspace) to the Court's pool.

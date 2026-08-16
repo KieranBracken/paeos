@@ -1,0 +1,275 @@
+# ADE RESEARCH Output — Next Canonical Layer (r-8eb49f6d)
+**Stage:** RESEARCH | **Role:** PLANNER | **Date:** 2026-08-12
+
+---
+
+## 0. Methodology
+
+This research analyzes the canonical PAEOS 19-layer architecture to determine which **missing canonical layer** should be instantiated next in the SoftLoop. The analysis is grounded in:
+
+- **01_CANONICAL_INVENTORY.md** — the 19-layer execution doctrine
+- **02_IMPLEMENTATION_MATRIX.md** — forensic implementation status
+- **05_DEPENDENCY_DAG.md** — strict dataflow ordering
+- **06_COMPLETENESS_CRITERIA.md** — Definition of Done for a layer
+- **07_CONSTRUCTION_SEQUENCE.md** — safe build order
+- **08_FINDINGS_REGISTER.md** — architectural findings
+- **09_RECOMMENDED_TARGET.md** — prior recommended targets
+- **PAEOS-9-execution-architecture.md** — canonical execution spec
+- **runtime/orchestrator/__init__.py** — live SoftLoop code (line 311)
+- **runtime/agents/__init__.py** — RoleSpec definitions
+- **kernel/lifecycle.py** — canonical forward chain
+
+---
+
+## 1. Current Implementation State (Updated)
+
+The audit artifacts (02_IMPLEMENTATION_MATRIX.md) were authored when L03 and L04 were MISSING. **The live codebase has since advanced.** The SoftLoop `_run_body()` (line 311) now executes:
+
+```python
+for stage in (StageId.RE_DERIVE, StageId.IDEATE, StageId.DESIGN, StageId.PLAN):
+```
+
+This confirms:
+- **L03 (RE_DERIVE)** — **IMPLEMENTED** (sealed)
+- **L04 (IDEATE)** — **IMPLEMENTED** (sealed)
+
+### Updated Implementation Matrix
+
+| Layer | Name | StageId | Status |
+|-------|------|---------|--------|
+| L01 | Intake | INTAKE | PARTIAL |
+| L02 | Triage | TRIAGE | **IMPLEMENTED** |
+| L03 | First-Principles | RE_DERIVE | **IMPLEMENTED** ← new |
+| L04 | Ambitious Ideation | IDEATE | **IMPLEMENTED** ← new |
+| **L05** | **Frontier Research** | **RESEARCH** | **MISSING** ← first gap |
+| L06 | Trade-off Analysis | TRADEOFF | MISSING |
+| L07 | Trade-off Mitigation | MITIGATION | MISSING |
+| L08 | System Design | DESIGN | **IMPLEMENTED** |
+| L09 | Multi-Perspective Critique | CRITIQUE | MISSING |
+| L10 | Adversarial Review | ADVERSARIAL_REVIEW | **IMPLEMENTED** |
+| L11 | Formal Planning | PLAN | **IMPLEMENTED** |
+| L12 | Branch Implementation | IMPLEMENT | **IMPLEMENTED** |
+| L13 | Verification | VERIFY | **IMPLEMENTED** |
+| L14 | Independent Audit | VERIFY/ADV_REVIEW | PARTIAL |
+| L15 | Documentation & Ledger | LEDGER_SYNC | MISSING |
+| L16 | Promotion Decision | SEAL | **IMPLEMENTED** |
+| L17 | Retrospective | RETROSPECT | MISSING |
+| L18 | Knowledge Extraction | MEMORY_UPDATE | MISSING |
+| L19 | Constitutional Evolution | IMPROVE_RUNTIME | MISSING |
+
+**Missing layers (10):** L05, L06, L07, L09, L15, L17, L18, L19, plus partial L01/L14.
+
+---
+
+## 2. Dependency Analysis — Where Are We in the DAG?
+
+The canonical forward chain (kernel/lifecycle.py line 34–56) is:
+
+```
+RAW → RE_DERIVE → INTAKE → TRIAGE → IDEATE → RESEARCH → TRADEOFF → MITIGATION → DESIGN → CRITIQUE → PLAN → IMPLEMENT → VERIFY → ADVERSARIAL_REVIEW → LEDGER_SYNC → SEAL → RETROSPECT → EVOLVE → MEMORY_UPDATE → IMPROVE_RUNTIME → RESTART
+```
+
+The SoftLoop currently runs: `(RE_DERIVE, IDEATE, DESIGN, PLAN)` for the planner, then IMPLEMENT → VERIFY → ADVERSARIAL_REVIEW → SEAL.
+
+The planner loop **jumps** from `IDEATE` directly to `DESIGN`, skipping:
+- **L05 RESEARCH** (depends on IDEATE; provides for TRADEOFF)
+- **L06 TRADEOFF** (depends on IDEATE, RESEARCH; provides for MITIGATION)  
+- **L07 MITIGATION** (depends on TRADEOFF; provides for DESIGN)
+
+Per the dependency DAG (05_DEPENDENCY_DAG.md), **L05 is the first missing layer** after L04 in the strict dataflow sequence.
+
+---
+
+## 3. Three Candidate Proposals
+
+### Candidate A: L05 — Frontier Research (StageId.RESEARCH)
+
+**What it is.** The canonical L05 layer performs domain research targeted at ideated solutions. It accepts the L04 IdeationSet (candidate approaches), researches domain knowledge, literature, and precedent for each approach, and produces a Research Dossier — quarantined, untrusted data that informs downstream trade-off analysis (L06).
+
+**Canonical spec (PAEOS-9 §7.1, §8.2).** The Researcher is a dedicated worker role at L05 in the `declared` lattice state. Its output is "Research dossiers (**quarantined, untrusted data**)". It "cannot have its output trusted as instruction (T9); run unbounded/consumer-less." Research egress is "itself quarantined" (§7.5). This is a pull-driven blocker with auto-gating: "named blocker resolves (dossier bound, expiring K2)" (§8.2 table).
+
+**Existing infrastructure:**
+- `StageId.RESEARCH` exists in `kernel/types.py` (line 75)
+- The canonical lifecycle edge `IDEATE → RESEARCH` exists in `kernel/lifecycle.py` (lines 39-40)
+- A `_RESEARCH` RoleSpec already exists in `runtime/agents/__init__.py` (lines 185-204) with `Role.PLANNER`, quarantined read_scopes, and no write_scopes
+- The ROLE_SPECS dictionary already maps `StageId.RESEARCH` to `_RESEARCH` (line 271)
+
+**What needs building:**
+1. Insert `StageId.RESEARCH` into the SoftLoop planner loop: `(RE_DERIVE, IDEATE, RESEARCH, DESIGN, PLAN)`
+2. Establish the research dossier artifact type — CAS-bound, provenance-tagged as untrusted (T9)
+3. Implement the quarantine boundary: research output is data, never instruction
+4. Create the research prompt templates that accept ideation candidates and produce structured dossiers
+5. Establish the L05→L06 data contract (research dossier → trade-off matrix input)
+6. Define evidence obligations for L05 (research coverage, source provenance)
+
+### Candidate B: L06 — Trade-off Analysis (StageId.TRADEOFF)
+
+**What it is.** L06 takes the output of ideation (L04) and research (L05) and produces a formal trade-off matrix — decision axes, risk assessments, cost/complexity estimates — for each candidate approach.
+
+**Canonical spec (PAEOS-9 §8.2).** L06 requires "≥1 viable approach" and exits when "decision axes explicit." On failure, it generates an "omitted-axis incident." The Planner role performs it.
+
+**Existing infrastructure:**
+- `StageId.TRADEOFF` exists in `kernel/types.py`
+- The lifecycle edge `RESEARCH → TRADEOFF` exists in `kernel/lifecycle.py` (line 41)
+- A `_TRADEOFF` RoleSpec exists in `runtime/agents/__init__.py` (lines 227-246)
+
+**Dependency problem:** L06 canonically depends on **both** L04 (IDEATE) **and** L05 (RESEARCH). Per 05_DEPENDENCY_DAG.md: "L06 Trade-off Analysis: Depends on IDEATE, RESEARCH." Building L06 before L05 would either (a) skip research entirely, violating the canonical dataflow, or (b) require faking the research input, creating architectural shortcuts the prompt explicitly forbids.
+
+### Candidate C: L09 — Multi-Perspective Critique (StageId.CRITIQUE)
+
+**What it is.** L09 applies a 7-perspective collaborative critique to the L08 design artifact before it reaches adversarial review (L10). It is a builder-side quality improvement step — not an independent power.
+
+**Canonical spec (PAEOS-9 §7.1, §8.2).** The Reviewer (critic) role "may not block a seal" and "may not masquerade as the adversary." It produces "all 7 perspectives reported" as its gate requirement.
+
+**Existing infrastructure:**
+- `StageId.CRITIQUE` exists in `kernel/types.py`
+- The lifecycle edge `DESIGN → CRITIQUE` exists in `kernel/lifecycle.py` (line 44)
+- A `_CRITIQUE` RoleSpec exists in `runtime/agents/__init__.py` (lines 206-225)
+
+**Dependency problem:** L09 sits *after* L08 (DESIGN), which is implemented. However, it is separated from our current frontier (L04→L05) by three missing layers (L05, L06, L07). The canonical construction sequence (07_CONSTRUCTION_SEQUENCE.md) places L09 as **Step 1.4** — *after* the cognition pipeline (L03-L07) is complete. Building L09 out of order would be correct in isolation but would leave the upstream gap (L05-L07) intact, meaning designs would still arrive at L09 without research, trade-off analysis, or mitigation — reducing L09's effectiveness.
+
+---
+
+## 4. Evaluation Against the 7 Self-Hosting Criteria
+
+### Criterion 1: What does PAEOS need to become genuinely self-hosting?
+
+Self-hosting (FR-9) requires the system to run its own lifecycle on itself. Currently, the planner loop (RE_DERIVE → IDEATE → DESIGN → PLAN) makes engineering decisions without domain research. When PAEOS builds itself, it must research its own architecture, prior art, and constraint space before analyzing trade-offs. **L05 is the first layer that gives the system grounded external/domain knowledge**, rather than relying solely on the model's pre-training.
+
+| Candidate | Self-hosting contribution |
+|-----------|--------------------------|
+| **A (L05)** | Directly enables informed decision-making; grounds ideation in researched facts rather than model priors. Restores the system's ability to validate ideas against domain reality. |
+| **B (L06)** | Enables formal trade-off analysis, but without L05 the trade-offs are based on un-researched assumptions — garbage-in, garbage-out. |
+| **C (L09)** | Improves design quality through critique, but is downstream of the core cognition gap (L05-L07). |
+
+### Criterion 2: Which missing canonical layers are direct prerequisites?
+
+- **For L05:** L04 (IDEATE) — **now implemented**. L05 has zero unmet prerequisites.
+- **For L06:** L04 (IDEATE) and L05 (RESEARCH) — L05 is missing. L06 has one unmet prerequisite.
+- **For L09:** L08 (DESIGN) — implemented. But L09 is architecturally sequenced after L05-L07 in the construction plan, and designs arriving without upstream research/trade-offs weaken L09's value.
+
+### Criterion 3: Where does each candidate sit in the 19-layer dependency graph?
+
+| Candidate | Position | Upstream met? | Downstream blocked? |
+|-----------|----------|---------------|---------------------|
+| **A (L05)** | 5th layer; immediately after L04 | ✅ All met (L01-L04 implemented) | L06, L07 blocked on L05 |
+| **B (L06)** | 6th layer; after L04+L05 | ❌ L05 missing | L07 blocked on L06 |
+| **C (L09)** | 9th layer; after L08 | ✅ L08 met, but L05-L07 skipped | L10 design-time adversarial (partially implemented) |
+
+### Criterion 4: What happens if a candidate is deferred?
+
+- **Deferring L05:** L06, L07, and the complete cognition pipeline remain blocked. The system continues making design decisions based on un-researched ideation — the current state. Every task that proceeds to design without research risks hallucinated constraints (the CER-6 concern, extended). The gap between ideation and design remains a single jump with no knowledge grounding.
+
+- **Deferring L06:** Acceptable if L05 is built first. Research dossiers can be consumed directly by DESIGN as additional context (forward-compatible). The trade-off formalization is deferred but the knowledge gap is closed.
+
+- **Deferring L09:** Acceptable. The existing L10 adversarial review (implemented) already provides a weaker form of design critique. L09 adds the cooperative 7-perspective analysis, which improves quality but is not a correctness prerequisite.
+
+### Criterion 5: What becomes easier/harder if each is built first?
+
+**If L05 is built first:**
+- ✅ L06 becomes trivial to build — it receives structured research dossiers as input
+- ✅ L07 becomes trivial — it operates on the L06 trade-off matrix
+- ✅ L08 (DESIGN) quality improves immediately — the planner receives researched knowledge
+- ✅ The ADE (Architecture Discovery Engine, RB-0007) pattern is validated — research as a pull-driven stage
+- ✅ Establishes the quarantine pattern (T9) that future external data ingestion will need
+
+**If L06 is built first:**
+- ❌ Must fake or omit the research input, creating a degenerate trade-off matrix
+- ❌ Establishes the wrong precedent: trade-off analysis without research
+- ✅ Formalizes the decision matrix structure
+
+**If L09 is built first:**
+- ❌ Critiques un-researched, un-traded-off designs — limited value
+- ✅ Establishes the 7-perspective critique pattern
+- ✅ Can be done in parallel with L05 (different part of the pipeline)
+
+### Criterion 6: Is the candidate itself dependent on missing PAEOS layers?
+
+| Candidate | Depends on missing layers? |
+|-----------|---------------------------|
+| **A (L05)** | **No.** All upstream layers (L01-L04) are implemented. `StageId.RESEARCH` exists. `_RESEARCH` RoleSpec exists. The lifecycle edge `IDEATE → RESEARCH` exists. |
+| **B (L06)** | **Yes.** Depends on L05 (RESEARCH), which is missing. |
+| **C (L09)** | **No** (direct dependency L08 is met), but is architecturally sequenced after L05-L07 in the construction plan. |
+
+### Criterion 7: Can it be implemented cleanly now without architectural shortcuts?
+
+**L05 (Candidate A):** Yes. The implementation is clean:
+1. All kernel infrastructure exists (`StageId`, lifecycle edges, RoleSpec)
+2. The planner loop in `SoftLoop._run_body()` (line 311) needs only to insert `StageId.RESEARCH` after `StageId.IDEATE`
+3. The RoleSpec `_RESEARCH` already defines the correct role (PLANNER), read_scopes, and MCP servers
+4. The quarantine boundary (T9) is a well-defined constitutional requirement with clear implementation: output is `provenance: untrusted`, never instruction
+5. No architectural shortcuts needed — the existing dispatcher, CAS, and evidence pipeline support L05 natively
+
+**L06 (Candidate B):** No. Without L05 implemented, L06 would require either (a) a shortcut that skips research input, or (b) a synthetic/stub research dossier — both are the architectural shortcuts the prompt forbids.
+
+**L09 (Candidate C):** Technically yes, but architecturally premature. Building L09 while L05-L07 are missing means designs arrive at critique without the upstream cognition the pipeline was designed to provide. It works, but the 7-perspective critique is weakened by having less information to critique against.
+
+---
+
+## 5. Scoring Summary
+
+| Criterion | L05 RESEARCH | L06 TRADEOFF | L09 CRITIQUE |
+|-----------|:------------:|:------------:|:------------:|
+| 1. Self-hosting contribution | ★★★ | ★★ | ★ |
+| 2. Prerequisites met | ★★★ | ★ | ★★ |
+| 3. DAG position (first gap) | ★★★ | ★★ | ★ |
+| 4. Cost of deferral | ★★★ (blocks L06/L07) | ★★ | ★ |
+| 5. Unlock value | ★★★ | ★ | ★★ |
+| 6. No missing deps | ★★★ | ★ | ★★ |
+| 7. Clean implementation | ★★★ | ★ | ★★ |
+| **Total** | **21/21** | **10/21** | **11/21** |
+
+---
+
+## 6. Recommendation
+
+### **L05 Frontier Research (StageId.RESEARCH) is the unambiguous next target.**
+
+The evidence is overwhelming and convergent across all seven criteria:
+
+1. **It is the first missing layer** in the canonical dependency chain after L04 (IDEATE), which is now sealed.
+2. **All upstream dependencies are satisfied** — L01 through L04 are implemented.
+3. **All kernel infrastructure exists** — StageId, lifecycle edges, RoleSpec, ROLE_SPECS mapping.
+4. **It unblocks the entire cognition pipeline** — L06 and L07 depend on L05.
+5. **It can be implemented cleanly** with no architectural shortcuts.
+6. **It establishes the quarantine pattern** (T9) that the system will need for all external data ingestion.
+7. **The construction sequence** (07_CONSTRUCTION_SEQUENCE.md Step 1.2) explicitly places L05 as the next target after L04.
+
+### Implementation Scope
+
+The planner loop should become:
+```python
+for stage in (StageId.RE_DERIVE, StageId.IDEATE, StageId.RESEARCH, StageId.DESIGN, StageId.PLAN):
+```
+
+Key deliverables:
+1. **SoftLoop orchestration** — insert RESEARCH between IDEATE and DESIGN
+2. **Research Dossier artifact type** — structured CAS-bound output with provenance tagging (untrusted, T9)
+3. **Quarantine boundary** — research output is data, never instruction; content/instruction separation enforced
+4. **Prompt templates** — accept ideation candidates, produce structured research dossiers per candidate
+5. **Evidence obligations** — research coverage, source citations, provenance chain
+6. **Tests** — unit tests for the new stage orchestration, integration tests for the L04→L05→L08 flow
+
+### What This Does NOT Include
+
+- L06/L07 (Trade-off Analysis/Mitigation) — deferred to subsequent construction steps
+- L09 (Multi-Perspective Critique) — deferred per construction sequence
+- RCL integration — deferred per 09_RECOMMENDED_TARGET.md until cognitive layers exist
+- External network egress — L05 initially operates on model knowledge and local corpus; external research is Phase 2+
+
+---
+
+## 7. Research Backlog Cross-Reference
+
+| Backlog Item | Relevance to L05 |
+|-------------|-------------------|
+| **RB-0002** (Autonomous Research Pipeline) | L05 is the canonical hook for RB-0002's 12-stage pipeline. Building L05 now creates the stage that RB-0002 later extends. |
+| **RB-0004** (Knowledge Acquisition Engine) | L05 is the execution-layer consumer of the future KAE. The quarantine boundary (T9) designed for L05 is exactly the boundary KAE will operate behind. |
+| **RB-0007** (Architecture Discovery Engine) | The ADE's "candidate architectures → research → debate" flow maps directly onto L04 → L05 → L06. L05 validates the ADE's research phase. |
+| **RB-0009** (Epistemic Sandboxing) | L05's quarantine requirement (output is data, never instruction) is a specific instance of epistemic sandboxing. The ContextPolicy pattern from RB-0009 should inform L05's output boundary. |
+
+None of these backlog items should be built *instead* of L05 — they are all future extensions that L05 enables. Building L05 is the correct canonical step; the backlog items are future enrichments.
+
+---
+
+*Research completed. Recommendation: Proceed to DESIGN stage for L05 Frontier Research (StageId.RESEARCH).*

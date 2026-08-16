@@ -1,0 +1,104 @@
+# Constitutional Implementation Review: [B2.G — L1/L3 Memory-Lifetime Boundary]
+
+**Date**: 2026-07-30
+**Task**: Enforce the L1 Ephemeral Execution Context vs. L3 Institutional Memory boundary
+(PAEOS-IP-0004 / IP-0005 / IP-0006, ratified 2026-07-30)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 2
+
+Deliverables:
+- `runtime/task_package.py` — the **L1** `ExecutionContext` (founder-authored, run-scoped: retry
+  hints / diagnostics / flags) + an `ephemeral_context` field on `TaskPackage`. Exported in `__all__`.
+- `runtime/orchestrator/__init__.py` — `SoftLoop.run` no longer authors an L3 scar on remand; it
+  records an L1 `ExecutionContext` on the `RunOutcome`. `RunOutcome` gains `ephemeral_context`.
+- `runtime/selfhost.py` — `run_backlog` wires the **Evolution Layer** as the **sole L3 author**
+  (Stage 17), run by run, over a shared scar store.
+- Tests: new `tests/runtime/test_memory_lifetime_boundary.py` (2); updated `test_soft_loop.py` and
+  `test_selfhost.py` to the new boundary.
+
+Evidence: **297 passed** (net +2); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT: `runtime/` + `tests/` only).
+
+**Reconciliation note.** The founder concurrently added the L1 `ExecutionContext` to
+`runtime/task_package.py` (the IP-0004 Axiom-1 carrier). I converged B2.G on that single L1 type and
+**removed a duplicate `RemandNote`** I had drafted — one L1 abstraction, no competing home.
+
+## What this delivers — and the authority to change ratified behaviour
+
+B2.G is the **founder-authorised** correction that IP-0004/0005 (via the governance analysis)
+identified and IP-0006 formalised. Ratifying those proposals gave the mandate to change the ratified
+B1.F/B2.B behaviour; this task executes it strictly to the **L1/L3 lifetime boundary** (IP-0006):
+
+- **L1 Ephemeral Execution Context** (owner: Runtime/`SoftLoop`; scope: `run_id`; never persisted).
+  On a court remand the loop now records an `ExecutionContext` — run-scoped retry hints/diagnostics,
+  non-institutional, discarded with the run. It carries **no** detection signature.
+- **L3 Institutional Memory** (owner: Evolution Layer; synthesised **exclusively** in Stage 17). The
+  Evolution Layer (B2.F) is now the **sole** scar author, wired into `run_backlog` after each run, so
+  scars still accumulate across a backlog (each authored scar is injectable into later runs) — the
+  self-improvement loop closes **without the operational loop ever authoring memory**.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** IP-0005 Axiom 1 ("operational execution SHALL NEVER author or commit institutional
+memory") is now enforced by construction: `SoftLoop.run` has no `propose_scar` call; its only
+remand output is an L1 `ExecutionContext`. IP-0005 Author/Commit authority (Evolution at 15–17; kernel
+commit) is honoured — the Evolution Layer is the sole author, and the kernel-gated `propose_scar`
+inside `ScarStore` remains the commit path. IP-0006's promotion rule ("L1→L3 only via Stage 17") is
+respected: the L1 `ExecutionContext`/verdict is consumed by the Evolution Layer to author the L3 scar, never promoted
+in place.
+
+### 2. Architectural Drift
+**PASS.** No new mechanism. The Evolution Layer (B2.F) is reused unchanged; the loop *loses* a
+responsibility (memory authoring) rather than gaining one. `RunOutcome.ephemeral_context` is an
+additive optional field. The driver interleaves the existing `SelfHostRunner` and `EvolutionLayer`
+per intake.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** The double-authoring conflict (the original IP-0004 symptom) is *removed*, not worked
+around: there is now exactly one L3 author, so the false-recurrence bug cannot occur. Terminology is
+**not invented** — the L1 `ExecutionContext` and its retry-hint content come straight from IP-0006 §4
+(`RetryHint / RemandNote → L1`) and IP-0004 Axiom 1.
+No circular import: `selfhost` imports `evolution`; `evolution` does not import `selfhost`.
+
+### 8. Security Implications
+**PASS.** This *strengthens* the T3 (memory-poison) posture: run-local noise can no longer be
+promoted to a standing cross-run guard by the operational loop — only the Evolution Layer, from
+adjudicated ledger evidence, authors memory (and its `propose_scar` still quarantines over-broad
+signatures). The L1 note is unpersisted and cannot leak cross-run.
+
+### 9–10. Runtime / Extensibility
+**PASS.** `ExecutionContext` is the seam for future retry logic (IP-0004's retry-hint use case) without
+touching memory authority. The Evolution pass in `run_backlog` is the single place L3 is authored, so
+adding precedent/skill authoring later has one correct home.
+
+## Adversary / property pass
+
+1. **Loop authors no L3** — a remand yields an L1 `ExecutionContext` and the scar store stays empty at
+   the loop level (tested: `test_soft_loop`, `test_selfhost`).
+2. **The L1 artifact is run-scoped context, not memory** — the remand outcome carries an
+   `ExecutionContext` with retry hints and no seal (tested).
+3. **Evolution is the sole L3 author** — after the loop remands, only the Evolution Layer's `run`
+   puts a scar in the store (tested).
+4. **The loop still closes across a backlog** — intake 1 remands (L1) → Evolution authors the L3
+   scar → it is injected into intake 2's DESIGN, through the driver (tested end-to-end).
+
+## OBSERVATIONS
+
+1. **Full per-artifact `lifetime_class` annotation (IP-0006 §5) is a follow-on.** B2.G enforces the
+   **L1/L3 boundary** the founder named; the L1 `ExecutionContext` encodes its class in its name and
+   docstring, but B2.G does **not** yet stamp every L0–L5 artifact (Scar/TaskPackage/Evidence/…) with
+   a machine-readable `lifetime_class` field. That system-wide annotation pass is a separate, low-risk
+   conformance task (proposed **B2.H**), not folded in here to keep the boundary change tightly scoped.
+2. **The Evolution Layer's IMPROVE_RUNTIME proposals are authored but not yet surfaced by the CLI.**
+   `run_backlog` runs the Evolution pass (authoring scars and, on TCB-implicated recurrence, amendment
+   proposals) but returns only `RunOutcome`s; surfacing proposals to the operator (feeding the B2.E
+   `amend` gate) is a small follow-on to the driver's reporting.
+
+## Action Items
+- [ ] **Founder**: ratify B2.G (F2-SOFT) → merge ff-only, remote CI green, tag `b2.g`.
+- [ ] **Follow-on (optional)**: **B2.H** — stamp every artifact with its `lifetime_class` (IP-0006 §5);
+      surface Evolution proposals through the `self-host` CLI.

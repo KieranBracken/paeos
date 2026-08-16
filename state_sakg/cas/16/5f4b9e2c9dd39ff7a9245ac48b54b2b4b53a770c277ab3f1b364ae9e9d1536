@@ -1,0 +1,23 @@
+# DEBT-0006 — Consolidate `SealAuthority` Index Under `Projector[SealRecord]`
+
+**Status**: OPEN  
+**Filed**: 2026-07-28  
+**Priority**: Low  
+**Category**: Code Refactoring / TCB DRY Enforcement  
+
+---
+
+## 1. Compromise
+`SealAuthority` in [kernel/seal.py](file:///Users/bob/GitHub/paeos/kernel/seal.py) implements its own in-memory index rebuild loop (`_rebuild_index`) by iterating directly over ledger rows at startup.
+
+## 2. Reason
+Task **B0.9 (Seal Authority)** was implemented prior to Task **B0.10 (Projections & Replay Engine)**. `kernel/projections.py` now provides the canonical, generic `Projector[S]` fold pattern over the ledger.
+
+## 3. Ideal Solution
+Refactor `SealAuthority`'s index initialization to consume `kernel/projections.py`'s `Projector[SealIndexState]` fold pattern rather than maintaining a custom ledger scan loop.
+
+## 4. Repayment Conditions
+Repay during post-Phase 0 kernel refactoring or during Phase 1 projection expansion.
+
+## 5. Estimated Impact
+Low operational impact (`SealAuthority` passes all 13 unit/restart tests today). Eliminates ~30 lines of redundant ledger scanning logic in the TCB.

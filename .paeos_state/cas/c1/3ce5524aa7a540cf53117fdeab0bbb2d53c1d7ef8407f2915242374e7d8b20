@@ -1,0 +1,24 @@
+# Adversarial Critique: Next Canonical Layer Candidates
+
+Based on the Research Dossier for the PAEOS SoftLoop, here is the adversarial critique of the three proposed architectural candidates.
+
+## Candidate A: L06 (Trade-off Analysis) - *Recommended by Research*
+* **Architectural Shortcuts:** Implementing L06 now forces its output (`Trade-off Matrix`) to be consumed directly by L08 (System Design) because L07 (Mitigation) does not exist yet. This creates an immediate architectural shortcut (L06 -> L08), skipping the crucial mitigation phase.
+* **Hidden Coupling:** By skipping L07, L08 will be forced to implicitly handle risk mitigation logic. This introduces hidden coupling where the Design phase is burdened with responsibilities (mitigating identified trade-offs) that canonically belong to L07. 
+* **Premature Abstractions:** Designing the `TradeOffArtifact` contract without having its true canonical consumer (L07) implemented risks creating a premature abstraction. The contract may not properly serve L07 once it is eventually built.
+* **Prerequisite Assessment:** L06 has no upstream missing dependencies (L04 and L05 are implemented). However, it is not a complete solution for self-construction on its own; it immediately necessitates L07 to avoid corrupting L08. While no missing layer must *precede* L06, building it mandates that L07 must immediately *follow* it.
+
+## Candidate B: L17 (Retrospective)
+* **Architectural Shortcuts:** L17 is designed to feed L18 (Memory Update). Since L18 is missing, L17's output will either be a dead end (producing no systemic learning) or will require an architectural shortcut (e.g., injecting retrospective data directly into the global context).
+* **Hidden Coupling:** If we shortcut L17's output into the next run's context without formalizing L18, we introduce hidden coupling between the retrospective artifact and the Context Compiler, bypassing and breaking the canonical dataflow.
+* **Premature Abstractions:** Formalizing root cause analysis structures (CER-4) before knowing how L18 will process and store them is premature. The data abstraction will likely be wrong without the downstream consumer defining the contract.
+* **Prerequisite Assessment:** L17 is NOT genuinely a prerequisite for autonomous self-construction right now. It is a retrospective tool for the evolution loop. To get meaningful retrospectives, the core construction pipeline must be robust. The memory update mechanism (L18) is arguably a more critical foundational piece to design before generating retrospective data for it.
+
+## Candidate C: L09 (Multi-Perspective Critique)
+* **Architectural Shortcuts:** L09 sits between L08 (Design) and L10 (Adversarial Review). If L10 is currently implemented as a monolithic block, forcing L09 into the pipeline will require a shortcut to adapt L09's 7-perspective finding register output for whatever currently follows L08.
+* **Hidden Coupling:** Introducing L09 requires a robust feedback loop mechanism to route back to L08 if the critique finds flaws. If the orchestrator lacks formal back-edge state machine routing, L09 will be tightly coupled to an informal, hacky retry loop inside L08.
+* **Premature Abstractions:** Decomposing critique into 7 distinct perspectives is a massive premature abstraction when the upstream layers (L06, L07) aren't even providing formal trade-off and mitigation data to ground the design.
+* **Prerequisite Assessment:** Another layer MUST precede L09. As noted in the dossier, "critique will be noisy without L06/L07 matrices". L09 evaluates the design, but the design currently lacks the foundational constraints of trade-off and mitigation. Therefore, L06 and L07 are strict prerequisites that must precede L09 to prevent hallucinated or ungrounded critiques.
+
+## Conclusion
+The research recommendation of **L06 (Trade-off Analysis)** is the most viable path forward as it respects the upstream dependency chain. However, it is flawed if implemented in isolation. If L06 is built, it will create a shortcut and hidden coupling directly into L08. The system must acknowledge that building L06 commits it to immediately building L07 (Mitigation) before L08 can safely and canonically consume the data without accumulating architectural debt.

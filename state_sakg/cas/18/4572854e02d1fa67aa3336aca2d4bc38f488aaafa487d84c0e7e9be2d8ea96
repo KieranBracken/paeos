@@ -1,0 +1,18 @@
+# DEBT-0054 — Broad Security Permission Bypass via `--dangerously-skip-permissions` in `claude_cli_invoker`
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-integrations** (touches `runtime/integrations/__init__.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+In `runtime/integrations/__init__.py`, `claude_cli_invoker` passes `--dangerously-skip-permissions` to every headless `claude` CLI invocation.
+
+## 2. Root Cause
+
+Headless execution inside isolated temporary sandboxes cannot respond to interactive UI permission prompts for tool calls (e.g. `Bash` or MCP tools). To prevent headless sessions from hanging, `--dangerously-skip-permissions` was added. However, this bypasses fine-grained tool permission enforcement specified in `SessionSpec.allowed_tools` and `TaskPackage.permissions`.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Maintain `--dangerously-skip-permissions` for headless execution while relying on `workspace_source` isolation and post-execution `_collect_writes` filtering as security boundaries.
+- **Long-term:** Configure non-interactive CLI permission flags explicitly per tool (or via non-interactive config profiles) to preserve principle of least privilege without relying on global permission bypass flags.

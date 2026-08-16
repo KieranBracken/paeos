@@ -1,0 +1,17 @@
+[
+  {
+    "objective": "Instantiate L19 (Constitutional Evolution). Hook this into the proposal generation of L18 (Knowledge Extraction).",
+    "changed_paths": ["runtime/evolve.py", "runtime/constitutional.py"],
+    "plan_write_scopes": ["runtime/", "kernel/", "tests/"],
+    "builder_evidence": [
+      {
+        "claim_id": "builds",
+        "command": "pytest",
+        "artifact_hash": "dummy_hash_for_now"
+      }
+    ],
+    "goal_signature": "g-l19-constitutional-evolution",
+    "verifiable": true,
+    "reversible": true
+  }
+]

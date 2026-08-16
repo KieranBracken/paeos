@@ -1,0 +1,36 @@
+# PAEOS RESEARCH Stage Transcript — Architectural Self-Hosting Dependency Evaluation
+
+Conducted architectural research against canonical `spec/PAEOS-9-execution-architecture.md`, the 230+ debt ledger entries (`ledger/debt/`), and the research backlog (`backlog/research/`).
+
+The candidates were evaluated against the 7 mandatory self-hosting criteria:
+
+---
+
+## Candidate 1: Reasoning Continuity Layer (RCL) (`PAEOS_REASONING_CONTINUITY_RB_v0.1.md`)
+- **Self-Hosting Role:** Preserves structured cognitive trajectories (decisions, rejected paths, active hypotheses) across ephemeral agent sessions and quota reset boundaries.
+- **Dependency Position:** Sits at L03 (Context Compiler) / L-J (Memory Layer). It builds on existing CAS and TaskPackage primitives.
+- **Prerequisites:** None missing. Fully self-contained within current L01–L03 capabilities.
+- **Impact if Deferred:** Severe cognitive drift across multi-session autonomous runs; loss of decision rationale between checkpoints.
+- **Leverage:** Multiplicative enabler for all subsequent self-construction cycles (L04–L19).
+- **Cleanliness:** Can be cleanly implemented in `runtime/` without introducing transitional shortcuts.
+
+## Candidate 2: Dynamic Capability Discovery Engine (`RB-0009-organisational-cognition...`)
+- **Self-Hosting Role:** Enables dynamic registration of MCP servers and agent skills during execution.
+- **Dependency Position:** Sits at L18 (Skill Compilation) / L-P (Capability Registry).
+- **Prerequisites:** Requires mature L17 Evolution Layer and MCP server lifecycle hooks.
+- **Impact if Deferred:** Agents remain bounded by static skill manifests; manageable in short-term Phase 2.
+- **Leverage:** High long-term flexibility, but lower immediate leverage than continuity.
+- **Cleanliness:** High risk of premature abstraction if built before L17/L18 are fully grounded.
+
+## Candidate 3: Autonomous Technical Leadership & Debt Triage (`RB-0008`)
+- **Self-Hosting Role:** Automatically triages surfaced friction and debt entries into high-leverage refactoring intakes.
+- **Dependency Position:** Sits at L17 (Evolution Layer) / L-N (Debt Governance).
+- **Prerequisites:** Requires working ADE and Scar Store.
+- **Impact if Deferred:** Debt continues to accumulate passively; requires manual or ADE-driven synthesis.
+- **Leverage:** Moderate; currently partially covered by the ADE bootstrap.
+- **Cleanliness:** Can be partially implemented, but full realization depends on L17/L18.
+
+---
+
+## Summary Recommendation
+Candidate 1 (RCL) emerges as the primary prerequisite for safe, continuous multi-agent self-construction. Candidates 2 and 3 depend on downstream layers (L17/L18) that are better constructed after reasoning continuity is established.

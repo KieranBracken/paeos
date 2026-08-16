@@ -1,0 +1,19 @@
+# DEBT-0016: Physical Repository Tree Duplication in Probative Verification Workspace
+
+## Compromise
+Task B2.N implemented `build_verification_workspace` in `runtime/verification.py` by performing a full `shutil.copytree` of the repository into a temporary directory before applying uncommitted builder artifacts.
+
+## Reason
+Required to quickly land probative court verification (FR-4 / Task B2.N) so the court could execute python reproduction assertions against the builder's uncommitted changes without mutating the host workspace tree.
+
+## Ideal Solution
+Use an ephemeral `git worktree` or a copy-on-write CAS virtual overlay filesystem instead of copying all repository files to disk for every court verification execution.
+
+## Repayment Conditions
+Repay during Phase 3 scale-up when multi-goal parallel backlogs increase disk I/O and workspace setup latency.
+
+## Priority
+Medium
+
+## Estimated Impact
+Sub-optimal execution speed and unnecessary disk allocation during large-scale self-hosting runs.

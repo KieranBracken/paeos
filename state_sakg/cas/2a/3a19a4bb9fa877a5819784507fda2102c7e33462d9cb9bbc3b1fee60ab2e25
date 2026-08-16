@@ -1,0 +1,22 @@
+# DEBT-0074 — Unratified Research Backlog (RB-0008/0009) Primitives Operating at Runtime
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3 / CER-2
+Level: **runtime-constitution** (touches `runtime/friction.py`, `backlog/research/RB-0008-autonomous-technical-leadership.md`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`runtime/friction.py` implements autonomous technical leadership primitives (ROI leverage scoring, confidence auto-promotion to `INTAKE_FIX`, dynamic queue re-ordering, and `PAEOS-IP-XXXX.md` auto-proposal filing) derived from `backlog/research/RB-0008` and `RB-0009`.
+
+While IP-0001 through IP-0013 have been formally proposed and ratified, the operational primitives of RB-0008 and RB-0009 dynamically alter runtime queue ordering, suppress debt filing by auto-downgrading to `INTAKE_FIX`, and generate proposal files without a ratified PAEOS-IP establishing their constitutional rules, blast-radius boundaries, or human ratification invariants.
+
+Executing un-ratified research primitives at runtime violates CER-2 and A4 human ratification principles.
+
+## 2. Root Cause
+
+Implementation of RB-0008/RB-0009 research backlog concepts directly into `runtime/friction.py` without first authoring and ratifying a corresponding PAEOS-IP proposal.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Draft and submit a formal PAEOS-IP for Autonomous Technical Leadership & Dynamic Friction Handling.
+- **Long-term:** Enforce that runtime behavioral changes modifying queue priority or proposal generation require a ratified PAEOS-IP prior to implementation.

@@ -1,0 +1,39 @@
+import os
+import pytest
+from rcl.models import Decision, Evidence
+from rcl.store import JSONContinuityStore
+from rcl.context import ContextBuilder
+from rcl.providers import DummyProvider
+
+def test_rcl_integration(tmp_path):
+    store_file = tmp_path / "test_store.json"
+    store = JSONContinuityStore(filename=str(store_file))
+    
+    # 1. Create a mission and record state
+    mission_id = "m-123"
+    store.create_mission(mission_id, "Implement feature X")
+    store.record_decision(mission_id, Decision(decision_id="d-1", description="Use Python"))
+    store.record_evidence(mission_id, Evidence(evidence_id="e-1", content="Python is good"))
+    
+    # 2. Re-instantiate the store (simulating fresh session)
+    fresh_store = JSONContinuityStore(filename=str(store_file))
+    mission = fresh_store.get_mission(mission_id)
+    assert mission is not None
+    assert len(mission.decisions) == 1
+    assert mission.decisions[0].description == "Use Python"
+    
+    # 3. Context Builder
+    builder = ContextBuilder(fresh_store)
+    context_pkg = builder.build_context(mission_id, "FULL_CONTINUATION")
+    
+    assert "Implement feature X" in context_pkg.content
+    assert "Use Python" in context_pkg.content
+    assert "Python is good" in context_pkg.content
+    
+    # 4. Provider Layer
+    provider = DummyProvider()
+    inv = provider.start_invocation(context_pkg, "gemini", "gemini-1.5-pro")
+    assert inv.status == "STARTED"
+    
+    res = provider.complete_invocation(inv.invocation_id, "Feature implemented.")
+    assert res.result == "Feature implemented."

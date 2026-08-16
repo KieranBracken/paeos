@@ -1,0 +1,20 @@
+# DEBT-0051 — Unratified RB-0008 Primitives Implementation in Substrate
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3 / CER-5
+Level: **runtime-architecture** (touches `runtime/friction.py` & `ops/autonomous_run.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`runtime/friction.py` implements RB-0008 Primitives 4 (ROI Leverage Scoring: substrate ×3, recurring ×2, blast radius +1) and 5 (Confidence & Auto-Promotion Thresholds), dynamically generating `DEBT`, `RESEARCH`, `PROPOSAL`, and `INTAKE_FIX` items on disk.
+
+However, commit `44574a4` explicitly reverted the formal specification files `operations/AUTONOMOUS_TECHNICAL_LEADERSHIP.md`, `spec/ADE-1-architecture.md`, and `spec/KAE-1-architecture.md`. `runtime/friction.py` was nevertheless built and merged into `main` without an active ratified specification or approved `PAEOS-IP-XXXX.md`.
+
+## 2. Root Cause
+
+Implementation proceeded ahead of formal constitutional ratification under CER-5 and Founder Implementation Principles. The friction module was added directly to `runtime/` while the underlying protocol specifications were reverted.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Maintain `runtime/friction.py` as an operational runtime utility for autonomous run monitoring, but flag its scoring constants as provisional.
+- **Long-term:** Author and ratify a formal `proposals/PAEOS-IP-0014-autonomous-friction-scoring.md` detailing Primitives 4 & 5 to align code with ratified architecture.

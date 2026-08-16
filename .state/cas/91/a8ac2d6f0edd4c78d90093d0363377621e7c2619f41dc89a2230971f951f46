@@ -1,0 +1,20 @@
+{
+  "objective": "Instantiate L04 Ambitious Ideation (IDEATE) in the canonical SoftLoop execution pipeline. Insert StageId.IDEATE into the planner stage loop in SoftLoop._run_body() between RE_DERIVE and DESIGN. Define the IDEATE task package prompt template that consumes the L03 derivation artifact and produces a structured IdeationSet artifact (multiple candidate approaches with rationale) saved to CAS. Ensure the ContextCompiler threads the derivation artifact forward and the IdeationSet becomes context for subsequent stages.",
+  "changed_paths": [
+    "runtime/orchestrator/__init__.py",
+    "runtime/agents/__init__.py",
+    "runtime/context_compiler.py"
+  ],
+  "plan_write_scopes": [
+    "runtime/"
+  ],
+  "goal_signature": "g-l04-ideate-instantiation",
+  "verifiable": true,
+  "reversible": true,
+  "accept": [
+    "StageId.IDEATE explicitly orchestrated in SoftLoop._run_body() between RE_DERIVE and DESIGN",
+    "IDEATE stage produces a structured IdeationSet artifact saved to CAS",
+    "IdeationSet artifact threaded as context_ref to subsequent planner stages",
+    "Tests pass validating L04 execution in the canonical pipeline"
+  ]
+}

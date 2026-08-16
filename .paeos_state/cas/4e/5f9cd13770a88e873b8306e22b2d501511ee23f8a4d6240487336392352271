@@ -1,0 +1,161 @@
+{
+  "schema": "paeos.ideation.candidate_set/v1",
+  "stage": "IDEATE",
+  "layer": "L04",
+  "role": "PLANNER",
+  "goal": "Construct canonical layer L07 Trade-off Mitigation (StageId.MITIGATION) as a real, gate-routed stage of the autonomous SoftLoop.",
+  "narrative_artifact": "ideation/L07_MITIGATION_IDEATION_SET.md",
+  "produced_evidence": "candidate_set",
+  "read_scope_disclosure": "Produced under IDEATE read scopes; runtime/ and kernel/ were not read. Code claims are quoted from the intake or listed as open_verifications.",
+
+  "derivation_constraints": [
+    { "id": "DC-1", "statement": "Generation is cheap; verification and judgment are scarce.", "source": "derivation/PAEOS-0-foundations.md first-principles.1" },
+    { "id": "DC-2", "statement": "Context is ephemeral; agents must be restartable from files alone.", "source": "derivation/PAEOS-0-foundations.md first-principles.2" },
+    { "id": "DC-3", "statement": "Errors correlate within a framing and decorrelate across stances; the only justification for multi-agent anything.", "source": "derivation/PAEOS-0-foundations.md first-principles.3" },
+    { "id": "DC-4", "statement": "Any rule not enforced mechanically decays.", "source": "derivation/PAEOS-0-foundations.md entropy law" },
+    { "id": "DC-5", "statement": "Route, don't pipeline: ceremony depth from verifiability x reversibility.", "source": "derivation/PAEOS-0-foundations.md; spec/PAEOS-9 8.3" },
+    { "id": "DC-6", "statement": "Every component ships with its own falsifier; a plan that cannot fail is a vibe.", "source": "derivation/PAEOS-0-foundations.md therefore.3" },
+    { "id": "DC-7", "statement": "The terminal value is low cost of change, not elegance.", "source": "derivation/PAEOS-0-foundations.md" },
+    { "id": "DC-8", "statement": "Hard minimality budget; the kernel taxes every prompt.", "source": "derivation/PAEOS-0-foundations.md therefore.4" },
+    { "id": "DC-9", "statement": "The four-tuple is the only legal state change; the gate is the only legal exit; deterministic evidence is kernel-re-run.", "source": "spec/PAEOS-7.6 4; spec/PAEOS-9 8.5" },
+    { "id": "DC-10", "statement": "Maximum leverage per founder intervention; every escalation ends in an artifact amendment.", "source": "derivation/PAEOS-0-foundations.md" }
+  ],
+
+  "cross_cutting_constraints": [
+    { "id": "CC-1", "statement": "L07 is unconditional in the kernel. WORKFLOW_STATE_MACHINE.yaml:179 offers a L06->L08 'no material risk' bypass that the lattice forbids, so every substantial run must execute L07 and emit a catalogue even with an empty risk set.", "conflicts_with": "operations/WORKFLOW_STATE_MACHINE.yaml:179" },
+    { "id": "CC-2", "statement": "Trace-A auto-discharge must still write a minimal catalogue object to the CAS, because SI-4 binding requires an artifact_hash for the {auto_pass, trace_a, runtime} stub to bind to.", "source": "spec/PAEOS-9:745; spec/PAEOS-7.6 6" },
+    { "id": "CC-3", "statement": "Coverage is not adequacy. A coverage oracle converts always-passes into trivially-satisfiable; 'safeguard: TBD' clears it. Each candidate must state which vacuity it defeats.", "source": "constitution/canaries/CANARY-0002.json" },
+    { "id": "CC-4", "statement": "Deterministic evidence needs a re-runnable command; non-deterministic (judgment) evidence needs two independent producers within tolerance.", "source": "spec/PAEOS-7.6 6 gate rules" },
+    { "id": "CC-5", "statement": "Irreversible accepted-risk escalation is a deliberate stop; blocking is safe indefinitely and the clock pauses. Per DC-10 the answer must terminate in a policy amendment.", "source": "operations/ENGINEERING_LIFECYCLE.md:111; spec/PAEOS-9 8.4" }
+  ],
+
+  "converged_core": [
+    "MITIGATION inserted into SoftLoop._run_body between TRADEOFF and DESIGN",
+    "_MITIGATION RoleSpec, role PLANNER, runtime write scope 'mitigation/' only",
+    "non-empty required_evidence obligation asserting the L07 exit guard",
+    "mitigation catalogue artifact emitted to CAS and carried to DESIGN via planner_artifacts",
+    "both MITIGATION edges routed through Gate.propose_transition with the four-tuple",
+    "gate failure takes the existing REMAND route",
+    "runtime/mitigation.py stub deleted or fully replaced"
+  ],
+
+  "candidates": [
+    {
+      "id": "A",
+      "name": "Inline Gated Node with a Deterministic Coverage Oracle",
+      "locus_of_enforcement": "a kernel-re-runnable checker script",
+      "dispatch_shape": "one PLANNER session",
+      "severity_source": "computed inside L07 from router axes (verifiability x reversibility)",
+      "adversary": "deferred to L09, recorded as debt",
+      "obligation_kinds": ["TEST/DETERMINISTIC"],
+      "grounded_in": ["DC-1", "DC-4", "DC-8", "DC-9"],
+      "rationale": "Smallest conforming diff and fully mechanical enforcement; the only candidate near-certain to seal this cycle, which matters because L07 gates three ordered successor goals.",
+      "tradeoffs": "Buys sealability at the cost of adequacy; severity and safeguards are authored by one mind, so the oracle cannot detect a lowered severity.",
+      "failure_modes": [
+        { "id": "F-A1", "severity": "high", "reversibility": "reversible", "statement": "Placeholder safeguards ('TBD') clear the coverage oracle.", "detection": "mutation test: blank each safeguard and confirm the oracle still passes", "containment": "require resolvable owner_artifact_ref and a machine-evaluable trigger predicate" },
+        { "id": "F-A2", "severity": "high", "reversibility": "reversible", "statement": "Self-marked severity: the planner downgrades a risk instead of mitigating it.", "detection": "not detectable within one session", "containment": "candidate D" },
+        { "id": "F-A3", "severity": "medium", "reversibility": "reversible", "statement": "The checker itself becomes vacuous (CANARY-0002 proper) if it never loads the artifact under review.", "detection": "revert-the-change negative test must fail", "containment": "acceptance test discrimination clause" },
+        { "id": "F-A4", "severity": "low", "reversibility": "reversible", "statement": "Empty-risk runs (CC-1) trip an oracle that demands at least one row.", "detection": "unit test with an empty catalogue", "containment": "accept well-formed empty, reject missing" }
+      ],
+      "cost_per_run_sessions": 1,
+      "blast_radius": "smallest",
+      "sealable_this_cycle": "very likely"
+    },
+    {
+      "id": "B",
+      "name": "Adversarial Dual-Session Node (Planner proposes, Adversary attacks, IBM between)",
+      "locus_of_enforcement": "role separation across decorrelated model families",
+      "dispatch_shape": "two sessions in one stage: PLANNER then ADVERSARY behind the InformationBarrierManager",
+      "severity_source": "as A, but adversary may contest a severity",
+      "adversary": "in-stage, decorrelated model family (A-08)",
+      "obligation_kinds": ["TEST/DETERMINISTIC (coverage)", "CITATION/JUDGMENT (adversary_survived)"],
+      "grounded_in": ["DC-3", "DC-6", "CC-4"],
+      "rationale": "The only candidate implementing L07 as specified (Planner + Adversary, ENGINEERING_LIFECYCLE.md:105; ROLE_RESPONSIBILITIES.md:57 names L07 as an Adversary station) and the only one satisfying the two-producer rule for judgment evidence.",
+      "tradeoffs": "About 2x per-run cost and materially more runtime surface; puts the IBM inside a stage rather than at a boundary; depends on an unverified kernel capability question.",
+      "failure_modes": [
+        { "id": "F-B1", "severity": "high", "reversibility": "reversible", "statement": "Remand oscillation: an adversary that always finds something burns the goal budget.", "containment": "hard remand cap (SI-9/T5); Nth remand escalates rather than retries" },
+        { "id": "F-B2", "severity": "medium", "reversibility": "reversible", "statement": "Adversarial theatre: findings with no failing case satisfy the claim without discriminating.", "containment": "require the 3.5/5.5 court format: violated-principle, evidence, severity, smallest-amendment" },
+        { "id": "F-B3", "severity": "medium", "reversibility": "reversible", "statement": "Epistemic leakage: an IBM bundle defaulting to full inclusion re-correlates the adversary with the planner.", "source": "PAEOS_CANONICAL_EXECUTION_VERDICT.md self-consistency threat", "containment": "semantic filtering in projections.py; pass artifacts, strip rationale" },
+        { "id": "F-B4", "severity": "low", "reversibility": "standing cost", "statement": "Two Opus sessions per L07 on every substantial run is a permanent tax.", "containment": "EVAD-bounded adversary invocation" }
+      ],
+      "cost_per_run_sessions": 2,
+      "blast_radius": "medium",
+      "sealable_this_cycle": "likely; degrades to A if OPEN-VERIFY-3 fails"
+    },
+    {
+      "id": "C",
+      "name": "Declarative Policy-Table Stage Driver (Architecture D as a reusable primitive)",
+      "locus_of_enforcement": "the topology substrate: a StageSpec table plus a generic run_gated_stage driver",
+      "dispatch_shape": "one PLANNER session, dispatched by the generic driver",
+      "severity_source": "as A",
+      "adversary": "deferred to L09",
+      "obligation_kinds": ["TEST/DETERMINISTIC"],
+      "grounded_in": ["DC-4", "DC-7", "DC-9"],
+      "rationale": "The ratified verdict holds that topology must be owned by Kernel Gates and Policy, not an imperative script; A and B fix F2 at one node by hand, C fixes the mechanism by which nodes go missing. Best against DC-7: the three successor goals become table rows.",
+      "tradeoffs": "Generalizes from one data point; largest blast radius, on the layer the whole loop depends on; the D-architecture critique warns of policy deadlock with no imperative fallback.",
+      "failure_modes": [
+        { "id": "F-C1", "severity": "high", "reversibility": "reversible", "statement": "Policy/lattice divergence halts the loop at a node the table believes is fine.", "containment": "derive table edges from is_legal at load time; never duplicate the lattice" },
+        { "id": "F-C2", "severity": "high", "reversibility": "reversible", "statement": "The driver breaks currently-working stages during migration.", "containment": "register only MITIGATION this cycle; leave the imperative path untouched" },
+        { "id": "F-C3", "severity": "medium", "reversibility": "reversible", "statement": "Premature abstraction: the driver interface is wrong for L15 (needs ledger/ write authority) and is redesigned at first reuse.", "containment": "defer generality beyond the fields L07 actually needs" },
+        { "id": "F-C4", "severity": "medium", "reversibility": "reversible", "statement": "Two orchestration paths coexist; readers cannot tell which governs a stage (F3 false-positive shape at orchestrator level).", "containment": "single registry as the authoritative list of migrated stages" }
+      ],
+      "cost_per_run_sessions": 1,
+      "blast_radius": "largest",
+      "sealable_this_cycle": "uncertain"
+    },
+    {
+      "id": "D",
+      "name": "Upstream-Typed Risk Register (contract-first at L06; L07 becomes a thin join)",
+      "locus_of_enforcement": "the hand-off data model between L06 and L07",
+      "dispatch_shape": "one PLANNER session (composes with A or B)",
+      "severity_source": "typed severity field emitted by L06 (roles: planner + reviewer)",
+      "adversary": "unchanged from the composed candidate",
+      "obligation_kinds": ["TEST/DETERMINISTIC (referential integrity join)"],
+      "grounded_in": ["DC-4", "DC-3"],
+      "rationale": "Removes self-marked severity structurally: severity is set by a different session than the one authoring safeguards, and the obligation becomes a join over two independently produced artifacts, which is much harder to satisfy vacuously.",
+      "tradeoffs": "Touches a working adjacent layer, and amending a FROZEN v1.0 state contract is arguably an L19 action rather than something an L07 intake may do.",
+      "failure_modes": [
+        { "id": "F-D1", "severity": "high", "reversibility": "reversible", "statement": "Regressing L06, losing ground the loop already held.", "containment": "additive register alongside the existing matrix; no change to existing fields" },
+        { "id": "F-D2", "severity": "medium", "reversibility": "irreversible-ish", "statement": "An L07 goal quietly performing an L19 amendment: the same authority-boundary defect that deferred L15 and L18.", "containment": "resolve the frozen-document question before selection" },
+        { "id": "F-D3", "severity": "medium", "reversibility": "reversible", "statement": "Register and matrix drift; L07 joins a stale register.", "containment": "bind both to the same produced_against hash (SI-4)" },
+        { "id": "F-D4", "severity": "low", "reversibility": "reversible", "statement": "Severity becomes a negotiation surface at L06 instead of L07 if the reviewer stance is not genuinely independent.", "containment": "decorrelated reviewer model family" }
+      ],
+      "cost_per_run_sessions": 1,
+      "blast_radius": "medium, on a working layer",
+      "sealable_this_cycle": "likely, if the frozen-document question resolves"
+    }
+  ],
+
+  "idealized_solution": {
+    "statement": "The full walk is a policy-driven event-sourced machine in which no stage is reachable except through propose_transition; L06 emits a typed severity-bearing risk register under a planner+reviewer split; L07 runs Planner and Adversary in decorrelated model families behind a semantically-filtering IBM with EVAD-bounded invocation; each safeguard carries a machine-evaluable trigger and an executable falsifier so the oracle tests adequacy by MUTATION rather than coverage; irreversible accepted-risks escalate to a batched founder queue whose answers terminate in policy amendments; Trace-A discharges the same machine at lower ceremony with a bound stub artifact.",
+    "projections": { "C": "policy-driven topology", "D": "typed risk register", "B": "planner+adversary behind the IBM", "A": "the floor of the mutation-tested oracle" },
+    "unbought_by_every_candidate": "the mutation-tested adequacy oracle; recommended to be carried as named debt rather than claimed"
+  },
+
+  "decorrelation_assessment": {
+    "degenerate": false,
+    "axis": "where enforcement lives: deterministic oracle (A) vs role separation (B) vs topology substrate (C) vs hand-off schema (D)",
+    "key_observation": "A, C and D all leave adequacy unchecked; only B attacks it. Only C reduces the probability that the next layer goes missing. These properties are orthogonal, which is what makes the composite worth L06's attention rather than a straight pick."
+  },
+
+  "preliminary_lean": {
+    "binding": false,
+    "recommendation": "B compose C, staged; A as the guaranteed floor",
+    "concretely": "Build C's run_gated_stage driver with MITIGATION as its only registered row (bounding F-C2 by construction); give it A's deterministic coverage oracle as the mandatory obligation; add B's adversary session behind a feature-gated second claim only if OPEN-VERIFY-3 clears. Record F-A1 and F-A2 as explicit debt with D named as the scheduled repair.",
+    "rationale": "C pays down the cause rather than the instance (DC-7); B honours the axiom that justifies multi-agent spend at all (DC-3); A is the only one certain to seal this cycle, and a sealed L07 is a precondition for L15, full-walk gating and L18."
+  },
+
+  "delegated_open_questions": {
+    "a_adversary": { "status": "answered per candidate", "note": "B answers in-stage; A/C/D defer to L09. Deferral is a documented departure from ROLE_RESPONSIBILITIES.md:57, not merely an unbuilt nicety." },
+    "b_severity": { "status": "answered per candidate", "note": "A/C compute inside L07 from router axes (self-marked); D types it at L06 (structurally sound, touches a working and possibly frozen contract)." },
+    "c_trace_a": { "status": "answered structurally and identically across candidates", "note": "CC-2: write a minimal catalogue object to the CAS and bind the {auto_pass, trace_a, runtime} stub to its hash. Auto-discharge is not skip, and a stub with nothing to bind to fails SI-4." }
+  },
+
+  "open_verifications": [
+    { "id": "OPEN-VERIFY-1", "blocking": true, "applies_to": "all", "question": "Does is_legal hold for TRADEOFF->MITIGATION and MITIGATION->DESIGN across ALL WeightClass values, as the acceptance test asserts? The intake cites only the SUBSTANTIAL case for the illegal TRADEOFF->DESIGN edge.", "why_it_matters": "If any weight class restricts a MITIGATION edge, the acceptance test fails and repair needs a kernel edit, invalidating the zero-kernel-edit premise.", "where": "kernel/lifecycle.py" },
+    { "id": "OPEN-VERIFY-2", "blocking": true, "applies_to": "all", "question": "Does SI-3 separation-of-powers treat PLANNER-after-PLANNER on the same (goal, run) as a conflicting pair?", "why_it_matters": "L06 and L07 are both PLANNER; if it conflicts, the first gated MITIGATION transition denies and the loop halts at the node this goal exists to build.", "where": "kernel/gates.py; spec/PAEOS-7.6 4 step 4" },
+    { "id": "OPEN-VERIFY-3", "blocking": true, "applies_to": "B", "question": "Can mint_capability issue two tokens for the same (goal, run, stage) under different roles, given bound_to is immutable and stage-scoped?", "why_it_matters": "If not, B degrades to A plus a deferred adversary.", "where": "kernel/" },
+    { "id": "OPEN-VERIFY-4", "blocking": false, "applies_to": "all", "question": "Which weight classes actually reach TRADEOFF in the live SoftLoop?", "why_it_matters": "If ROUTINE runs never enter the cognitive pipeline, the Trace-A stub path is untestable end-to-end and must be covered at unit level.", "where": "runtime/orchestrator/__init__.py" },
+    { "id": "OPEN-VERIFY-5", "blocking": false, "applies_to": "documentation", "question": "Who owns the L06->L08 'no material risk' bypass in WORKFLOW_STATE_MACHINE.yaml:179 that the kernel lattice forbids?", "why_it_matters": "A live doc/kernel divergence of the same species as Finding 4 in the gaps register; it will mislead the next reader.", "where": "operations/WORKFLOW_STATE_MACHINE.yaml:179" }
+  ]
+}

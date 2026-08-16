@@ -1,0 +1,19 @@
+# DEBT-0053 — Un-derived Queue Mutation and Coupling of `RunOutcome` to `Intake`
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3 / CER-5
+Level: **runtime-scheduler** (touches `runtime/orchestrator/__init__.py` & `runtime/scheduler.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`RunOutcome` in `runtime/orchestrator/__init__.py` was extended with `high_leverage_intake: Intake | None = None`. In `runtime/scheduler.py` (`ContinuousScheduler` and `ConcurrentScheduler`), if `outcome.high_leverage_intake` is set (when friction leverage >= 5.0), the scheduler prepends the repair intake directly to the front of the active queue (`queue.appendleft`).
+
+## 2. Root Cause
+
+1. `RunOutcome` (a core orchestrator execution result) is coupled directly to `Intake` (a scheduler data structure) and to friction-scoring heuristics.
+2. Dynamically constructing and injecting repair intakes into the running scheduler queue bypasses the formal PAEOS engineering lifecycle (`ENGINEERING_LIFECYCLE.md`), where every intake must undergo triage and playbook stage execution (DESIGN -> PLAN -> IMPLEMENT).
+
+## 3. Remediation Strategy
+
+- **Short-term:** Keep high-leverage queue prepending isolated within `ContinuousScheduler` / `ConcurrentScheduler` to ensure critical substrate repairs are not dropped.
+- **Long-term:** Decouple `RunOutcome` from `Intake`. High-leverage repair requests should be emitted as formal event signals or triage inputs rather than mutating `RunOutcome` and `ContinuousScheduler` in-flight.

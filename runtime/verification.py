@@ -17,6 +17,7 @@ stays F2-SOFT; the resource-limited sandbox and the deterministic-reproduction c
 
 from __future__ import annotations
 
+import logging
 import shutil
 import tempfile
 from collections.abc import Callable
@@ -26,6 +27,8 @@ from kernel.cas import CAS
 from kernel.ledger import JsonValue
 from kernel.sandbox import run_sandboxed
 from kernel.types import Hash
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["build_verification_workspace", "vacuous_commands", "workspace_runner"]
 
@@ -60,18 +63,53 @@ def vacuous_commands(
     cas: CAS,
     commands: tuple[str, ...],
 ) -> tuple[str, ...]:
-    """The **vacuous** commands (B2.O): those whose sandboxed result is **identical** whether the
-    builder's change is applied or not — zero discriminating power, so they prove nothing about the
-    change (the defect the live Adversary caught, now mechanised). Runs each command in a workspace
-    *with* the change and a baseline *without* it, once each."""
+    """The **vacuous** commands (B2.O / CANARY-0002): those whose sandboxed result is **identical**
+    whether the production implementation change is applied or not — zero discriminating power.
+
+    HARDENED CANARY-0002 DISCRIMINATION:
+    - `with_change`: repo_root + all written files (production implementation + test files).
+    - `baseline`: repo_root + written TEST files ONLY, with production implementation files reverted.
+    The test file runs in BOTH environments. The command MUST fail in `baseline` (proving the
+    production implementation is required) and pass in `with_change`."""
     with_change = build_verification_workspace(repo_root, written_paths, cas)
     baseline = build_verification_workspace(repo_root, (), cas)
+
+    for rel_path, artifact_hash in written_paths:
+        target = baseline / rel_path
+        is_test_file = rel_path.startswith("tests/") or "test_" in rel_path or rel_path.endswith("_test.py")
+        if is_test_file:
+            # Apply new test file to baseline workspace so the test executes against baseline code
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(cas.get(artifact_hash))
+        else:
+            # Revert non-test production implementation file in baseline workspace
+            orig_file = repo_root / rel_path
+            if orig_file.is_file():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(orig_file.read_bytes())
+            elif target.is_file():
+                target.unlink()
+            elif target.is_dir():
+                shutil.rmtree(target, ignore_errors=True)
+
     try:
         run_with, run_without = workspace_runner(with_change), workspace_runner(baseline)
-        return tuple(c for c in commands if run_with(c) == run_without(c))
+        vacuous: list[str] = []
+        for c in commands:
+            res_with = run_with(c)
+            res_without = run_without(c)
+            is_test_cmd = "pytest" in c or "test" in c
+            # Vacuous if identical output in both environments, or if a test passes in baseline without implementation
+            if res_with == res_without:
+                vacuous.append(c)
+            elif is_test_cmd and res_with.get("exit_code") == 0 and res_without.get("exit_code") == 0:
+                vacuous.append(c)
+        return tuple(vacuous)
     finally:
         shutil.rmtree(with_change, ignore_errors=True)
         shutil.rmtree(baseline, ignore_errors=True)
+
+
 
 
 def workspace_runner(workspace: Path) -> Callable[[str], dict[str, JsonValue]]:
@@ -84,3 +122,21 @@ def workspace_runner(workspace: Path) -> Callable[[str], dict[str, JsonValue]]:
         return {"exit_code": exit_code, "stdout": result.stdout}
 
     return _run
+
+
+def check_ast(
+    repo_root: Path, written_paths: tuple[tuple[str, Hash], ...], cas: CAS
+) -> tuple[str, ...]:
+    """Verify that all written python files comply with PAEOS AST exception handling rules."""
+    from runtime.ast_linter import check_ast as check_ast_linter
+
+    violations: list[str] = []
+    for rel_path, artifact_hash in written_paths:
+        if not rel_path.endswith(".py"):
+            continue
+        code = cas.get(artifact_hash).decode("utf-8")
+        file_violations = check_ast_linter(code)
+        for v in file_violations:
+            violations.append(f"{rel_path}: {v}")
+    return tuple(violations)
+

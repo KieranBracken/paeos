@@ -1,0 +1,17 @@
+# PAEOS CRITIQUE Stage Transcript
+
+Adversarial critique on the proposed architectural options:
+
+## Critique of Approach 1 (Epistemic Reasoning Continuity Layer)
+- **Risks & Edge Cases:** If the ReasoningState is stored out-of-band and compiled dynamically, we risk severe context window ballooning over long execution runs. The compiler must enforce a strict token limit and lossy compaction/distillation logic.
+- **Dependency Issues:** It depends on having robust text summarizers. If the summarizer itself crashes due to quota limits, we enter a recursive dependency loop (amnesia during compaction).
+- **Constitutional Alignment:** Aligns with PAEOS-9 §4.7 (feedback loop). No violations, provided SAKG data is kept logically separated.
+
+## Critique of Approach 2 (Event-Sourced Ledger)
+- **Risks & Edge Cases:** Replaying the SQLite ledger on every boot works well for small DAGs, but is O(N) over the lifetime of the OS. It will eventually bottleneck initialization times.
+- **Dependency Issues:** SQLite database corruption or schema migration failures will block boot entirely.
+- **Constitutional Alignment:** Strong transaction security, but violates performance scaling guidelines.
+
+## Critique of Approach 3 (Asynchronous Git Workspaces)
+- **Risks & Edge Cases:** Leaving git worktrees on disk after task completion wastes massive amounts of filesystem space. It also introduces potential conflict resolution overhead that an autonomous agent cannot easily resolve without human-in-the-loop intervention.
+- **Constitutional Alignment:** Violates the spirit of absolute sandbox isolation. If paths collide, a subagent could accidentally write to a shared worktree branch, bypassing the reference monitor.

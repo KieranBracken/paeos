@@ -1,0 +1,88 @@
+# Constitutional Implementation Review: [B1.A]
+
+**Date**: 2026-07-28
+**Task**: B1.A — MCP substrate servers (PAEOS-8 §10 / 7.6 §8) · **Phase 1, first task**
+**Reviewer Role**: Auditor / Builder Self-Adversarial (Adversary pass = T1)
+
+## Summary of Findings
+
+- **BLOCKER**: 0
+- **MAJOR**: 0
+- **MINOR**: 0
+- **OBSERVATION**: 2
+
+Deliverable: `mcp/servers.py` — `ConstitutionServer`, `LedgerServer`, `ArtifactsServer`,
+`MemoryServer`, `CourtServer` + `ScarBackend`/`CourtBackend` Protocols. Evidence: 11 tests in
+`tests/mcp/test_servers.py`; **200 tests total**; ruff clean (clean-cache); pyright 0 errors
+(strict on kernel, standard on mcp); F1 2367/20000 (kernel unchanged). **F2-SOFT** (mcp/, Z2).
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Each server exposes **exactly** its 7.6 §8 methods, capability-gated (deny-by-default,
+FR-4). Two invariants are structural: **`ledger.append` is absent** (agents write only via the
+kernel's single-writer `record_event`, SI-6/T7), and the **constitution has no write method**
+(FR-1). Gating reuses the kernel `CapabilityBroker` — the MCP layer can only *check* authority,
+never widen it (Z2).
+
+### 2. Architectural Drift
+**PASS.** No new mechanism. `_authorize` verifies the token against its own binding, so the
+effective gates are the unforgeable signature, the TTL, and the operation allow-list — the checks
+an MCP boundary needs, reusing the existing broker (no kernel change).
+
+### 3. Duplication of Mechanisms
+**PASS.** Servers are thin gated dispatchers over the sealed Phase-0 modules (constitution/ledger/
+CAS) or injected backends (memory/court). No re-implementation of kernel logic.
+
+### 4. Bypassing Mechanisms
+**PASS.** Every method authorizes *before* dispatch; there is no ungated path. The ledger's write
+path is not merely denied — it is **not present** to be called.
+
+### 5. Simpler Implementation Possible
+**PASS.** One `_authorize` helper + five small classes. Operation grants follow the 7.6 §5 examples
+(`mcp:<server>[:<mode>]`); `:read`/`:write` are separate grants where 7.6 distinguishes them.
+
+### 6. Better Derivation
+**PASS.** The method surface is a 1:1 transcription of 7.6 §8; the gate is the broker's existing
+allow-list check.
+
+### 7. Hidden Technical Debt
+**PASS.** Two seams are explicit (Observations): the MCP *wire transport* and the memory/court
+*backends*. Neither is hidden; both land with named later tasks.
+
+### 8. Security Implications
+**PASS — this is an authority boundary.** Adversary pass below. A token for one server cannot reach
+another; forged and expired tokens are denied; a read grant cannot write; `ledger.append` cannot be
+reached at all. The MCP layer holds no key and can only present a token to the broker.
+
+### 9. Runtime Implications
+**PASS.** Gated dispatch; no blocking beyond the wrapped module; typed denials (`Unauthorized`).
+
+### 10. Future Extensibility
+**PASS.** B1.B's dispatcher hands agents these servers scoped by their token's `mcp_servers`
+allow-list; B1.E/B1.F implement the `CourtBackend`/`ScarBackend` Protocols; the wire transport binds
+behind the same server API.
+
+## Adversary pass (T1)
+
+1. **Unauthorized method** (token lacks the server's grant) → `Unauthorized` (tested per server).
+2. **Cross-server** (a `mcp:constitution` token used on the ledger/artifacts servers) → `Unauthorized`.
+3. **Forged token** (bad signature) → `Unauthorized`.
+4. **Expired token** (clock past TTL) → `Unauthorized`.
+5. **Read→write escalation** (a `:read` token calling `put`/`propose_scar`/`submit_evidence`) → denied.
+6. **`ledger.append`** — not exposed at all (`not hasattr`, surface == {read, verify_chain}).
+
+## OBSERVATIONS
+1. **MCP wire transport is deferred to B1.B.** This task delivers the *contract + gating* (the
+   security-critical surface the T1 acceptance tests). Binding it to the actual MCP JSON-RPC stdio
+   transport, and handing scoped server sets to real Claude Code sessions, is B1.B's integration —
+   the server API is the stable seam. (§3 does not pin an MCP library; the transport is an adapter.)
+2. **memory/court backend types are `object` placeholders.** `ScarBackend`/`CourtBackend` are
+   Protocols; the concrete scar/verdict/precedent types land with B1.F/B1.E and are deliberately not
+   invented here (CER-6). The gating contract is complete regardless of those types.
+
+## Action Items & Proposals
+- [ ] **Founder**: ratify B1.A (F2-SOFT) → merge, remote CI, tag `b1.A`.
+- [ ] **B1.B (Agent dispatcher + context compiler)** next — productionize the DEBT-0002 spike: build
+      `TaskPackage`s (compile context per PAEOS-9/9A), spawn scoped sessions, hand them these MCP
+      servers per their allow-list, parse `TaskResult`. Sequence **DEBT-0003** (durable ledger) with it.

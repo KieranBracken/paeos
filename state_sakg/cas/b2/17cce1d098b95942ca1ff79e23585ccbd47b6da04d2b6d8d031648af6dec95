@@ -1,0 +1,30 @@
+# DEBT-0079 — Order-Dependent Module Import Assertion in `tests/test_smoke.py`
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **tests** (touches `tests/test_smoke.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+In `tests/test_smoke.py`, commit `54c3f33` updated `test_skeleton_imports` to assert:
+```python
+import cli
+import kernel
+import runtime
+
+assert hasattr(kernel, "ledger")
+```
+In Python, `import kernel` only binds the package namespace object. Submodules (like `kernel.ledger`) are only attached as attributes on the `kernel` module if they are explicitly imported or if `kernel/__init__.py` exposes them.
+
+When `pytest` runs the full test suite in default ordering, previous test files (e.g., `tests/kernel/test_ledger.py`) import `kernel.ledger`, populating the attribute as a side effect. However, running `pytest tests/test_smoke.py` in isolation fails with `AssertionError: assert False`.
+
+Test assertions that rely on global module cache side-effects from earlier tests violate test isolation and create fragile test suite behavior.
+
+## 2. Root Cause
+
+Attempting to check submodule availability via `hasattr(module, "submodule")` without explicitly importing the submodules within `test_smoke.py`.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Update `test_smoke.py` to import submodules explicitly (e.g., `import kernel.ledger`, `import cli.paeos`, `import runtime.claude_code`) before checking attributes.
+- **Long-term:** Enforce isolated execution of smoke and unit tests to catch hidden order dependencies.

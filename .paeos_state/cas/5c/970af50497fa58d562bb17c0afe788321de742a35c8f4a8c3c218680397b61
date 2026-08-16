@@ -1,0 +1,23 @@
+# PAEOS Task: g-ade (RESEARCH Stage) Complete
+
+The canonical architecture, implementation matrix, and debt ledger have been thoroughly analyzed. The results of the frontier research have been synthesized into a Research Dossier inside the sandboxed workspace at `research/L06_Tradeoff_Research.md`.
+
+## Analysis Summary
+
+Based on the forensic audit (specifically `02_IMPLEMENTATION_MATRIX.md` and `07_CONSTRUCTION_SEQUENCE.md`) and the dependency DAG, the system has successfully bootstrapped L03 (RE_DERIVE), L04 (IDEATE), and L05 (RESEARCH). We evaluated three unblocked missing canonical layers to determine which should be instantiated next:
+
+1. **Candidate A: L06 (Trade-off Analysis)**
+2. **Candidate B: L17 (Retrospective)**
+3. **Candidate C: L09 (Multi-Perspective Critique)**
+
+### Evaluation against Self-Hosting Criteria
+
+- **L06 (Trade-off Analysis)** sits directly in the critical path of the cognition pipeline, right after L05 (RESEARCH). Without it, L08 (DESIGN) lacks a formal `Trade-off Matrix`, which forces it to hallucinate constraints and leads to downstream Builder failures (as evidenced by the numerous `builder produced no artifact` incidents in the `ledger/debt/`). It has no missing dependencies since L04 and L05 are now implemented.
+- **L17 (Retrospective)** is unblocked (depends on SEAL) and critical for the Evolution Loop. However, building it before closing the cognition gap means the system will continually perform root-cause analysis on the same upstream cognitive flaws.
+- **L09 (Multi-Perspective Critique)** is also unblocked (depends on DESIGN) but will be noisy and ineffective if the upstream design (L08) wasn't based on explicit trade-offs and mitigations (L06/L07).
+
+### Conclusion
+
+**L06 (Trade-off Analysis)** is the recommended next target. It satisfies strict dataflow construction principles and addresses the most urgent risk to genuine self-hosting: the gap between abstract research and concrete system design.
+
+The next stage (DESIGN) should instantiate `StageId.TRADEOFF` in `runtime/orchestrator/__init__.py`, defining a `TradeOffArtifact` contract that enforces explicit decision axes and maps the output of L05 into this new cognitive layer.

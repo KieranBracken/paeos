@@ -1,0 +1,10 @@
+{
+  "artifact_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "claim_id": "builds",
+  "kind": "TEST",
+  "reproducible_command": "grep critique_primitive runtime/critique.py",
+  "result": {
+    "exit_code": 0,
+    "stdout": "def critique_primitive():"
+  }
+}

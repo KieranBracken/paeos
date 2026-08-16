@@ -1,0 +1,20 @@
+# DEBT-0062 — Uncurated Auto-Filing of Architectural Proposals
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-2 / CER-3
+Level: **runtime-friction** (touches `runtime/friction.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`runtime/friction.py` automatically generates and writes `proposals/PAEOS-IP-XXXX.md` files when TCB-implicated failures recur (`FrictionCategory.PROPOSAL`).
+
+Automatically generating proposal files directly onto disk from raw failure strings can pollute `proposals/` with uncurated IP stubs without prior human design deliberation, violating CER-2 expectations for deliberate proposal authoring.
+
+## 2. Root Cause
+
+Friction classification attempted to automate stage 18 (`IMPROVE_RUNTIME`) IP creation end-to-end without a human-in-the-loop review gate or duplicate proposal detection.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Ensure generated proposal titles are descriptive and flag them clearly as auto-filed drafts.
+- **Long-term:** Require proposal generation to output to a draft folder or queue (`proposals/drafts/`) for human review before assigning a formal `PAEOS-IP-XXXX.md` identifier.

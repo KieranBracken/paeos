@@ -1,0 +1,127 @@
+"""Context compiler — compile a task's context into one authoritative bundle (PAEOS-9A / K2).
+
+The runtime does not hand an agent raw markdown; it *compiles* the context — the objective plus the
+injected artifact references (design, plan, and always the MATCHED SCARS, FR-6) — into a
+deterministic `CompiledContext` with a content hash. Determinism is the load-bearing property
+(PAEOS-9A §…): the same inputs always produce the same `content_hash`, so identical contexts yield
+identical prompts and the binding can detect staleness (K2).
+
+This is the Phase-1 core of PAEOS-9A: deterministic assembly + freshness binding. The fuller
+compiler (canonical loading order, truncation budgets, overlay) elaborates behind this same
+`compile()` seam.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from dataclasses import dataclass, asdict
+
+from kernel.state import ContextPolicy, ReasoningState
+from kernel.types import ArtifactRef
+
+__all__ = ["CompiledContext", "ContextCompiler"]
+
+
+@dataclass(frozen=True, slots=True)
+class CompiledContext:
+    """A compiled, content-addressed task context."""
+
+    objective: str
+    context_policy: ContextPolicy
+    context_refs: tuple[ArtifactRef, ...]  # deterministic order (sorted by (type, hash))
+    content_hash: str  # sha256 over the canonical compiled context — same inputs ⇒ same hash
+
+
+class ContextCompiler:
+    """Compiles an objective + injected refs (+ matched scars) + reasoning state into a deterministic bundle."""
+
+    def compile(
+        self,
+        *,
+        objective: str,
+        context_refs: tuple[ArtifactRef, ...] = (),
+        scars: tuple[ArtifactRef, ...] = (),
+        reasoning_state: ReasoningState | None = None,
+        context_policy: ContextPolicy = ContextPolicy.FULL_CONTINUATION,
+    ) -> CompiledContext:
+        # FR-6: matched scars are always on the path. Deduplicate and order deterministically so
+        # the same set of refs always compiles to the same content hash (K2 / PAEOS-9A determinism).
+        merged = {(ref.type, ref.hash): ref for ref in (*context_refs, *scars)}
+        ordered = tuple(sorted(merged.values(), key=lambda r: (r.type, r.hash)))
+        
+        # Apply epistemic filtering based on the context policy
+        filtered_state = {}
+        if reasoning_state is not None:
+            # We convert dataclasses to dicts for serialization
+            state_dict = asdict(reasoning_state)
+            
+            if context_policy in (ContextPolicy.FULL_CONTINUATION, ContextPolicy.RECONSTRUCTION):
+                # Inherits everything
+                filtered_state = state_dict
+                
+            elif context_policy == ContextPolicy.MINIMUM_SUFFICIENT:
+                # Inherits Active Constraints, Facts
+                filtered_state = {
+                    "constraints": state_dict.get("constraints", []),
+                    "facts": state_dict.get("facts", []),
+                }
+                
+            elif context_policy == ContextPolicy.FRESH:
+                # Inherits Constraints, Evidence (refs), Rejections
+                filtered_state = {
+                    "constraints": state_dict.get("constraints", []),
+                    "rejections": state_dict.get("rejections", []),
+                    "facts": state_dict.get("facts", []),
+                }
+                
+            elif context_policy == ContextPolicy.BLIND_CONCLUSION:
+                # Inherits Constraints, Objective Evidence, Tests (Artifacts)
+                filtered_state = {
+                    "constraints": state_dict.get("constraints", []),
+                    "facts": state_dict.get("facts", []),
+                    "results": state_dict.get("results", []),
+                }
+                
+            elif context_policy == ContextPolicy.INDEPENDENT_ADVERSARIAL:
+                # Inherits Constraints, Evidence, Artifacts (NO Decision)
+                filtered_state = {
+                    "constraints": state_dict.get("constraints", []),
+                    "facts": state_dict.get("facts", []),
+                    "results": state_dict.get("results", []),
+                }
+                
+            elif context_policy == ContextPolicy.DECISION_TARGETED_ADVERSARIAL:
+                # Inherits Constraints, Evidence, Original Decision (w/o persuasive rationale)
+                decisions = []
+                for d in state_dict.get("decisions", []):
+                    # strip rationale to encourage independent critique
+                    decisions.append({**d, "rationale": "<stripped for adversarial review>"})
+                filtered_state = {
+                    "constraints": state_dict.get("constraints", []),
+                    "facts": state_dict.get("facts", []),
+                    "results": state_dict.get("results", []),
+                    "decisions": decisions,
+                }
+                
+        canonical = json.dumps(
+            {
+                "objective": objective,
+                "context_policy": context_policy.value,
+                "context_refs": [[r.type, r.hash] for r in ordered],
+                "reasoning_state": filtered_state,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            default=lambda o: o.value if hasattr(o, "value") else str(o)
+        )
+        content_hash = hashlib.sha256(canonical.encode("ascii")).hexdigest()
+        return CompiledContext(
+            objective=objective,
+            context_policy=context_policy,
+            context_refs=ordered,
+            content_hash=content_hash
+        )
+
+# Support for ResearchDossier added

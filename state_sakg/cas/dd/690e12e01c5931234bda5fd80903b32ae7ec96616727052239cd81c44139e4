@@ -1,0 +1,898 @@
+# DESIGN — F-ENVELOPE: universal node envelope schema + fixture corpus
+
+| | |
+|---|---|
+| **Goal** | **F-ENVELOPE** — Freeze the universal node envelope schema + fixture corpus (SAEOS-1 §4.2, delivery slice S2) |
+| **Artifact** | System design: component graph, interfaces, data flow, state machine |
+| **Stage / Role** | `DESIGN` / `PLANNER` (PAEOS-7.6 §3) |
+| **Status** | DESIGN ONLY — no implementation. Frozen input to `IMPLEMENT` (BUILDER) and `VERIFY` (VERIFIER). |
+| **Date** | 2026-08-08 |
+| **Required evidence** | `design_coherent` — assumptions surfaced (PAEOS-6), perspectives covered, no orphan/gap |
+| **Constitutional basis** | SAEOS-1 §4.2 (envelope + invariants), §3.3 (structural non-authority), §5.1 (projection contract), §6.1b (write path), §8 (slice S2); PAEOS-7.6 §6 (EvidenceKind); PAEOS-9 §10.2 (untrusted tier) |
+
+---
+
+## 0. Scope boundary (read first)
+
+This session is **PLANNER @ DESIGN**, write-capability `design/`, read-capability
+`constitution/`, `spec/`, `design/`. The goal objective names three artifacts that this
+stage **does not and must not write**:
+
+| Artifact | Owning stage / role | Why not here |
+|---|---|---|
+| `sakg/schema/envelope.schema.json` | `IMPLEMENT` / BUILDER | `sakg/` tree write, outside this session's capability |
+| `tests/sakg/fixtures/envelope/{valid,invalid}/*.json` | `IMPLEMENT` / BUILDER | `tests/` tree write, outside capability |
+| `tests/sakg/test_envelope_schema.py` | `IMPLEMENT` / BUILDER, executed by `VERIFY` / VERIFIER | ditto; running the acceptance commands now would fail (nothing exists) and would misrepresent build evidence as design output |
+
+This document is therefore the **hand-off spec**, written to be mechanically realizable:
+§2 gives the complete normative schema text, §6 gives the complete fixture manifest with
+one row per file, §7 gives the test-module contract, §9 gives the acceptance oracle
+verbatim. Evidence emitted by this session is `design_coherent` (this file) only.
+
+**Sources consulted.** `spec/SAEOS-1-architecture.md` (canonical, RATIFIED 2026-08-06),
+`spec/PAEOS-7.6-runtime-interface-contracts.md` §6, `spec/PAEOS-9-execution-architecture.md`
+§10, `design/classify-obj-lifetime.md` (house format), and — per the mission preamble's
+research-backlog permission — `backlog/research/RB-0005`. **`backlog/SAKG-1-backlog.yaml`
+was not read** (outside read capability), so downstream sibling goals are referred to by
+description, never by invented id (see A10).
+
+---
+
+## 1. Component graph
+
+The deliverable is one schema file, one fixture corpus, one test module. Everything that
+*consumes* the envelope is out of scope for this goal and is drawn dashed, so the seam is
+explicit and no component is orphaned.
+
+```mermaid
+flowchart TB
+    subgraph DEL["F-ENVELOPE deliverable (this goal)"]
+        SCH["sakg/schema/envelope.schema.json<br/>draft 2020-12, single file"]
+        subgraph ANCH["two entry points, one file"]
+            ING["#ingest — producer-submitted profile"]
+            STO["#stored — store-materialized profile (root)"]
+        end
+        DEFS["$defs — node_id · node_type · project_ref ·<br/>timestamp · sha256 · provenance · origin_ref ·<br/>evidence_ref · status · confidence ·<br/>confidence_derivation · promotion · lifecycle ·<br/>review_priority · facets · coordinates · summary"]
+        FV["tests/sakg/fixtures/envelope/valid/*.json<br/>16 files"]
+        FI["tests/sakg/fixtures/envelope/invalid/*.json<br/>16 files"]
+        TST["tests/sakg/test_envelope_schema.py"]
+    end
+
+    SCH --> ANCH
+    ANCH --> DEFS
+    TST -->|"validates against #ingest or #stored<br/>(profile from filename)"| SCH
+    TST -->|"parametrized: MUST pass"| FV
+    TST -->|"parametrized: MUST fail, at a declared locus"| FI
+
+    subgraph FUT["consumers — later slices, NOT this goal"]
+        EMIT["PAEOS L15 emission bundle<br/>(SAEOS-1 §6.1b)"]
+        IGV["ingest validator +<br/>transition guard"]
+        STORE["node store +<br/>Truth Maintenance"]
+        PROJ["projection interface<br/>(SAEOS-1 §5.1)"]
+    end
+
+    EMIT -.->|"ingest-profile documents"| IGV
+    IGV -.->|"gate 1: validate @ #ingest"| SCH
+    IGV -.-> STORE
+    STORE -.->|"gate 2: validate @ #stored"| SCH
+    STORE -.-> PROJ
+    PROJ -.->|"node_summary = id+label+summary+status+confidence"| OUT["consumer context<br/>trust: untrusted"]
+
+    classDef out fill:#f6f6f6,stroke:#bbb,stroke-dasharray:4 3,color:#666
+    class FUT,EMIT,IGV,STORE,PROJ,OUT out
+```
+
+**Placement rationale.** One schema file with two `$anchor`s rather than two files,
+because the ingest profile is a *strict restriction* of the stored profile — they must not
+be able to drift. `$defs/envelope_base` holds every property name exactly once; the two
+profiles only re-constrain names already declared there. This is what lets the envelope be
+**closed** (§2.3) without the classic draft-2020-12 composition bug.
+
+**No new runtime module, no new dependency in the product tree.** `jsonschema` is a *test*
+dependency only; the schema file itself is inert JSON.
+
+---
+
+## 2. Interface contract — the normative schema
+
+### 2.1 Field-by-field derivation from SAEOS-1 §4.2
+
+Every §4.2 field is present. Four fields are **added**; each exists to make exactly one
+§4.2 invariant mechanically checkable, and each is a strict tightening (see DD-1, A7).
+
+| §4.2 field | Schema encoding | Required | Rationale / clause |
+|---|---|---|---|
+| `id: URI` | `^sakg://<ns>/<Type>/<ULID>$`, Crockford base32, 26 chars, first char `0-7` | both profiles | §4.2 id form; ULID uppercase is canonical |
+| `type: NodeType` | closed `enum` of the 12 §4.3 types | both | §4.3 "closed set at v1"; closedness is the Concept-OS boundary (§6.2) |
+| `namespace: ProjectRef` | `^[a-z0-9][a-z0-9._-]{0,62}$` | both | Ω5 tenancy boundary; DNS-label-ish so it is safe in URIs and paths |
+| `facets: {name:{...}}` | open map, snake_case keys → object values, `maxProperties: 32` | both, may be `{}` | ✓7 ECS extension point — the *only* place domain content lives |
+| `label: string` | 1–120 chars | both | INDEX-tier unit |
+| `summary: string` | 1–**280** chars | both | Ω3/FPL-4 — the SUMMARY-tier projection unit; the bound *is* the context-economy law |
+| `provenance.origin: OriginRef` | `{system, run_id, goal_id, stage?}` | both | §6.1b "producing system + run/goal id" |
+| `provenance.author_kind` | `enum(human, agent, ingest, inferred)` | both | FPL-7 |
+| `provenance.ingested_at` | RFC3339 UTC timestamp | both | FPL-7 |
+| `provenance.source_hash` | `sha256:<64 hex>` | both | ✓4 content-addressed source |
+| `evidence: [EvidenceRef]` | array of **closed** EvidenceRef objects | both, may be `[]` | §3.2.3 references only |
+| `status` | `enum(candidate, canonical, superseded, refuted)` | both; `const candidate` at `#ingest` | §6.1b "nodes land as candidate" |
+| `confidence: float` | `number` in `[0,1]` | **forbidden** at `#ingest`, **required** at `#stored` | Δ6 — derived, never authored |
+| `valid_from` | timestamp | both | FPL-6 |
+| `valid_until` | timestamp \| `null` (null = open) | both, present-with-null | FPL-6; presence keeps serialization uniform → deterministic `corpus_hash` (§5.1 r3) |
+| `falsifier` | string(1–500) \| `null` | both, present-with-null | Ω4/K6 |
+| `coordinates: {dim:[value]}` | map → array **of strings**, `minItems 1`, unique | both, may be `{}` | ✓8 — string items are the structural bar on hierarchy |
+| **+ `confidence_derivation`** | `{method, inputs[], computed_at, corpus_seq}`, `method` enum excludes any authored value | required iff `confidence` present; forbidden at `#ingest` | **DD-1a**, makes Δ6 checkable |
+| **+ `promotion`** | `{basis, evidence_hash, promoted_at}`, `basis ∈ {outcome_observed, benchmark_bound, sealed_goal}` | required iff `canonical`; forbidden iff `candidate`; forbidden at `#ingest` | **DD-1b**, makes ×5 checkable |
+| **+ `lifecycle`** | `{retained: const true, terminated_at, superseded_by?, refuted_by?}` | required iff `superseded`/`refuted`; forbidden otherwise | **DD-1c**, makes "nothing is ever deleted" checkable |
+| **+ `review_priority`** | `{reference_count, distinct_namespaces, last_seen}` | optional, any status | **DD-1d** — gives frequency a *legal home that is not `promotion`*, encoding "frequency may raise review priority only" (×5) |
+
+### 2.2 Design decisions
+
+**DD-1 — one added field per unenforceable invariant.** §4.2's four invariants are
+statements about *provenance of a value*, *reason for a transition*, and *corpus
+retention*. None is expressible over a bare §4.2 document: a `float` confidence cannot say
+who computed it, and `status: canonical` cannot say why. Left as-is, the invariants would
+be policy, not structure — the exact failure mode §3.3 forbids — and the goal's own
+acceptance criterion ("invalid fixtures exercising authored confidence, frequency-based
+promotion, deleted node") would be unsatisfiable, because such a fixture would be
+byte-indistinguishable from a valid one. Rejected alternative: enforce in the ingest
+validator instead. Rejected because the frozen artifact would then carry no falsifier
+(Δ3, K6) and the fixture corpus could not exist. Each added field is **conditionally
+required and closed**, so it can only ever reject documents the base would have accepted —
+a tightening, never a widening (D2). Routed as a CER-2 proposal against SAEOS-1 §4.2; it
+does **not** block S2 (A7).
+
+**DD-2 — the envelope is closed; extension happens only through `facets` and
+`coordinates`.** `unevaluatedProperties: false` at both profile roots. This is
+load-bearing: it is what makes a smuggled tombstone key (`"deleted": true`) a schema
+failure rather than an ignored annotation, and it is the direct encoding of §4.2's "every
+node carries the same envelope; type-specific content lives in facets" (✓7).
+
+**DD-3 — composition rule (draft-2020-12 pitfall).** Every property **name** is declared
+once, in `$defs/envelope_base.properties`. Profile subschemas may only *re-constrain*
+existing names; they may never introduce a new one. `additionalProperties` is deliberately
+**not** used at the envelope level (it does not see names contributed by a sibling `$ref`,
+which would silently reject every valid document); `unevaluatedProperties` is used
+instead, because its annotations do flow across `$ref`/`allOf` in 2020-12.
+`additionalProperties: false` **is** used on the leaf objects (`provenance`, `origin_ref`,
+`evidence_ref`, `confidence_derivation`, `promotion`, `lifecycle`, `review_priority`),
+where there is no composition.
+
+**DD-4 — `format` is an annotation, not an assertion.** Draft 2020-12 makes `format`
+non-assertive by default, so a validator's configuration would decide whether a timestamp
+is checked — nondeterminism inside a *frozen* artifact. Every temporal and hash field
+therefore carries a `pattern` that does the asserting; `format: date-time` is retained for
+tooling only. Timestamps are RFC3339 **UTC with a literal `Z`** (A9), which also makes
+lexical order equal chronological order for the store.
+
+**DD-5 — EvidenceRef is closed and has no result slot.** `additionalProperties: false` on
+`evidence_ref`, and the object declares `kind, hash, uri, artifact_hash,
+environment_hash?, reverification` — deliberately **no** `result` and **no** `attestation`
+(contrast PAEOS-7.6 §6 `Evidence`, which has both). This is §3.3.3 "no evidence minting"
+made structural: SAKG cannot express a verdict, only a pointer plus re-verification
+instructions.
+
+**DD-7 — prohibitions are `not/required` branches, never `false` subschemas.** The obvious
+way to forbid a field is `"properties": {"confidence": false}`. Smoke-testing the schema
+(§2.4) showed this is a diagnostic dead end: a boolean `false` subschema reports at the
+*document root* with no keyword and a schema pointer truncated to `.../properties`, so two
+different prohibitions are indistinguishable in the error stream and a fixture cannot be
+pinned to the rule it is supposed to violate. Each prohibition is therefore its own
+`allOf` branch of the form `{"not": {"required": ["<field>"]}}`, which rejects at its own
+addressable pointer. This is what makes the §6.2 rejecting-clause column meaningful.
+
+**DD-6 — required-but-possibly-empty.** `facets`, `coordinates`, `evidence`, `valid_until`
+and `falsifier` are **required**, with `{}`/`[]`/`null` as the empty forms, rather than
+optional. Uniform key presence gives every node one canonical serialization, which is what
+lets §5.1's `corpus_hash`/`query_hash` be stable and a projection be reproducible.
+
+### 2.3 Normative schema text (transcribe verbatim into `sakg/schema/envelope.schema.json`)
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sakg.dev/schema/envelope.schema.json",
+  "title": "SAKG Universal Node Envelope",
+  "description": "SAEOS-1 §4.2. Root schema is the stored profile (#stored); #ingest is the producer-submitted restriction (§6.1b). Every property name is declared once in $defs/envelope_base; profiles only re-constrain.",
+  "$ref": "#/$defs/stored_envelope",
+
+  "$defs": {
+    "stored_envelope": {
+      "$anchor": "stored",
+      "$comment": "What the store holds. Confidence is present and must carry its derivation.",
+      "allOf": [
+        { "$ref": "#/$defs/envelope_base" },
+        { "required": ["confidence", "confidence_derivation"] }
+      ],
+      "unevaluatedProperties": false
+    },
+
+    "ingest_envelope": {
+      "$anchor": "ingest",
+      "$comment": "SAEOS-1 §6.1b: nodes land as candidate. A producer may not author confidence, may not promote, may not terminate. One write path, zero authority. Each prohibition is its own allOf branch (DD-7) so it rejects at its own schema pointer.",
+      "allOf": [
+        { "$ref": "#/$defs/envelope_base" },
+        { "properties": { "status": { "const": "candidate" } } },
+        { "$comment": "Δ6 — a producer may not author confidence.", "not": { "required": ["confidence"] } },
+        { "$comment": "Δ6 — nor its derivation.", "not": { "required": ["confidence_derivation"] } },
+        { "$comment": "×5 — a producer may not promote.", "not": { "required": ["promotion"] } },
+        { "$comment": "✓4 — a producer may not terminate a node.", "not": { "required": ["lifecycle"] } },
+        { "$comment": "×5 — review priority is store-computed.", "not": { "required": ["review_priority"] } }
+      ],
+      "unevaluatedProperties": false
+    },
+
+    "envelope_base": {
+      "type": "object",
+      "required": [
+        "id", "type", "namespace", "label", "summary", "facets", "coordinates",
+        "provenance", "evidence", "status", "valid_from", "valid_until", "falsifier"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/node_id" },
+        "type": { "$ref": "#/$defs/node_type" },
+        "namespace": { "$ref": "#/$defs/project_ref" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "summary": { "$ref": "#/$defs/summary" },
+        "facets": { "$ref": "#/$defs/facets" },
+        "coordinates": { "$ref": "#/$defs/coordinates" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence_ref" },
+          "uniqueItems": true,
+          "maxItems": 64
+        },
+        "status": { "$ref": "#/$defs/status" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "confidence_derivation": { "$ref": "#/$defs/confidence_derivation" },
+        "valid_from": { "$ref": "#/$defs/timestamp" },
+        "valid_until": {
+          "oneOf": [ { "$ref": "#/$defs/timestamp" }, { "type": "null" } ]
+        },
+        "falsifier": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 500 },
+            { "type": "null" }
+          ]
+        },
+        "promotion": { "$ref": "#/$defs/promotion" },
+        "lifecycle": { "$ref": "#/$defs/lifecycle" },
+        "review_priority": { "$ref": "#/$defs/review_priority" }
+      },
+
+      "dependentRequired": {
+        "confidence": ["confidence_derivation"],
+        "confidence_derivation": ["confidence"]
+      },
+
+      "allOf": [
+        {
+          "$comment": "INV-2. Canonical requires an evidence binding and a non-frequency promotion basis.",
+          "if": { "properties": { "status": { "const": "canonical" } }, "required": ["status"] },
+          "then": {
+            "required": ["promotion", "confidence"],
+            "properties": { "evidence": { "minItems": 1 } }
+          }
+        },
+        {
+          "$comment": "INV-2b. A candidate was never promoted.",
+          "if": { "properties": { "status": { "const": "candidate" } }, "required": ["status"] },
+          "then": { "not": { "required": ["promotion"] } }
+        },
+        {
+          "$comment": "INV-3. Refuted implies an observed falsifier and a retained terminus.",
+          "if": { "properties": { "status": { "const": "refuted" } }, "required": ["status"] },
+          "then": {
+            "required": ["lifecycle"],
+            "properties": {
+              "falsifier": { "type": "string", "minLength": 1 },
+              "lifecycle": {
+                "required": ["refuted_by"],
+                "properties": { "refuted_by": { "$ref": "#/$defs/sha256" } }
+              }
+            }
+          }
+        },
+        {
+          "$comment": "INV-4. Supersession, never deletion: a closed window plus a successor.",
+          "if": { "properties": { "status": { "const": "superseded" } }, "required": ["status"] },
+          "then": {
+            "required": ["lifecycle"],
+            "properties": {
+              "valid_until": { "$ref": "#/$defs/timestamp" },
+              "lifecycle": {
+                "required": ["superseded_by"],
+                "properties": { "superseded_by": { "$ref": "#/$defs/node_id" } }
+              }
+            }
+          }
+        },
+        {
+          "$comment": "INV-4b. lifecycle is a terminus record; live states must not carry one.",
+          "if": { "properties": { "status": { "enum": ["candidate", "canonical"] } }, "required": ["status"] },
+          "then": { "not": { "required": ["lifecycle"] } }
+        }
+      ]
+    },
+
+    "node_type": {
+      "enum": ["Component", "Constraint", "Decision", "EvidenceRef", "Mechanism",
+               "Objective", "Option", "Outcome", "Pattern", "Problem", "Scar", "TradeOff"]
+    },
+
+    "status": { "enum": ["candidate", "canonical", "superseded", "refuted"] },
+
+    "project_ref": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,62}$" },
+
+    "node_id": {
+      "type": "string",
+      "$comment": "sakg://<namespace>/<Type>/<ULID>. ULID = 26 Crockford base32 chars (no I, L, O, U); first char 0-7 bounds the timestamp.",
+      "pattern": "^sakg://[a-z0-9][a-z0-9._-]{0,62}/(Component|Constraint|Decision|EvidenceRef|Mechanism|Objective|Option|Outcome|Pattern|Problem|Scar|TradeOff)/[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "$comment": "DD-4: pattern asserts; format only annotates. RFC3339, UTC, literal Z.",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,9})?Z$"
+    },
+
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+
+    "summary": { "type": "string", "minLength": 1, "maxLength": 280 },
+
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+
+    "origin_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "run_id", "goal_id"],
+      "properties": {
+        "system": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "run_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "goal_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "stage": { "type": "string", "minLength": 1, "maxLength": 32 }
+      }
+    },
+
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "author_kind", "ingested_at", "source_hash"],
+      "properties": {
+        "origin": { "$ref": "#/$defs/origin_ref" },
+        "author_kind": { "enum": ["human", "agent", "ingest", "inferred"] },
+        "ingested_at": { "$ref": "#/$defs/timestamp" },
+        "source_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "DD-5 / SAEOS-1 §3.3.3: a pointer only. No `result`, no `attestation` — SAKG cannot mint evidence.",
+      "required": ["kind", "hash", "uri", "artifact_hash", "reverification"],
+      "properties": {
+        "kind": { "enum": ["BUILD", "TEST", "BENCHMARK", "PROOF", "CITATION", "TRACE", "MUTATION", "CANARY"] },
+        "hash": { "$ref": "#/$defs/sha256" },
+        "uri": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[a-z][a-z0-9+.-]*:" },
+        "artifact_hash": { "$ref": "#/$defs/sha256" },
+        "environment_hash": { "$ref": "#/$defs/sha256" },
+        "reverification": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+
+    "confidence_derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "Δ6: the enum has no authored/manual member, so an authored confidence cannot be expressed.",
+      "required": ["method", "inputs", "computed_at", "corpus_seq"],
+      "properties": {
+        "method": {
+          "enum": ["evidence_binding", "outcome_propagation", "decay",
+                   "supersession_propagation", "refutation_propagation"]
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "maxItems": 64,
+          "items": { "oneOf": [ { "$ref": "#/$defs/node_id" }, { "$ref": "#/$defs/sha256" } ] }
+        },
+        "computed_at": { "$ref": "#/$defs/timestamp" },
+        "corpus_seq": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "×5: the basis enum admits only evidence bindings. Frequency is not a member and cannot become one without an amendment.",
+      "required": ["basis", "evidence_hash", "promoted_at"],
+      "properties": {
+        "basis": { "enum": ["outcome_observed", "benchmark_bound", "sealed_goal"] },
+        "evidence_hash": { "$ref": "#/$defs/sha256" },
+        "promoted_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "✓4: retention is const true. A node can record its end; it cannot record its removal.",
+      "required": ["retained", "terminated_at"],
+      "properties": {
+        "retained": { "const": true },
+        "terminated_at": { "$ref": "#/$defs/timestamp" },
+        "superseded_by": { "$ref": "#/$defs/node_id" },
+        "refuted_by": { "$ref": "#/$defs/sha256" }
+      }
+    },
+
+    "review_priority": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "×5: frequency's only legal home. Structurally disjoint from `promotion`; no member of this object is a promotion basis.",
+      "required": ["reference_count", "distinct_namespaces", "last_seen"],
+      "properties": {
+        "reference_count": { "type": "integer", "minimum": 0 },
+        "distinct_namespaces": { "type": "integer", "minimum": 0 },
+        "last_seen": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+
+    "facets": {
+      "type": "object",
+      "$comment": "✓7 ECS: the only extension surface for type-specific content.",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+      "additionalProperties": { "type": "object" },
+      "maxProperties": 32
+    },
+
+    "coordinates": {
+      "type": "object",
+      "$comment": "✓8: flat and multi-valued. String items are the structural bar on hierarchy.",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "maxItems": 32,
+        "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+      },
+      "maxProperties": 16
+    }
+  }
+}
+```
+
+### 2.4 Pre-flight verification of the schema text
+
+The §2.3 text was not just written — it was **executed in-design**, in memory, against
+representative documents for every fixture family, so that IMPLEMENT starts from a schema
+already known to work. This is design-stage self-check, **not** `IMPLEMENT` or `VERIFY`
+evidence: no file was created under `sakg/` or `tests/`, and the §11 acceptance commands
+were not run.
+
+What was established:
+
+| Check | Result |
+|---|---|
+| `Draft202012Validator.check_schema()` | valid draft 2020-12 |
+| All 18 `$ref` targets resolve; no unreferenced `$defs` | clean |
+| DD-3 composition rule — every name constrained by a profile is declared in `envelope_base` | holds |
+| Representative valid documents for the ingest, canonical, high-frequency-candidate, superseded, refuted and decayed families | all accept |
+| All 16 invalid families | all reject, each at a distinct, addressable clause (§6.2) |
+
+Two defects were found this way and are fixed in the text above rather than left for
+IMPLEMENT to discover:
+
+1. **Prohibitions were unaddressable.** `"confidence": false` rejected at the document root
+   with a truncated schema pointer, making two different prohibitions indistinguishable in
+   the error stream — which would have made T3's anti-false-positive control vacuous for the
+   ingest-profile fixtures. Fixed by DD-7 (`not/required` branches).
+2. **The invalid-fixture expectation was anchored to the wrong axis.** Instance paths
+   collapse to `()` for every root-level keyword, which is most of the corpus. Fixed by
+   re-anchoring §6.2 and T3 to `absolute_schema_path`.
+
+Residual: this exercised *representative* documents, not the 32 authored fixture files —
+authoring them is IMPLEMENT's job, and T2/T3 are what prove them.
+
+---
+
+## 3. Data flow
+
+The envelope crosses exactly two validation gates, both against this one file. Nothing
+else in the system may accept a node document.
+
+```
+PAEOS goal seals at L16
+   │
+   ├─ L15 writes the emission bundle to the append-only outbox      (SAEOS-1 §6.1b)
+   │     Decision · TradeOff · Option · Constraint · Component · Scar · EvidenceRef
+   │     shape: INGEST profile — status=candidate, no confidence, no promotion,
+   │            no lifecycle, no review_priority
+   ▼
+SAKG ingest pulls (never push)
+   │
+   ▼
+┌─ GATE 1 ── validate @ envelope.schema.json#ingest ───────────────┐
+│  reject → ingest defect, node never enters the corpus            │
+└──────────────────────────────────────────────────────────────────┘
+   │ accept
+   ▼
+Store materializes the node:
+   • computes confidence            → confidence + confidence_derivation
+   • records frequency, if any      → review_priority   (priority only, never promotion)
+   • assigns corpus_seq
+   ▼
+┌─ GATE 2 ── validate @ envelope.schema.json  (root = #stored) ────┐
+│  reject → store defect (the store built a malformed node)        │
+└──────────────────────────────────────────────────────────────────┘
+   │ accept
+   ▼
+Corpus  ◄── Truth Maintenance: on any Outcome/edge change, recompute confidence,
+   │        bump corpus_seq, re-run GATE 2. Propagates along derived_from / supports.
+   │        Later: L17/L19 emits an Outcome node bound to the Decision (Ω2 loop).
+   ▼
+Projection (§5.1) — SUMMARY tier emits only { id, label, summary, status, confidence }
+   ▼
+Consumer context, tagged provenance: sakg · tier: SUMMARY|INDEX · trust: untrusted
+```
+
+**Element-by-element.** Every envelope field is produced at exactly one place and consumed
+at at least one — no orphan:
+
+| Field | Produced by | Consumed by |
+|---|---|---|
+| `id`, `type`, `namespace` | producer at emission | addressing, tenancy filter (Ω5), all five §5.2 methods |
+| `label`, `summary` | producer | the SUMMARY/INDEX projection unit (Ω3) |
+| `facets` | producer | type-specific traversal (`Scar.detection_signature`, `TradeOff.axis`, …) |
+| `coordinates` | producer | `analogous_to` / cross-domain transfer (✓9), disclosure scoping |
+| `provenance.*` | producer at emission | FPL-7 re-verify-or-discard; `why` path in the projection response |
+| `evidence[]` | producer (hashes only) | promotion gating; consumer re-verification against PAEOS CAS |
+| `status` | store (transition guard) | `filters.status`, default `[canonical]` (§5.1 r4) |
+| `confidence` + `confidence_derivation` | **store only** | `filters.min_confidence`; withheld below threshold (§7) |
+| `valid_from` / `valid_until` | producer / store on supersession | `filters.as_of` time travel (Ω4) |
+| `falsifier` | producer | the refutation watch (Ω4/K6) |
+| `promotion` | store at promotion | audit of ×5 compliance |
+| `lifecycle` | store at terminus | retention proof; lineage walk |
+| `review_priority` | store, from ingest frequency | human/agent review queue ordering — **never** the projection ranking authority |
+
+**Sensitivity.** The envelope carries no artifact bodies and no evidence results (DD-5), so
+a leak across a namespace boundary discloses labels, summaries and hashes — not source. The
+disclosure policy that governs cross-namespace edges (Ω5) is a later slice (S5); this
+schema's contribution is that `namespace` is mandatory and pattern-bounded from day one, so
+no node can exist untenanted.
+
+---
+
+## 4. State machine
+
+### 4.1 The status lattice
+
+```mermaid
+stateDiagram-v2
+    [*] --> candidate: ingest accepted @ #ingest (§6.1b)
+
+    candidate --> canonical: evidence binding<br/>promotion.basis ∈ {outcome_observed,<br/>benchmark_bound, sealed_goal}
+    candidate --> superseded: successor node admitted
+    candidate --> refuted: falsifier observed
+
+    canonical --> superseded: successor node admitted
+    canonical --> refuted: falsifier observed
+
+    superseded --> refuted: falsifier observed on a retired node
+
+    refuted --> [*]: TERMINAL — retained forever (✓1, FPL-2)
+    superseded --> [*]: retained forever
+```
+
+**Forbidden edges, and why each is forbidden:**
+
+| Forbidden | Clause | Where caught |
+|---|---|---|
+| `candidate → canonical` on a frequency threshold | ×5 | schema: `promotion.basis` enum has no frequency member; and `canonical ⇒ evidence minItems 1` |
+| `canonical → candidate` (demotion) | §7 | confidence collapse causes **withholding at query time**, never a status change; transition guard |
+| any state `→ ∅` (deletion) | ✓4 | schema: `status` enum is closed (no `deleted`); envelope is closed (no tombstone key); `lifecycle.retained` is `const true` |
+| `refuted → anything` | FPL-2 | transition guard (refuted is terminal) |
+| producer writing any state but `candidate` | §6.1b, FPL-3 | schema: `#ingest` pins `status: const candidate` |
+
+### 4.2 What the schema pins, and what it cannot
+
+The schema is a predicate over **one document**, so it constrains *states*, not
+*transitions*. The split is stated explicitly so the seam is not mistaken for coverage:
+
+- **Schema-enforced (this goal):** every state above is well-formed or unrepresentable.
+  A `deleted` state cannot be written. A canonical node without an evidence binding cannot
+  be written. A refuted node that is not retained cannot be written. A producer-authored
+  confidence cannot be written.
+- **Transition-guard-enforced (the ingest/mutation-validator goal, not this one):** that a
+  given *edit* follows a legal edge — e.g. that a node currently `refuted` is not moved back
+  to `canonical`. That guard reads the prior state; a schema never sees it.
+
+### 4.3 Confidence recomputation (the Truth Maintenance obligation, L2 IT-05)
+
+```
+Outcome node admitted, or edge confidence changes
+        │
+        ▼
+recompute(node) → confidence', confidence_derivation{method, inputs, computed_at, corpus_seq+1}
+        │
+        ▼
+propagate along derived_from / supports edges  ──► repeat to fixpoint
+        │
+        ▼
+re-validate every touched node @ GATE 2
+```
+
+The schema's contribution is that a recomputation **cannot** be recorded without naming its
+`method` and its `inputs` — so a silent confidence edit is a schema failure, which is what
+turns Δ6 from an aspiration into a check. The propagation algorithm itself is a later slice
+(S3) and is out of scope here.
+
+---
+
+## 5. Invariant enforcement matrix
+
+The core of the design: every §4.2 invariant, its schema clause, its fixtures, and the
+residual that a schema provably cannot carry.
+
+| id | §4.2 invariant | Schema clause | Valid fixtures | Invalid fixtures | Residual → owner |
+|---|---|---|---|---|---|
+| **INV-1** | `confidence` is derived, never authored (Δ6) | `#ingest` sets `confidence: false` and `confidence_derivation: false`; `dependentRequired` both ways; `confidence_derivation.method` enum has no authored member | 04, 05, 06, 08, 13 | 01, 02, 03 | that `inputs` really are the nodes used → TMS goal (S3) |
+| **INV-2** | `candidate → canonical` requires an evidence binding, never a frequency threshold (×5) | `canonical ⇒ required[promotion, confidence] ∧ evidence.minItems 1`; `promotion.basis` enum; `candidate ⇒ promotion:false`; frequency confined to `review_priority` | 04, 05, 06, 15 | 04, 05, 06, 07 | that `promotion.evidence_hash` is one of this node's `evidence[].hash` → validator (cross-field, §8 R2) |
+| **INV-3** | falsifier observed ⇒ `refuted`; refuted nodes are retained (Ω4, FPL-2) | `refuted ⇒ falsifier` non-null ∧ `lifecycle.refuted_by` present ∧ `retained: true` | 08, 14 | 08, 09 | that the falsifier was *actually observed* → falsifier-watch goal |
+| **INV-4** | nothing is ever deleted; supersession only (✓4) | `status` enum closed (no `deleted`); `unevaluatedProperties: false` (no tombstone key); `lifecycle.retained: const true`; `superseded ⇒ superseded_by ∧ closed valid_until` | 07, 08 | 10, 11, 12 | that the corpus never *loses* a node → append-only store + corpus-diff check (§8 R5) |
+| **INV-5** | envelope shape / non-authority (§4.2 form, §3.3.3, Ω3, ✓8) | `summary maxLength 280`; `node_id` pattern; `node_type` enum; `confidence` range; `evidence_ref` closed with no `result`; `coordinates` items are strings | all | 13, 14, 15, 16 | — |
+
+---
+
+## 6. Fixture corpus manifest
+
+**Location.** `tests/sakg/fixtures/envelope/valid/` and `.../invalid/`.
+
+**Filename grammar** — hyphen-separated, fixed leading tokens so the test module can parse
+profile and rule without a side-car manifest, while each file stays a pure node document:
+
+```
+valid/    <NN>-<profile>-<slug>.json                # profile ∈ {ingest, stored}
+invalid/  <NN>-<profile>-<rule>-<slug>.json         # rule ∈ {inv1, inv2, inv3, inv4, inv5}
+```
+
+### 6.1 Valid corpus — 16 files (acceptance floor: 12)
+
+| # | Filename | Profile | type / status | What it exercises |
+|---|---|---|---|---|
+| 01 | `01-ingest-decision-candidate-minimal.json` | ingest | Decision / candidate | The **floor**: required fields only, `facets:{}`, `coordinates:{}`, `evidence:[]`, `valid_until:null`, `falsifier:null`, `author_kind:ingest` |
+| 02 | `02-ingest-option-rejected.json` | ingest | Option / candidate | A rejected option (§4.3 "scarcest knowledge") via a `rejection` facet; `author_kind:agent`; multi-valued coordinates |
+| 03 | `03-ingest-scar-roundtrip.json` | ingest | Scar / candidate | Ω1 lossless round-trip: `root_cause`/`detection_signature`/`guard_action` facets; one EvidenceRef |
+| 04 | `04-stored-decision-canonical-maximal.json` | stored | Decision / canonical | **The every-optional-field node.** Every declared property and every declared leaf present, incl. `origin.stage`, `environment_hash`, `review_priority`; 3 EvidenceRefs across 3 kinds; `promotion.basis: sealed_goal`; `author_kind: human`; `summary` at exactly 280 chars |
+| 05 | `05-stored-decision-candidate-high-frequency.json` | stored | Decision / candidate | ×5 stated positively: `review_priority.reference_count: 47`, `distinct_namespaces: 6`, **no `promotion`**, still `candidate`. Frequency raised review priority and nothing else |
+| 06 | `06-stored-outcome-canonical-benchmark.json` | stored | Outcome / canonical | Ω2: created long after its subject (`valid_from` years later); `promotion.basis: benchmark_bound`; `confidence_derivation.method: outcome_propagation` |
+| 07 | `07-stored-decision-superseded.json` | stored | Decision / superseded | Closed window (`valid_until` non-null), `lifecycle.superseded_by`, `retained:true`, `promotion` retained from its canonical era |
+| 08 | `08-stored-decision-refuted.json` | stored | Decision / refuted | `falsifier` non-null, `lifecycle.refuted_by`, `retained:true`, low confidence via `refutation_propagation` |
+| 09 | `09-stored-evidenceref-node.json` | stored | EvidenceRef / canonical | A pointer node: hash + uri + reverification, no artifact body |
+| 10 | `10-stored-component-namespaced.json` | stored | Component / canonical | Ω5: a second namespace; disclosure recorded as a coordinate |
+| 11 | `11-stored-tradeoff-axes.json` | stored | TradeOff / canonical | `axis` + `resolution` facets; `confidence_derivation.method: evidence_binding` |
+| 12 | `12-stored-pattern-antipattern.json` | stored | Pattern / canonical | An **anti**-pattern (§4.3); `analogous_to` coordinates |
+| 13 | `13-stored-mechanism-inferred-decayed.json` | stored | Mechanism / candidate | `author_kind: inferred`; `confidence_derivation.method: decay`; the FPL-6 rot path |
+| 14 | `14-stored-problem-closed-window.json` | stored | Problem / canonical | `valid_until` non-null **and** `falsifier` non-null on a live node; multibyte summary |
+| 15 | `15-stored-constraint-outcome-promoted.json` | stored | Constraint / canonical | `promotion.basis: outcome_observed` (the third basis) |
+| 16 | `16-stored-objective-candidate.json` | stored | Objective / candidate | Completes the 12-type closed set |
+
+**Coverage discharged by this corpus** (asserted mechanically by §7 T4–T6, not by
+inspection): all 4 `status` values (01/02/03/05/13/16 · 04/06/09/10/11/12/14/15 · 07 · 08);
+all 4 `author_kind` values (01/03 · 02 · 04 · 13); all 12 `type` values (one each, 01–16);
+all 3 `promotion.basis` values (04 · 06 · 15); all 5 `confidence_derivation.method` values
+(11 · 06 · 13 · 07 · 08); both profiles; `valid_until` and `falsifier` in both null and
+non-null form; `facets`/`coordinates`/`evidence` in both empty and populated form.
+
+### 6.2 Invalid corpus — 16 files (acceptance floor: 8)
+
+The **rejecting clause** column is normative: T3 asserts that each fixture produces an error
+whose `absolute_schema_path` is exactly this pointer, so a fixture cannot pass the suite by
+being malformed for an unrelated reason. Pointers are **into the schema**, not the instance
+— that is what makes them unambiguous for prohibition clauses (DD-7). Every value below was
+observed empirically against the §2.3 text (§2.4); pointers are relative to the profile's
+own validator root, where `allOf/0` is the `$ref` to `envelope_base`.
+
+| # | Filename | Profile | Rejecting clause (`absolute_schema_path`) | Violation |
+|---|---|---|---|---|
+| 01 | `01-stored-inv1-confidence-without-derivation.json` | stored | `allOf/0/dependentRequired` | Confidence present, no derivation: authored by assertion (Δ6) |
+| 02 | `02-stored-inv1-derivation-method-authored.json` | stored | `allOf/0/properties/confidence_derivation/properties/method/enum` | `"authored"` is not in the method enum |
+| 03 | `03-ingest-inv1-producer-authors-confidence.json` | ingest | `allOf/2/not` | A producer submitting confidence at all — even a *well-formed* derived pair (§6.1b) |
+| 04 | `04-stored-inv2-canonical-without-evidence.json` | stored | `allOf/0/allOf/0/then/properties/evidence/minItems` | `canonical` with `evidence: []` — promotion with no binding (×5) |
+| 05 | `05-stored-inv2-promotion-basis-frequency.json` | stored | `allOf/0/properties/promotion/properties/basis/enum` | `"frequency_threshold"` — the ADR-011 rule, explicitly rejected |
+| 06 | `06-stored-inv2-promotion-basis-reference-count.json` | stored | `allOf/0/properties/promotion/properties/basis/enum` | `"reference_count"` — frequency under a second name |
+| 07 | `07-ingest-inv2-producer-lands-canonical.json` | ingest | `allOf/1/properties/status/const` | A producer writing `canonical` directly: authority across the write path (FPL-3) |
+| 08 | `08-stored-inv3-refuted-without-falsifier.json` | stored | `allOf/0/allOf/2/then/properties/falsifier/type` | `refuted` with `falsifier: null` — refutation without a falsifier (Ω4) |
+| 09 | `09-stored-inv3-refuted-without-lifecycle.json` | stored | `allOf/0/allOf/2/then/required` | `refuted` with no terminus record |
+| 10 | `10-stored-inv4-status-deleted.json` | stored | `allOf/0/properties/status/enum` | `"deleted"` — the state that must not exist (✓4) |
+| 11 | `11-stored-inv4-tombstone-property.json` | stored | `unevaluatedProperties` | A smuggled root key `"deleted": true` |
+| 12 | `12-stored-inv4-refuted-not-retained.json` | stored | `allOf/0/properties/lifecycle/properties/retained/const` | `retained: false` — deletion wearing a lifecycle costume |
+| 13 | `13-stored-inv5-summary-over-budget.json` | stored | `allOf/0/properties/summary/maxLength` | 281 chars — breaks the SUMMARY projection unit (Ω3/FPL-4) |
+| 14 | `14-stored-inv5-malformed-id-ulid.json` | stored | `allOf/0/properties/id/pattern` | ULID containing `I`/`O` (excluded from Crockford base32) |
+| 15 | `15-stored-inv5-type-outside-closed-set.json` | stored | `allOf/0/properties/type/enum` | `"Hypothesis"` — a Concept OS object; hypotheses are not decisions (§6.2) |
+| 16 | `16-stored-inv5-evidence-carries-result.json` | stored | `allOf/0/properties/evidence/items/additionalProperties` | An EvidenceRef with an inline `result`/`attestation`: evidence minting (§3.3.3) |
+
+Rows 05 and 06 share a clause deliberately: they are two spellings of the same rejected
+promotion rule, and the schema is right to treat them identically.
+
+**The pointer column also pins the schema text.** If IMPLEMENT reorders or restructures the
+§2.3 clauses, these pointers shift and T3 fails loudly rather than silently accepting a
+re-encoded schema. That coupling is intentional: this goal's deliverable is a *frozen*
+envelope.
+
+**Deliberately excluded from the invalid corpus** — these are real defects that draft
+2020-12 cannot express over a single document, so a fixture for them would be a fixture the
+schema *should* accept. They are listed as validator obligations in §8, not smuggled in
+here.
+
+---
+
+## 7. Test module contract — `tests/sakg/test_envelope_schema.py`
+
+```
+SCHEMA   = repo_root/"sakg"/"schema"/"envelope.schema.json"
+FIXTURES = Path(__file__).parent/"fixtures"/"envelope"
+resolve(profile) -> the root schema for "stored", the "#ingest" anchor for "ingest"
+```
+
+| id | Test | Assertion |
+|---|---|---|
+| **T1** | `test_schema_is_valid_draft_2020_12` | `Draft202012Validator.check_schema(schema)` raises nothing; `$schema` is the 2020-12 URI |
+| **T2** | `test_valid_fixtures_validate` (parametrized over `valid/*.json`) | zero errors against the profile named in the filename |
+| **T3** | `test_invalid_fixtures_fail_at_declared_clause` (parametrized over `invalid/*.json`) | ≥1 error, **and** the §6.2 pointer is in `{"/".join(map(str, e.absolute_schema_path)) for e in errors}` |
+| **T4** | `test_valid_corpus_covers_every_declared_property` | walk every property path declared under `$defs` reachable from `envelope_base.properties` (incl. leaves of `provenance`, `origin_ref`, `evidence_ref`, `confidence_derivation`, `promotion`, `lifecycle`, `review_priority`); each appears in ≥1 valid fixture |
+| **T5** | `test_valid_corpus_covers_every_enum_value` | every member of `status`, `node_type`, `author_kind`, `EvidenceKind`, `promotion.basis`, `confidence_derivation.method` appears in ≥1 valid fixture |
+| **T6** | `test_invalid_corpus_covers_every_invariant` | `{inv1, inv2, inv3, inv4, inv5}` each appear in ≥1 invalid filename |
+| **T7** | `test_corpus_size_floors` | `len(valid) >= 12` and `len(invalid) >= 8` — mirrors the acceptance commands so a deletion fails the suite before it fails the gate |
+| **T8** | `test_profiles_are_nested` | every `ingest`-profile valid fixture also validates against the stored profile **after** the store's additions are absent-tolerant — asserted as: `#ingest` accepts ⊆ what `envelope_base` accepts (restriction, not divergence) |
+
+**Implementation notes for BUILDER.**
+
+1. `jsonschema.Draft202012Validator(schema).iter_errors(doc)` — collect all errors; do not
+   stop at the first.
+2. For the `#ingest` anchor, build the validator from a `Registry`/`$ref` to
+   `"...envelope.schema.json#ingest"`, or equivalently validate against
+   `{"$ref": "#/$defs/ingest_envelope"}` resolved in the same document. Do **not** copy the
+   subschema out — a copy can drift, which is the failure DD-3 exists to prevent.
+3. **Assert on `absolute_schema_path`, never on `absolute_path` or `validator`.** Instance
+   paths collapse to the document root for every root-level keyword (`dependentRequired`,
+   `required`, `not`, `unevaluatedProperties`), which is most of the invalid corpus, so they
+   cannot discriminate. Schema pointers always can. See DD-7.
+4. **Annotation cascade — assert membership, never error count.** When `envelope_base`
+   fails, its `properties` annotations are dropped, so `unevaluatedProperties` then reports
+   *every* key as unevaluated. This is correct 2020-12 behaviour on an already-invalid
+   document, but it means most invalid fixtures produce 2–5 errors. T3 checks that the
+   declared pointer is *present in* the error set; it must not assert the set's size, and it
+   must not stop at the first error.
+5. Fixture filenames are parsed by `name.split("-")`: token 0 = sequence, token 1 = profile,
+   token 2 = rule (invalid only). Slugs may contain further hyphens.
+6. Fixtures are pure node documents — no wrapper, no metadata key. This is what keeps the
+   acceptance `ls … | wc -l` counts meaningful.
+
+---
+
+## 8. Validator obligations — checks a schema provably cannot carry
+
+Stated so the seam is visible and nothing is silently assumed covered. Each has a named
+downstream owner; none is a gap in *this* goal.
+
+| id | Obligation | Why not schema-expressible | Owner |
+|---|---|---|---|
+| **R1** | `id`'s embedded `<namespace>` and `<Type>` equal the `namespace` and `type` fields | cross-field equality | ingest validator |
+| **R2** | `promotion.evidence_hash` ∈ `{evidence[].hash}` | cross-field membership | ingest validator |
+| **R3** | `valid_until` ≥ `valid_from`; `lifecycle.terminated_at` ≥ `valid_from` | cross-field ordering | ingest validator |
+| **R4** | Transition legality (no `refuted → canonical`, no demotion) | needs the prior state | transition guard |
+| **R5** | Nothing is ever deleted, at *corpus* scope | needs two corpus snapshots | append-only store + corpus-diff check |
+| **R6** | `evidence[].hash` resolves in PAEOS CAS and re-verifies | needs the outside world | consumer, on re-verification (FPL-7) |
+| **R7** | Dependency edges acyclic within a namespace (§4.4) | edge-level, not node-level | edge-schema goal |
+| **R8** | Cross-namespace disclosure policy (Ω5) | policy state outside the node | slice S5 |
+
+---
+
+## 9. Assumptions surfaced (PAEOS-6)
+
+| id | Assumption | Falsifier / verification owner |
+|---|---|---|
+| **A1** | `sakg/` does not yet exist; this goal creates `sakg/schema/`. | Unverifiable here (`sakg/` outside read capability). BUILDER confirms; if a schema already exists, this design supersedes it and the prior file becomes evidence, not law. |
+| **A2** | `jsonschema >= 4.18` (2020-12 + `Registry`) is available, or addable to the dev dependency group. | Acceptance command 2 fails on import. BUILDER adds the dependency as part of IMPLEMENT. |
+| **A3** | `uv run pytest tests/sakg/test_envelope_schema.py` collects without a `tests/sakg/__init__.py`, i.e. no basename collision with another `test_envelope_schema.py`. | Acceptance command 2. If it collides, BUILDER adds `tests/sakg/__init__.py` — no design change. |
+| **A4** | ULID is the canonical uppercase Crockford form. §4.2 says `ulid` without a case rule. | If lowercase ids are wanted, the `node_id` pattern changes; nothing else does. |
+| **A5** | `ProjectRef` is a lowercase DNS-label-ish string. §4.2 leaves the charset open. | The tenancy slice (S5) may widen it; widening a pattern never invalidates existing fixtures. |
+| **A6** | `EvidenceKind` is reused verbatim from PAEOS-7.6 §6 (8 members). | Ω1 round-trip: a PAEOS scar bundle must serialize losslessly. If PAEOS-7.6 amends the enum, this schema follows. |
+| **A7** | The four added fields (DD-1) are acceptable as an SAEOS-1 §4.2 amendment. | They are strict tightenings, so S2 proceeds regardless; if ratification is denied, the fallback is to demote them into registered `facets` keys — the invariant checks survive, the field paths change. **Routed as a CER-2 proposal; not a blocker.** |
+| **A8** | `summary ≤ 280` is a character count, not a token or byte count. | Fixture 04 (280 chars) and 13 (281 chars) pin it. If the projection budget is later expressed in tokens, `maxLength` becomes a proxy, not the authority. |
+| **A9** | Timestamps are RFC3339 UTC with a literal `Z`. §4.2 says only `timestamp`. | Any producer emitting an offset (`+01:00`) fails GATE 1 loudly — the intended behaviour. |
+| **A10** | Sibling goals exist for the ingest validator, the transition guard, the edge schema and the TMS propagation (§8 owners). `backlog/SAKG-1-backlog.yaml` was **not read** (outside read capability), so no goal ids are cited. | PLANNER at the next stage reconciles §8 against the real backlog; if an owner is missing, §8 is the list of goals to file. |
+
+None of A1–A10 changes the design. Each is either confirmed downstream or has a stated
+fallback that leaves the invariant enforcement intact.
+
+---
+
+## 10. Perspectives covered (multi-perspective critique input)
+
+- **Correctness / conformance.** Every §4.2 field appears in §2.1 and in the schema text;
+  every §4.2 invariant maps to a schema clause in §5; T4/T5/T6 make coverage a *test*
+  rather than a claim; and §2.4 records that the schema text was executed rather than
+  merely asserted — which is how DD-7 was found. ✔
+- **Falsifiability (Δ3, K6).** SAEOS-1 requires every spec to state at least one mechanically
+  checkable conformance assertion. This design states 32 (the fixture corpus) plus 8 test
+  predicates, and §9's assumptions each carry a falsifier. ✔
+- **Non-authority (FPL-3, §3.3).** Three structural expressions, not three rules:
+  EvidenceRef has no result slot (cannot mint evidence); `#ingest` pins `status: candidate`
+  (a producer cannot promote); `promotion.basis` admits only evidence bindings (popularity
+  cannot promote). ✔
+- **Poisoning resistance (Ω6).** The corpus's cheapest attack is mass low-quality
+  assertion to manufacture consensus. The schema makes that attack *inert*: frequency can
+  only ever land in `review_priority`, which is structurally disjoint from `promotion`, so
+  a flood raises a review queue and changes nothing a consumer sees under the default
+  `status: [canonical]` filter. ✔
+- **Context economy (FPL-4, Ω3).** `summary ≤ 280`, `label ≤ 120`, and bounded
+  `maxItems`/`maxProperties` throughout mean a node's SUMMARY projection has a computable
+  worst-case size — the budget in §5.1 is enforceable rather than aspirational. ✔
+- **Tenancy (Ω5).** `namespace` is required and pattern-bounded on every node from day one,
+  so an untenanted node is unrepresentable even before S5 exists. ✔
+- **Decay / Truth Maintenance (FPL-6, Δ6).** `valid_from`/`valid_until`/`falsifier` are
+  required (present-with-null), and no confidence can be recorded without naming its method
+  and inputs — §4.3's recompute loop has a schema-checkable footprint. ✔
+- **Extensibility (✓7, ✓8).** The envelope is closed and `facets`/`coordinates` are open.
+  Adding a domain costs a facet key; it never costs envelope surgery. Widening later is
+  cheap, narrowing later would be a rewrite — the §9 A1 trade, taken deliberately. ✔
+- **Round-trip fidelity (Ω1).** Fixture 03 is the Scar round-trip probe. If PAEOS's scar
+  bundle cannot serialize into facets losslessly, fixture 03 is where it shows — which is
+  A8's load-bearing S1 assumption getting its first test. ✔
+- **Cost / proportionality.** One inert JSON file, 32 small fixtures, one test module, one
+  test-only dependency. Nothing added to the runtime path; the schema can be deleted with
+  zero correctness impact on PAEOS (×6). ✔
+- **Adversarial (what would break this).** The strongest attack on the design is DD-1: if
+  ratification rejects the four added fields, three of the four invariants lose their
+  schema teeth. A7 states the fallback (registered facet keys) explicitly, and the fallback
+  preserves every check at a different path. The residual is field naming, not enforcement. ✔
+
+---
+
+## 11. Verification hand-off (for VERIFIER @ VERIFY — not run in this stage)
+
+The design is realized correctly iff all four commands exit `0`:
+
+```bash
+uv run python -c "import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())"
+uv run pytest tests/sakg/test_envelope_schema.py -q
+test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12
+test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8
+```
+
+This corpus targets 16/16, giving 4 files of margin above the valid floor and 8 above the
+invalid floor. T7 mirrors commands 3 and 4 inside the suite, so an accidental fixture
+deletion fails the test run rather than only the gate.
+
+---
+
+## 12. IMPLEMENT checklist (hand-off)
+
+1. Create `sakg/schema/envelope.schema.json` with the §2.3 text **verbatim**. No
+   reformatting of `pattern` values (the backslashes are JSON-escaped as written).
+2. Add `jsonschema>=4.18` to the dev dependency group (A2).
+3. Create `tests/sakg/fixtures/envelope/valid/` — 16 files per the §6.1 manifest, filenames
+   exactly as listed.
+4. Create `tests/sakg/fixtures/envelope/invalid/` — 16 files per the §6.2 manifest,
+   filenames exactly as listed, each failing at its declared locus.
+5. Create `tests/sakg/test_envelope_schema.py` with T1–T8 per §7, transcribing the §6.2
+   rejecting-clause column verbatim into the expectation table.
+6. Change nothing outside `sakg/schema/`, `tests/sakg/`, and the dev dependency entry.
+7. File the CER-2 proposal for the SAEOS-1 §4.2 amendment (DD-1 / A7). Do not block on it.
+8. Hand to VERIFY to run the §11 commands unchanged.
+
+---
+
+**No orphan / no gap.** Every schema field (§2.1) has a producer and a consumer (§3);
+every state (§4.1) has an entry, an exit or a stated terminal, and a forbidden-edge
+rationale; every §4.2 invariant has a schema clause, ≥1 valid fixture, ≥1 invalid fixture,
+and a named residual owner (§5, §8); every fixture has a declared purpose and, for the
+invalid corpus, a declared rejecting clause verified against the schema text (§2.4, §6);
+every test has an assertion (§7); every
+assumption has a falsifier and a downstream owner (§9). Evidence for this gate:
+`design_coherent` = this file.

@@ -1,0 +1,551 @@
+# SAKG-1 Implementation Backlog (v1.0)
+# ============================================================================
+# This file IS the decomposition of root goal G-SAKG ("SAKG returns a real,
+# outcome-joined precedent to a real PAEOS goal, within budget, with `why`").
+#
+# Authority: spec/SAEOS-1-architecture.md — RATIFIED BY FOUNDER PROXY 2026-08-06.
+# Scope: Slice S1 (Post-Seal Exhaust Extractor & Ingestion Engine) and Slice S2
+# (Query & Projection Engine) ONLY, per SAEOS-1 §8. Slices S3–S6 are NOT
+# decomposed here and are NOT authorised.
+#
+# Each node is a leaf Goal: `accept` is its evidence_spec (executable commands —
+# a node is done ONLY when they exit 0); `deps` are DAG edges; `actor` is the
+# router-matrix channel (see assignment_rule), `role` is the lifecycle role that
+# owns the state. Feed nodes whose deps are all `integrated` to any runtime.
+# K1: no promotion without evidence.
+#
+# Clause refs: SAEOS-1 = spec/SAEOS-1-architecture.md; K/A/I = PAEOS-4 kernel;
+# L01–L19 = operations/ENGINEERING_LIFECYCLE.md.
+# ============================================================================
+
+meta:
+  backlog_id: SAKG-1
+  version: 1.0.0
+  derives_from: spec/SAEOS-1-architecture.md
+  ratification: "Founder Proxy, 2026-08-06 (A4)"
+  mission: "RB-0005 Phase D"
+  slices_in_scope: [S1, S2]
+  root_goal: >
+    SAKG returns a real, outcome-joined architectural precedent to a real PAEOS
+    goal, inside a hard token budget, with an auditable `why` path — or is
+    falsified and reverted (SAEOS-1 §7 falsifier).
+
+# ── Router matrix (inherited unchanged from backlog/PAEOS-5-backlog.yaml) ────
+assignment_rule: |
+  Derived from the router matrix (PAEOS-2 §4, K3), not from preference:
+  - actor: fable  ⟺ the task's output IS a verifier or frozen contract
+    (fixtures, schemas, conformance definitions — verifiers cannot be verified
+    mechanically; freezing is irreversible), OR the output is a judgment for
+    which no mechanical check exists (feasibility findings).
+  - actor: sonnet ⟺ the acceptance tests are executable before the task starts.
+    Requires its fable-authored fixtures to be integrated first — which yields
+    provenance decorrelation between test author and implementer, satisfying
+    K3/A-08 by construction.
+  - actor: founder ⟺ A4 channel (intent, appetite, go/no-go).
+  - actor: none    ⟺ milestone gate; no work, only evidence aggregation.
+
+conventions:
+  accept: >
+    Every entry is a shell command run from the repo root. A node is `verified`
+    only when every command exits 0. Commands are executable BEFORE the node
+    starts (they fail red first) — this is the K3 mechanical-adversary property.
+  wave: "max parallelization layer; all nodes in a wave are mutually independent"
+  slice: "SAEOS-1 §8 delivery slice (S1 | S2). NOT PAEOS-3 bootstrap stages."
+  trust_zone: >
+    Zone 2 (untrusted runtime) for ALL nodes. SAKG is never in the TCB
+    (SAEOS-1 §3.3). `runtime/emission/` is PAEOS-side (emits); `sakg/` is
+    SAKG-side (ingests, stores, projects). The dependency arrow is one-way:
+    PAEOS never imports `sakg` (SAEOS-1 §6.1, enforced by T-NONAUTH).
+
+# ============================================================================
+# SLICE S1 — Post-Seal Exhaust Extractor & Ingestion Engine
+# Exit criterion (SAEOS-1 §8): a sealed PAEOS goal produces a valid bundle;
+# round-trip is lossless.
+# ============================================================================
+nodes:
+
+  - id: S-PROBE
+    title: Extraction feasibility spike — falsify SAEOS-1 §9/A8 before building
+    clause: [SAEOS-1 §9/A8, SAEOS-1 §10/D7, SAEOS-1 §8/S1, CER-1]
+    actor: fable
+    role: Researcher
+    slice: S1
+    wave: 0
+    deps: []
+    rationale: >
+      A8 is the ratified spec's single largest untested assumption: that PAEOS's
+      L15/L16 artifacts are structured enough to extract losslessly. D7 ratified
+      S1 as "explicitly a falsification test, not a build". This node runs FIRST
+      and may kill the slice.
+    deliverables: >
+      reviews/spikes/sakg-s1-extraction-probe.md — for each of 3 real sealed
+      goals from ledger/ + reviews/tasks/, a hand-extraction attempt into the
+      SAEOS-1 §4.3 node types, recording per-field: extractable / partial /
+      absent. Explicit verdict GO or NO-GO with the loss ratio.
+    accept:
+      - "test -f reviews/spikes/sakg-s1-extraction-probe.md"
+      - "rg -q '^verdict: (GO|NO-GO)$' reviews/spikes/sakg-s1-extraction-probe.md"
+      - "test $(rg -c '^## goal: ' reviews/spikes/sakg-s1-extraction-probe.md) -ge 3"
+      - "rg -q '^loss_ratio: 0\\.[0-9]+$' reviews/spikes/sakg-s1-extraction-probe.md"
+
+  - id: F-ENVELOPE
+    title: Freeze the universal node envelope schema + fixture corpus
+    clause: [SAEOS-1 §4.2, SAEOS-1 §4.3, K4§2]
+    actor: fable
+    role: Planner
+    slice: S1
+    wave: 0
+    deps: []
+    deliverables: >
+      sakg/schema/envelope.schema.json (JSON Schema, draft 2020-12) covering every
+      §4.2 field; tests/sakg/fixtures/envelope/{valid,invalid}/*.json exercising
+      every field, every status value, and every §4.2 invariant violation
+      (authored confidence, frequency-based promotion, deleted node).
+    accept:
+      - "uv run python -c \"import json,pathlib;json.loads(pathlib.Path('sakg/schema/envelope.schema.json').read_text())\""
+      - "uv run pytest tests/sakg/test_envelope_schema.py -q"
+      - "test $(ls tests/sakg/fixtures/envelope/valid/*.json | wc -l) -ge 12"
+      - "test $(ls tests/sakg/fixtures/envelope/invalid/*.json | wc -l) -ge 8"
+
+  - id: G-S1-GO
+    title: "FOUNDER GATE: A4 go/no-go on the S1 build, on S-PROBE evidence"
+    clause: [SAEOS-1 §10/D7, CER-5, L02, L16]
+    actor: founder
+    role: Founder
+    slice: S1
+    wave: 1
+    deps: [S-PROBE]
+    rationale: >
+      CER-5: the runtime recommends, never legislates. If S-PROBE returns NO-GO
+      or a loss ratio the founder judges fatal, SAEOS-1 §7's falsifier fires and
+      the specification is reverted rather than extended. No implementation node
+      may start before this gate.
+    deliverables: >
+      A recorded founder decision (ledger entry) — PROCEED or REVERT — citing the
+      S-PROBE loss ratio.
+    accept:
+      - "rg -q 'SAKG-1/G-S1-GO' ledger/decisions/*.md"
+      - "rg -q '^decision: (PROCEED|REVERT)$' ledger/decisions/SAKG-1-G-S1-GO.md"
+
+  - id: F-BUNDLE
+    title: Freeze the Emission Bundle contract + golden serialization bytes
+    clause: [SAEOS-1 §6.1b, SAEOS-1 §4.3, K4§2]
+    actor: fable
+    role: Planner
+    slice: S1
+    wave: 1
+    deps: [F-ENVELOPE]
+    deliverables: >
+      sakg/schema/bundle.schema.json — the append-only outbox record emitted at
+      L15/L16, carrying Decision, TradeOff, Option (including rejected),
+      Constraint, Component, Scar, EvidenceRef. Golden JCS bytes + SHA-256 for
+      each fixture. Explicitly forbids inline evidence payloads (§3.3.3).
+    accept:
+      - "uv run pytest tests/sakg/test_bundle_schema.py -q"
+      - "uv run pytest tests/sakg/test_bundle_golden_bytes.py -q"
+      - "uv run pytest tests/sakg/test_bundle_forbids_inline_evidence.py -q"
+
+  - id: F-EXTRACT-FIX
+    title: Golden extraction fixtures — sealed PAEOS goal → expected bundle
+    clause: [SAEOS-1 §6.1b, SAEOS-1 §9/A8, K3]
+    actor: fable
+    role: Planner
+    slice: S1
+    wave: 2
+    deps: [F-BUNDLE, G-S1-GO]
+    rationale: >
+      Test author ≠ implementer (A-08). These fixtures are authored from the
+      S-PROBE hand-extractions, so I-EXTRACT is graded against a target it did
+      not write.
+    deliverables: >
+      tests/sakg/fixtures/extract/<goal_id>/{input/,expected_bundle.json} for the
+      3 S-PROBE goals plus 2 adversarial cases (a remanded goal; a goal whose
+      L06 matrix is absent).
+    accept:
+      - "test $(ls -d tests/sakg/fixtures/extract/*/ | wc -l) -ge 5"
+      - "uv run pytest tests/sakg/test_extract_fixtures_wellformed.py -q"
+
+  - id: I-STORE
+    title: Implement the SAKG graph store — append-only nodes, edges, supersession
+    clause: [SAEOS-1 §4.2, SAEOS-1 §4.4, K8]
+    actor: sonnet
+    role: Builder
+    slice: S1
+    wave: 2
+    deps: [F-ENVELOPE, G-S1-GO]
+    deliverables: >
+      sakg/store.py — node + edge persistence honouring the §4.2 envelope;
+      append-only (no delete, supersession only); namespace isolation at the
+      storage boundary; the 8 §4.4 edge families with edge-as-object properties.
+      Registers `sakg` in pyproject [tool.hatch.build.targets.wheel].packages.
+    accept:
+      - "uv run pytest tests/sakg/test_store.py -q"
+      - "uv run pytest tests/sakg/test_store_append_only.py -q"
+      - "uv run pytest tests/sakg/test_store_namespace_isolation.py -q"
+      - "uv run pytest tests/sakg/test_edge_families.py -q"
+      - "uv run ruff check sakg/"
+      - "uv run pyright sakg/"
+
+  - id: I-OUTBOX
+    title: Implement the PAEOS-side post-seal outbox writer (L15/L16)
+    clause: [SAEOS-1 §6.1b, L15, L16, K8]
+    actor: sonnet
+    role: Builder
+    slice: S1
+    wave: 2
+    deps: [F-BUNDLE, G-S1-GO]
+    rationale: >
+      Lives in `runtime/`, not `sakg/`. Emission is post-seal and one-way, so
+      nothing SAKG does can affect the goal that produced it.
+    deliverables: >
+      runtime/emission/outbox.py — append-only bundle writer invoked at L15/L16
+      after seal. MUST NOT import `sakg`. MUST be a no-op when the goal did not
+      reach `integrated`.
+    accept:
+      - "uv run pytest tests/runtime/test_outbox_append_only.py -q"
+      - "uv run pytest tests/runtime/test_outbox_noop_unless_sealed.py -q"
+      - "uv run pytest tests/runtime/test_outbox_post_seal_ordering.py -q"
+      - "! rg -q 'import sakg|from sakg' runtime/"
+      - "uv run pyright runtime/emission/"
+
+  - id: I-EXTRACT
+    title: Implement PAEOS artifact → typed node extractors
+    clause: [SAEOS-1 §6.1b, SAEOS-1 §4.3, SAEOS-1 §9/A8]
+    actor: sonnet
+    role: Builder
+    slice: S1
+    wave: 3
+    deps: [F-EXTRACT-FIX, I-STORE]
+    deliverables: >
+      sakg/extract.py — L06 matrix → TradeOff; L04 candidates → Option (incl.
+      rejected); L08 design set → Component; L11 contract → Constraint;
+      decision-graph → Decision; scar-graph → Scar; CAS hashes → EvidenceRef.
+      Unextractable fields are recorded as explicit gaps, never silently dropped.
+    accept:
+      - "uv run pytest tests/sakg/test_extract.py -q"
+      - "uv run pytest tests/sakg/test_extract_golden.py -q"
+      - "uv run pytest tests/sakg/test_extract_records_gaps.py -q"
+      - "uv run pytest tests/sakg/test_extract_rejected_options_retained.py -q"
+      - "uv run pyright sakg/"
+
+  - id: I-INGEST
+    title: Implement pull-based ingest — outbox → candidate nodes in namespace
+    clause: [SAEOS-1 §6.1b, SAEOS-1 §4.2, ×5]
+    actor: sonnet
+    role: Builder
+    slice: S1
+    wave: 3
+    deps: [I-OUTBOX, I-STORE]
+    rationale: >
+      Pull, never push (§6.1b rule 1). Everything lands as `candidate`;
+      promotion to `canonical` requires an evidence binding, never a frequency
+      threshold (×5).
+    deliverables: >
+      sakg/ingest.py — reads the outbox, writes nodes at status=candidate in the
+      producing project's namespace, idempotent on re-read.
+    accept:
+      - "uv run pytest tests/sakg/test_ingest.py -q"
+      - "uv run pytest tests/sakg/test_ingest_idempotent.py -q"
+      - "uv run pytest tests/sakg/test_ingest_lands_candidate_only.py -q"
+      - "uv run pytest tests/sakg/test_promotion_requires_evidence_binding.py -q"
+      - "uv run pytest tests/sakg/test_frequency_never_promotes.py -q"
+
+  - id: T-ROUNDTRIP
+    title: "S1 EXIT HARNESS: lossless round-trip on a real sealed goal"
+    clause: [SAEOS-1 §8/S1, K1, A-09]
+    actor: sonnet
+    role: Auditor
+    slice: S1
+    wave: 4
+    deps: [I-EXTRACT, I-INGEST]
+    rationale: >
+      This harness IS the S1 exit criterion. It is also the mechanical
+      falsification of A8 — if round-trip loses content, S1 has failed and §7's
+      falsifier fires.
+    deliverables: >
+      tests/sakg/test_roundtrip.py + a hypothesis property test over generated
+      bundles. Reports a machine-readable loss ratio.
+    accept:
+      - "uv run pytest tests/sakg/test_roundtrip.py -q"
+      - "uv run pytest tests/sakg/test_roundtrip_property.py -q"
+      - "uv run python -m sakg.report roundtrip --assert-loss-ratio 0"
+
+  - id: M-S1
+    title: "MILESTONE: S1 complete — sealed goal produces a valid, lossless bundle"
+    clause: [SAEOS-1 §8/S1, L16]
+    actor: none
+    role: Runtime
+    slice: S1
+    wave: 5
+    deps: [T-ROUNDTRIP]
+    accept:
+      - "uv run pytest tests/sakg tests/runtime/test_outbox_append_only.py -q"
+      - "uv run ruff check sakg/ runtime/emission/"
+      - "uv run pyright sakg/ runtime/emission/"
+      - "uv run python -m sakg.report roundtrip --assert-loss-ratio 0"
+
+# ============================================================================
+# SLICE S2 — Query & Projection Engine
+# Exit criterion (SAEOS-1 §8): returns a real precedent from a real prior goal,
+# within budget, with `why`.
+# ============================================================================
+
+  - id: F-PROJ
+    title: Freeze the Projection Request/Response contract + fixtures
+    clause: [SAEOS-1 §5.1, SAEOS-1 §3.3.2, Ω3]
+    actor: fable
+    role: Planner
+    slice: S2
+    wave: 1
+    deps: [F-ENVELOPE]
+    rationale: >
+      Contract-only, so it may be frozen in parallel with S1 implementation.
+      The budget field is the whole point (Ω3 / FPL-4).
+    deliverables: >
+      sakg/schema/projection.schema.json — request (method, subject, namespace,
+      budget{max_tokens,max_nodes,tier}, filters{min_confidence,as_of,status})
+      and response (results[{node_summary,score,why}], provenance{sakg_version,
+      corpus_hash,query_hash}, truncated, omitted, trust, tier). `trust` is the
+      constant "untrusted"; `tier` never admits FULL.
+    accept:
+      - "uv run pytest tests/sakg/test_projection_schema.py -q"
+      - "uv run pytest tests/sakg/test_projection_trust_constant.py -q"
+      - "uv run pytest tests/sakg/test_projection_rejects_full_tier.py -q"
+
+  - id: F-BUDGET-FIX
+    title: Golden budget-enforcement fixtures — drop-and-count, never truncate
+    clause: [SAEOS-1 §5.1 rule 1, SAEOS-1 §7, FPL-4]
+    actor: fable
+    role: Planner
+    slice: S2
+    wave: 2
+    deps: [F-PROJ]
+    deliverables: >
+      tests/sakg/fixtures/budget/*.json — cases where results exceed max_tokens
+      and max_nodes, each with the expected retained set, `omitted` count and
+      `truncated` flag. Includes the pathological case where a single result
+      exceeds the whole budget.
+    accept:
+      - "test $(ls tests/sakg/fixtures/budget/*.json | wc -l) -ge 6"
+      - "uv run pytest tests/sakg/test_budget_fixtures_wellformed.py -q"
+
+  - id: F-TRADEOFF-FIX
+    title: Golden `tradeoff_precedents` fixtures — query → ranked results + why
+    clause: [SAEOS-1 §5.2, SAEOS-1 §8/S2, K3]
+    actor: fable
+    role: Planner
+    slice: S2
+    wave: 6
+    deps: [M-S1, F-PROJ]
+    rationale: >
+      Authored against the real S1-ingested corpus, by a different provenance
+      than the implementer (A-08).
+    deliverables: >
+      tests/sakg/fixtures/tradeoff/*.json — for real trade-off axes present in
+      the ingested corpus, the expected ranked Decision set, each with its
+      expected `why` traversal path and its joined Outcome.
+    accept:
+      - "test $(ls tests/sakg/fixtures/tradeoff/*.json | wc -l) -ge 5"
+      - "uv run pytest tests/sakg/test_tradeoff_fixtures_wellformed.py -q"
+      - "uv run pytest tests/sakg/test_tradeoff_fixtures_reference_real_goals.py -q"
+
+  - id: I-BACKFILL
+    title: Backfill historical Outcome nodes from ledger/debt + incident records
+    clause: [SAEOS-1 §4.3 Outcome, SAEOS-1 §8/S2, CER-3]
+    actor: sonnet
+    role: Builder
+    slice: S2
+    wave: 6
+    deps: [M-S1]
+    rationale: >
+      SAEOS-1 §8 puts the Outcome NODE in S2 but the automatic outcome LOOP in
+      S3. Without backfill, `tradeoff_precedents` cannot answer "and whether it
+      held" — the clause that makes it memory rather than archive (FPL-2). This
+      is a scoped compromise and MUST be recorded as debt: backfilled outcomes
+      are hand-attributed, not evidence-derived.
+    deliverables: >
+      sakg/backfill.py mapping ledger/debt/DEBT-*.md and incident records onto
+      Outcome nodes bound to their Decisions; ledger/debt/DEBT-00NN.md recording
+      the compromise, its repayment condition (S3 automatic loop), and its risk.
+    accept:
+      - "uv run pytest tests/sakg/test_backfill.py -q"
+      - "uv run pytest tests/sakg/test_backfill_outcomes_bound_to_decisions.py -q"
+      - "uv run pytest tests/sakg/test_backfill_marked_hand_attributed.py -q"
+      - "rg -q 'SAKG-1/I-BACKFILL' ledger/debt/DEBT-*.md"
+
+  - id: I-TRAVERSE
+    title: Implement traversal primitives over the 8 edge families
+    clause: [SAEOS-1 §4.4, SAEOS-1 §5.3, Δ5]
+    actor: sonnet
+    role: Builder
+    slice: S2
+    wave: 6
+    deps: [M-S1, F-PROJ]
+    rationale: >
+      Traversal ONLY. No ranking heuristics, no synthesis, no recommendation —
+      Δ5 removed the Reasoning Layer from SAKG core. If this module grows a
+      judgment, it is an architecture violation.
+    deliverables: >
+      sakg/traverse.py — typed walks per §4.4 family; acyclicity enforcement on
+      dependency edges; non-transitive `analogous_to`; cross-namespace edges
+      gated on both disclosure policies.
+    accept:
+      - "uv run pytest tests/sakg/test_traverse.py -q"
+      - "uv run pytest tests/sakg/test_traverse_dependency_acyclic.py -q"
+      - "uv run pytest tests/sakg/test_traverse_analogous_not_transitive.py -q"
+      - "uv run pytest tests/sakg/test_traverse_cross_namespace_gated.py -q"
+      - "uv run pyright sakg/"
+
+  - id: I-PROJ
+    title: Implement the projection engine — budget, ranking, `why`, provenance
+    clause: [SAEOS-1 §5.1, Ω3, FPL-4]
+    actor: sonnet
+    role: Builder
+    slice: S2
+    wave: 7
+    deps: [I-TRAVERSE, F-BUDGET-FIX]
+    deliverables: >
+      sakg/project.py — hard max_tokens ceiling; drop-and-count (never mid-
+      structure truncation); mandatory `why` path on every result; corpus_hash +
+      query_hash so any projection is reproducible.
+    accept:
+      - "uv run pytest tests/sakg/test_projection.py -q"
+      - "uv run pytest tests/sakg/test_projection_budget_golden.py -q"
+      - "uv run pytest tests/sakg/test_projection_never_exceeds_budget.py -q"
+      - "uv run pytest tests/sakg/test_projection_every_result_has_why.py -q"
+      - "uv run pytest tests/sakg/test_projection_reproducible_hashes.py -q"
+      - "uv run pyright sakg/"
+
+  - id: I-TRADEOFF
+    title: Implement `tradeoff_precedents` — the single S2 method
+    clause: [SAEOS-1 §5.2, SAEOS-1 §8/S2, ×2]
+    actor: sonnet
+    role: Builder
+    slice: S2
+    wave: 8
+    deps: [I-PROJ, F-TRADEOFF-FIX, I-BACKFILL]
+    rationale: >
+      Exactly one of the five ratified PAEOS-9 §10.1 methods. The other four are
+      S4 and MUST NOT be implemented here (scope creep is an L12 incident).
+    deliverables: >
+      sakg/methods/tradeoff_precedents.py — match TradeOff on axes, walk to the
+      resolving Decision, join its realized Outcome.
+    accept:
+      - "uv run pytest tests/sakg/test_tradeoff_precedents.py -q"
+      - "uv run pytest tests/sakg/test_tradeoff_golden.py -q"
+      - "uv run pytest tests/sakg/test_tradeoff_joins_outcome.py -q"
+      - "test $(ls sakg/methods/*.py | grep -v __init__ | wc -l) -eq 1"
+
+  - id: I-MCP
+    title: Implement the read-only `sakg` MCP server surface
+    clause: [SAEOS-1 §3.3.1, SAEOS-1 §6.1a, PAEOS-7.6 §8]
+    actor: sonnet
+    role: Builder
+    slice: S2
+    wave: 9
+    deps: [I-TRADEOFF]
+    deliverables: >
+      sakg/mcp_server.py — exposes `tradeoff_precedents` only; deny-by-default;
+      NO mutating method exists on the surface (structural, not policy);
+      every response tagged provenance=sakg, trust=untrusted, tier∈{SUMMARY,INDEX}.
+    accept:
+      - "uv run pytest tests/mcp/test_sakg_server.py -q"
+      - "uv run pytest tests/mcp/test_sakg_server_readonly.py -q"
+      - "uv run pytest tests/mcp/test_sakg_server_tags_untrusted.py -q"
+      - "uv run pyright sakg/"
+
+  - id: T-NONAUTH
+    title: "CONFORMANCE: the three structural non-authority guarantees"
+    clause: [SAEOS-1 §3.3, FPL-3, ×4, PAEOS-9 §10.2]
+    actor: sonnet
+    role: Auditor
+    slice: S2
+    wave: 10
+    deps: [I-MCP]
+    rationale: >
+      FPL-3 requires non-authority be STRUCTURAL, not policy. This suite proves
+      it mechanically: a poisoned SAKG must be unable to gate anything. It is the
+      most important test in the slice.
+    deliverables: >
+      tests/sakg/test_nonauthority.py — (1) no mutating method reachable from any
+      consumer capability; (2) every result carries trust=untrusted and a
+      SUMMARY/INDEX tier; (3) SAKG cannot mint an object of type Evidence — only
+      EvidenceRef; (4) PAEOS does not import sakg anywhere.
+    accept:
+      - "uv run pytest tests/sakg/test_nonauthority.py -q"
+      - "uv run pytest tests/sakg/test_nonauthority_no_mutating_egress.py -q"
+      - "uv run pytest tests/sakg/test_nonauthority_no_evidence_minting.py -q"
+      - "! rg -q 'import sakg|from sakg' kernel/ runtime/ cli/"
+      - "uv run pytest tests/sakg/test_poisoned_corpus_cannot_gate.py -q"
+
+  - id: T-BASELINE
+    title: "MEASUREMENT: no-SAKG baseline harness (the §7 falsifier)"
+    clause: [SAEOS-1 §7, SAEOS-1 §10/D5, Ω9, PAEOS-9 §10.3]
+    actor: sonnet
+    role: Auditor
+    slice: S2
+    wave: 10
+    deps: [I-MCP]
+    rationale: >
+      ×6 ratified that SAKG must earn its place. Without this harness the
+      §7 falsifier cannot fire and SAKG becomes unfalsifiable — the Δ3 defect
+      this specification exists to avoid repeating.
+    deliverables: >
+      sakg/baseline.py + tests — runs a fixed goal set with and without the sakg
+      allow-list entry, reporting the delta in research spawns, L10 remands, and
+      tokens. Also asserts correct behaviour against an EMPTY graph (cold start).
+    accept:
+      - "uv run pytest tests/sakg/test_baseline_harness.py -q"
+      - "uv run pytest tests/sakg/test_empty_graph_returns_empty_not_error.py -q"
+      - "uv run pytest tests/sakg/test_unreachable_sakg_degrades_cleanly.py -q"
+      - "uv run python -m sakg.baseline report --emit-json baseline.json"
+      - "uv run python -c \"import json;d=json.load(open('baseline.json'));assert set(d)>={'research_spawns_delta','remands_delta','tokens_delta'}\""
+
+  - id: M-S2
+    title: "MILESTONE: S2 complete — a real precedent, in budget, with why"
+    clause: [SAEOS-1 §8/S2, SAEOS-1 §7, L16]
+    actor: none
+    role: Runtime
+    slice: S2
+    wave: 11
+    deps: [T-NONAUTH, T-BASELINE]
+    rationale: >
+      Reaching M-S2 does NOT authorise S3–S6. Per SAEOS-1 §8, "S1 and S2 are the
+      whole bet" — continuation is a fresh founder decision on the T-BASELINE
+      evidence, not an entitlement.
+    accept:
+      - "uv run pytest tests/sakg tests/mcp/test_sakg_server.py -q"
+      - "uv run ruff check sakg/ runtime/emission/"
+      - "uv run pyright sakg/ runtime/emission/"
+      - "uv run python -m sakg.report precedent --goal-id ANY --assert-nonempty --assert-has-why --assert-within-budget"
+      - "uv run python -m sakg.baseline report --emit-json baseline.json"
+
+# ── DAG summary (edges implied by deps; waves = antichains) ──────────────────
+dag_properties:
+  nodes: 22                  # S1: 11, S2: 11
+  s1_nodes: [S-PROBE, F-ENVELOPE, G-S1-GO, F-BUNDLE, F-EXTRACT-FIX, I-STORE,
+             I-OUTBOX, I-EXTRACT, I-INGEST, T-ROUNDTRIP, M-S1]
+  s2_nodes: [F-PROJ, F-BUDGET-FIX, F-TRADEOFF-FIX, I-BACKFILL, I-TRAVERSE,
+             I-PROJ, I-TRADEOFF, I-MCP, T-NONAUTH, T-BASELINE, M-S2]
+  critical_path: [S-PROBE, G-S1-GO, F-EXTRACT-FIX, I-EXTRACT, T-ROUNDTRIP, M-S1,
+                  I-TRAVERSE, I-PROJ, I-TRADEOFF, I-MCP, T-NONAUTH, M-S2]
+  max_parallelism: 4        # wave 6: F-TRADEOFF-FIX, I-BACKFILL, I-TRAVERSE + F-BUDGET-FIX carry-over
+  roots: [S-PROBE, F-ENVELOPE]
+  terminal: [M-S2]
+  fable_nodes: [S-PROBE, F-ENVELOPE, F-BUNDLE, F-EXTRACT-FIX, F-PROJ,
+                F-BUDGET-FIX, F-TRADEOFF-FIX]
+  sonnet_nodes: [I-STORE, I-OUTBOX, I-EXTRACT, I-INGEST, T-ROUNDTRIP, I-BACKFILL,
+                 I-TRAVERSE, I-PROJ, I-TRADEOFF, I-MCP, T-NONAUTH, T-BASELINE]
+  founder_nodes: [G-S1-GO]
+  milestone_nodes: [M-S1, M-S2]
+  decorrelation_note: >
+    Every sonnet node's acceptance fixtures are fable-authored — test author and
+    implementer differ in provenance, satisfying K3/A-08 by construction.
+  kill_switches:
+    - "S-PROBE returns NO-GO → G-S1-GO records REVERT → SAEOS-1 §7 falsifier fires."
+    - "T-ROUNDTRIP loss ratio > 0 → A8 falsified → S1 fails, S2 never starts."
+    - "T-BASELINE shows no benefit → SAKG removed from allow-lists (×6, §7)."
+  out_of_scope:
+    - "Slices S3–S6 (outcome loop, remaining 4 methods, multi-tenancy, ecosystem)."
+    - "The four unimplemented PAEOS-9 §10.1 methods — S4 only."
+    - "Any reasoning, ranking heuristic, or recommendation engine inside sakg/ (Δ5)."

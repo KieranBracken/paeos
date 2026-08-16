@@ -1,0 +1,174 @@
+# PAEOS Reasoning Continuity Layer (RCL) System Design
+
+## 1. Overview
+The Reasoning Continuity Layer (RCL) provides high-fidelity, provider-independent, and auditable continuity of a PAEOS reasoning mission. It allows reasoning sessions to be persisted, evaluated, and resumed, while keeping the reasoning state explicitly decoupled from SAKG. 
+
+The core philosophy of RCL is that **the reasoning session is ephemeral, but the reasoning state is durable**.
+
+## 2. Component Graph
+The RCL conceptually breaks down into the following major components:
+- **Core Models**: Defines the domain models (`Mission`, `Decision`, `Evidence`, `Checkpoint`, `ContextPackage`).
+- **State Store**: Manages persistence, versioning, and retrieval of the continuity state without relying on provider-specific memory blobs.
+- **Context Engine**: Implements context policies (`FULL_CONTINUATION`, `FRESH`, `MINIMUM_SUFFICIENT`, `ADVERSARIAL`, etc.) to filter, rank, and package the state into a `ContextPackage`.
+- **Handoff Manager**: Handles the lifecycle of `Checkpoint` creation and restoration, binding reasoning state with repository revisions.
+
+```mermaid
+graph TD
+    PAEOS[PAEOS Orchestrator] -->|Uses| RCLFacade[RCL Facade]
+    
+    RCLFacade --> ContextEngine[Context Engine]
+    RCLFacade --> StateStore[State Store]
+    RCLFacade --> HandoffManager[Handoff Manager]
+
+    ContextEngine -->|Builds| ContextPackage[Context Package]
+    ContextEngine -->|Applies| ContextPolicies[Context Policies]
+    ContextEngine -->|Compresses & Ranks| StateStore
+    
+    StateStore --> Models[RCL Core Models]
+    StateStore -->|Reads/Writes Versioned State| StorageDB[(Durable Continuity Storage)]
+    
+    HandoffManager -->|Creates/Restores| Checkpoint[Checkpoint]
+    HandoffManager -->|Retrieves Repo Info| VcsIntegration[VCS Integration]
+    HandoffManager -->|Writes Checkpoint| StateStore
+
+    PAEOS --> ProviderAdapters[Provider Adapters]
+    ProviderAdapters -->|Translates| ContextPackage
+```
+
+## 3. Data Models
+
+```mermaid
+classDiagram
+    class Mission {
+        +String mission_id
+        +String objective
+        +String phase
+        +String status
+        +String owner
+    }
+    class Checkpoint {
+        +String checkpoint_id
+        +String mission_id
+        +String state_revision
+        +String repository_revision
+        +String active_task
+        +DateTime timestamp
+    }
+    class Decision {
+        +String decision_id
+        +String subject
+        +String selected_option
+        +String rationale
+        +String status
+    }
+    class Evidence {
+        +String evidence_id
+        +String source
+        +String provenance
+        +String verification_status
+    }
+    class Invariant {
+        +String invariant_id
+        +String statement
+        +String authority
+        +String status
+    }
+    class ContextPackage {
+        +String package_id
+        +List~Evidence~ facts
+        +List~Decision~ decisions
+        +List~Invariant~ constraints
+        +List~String~ open_questions
+        +String next_action
+    }
+    
+    Mission "1" *-- "many" Checkpoint
+    Checkpoint "1" *-- "many" Decision
+    Checkpoint "1" *-- "many" Evidence
+    Checkpoint "1" *-- "many" Invariant
+    ContextPackage --> Checkpoint : derives from
+```
+
+## 4. Interfaces
+
+```python
+from typing import Dict, List, Optional
+from dataclasses import dataclass
+
+@dataclass
+class ContextPackage:
+    package_id: str
+    mission_objective: str
+    constraints: List[dict]
+    decisions: List[dict]
+    evidence: List[dict]
+    open_questions: List[str]
+    next_action: str
+
+class StateStore:
+    def create_mission(self, objective: str, owner: str) -> str: ...
+    def get_mission(self, mission_id: str) -> dict: ...
+    def record_decision(self, mission_id: str, subject: str, option: str, rationale: str) -> str: ...
+    def record_evidence(self, mission_id: str, provenance: str) -> str: ...
+    def detect_conflict(self, record_a_id: str, record_b_id: str) -> str: ...
+
+class ContextEngine:
+    def build_context(self, mission_id: str, checkpoint_id: str, policy: str) -> ContextPackage: ...
+    def create_fresh_context(self, mission_id: str, task: str) -> ContextPackage: ...
+    def create_adversarial_context(self, mission_id: str, proposal_id: str) -> ContextPackage: ...
+
+class HandoffManager:
+    def create_checkpoint(self, mission_id: str, state_rev: str, repo_rev: str, next_action: str) -> str: ...
+    def restore_checkpoint(self, checkpoint_id: str) -> dict: ...
+```
+
+## 5. Data Flow (Session Handoff & Model Switch)
+```mermaid
+sequenceDiagram
+    participant AgentA as Model A (e.g. Claude)
+    participant Handoff as Handoff Manager
+    participant Store as State Store
+    participant Engine as Context Engine
+    participant AgentB as Model B (e.g. Gemini)
+
+    Note over AgentA,Store: Session 1
+    AgentA->>Store: record_decision(D-01)
+    AgentA->>Store: record_evidence(E-05)
+    AgentA->>Handoff: create_checkpoint()
+    Handoff->>Store: save_state()
+    Handoff-->>AgentA: Checkpoint C-10
+    
+    Note over AgentA,AgentB: Process Restart / Model Switch
+    
+    AgentB->>Engine: build_context(C-10, policy=FULL_CONTINUATION)
+    Engine->>Store: get_state(C-10)
+    Store-->>Engine: Raw State
+    Engine->>Engine: Filter & Rank Context
+    Engine-->>AgentB: Context Package
+    AgentB->>AgentB: Resume Mission
+```
+
+## 6. State Machines
+### Decision Lifecycle
+```mermaid
+stateDiagram-v2
+    [*] --> Proposed
+    Proposed --> Accepted: Verifier confirms evidence & constraints
+    Proposed --> Rejected: Violates invariants / lacks evidence
+    Accepted --> Superseded: New decision replaces old
+    Accepted --> Disputed: Contradictory evidence discovered
+    Rejected --> Reopened: Underlying assumptions change
+    Disputed --> Accepted: Re-verified
+    Disputed --> Rejected: Original premise invalidated
+```
+
+### Epistemic Promotion (Fact Lifecycle)
+```mermaid
+stateDiagram-v2
+    [*] --> Claim : Model outputs assertion
+    Claim --> Observation : Candidate evidence retrieved
+    Observation --> Fact : Verification / Grounding successful
+    Observation --> Hypothesis : Verification inconclusive
+    Fact --> Stale : Underlying state/repo changes
+    Hypothesis --> Fact : Additional evidence gathered
+```

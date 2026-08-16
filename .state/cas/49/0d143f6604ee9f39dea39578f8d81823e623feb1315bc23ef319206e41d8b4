@@ -1,0 +1,18 @@
+{
+  "objective": "Implement the PAEOS Reasoning Continuity Layer (RCL) based on backlog/research/PAEOS_REASONING_CONTINUITY_RB_v0.1.md. Define the ReasoningState data structure, update the ContextCompiler to dynamically compile prior reasoning context into task packages, and ensure reasoning is persisted across run checkpoints without leaking chat memory.",
+  "changed_paths": [
+    "runtime/context_compiler.py",
+    "runtime/orchestrator/__init__.py",
+    "kernel/types.py"
+  ],
+  "plan_write_scopes": [
+    "runtime/",
+    "kernel/"
+  ],
+  "goal_signature": "g-rcl-implementation",
+  "verifiable": true,
+  "reversible": true,
+  "accept": [
+    "Tests pass proving context continuity across mock session boundaries"
+  ]
+}

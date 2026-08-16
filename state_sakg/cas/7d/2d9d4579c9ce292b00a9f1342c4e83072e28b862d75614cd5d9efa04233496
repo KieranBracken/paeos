@@ -1,0 +1,24 @@
+# DEBT-0068 — Prompt Directive vs Permission Scope Contradiction in Session Prompt Builder
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3 / CER-5
+Level: **runtime-integrations** (touches `runtime/integrations/__init__.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+In `runtime/integrations/__init__.py` (`build_prompt`), a prompt directive instructs subagent sessions:
+`"During execution, you may freely consult the Research Backlog ('backlog/research/') when it is relevant..."`.
+
+However, `package.permissions.read_scopes` may not include `backlog/research/`, while the same prompt explicitly asserts:
+`"# You MAY read only these paths: [read_scopes]"`.
+
+This creates a direct prompt directive conflict: ordering the session to consult `backlog/research/` while declaring `read_scopes` as an exhaustive, exclusive list of permitted paths. If `backlog/research/` is absent from `read_scopes`, attempting to read it causes a capability violation; if ignored, the directive is disobeyed.
+
+## 2. Root Cause
+
+Injection of a global prompt directive for the Research Backlog (commit `ad6de0f`) without automatically appending `backlog/research/` to `package.permissions.read_scopes` or qualifying the directive with scope availability checks.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Condition the Research Backlog prompt text on `backlog/` or `backlog/research/` being present in `package.permissions.read_scopes`.
+- **Long-term:** Align prompt compilation (K5) with capability specification so that every path invited by system prompts is explicitly backed by declared `read_scopes`.

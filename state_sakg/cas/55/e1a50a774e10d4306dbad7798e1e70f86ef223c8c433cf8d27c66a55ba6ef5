@@ -1,0 +1,20 @@
+# DEBT-0060 — Duplicated Self-Hosting Runner & Scheduler Bypass
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-architecture** (touches `runtime/selfhost.py` & `ops/autonomous_run.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`runtime/selfhost.py` (`run_backlog`) and `ops/autonomous_run.py` (`build_scheduler` / `main`) both implement autonomous backlog execution loops, soft loop instantiation, and post-run friction handling.
+
+`runtime/selfhost.py` bypasses `ContinuousScheduler` and `EconomicGovernor`, running a custom `while queue:` loop that does not enforce K11 global budget ceilings. Conversely, `ops/autonomous_run.py` uses `ContinuousScheduler` but duplicates loop setup and friction hooks.
+
+## 2. Root Cause
+
+Ad-hoc evolution of autonomous execution scripts without consolidating self-hosting execution into a single, canonical scheduler pipeline.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Keep both entry points aligned on friction handling.
+- **Long-term:** Refactor `runtime/selfhost.py` to delegate backlog execution directly to `ContinuousScheduler` / `ConcurrentScheduler`, eliminating duplicate execution loops and enforcing K11 global budgets consistently.

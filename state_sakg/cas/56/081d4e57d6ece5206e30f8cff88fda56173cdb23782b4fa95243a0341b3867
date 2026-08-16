@@ -1,0 +1,23 @@
+# DEBT-0013 — Standing Canary Calibration Category Hardcoding & Unratified Pre-Flight Gate
+
+**Status**: OPEN  
+**Filed**: 2026-07-30  
+**Priority**: Medium  
+**Category**: Architectural Deviation / Implementation Ahead of Specification  
+
+---
+
+## 1. Compromise
+In [runtime/calibration.py](file:///Users/bob/GitHub/paeos/runtime/calibration.py), `court_detector` hardcodes `_FORGED_EVIDENCE = "forged-evidence"` and mock artifact hashes (`"a" * 64`). Any canary in `constitution/canaries/` with a category other than `forged-evidence` is marked as not caught, causing an immediate calibration miss / quarantine alarm. Furthermore, using standing canary calibration as a mandatory CLI pre-flight tripwire (`paeos self-host`) was introduced directly in implementation code without a formal Improvement Proposal updating PAEOS specifications.
+
+## 2. Reason
+CANARY-0001 (`forged-evidence`) was the sole planted canary available during B2.D. Hardcoding the category check allowed standing calibration to be verified against `Court` without needing a generalized detector registry.
+
+## 3. Ideal Solution
+Draft and ratify an Improvement Proposal (`PAEOS-IP-0007`) formalizing standing canary CLI pre-flight tripwires. Refactor `court_detector` to support an extensible detector registry capable of handling diverse canary categories (e.g., forged signatures, budget breaches, scope violations).
+
+## 4. Repayment Conditions
+Repay during Phase 3 canary expansion when new canary categories are added.
+
+## 5. Estimated Impact
+Medium. Adding any non-`forged-evidence` canary to `constitution/canaries/` will immediately trip a false-positive quarantine alarm until `court_detector` is generalized.

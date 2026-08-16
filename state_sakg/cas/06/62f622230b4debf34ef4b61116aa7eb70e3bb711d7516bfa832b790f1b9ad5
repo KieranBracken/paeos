@@ -1,0 +1,22 @@
+# DEBT-0023 — Fixed Write-Scope Coupling in Autonomous Intake Generation
+
+Status: **OPEN** · Filed: 2026-08-06 · Channel: CER-3
+Level: **runtime-integrations** (touches `runtime/integrations/__init__.py` & `ops/backlogs/`).
+Source: Autonomous SAKG run audit (CER-1).
+
+## 1. Observation
+
+When `ops/backlogs/sakg-1-intakes.json` was initially generated from `backlog/SAKG-1-backlog.yaml`, `changed_paths` and `plan_write_scopes` were hardcoded to a fixed set of directory prefixes (`["spec/", "runtime/", "kernel/", "tests/", "cli/"]`). 
+
+When tasks like `S-PROBE` or `G-S1-GO` attempted to write deliverables into `reviews/spikes/sakg-s1-extraction-probe.md` or `ledger/decisions/SAKG-1-G-S1-GO.md`, `_collect_writes` rejected the files as out-of-scope (`within_scopes()` returned `False`). The builder session completed, but `_collect_writes` returned 0 artifacts, causing a false remand (`builder produced no artifact`).
+
+## 2. Root Cause
+
+1. The intake JSON format requires explicit `changed_paths` and `plan_write_scopes` per item.
+2. Generating intakes from YAML DAG nodes did not automatically parse the node's `deliverables` list to infer the required write scopes.
+3. `within_scopes()` in `runtime/claude_code.py` strictly checks prefix matches; an intake whose write scopes miss a deliverable directory drops valid authored files.
+
+## 3. Remediation Strategy
+
+- **Short-term (applied):** Expanded `ops/backlogs/sakg-1-intakes.json` write scopes to include `reviews/`, `sakg/`, `ledger/`, `backlog/`, `spec/`, `runtime/`, `kernel/`, `tests/`, and `cli/`.
+- **Long-term (protocol fix):** Implement `infer_write_scopes(deliverables: list[str]) -> tuple[str, ...]` in `runtime/selfhost.py` so write scopes are dynamically computed from declared task deliverables.

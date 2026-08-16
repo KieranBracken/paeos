@@ -1,0 +1,90 @@
+# Constitutional Implementation Review: [B2.K + B2.J — Adversary Seal Gate + Workspace Context]
+
+**Date**: 2026-07-30
+**Task**: Enforce FR-3 at the seal (B2.K, PAEOS-IP-0007 Option A) and give agents their context
+(B2.J), so an R4 seal can be *genuine* (Phase 2 / PAEOS-7 §4.3/§5.3/FR-3)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 2
+
+Deliverables (both ratified from IP-0007; delivered together as they jointly enable a real seal):
+- **B2.K — the adversary gate.** `runtime/review`: `AdversaryOutcome` (PASS/BLOCK) +
+  `read_adversary_verdict` (fail-closed); the review objective now requires a `VERDICT:` line.
+  `runtime/orchestrator`: `SoftLoop.run` **REMANDS unless the adversary PASSes** (no report or BLOCK
+  ⇒ remand). Closes the IP-0007 defect (a run could seal over a blocking dissent).
+- **B2.J — workspace context.** `runtime/integrations`: each session's workspace is seeded with the
+  **constitution** and its **injected context refs** (design/plan/scars/bundle) are materialised from
+  the CAS (`artifact_resolver`). `runtime/orchestrator`: design → plan → IMPLEMENT context **chains
+  forward**, so the Builder has a plan to implement against.
+
+Evidence: **311 passed** (+6); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT: `runtime/` + `cli/` + `tests/`).
+
+## What this fixes (from the live R4 runs)
+
+The contained live runs sealed a **hollow** result: the Planner/Builder blocked on empty workspaces,
+and the Adversary filed **blocking dissents that the loop ignored**. B2.K + B2.J address both:
+
+- **B2.K (FR-3 by construction):** the seal is now a *precondition on the adversary's PASS*
+  (PAEOS-3.5). Deny-by-default: a missing/ambiguous verdict, or an adversary that could not review
+  (no report), **remands**. FR-3 has teeth.
+- **B2.J (unblock the agents):** the constitution is now readable in the workspace (the Planner's
+  "nothing to cite" block), and design/plan flow forward so the Builder has "a plan to implement
+  against," and the Adversary's bundle is materialised so it has "something to attack."
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** B2.K enforces FR-3 exactly as PAEOS-3.5/§5.3 require — the independent adversary failing to
+break the change is now a *gate*, mirroring the Court's `VerdictOutcome`. B2.J changes only *what the
+agent can read*, never its authority (scopes/capabilities unchanged); materialised context is a copy
+into an isolated, auto-deleted temp workspace.
+
+### 2. Architectural Drift
+**PASS.** The adversary gate reuses the existing review harness + CAS; the verdict is a small enum
+parsed from the report (no new mechanism). Context materialisation reuses the B2.I seeding path and
+the existing `run_stage(context_refs=…)` seam. No new authority path.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** The verdict marker (`VERDICT: PASS`/`BLOCK`) is the minimal machine-readable signal, parsed
+fail-closed — no NLP, no invented protocol beyond IP-0007's ratified Option A. Chaining is a plain
+artifact hand-forward. No debt beyond the flagged observations.
+
+### 8. Security Implications
+**PASS.** This is a **security fix**: it closes the "advance a defective goal to SEAL despite dissent"
+threat (§7.5). Fail-closed everywhere — no verdict ⇒ no seal; no report ⇒ no seal. B2.J does not widen
+scope: the session still may write only its `write_scopes`; materialised context is read-only input.
+
+### 9–10. Runtime / Extensibility
+**PASS.** A richer adversary verdict (structured dissents) can replace the marker later without
+changing the gate. Context materialisation is best-effort and additive; a proper filename-preserving
+context channel can supersede the `context/<type>-<hash>` scheme.
+
+## Adversary / property pass
+
+1. **Seal requires PASS** — a `VERDICT: BLOCK` report REMANDS even when the court passed (tested).
+2. **Fail-closed** — no verdict line ⇒ BLOCK; no report at all ⇒ REMAND (tested).
+3. **Good path still seals** — a `VERDICT: PASS` report seals the full run (tested across the suite).
+4. **Builder gets a plan** — the IMPLEMENT package carries design + plan as context (tested).
+5. **Context is readable** — constitution seeded; a context ref is materialised from the resolver
+   into `context/` (tested).
+
+## OBSERVATIONS
+
+1. **The verdict is a text marker, not a structured dissent record.** `VERDICT: PASS/BLOCK` is the
+   minimal signal ratified as Option A. A structured `AdversaryVerdict` (dissent ids + rationale, like
+   the Court's `unmet_claims`) is a clean follow-on that would also let the Evolution Layer author
+   sharper scars. Not required for the FR-3 gate.
+2. **Context materialisation loses original filenames.** Refs are content hashes; materialised files
+   are named `context/<type>-<hash>` (content is intact, path is not). Design→plan→implement chaining
+   works, but a filename-preserving context channel (carry the path alongside the hash) would let
+   agents cite files by their real names — a further refinement toward a fully-live run.
+
+## Action Items
+- [ ] **Founder**: ratify B2.K + B2.J (F2-SOFT) → merge ff-only, remote CI green, tag `b2.jk`.
+- [ ] **Then**: re-run the contained R4 with a genuinely-new objective — the adversary gate + real
+      context should now produce a **real, adversary-approved sealed change** (or an honest remand).
+- [ ] **Follow-ons** (optional): structured adversary verdict; filename-preserving context channel;
+      live-evidence flow (toward R5).

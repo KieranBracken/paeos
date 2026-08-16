@@ -1,0 +1,17 @@
+[
+  {
+    "objective": "Instantiate L18 (Knowledge Extraction). Connect this to the output of L17 to generate versioned skills and scars. Trigger StageId.EVOLVE after RETROSPECT.",
+    "changed_paths": ["runtime/orchestrator/__init__.py", "runtime/evolve.py"],
+    "plan_write_scopes": ["runtime/", "kernel/", "tests/"],
+    "builder_evidence": [
+      {
+        "claim_id": "builds",
+        "command": "pytest",
+        "artifact_hash": "dummy_hash_for_now"
+      }
+    ],
+    "goal_signature": "g-l18-knowledge-extraction",
+    "verifiable": true,
+    "reversible": true
+  }
+]

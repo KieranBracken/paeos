@@ -1,0 +1,79 @@
+# Constitutional Implementation Review: [B2.D — Standing Canary Calibration]
+
+**Date**: 2026-07-30
+**Task**: Canary calibration running — a live FR-2/FR-3 tripwire (Phase 2 / PAEOS-7 §5.3, PAEOS-8 §12)
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverables:
+- `runtime/calibration.py` — `court_detector` (live Court), `calibrate`, `CalibrationReport`.
+- `cli/paeos.py` — `calibrate` subcommand + a standing calibration **gate** in `self-host`.
+- `tests/runtime/test_calibration.py` — 7 tests (catch, fail-safe miss, empty-alarm, CLI exits).
+
+Evidence: **282 passed** (7 new); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT, `runtime/` + `cli/` + `tests/` only).
+
+## What this delivers
+
+The Phase-2 exit criterion "canary calibration **running**" (playbook §158). B0.14 built the canary
+*scaffold*; B1.E wired the seed canary to the real Court **in the test suite only**. B2.D makes
+calibration **standing**: `calibrate()` runs the canaries in `constitution/canaries/` against a
+**live Court** and reports catch/miss, and `paeos self-host` runs calibration **before any backlog
+work** — a miss **quarantines** (refuse to run, exit 3), so a blunted Court can never seal (§5.3).
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** A **miss** — a `CAUGHT`-expected canary the detector does not catch — is the FR-2/FR-3
+tripwire: no sealing proceeds until a human clears it (§5.3). The `self-host` gate enforces exactly
+this: `calibration.passed` is checked before the backlog runs; on failure it returns 3 and does no
+work. The runtime still holds no opinion — the *Court* catches the canary; calibration only checks
+that it did.
+
+### 2. Architectural Drift
+**PASS.** `court_detector` reuses the real `Court` unchanged (same sandboxed re-run as B1.E);
+`calibrate` reuses `kernel.canary.run_calibration`. No new detection mechanism — B2.D only *wires*
+the existing scaffold to the live Court and reports.
+
+### 3–7. Duplication / Bypass / Simplicity / Derivation / Debt
+**PASS.** No duplication of the harness; `CalibrationReport` is a thin view over `CanaryResult`s.
+Two fail-safe rules are **derived**, not invented: (a) an un-exercisable canary category returns
+*not caught* → a miss → alarm (forces `court_detector` to be extended before a new category lands);
+(b) an **empty** canary set is `passed=False` — a standing tripwire must never be silently disabled.
+No hidden debt.
+
+### 8. Security Implications
+**PASS.** This *is* a security control (T2 reward-hack detection calibration). The gate is
+fail-closed: any miss, or an empty/unreadable canary set, quarantines. Calibration constructs its
+own evidence and its own Court instance per run — no shared state an adversary could pre-seed.
+
+### 9–10. Runtime / Extensibility
+**PASS.** `court_detector` is category-dispatched; adding a canary category = extend the detector
+(and until then that category alarms, by design). `calibrate` takes the canary directory as a
+parameter; the CLI exposes `--canaries` on both `calibrate` and `self-host`.
+
+## Adversary / property pass
+
+1. **Live catch** — `calibrate()` over the real canary dir passes; `court_detector(seed)` is True: a
+   live Court remands the forged evidence (tested).
+2. **Fail-safe miss** — an unknown-category canary returns not-caught → a miss (tested).
+3. **Silent tripwire is an alarm** — an empty canary set yields `passed=False`; `paeos calibrate`
+   on an empty dir exits 3 (tested).
+4. **Gate blocks sealing** — `self-host` runs calibration first and returns 3 (quarantine) without
+   running the backlog if calibration fails (code path; the live backlog step is deployment-gated).
+
+## OBSERVATIONS
+
+1. **One planted category today.** Only `forged-evidence` (CANARY-0001) is planted, so
+   `court_detector` exercises only that category; every other category is a fail-safe miss until the
+   detector is extended. Broadening the canary corpus (scope-escape, capability-escalation, memory
+   poisoning — 7.5 threat classes) is follow-on constitution work, not a B2.D blocker: the standing
+   tripwire and its fail-closed semantics are complete for the planted set.
+
+## Action Items
+- [ ] **Founder**: ratify B2.D (F2-SOFT) → merge ff-only, remote CI green, tag `b2.d`.
+- [ ] **Phase-2 seal** now needs only the **amendment path** (wired + human-gated) plus the
+      founder/ops-gated **live R4 run** (per `docs/R4-SELF-HOSTING-RUNBOOK.md`).

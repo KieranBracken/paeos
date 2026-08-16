@@ -1,0 +1,61 @@
+# PAEOS ADE CRITIQUE Stage Output — Adversarial Evaluation
+
+## Critique of Candidate 1: L04 Ambitious Ideation (IDEATE)
+
+### Architectural Shortcuts / Hidden Coupling
+- **No architectural shortcuts.** L04 sits directly after L03 (RE_DERIVE) in the canonical dependency chain. Inserting it into the existing planner loop in `_run_body()` follows the same pattern as RE_DERIVE, DESIGN, and PLAN — no new abstractions or shims required.
+- **No hidden coupling.** L04 consumes L03's derivation artifact via `context_refs` (the same mechanism used by all other planner stages). It produces an `IdeationSet` artifact that becomes context for L05/L06/L07.
+- **Risk: Output consumption gap.** L04's output (`IdeationSet`) is canonically consumed by L05 (RESEARCH) and L06 (TRADEOFF), which are themselves MISSING. Until L05/L06 are built, L04's output will flow directly to L08 (DESIGN). This is architecturally tolerable — DESIGN already operates on whatever context_refs precede it — but means L04's ideation breadth won't be fully exploited until L05–L07 are also instantiated. This is NOT a reason to defer L04; it's a known limitation that resolves naturally as subsequent layers are built.
+
+### Is L04 genuinely a prerequisite for autonomous self-construction?
+**Yes.** Without ideation, the system operates on single-path assumptions derived from first principles. Autonomous self-construction requires exploring multiple candidate architectures before freezing a design. L04 is the canonical mechanism for this.
+
+### Must another layer precede it?
+**No.** All upstream dependencies (L01, L02, L03) are satisfied. L04 has zero unmet prerequisites.
+
+### Verdict: **PASS — No blocking defects. Build L04 next.**
+
+---
+
+## Critique of Candidate 2: L09 Multi-Perspective Critique (CRITIQUE)
+
+### Architectural Shortcuts / Hidden Coupling
+- **Dependency inversion risk.** L09 canonically consumes L08 (DESIGN) output that was itself informed by L04 (IDEATE) → L05 (RESEARCH) → L06 (TRADEOFF) → L07 (MITIGATION). Building L09 now means it would critique designs that were NOT informed by the full cognition pipeline. The critique would evaluate a narrow, un-explored design rather than a properly ideated and traded-off one.
+- **Not a shortcut per se**, but building L09 before L04–L07 creates a quality inversion: the critic has higher fidelity than the thing being critiqued.
+
+### Is L09 genuinely a prerequisite for autonomous self-construction?
+**Yes, eventually.** But its value is substantially diminished when critiquing un-ideated designs. The critique has nothing to compare against (no ideation alternatives, no trade-off matrix).
+
+### Must another layer precede it?
+**Yes — L04 through L07 should precede L09 for full canonical value.** However, L09 CAN be built now without breaking anything; it just won't achieve its canonical purpose until the cognition pipeline feeds it properly.
+
+### Verdict: **DEFER — Build after L04–L07 for maximum architectural value.**
+
+---
+
+## Critique of Candidate 3: L17 Retrospective & CER (RETROSPECT)
+
+### Architectural Shortcuts / Hidden Coupling
+- **No coupling risk.** L17 operates post-seal and has no upstream dependency on missing cognitive layers. It consumes L16 (SEAL) outcomes, which are fully implemented.
+- **Partial implementation exists.** `runtime/evolution.py` contains `EvolutionLayer` which already runs `evolution.run(outcome, ...)` after each `run_one()` call in `autonomous_run.py`. This is a proto-L17 that writes scars. Building L17 formally would promote this into the canonical SoftLoop spine.
+- **Risk: Premature formalization.** The current `EvolutionLayer` works at the `autonomous_run.py` composition layer, not inside `SoftLoop._run_body()`. Moving it inside `_run_body()` is architecturally cleaner but changes the execution boundary. This is manageable but should be handled carefully.
+
+### Is L17 genuinely a prerequisite for autonomous self-construction?
+**Yes, but not before L04.** L17 closes the learning loop, but the learning loop is less valuable if the execution loop itself is incomplete (missing L04–L07, L09). Building the cognition pipeline first means L17 will have richer execution traces to learn from.
+
+### Must another layer precede it?
+**No strict prerequisite is missing.** But building the cognition pipeline first gives L17 more to work with.
+
+### Verdict: **VALID but lower priority than L04. Build after cognition pipeline.**
+
+---
+
+## Summary Verdict
+
+| Candidate | Verdict | Rationale |
+|---|---|---|
+| L04 IDEATE | **BUILD NEXT** | First missing canonical layer, zero unmet prerequisites, forward dataflow order |
+| L09 CRITIQUE | DEFER | Value diminished without L04–L07 feeding L08 |
+| L17 RETROSPECT | DEFER | Valid but lower leverage than completing cognition pipeline first |
+
+**L04 (IDEATE) passes adversarial critique with no blocking defects.**

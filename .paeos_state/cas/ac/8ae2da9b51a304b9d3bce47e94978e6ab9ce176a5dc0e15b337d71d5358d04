@@ -1,0 +1,35 @@
+# PAEOS Reasoning Continuity Layer (RCL) - Implementation Plan
+## Phase 1 Slice
+
+This document outlines the formal implementation plan for the Reasoning Continuity Layer (RCL) based on the upstream design artifact (Version 0.1).
+
+### 1. Work Units
+
+*   **WU1: Domain Models Definition**
+    *   **Scope:** Implement `Mission`, `Decision`, `Evidence`, `Checkpoint`, and `ContextPackage` as Pydantic models or Python dataclasses.
+    *   **Target:** `rcl/models.py`
+*   **WU2: State Store Implementation**
+    *   **Scope:** Implement the `IContinuityStore` interface using an in-memory storage backed by JSON file persistence.
+    *   **Target:** `rcl/store.py`
+*   **WU3: Context Builder Implementation**
+    *   **Scope:** Implement `IContextBuilder` that supports the `FULL_CONTINUATION` policy to reconstruct context packages from checkpoints.
+    *   **Target:** `rcl/context.py`
+*   **WU4: Provider Interface Integration**
+    *   **Scope:** Implement `IProviderInterface` to support model invocation (specifically targeting Gemini) with the constructed `ContextPackage`.
+    *   **Target:** `rcl/providers.py`
+*   **WU5: Test Suite Development**
+    *   **Scope:** Develop a test suite validating that a fresh agent can pick up tasks without original raw conversation context.
+    *   **Target:** `tests/test_rcl_integration.py`
+
+### 2. Evidence Plan
+
+To ensure the implementation meets the required design constraints:
+*   **Unit Testing:** Strict unit tests for Domain Models ensuring data integrity and serialization.
+*   **Continuity Validation:** E2E integration test proving the `Mission -> Checkpoint -> ContextPackage -> Fresh Session` lifecycle. The test must verify that the new session acts upon the correct state without relying on raw history.
+*   **State Machine Verification:** Tests validating the state promotion pipeline (e.g., `Claim -> Proposal -> Decision -> Implemented -> VerifiedFact`).
+
+### 3. Rollback Plan
+
+*   **Isolation:** All changes will be developed in an isolated feature branch (`feature/rcl-phase1`).
+*   **Safe Revert:** Because the RCL introduces new independent modules, any failure in the main branch integration can be mitigated by reverting the PR without affecting existing PAEOS logic.
+*   **State Store Corruption:** In the event of broken JSON persistence during rollout, rollback involves wiping the generated `rcl_store.json` files and reverting the codebase to the `main` branch prior to merge.

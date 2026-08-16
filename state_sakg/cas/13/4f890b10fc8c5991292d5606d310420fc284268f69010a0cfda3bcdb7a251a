@@ -1,0 +1,20 @@
+# DEBT-0052 — Fragile Free-Form String Matching for Failure Classification in `SoftLoop` and `friction.py`
+
+Status: **OPEN** · Filed: 2026-08-07 · Channel: CER-3
+Level: **runtime-orchestrator** (touches `runtime/friction.py` & `runtime/orchestrator/__init__.py`).
+Source: Checkpoint Audit Loop (Constitutional Drift Audit).
+
+## 1. Observation
+
+`classify_friction()` in `runtime/friction.py` relies on `_CLASSIFICATION_RULES` matching substrings in `outcome.detail` (e.g. `"builder produced no artifact"`, `"no evidence submitted"`, `"non-probative (vacuous) evidence"`).
+
+`RunOutcome.detail` is a free-form human-readable diagnostic string generated across `runtime/orchestrator/__init__.py`. 
+
+## 2. Root Cause
+
+Friction classification relies on fragile string matching across module boundaries instead of typed enums or structured failure codes. Any minor rephrasing of diagnostic messages in `SoftLoop` silently causes classification to fall back to `FrictionCategory.DEBT` with title `Unclassified Friction`, breaking automated diagnostic routing.
+
+## 3. Remediation Strategy
+
+- **Short-term:** Maintain substring patterns in `_CLASSIFICATION_RULES` while adding regression unit tests verifying that all `RunOutcome` exit paths in `SoftLoop` match an explicit rule.
+- **Long-term:** Add a structured `failure_reason: FailureReason | None` enum to `RunOutcome` so friction classification is strongly typed and compiler-checked rather than string-matched.

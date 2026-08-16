@@ -1,0 +1,45 @@
+# DEBT-0022: Artifact Selection Prefers Compiled `.pyc` Over Source; Fragile Adversary Materialization
+
+## 1. Context
+During the Phase-3 M3 live multi-goal concurrent self-hosting run (2026-08-04), two isolated goals
+built additive pure functions (`greet`, `farewell`). Each builder wrote source (`lib/*.py`) **and**
+ran `python3 -m py_compile lib/*.py` for its `builds` evidence — which emits a `__pycache__/*.pyc`.
+`_collect_writes()` collected the `.pyc` too, and `SoftLoop` reviews `build.artifacts[0]`, which
+resolved to the **compiled bytecode** (`.pyc`), not the source `.py`. One goal SEALED (adversary
+placed the `.pyc` as `lib/greet.pyc` and reproduced `import lib.greet`); the other was adversary
+**BLOCKED** — that adversary could not make `import lib.farewell` resolve against the bare `.pyc`
+bundle materials (`ModuleNotFoundError: No module named 'lib'`), so it filed a blocking dissent.
+
+## 2. Problem & Risk
+- **Non-deterministic seal/block outcome from artifact *form*, not content.** The reviewed artifact
+  being a sourceless `.pyc` makes adversary reproduction depend on ad-hoc workspace materialization
+  (where the `.pyc` is placed, `__pycache__` layout, interpreter magic-number match). Two adversaries
+  reviewing equivalent work reached opposite verdicts purely on materialization mechanics.
+- **`build.artifacts[0]` is order-dependent and semantically wrong.** Selecting "the first written
+  file" can pick a build *by-product* (`.pyc`) over the *source* the goal actually authored. The
+  bytecode is toolchain- and version-coupled (Python magic number), unlike the durable source.
+- **Interacts with the probative/B2.N and adversary paths**, which materialize the artifact into a
+  workspace and re-run commands — a `.pyc` is far more fragile to materialize than `.py` source.
+
+## 3. Recommended Resolution
+- **Exclude build by-products from `_collect_writes()`** (e.g. `__pycache__/`, `*.pyc`), so
+  ephemeral compiler output never becomes a reviewed artifact; and/or
+- **Make artifact selection explicit and deterministic**: review the artifact(s) named by the plan's
+  `write_scopes`/`changed_paths` (source), not "the first collected write". Prefer source over
+  derived bytecode when both are present.
+- Add a regression test: a builder that emits both `lib/x.py` and `__pycache__/x.pyc` yields the
+  **source** as the reviewed artifact, and the adversary materializes it deterministically.
+
+## 4. Status
+**RESOLVED** (2026-08-04). `runtime/integrations/__init__.py` now excludes Python bytecode
+by-products from write collection: `_is_build_byproduct()` drops any `*.pyc`/`*.pyo` and anything
+under a `__pycache__/` directory, and `_collect_writes()` skips them, so a `py_compile` `.pyc` can
+never become the reviewed `build.artifacts[0]` — the reviewed artifact is the deterministic Python
+**source** the goal authored, which the adversary/court materialise reliably. Covered by
+`tests/runtime/test_live_adapter.py::test_run_excludes_pycache_bytecode_byproducts` and
+`::test_is_build_byproduct_matches_bytecode_only`.
+
+Not a concurrency defect and not a corruption — the sealed run's adversary attacked comprehensively
+and PASSED; the blocked run's adversary correctly refused evidence it could not reproduce (B2.K /
+anti-forgery working). This debt was the *robustness* gap that made the outcome depend on artifact
+form; the fix removes that dependence.

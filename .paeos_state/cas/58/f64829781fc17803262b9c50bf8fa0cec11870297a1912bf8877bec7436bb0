@@ -1,0 +1,73 @@
+# Constitutional Implementation Review: [B2.O — Vacuous-Evidence Discrimination Gate]
+
+**Date**: 2026-07-31
+**Task**: Mechanise the vacuous-evidence catch the live Adversary made (Phase 3 / CANARY-0002 / FR-4).
+**Reviewer Role**: Auditor / Builder Self-Adversarial
+
+## Summary of Findings
+
+- **BLOCKER**: 0 · **MAJOR**: 0 · **MINOR**: 0 · **OBSERVATION**: 1
+
+Deliverables:
+- `runtime/verification.py` — `vacuous_commands`: run each command in a workspace **with** the
+  change and a baseline **without** it; a command whose result is **identical** is vacuous
+  (zero discriminating power).
+- `runtime/orchestrator/__init__.py` — after the court PASS, the SoftLoop **REMANDS** if any
+  evidence command is vacuous (a live-run gate; skipped when `repo_root` is unset).
+
+Evidence: **319 passed** (+2); ruff clean (clean-cache); pyright 0 errors (strict on `kernel/`);
+F1 **2644/20000** (unchanged — F2-SOFT).
+
+## What this delivers
+
+CANARY-0002 (the Adversary's finding) is "faithfully-reproducing-but-vacuous evidence." B2.O
+mechanises the detection the Adversary previously did by reasoning: the Court's re-run confirms the
+command *reproduces*; B2.O confirms it *discriminates* — its result must differ with the change vs
+without. `echo r4-classify-obj` yields the same output either way → vacuous → REMAND. The probative
+`… assert classify_obj(...)` command yields different results (verified vs ImportError) → probative →
+allowed to proceed. The system no longer depends on the Adversary catching vacuous evidence by hand.
+
+## Evaluation Checklist
+
+### 1. Constitutional Compliance
+**PASS.** Strengthens FR-4: evidence must not merely reproduce but *test the change*. Deny-by-default
+in spirit — non-discriminating evidence cannot seal. Composes with B2.N (same verification workspace
+substrate); the Court's T2 contract is unchanged.
+
+### 2–7. Drift / Duplication / Simplicity / Derivation / Debt
+**PASS.** `vacuous_commands` reuses `build_verification_workspace` + `workspace_runner` (B2.N); the
+gate is a single comparison (with vs without). No new mechanism; the definition of "vacuous" is
+exactly the Adversary's ("same PASS for the claim and its negation"). Builds the two workspaces once.
+
+### 8. Security Implications
+**PASS.** Closes the vacuous-evidence attack (§7.5-adjacent: a change sealing on evidence that tests
+nothing) mechanically, not only by an adversary who might be sandbagged. Runs under the same
+resource-limited sandbox; workspaces are throwaway copies.
+
+### 9–10. Runtime / Extensibility
+**PASS.** The gate is live-run-only (`repo_root` set); scripted tests are unaffected. The
+`vacuous_commands` primitive is reusable for a future court-side check or a richer canary detector.
+
+## Adversary / property pass
+
+1. **Vacuous flagged** — `echo` (same with/without) is vacuous; `cat marker.txt` (reads the change)
+   is not (tested).
+2. **Live gate remands** — a SoftLoop run under a verification repo with `echo` evidence REMANDS as
+   non-probative (tested).
+3. **Probative passes** — the R4 `classify_obj` command discriminates (verified vs ImportError), so
+   it is not flagged — consistent with the genuine seal.
+
+## OBSERVATION
+
+1. **The calibration canary CANARY-0002 keeps its token-heuristic detector.** `runtime/calibration.py`
+   catches CANARY-0002 by "the command invokes no interpreter" — a fast proxy sufficient for the bare-
+   echo canary. B2.O's full with/without discrimination is the *runtime* gate on real evidence; unifying
+   the calibration detector onto `vacuous_commands` (running the canary command against two differing
+   workspaces) is a small optional follow-on. Both agree that `echo …` is vacuous.
+
+## Action Items
+- [ ] **Founder**: ratify B2.O (F2-SOFT) → merge ff-only, remote CI green, tag `b2.o`.
+- [ ] **Next (this directive)**: wire the live Court MCP evidence flow — the SoftLoop sources evidence
+      from the court's submitted pool (the Builder submits via `CourtServer`) instead of the pre-declared
+      backlog, making runs autonomous. Seam is F2-SOFT + testable; the live `claude --mcp-config`
+      connection is the deployment step (parallel to the live `claude` call itself).
