@@ -141,6 +141,9 @@ These changes were made by the Antigravity agent running outside the PAEOS SoftL
 * `tests/runtime/test_verification.py` — Updated `test_vacuous_commands_flags_non_discriminating` to use `grep` testing discriminative power (exit code changes).
 
 ### Untracked Files Created (New Additions)
+* `AGENTS.md` — Project-level Antigravity Overseer & Hypervisor role definition.
+* `.agents/rules/antigravity_overseer_role.md` — Workspace rule defining the Antigravity Overseer, Hypervisor, and Pair Programmer role.
+* `~/.gemini/config/rules/antigravity_overseer_role.md` — Global Antigravity configuration rule loaded across all machine workspaces.
 * `runtime/ast_linter.py` (52 lines) — Implemented `PaeosAstLinter` using Python's `ast` module to statically catch swallowed exceptions and bare `except:`.
 * `tests/kernel/test_cas_properties.py` (23 lines) — Added Hypothesis property tests for `kernel/cas.py`.
 * `tests/kernel/test_capability_properties.py` (44 lines) — Added Hypothesis property tests for capability broker unforgeability.
@@ -149,3 +152,55 @@ These changes were made by the Antigravity agent running outside the PAEOS SoftL
 
 ### Deleted Files
 * None
+
+## August 15 - Multi-Provider & Hybrid Runtime Integrations (Codex & GLM-5.3)
+
+Implemented vendor-neutral multi-provider runtime support in `runtime/integrations/hybrid.py` to allow PAEOS to route the main construction chain (`L03` -> `L04` -> `L08` -> `L10` -> `L11`) to Codex / GPT-5.6 Sol, and heterogeneous audit stages (`L09 CRITIQUE` & `L12 ADVERSARIAL_REVIEW`) to GLM-5.3 / Cline.
+
+### Modified Tracked Files
+* `ops/autonomous_run.py` — **[MODIFIED]** Added support for `runtime_type` CLI parameter (`claude`, `codex`, `hybrid`, `chat-bridge`).
+* `runtime/context_compiler.py` — **[MODIFIED]** Included optional `reasoning_state` and `context_policy` parameters in canonical context hashing payload.
+* `runtime/verification.py` — **[MODIFIED]** Replaced `except SyntaxError: pass` with `logger.warning()` to achieve 0 AST linter exception violations.
+
+### Untracked Files Created (New Additions)
+* `spec/PAEOS-9B-multi-model-runtime-architecture.md` (150 lines) — Canonical PAEOS specification documenting the Multi-Model Runtime Architecture, Stage-Aware Routing (GPT-5.6 Sol + GLM-5.3), Court Verification, and Antigravity Overseer Protocol.
+* `runtime/integrations/hybrid.py` (140 lines) — Implemented `CodexRuntime`, `GlmRuntime`, and stage-aware `HybridRuntime` router.
+* `tests/runtime/test_hybrid_runtime.py` (45 lines) — Unit tests verifying stage-aware routing for main construction chain vs heterogeneous audit stages.
+
+
+## August 15 - PAEOS Court Verification of L06 Upgrades
+
+This session formally pushed the L06 changes (AST Linter, Property Tests, Vacuous Checks) through the PAEOS autonomous Verification Court to ensure they legally comply with CANARY-0002.
+
+### Modified Tracked Files
+* `README.md` — **[MODIFIED]** Documented the `chat-bridge` runtime argument for PAEOS development in the Autonomous Pipeline Driver instructions.
+
+### Verification Flow & Ephemeral Changes
+* Restored host repo to pristine state by moving L06 files out of the directory.
+* Orchestrated PAEOS `chat-bridge` runtime across RE_DERIVE -> IDEATE -> RESEARCH -> TRADEOFF -> DESIGN -> CRITIQUE -> PLAN -> IMPLEMENT.
+* Applied L06 changes directly into the isolated sandbox (`/var/folders/...`).
+* Authored `submit_evidence.py` to trigger the Court payload using the `FileCourtEvidencePool`.
+* The Court successfully reproduced the evidence, confirming the `pytest` output passed in the sandbox (where the artifact was applied) and correctly failed on the unmodified baseline (thereby proving the test was not "vacuous").
+* Run logically sealed into the Ledger as `r-e1a8d5c3`.
+* L06 files and host tracking modifications safely restored to host repository after the verification phase successfully concluded.
+
+## August 16 - Architectural Assurance & Level 4 Conformance Engine
+
+Implemented Gate Hardening remediations, negative assurance unit tests, and the Level 4 Architectural Graph Conformance Verifier (`RB-ARCH-ASSURANCE-001`).
+
+### Modified Tracked Files
+* `kernel/sandbox.py` — **[MODIFIED]** Replaced raw `os.environ["PATH"]` inheritance with an explicit allowlisted tool PATH (`Path.home() / ".cargo" / "bin"`, `Path.home() / ".local" / "bin"`, etc.). Eliminates literal `~` unexpanded path vulnerability.
+* `runtime/verification.py` — **[MODIFIED]** Hardened CANARY-0002 non-vacuity check. Baseline workspace now copies and retains written test files while reverting non-test production implementation files, proving tests fail in baseline without production implementation.
+* `runtime/orchestrator/__init__.py` — **[MODIFIED]** Removed trace fallback from adversary gate. Adversary verdicts MUST be parsed strictly from authentic `adversary.artifacts` report files (`review/adversary_report.md`).
+* `AGENTS.md` — **[MODIFIED]** Enforced strict Auditor Precision Rule: mandated exact empirical statistics and prohibited false "100% zero-remand" claims when remands or debts occurred.
+* `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` — **[MODIFIED]** Formatted Entries 105–108 documenting empirical verification runs, negative test execution, and Level 4 verifier implementation.
+
+### New Untracked Files Created
+* `runtime/arch_verifier.py` — **[NEW FILE, 120 lines]** Level 4 Architectural Graph Conformance Engine (`DependencyGraph`, `check_kernel_isolation`, `check_layer_dag`). Enforces Kernel Isolation Invariant (`kernel/` MUST NOT import `runtime/` or `ops/`) and Layer DAG Invariant (zero circular import dependencies).
+* `tests/runtime/test_architectural_assurance.py` — **[NEW FILE, 150 lines]** Dedicated negative & discriminative test suite with 8 targeted tests (run-bound evidence isolation, PATH absolute expansion, missing adversary report fail-closed, transcript PASS marker rejection, adversary scope restrictions).
+* `tests/runtime/test_arch_verifier.py` — **[NEW FILE, 40 lines]** Empirical tests verifying `runtime/arch_verifier.py` kernel isolation, DAG check, and synthetic illegal import detection.
+
+### Git Tags & Commits Created
+* **Git Tag**: `v0.9.5-assurance-hardened` — Saved and tagged Level 2/3 verification court & adversary gate hardening checkpoint.
+* **Git Commit**: `dc9e3f1` — *"feat(assurance): implement Level 4 Architectural Graph Conformance verifier (RB-ARCH-ASSURANCE-001)"*.
+
