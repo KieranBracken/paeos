@@ -58,10 +58,11 @@ class _Recorder:
                          b"t", Cost(100, 1.0, "m"))
 
 
-def _intake(evidence: tuple[Evidence, ...], *, signature: str) -> Intake:
+def _intake(evidence: tuple[Evidence, ...], *, signature: str, reversible: bool = True) -> Intake:
     return Intake(
         objective="add x()", changed_paths=("runtime/x.py",),
         plan_write_scopes=("runtime/x.py",), builder_evidence=evidence, goal_signature=signature,
+        reversible=reversible,
     )
 
 
@@ -89,7 +90,10 @@ def test_evolution_authored_scar_is_injected_into_a_later_run() -> None:
     # with the operational loop never authoring memory.
     sig = "domain:runtime,task:t,stage:VERIFY,kind:court-remand"
     runtime = _Recorder()
-    outcomes = _run([_intake(_FORGED, signature=sig), _intake(_GOOD, signature=sig)], runtime)
+        outcomes = _run(
+        [_intake(_FORGED, signature=sig, reversible=False), _intake(_GOOD, signature=sig, reversible=False)],
+        runtime,
+    )
     assert [o.status for o in outcomes] == [RunStatus.REMANDED, RunStatus.SEALED]
     # the SECOND run's DESIGN package received the scar authored from the FIRST run's remand
     second_design = runtime.design_packages[-1]

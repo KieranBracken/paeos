@@ -1,1 +1,0 @@
-{"mcpServers": {"paeos-court": {"command": "/Users/bob/GitHub/paeos/.venv/bin/python3", "args": ["-m", "runtime.transports.mcp.court_server", "/Users/bob/GitHub/paeos/.state/court"]}}}

@@ -1,8 +1,0 @@
-# PAEOS TRADEOFF Stage Transcript
-
-We have reviewed the architectural proposals (RCL implementation, Event-Sourced Ledger, and Asynchronous Git Workspaces) and their adversarial critiques.
-
-## Selected Approach: Approach 1 (Reasoning Continuity Layer)
-- **Rationale:** The Reasoning Continuity Layer (RCL) directly targets the primary source of operational friction when building PAEOS—multi-agent context loss across session boundaries. It is well-specified in `backlog/research/PAEOS_REASONING_CONTINUITY_RB_v0.1.md`.
-- **Mitigation for Critique:** To address the context window bloat risk, the implementation of the `ContextCompiler` (L03) will feature a strict limit on reasoning history and employ lossy summarization/distillation steps when approaching token thresholds.
-- **Output:** We have written a valid Intake JSON object for this approach to `ops/backlogs/ade_intake.json`.

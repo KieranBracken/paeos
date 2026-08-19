@@ -70,10 +70,12 @@ def _runner(runtime: ScriptedRuntime, scar_store: ScarStore | None = None) -> Se
     return SelfHostRunner(loop)
 
 
-def _intake(evidence: tuple[Evidence, ...], *, signature: str = "domain:runtime,task:t") -> Intake:
+def _intake(evidence: tuple[Evidence, ...], *, signature: str = "domain:runtime,task:t",
+            reversible: bool = True) -> Intake:
     return Intake(
         objective="add x()", changed_paths=("runtime/x.py",),
         plan_write_scopes=("runtime/x.py",), builder_evidence=evidence, goal_signature=signature,
+        reversible=reversible,
     )
 
 
@@ -113,8 +115,8 @@ def test_stored_scar_is_injected_into_a_later_design() -> None:
         ScarDraft(frozenset({"domain:runtime", "kind:seam"}), "watch the seams", "sig")
     )
     runtime = ScriptedRuntime()
-    _runner(runtime, scar_store).run_backlog(
-        [_intake(_GOOD, signature="domain:runtime,kind:seam,task:t")]
+            _runner(runtime, scar_store).run_backlog(
+        [_intake(_GOOD, signature="domain:runtime,kind:seam,task:t", reversible=False)]
     )
     design_pkg = runtime.packages[StageId.DESIGN]
     assert any(ref.type == "scar" for ref in design_pkg.context_refs)  # prior lesson on the path

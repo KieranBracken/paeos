@@ -13,6 +13,7 @@ from kernel.ledger import InMemoryLedgerStore, Ledger
 from kernel.types import Role, StageId, WeightClass
 from nacl.signing import SigningKey
 from runtime.claude_code import AgentWrite, RunOutput
+from runtime.ceremony import Layer
 from runtime.court import VerdictOutcome
 from runtime.memory import ScarDraft, ScarStore
 from runtime.orchestrator import RunStatus, SoftLoop
@@ -93,10 +94,14 @@ _GOOD_EVIDENCE = (
 
 
 def test_unattended_run_reaches_seal() -> None:
+    # Trace-B (Substantial) intake: the full ceremony path — the entire front-end chain executes
+    # and the run reaches SEAL. (Trace-A discharges the front-end — see test_trace_a_run_discharges_.)
     runtime = ScriptedRuntime(_writes())
-    outcome = _loop(runtime).run(
+    loop = _loop(runtime)
+    outcome = loop.run(
         objective="add feature()", changed_paths=("runtime/feature.py",),
         plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,  # non-reversible => Substantial => Trace-B full ceremony
     )
     assert outcome.status is RunStatus.SEALED
     assert outcome.seal is not None
@@ -109,6 +114,43 @@ def test_unattended_run_reaches_seal() -> None:
     assert runtime.packages[StageId.DESIGN].role is Role.PLANNER
     assert runtime.packages[StageId.IMPLEMENT].role is Role.BUILDER
     assert runtime.packages[StageId.ADVERSARIAL_REVIEW].role is Role.ADVERSARY
+    # Trace-B never discharges: no LAYER_DISCHARGED rows in the ledger
+    assert not [r for r in loop._ledger.read() if r.event.kind == "layer_discharged"]
+
+
+def test_trace_a_run_discharges_front_end_and_seals() -> None:
+    # Canonical Trace-A (reversible + cheaply verified): the L02 ceremony contract DISCHARGES the
+    # front-end planner stages (L03-L11/L17/L18), so they record K1 stubs and do NOT execute;
+    # only IMPLEMENT (L12, never dischargeable) + ADVERSARIAL_REVIEW (L14) run, and the run seals.
+    runtime = ScriptedRuntime(_writes())
+    loop = _loop(runtime)
+    outcome = loop.run(
+        objective="add feature()", changed_paths=("runtime/feature.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+    )  # default verifiable=True, reversible=True => ROUTINE => Trace-A
+    assert outcome.status is RunStatus.SEALED
+    # the discharged front-end stages were NOT executed (the old unconditional MITIGATION->DESIGN
+    # chain is gone on the fast path)
+    assert runtime.stages_run == [StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW]
+    assert StageId.DESIGN not in runtime.packages  # discharged, never ran
+    # the goal was classified ROUTINE on the canonical fast path
+    kinds = [r.event.payload.get("weight_class") for r in loop._ledger.read()
+             if r.event.kind == "goal_created"]
+    assert kinds == [WeightClass.ROUTINE.value]
+    # exactly the 11 canonical Trace-A auto-discharge stubs were recorded (L03-L11, L17, L18)
+    discharged = [r for r in loop._ledger.read() if r.event.kind == "layer_discharged"]
+    assert len(discharged) == 11
+    stub_layers = {r.event.payload["discharge"]["layer"] for r in discharged}
+    assert stub_layers == {layer.value for layer in (
+        Layer.L03, Layer.L04, Layer.L05, Layer.L06, Layer.L07, Layer.L08,
+        Layer.L09, Layer.L10, Layer.L11, Layer.L17, Layer.L18,
+    )}
+    for row in discharged:
+        stub = row.event.payload["discharge"]
+        assert stub["result"] == "auto_pass"
+        assert stub["reason"] == "trace_a"
+        assert stub["by"] == "runtime"
+
 
 
 def test_seal_is_idempotent_reseal_same() -> None:
@@ -253,6 +295,7 @@ def test_goal_objective_is_threaded_into_every_stage() -> None:
     _loop(runtime).run(
         objective="ADD_SENTINEL_XYZ helper", changed_paths=("runtime/f.py",),
         plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,  # Trace-B: full front-end so all stages receive the objective
     )
     for stage in (StageId.DESIGN, StageId.PLAN, StageId.IMPLEMENT):
         assert "ADD_SENTINEL_XYZ" in runtime.packages[stage].objective
@@ -279,6 +322,7 @@ def test_implement_receives_design_and_plan_as_context() -> None:
     _loop(runtime).run(
         objective="x", changed_paths=("runtime/f.py",),
         plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,  # Trace-B: DESIGN+PLAN execute, chaining to IMPLEMENT
     )
     impl_pkg = runtime.packages[StageId.IMPLEMENT]
     assert impl_pkg.context_refs  # design + plan artifacts injected as IMPLEMENT context
@@ -292,11 +336,12 @@ def test_matched_scar_is_injected_at_design() -> None:
     scar_store.propose_scar(
         ScarDraft(signature=frozenset({"stage:DESIGN", "domain:runtime"}),
                   lesson="watch the seams", detection="sig")
-    )
+        )
     runtime = ScriptedRuntime(_writes())
     _loop(runtime, scar_store=scar_store).run(
         objective="x", changed_paths=("runtime/f.py",), plan_write_scopes=("runtime/feature.py",),
         builder_evidence=_GOOD_EVIDENCE, goal_signature="stage:DESIGN,domain:runtime,goal:g",
+        reversible=False,  # Trace-B: DESIGN executes so the scar injection is observable
     )
     design_pkg = runtime.packages[StageId.DESIGN]
     assert any(ref.type == "scar" for ref in design_pkg.context_refs)  # injected on the path
@@ -320,13 +365,16 @@ def test_triage_marks_kernel_touching_full_path() -> None:
 
 
 def test_budget_breach_halts_the_run() -> None:
-    tight = {**_BUDGETS, WeightClass.ROUTINE: Budget(1500, 3600, 5)}  # only ~1 dispatch fits
+    # Trace-B (Substantial) full front-end: MITIGATION+DESIGN alone (2x1000 tokens) exceed the
+    # tightened Substantial budget, so the run HALTs on budget breach before IMPLEMENT.
+    tight = {**_BUDGETS, WeightClass.SUBSTANTIAL: Budget(1500, 7200, 5)}  # only ~1 dispatch fits
     runtime = ScriptedRuntime(_writes(), cost_tokens=1000)
     outcome = _loop(runtime, budgets=tight).run(
         objective="x", changed_paths=("runtime/f.py",),
         plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,  # Trace-B => Substantial budget applies
     )
-    assert outcome.status is RunStatus.HALTED  # design (1000) + plan (1000) > 1500
+    assert outcome.status is RunStatus.HALTED  # front-end chain (2x1000) > 1500
 
 
 def test_file_court_evidence_pool_roundtrips(tmp_path: object) -> None:

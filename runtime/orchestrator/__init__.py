@@ -33,6 +33,7 @@ from kernel.types import ArtifactRef, Claim, Role, StageId, WeightClass
 from nacl.signing import SigningKey
 
 from runtime.agents import StagePlaybook
+from runtime.ceremony import CeremonyContract, Layer, Obligation
 from runtime.claude_code import AgentDispatcher, AgentRuntime
 from runtime.court import Court, Verdict, VerdictOutcome
 from runtime.memory import ScarStore
@@ -63,6 +64,20 @@ __all__ = [
 ]
 
 GOAL_CREATED = "goal_created"
+LAYER_DISCHARGED = "layer_discharged"
+
+
+# Canonical front-end planner stages -> their lifecycle Layer (L07-L11).
+# Driven by the L02 ceremony contract (Step 4, EL L24-28): a DISCHARGE obligation records its
+# K1 stub and does NOT execute; only EXECUTE obligations run. The unconditional
+# MITIGATION->DESIGN->CRITIQUE->PLAN chain disappears on the Trace-A fast path as a
+# ceremony-routing consequence, not a hard-coded reorder patch (addendum §4.1).
+FRONTEND_PLANNER_STAGES: tuple[tuple[StageId, Layer], ...] = (
+    (StageId.MITIGATION, Layer.L07),
+    (StageId.DESIGN, Layer.L08),
+    (StageId.CRITIQUE, Layer.L09),
+    (StageId.PLAN, Layer.L11),
+)
 
 
 class EvidenceSource(Protocol):
@@ -267,19 +282,32 @@ class SoftLoop:
             Event(
                 1, GOAL_CREATED,
                 {"goal_id": goal_id, "weight_class": decision.weight_class.value},
-            )
+                        )
         )
 
+        # Step 4 — lawful Trace-A discharge evidence (K1): emit one canonical LAYER_DISCHARGED row
+        # per auto-discharged layer (L03-L11, L17, L18) so every discharged transition still carries
+        # evidence instead of vanishing. Trace-B contracts discharge nothing, so this is a no-op on
+        # the full-ceremony path. (No v/r scoring invented here -- ceremony only consumes triage's
+        # trace; the v/r mechanics remain RB-CEREMONY-DEPTH-001's open edge case.)
+        self._record_discharges(run_id, goal_id, decision.ceremony)
+
         try:
-            # --- Planner: DESIGN then PLAN (matched scars injected, FR-6) ---
-            # Stage context chains forward (B2.J): PLAN sees DESIGN, IMPLEMENT sees design + plan —
-            # so the live Builder has a plan to implement against (it blocked without one).
-            # The goal objective is threaded into every stage (B2.L) so DESIGN designs FOR it, PLAN
-            # plans FOR it, and the Builder is told the specific change — without it each stage got
-            # only a generic role objective and the Builder had nothing concrete to implement.
+            # --- Planner: ceremony-resolved obligation graph (EL L24-28) ---
+            # The front-end stages are gated by the L02 ceremony contract: a DISCHARGE obligation
+            # (Trace-A) records its K1 stub above and does NOT execute, so the unconditional
+            # MITIGATION->DESIGN->CRITIQUE->PLAN chain disappears on the fast path (the prior
+            # "MISPLACED" execution of L07/L08/L09/L11 without a ceremony decision). Only EXECUTE
+            # obligations run; IMPLEMENT/Court/Adversary/Seal always run (never dischargeable).
+            # Stage context chains forward (B2.J): PLAN sees DESIGN, IMPLEMENT sees design + plan,
+            # so the live Builder has a plan to implement against (it blocked without one). The goal
+            # objective is threaded into every stage (B2.L) so DESIGN designs FOR it, PLAN plans FOR
+            # it, and the Builder is told the specific change.
             goal_detail = f"Goal objective: {objective}"
             planner_artifacts: list[ArtifactRef] = []
-            for stage in (StageId.MITIGATION, StageId.DESIGN, StageId.CRITIQUE, StageId.PLAN):
+            for stage, layer in FRONTEND_PLANNER_STAGES:
+                if decision.ceremony.obligation_for(layer) is Obligation.DISCHARGE:
+                    continue
                 scars = self._scar_refs(goal_signature, stage)
                 result = self._playbook.run_stage(
                     goal_id=goal_id, run_id=run_id, stage=stage, session="planner",
@@ -458,6 +486,29 @@ class SoftLoop:
                 },
             )
         )
+
+    def _record_discharges(
+        self, run_id: str, goal_id: str, ceremony: CeremonyContract
+    ) -> None:
+        """Emit the K1 evidence stubs for every layer the ceremony contract discharges.
+
+        Auto-discharge is NOT a skip (EL L29-30 / WSM L70-72): each discharged layer appends one
+        ``LAYER_DISCHARGED`` row carrying the canonical DischargeStub record
+        ``{layer, result: auto_pass, reason: trace_a, by: runtime}``. Trace-B contracts discharge
+        nothing, so this records zero rows on the full-ceremony path.
+        """
+        for stub in ceremony.discharge_stubs():
+            self._ledger.append(
+                Event(
+                    1,
+                    LAYER_DISCHARGED,
+                    {
+                        "run_id": run_id,
+                        "goal_id": goal_id,
+                        "discharge": stub.to_record(),
+                    },
+                )
+            )
 
     def _court_for_run(self, build: TaskResult) -> tuple[Court, Callable[[], None]]:
         """The court to adjudicate this run's evidence (B2.N). For a live run (repo_root set + the
