@@ -45,12 +45,14 @@
 > No founder adjudication is required for them — see Entry 146 and `proposals/PAEOS-IP-0014`.
 > The sequence is therefore re-expressed from RB-CEREMONY-DEPTH-001 onward:
 
-1. **RB-CEREMONY-DEPTH-001** (research) — extract the exact ceremony-depth contract from the
-   Engineering Lifecycle (`(verifiability × reversibility)`, Trace-A/B, auto-discharge rule):
-   D1 doctrine extraction is produced first (no founder design decision needed — the doctrine exists).
-2. Implement canonical **L02 ceremony contract** + **Trace-A discharge evidence stubs** (K1).
-3. Runtime executes the **ceremony-resolved obligation graph** — NOT more hard-coded
-   SoftLoop stages.
+1. **[DONE 2026-08-19] RB-CEREMONY-DEPTH-001** — canonical ceremony doctrine extracted to
+   `backlog/research/PAEOS_RESEARCH_BACKLOGS_CEREMONY_TDD_v0.1/PAEOS_CEREMONY_DEPTH_DOCTRINE_EXTRACTION_v1.md`
+   (D1). Doctrine exists in the EL; no founder design decision needed.
+2. **[DONE 2026-08-19] L02 ceremony contract + Trace-A discharge evidence stubs (K1)** — implemented
+   in `runtime/ceremony.py`, wired into `runtime/triage.py`, tested
+   (`tests/runtime/test_ceremony_contract.py`). Implements EL/WSM law; no legislation. Unknown depth ⇒ Trace-B.
+3. **Runtime executes the ceremony-resolved obligation graph** — walk `CeremonyContract.obligation_plan()`
+   in the orchestrator and record each discharge stub (instead of hard-coding SoftLoop stages). **NEXT.**
 4. **A-08 fail-closed** enforcement: `BuilderFamily ≠ AuditorFamily`, generic
    (never vendor-locked to GPT-5.6). Same-family audit must HALT/REMAND, never degrade.
 5. Prove canonical Trace-A → warranted Trace-B → **R4 conformance decision**.

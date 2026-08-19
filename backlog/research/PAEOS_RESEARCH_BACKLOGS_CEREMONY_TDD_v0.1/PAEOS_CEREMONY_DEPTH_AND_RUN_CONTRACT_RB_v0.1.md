@@ -2,10 +2,11 @@
 ## Research Backlog Item — v0.1
 
 **Research ID:** RB-CEREMONY-DEPTH-001  
-**Status:** PRE-IMPLEMENTATION / RESEARCH  
+**Status:** **D1 EXTRACTED (2026-08-19) — doctrine EXISTS in the canonical Engineering Lifecycle; proceed to L02 ceremony-contract design (Step 3).**  
 **Priority:** CRITICAL  
 **Domain:** L02 Triage / Ceremony Depth / Constitutional Lifecycle / Architectural Assurance  
-**Related Work:** Canonical 19-Layer Freeze, Canonical Architecture Registry, Runtime Lifecycle Trace Verifier, Architectural Conformance Firewall
+**Related Work:** `operations/ENGINEERING_LIFECYCLE.md` (v1.3, canonical L01–L19 baseline), `operations/WORKFLOW_STATE_MACHINE.yaml` (derived form), `PAEOS_CEREMONY_DEPTH_DOCTRINE_EXTRACTION_v1.md` (**D1**) in this directory, Two-Axis Conformance Map v1, Architectural Conformance Firewall.
+**Authority note (2026-08-19):** "Canonical 19-Layer Freeze" is NOT an authority (demoted/archived; see `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` Entry 146). Use `ENGINEERING_LIFECYCLE.md` v1.3.
 
 ---
 

@@ -289,3 +289,29 @@ Per founder directive (source hierarchy correction), engineering lifecycle prove
 - **`PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`**: Entry 146 added (full evidence record); Entry 144 inline reclassification note.
 
 **No runtime code was changed by the reconciliation** (documentation/provenance repair only). The L13 Court, ledger, and gates behavior are unchanged and remain tested.
+
+## 2026-08-19 (late) — Step 3: L02 ceremony contract + Trace-A discharge stubs (K1)
+
+Implements existing canonical law (no legislation) per RB-CEREMONY-DEPTH-001 D1 and the approved
+sequence. Grounded in `operations/ENGINEERING_LIFECYCLE.md` (v1.3 L18–30) + its derived WSM form.
+
+- **New `runtime/ceremony.py`** — the L02 run ceremony contract:
+  - `Layer` (L01–L19), `Obligation` (EXECUTE/DISCHARGE), `DischargeStub`
+    (`{result: auto_pass, reason: trace_a, by: runtime}` — WSM L70–72 / K1).
+  - `CeremonyContract` with `dischargeable` / `execute_full` / `obligation_plan` /
+    `discharge_stubs()` / `assert_discharge_legal()`.
+  - `ceremony_for(trace)` builds Trace-A (discharge L03–L11, L17–L18; execute L01–L02, L12–L16,
+    L19-if) or Trace-B (all 19 execute). Unknown/missing depth ⇒ **Trace-B** (T6: never a silent
+    fast-path; RB §16 G).
+- **`runtime/triage.py`** — `TriageDecision` now carries the `ceremony` contract + a
+  `discharge_stubs()` convenience; `triage()` derives it from the trace decision.
+- **New `tests/runtime/test_ceremony_contract.py`** (13 tests) — doctrinal set checks, exact K1
+  stub emission, Trace-B no-discharge, unknown-depth⇒full-ceremony, never-dischargeable fail-closed,
+  and triage integration (ROUTINE→Trace-A stubs; SUBSTANTIAL/KERNEL_TOUCHING→Trace-B no stubs).
+- **Validation:** `uv run pytest` → the 20 ceremony+triage tests pass; full suite has exactly the
+  one pre-existing failure (`test_root_submit_evidence_script_takes_real_arguments`, root-path
+  mismatch vs `ops/submit_evidence.py`, unrelated).
+
+**Remaining in the approved sequence (next):** Step 4 — runtime executes the ceremony-resolved
+obligation graph (walk `CeremonyContract.obligation_plan()` in the orchestrator, emitting each
+discharge stub instead of hard-coding SoftLoop stages). Not yet wired; checkpointed here.

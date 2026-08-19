@@ -24,6 +24,7 @@ from enum import Enum
 from kernel.classifier import classify_paths
 from kernel.types import WeightClass
 
+from runtime.ceremony import CeremonyContract, ceremony_for
 from runtime.task_package import Budget, Cost
 
 __all__ = [
@@ -47,6 +48,11 @@ class TriageDecision:
     weight_class: WeightClass
     trace: Trace  # A = fast path, B = full path
     budget: Budget
+    ceremony: CeremonyContract  # L02 run ceremony contract (derived from trace)
+
+    def discharge_stubs(self):
+        """K1 evidence stubs the runtime must record for every auto-discharged layer."""
+        return self.ceremony.discharge_stubs()
 
 
 def triage(
@@ -69,7 +75,10 @@ def triage(
         weight_class = WeightClass.SUBSTANTIAL
     trace = Trace.A if weight_class is WeightClass.ROUTINE else Trace.B
     return TriageDecision(
-        weight_class=weight_class, trace=trace, budget=budget_by_class[weight_class]
+        weight_class=weight_class,
+        trace=trace,
+        budget=budget_by_class[weight_class],
+        ceremony=ceremony_for(trace.value),
     )
 
 

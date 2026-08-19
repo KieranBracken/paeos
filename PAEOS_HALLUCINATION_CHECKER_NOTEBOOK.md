@@ -2331,3 +2331,29 @@ behavior used to infer intent. Step 2 (conformance map, expanded status vocabula
 **Phase-5 validation.** No implementation defect induced by the doc change: the L13 Court, ledger, gates are unchanged and remain tested. The L15 docs-partial capability gap and the L02 ceremony-depth implementation gap (R4) stand as implementation findings, now grounded in the EL directly.
 
 **Continuity.** Next step in the approved sequence is **RB-CEREMONY-DEPTH-001** (canonical ceremony-doctrine extraction from the EL). This entry persists the reconciliation so a later context can resume without repeating the forensic work.
+
+### Entry 147 — Steps 2–3 of the R4 sequence: ceremony doctrine extraction + L02 ceremony contract (2026-08-19)
+
+**Continuation from Entry 146's hierarchy correction.** Implemented existing canonical law; no
+legislation (CER-5/6), grounded entirely in the Engineering Lifecycle v1.3 (L18–30) + WSM
+(ceremony_depth L56–72).
+
+1. **RB-CEREMONY-DEPTH-001 D1** →
+   `backlog/research/PAEOS_RESEARCH_BACKLOGS_CEREMONY_TDD_v0.1/PAEOS_CEREMONY_DEPTH_DOCTRINE_EXTRACTION_v1.md`.
+   Answers who (L02/Planner-Router), when (L02), classes (Trace-A/B only), factors (v×r, 2×2 →
+   Trace-A = reversible AND cheaply verified; else Trace-B), dischargeable sets, never-dischargeable
+   layers, mandatory K1 stub format, and the open edge cases (v/r rubric, escalation, de-escalation,
+   substantive-replaces-discharge) for the design step — not legislated.
+2. **L02 ceremony contract + Trace-A discharge stubs (K1)** — new `runtime/ceremony.py`
+   (`Layer`, `Obligation`, `DischargeStub`, `CeremonyContract`, `ceremony_for`), wired into
+   `runtime/triage.py` (`TriageDecision.ceremony` + `discharge_stubs()`). Unknown/missing depth ⇒
+   **Trace-B** (T6/RB§16 G fail-closed). Tests: `tests/runtime/test_ceremony_contract.py` (13 tests)
+   + existing triage tests — all pass. Full suite: only the pre-existing unrelated
+   `test_root_submit_evidence_script_takes_real_arguments` failure (root `submit_evidence.py` path
+   mismatch vs `ops/submit_evidence.py`).
+
+**Next (Step 4):** wire the orchestrator to walk `CeremonyContract.obligation_plan()` and record
+each discharge stub, replacing the hard-coded SoftLoop stage chain. Then A-08 fail-closed
+enforcement (Step 5), then Trace-A/Trace-B R4 proof (Step 6). Detailed in
+`operations/CURRENT_STATE.md` §3 and `MessyChangesNeedsReview.md`. Commit: `2fa724d` (Entry 146
+reconciliation) then the Step-3 ceremony-contract commit to follow.
