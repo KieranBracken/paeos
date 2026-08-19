@@ -101,26 +101,29 @@ def check_cline_running() -> bool:
 
 
 def get_repo_idle_minutes() -> float:
-    """How many minutes since the last file change in the repo."""
+    """How many minutes since the last git activity (commit or working-tree change).
+    Uses git only — no slow filesystem find."""
     try:
+        # Check uncommitted working-tree changes first (fastest signal)
         r = subprocess.run(
-            ["find", str(REPO_ROOT), "-not", "-path", "*/.git/*",
-             "-not", "-path", "*/__pycache__/*", "-not", "-path", "*/ops/chatgpt_bridge/*",
-             "-newer", str(REPO_ROOT / ".git" / "HEAD"), "-type", "f"],
-            capture_output=True, text=True, timeout=10
+            ["git", "-C", str(REPO_ROOT), "status", "--short", "--untracked-files=no"],
+            capture_output=True, text=True, timeout=5
         )
-        files = r.stdout.strip().splitlines()
-        if not files:
-            # No files newer than HEAD — check git log timestamp
-            r2 = subprocess.run(
-                ["git", "-C", str(REPO_ROOT), "log", "-1", "--format=%ct"],
-                capture_output=True, text=True
+        changed = [l[3:].strip() for l in r.stdout.splitlines()
+                   if l.strip() and "ops/chatgpt_bridge" not in l and "misc/" not in l]
+        if changed:
+            latest = max(
+                (REPO_ROOT / f).stat().st_mtime
+                for f in changed[:20] if (REPO_ROOT / f).exists()
             )
-            last_commit = int(r2.stdout.strip() or "0")
-            return (time.time() - last_commit) / 60
-        # Find most recent mtime
-        latest = max(Path(f).stat().st_mtime for f in files if Path(f).exists())
-        return (time.time() - latest) / 60
+            return (time.time() - latest) / 60
+        # Fall back to last commit timestamp
+        r2 = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "log", "-1", "--format=%ct"],
+            capture_output=True, text=True, timeout=5
+        )
+        last_commit = int(r2.stdout.strip() or "0")
+        return (time.time() - last_commit) / 60
     except Exception:
         return 0.0
 
@@ -172,8 +175,26 @@ def relaunch_chrome():
         wlog("  ⚠ Chrome relaunched but ChatGPT tab not found — may need login")
 
 
-def nudge_cline(message: str):
-    """Paste a nudge message into the Cline terminal."""
+def nudge_cline(message: str) -> bool:
+    """Paste a nudge message into the Cline terminal. Returns True if successful."""
+    # Check if display is active before attempting UI automation
+    disp = subprocess.run(
+        ["ioreg", "-n", "IOHIDSystem", "-d", "1"],
+        capture_output=True, text=True, timeout=5
+    )
+    if "HIDIdleTime" in disp.stdout:
+        idle_ns = 0
+        for line in disp.stdout.splitlines():
+            if "HIDIdleTime" in line:
+                try:
+                    idle_ns = int(line.split("=")[-1].strip())
+                except Exception:
+                    pass
+        idle_min = idle_ns / 1e9 / 60
+        if idle_min > 5:
+            wlog(f"  ⚠ Nudge skipped — display idle {idle_min:.0f} min (screen likely locked)")
+            return False
+
     subprocess.run(["pbcopy"], input=message.encode(), check=True)
     time.sleep(0.3)
     script = f'''tell application "Terminal" to activate
@@ -188,8 +209,10 @@ end tell'''
     r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
     if r.returncode == 0:
         wlog(f"  Nudge sent to Cline: {message[:60]}...")
+        return True
     else:
         wlog(f"  ⚠ Nudge failed: {r.stderr.strip()}")
+        return False
 
 
 def read_recent_bridge_log(lines: int = 20) -> str:
@@ -275,8 +298,11 @@ def run_watchdog():
                 "and continue with the next step in the approved implementation sequence. "
                 "If you are waiting for architect input, re-state your questions."
             )
-            nudge_cline(nudge)
-            healed.append("Nudge sent to unstick Cline")
+            nudge_ok = nudge_cline(nudge)
+            if nudge_ok:
+                healed.append("Nudge sent to unstick Cline")
+            else:
+                issues.append("Nudge failed — screen likely locked, cannot auto-heal")
 
     # ── 6. Response freshness ────────────────────────────────
     resp_age = get_response_age_minutes()
