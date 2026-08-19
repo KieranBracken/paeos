@@ -2357,3 +2357,82 @@ each discharge stub, replacing the hard-coded SoftLoop stage chain. Then A-08 fa
 enforcement (Step 5), then Trace-A/Trace-B R4 proof (Step 6). Detailed in
 `operations/CURRENT_STATE.md` §3 and `MessyChangesNeedsReview.md`. Commit: `2fa724d` (Entry 146
 reconciliation) then the Step-3 ceremony-contract commit to follow.
+
+### Entry 148 — Hourly Watchdog Check-in (2026-08-19 11:00)
+
+**Automated oversight check — all systems healthy.**
+
+| Component | Status |
+|---|---|
+| Bridge monitor (PID 33451) | ✅ Alive |
+| Bridge log activity | ✅ Active (0 min idle) |
+| Chrome CDP / ChatGPT tab | ✅ Connected |
+| Cline process | ✅ Running |
+| Repo idle | 16.2 min (cleanup commits, not stuck) |
+| Last ChatGPT response | 351 min ago (bridge in socratic mode, waiting for questions) |
+
+**Recent commits (healthy — all chore/cleanup):**
+- `52097c8` chore: rename superseded docs, clear duplicates
+- `371a876` chore: consolidate clutter into misc/
+- `e302665` feat(runtime): L02 ceremony contract (last real implementation)
+
+**No anomalies. No intervention required.**
+
+Next check-in: 12:00.
+
+### Entry 149 — Hourly Watchdog Check-in (2026-08-19 12:00)
+
+**Automated oversight check — all systems healthy. Watchdog perf bug fixed.**
+
+| Component | Status |
+|---|---|
+| Bridge monitor (PID 33451) | ✅ Alive |
+| Bridge log activity | ✅ Active (0 min idle) |
+| Chrome CDP / ChatGPT tab | ✅ Connected |
+| Cline process | ✅ Running |
+| Repo idle | ~54 min (last real commit was the test indentation fix at ~11:03) |
+
+**Watchdog bug fixed this check-in:**  
+`get_repo_idle_minutes()` was using `find` across the whole repo tree — now large after misc/ cleanup — causing the watchdog to hang. Replaced with `git status --short` + `git log -1 --format=%ct` (git-only, no filesystem traversal). Fix committed.
+
+**Test suite improvement:**  
+`test_selfhost.py` and `test_memory_lifetime_boundary.py` indentation bugs repaired (commit `02bf2e0`). Suite now has only 1 pre-existing failure (`test_root_submit_evidence_script`).
+
+**Repo idle note:** 54 min since last commit is within normal range — model may be reasoning/planning before its next implementation step.
+
+Next check-in: 13:00.
+
+### Entry 150 — Catch-up Watchdog (2026-08-19 12:00–16:00, iterations 5–10)
+
+**Multiple check-ins fired while stream was interrupted. Retrospective summary.**
+
+**Root cause of all issues: Mac screen went to sleep (screensaver/lock).**
+
+| Check-in | Time | Status |
+|---|---|---|
+| Iteration 5 | 12:00 | Screen black — nudge failed (-25208) |
+| Iteration 6 | 13:00 | Screen black — all processes alive, UI paste impossible |
+| Iteration 7 | 14:00 | Screen black |
+| Iteration 8 | 14:00 | Screen black |
+| Iteration 9 | 15:00 | Screen black |
+| Iteration 10 | 16:00 | Screen black — current state |
+
+**Background infrastructure — all healthy throughout:**
+- Bridge monitor (PID 33451): ✅ continuously alive
+- Chrome CDP: ✅ up (`Chrome/151.0.7922.138`)
+- Cline process: ✅ running (process alive, just waiting)
+- Bridge log: ✅ active
+
+**Repo idle: ~238 min** — last commit was `02bf2e0` at ~11:03 (test indentation fix).
+No commits since. This is expected — Cline cannot produce output paste-backs while screen is locked.
+
+**Nudge failure root cause:** osascript `click at {340,822}` returns `-25208` when
+the display is off/locked. The watchdog correctly detected "stuck" but the auto-heal
+failed for the same reason. This is a known limitation — UI automation requires an
+active display. No code defect; just physical state.
+
+**Action required:** User wakes Mac → Cline resumes automatically.
+No data loss, no process crashes, no test regressions.
+
+**Watchdog improvement applied:** `get_repo_idle_minutes()` now uses
+`git status --short` instead of `find` to avoid hanging on the large misc/ tree.

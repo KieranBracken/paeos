@@ -6,9 +6,9 @@ Test objective
 
 ## Strict Workspace Binding
 You MUST execute all work inside the isolated sandboxed workspace at:
-`/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-373/test_bridge_adversarial_review0/paeos-t-1234-bridge-xqhbqeb4`
+`/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-378/test_bridge_adversarial_review0/paeos-t-1234-bridge-v380a49p`
 
-Use the `run_command` tool with `Cwd` set to `/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-373/test_bridge_adversarial_review0/paeos-t-1234-bridge-xqhbqeb4`. DO NOT modify any repository files outside of this workspace sandbox! The sandbox contains a seeded mirror of the code you need.
+Use the `run_command` tool with `Cwd` set to `/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-378/test_bridge_adversarial_review0/paeos-t-1234-bridge-v380a49p`. DO NOT modify any repository files outside of this workspace sandbox! The sandbox contains a seeded mirror of the code you need.
 
 ## The Package Prompt
 ```
@@ -16,7 +16,7 @@ Test objective
 ```
 
 ## Instructions for Orchestrator
-1. Spawn a subagent or perform the task yourself inside `/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-373/test_bridge_adversarial_review0/paeos-t-1234-bridge-xqhbqeb4`.
+1. Spawn a subagent or perform the task yourself inside `/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-378/test_bridge_adversarial_review0/paeos-t-1234-bridge-v380a49p`.
 2. The subagent can read context files provided inside the workspace, and edit the code using `write_scopes` authorized inside the workspace.
  3. If this is a BUILDER role, the subagent MUST submit evidence to the PAEOS Court with
    **REAL, KERNEL-REPRODUCIBLE values** (CRITICAL-002: placeholder evidence is forbidden —
