@@ -224,6 +224,8 @@ def test_live_invoker_passes_dangerously_skip_permissions(monkeypatch) -> None: 
 
     class _Proc:
         stdout = _TRANSCRIPT
+        returncode = 0  # CRITICAL-002 fail-loud check requires the real exit status
+        stderr = ""
 
     def _fake_run(cmd, **kwargs):  # type: ignore[no-untyped-def]
         captured["cmd"] = cmd

@@ -1,14 +1,17 @@
-from hypothesis import given
-from hypothesis import strategies as st
-from kernel.lifecycle import is_legal
+"""Hypothesis property tests for Kernel Gates legality matrix (RB-0013)."""
+
+from __future__ import annotations
+
+from hypothesis import given, strategies as st
+
+from kernel.gates import is_legal
 from kernel.types import StageId, WeightClass
 
-st_stage = st.sampled_from(list(StageId))
-st_weight = st.sampled_from(list(WeightClass))
 
-
-@given(st_stage, st_stage, st_weight)
-def test_gate_matrix_validity(from_stage, to_stage, weight_class):
-    """Assert is_legal completes without exception over arbitrary StageId pairs."""
-    result = is_legal(from_stage, to_stage, weight_class)
-    assert isinstance(result, bool)
+@given(st.sampled_from(list(StageId)), st.sampled_from(list(StageId)), st.sampled_from(list(WeightClass)))
+def test_gate_legality_determinism_property(from_stage: StageId, to_stage: StageId, weight: WeightClass) -> None:
+    # Invariant 1: Gate legality decision is a total deterministic function
+    res1 = is_legal(from_stage, to_stage, weight)
+    res2 = is_legal(from_stage, to_stage, weight)
+    assert res1 == res2
+    assert isinstance(res1, bool)

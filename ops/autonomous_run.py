@@ -32,6 +32,7 @@ from runtime.evolution import EvolutionLayer
 # RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
 from runtime.friction import FrictionCategory, classify_friction, record_friction
 from runtime.integrations import ClaudeCodeRuntime
+from runtime.integrations.hybrid import CodexRuntime, HybridRuntime
 from runtime.orchestrator import Intake, RunOutcome, RunStatus, SoftLoop
 from runtime.scheduler import (
     ConcurrentScheduler,
@@ -44,29 +45,60 @@ from runtime.transports.mcp.transport import McpWorkerTransport
 
 
 def build_scheduler(
-    state_dir: Path, repo_root: Path, *, global_budget: GlobalBudget, max_concurrency: int = 1
+    state_dir: Path,
+    repo_root: Path,
+    *,
+    global_budget: GlobalBudget,
+    max_concurrency: int = 1,
+    runtime_type: str = "claude",
 ) -> tuple[ContinuousScheduler | ConcurrentScheduler, EvolutionLayer, Ledger]:
-    """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`.
-
-    `max_concurrency > 1` runs goals in parallel (ConcurrentScheduler). This is K8-safe: the ledger
-    serializes institutional commit (kernel/ledger.py `_append_lock` + the SQLite connection lock),
-    and L3 memory authoring (the Evolution Layer, IP-0005 sole committer) is serialized here too —
-    parallel *generation*, serial *integration*. `max_concurrency == 1` is the sequential loop.
-    """
+    """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`."""
     state_dir.mkdir(parents=True, exist_ok=True)
 
     # The evidence pool + the --mcp-config that launches the court server against THIS pool. The
     # live builder session submits to it via the `submit_evidence` MCP tool; we read it back here.
     transport = McpWorkerTransport(state_dir / "court")
     config_file = state_dir / "mcp-config.json"
-    config_file.write_text(json.dumps(transport.mcp_config()), encoding="utf-8")
+    config_file.write_text(json.dumps(transport.mcp_config(repo_root)), encoding="utf-8")
 
     cas = CAS(FilesystemCasStore(state_dir / "cas"))
-    runtime = ClaudeCodeRuntime(
-        workspace_source=repo_root,  # B2.J: seed the constitution + write scopes into the sandbox
-        artifact_resolver=cas.get,
-        mcp_config_path=config_file,
-    )
+    if runtime_type == "codex":
+        runtime = CodexRuntime(
+            workspace_source=repo_root,
+            artifact_resolver=cas.get,
+            mcp_config_path=config_file,
+        )
+    elif runtime_type == "hybrid":
+        runtime = HybridRuntime(
+            workspace_source=repo_root,
+            artifact_resolver=cas.get,
+            mcp_config_path=config_file,
+        )
+    elif runtime_type in ("glm", "cline"):
+        # Single-model interim (notebook Entry 142 LIMITATION): GPT quota exhausted until
+        # ~2026-08-22, so construction AND audit both run on GLM-5.3 via Cline. Homogeneous-audit
+        # risk — every seal from this window carries that caveat. Re-run the proof intake on
+        # `hybrid` when GPT quota returns.
+        from runtime.integrations.hybrid import GlmRuntime
+
+        runtime = GlmRuntime(
+            workspace_source=repo_root,
+            artifact_resolver=cas.get,
+            mcp_config_path=config_file,
+        )
+    elif runtime_type in ("chat-bridge", "antigravity"):
+        from runtime.integrations.chat_bridge import ChatBridgeRuntime
+
+        runtime = ChatBridgeRuntime(
+            workspace_source=repo_root,
+            artifact_resolver=cas.get,
+        )
+    else:
+        runtime = ClaudeCodeRuntime(
+            workspace_source=repo_root,
+            artifact_resolver=cas.get,
+            mcp_config_path=config_file,
+        )
     ledger = Ledger(SqliteLedgerStore(state_dir / "ledger.db"))
     signing_key = load_or_create_signing_key(state_dir / "seal.key")
     loop = SoftLoop(
@@ -86,7 +118,7 @@ def build_scheduler(
             objective=intake.objective,
             changed_paths=intake.changed_paths,
             plan_write_scopes=intake.plan_write_scopes,
-            builder_evidence=(),  # autonomous: the builder SUBMITS its own evidence via the court
+            builder_evidence=intake.builder_evidence,  # fallback if MCP submission omitted
             goal_signature=intake.goal_signature,
             verifiable=intake.verifiable,
             reversible=intake.reversible,
@@ -126,16 +158,17 @@ def build_scheduler(
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    if not 2 <= len(argv) <= 4:
+    if not 2 <= len(argv) <= 5:
         print(
             "usage: python ops/autonomous_run.py <backlog.json> <state_dir> "
-            "[max_concurrency] [max_runs]",
+            "[max_concurrency] [max_runs] [runtime_type: claude|codex|hybrid|glm|chat-bridge]",
             file=sys.stderr,
         )
         return 64
     backlog_path, state_dir = Path(argv[0]), Path(argv[1])
     max_concurrency = int(argv[2]) if len(argv) >= 3 else 1
     max_runs = int(argv[3]) if len(argv) >= 4 else 25
+    runtime_type = argv[4] if len(argv) >= 5 else "claude"
     repo_root = Path.cwd()
 
     backlog = parse_backlog(json.loads(backlog_path.read_text(encoding="utf-8")))
@@ -145,6 +178,7 @@ def main(argv: list[str] | None = None) -> int:
         # A contained ceiling: enough for specified runs; halts (not spins) when exhausted.
         global_budget=GlobalBudget(tokens=25_000_000, wallclock_s=72_000, runs=max_runs),
         max_concurrency=max_concurrency,
+        runtime_type=runtime_type,
     )
     report = scheduler.run(backlog)
 

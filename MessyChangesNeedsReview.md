@@ -204,3 +204,71 @@ Implemented Gate Hardening remediations, negative assurance unit tests, and the 
 * **Git Tag**: `v0.9.5-assurance-hardened` — Saved and tagged Level 2/3 verification court & adversary gate hardening checkpoint.
 * **Git Commit**: `dc9e3f1` — *"feat(assurance): implement Level 4 Architectural Graph Conformance verifier (RB-ARCH-ASSURANCE-001)"*.
 
+
+## August 18 - CRITICAL-002/003 Remediation Phase 1: Fail-Closed Verification Chain
+
+Executed Phase 1 of the remediation plan from hallucination-notebook Entry 138 (adversarially critiqued and revised). All changes verified: 7 new regression tests pass, full suite green, AST linter clean.
+
+### Modified Tracked Files
+* `runtime/integrations/chat_bridge.py` — **[MODIFIED]** (1) REMOVED the auto-feed fabrication path: non-builder stages (incl. ADVERSARIAL_REVIEW) were auto-fed a fabricated PASS verdict and a fabricated empty-dissent adversary report, making every seal's L12 gate vacuous (CRITICAL-003). Every stage now blocks on real orchestrator output; a missing `current_output.md` yields TaskStatus.FAILED. (2) REPLACED the placeholder court-evidence template (`dummy_hash_for_now`, `dummy_env`, invented `exit_code: 0 / "test passed"`) with a template that runs the real verification command and hashes the real artifact (CRITICAL-002).
+* `runtime/integrations/hybrid.py` — **[MODIFIED]** (1) Removed silent `cline`→`claude` and `codex`→`claude` provider fallbacks; missing binaries now raise RuntimeError (audit-chain homogenisation is forbidden). (2) Fail-loud subprocess handling in both invokers: nonzero exit, empty transcript, or timeout now raise RuntimeError instead of being recorded as zero-cost COMPLETE runs. NOTE: the cline CLI flag set itself is still Claude-style (known-broken; rejected by cline) — now it fails loudly instead of silently; the cline-native invocation + transcript parser remains its own roadmap task.
+* `runtime/integrations/__init__.py` — **[MODIFIED]** `claude_cli_invoker` now fails loud on nonzero exit / empty transcript.
+* `submit_evidence.py` — **[MODIFIED]** Now requires `<run_id> <artifact_path> <command...>` arguments; derives artifact_hash, exit_code and stdout from the real run. Placeholder values removed.
+* `tests/runtime/test_live_adapter.py` — **[MODIFIED]** Test fake `_Proc` gained `returncode`/`stderr` attributes required by the new fail-loud check.
+
+### New Untracked Files Created
+* `tests/runtime/test_chat_bridge_fail_closed.py` — **[NEW FILE, ~150 lines]** 7 regression tests: source invariants (no auto-feed/no fabricated verdicts/no placeholder evidence in bridge or script), behavioral test that ADVERSARIAL_REVIEW blocks on and returns real orchestrator output (including a REMAND verdict), and fail-loud refusal of silent provider fallbacks in both hybrid invokers.
+
+### Verification
+* New suite: `pytest tests/runtime/test_chat_bridge_fail_closed.py` → 7 passed.
+* Full suite: `pytest -q` → exit 0 (409 tests, zero failures).
+* `runtime/ast_linter.check_ast` clean on all modified runtime files.
+
+## 2026-08-18 — Phase 2 (Entry 140)
+- `ops/submit_evidence.py`: removed fabrication defaults (`--artifact-hash` 64-zeros, `--exit-code` 0, `--stdout` "100% passed") — all three now `required=True` (CRITICAL-002 second source, Finding H).
+- Read-only audit: court contamination census (47/60 runs tainted), seal cross-reference (24/25 seals on contaminated evidence, all 25 with inauthentic L12 verdicts), GLM-5.3 seeded-bug calibration 3/3 — documented in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` Entry 140. Founder decisions requested on seal disposition + court-pool hygiene.
+
+## 2026-08-18 — Phase 2 completion (Entry 141)
+- `runtime/orchestrator/__init__.py`: `FileCourtEvidencePool` gained a taint index (`.tainted.json`, line-hash keyed); `evidence_for` skips tainted rows; pool files never rewritten. +`import hashlib`.
+- `.paeos_state/court/.tainted.json`: 99 fabricated rows indexed (dummy + zero-hash classes); 26 genuine rows across 13 runs unaffected.
+- Seal→artifact reconstruction (Finding K): 24/25 seals certified junk (9 empty blobs, 15 `.DS_Store`); only `r-5bf1dea3` sealed a real artifact — re-reviewed by a genuine GLM-5.3 adversary session: PASS (Finding L).
+- `tests/runtime/test_court_taint_index.py`: 3 new tests.
+- `runtime/integrations/__init__.py`: `_collect_writes` now excludes OS droppings (`.DS_Store` etc.) and 0-byte files via `_is_junk_artifact` (closes the Finding K harvesting vector); `tests/runtime/test_junk_artifact_exclusion.py` covers it.
+- Verification: full suite `pytest -q` → 413 passed, 0 failed; AST linter clean on both modified runtime files.
+
+
+## 2026-08-18 — Phase A close-out + Phase B dogfooding launch (GLM-only window)
+
+- `runtime/integrations/hybrid.py`: Cline-native GLM-5.3 invoker live-verified (real session: COMPLETE, 18,986 tokens, model_ver=cline-pass/glm-5.3, real artifact written).
+- `backlog/intakes/evolution_ledger_events.json`: NEW intake — L17-L19 evolution events appended to the ledger (currently 0 evolution rows exist).
+- `backlog/intakes/durable_scar_store.json`: pre-existing intake confirmed staged for launch.
+- Launching intake `durable_scar_store` through `ops/autonomous_run.py ... glm` — first full-19-layer GLM-5.3 run under the documented single-model LIMITATION (GPT quota exhausted until ~08-22; notebook Entry 142).
+
+## 2026-08-18 (late) — RB-0030 remediation: workspace seeding scope + budget headroom
+
+- `runtime/integrations/__init__.py` `_seed_workspace`: was mirroring the ENTIRE repo (less
+  .git/.venv, ~6MB text incl. 31MB CAS tree state) into every stage workspace — root cause of the
+  2.8M-token budget breach (goal g-19803efbff21, run 5). Now seeds ONLY write_scopes subtrees
+  (per-file scopes copied individually); read-only context still arrives via the sanctioned CAS
+  `_materialize_context` path (B2.J). Full test suite green after change (416 tests).
+- `runtime/selfhost.py` DEFAULT_BUDGETS: ROUTINE 2M→4M, SUBSTANTIAL 4M→8M, KERNEL_TOUCHING
+  6M→12M tokens (modest headroom on top of the ~90% context cut; wallclock/retries unchanged).
+- Run 6 of intake 1 (durable ScarStore) launched 23:08 BST on the glm runtime with both fixes.
+- Note: run 6 was launched twice; first attempt (23:07) died immediately on an argv-order bug in
+  my wrapper (`glm` in the concurrency slot) — no tokens spent, no state touched.
+
+## 2026-08-19 — Canonical 19-Layer Freeze v1.0
+
+- **New:** `operations/PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md` — read-only forensic extraction of
+  L01–L19 from ENGINEERING_LIFECYCLE.md (FROZEN v1.0) + WORKFLOW_STATE_MACHINE.yaml (frozen v1.1).
+  Verbatim slices, source hashes, conflict register (C-01..C-03), zero interpretation.
+- **Provenance:** generated mechanically by `operations/_gen_freeze_v1.py` (kept for audit);
+  integrity re-verified after generation (19/19 prose + 19/19 YAML blocks byte-identical; hashes match).
+- **No source files modified.** No code changed.
+- **Next:** Step 2 conformance map against this Freeze; Step 3 founder decision list.
+
+## 2026-08-19 (late) — Step 2 Two-Axis Conformance Map
+- Produced `operations/PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md` (L01–L19 x autonomy-rung readiness).
+- Read-only analysis; no code changes. Follows the Freeze v1 (Entry 144).
+- Statuses use the expanded vocabulary (CONFORMANT_EXECUTED / DISCHARGEABLE_BUT_EVIDENCE_MISSING / MANDATORY_BUT_SKIPPED / etc.).
+- Remediation classes split: implementation remediation vs R4-readiness gap vs canonical conflict vs candidate improvement vs historical evidence defect.

@@ -14,3 +14,13 @@ __pycache__/
 # --- secrets / keys (PAEOS-8 §9 T2: signing keys live OUT of the repo) ---
 ops/keys/*
 !ops/keys/.gitkeep
+
+# --- runtime content-addressable stores & transient state (immutable blobs, rebuildable; ledger stays tracked) ---
+.paeos_state/cas/
+.paeos_state/evaluations/
+.state/
+state_sakg/
+
+# --- patch artifacts ---
+*.rej
+*.orig

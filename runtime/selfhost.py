@@ -45,9 +45,17 @@ __all__ = [
 ]
 
 DEFAULT_BUDGETS: dict[WeightClass, Budget] = {
-    WeightClass.ROUTINE: Budget(400_000, 1800, 2),
-    WeightClass.SUBSTANTIAL: Budget(1_000_000, 5400, 3),
-    WeightClass.KERNEL_TOUCHING: Budget(2_000_000, 10800, 3),
+    # Entry 143 recalibration (RB-0029): measured real cost of a 6-stage GLM-5.3 run
+    # (5 planner stages + IMPLEMENT, high thinking) was 1,233,214 tokens (~205k/stage).
+    # The previous 400k ROUTINE ceiling made every run halt at the adversary charge —
+    # no intake could ever seal. Ceilings now sized from that measurement.
+    # RB-0030 (run 5, g-19803efbff21): full-repo workspace seeding blew this up to
+    # 2.8M tokens for 3 stages. Seeding is now scoped to write_scopes (RB-0030
+    # remediation), cutting per-stage context ~90%; ceilings raised once more as
+    # headroom so a healthy run never halts at the adversary charge again.
+    WeightClass.ROUTINE: Budget(4_000_000, 5400, 2),
+    WeightClass.SUBSTANTIAL: Budget(8_000_000, 10800, 3),
+    WeightClass.KERNEL_TOUCHING: Budget(12_000_000, 21600, 3),
 }
 
 _DEFAULT_ENV_HASH = content_hash(b"paeos-selfhost-env")
@@ -137,6 +145,14 @@ def _parse_evidence(raw: object) -> Evidence:
     obj = _as_object(raw, "evidence")
     command = _req_str(obj, "command")
     claim_id = _req_str(obj, "claim_id")
+    artifact_hash = _req_str(obj, "artifact_hash")
+    if artifact_hash == "live":
+        # Live-intake sentinel (Entry 142): the artifact does not exist yet, so its hash is
+        # unknowable at authoring time. The kernel REBINDS it to the real artifact hash before
+        # adjudication (orchestrator R4 live-binding) — the court still re-runs the command, so
+        # anti-forgery is intact. Any other value must be a real hash; fabricated defaults are
+        # forbidden (CRITICAL-002).
+        artifact_hash = "0" * 64
     result: dict[str, JsonValue] = {
         "exit_code": _as_int(obj.get("exit_code")),
         "stdout": _as_str(obj.get("stdout")) or "",
@@ -145,7 +161,9 @@ def _parse_evidence(raw: object) -> Evidence:
         hash=content_hash(f"{claim_id}:{command}".encode()),
         kind=EvidenceKind[_as_str(obj.get("kind")) or "TEST"],
         claim_id=claim_id,
-        artifact_hash=_req_str(obj, "artifact_hash"),
+        artifact_hash=artifact_hash,  # the rebound local — NOT a re-read (Entry 143 bugfix:
+        # the previous `_req_str(obj, "artifact_hash")` discarded the "live" sentinel
+        # conversion and passed the literal string "live" through as the hash)
         environment_hash=_as_str(obj.get("environment_hash")) or _DEFAULT_ENV_HASH,
         reproducible_command=command,
         producer=EvidenceProducer(role=Role.BUILDER, session="backlog"),

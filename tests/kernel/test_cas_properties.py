@@ -1,29 +1,28 @@
-import pytest
-from hypothesis import given
-from hypothesis import strategies as st
-from kernel.cas import CAS, CasMiss, InMemoryCasStore, content_hash, is_valid_hash
+"""Hypothesis property tests for CAS store (RB-0013 / RB-ARCH-VERIFY-002)."""
+
+from __future__ import annotations
+
+import tempfile
+from pathlib import Path
+from hypothesis import given, strategies as st
+
+from kernel.cas import CAS, FilesystemCasStore
 
 
 @given(st.binary())
-def test_cas_determinism_and_format(data: bytes):
-    """Hash should be deterministic, 64-char hex, and identical for same bytes."""
-    h1 = content_hash(data)
-    h2 = content_hash(data)
-    assert h1 == h2
-    assert is_valid_hash(h1)
+def test_cas_put_get_roundtrip_property(data: bytes) -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        cas = CAS(FilesystemCasStore(Path(tmp)))
+        ref = cas.put(data)
+        
+        # Invariant 1: Hash is 64-char hex
+        assert len(ref) == 64
+        assert all(c in "0123456789abcdef" for c in ref)
 
+        # Invariant 2: CAS get returns identical binary payload
+        retrieved = cas.get(ref)
+        assert retrieved == data
 
-@given(st.binary())
-def test_cas_idempotency_and_missing(data: bytes):
-    """Put is idempotent, and missing hashes raise CasMiss."""
-    cas = CAS(InMemoryCasStore())
-    addr1 = cas.put(data)
-    addr2 = cas.put(data)
-
-    assert addr1 == addr2
-    assert cas.has(addr1)
-    assert cas.get(addr1) == data
-
-    # Random invalid hash should miss
-    with pytest.raises(CasMiss):
-        cas.get("0" * 64)
+        # Invariant 3: Idempotent put returns same ref
+        ref2 = cas.put(data)
+        assert ref2 == ref

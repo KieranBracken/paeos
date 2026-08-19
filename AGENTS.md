@@ -13,8 +13,9 @@
 1. **Auditor Agent Role (Oversight Chat)**:
    * Performs periodic forensic audits, Court non-vacuity verifications (CANARY-0002), AST anti-pattern checks (`check_ast()`), and system health audits.
    * Logs all findings, open anomalies (`[CRITICAL-xxx]`), Court remand root causes (`DEBT-xxx`), and model configuration tuning exclusively in [`PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`](file:///Users/bob/GitHub/paeos/PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md).
-   * **Strict Auditor Precision Rule**: Must compute exact empirical statistics (e.g. `Sealed: X | Remanded: Y | Remediated: Z`). NEVER claim "100% zero-remand execution" if any remands or debt items were recorded in the session window.
+   * **Strict Auditor Precision & Remand Integrity Rule**: Remands are healthy, essential back-pressure mechanisms that protect constitutional invariants. NEVER optimize for "zero remands" or use "zero-remand execution" as an acceptance criterion — doing so incentivizes bypassing safety machinery. Always compute exact empirical statistics (e.g. `Sealed: X | Remanded: Y | Remediated: Z`) and validate that Court remands correctly reject invalid or non-probative artifacts.
    * **Fixed 60-Minute Oversight Schedule**: Schedules hourly audit timers (`schedule`) at 60m (3,600s). On quota reset/429 limits, resumes immediately when quota resets without doubling or altering the check-in frequency.
+
 
 
 

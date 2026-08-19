@@ -14,6 +14,7 @@ Claude Agent SDK adapter implements it, tests script it. Nothing here can grant 
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import uuid
@@ -79,7 +80,18 @@ class FileCourtEvidencePool:
     """A **durable, cross-process** evidence pool (R5): the sink a live evidence submitter writes to
     and the `SoftLoop` reads from, in separate processes. Evidence for a run lands in
     `<dir>/<run_id>.jsonl` (one JSON evidence per line). This is the substrate a `CourtServer` MCP —
-    or a file-writing Builder session — binds to; the `SoftLoop` pulls via `evidence_for`."""
+    or a file-writing Builder session — binds to; the `SoftLoop` pulls via `evidence_for`.
+
+    Taint index (CRITICAL-002 remediation, notebook Entry 140/141): rows listed in
+    `<dir>/.tainted.json` (a mapping of line hash → reason, where line hash is sha256 of the exact
+    JSON line) are fabricated or unbound evidence (e.g. the `dummy_hash_for_now` / 64-zero-hash
+    classes). `evidence_for` SKIPS them — the pool record is preserved for forensics (append-only
+    files are never rewritten) but tainted evidence can no longer feed any gate. Taint is keyed by
+    the full line content (not the Evidence's own hash, which covers only claim+command and is
+    shared across runs), so an identical claim/command submitted honestly elsewhere is unaffected.
+    """
+
+    _TAINT_INDEX = ".tainted.json"
 
     def __init__(self, directory: Path) -> None:
         self._dir = Path(directory)
@@ -87,6 +99,21 @@ class FileCourtEvidencePool:
 
     def _path(self, run_id: str) -> Path:
         return self._dir / f"{run_id}.jsonl"
+
+    def _tainted(self) -> frozenset[str]:
+        index = self._dir / self._TAINT_INDEX
+        if not index.is_file():
+            return frozenset()
+        try:
+            data = json.loads(index.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            # A corrupt index is treated as absent: the pool stays usable and the index can be
+            # repaired by the auditor. Taint is an additive deny-list — rows only ever enter it
+            # via an explicit auditor action, never implicitly.
+            return frozenset()
+        if not isinstance(data, dict):
+            return frozenset()
+        return frozenset(data.keys())
 
     def submit(self, run_id: str, evidence: Evidence) -> None:
         line = json.dumps(_evidence_to_json(evidence), sort_keys=True)
@@ -97,8 +124,10 @@ class FileCourtEvidencePool:
         path = self._path(run_id)
         if not path.is_file():
             return ()
+        tainted = self._tainted()
         lines = [ln for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()]
-        return tuple(_evidence_from_json(json.loads(ln)) for ln in lines)
+        kept = [ln for ln in lines if hashlib.sha256(ln.encode("utf-8")).hexdigest() not in tainted]
+        return tuple(_evidence_from_json(json.loads(ln)) for ln in kept)
 
 
 class CourtEvidencePool:
@@ -258,8 +287,22 @@ class SoftLoop:
                     detail=goal_detail,
                 )
                 budget.charge(result.cost)
+                self._record_stage(run_id, goal_id, stage, "planner", result)
                 planner_artifacts.extend(result.artifacts)
-                self._sidecar_scorer.score_stage(run_id=run_id, stage=stage, artifact_content=goal_detail)
+                # Entry 143: score the ARTIFACT the stage produced (not the goal objective,
+                # which is identical every stage and made all scores identical), and record
+                # the model that actually ran the stage (result.cost.model_ver).
+                stage_content = (
+                    self._cas.get(result.artifacts[0].hash).decode("utf-8", errors="replace")
+                    if result.artifacts
+                    else goal_detail
+                )
+                self._sidecar_scorer.score_stage(
+                    run_id=run_id,
+                    stage=stage,
+                    primary_model=result.cost.model_ver,
+                    artifact_content=stage_content,
+                )
 
             # --- Builder: IMPLEMENT on the plan scopes, with design + plan as context (B2.J) ---
             build = self._playbook.run_stage(
@@ -268,7 +311,17 @@ class SoftLoop:
                 context_refs=tuple(planner_artifacts), detail=goal_detail,
             )
             budget.charge(build.cost)
-            self._sidecar_scorer.score_stage(run_id=run_id, stage=StageId.IMPLEMENT, artifact_content=goal_detail)
+            self._record_stage(run_id, goal_id, StageId.IMPLEMENT, "builder", build)
+            self._sidecar_scorer.score_stage(
+                run_id=run_id,
+                stage=StageId.IMPLEMENT,
+                primary_model=build.cost.model_ver,
+                artifact_content=(
+                    self._cas.get(build.artifacts[0].hash).decode("utf-8", errors="replace")
+                    if build.artifacts
+                    else goal_detail
+                ),
+            )
             if not build.artifacts:
                 return RunOutcome(RunStatus.REMANDED, goal_id, "builder produced no artifact")
             artifact = build.artifacts[0]
@@ -352,6 +405,7 @@ class SoftLoop:
                 budget=decision.budget,
             )
             budget.charge(adversary.cost)
+            self._record_stage(run_id, goal_id, StageId.ADVERSARIAL_REVIEW, "adversary", adversary)
         except BudgetExceeded as exc:
             return RunOutcome(RunStatus.HALTED, goal_id, f"budget breach at review: {exc}")
 
@@ -379,6 +433,31 @@ class SoftLoop:
             verdict_ref=verdict_ref, adversary_ref=adversary.trace_ref,
         )
         return RunOutcome(RunStatus.SEALED, goal_id, "sealed", seal=seal, verdict=verdict)
+
+    def _record_stage(
+        self, run_id: str, goal_id: str, stage: StageId, session: str, result: TaskResult
+    ) -> None:
+        """Ledger model attribution (MEDIUM-003 remediation, notebook Entry 142): every executed
+        stage appends a STAGE_COMPLETED row naming the model that actually ran it
+        (``cost.model_ver``, populated by the runtime's transcript parser — cline run_result or
+        Claude JSON). This is what makes a posteriori session-log cross-checks possible: the
+        ledger now *claims* which model ran each stage, so the claim can be verified against
+        host CLI session logs instead of being an unverifiable assertion."""
+        self._ledger.append(
+            Event(
+                1,
+                "STAGE_COMPLETED",
+                {
+                    "run_id": run_id,
+                    "goal_id": goal_id,
+                    "stage": stage.name,
+                    "session": session,
+                    "status": result.status.value,
+                    "model_ver": result.cost.model_ver,
+                    "tokens": result.cost.tokens,
+                },
+            )
+        )
 
     def _court_for_run(self, build: TaskResult) -> tuple[Court, Callable[[], None]]:
         """The court to adjudicate this run's evidence (B2.N). For a live run (repo_root set + the

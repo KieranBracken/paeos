@@ -1,0 +1,68 @@
+"""L07 gate proof for RB-0026: mechanically verify the mitigation catalogue.
+
+Loads mitigation/mitigation_catalogue_rb0026.json into the canonical
+`runtime.mitigation.MitigationCatalogue` guard and asserts:
+  1. every HIGH-severity hazard carries at least one safeguard (exit guard),
+  2. every emitted hazard is bound by a safeguard OR an explicit accepted-risk record,
+  3. every safeguard.hazard_id / accepted_risk.hazard_id references a real hazard,
+  4. safeguard mechanisms are from the canonical set.
+
+Run: uv run python mitigation/verify_mitigation_coverage.py  (exit 0 = proof holds)
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+from runtime.mitigation import AcceptedRisk, MitigationCatalogue, Safeguard, TradeoffHazard
+
+_CATALOGUE = Path(__file__).with_name("mitigation_catalogue_rb0026.json")
+_VALID_MECHANISMS = {"KILL_SWITCH", "FALLBACK", "SHADOW_MODE", "SAFETY_CONSTRAINT"}
+
+
+def main() -> int:
+    raw = json.loads(_CATALOGUE.read_text(encoding="utf-8"))
+    # `axis` is supplementary provenance metadata (which L06 trade-off axis raised the
+    # hazard); the canonical TradeoffHazard record is id/title/severity only.
+    hazards = tuple(
+        TradeoffHazard(id=h["id"], title=h["title"], severity=h["severity"])
+        for h in raw["hazards"]
+    )
+    safeguards = tuple(Safeguard(**s) for s in raw["safeguards"])
+    accepted_risks = tuple(AcceptedRisk(**a) for a in raw["accepted_risks"])
+    catalogue = MitigationCatalogue(
+        hazards=hazards, safeguards=safeguards, accepted_risks=accepted_risks
+    )
+
+    # 1. canonical exit guard: HIGH hazards must carry a safeguard.
+    assert catalogue.has_high_severity_coverage(), "uncovered HIGH-severity hazard"
+    high = {h.id for h in hazards if h.severity.upper() == "HIGH"}
+    safeguarded = {s.hazard_id for s in safeguards}
+    assert high and high <= safeguarded, f"HIGH hazards without safeguard: {high - safeguarded}"
+
+    # 2. every hazard bound by safeguard OR accepted-risk record.
+    covered = safeguarded | {r.hazard_id for r in accepted_risks}
+    unbound = {h.id for h in hazards} - covered
+    assert not unbound, f"hazards with neither safeguard nor accepted risk: {sorted(unbound)}"
+
+    # 3. references resolve to real hazards; mechanisms canonical; severities canonical.
+    hazard_ids = {h.id for h in hazards}
+    for s in safeguards:
+        assert s.hazard_id in hazard_ids, f"{s.id} references unknown hazard {s.hazard_id}"
+        assert s.mechanism in _VALID_MECHANISMS, f"{s.id} bad mechanism {s.mechanism}"
+    for r in accepted_risks:
+        assert r.hazard_id in hazard_ids, f"{r.id} references unknown hazard {r.hazard_id}"
+    for h in hazards:
+        assert h.severity.upper() in {"HIGH", "MEDIUM", "LOW"}, f"{h.id} bad severity"
+
+    print(
+        f"OK: {len(high)}/{len(high)} HIGH hazards safeguarded; "
+        f"{len(covered)}/{len(hazards)} hazards covered; catalogue valid"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -154,7 +154,9 @@ class AntigravityRuntime:
                 timeout_s=package.budget.wallclock_s,
             )
 
-            mcp_cfg = self._mcp_config_path if package.role is Role.BUILDER else None
+            mcp_cfg = (
+                self._mcp_config_path if package.role in (Role.BUILDER, Role.ADVERSARY) else None
+            )
             invoker = antigravity_cli_invoker(package, mcp_config_path=mcp_cfg)
 
             transcript = invoker(spec)

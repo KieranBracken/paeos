@@ -1,0 +1,33 @@
+[
+  {
+    "objective": "Make PAEOS institutional memory durable: the ScarStore used by SoftLoop (runtime/orchestrator/__init__.py, currently default-constructed in-memory) must persist scars to SQLite in the state directory, and ops/autonomous_run.py must inject the durable store. Implement a SqliteScarStore (new module runtime/scar_store.py) with the same interface as ScarStore (record/match), colocating its database with the ledger (e.g. <state_dir>/scars.db). Add tests proving a scar written in one process is matched in a fresh process. See backlog/research/RB-0026-durable-institutional-memory.md.",
+    "accept": [
+      "A scar recorded via one SqliteScarStore instance is returned by match_scars on a new instance over the same path",
+      "Full pytest suite passes",
+      "ops/autonomous_run.py constructs the durable store when state_dir is set"
+    ],
+    "changed_paths": [
+      "runtime/scar_store.py",
+      "runtime/orchestrator/__init__.py",
+      "ops/autonomous_run.py",
+      "tests/runtime/test_scar_store.py"
+    ],
+    "plan_write_scopes": [
+      "runtime/scar_store.py",
+      "runtime/orchestrator/__init__.py",
+      "ops/autonomous_run.py",
+      "tests/runtime/test_scar_store.py"
+    ],
+    "builder_evidence": [
+      {
+        "claim_id": "durable",
+        "kind": "TEST",
+        "command": ".venv/bin/python -m pytest tests/runtime/test_scar_store.py -q",
+        "exit_code": 0,
+        "stdout": "passed"
+      }
+    ],
+    "verifiable": true,
+    "reversible": true
+  }
+]

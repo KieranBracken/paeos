@@ -64,6 +64,7 @@ def _evidence(claim_id: str, command: str, stdout: str) -> Evidence:
 def _writes(impl_path: str = "runtime/feature.py") -> dict[StageId, tuple[AgentWrite, ...]]:
     return {
         StageId.DESIGN: (AgentWrite("design/design.md", b"design"),),
+        StageId.CRITIQUE: (AgentWrite("critique/critique.md", b"critique"),),
         StageId.PLAN: (AgentWrite("plan/plan.md", b"plan"),),
         StageId.IMPLEMENT: (AgentWrite(impl_path, _CODE),),
         StageId.ADVERSARIAL_REVIEW: (
@@ -102,7 +103,7 @@ def test_unattended_run_reaches_seal() -> None:
     assert outcome.verdict is not None and outcome.verdict.outcome is VerdictOutcome.PASS
     # all four roles ran, in order
     assert runtime.stages_run == [
-        StageId.DESIGN, StageId.PLAN, StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW,
+        StageId.MITIGATION, StageId.DESIGN, StageId.CRITIQUE, StageId.PLAN, StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW,
     ]
     # Planner and Builder roles were correctly scoped
     assert runtime.packages[StageId.DESIGN].role is Role.PLANNER

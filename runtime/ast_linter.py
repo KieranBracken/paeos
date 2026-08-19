@@ -1,90 +1,67 @@
-"""AST-Based Anti-Pattern Linter for PAEOS Court Verification (RB-0015 / RB-ARCH-VERIFY-004).
+"""AST Static Anti-Pattern Linter (PAEOS RB-0015 / RB-ARCH-VERIFY-004).
 
-Statically inspects Python syntax trees to reject bare `except:`, swallowed exceptions (`except Exception: pass`),
-and un-logged fallback returns before code execution or unit testing.
+Scans Abstract Syntax Trees of Python source code to detect swallowed exceptions, bare excepts,
+and un-logged fallback returns before Court verification runs.
 """
 
 from __future__ import annotations
 
 import ast
-from dataclasses import dataclass
 from pathlib import Path
 
-
-@dataclass(frozen=True, slots=True)
-class AstViolation:
-    line_number: int
-    rule_id: str
-    message: str
+__all__ = ["PaeosAstLinter", "check_ast"]
 
 
-class PaeosAstVisitor(ast.NodeVisitor):
-    """AST Visitor enforcing PAEOS Exception Handling Rules (PAEOS-AST-01..03)."""
+class PaeosAstLinter(ast.NodeVisitor):
+    """AST visitor that detects exception-swallowing anti-patterns."""
 
     def __init__(self) -> None:
-        self.violations: list[AstViolation] = []
+        self.violations: list[str] = []
 
     def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
-        lineno = node.lineno
-
-        # PAEOS-AST-01: Bare `except:` is strictly forbidden
+        # Rule 1: Bare except (except:)
         if node.type is None:
             self.violations.append(
-                AstViolation(
-                    line_number=lineno,
-                    rule_id="PAEOS-AST-01",
-                    message="Bare 'except:' is strictly forbidden. Specify exception types explicitly.",
-                )
+                f"Line {node.lineno}: Bare 'except:' is strictly forbidden (PAEOS-AST-01)."
             )
 
-        # PAEOS-AST-02 & PAEOS-AST-03: Single-statement body checks (pass / silent return)
-        body = node.body
-        if len(body) == 1:
-            stmt = body[0]
-            if isinstance(stmt, ast.Pass):
-                self.violations.append(
-                    AstViolation(
-                        line_number=lineno,
-                        rule_id="PAEOS-AST-02",
-                        message="Silent 'except Exception: pass' is forbidden. Log exception or raise.",
-                    )
-                )
-            elif isinstance(stmt, ast.Return):
-                # Return None or empty without logging
-                val = stmt.value
-                if val is None or (isinstance(val, ast.Constant) and val.value is None):
-                    self.violations.append(
-                        AstViolation(
-                            line_number=lineno,
-                            rule_id="PAEOS-AST-03",
-                            message="Un-logged 'except Exception: return None' is forbidden.",
-                        )
-                    )
+        # Rule 2: Swallowed exception (body contains only 'pass')
+        if len(node.body) == 1 and isinstance(node.body[0], ast.Pass):
+            self.violations.append(
+                f"Line {node.lineno}: Silent 'except Exception: pass' is forbidden (PAEOS-AST-02)."
+            )
+
+        # Rule 3: Un-logged return None fallback without raise/logging
+        if (
+            len(node.body) == 1
+            and isinstance(node.body[0], ast.Return)
+            and (
+                node.body[0].value is None
+                or (isinstance(node.body[0].value, ast.Constant) and node.body[0].value.value is None)
+            )
+        ):
+            self.violations.append(
+                f"Line {node.lineno}: Un-logged 'except Exception: return None' is forbidden (PAEOS-AST-03)."
+            )
 
         self.generic_visit(node)
 
 
-def check_ast_violations(code: str, filename: str = "<unknown>") -> tuple[AstViolation, ...]:
-    """Parse python source code into an AST and return any PAEOS AST violations."""
+def check_ast(source_or_path: str | Path) -> list[str]:
+    """Check Python source string or file path for AST anti-patterns."""
+    if isinstance(source_or_path, Path):
+        try:
+            source = source_or_path.read_text(encoding="utf-8")
+        except OSError as e:
+            return [f"Could not read file {source_or_path}: {e}"]
+    else:
+        source = str(source_or_path)
+
     try:
-        tree = ast.parse(code, filename=filename)
-    except SyntaxError as exc:
-        return (
-            AstViolation(
-                line_number=exc.lineno or 1,
-                rule_id="PAEOS-AST-SYNTAX",
-                message=f"Syntax error during AST parsing: {exc.msg}",
-            ),
-        )
+        tree = ast.parse(source)
+    except SyntaxError as e:
+        return [f"SyntaxError parsing AST: {e}"]
 
-    visitor = PaeosAstVisitor()
-    visitor.visit(tree)
-    return tuple(visitor.violations)
-
-
-def check_file_ast(file_path: Path) -> tuple[AstViolation, ...]:
-    """Check a Python file for AST violations."""
-    if not file_path.is_file() or file_path.suffix != ".py":
-        return ()
-    code = file_path.read_text(encoding="utf-8")
-    return check_ast_violations(code, filename=str(file_path))
+    linter = PaeosAstLinter()
+    linter.visit(tree)
+    return linter.violations

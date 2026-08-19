@@ -12,12 +12,20 @@ Drives a backlog of goals through the 19-stage lifecycle autonomously using live
 * **File**: `ops/autonomous_run.py`
 * **Usage**:
   ```bash
-  PYTHONPATH=. uv run python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency] [max_runs]
+  PYTHONPATH=. uv run python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency] [max_runs] [runtime]
   ```
-* **Example (Running SAKG Mission 1)**:
+  - `runtime` options: `claude-code` (default, spawns Claude Code subprocesses), `chat-bridge` (interactive loop, ideal for Antigravity-driven development)
+
+* **Example (Running SAKG Mission 1 via Claude Code)**:
   ```bash
   PYTHONPATH=. uv run python ops/autonomous_run.py ops/backlogs/sakg-1-intakes.json state_sakg/ 1 25
   ```
+
+* **Example (PAEOS Development via Chat Bridge)**:
+  ```bash
+  PYTHONPATH=. uv run python ops/autonomous_run.py ops/backlogs/l06_intake.json .state 1 25 chat-bridge
+  ```
+  *Use the `chat-bridge` runtime to securely drive the SoftLoop lifecycle within the Antigravity IDE without unauthorized direct root modifications.*
 
 ### B. CLI Control Plane (Manual & Inspection)
 The operator CLI to create goals, advance stages, inspect states, or dump event logs.
@@ -82,3 +90,14 @@ On every task execution, agents and operators MUST obey all governance principle
   - **Layer 1 (Ephemeral Working Memory)**: Destroyed when task step finishes.
   - **Layer 2 (Execution Context)**: Scoped strictly to `run_id` (`TaskPackage` retry hints, compile diagnostics). Destroyed when execution scope terminates.
   - **Layer 3 (Institutional Memory)**: Permanent cross-run scars/lessons. Synthesized EXCLUSIVELY by Evolution during Stage 17 (`MEMORY_UPDATE`).
+
+---
+
+## 4. Forensic Audit & Anti-Hallucination Notebook Protocol
+
+PAEOS enforces an autonomous 2-agent closed-loop forensic audit feedback architecture:
+
+* **Canonical Forensic Notebook**: [`PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`](file:///Users/bob/GitHub/paeos/PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md)
+* **Auditor Role (Oversight Chat)**: Conducts periodic forensic audits, monitors Court evidence non-vacuity (CANARY-0002), verifies AST linter compliance (`check_ast()`), and logs structured entries (`Entry XXX`), Court remands (`DEBT-xxx`), and open anomalies (`[CRITICAL-xxx]`).
+* **Overseer Ingestion Protocol (Execution Chat)**: The Overseer execution session ingests `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` at the start of every cycle to consume open anomaly flags, execute root-cause code fixes, verify test pass status (`uv run pytest`), and unblock continuous autonomous execution.
+

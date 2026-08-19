@@ -1,0 +1,76 @@
+# L07 — Trade-off Mitigation Catalogue · RB-0026 Durable Institutional Memory
+
+**Stage:** MITIGATION (`StageId.MITIGATION`) · **Role:** PLANNER · **Goal:** `g-70b70a4a60ae`
+**Objective mitigated:** make institutional memory durable — SQLite-backed `DurableScarStore` in
+`runtime/memory/__init__.py` (same contract as `ScarStore` + T3 quarantine), wired in
+`ops/autonomous_run.py` `build_scheduler` as `SoftLoop(scar_store=...)` at `state_dir/scars.db`.
+
+**Upstream L06 trade-off basis** (selected approach + axes evaluated):
+
+- `backlog/research/RB-0026-durable-institutional-memory.md` (weight SUBSTANTIAL; acceptance:
+  persistence proven across processes, genuine adversary seal, STAGE_COMPLETED attribution)
+- `backlog/research/PAEOS_DURABLE_MEMORY_RB_v0.1.md` (CRITICAL; intake 1 = this goal)
+- `ops/backlog_rb0026_durable_scars.json` (minted intake; `reversible: true`)
+
+Axes: risk · accuracy · latency · memory · maintainability · complexity (stdlib-only) ·
+reversibility. Machine-readable catalogue: `mitigation/mitigation_catalogue_rb0026.json`
+(shape mirrors `runtime.mitigation` dataclasses: `TradeoffHazard` / `Safeguard` / `AcceptedRisk`).
+
+## Hazards emitted (from the L06 trade-off matrix)
+
+| ID | Severity | Axis | Hazard |
+|----|----------|------|--------|
+| HZ-01 | **HIGH** | risk | **Durable scar poisoning.** Persistence converts a self-limiting defect (a bad scar dies at process exit) into a permanent cross-run poison vector injected into every matching future goal. |
+| HZ-02 | **HIGH** | accuracy/maintainability | **Contract drift.** `DurableScarStore` diverging from the in-memory `ScarStore` (match semantics, `INJECTION_STAGES` gating, ordering, `get_precedent`) breaks L18 injection assumptions — or the change breaks the existing store/tests. |
+| HZ-03 | **HIGH** | accuracy | **Scar-ID instability across reopen.** A counter reset mints duplicate `scar-NNNN` ids, making `get_precedent` ambiguous and shadowing older lessons. |
+| HZ-04 | MEDIUM | risk/latency | **SQLite contention/corruption** of `state_dir/scars.db` under `ConcurrentScheduler` parallel runs (`SQLITE_BUSY`, partial writes). |
+| HZ-05 | MEDIUM | latency/memory | **I/O overhead**: full row load on construction + write-through on every `propose_scar` vs the zero-cost in-memory dict. |
+| HZ-06 | LOW | maintainability | **No schema migration path** for `scars.db` when the scar record shape evolves. |
+| HZ-07 | LOW | memory/latency | **Unbounded scar growth** inflates `match_scars` cost and `_scar_refs` injection payloads. |
+| HZ-08 | MEDIUM | risk (environment) | **Homogeneous-audit window**: implementation/seal run GLM-5.3-only until ~2026-08-22. |
+
+## Safeguards bound to hazards
+
+| ID | Hazard | Mechanism | Safeguard |
+|----|--------|-----------|-----------|
+| SG-01 | HZ-01 | SAFETY_CONSTRAINT | **T3 quarantine before any durable write.** `propose_scar` raises `ScarQuarantined` for signatures with `< MIN_SIGNATURE_TAGS` *before* write-through; over-broad scars can never reach `scars.db`. Proven by the durability test's quarantine case. |
+| SG-02 | HZ-01 | SAFETY_CONSTRAINT | **Subset-containment match frozen.** `scar.signature <= goal_tags` via `parse_signature`; a durable scar injects only into goals meeting ALL its conditions. Shared logic reused (not reimplemented) so the two stores cannot drift. |
+| SG-03 | HZ-01 | KILL_SWITCH | **Single-file memory reset.** `scars.db` is a plain SQLite file colocated with `ledger.db`; deleting it restores the zero-scar baseline, and reverting the `SoftLoop(scar_store=...)` wiring restores today's in-memory behavior. Blast radius never touches ledger/CAS. |
+| SG-04 | HZ-02 | SAFETY_CONSTRAINT | **Contract-parity freeze.** Exact `ScarStore` surface (`propose_scar`, `match_scars`, `get_precedent`, `injected_scars` gated by `INJECTION_STAGES`); in-memory store and its tests untouched and green. Gate: `uv run pytest -q tests/runtime/test_scar_durability.py tests/runtime/test_scars.py tests/runtime/test_evolution.py`. |
+| SG-05 | HZ-03 | SAFETY_CONSTRAINT | **ID stability across reopen.** Counter derived at construction from max existing `scar-NNNN` row id; ids immutable once written. Durability test asserts same id from a fresh instance. |
+| SG-06 | HZ-04 | FALLBACK | **Proven-concurrency pattern + fail-loud bootstrap.** SQLite file locking arbitrates cross-process access; in-process L3 authoring already single-committer (`evolution_lock`, IP-0005). If `scars.db` cannot be opened, `build_scheduler` fails loud (fail-loud invoker policy) rather than silently masquerading as durable. |
+
+## Accepted risks (explicit records; none irreversible → no Founder escalation required)
+
+| ID | Hazard | Rationale (abridged) | Approver |
+|----|--------|----------------------|----------|
+| AR-01 | HZ-04 | Residual `SQLITE_BUSY` accepted: one post-gate row-write per run; ledger already runs SQLite under the same scheduler; SG-03 bounds blast radius to the scar corpus. | L07_MITIGATION_STAGE |
+| AR-02 | HZ-05 | I/O overhead accepted: scar corpus is O(runs) institutional lessons (zero exist today); stdlib `sqlite3` honors the no-new-dependencies constraint; latency dominated by stage-model calls. | L07_MITIGATION_STAGE |
+| AR-03 | HZ-06 | No-migration accepted: single new table, zero legacy data (durability begins here); additive columns cheap; SG-03 is the documented reset path. | L07_MITIGATION_STAGE |
+| AR-04 | HZ-07 | Growth accepted: FR-6 subset-match gating bounds per-goal payload; scar lifecycle (decay/compaction) deferred to a follow-up intake — not smuggled in (single-task session). | L07_MITIGATION_STAGE |
+| AR-05 | HZ-08 | Homogeneous-audit window accepted per RB-0026: deterministic kernel guarantees are model-independent; re-run proof intake under `hybrid` when GPT quota returns and record the delta (notebook Entry 142). | Founder-directed audit protocol (Entry 142) |
+
+## Coverage proof (exit guard)
+
+Every HIGH-severity hazard carries ≥1 safeguard (HZ-01 → SG-01/02/03; HZ-02 → SG-04;
+HZ-03 → SG-05); every non-HIGH hazard carries an explicit accepted-risk record (AR-01…AR-05);
+**all 8 of 8 hazards are bound**. This satisfies `MitigationCatalogue.has_high_severity_coverage()`
+and the L07 template rule "every high-severity trade-off gets a named mitigation OR an explicit
+accepted-risk record". Live mechanical verification (loads the JSON catalogue into the runtime
+`MitigationCatalogue` guard): `uv run python verify_mitigation_coverage.py` →
+`OK: 3/3 HIGH hazards safeguarded; 8/8 hazards covered; catalogue valid`.
+
+## Downstream bindings (constraints L08 DESIGN / L11 PLAN must carry)
+
+1. `DurableScarStore` lives **alongside** `ScarStore` in `runtime/memory/__init__.py`; the
+   in-memory class and its tests must not change (SG-04).
+2. Quarantine gate runs **before** the SQLite write (SG-01); construction loads existing rows and
+   derives the counter from `max(id)` (SG-05).
+3. `build_scheduler` constructs the store at `state_dir / "scars.db"` and passes
+   `SoftLoop(scar_store=...)`; `EvolutionLayer` keeps taking `loop.scar_store` (no second seam).
+4. Tests land at `tests/runtime/test_scar_durability.py` covering: (a) cross-instance persistence
+   via `match_scars` on a fresh store over the same file, (b) `ScarQuarantined` still raised,
+   (c) `injected_scars` gating by `INJECTION_STAGES` preserved.
+5. Stdlib-only: `sqlite3` — no new dependencies (intake constraint, honored by AR-02).
+6. Rollback plan: revert `ops/autonomous_run.py` wiring; optionally delete `state_dir/scars.db`
+   (SG-03 kill switch; `reversible: true` in the intake).

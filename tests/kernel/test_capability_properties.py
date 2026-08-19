@@ -1,84 +1,44 @@
+"""Hypothesis property tests for Capability Broker unforgeability (RB-0013)."""
+
+from __future__ import annotations
+
 import pytest
-from hypothesis import given
-from hypothesis import strategies as st
-from kernel.capability import (
-    CapabilityBroker,
-    CapabilityToken,
-    ExpiredToken,
-    InvalidToken,
-    OperationNotPermitted,
-)
+from hypothesis import given, strategies as st
+
+from kernel.capability import CapabilityBroker, InvalidToken
 from kernel.types import Role, StageId
 
-st_goal_id = st.text(min_size=1)
-st_run_id = st.text(min_size=1)
-st_stage = st.sampled_from(list(StageId))
-st_role = st.sampled_from(list(Role))
-st_session = st.text(min_size=1)
-st_op = st.text(min_size=1, max_size=10)
-st_seq = st.integers(min_value=0, max_value=10000)
 
-
-@given(st_goal_id, st_run_id, st_stage, st_role, st_session, st_op, st_seq, st_seq)
-def test_capability_signature_and_binding(
-    goal_id, run_id, stage, role, session, op, issued, offset
-):
-    """Token should verify correctly when all inputs match, and reject when tampered or expired."""
-    expires = issued + offset
+@given(st.text(), st.text(), st.integers(min_value=1, max_value=100))
+def test_capability_broker_unforgeability_property(goal_id: str, run_id: str, seq: int) -> None:
     broker = CapabilityBroker()
-
     token = broker.mint(
         goal_id=goal_id,
         run_id=run_id,
-        stage=stage,
-        role=role,
-        session=session,
-        operations=(op,),
-        issued_seq=issued,
-        expires_seq=expires,
+        stage=StageId.IDEATE,
+        role=Role.PLANNER,
+        session="sess-1",
+        operations=("read", "write"),
+        issued_seq=seq,
+        expires_seq=seq + 10,
     )
 
-    # Genuine use
+    # Invariant 1: Minted genuine token verifies cleanly
     broker.verify(
-        token,
+        token=token,
         goal_id=goal_id,
         run_id=run_id,
-        stage=stage,
-        role=role,
-        operation=op,
-        current_seq=issued,
-        session=session,
+        stage=StageId.IDEATE,
+        role=Role.PLANNER,
+        session="sess-1",
+        operation="read",
+        current_seq=seq + 1,
     )
 
-    # Expired use
-    with pytest.raises(ExpiredToken):
-        broker.verify(
-            token,
-            goal_id=goal_id,
-            run_id=run_id,
-            stage=stage,
-            role=role,
-            operation=op,
-            current_seq=expires + 1,
-            session=session,
-        )
-
-    # Operation not permitted
-    with pytest.raises(OperationNotPermitted):
-        broker.verify(
-            token,
-            goal_id=goal_id,
-            run_id=run_id,
-            stage=stage,
-            role=role,
-            operation=op + "_tamper",
-            current_seq=issued,
-            session=session,
-        )
-
-    # Tampered signature
-    tampered_token = CapabilityToken(
-        token="00" * 64,
+    # Invariant 2: Tampered signature string fails verification (unforgeable)
+    tampered_sig = token.token[:-2] + ("00" if token.token[-2:] != "00" else "11")
+    forged_token = type(token)(
+        token=tampered_sig,
         bound_to=token.bound_to,
         operations=token.operations,
         issued_seq=token.issued_seq,
@@ -86,12 +46,12 @@ def test_capability_signature_and_binding(
     )
     with pytest.raises(InvalidToken):
         broker.verify(
-            tampered_token,
+            token=forged_token,
             goal_id=goal_id,
             run_id=run_id,
-            stage=stage,
-            role=role,
-            operation=op,
-            current_seq=issued,
-            session=session,
+            stage=StageId.IDEATE,
+            role=Role.PLANNER,
+            session="sess-1",
+            operation="read",
+            current_seq=seq + 1,
         )

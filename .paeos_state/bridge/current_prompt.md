@@ -1,25 +1,30 @@
-# PAEOS Task: g-1d5580def4bd (r-0c3b9c9f)
-**Stage:** RESEARCH | **Role:** PLANNER
+# PAEOS Task: g-test (r-5678)
+**Stage:** ADVERSARIAL_REVIEW | **Role:** ADVERSARY
 
 ## Objective
-Conduct frontier research on the ideated candidates. Analyze the codebase, dependencies, and relevant documentation to evaluate feasibility, architectural fit, and constraints. Produce a structured ResearchDossier (saved to the research/ directory) synthesizing the findings to inform the DESIGN stage. Goal objective: Instantiate L19 (Constitutional Evolution). Hook this into the proposal generation of L18 (Knowledge Extraction).
+Test objective
 
 ## Strict Workspace Binding
 You MUST execute all work inside the isolated sandboxed workspace at:
-`/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-t-84f88a636157-bridge-plm6zrnj`
+`/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-362/test_bridge_adversarial_review0/paeos-t-1234-bridge-jpe3cn_f`
 
-Use the `run_command` tool with `Cwd` set to `/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-t-84f88a636157-bridge-plm6zrnj`. DO NOT modify any repository files outside of this workspace sandbox! The sandbox contains a seeded mirror of the code you need.
+Use the `run_command` tool with `Cwd` set to `/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-362/test_bridge_adversarial_review0/paeos-t-1234-bridge-jpe3cn_f`. DO NOT modify any repository files outside of this workspace sandbox! The sandbox contains a seeded mirror of the code you need.
 
 ## The Package Prompt
 ```
-Conduct frontier research on the ideated candidates. Analyze the codebase, dependencies, and relevant documentation to evaluate feasibility, architectural fit, and constraints. Produce a structured ResearchDossier (saved to the research/ directory) synthesizing the findings to inform the DESIGN stage. Goal objective: Instantiate L19 (Constitutional Evolution). Hook this into the proposal generation of L18 (Knowledge Extraction).
+Test objective
 ```
 
 ## Instructions for Orchestrator
-1. Spawn a subagent or perform the task yourself inside `/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-t-84f88a636157-bridge-plm6zrnj`.
+1. Spawn a subagent or perform the task yourself inside `/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-362/test_bridge_adversarial_review0/paeos-t-1234-bridge-jpe3cn_f`.
 2. The subagent can read context files provided inside the workspace, and edit the code using `write_scopes` authorized inside the workspace.
-3. If this is a BUILDER role, the subagent MUST submit evidence to the PAEOS Court. The simplest way is to write and run this python script inside the sandbox:
+ 3. If this is a BUILDER role, the subagent MUST submit evidence to the PAEOS Court with
+   **REAL, KERNEL-REPRODUCIBLE values** (CRITICAL-002: placeholder evidence is forbidden —
+   the kernel re-runs the command and rejects fabricated results). Substitute the two
+   REQUIRED placeholders, then write and run this python script inside the sandbox:
    ```python
+   import shlex
+   import subprocess
    import sys
    sys.path.insert(0, "/Users/bob/GitHub/paeos")
    from pathlib import Path
@@ -28,21 +33,26 @@ Conduct frontier research on the ideated candidates. Analyze the codebase, depen
    from kernel.types import Role
    from runtime.orchestrator import FileCourtEvidencePool
 
+   # REQUIRED (CRITICAL-002): real values, never placeholders.
+   artifact_path = Path("REPLACE_WITH_THE_ARTIFACT_YOU_ACTUALLY_BUILT")  # relative to this sandbox
+   command = "REPLACE_WITH_THE_REAL_VERIFICATION_COMMAND"  # e.g. "pytest"
+
+   proc = subprocess.run(shlex.split(command), capture_output=True, text=True, timeout=600)
    pool = FileCourtEvidencePool(Path("/Users/bob/GitHub/paeos/.paeos_state/court"))
    pool.submit(
-       "r-0c3b9c9f",
+       "r-5678",
        Evidence(
-           hash=content_hash(b"builds:pytest"),
+           hash=content_hash(f"{command}:{proc.returncode}".encode()),
            kind=EvidenceKind.TEST,
            claim_id="builds",
-           artifact_hash="dummy_hash_for_now",
-           environment_hash="dummy_env",
-           reproducible_command="pytest",
+           artifact_hash=content_hash(artifact_path.read_bytes()),
+           environment_hash=content_hash(sys.executable.encode()),
+           reproducible_command=command,
            producer=EvidenceProducer(role=Role.BUILDER, session="mcp"),
            determinism=Determinism.DETERMINISTIC,
-           result={"exit_code": 0, "stdout": "test passed"},
+           result={"exit_code": proc.returncode, "stdout": proc.stdout},
            attestation="pending-kernel-sig",
-       )
+       ),
    )
    ```
 4. Once completed, write your full response/transcript to `/Users/bob/GitHub/paeos/.paeos_state/bridge/current_output.md`.

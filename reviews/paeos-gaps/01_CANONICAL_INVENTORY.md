@@ -14,7 +14,7 @@ This document serves as the canonical inventory of the 19-layer execution doctri
 | **L06** | Trade-off Analysis | `TRADEOFF` | `declared` | Analyzes trade-offs of ideated solutions (time vs cost vs correctness). |
 | **L07** | Trade-off Mitigation | `MITIGATION` | `declared` | Selects mitigations for accepted trade-offs. |
 | **L08** | System Design | `DESIGN` | `declared` | Produces the formal architectural design artifact (components, interfaces, schemas). |
-| **L09** | Multi-Perspective Critique | `CRITIQUE` | `declared` | Collaborative, builder-side critique (7 stances) to improve the design before formal review. |
+| **L09** | Multi-Perspective Critique | `CRITIQUE` | `declared` | Collaborative, builder-side critique (8 stances: Security, Performance, Simplicity, Maintainability, Testability, Backward Compatibility, Constitutional Alignment, Functionality) to improve the design before formal review. |
 | **L10** | Adversarial Review | `ADVERSARIAL_REVIEW` | `declared` (gate) | Design-time adversarial falsification attempt. Emits RATIFY, RATIFY-WITH-AMENDMENTS, or REJECT. |
 | **L11** | Formal Planning | `PLAN` | `declared` | Freezes the implementation contract and creates an actionable plan. |
 | **L12** | Branch Implementation | `IMPLEMENT` | `speculated` → `executed` | Implements the frozen L11 contract on an isolated worktree. |

@@ -40,16 +40,23 @@ class ContextCompiler:
         objective: str,
         context_refs: tuple[ArtifactRef, ...] = (),
         scars: tuple[ArtifactRef, ...] = (),
+        reasoning_state: object = None,
+        context_policy: object = None,
     ) -> CompiledContext:
         # FR-6: matched scars are always on the path. Deduplicate and order deterministically so
         # the same set of refs always compiles to the same content hash (K2 / PAEOS-9A determinism).
         merged = {(ref.type, ref.hash): ref for ref in (*context_refs, *scars)}
         ordered = tuple(sorted(merged.values(), key=lambda r: (r.type, r.hash)))
+        payload: dict[str, object] = {
+            "objective": objective,
+            "context_refs": [[r.type, r.hash] for r in ordered],
+        }
+        if context_policy is not None:
+            payload["context_policy"] = str(context_policy)
+        if reasoning_state is not None:
+            payload["reasoning_state"] = str(reasoning_state)
         canonical = json.dumps(
-            {
-                "objective": objective,
-                "context_refs": [[r.type, r.hash] for r in ordered],
-            },
+            payload,
             sort_keys=True,
             separators=(",", ":"),
             ensure_ascii=True,

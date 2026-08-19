@@ -82,15 +82,17 @@ def vacuous_commands(
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(cas.get(artifact_hash))
         else:
-            # Revert non-test production implementation file in baseline workspace
-            orig_file = repo_root / rel_path
-            if orig_file.is_file():
+            # Revert non-test production implementation file in baseline workspace to empty stub
+            # so Python imports from baseline (failing missing symbols) rather than falling back to repo_root via editable .pth
+            if rel_path.endswith(".py"):
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(orig_file.read_bytes())
+                target.write_text("# baseline stub: implementation removed for non-vacuity check\n", encoding="utf-8")
             elif target.is_file():
                 target.unlink()
             elif target.is_dir():
                 shutil.rmtree(target, ignore_errors=True)
+
+
 
     try:
         run_with, run_without = workspace_runner(with_change), workspace_runner(baseline)

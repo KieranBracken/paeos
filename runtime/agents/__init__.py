@@ -80,27 +80,58 @@ _PLAN = RoleSpec(
     skills=(SkillRef("planning", "1.0"),),
 )
 
+_MITIGATION = RoleSpec(
+    stage=StageId.MITIGATION,
+    role=Role.PLANNER,
+    objective="Mitigate hazards identified in L06 Trade-off Analysis by binding safeguards and accepted risks.",
+    write_scopes=("mitigation/",),
+    read_scopes=("constitution/", "design/", "backlog/"),
+    mcp_servers=("constitution", "artifacts", "memory:read"),
+    required_evidence=(
+        EvidenceObligation(
+            claim_id="mitigations",
+            kind=EvidenceKind.PROOF,
+            acceptance="catalogue binding safeguards to hazards emitted",
+        ),
+    ),
+    skills=(SkillRef("planning", "1.0"),),
+)
+
 _IMPLEMENT = RoleSpec(
     stage=StageId.IMPLEMENT,
     role=Role.BUILDER,
     objective="Implement per the ratified plan on an isolated branch; run local tests.",
     write_scopes=(),  # provided per-plan at dispatch (the exact files the plan authorizes)
     read_scopes=("constitution/", "design/", "plan/"),
-    mcp_servers=("constitution", "artifacts", "memory:read"),
+    mcp_servers=("constitution", "artifacts", "court", "memory:read"),
     required_evidence=(
-        EvidenceObligation(claim_id="builds", kind=EvidenceKind.BUILD, acceptance="exit 0"),
+        EvidenceObligation(claim_id="builds", kind=EvidenceKind.TEST, acceptance="exit 0, probative test"),
         EvidenceObligation(
-            claim_id="unit", kind=EvidenceKind.TEST, acceptance="tests green, reproducible"
+            claim_id="unit", kind=EvidenceKind.TEST, acceptance="probative unit test green"
         ),
     ),
     skills=(SkillRef("testing", "2.1"),),
 )
 
+_CRITIQUE = RoleSpec(
+    stage=StageId.CRITIQUE,
+    role=Role.PLANNER,
+    objective="Evaluate candidate designs across 8 canonical stances (Security, Performance, Simplicity, Maintainability, Testability, Backward Compatibility, Constitutional Alignment, Functionality).",
+    write_scopes=("critique/",),
+    read_scopes=("constitution/", "design/", "plan/"),
+    mcp_servers=("constitution", "artifacts", "memory:read"),
+    required_evidence=(),
+    skills=(SkillRef("planning", "1.0"),),
+)
+
 ROLE_SPECS: dict[StageId, RoleSpec] = {
     StageId.DESIGN: _DESIGN,
     StageId.PLAN: _PLAN,
+    StageId.MITIGATION: _MITIGATION,
+    StageId.CRITIQUE: _CRITIQUE,
     StageId.IMPLEMENT: _IMPLEMENT,
 }
+
 
 
 def role_spec(stage: StageId) -> RoleSpec:

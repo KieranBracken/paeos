@@ -42,6 +42,8 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "standard"
+reportUnknownMemberType = false
+reportMatchNotExhaustive = true
 include = ["kernel", "runtime", "cli", "tests"]
 exclude = ["**/__pycache__", ".venv", ".agents", ".claude"]
 strict = ["kernel"]   # TCB is strictly typed

@@ -43,13 +43,15 @@ class McpWorkerTransport:
     def evidence_for(self, run_id: str) -> tuple[Evidence, ...]:
         return self._pool.evidence_for(run_id)
 
-    def mcp_config(self) -> dict[str, object]:
-        """The `--mcp-config` for `claude`: launch the court server against this pool over stdio."""
+    def mcp_config(self, repo_root: str | Path | None = None) -> dict[str, object]:
+        """The `--mcp-config` for `claude`/`codex`: launch the court server against this pool over stdio."""
+        root = Path(repo_root).resolve() if repo_root else Path.cwd().resolve()
         return {
             "mcpServers": {
                 self._server_name: {
                     "command": sys.executable,
                     "args": ["-m", "runtime.transports.mcp.court_server", str(self._dir)],
+                    "env": {"PYTHONPATH": str(root)},
                 }
             }
         }
