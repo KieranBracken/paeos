@@ -3,7 +3,7 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-08-19 (late)
+> **Last updated:** 2026-08-19 (handoff — new logged session)
 
 ## 1. What just happened (session arc, condensed)
 
@@ -23,6 +23,12 @@
   canonical lifecycle phases (L01–L19), autonomy rungs (R1–R5), construction milestones
   (B0/B1/B2). SoftLoop = B1 proof vehicle for R2/R3. "Bolt all 19 layers into SoftLoop"
   was a later AI reconstruction, **never an original plan**.
+- **Repo cleanup (2026-08-19):** clutter consolidated into `misc/` (nothing deleted).
+  Superseded/duplicate docs renamed with `SUPERSEDED__` / `ARCHIVED_DERIVED__` prefixes.
+  Auto-filed boilerplate RBs (RB-0011..0025, RB-0027..0030) moved to `misc/_autofiled_rbs/`.
+- **Test suite (2026-08-19):** `test_selfhost.py` and `test_memory_lifetime_boundary.py`
+  indentation bugs repaired. Suite now has exactly **1 pre-existing failure**
+  (`test_root_submit_evidence_script` — wrong path, unrelated to ceremony work).
 
 ## 2. Key documents (read these first, in order)
 
@@ -30,11 +36,11 @@
 |---|---|
 | `operations/ENGINEERING_LIFECYCLE.md` | **THE CANONICAL L01–L19 BASELINE (v1.3).** Authoritative lifecycle doctrine; CER-1..6; amendment authority = L19 + founder. Read first. |
 | `operations/WORKFLOW_STATE_MACHINE.yaml` | Machine-executable **form** of the Engineering Lifecycle (derived, subordinate). Prose EL wins on conflict. |
-| `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` | Archived **derived verbatim extraction** (former "Canonical Freeze"). No independent authority; see its status header. |
-| `operations/archive/PAEOS_19_LAYER_FREEZE_DRAFT_v1.md` | Archived **superseded draft** with invalid source hashes. Historical only. |
+| `operations/archive/ARCHIVED_DERIVED__PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` | Archived derived verbatim extraction. No independent authority; see its status header. |
+| `operations/archive/SUPERSEDED_DRAFT__PAEOS_19_LAYER_FREEZE_v1.md` | Archived superseded draft with invalid source hashes. Historical only. |
 | `operations/PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md` | Lifecycle conformance × autonomy rung. Verdict: **R4-ALIGNED, NOT R4-CONFORMANT**. |
 | `operations/PAEOS_CONFORMANCE_MAP_2_1_ADDENDUM.md` | Capability/transition split, C-01/C-02 resolution, seal-terminology. |
-| `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` | Entries 139–146 = this program's audit trail (146 = source-hierarchy reconciliation). |
+| `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` | Entries 139–150 = full audit trail. Entry 147 = ceremony contract. Entries 148–150 = watchdog check-ins. |
 | `MessyChangesNeedsReview.md` | All code changes logged for human review. |
 
 ## 3. Approved next sequence (DO NOT REORDER)

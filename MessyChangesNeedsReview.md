@@ -315,3 +315,27 @@ sequence. Grounded in `operations/ENGINEERING_LIFECYCLE.md` (v1.3 L18–30) + it
 **Remaining in the approved sequence (next):** Step 4 — runtime executes the ceremony-resolved
 obligation graph (walk `CeremonyContract.obligation_plan()` in the orchestrator, emitting each
 discharge stub instead of hard-coding SoftLoop stages). Not yet wired; checkpointed here.
+
+## 2026-08-19 (handoff) — Session cleanup + watchdog infrastructure
+
+**No implementation code changed this handoff block.** All changes are housekeeping,
+infrastructure, and test repairs.
+
+### Repo cleanup
+- All clutter moved to `misc/` (nothing deleted). See `misc/README.md` for index.
+- Superseded docs renamed: `SUPERSEDED__*`, `ARCHIVED_DERIVED__*` prefixes.
+- Auto-filed boilerplate RBs (RB-0011..0025, RB-0027..0030) → `misc/_autofiled_rbs/`.
+
+### Test repairs (commit `02bf2e0`)
+- `tests/runtime/test_selfhost.py:118` — over-indented `_runner()` call fixed
+- `tests/runtime/test_memory_lifetime_boundary.py:93` — over-indented `outcomes = _run()` fixed
+- **Suite now: 1 pre-existing failure** (`test_root_submit_evidence_script`), 0 regressions
+
+### Watchdog infrastructure (commits `watchdog.py`)
+- `get_repo_idle_minutes()`: `find` → `git status --short` (avoids hanging on large misc/ tree)
+- `nudge_cline()`: checks `HIDIdleTime` via `ioreg` before UI automation; skips if display idle >5 min
+- Honest heal reporting: "Nudge sent" only logged if osascript actually succeeded
+
+### Next step for new session
+`runtime/orchestrator/__init__.py` — walk `CeremonyContract.obligation_plan()` instead of
+hard-coded SoftLoop stages. This is item 3 in §3 of `operations/CURRENT_STATE.md`.
