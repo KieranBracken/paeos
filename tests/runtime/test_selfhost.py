@@ -115,7 +115,7 @@ def test_stored_scar_is_injected_into_a_later_design() -> None:
         ScarDraft(frozenset({"domain:runtime", "kind:seam"}), "watch the seams", "sig")
     )
     runtime = ScriptedRuntime()
-            _runner(runtime, scar_store).run_backlog(
+    _runner(runtime, scar_store).run_backlog(
         [_intake(_GOOD, signature="domain:runtime,kind:seam,task:t", reversible=False)]
     )
     design_pkg = runtime.packages[StageId.DESIGN]

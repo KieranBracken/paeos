@@ -90,7 +90,7 @@ def test_evolution_authored_scar_is_injected_into_a_later_run() -> None:
     # with the operational loop never authoring memory.
     sig = "domain:runtime,task:t,stage:VERIFY,kind:court-remand"
     runtime = _Recorder()
-        outcomes = _run(
+    outcomes = _run(
         [_intake(_FORGED, signature=sig, reversible=False), _intake(_GOOD, signature=sig, reversible=False)],
         runtime,
     )
