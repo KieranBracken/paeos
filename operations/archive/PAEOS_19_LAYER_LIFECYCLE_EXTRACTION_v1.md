@@ -1,52 +1,58 @@
-# PAEOS Canonical 19-Layer Freeze — v1
+# PAEOS 19-Layer Lifecycle Extraction — v1.0 (ARCHIVED / DERIVED)
 
-**Status: FROZEN EXTRACTION — forensic, non-interpretive.**
-**Date of extraction: 2026-08-19.** Extracted mechanically by script (disk → disk); every layer
-section and state block below is verbatim from the cited sources. Nothing in this document
-amends, reconciles, or reinterprets the sources. Conflicts between sources of different tiers are
-RECORDED, not resolved (§4).
+> **STATUS — DERIVED RESTATEMENT, NOT AN AUTHORITY (reclassified 2026-08-19).**
+> This document is a machine-generated, byte-faithful *verbatim extraction* of the two
+> canonical founding sources. It carries **no independent authority** over L01–L19.
+>
+> **The canonical baseline for the existing L01–L19 lifecycle is:
+> `operations/ENGINEERING_LIFECYCLE.md` (v1.3), subject only to validly ratified
+> amendments (proposals/PAEOS-IP-*, A-01..A-19, ratified specs).**
+>
+> - Part A (prose) below is a verbatim copy of ENGINEERING_LIFECYCLE.md.
+> - Part B (YAML) below is a verbatim copy of WORKFLOW_STATE_MACHINE.yaml — which is itself
+>   only the *machine-executable form* of ENGINEERING_LIFECYCLE.md (per its own header).
+> - Where Part A and Part B differ, **ENGINEERING_LIFECYCLE.md (prose) wins**, because the
+>   WSM is a derived form and no ratified amendment establishes the divergent YAML as doctrine.
+> - The conflict register (Part C) is analytical framing, not doctrine; it does not create
+>   law and does not require founder adjudication where the Engineering Lifecycle already
+>   resolves the matter.
+>
+> This file was historically named "PAEOS Canonical 19-Layer Freeze". That name implied it
+> outranked the Engineering Lifecycle; the name is false and has been retired. It is preserved
+> here only as a verified extraction index and provenance record. Repository evidence for the
+> reclassification is in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` Entry 146.
 
-## 0. Source corpus, precedence, hashes
+**Extraction note (retained):** forensic extraction ONLY. No interpretation, no amendment
+proposals, no reconciliation of conflicts, no inference from implementation behavior.
+Where authoritative sources conflict, this document records
+`CANONICAL CONFLICT — REQUIRES RESOLUTION` and takes no side.
 
-| Tier | Source | Version/ratification | sha256 |
+## Frozen corpus (source_precedence / source_hash)
+
+| Precedence | Source | SHA-256 | Status recorded in source |
 |---|---|---|---|
-| 1 | `operations/ENGINEERING_LIFECYCLE.md` | FROZEN v1.0 2026-07-20; CER v1.2 rules founder-ratified 2026-07-27 | `6eb3b80b02c2c3626e286a9f33292d2b85f9e641040333696e308382c3521e45` |
-| 2 | `operations/WORKFLOW_STATE_MACHINE.yaml` | v1.1, `frozen: true`, founder-ratified 2026-07-21 | `3a2d6a1cf2ffa6b291e3bc0419ff1e7faa1b7be41c1b771174aee16704cf4cf8` |
+| 1 | operations/ENGINEERING_LIFECYCLE.md | `3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64` | FROZEN v1.0 (2026-07-20); CER rules v1.2 founder-ratified 2026-07-27 |
+| 2 | operations/WORKFLOW_STATE_MACHINE.yaml | `1a5dd9d7777724fea84ecd3ad1fc00f3341beb175ca35288cbd9debf7e92d49a` | v1.1, frozen: true, founder-ratified 2026-07-21 |
 
-Precedence (per founder directive 2026-08-19): original constitutional PAEOS corpus (highest) →
-PAEOS-9 execution architecture / ENGINEERING_LIFECYCLE / ratified amendments & IPs / kernel
-constitutional invariants → this Freeze → implementation conformance → current code → audit
-reports → AI opinions (lowest). Secondary documents (research backlog reconstructions, audit
-notes) do NOT redefine the lifecycle.
+Extraction date: 2026-08-19. Extractor: mechanical script (disk-to-disk, byte-exact slices);
+every layer section and YAML state block below is a verbatim slice of the hashed source.
 
-## 1. Canonical layer index (mechanically extracted)
+## Canonical layer sequence (in source order)
 
-| ID | Canonical name (from Source A heading) | Source A lines | Source B state lines |
-|---|---|---|---|
-| L01 | Intake | 49–57 | 105–117 |
-| L02 | Triage | 58–68 | 118–133 |
-| L03 | First-Principles Re-Derivation | 69–77 | 134–145 |
-| L04 | Ambitious Ideation | 78–86 | 146–157 |
-| L05 | Frontier Research | 87–95 | 158–170 |
-| L06 | Trade-off Analysis | 96–104 | 171–182 |
-| L07 | Trade-off Mitigation | 105–113 | 183–195 |
-| L08 | System Design | 114–124 | 196–207 |
-| L09 | Multi-Perspective Critique | 125–133 | 208–220 |
-| L10 | Adversarial Review | 134–142 | 221–235 |
-| L11 | Formal Planning | 143–153 | 236–248 |
-| L12 | Branch Implementation | 154–162 | 249–260 |
-| L13 | Verification | 163–171 | 261–272 |
-| L14 | Independent Audit | 172–182 | 273–287 |
-| L15 | Documentation & Ledger | 183–191 | 288–300 |
-| L16 | Promotion Decision | 192–202 | 301–313 |
-| L17 | Retrospective + Constitutional Review | 203–211 | 314–328 |
-| L18 | Knowledge Extraction | 212–222 | 329–340 |
-| L19 | Constitutional Evolution | 223–317 | 341–375 |
+L01 Intake · L02 Triage · L03 First-Principles Re-Derivation · L04 Ambitious Ideation ·
+L05 Frontier Research · L06 Trade-off Analysis · L07 Trade-off Mitigation · L08 System Design ·
+L09 Multi-Perspective Critique · L10 Adversarial Review · L11 Formal Planning ·
+L12 Branch Implementation · L13 Verification · L14 Independent Audit ·
+L15 Documentation & Ledger · L16 Promotion Decision ·
+L17 Retrospective + Constitutional Review · L18 Knowledge Extraction · L19 Constitutional Evolution
 
-## 2. Verbatim layer sections (Source A: ENGINEERING_LIFECYCLE.md)
+---
 
-### L01 — verbatim (Source A lines 49–57)
+# Part A — Prose corpus, verbatim (ENGINEERING_LIFECYCLE.md)
 
+## L01 (source line 49)
+
+```markdown
 #### L01 — Intake · *Runtime + any source · model: n/a*
 - **Purpose:** capture an idea, bug, research question, architectural concern, or improvement.
 - **Entry:** a source (founder, agent, incident, external signal) has something worth recording.
@@ -55,9 +61,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none (capture is unconditional).
 - **Failure:** malformed/empty intent → not admitted.
 - **Evidence produced:** the declared artifact itself (its existence is the evidence for L02).
+```
 
-### L02 — verbatim (Source A lines 58–68)
+## L02 (source line 58)
 
+```markdown
 #### L02 — Triage · *Planner (Router) · model: Opus/Sonnet*
 - **Purpose:** decide whether this deserves engineering effort, and at what ceremony depth.
 - **Entry:** a declared artifact from L01.
@@ -68,9 +76,11 @@ notes) do NOT redefine the lifecycle.
 - **Evidence produced:** disposition record; classification Evidence; duplicate/forbidden-zone findings.
 
 ### Phase II — Understanding *(Trace-B in full; auto-discharged for Trace-A)*
+```
 
-### L03 — verbatim (Source A lines 69–77)
+## L03 (source line 69)
 
+```markdown
 #### L03 — First-Principles Re-Derivation · *Planner + Researcher · model: Opus*
 - **Purpose:** derive the problem from first principles — no assumptions, no implementation. "What must be true?"
 - **Entry:** L02 = Keep/Research/Immediate AND ceremony depth ≥ Trace-B (else auto-pass).
@@ -79,9 +89,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none (internal understanding).
 - **Failure:** cannot derive → spawn L05 Frontier Research for missing knowledge.
 - **Evidence produced:** the derivation artifact (challenges/validates inherited framing).
+```
 
-### L04 — verbatim (Source A lines 78–86)
+## L04 (source line 78)
 
+```markdown
 #### L04 — Ambitious Ideation · *Planner + Builder · model: Opus/Gemini*
 - **Purpose:** generate the strongest possible solution; ignore practicality; aim for the ideal.
 - **Entry:** L03 complete.
@@ -90,9 +102,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none.
 - **Failure:** degenerate space (all candidates ≈ identical) → collapse to single approach, note it.
 - **Evidence produced:** candidate architecture set (feeds L06/L08 tournament).
+```
 
-### L05 — verbatim (Source A lines 87–95)
+## L05 (source line 87)
 
+```markdown
 #### L05 — Frontier Research · *Researcher · model: Gemini (web/frontier) + Opus*
 - **Purpose:** establish state of the art — literature, mathematics, production systems, open source.
 - **Entry:** a blocked understanding (L03/L04/L06) needs external knowledge; **pull-driven, never a phase**.
@@ -101,9 +115,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** founder Inject for market/user/money ground truth the system cannot generate.
 - **Failure:** consumer-less/unbounded research → scope-creep incident (findings expire, K2).
 - **Evidence produced:** research dossier (bound, expiring).
+```
 
-### L06 — verbatim (Source A lines 96–104)
+## L06 (source line 96)
 
+```markdown
 #### L06 — Trade-off Analysis · *Planner + Reviewer · model: Opus*
 - **Purpose:** identify every important trade-off (latency, accuracy, memory, risk, maintainability, complexity, …).
 - **Entry:** ≥1 viable approach from L04.
@@ -112,9 +128,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none.
 - **Failure:** hidden/omitted axis surfaced later → incident against this matrix.
 - **Evidence produced:** trade-off matrix (the Judge's selection basis).
+```
 
-### L07 — verbatim (Source A lines 105–113)
+## L07 (source line 105)
 
+```markdown
 #### L07 — Trade-off Mitigation · *Planner + Adversary · model: Opus*
 - **Purpose:** design safeguards for every important compromise.
 - **Entry:** L06 matrix exists with material risks.
@@ -123,9 +141,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** irreversible accepted-risks → founder Decision.
 - **Failure:** an unmitigated high-severity risk with no accepted-risk record → blocks L08.
 - **Evidence produced:** mitigation catalogue.
+```
 
-### L08 — verbatim (Source A lines 114–124)
+## L08 (source line 114)
 
+```markdown
 #### L08 — System Design · *Planner (Decomposer) · model: Opus*
 - **Purpose:** produce the architecture — no implementation.
 - **Entry:** selected approach (L04/L06) + mitigations (L07).
@@ -136,9 +156,11 @@ notes) do NOT redefine the lifecycle.
 - **Evidence produced:** the architecture artifact set; conservation + spec-sufficiency audit records.
 
 ### Phase III — Constitutional Review
+```
 
-### L09 — verbatim (Source A lines 125–133)
+## L09 (source line 125)
 
+```markdown
 #### L09 — Multi-Perspective Critique · *Reviewer (7 perspectives) · model: Gemini/Opus (decorrelated)*
 - **Purpose:** attack the design from every stance — Builder, Architect, Risk Officer, Performance, Security, Replay, Maintainer.
 - **Entry:** an architecture artifact from L08.
@@ -147,9 +169,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none (advisory to L10/L11).
 - **Failure:** a perspective is skipped → the review is incomplete, cannot advance.
 - **Evidence produced:** per-perspective finding register.
+```
 
-### L10 — verbatim (Source A lines 134–142)
+## L10 (source line 134)
 
+```markdown
 #### L10 — Adversarial Review · *Court + Adversary · model: Opus/Gemini (≠ Builder family)*
 - **Purpose:** attempt to prove the design wrong — contradictions, hidden assumptions, circular reasoning, economic/security/scaling failures, emergent behaviour.
 - **Entry:** L08 design + L09 findings.
@@ -158,9 +182,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** **Court verdict is a gate** — REJECT halts; amendments must be resolved.
 - **Failure:** a proven contradiction/blocking finding → design returns to L08.
 - **Evidence produced:** adversarial report; blocking-amendment ledger.
+```
 
-### L11 — verbatim (Source A lines 143–153)
+## L11 (source line 143)
 
+```markdown
 #### L11 — Formal Planning · *Planner · model: Opus*
 - **Purpose:** freeze implementation scope — the implementation contract.
 - **Entry:** L10 verdict = RATIFY(-WITH-AMENDMENTS, resolved).
@@ -171,9 +197,11 @@ notes) do NOT redefine the lifecycle.
 - **Evidence produced:** the frozen implementation contract.
 
 ### Phase IV — Engineering
+```
 
-### L12 — verbatim (Source A lines 154–162)
+## L12 (source line 154)
 
+```markdown
 #### L12 — Branch Implementation · *Builder · model: Sonnet (fast generation)*
 - **Purpose:** implement **only** the approved scope.
 - **Entry:** approved implementation contract (L11) on an isolated branch/worktree (A-16).
@@ -182,9 +210,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none (the Builder self-reports; it may NOT self-verify — X6).
 - **Failure:** scope creep, or cannot build within budget → incident (cap-overrun, A-12).
 - **Evidence produced:** implementation artifacts + builder execution self-report (not promoting evidence).
+```
 
-### L13 — verbatim (Source A lines 163–171)
+## L13 (source line 163)
 
+```markdown
 #### L13 — Verification · *Auditor/Runtime (mechanical) + Adversary · model: local+Sonnet, then Opus*
 - **Purpose:** prove correctness. Order: Compile → Lint → Unit → Integration → Simulation → Replay → Performance.
 - **Entry:** `executed` implementation from L12.
@@ -193,9 +223,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none (mechanical evidence is self-approving via EXEC signature).
 - **Failure:** any refutation → regress + incident (L19/Capture).
 - **Evidence produced:** signed execution evidence, test logs, coverage, perf numbers.
+```
 
-### L14 — verbatim (Source A lines 172–182)
+## L14 (source line 172)
 
+```markdown
 #### L14 — Independent Audit · *Auditor · model: Opus or Gemini (MUST ≠ Builder family, A-08)*
 - **Purpose:** a different agent (different model family) hunts faults: AI slop, hidden mocks, fake implementations, dead code, architecture violations, security flaws, regressions.
 - **Entry:** L13 passed.
@@ -206,9 +238,11 @@ notes) do NOT redefine the lifecycle.
 - **Evidence produced:** independent audit report (decorrelated verification, I3/A-08).
 
 ### Phase V — Integration
+```
 
-### L15 — verbatim (Source A lines 183–191)
+## L15 (source line 183)
 
+```markdown
 #### L15 — Documentation & Ledger · *Runtime + Builder · model: Sonnet*
 - **Purpose:** synchronize institutional knowledge.
 - **Entry:** L14 clean.
@@ -217,9 +251,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none.
 - **Failure:** stale/missing ledger update → incident (undocumented change).
 - **Evidence produced:** ledger deltas; updated traceability links.
+```
 
-### L16 — verbatim (Source A lines 192–202)
+## L16 (source line 192)
 
+```markdown
 #### L16 — Promotion Decision · *Integrator + Founder (Audit verb) · model: Opus*
 - **Purpose:** decide the artifact's fate: Merge / Seal / Reject / Research-Only / Dormant.
 - **Entry:** L15 complete; artifact `verified`.
@@ -230,9 +266,11 @@ notes) do NOT redefine the lifecycle.
 - **Evidence produced:** merge commit + aggregation roll-up, or disposition record.
 
 ### Phase VI — Learning
+```
 
-### L17 — verbatim (Source A lines 203–211)
+## L17 (source line 203)
 
+```markdown
 #### L17 — Retrospective + Constitutional Review · *Auditor + Runtime · model: Opus*
 - **Purpose:** improve engineering itself, and **improve PAEOS itself** — what slowed us, what failed, what repeated, which prompts improved, what should become policy.
 - **Entry:** L16 complete (or a failure at any state).
@@ -241,9 +279,11 @@ notes) do NOT redefine the lifecycle.
 - **Approval:** none (Steward-owned, continuous, with teeth). The review **recommends**; it never legislates (CER-5).
 - **Failure:** a repeated mistake with no lesson → the meta-failure (Ω-11); a completed task with no Constitutional Review → the task is not done.
 - **Evidence produced:** lessons-learned record; the Constitutional Review (`reviews/tasks/<task_id>_review.md`); links to any Proposals/Debt created.
+```
 
-### L18 — verbatim (Source A lines 212–222)
+## L18 (source line 212)
 
+```markdown
 #### L18 — Knowledge Extraction · *Auditor (Steward) · model: Opus*
 - **Purpose:** generalize reusable knowledge.
 - **Entry:** L17 lessons exist.
@@ -254,9 +294,11 @@ notes) do NOT redefine the lifecycle.
 - **Evidence produced:** institutional-knowledge artifacts (with scars + falsifiers).
 
 ### Phase VII — Evolution
+```
 
-### L19 — verbatim (Source A lines 223–317)
+## L19 (source line 223)
 
+```markdown
 #### L19 — Constitutional Evolution · *Court + Founder · model: Opus (+ decorrelated Adversary)*
 - **Purpose:** update PAEOS itself — did implementation reveal hidden assumptions? should policy/schema/lifecycle/routing change?
 - **Entry:** an incident, an L18 amendment candidate, or a kernel-surface finding.
@@ -350,30 +392,24 @@ adds no state, changes no ordering, modifies no kernel invariant). Amendments to
 L19 events on this document — scarred, falsifiable, founder-ratified. The machine-executable form is
 `operations/WORKFLOW_STATE_MACHINE.yaml`; roles are in `operations/ROLE_RESPONSIBILITIES.md`;
 per-state prompts are in `operations/PROMPT_TEMPLATES.md`.
+```
 
-## 3. Verbatim execution rules and state machine (Source B: WORKFLOW_STATE_MACHINE.yaml)
+---
 
-### `version:` (verbatim)
+# Part B — Machine-executable companion, verbatim (WORKFLOW_STATE_MACHINE.yaml)
+
+## B.0 Top-level rules (ceremony depth / discharge machinery), verbatim
 
 ```yaml
+# PAEOS Engineering Lifecycle — Executable State Machine v1.0
+# Machine-readable form of operations/ENGINEERING_LIFECYCLE.md.
+# The future PAEOS Runtime consumes this to drive engineering automatically.
+# Implementation-independent; multi-model; router-compatible via ceremony_depth.
+
 version: "1.1"    # v1.1 Constitutional Execution Rules amendment, founder-ratified 2026-07-21
-```
-
-### `frozen:` (verbatim)
-
-```yaml
 frozen: true
-```
-
-### `governs:` (verbatim)
-
-```yaml
 governs: [paeos-runtime, sentium, orca-strator, inspiration-engine, library-of-fire, sakg, "*future"]
-```
 
-### `constitutional_rule:` (verbatim)
-
-```yaml
 constitutional_rule: >
   No engineering artifact may transition directly to Implementation. Every artifact
   progresses through the lifecycle unless explicitly rejected. Each state produces
@@ -382,11 +418,6 @@ constitutional_rule: >
 # ---- Constitutional Execution Rules (v1.1) — govern EVERY state; add no state ----
 # Canonical definition: operations/ENGINEERING_LIFECYCLE.md §Constitutional Execution Rules.
 # PAEOS exists to discover the best architecture, not implement the first that works.
-```
-
-### `constitutional_execution_rules:` (verbatim)
-
-```yaml
 constitutional_execution_rules:
   CER-1_mandatory_critical_thinking: >
     Every task MUST actively attempt to FALSIFY the current architecture (weaknesses,
@@ -419,11 +450,12 @@ constitutional_execution_rules:
     namespace, service, or kernel responsibility, the Builder MUST demonstrate its explicit
     derivation from existing constitutional artifacts (Z0, spec/, derivation/). If no derivation
     exists, implementation MUST halt and emit an Improvement Proposal rather than invent architecture.
-```
 
-### `ceremony_depth:` (verbatim)
+artifact_sinks:                         # where CER outputs persist (not lifecycle states)
+  proposals: proposals/PAEOS-IP-NNNN.md   # CER-2
+  debt:      ledger/debt/DEBT-NNNN.md      # CER-3
 
-```yaml
+# ---- Ceremony depth: how the router stays compatible with a full lifecycle ----
 ceremony_depth:
   assigned_at: L02
   basis: [verifiability, reversibility]   # kernel router (v x r)
@@ -443,11 +475,6 @@ ceremony_depth:
     {result: auto_pass, reason: trace_a, by: runtime} so every transition remains valid.
 
 # ---- Model orchestration (Runtime assigns; decorrelation is mandatory) ----
-```
-
-### `model_policy:` (verbatim)
-
-```yaml
 model_policy:
   classes:
     opus:   {use: [deep-reasoning, planning, adversarial, court, audit], }
@@ -462,11 +489,9 @@ model_policy:
   runtime_selects: true     # per-state recommended_model is advisory; Runtime binds actual model
 
 # ---- Roles (full defs: operations/ROLE_RESPONSIBILITIES.md) ----
-```
+roles: [founder, planner, researcher, builder, reviewer, court, adversary, auditor, runtime]
 
-### `gates:` (verbatim)
-
-```yaml
+# ---- Approval gates (a transition through a gate needs the named approver) ----
 gates:
   triage_reject:   {at: L02, approver: founder, when: "reject/dormant on founder-authored intent"}
   court_verdict:   {at: L10, approver: court,   blocks_on: [REJECT, unresolved_amendments]}
@@ -478,46 +503,10 @@ gates:
 # ---- States ----
 # Each: phase, purpose, role, recommended_model, entry, required_artifacts,
 # produced_evidence, exit, transitions (target: condition), failure.
+states:
 ```
 
-### `global_rules:` (verbatim)
-
-```yaml
-global_rules:
-  - no_direct_intake_to_implementation
-  - every_transition_requires_evidence            # K1
-  - implementation_never_creates_architecture     # L12 bound to L11
-  - architecture_never_creates_policy             # L08 -> policy only via L19
-  - policy_changes_require_constitutional_review  # §14.5
-  - every_implementation_survives_independent_audit  # L14, A-08
-  - every_task_improves_institutional_knowledge   # L15/L18
-  - every_defect_becomes_incident
-  - every_ambiguity_becomes_incident              # HALT rule
-  - every_repeated_mistake_becomes_skill_template_or_amendment
-  - every_artifact_traceable_to_origin            # serving-clause chain
-  - workflow_is_versioned_and_amendable           # this file evolves via L19
-  - every_task_attempts_to_falsify_architecture   # CER-1
-  - every_improvement_becomes_a_proposal_not_a_silent_change  # CER-2
-  - every_deliberate_nonideal_choice_becomes_debt # CER-3
-  - every_task_ends_with_constitutional_review    # CER-4
-  - only_founder_ratifies_kernel_lifecycle_authority_invariants  # CER-5 (runtime recommends, never legislates)
-```
-
-### `terminal_states:` (verbatim)
-
-```yaml
-terminal_states: [DONE]
-```
-
-### `initial_state:` (verbatim)
-
-```yaml
-initial_state: L01
-```
-
-### States L01–L19 (verbatim)
-
-#### State `L01` (Source B lines 105–117, verbatim)
+## B.1 — YAML state `L01` (source line 105)
 
 ```yaml
   L01:
@@ -534,7 +523,7 @@ initial_state: L01
     failure: "malformed intent -> not admitted"
 ```
 
-#### State `L02` (Source B lines 118–133, verbatim)
+## B.2 — YAML state `L02` (source line 118)
 
 ```yaml
   L02:
@@ -554,7 +543,7 @@ initial_state: L01
     failure: "unclassifiable -> L05 or escalate Decision"
 ```
 
-#### State `L03` (Source B lines 134–145, verbatim)
+## B.3 — YAML state `L03` (source line 134)
 
 ```yaml
   L03:
@@ -570,7 +559,7 @@ initial_state: L01
     failure: "cannot derive -> spawn L05"
 ```
 
-#### State `L04` (Source B lines 146–157, verbatim)
+## B.4 — YAML state `L04` (source line 146)
 
 ```yaml
   L04:
@@ -586,7 +575,7 @@ initial_state: L01
     failure: "degenerate space -> collapse to single approach (noted)"
 ```
 
-#### State `L05` (Source B lines 158–170, verbatim)
+## B.5 — YAML state `L05` (source line 158)
 
 ```yaml
   L05:
@@ -603,7 +592,7 @@ initial_state: L01
     failure: "consumer-less research -> scope-creep incident"
 ```
 
-#### State `L06` (Source B lines 171–182, verbatim)
+## B.6 — YAML state `L06` (source line 171)
 
 ```yaml
   L06:
@@ -619,7 +608,7 @@ initial_state: L01
     failure: "omitted axis surfaced later -> incident"
 ```
 
-#### State `L07` (Source B lines 183–195, verbatim)
+## B.7 — YAML state `L07` (source line 183)
 
 ```yaml
   L07:
@@ -636,7 +625,7 @@ initial_state: L01
     failure: "unmitigated high-severity risk, no accepted-risk record -> blocks L08"
 ```
 
-#### State `L08` (Source B lines 196–207, verbatim)
+## B.8 — YAML state `L08` (source line 196)
 
 ```yaml
   L08:
@@ -652,7 +641,7 @@ initial_state: L01
     failure: "orphan/gap/loosened-constraint -> redesign or escalate"
 ```
 
-#### State `L09` (Source B lines 208–220, verbatim)
+## B.9 — YAML state `L09` (source line 208)
 
 ```yaml
   L09:
@@ -669,7 +658,7 @@ initial_state: L01
     failure: "a perspective skipped -> incomplete, cannot advance"
 ```
 
-#### State `L10` (Source B lines 221–235, verbatim)
+## B.10 — YAML state `L10` (source line 221)
 
 ```yaml
   L10:
@@ -688,7 +677,7 @@ initial_state: L01
     failure: "proven contradiction -> back to L08"
 ```
 
-#### State `L11` (Source B lines 236–248, verbatim)
+## B.11 — YAML state `L11` (source line 236)
 
 ```yaml
   L11:
@@ -705,7 +694,7 @@ initial_state: L01
     failure: "ambiguous contract OR un-derived architecture -> incident (ambiguity = incident / CER-6 halt)"
 ```
 
-#### State `L12` (Source B lines 249–260, verbatim)
+## B.12 — YAML state `L12` (source line 249)
 
 ```yaml
   L12:
@@ -721,7 +710,7 @@ initial_state: L01
     failure: "cannot satisfy contract without un-derived architecture -> HALT (CER-6), emit proposal"
 ```
 
-#### State `L13` (Source B lines 261–272, verbatim)
+## B.13 — YAML state `L13` (source line 261)
 
 ```yaml
   L13:
@@ -737,7 +726,7 @@ initial_state: L01
     failure: "failing tests -> iterate in L12; forged evidence -> immediate halt"
 ```
 
-#### State `L14` (Source B lines 273–287, verbatim)
+## B.14 — YAML state `L14` (source line 273)
 
 ```yaml
   L14:
@@ -756,7 +745,7 @@ initial_state: L01
     failure: "unresolved audit findings -> back to L12"
 ```
 
-#### State `L15` (Source B lines 288–300, verbatim)
+## B.15 — YAML state `L15` (source line 288)
 
 ```yaml
   L15:
@@ -772,7 +761,7 @@ initial_state: L01
     failure: "missing docs / stale atlas -> back to L15"
 ```
 
-#### State `L16` (Source B lines 301–313, verbatim)
+## B.16 — YAML state `L16` (source line 301)
 
 ```yaml
   L16:
@@ -789,7 +778,7 @@ initial_state: L01
     failure: "merge conflict / coherence break -> incident"
 ```
 
-#### State `L17` (Source B lines 314–328, verbatim)
+## B.17 — YAML state `L17` (source line 314)
 
 ```yaml
   L17:
@@ -808,7 +797,7 @@ initial_state: L01
     failure: "repeated mistake, no lesson -> meta-failure (Ω-11); no Constitutional Review -> task not done (CER-4)"
 ```
 
-#### State `L18` (Source B lines 329–340, verbatim)
+## B.18 — YAML state `L18` (source line 329)
 
 ```yaml
   L18:
@@ -824,7 +813,7 @@ initial_state: L01
     failure: "repeated mistake not converted to skill/template/amendment (global rule 10)"
 ```
 
-#### State `L19` (Source B lines 341–375, verbatim)
+## B.19 — YAML state `L19` (source line 341)
 
 ```yaml
   L19:
@@ -864,24 +853,22 @@ terminal_states: [DONE]
 initial_state: L01
 ```
 
-## 4. Canonical conflicts — RECORDED, NOT RESOLVED
+---
 
-- **CONFLICT-1 (numbering authority):** `backlog/research/PAEOS_CANONICAL_LIFECYCLE.md` — an AI
-  reconstruction (contains inline uncertainty, e.g. "actually wait…" at L14) — assigns different
-  layer orderings than Sources A/B. Authority tier: research backlog (lowest). Requires founder
-  resolution if it is to carry any weight; by default it is superseded by this Freeze.
-- **CONFLICT-2 (historical IP stage labels):** an earlier constitutional IP describes VERIFY as
-  "stage 11", adversarial review as "stage 12", seal ≈ "stage 14", Evolution across 15–19 —
-  inconsistent with Sources A/B (VERIFY=L13, design-adversary=L10, post-build audit=L14).
-  Sources A/B are frozen and ratified later; the IP predates the freeze. Requires founder
-  resolution.
-- **CONFLICT-3 (implementer model names):** Source A names model families (Opus/Sonnet/Gemini)
-  per layer; the implemented runtime uses codex/gpt-5.6-sol and cline-pass/glm-5.3. Source B
-  `model_policy` is the machine-executable rule; whether the substitution satisfies it is a
-  **conformance question (Step 2), not a canonical question.**
+# Part C — Conflict register (recorded, NOT resolved)
 
-## 5. Non-interpretation statement
+This Freeze does not adjudicate. Step 2 (conformance map) and Step 3 (founder decisions)
+own interpretation. Flags only:
 
-This Freeze adds no states, renumbers nothing, reconciles nothing, and proposes no amendments.
-Per the Source B constitutional rule, the CER "governs every state; add no state." Any change to
-the canonical map must proceed through the amendment loop (L19) with founder ratification.
+1. **C-01 — Prose vs YAML divergences:** any semantic difference between a Part A layer
+   section and its Part B state block is `CANONICAL CONFLICT — REQUIRES RESOLUTION`.
+2. **C-02 — Secondary-source numbering:** documents outside this corpus (backlog/research
+   reconstructions; IPs describing VERIFY as "stage 11", adversarial review as "stage 12",
+   seal as "stage 14", evolution as "15–19") use numbering inconsistent with the frozen
+   corpus. Lowest authority, excluded by design; no resolution offered here.
+3. **C-03 — Ceremony-depth legality questions** (who assigns depth, what discharge evidence
+   suffices, whether substantive L07 requires substantive L06): the frozen corpus states the
+   rules; applying them to historical runs is a Step 2/3 function, not a Freeze function.
+
+---
+End of Freeze v1.0.

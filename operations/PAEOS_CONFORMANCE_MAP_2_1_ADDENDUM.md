@@ -2,7 +2,7 @@
 
 Status: ADDENDUM to `PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md`, per founder review 2026-08-19.
 Scope: reclassifications, atomic conflict split, seal-terminology resolution. No code changes.
-Sources: Freeze v1.0 (`PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md`), map v1, kernel/seal.py.
+Sources: `operations/ENGINEERING_LIFECYCLE.md` (v1.3, canonical L01–L19 baseline), `operations/WORKFLOW_STATE_MACHINE.yaml` (derived machine-executable form), map v1, kernel/seal.py, and the archived verbatim extraction `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` (derived, no independent authority).
 
 ## 1. Capability vs. transition status split
 
@@ -18,28 +18,44 @@ Consequences (corrections to map v1):
 | Layer | v1 status | Corrected |
 |---|---|---|
 | L08 DESIGN, L09 CRITIQUE | CONFORMANT_EXECUTED | capability CONFORMANT; transition MALFORMED until L02 exists (no ceremony decision, no discharge stubs on any path) |
-| L12 IMPLEMENT, L13 VERIFY | CONFORMANT_EXECUTED | capability CONFORMANT (post-remediation); transition MALFORMED (same basis) |
-| L13 | CONFORMANT_EXECUTED | **CANONICAL_CONFLICT — IMPLEMENTATION PRESENT** until C-01a adjudicated (see §2) |
+| L12 IMPLEMENT | CONFORMANT_EXECUTED | capability CONFORMANT (post-remediation); transition MALFORMED (same basis) |
+| L13 VERIFY | CONFORMANT_EXECUTED | capability **CONFORMANT** — the deterministic Court is a faithful implementation of EL L13 prose (mechanical/self-approving, A-09); former C-01a resolved mechanically by EL-wins (see §2). transition MALFORMED until L02 ceremony + discharge stubs exist |
 | L19 | CONFORMANT_EXECUTED (machinery tested) | capability IMPLEMENTED/TESTED; autonomous runtime evolution **UNPROVEN**; R5 evidence outstanding |
 
-## 2. Atomic conflict split (C-01 decomposed; C-02/C-03 narrowed)
+> Addendum reclassification (2026-08-19): the prior line "CANONICAL_CONFLICT — IMPLEMENTATION
+> PRESENT until C-01a adjudicated" is superseded. Under the corrected hierarchy the EL prose wins
+> over the derived WSM YAML, so no founder adjudication is needed for L13 (see §2).
 
-- **C-01a — L13 authority.** Prose vs. YAML disagree on the verification authority semantics.
-  The deterministic Court is a strong candidate interpretation but is NOT ratified canonical
-  semantics until the founder adjudicates. Suggested outcome: ratify Court as canonical L13
-  implementation (it is stricter), via amendment.
-- **C-01b — L15 role/artifacts.** Residual prose-vs-YAML divergence on Documentation & Ledger
-  responsibilities/artifacts. Founder adjudication; side-by-side clauses in Freeze Part A/B.
-- **C-01c — required-artifact differences** anywhere else in Part A vs. Part B. Sweep pending.
+## 2. Atomic conflict split — resolved mechanically by hierarchy (2026-08-19)
+
+> Prior text treated C-01a/C-01b/C-01c as requiring founder adjudication. The corrected source
+> hierarchy (`ENGINEERING_LIFECYCLE.md` v1.3 = canonical baseline; WSM = derived form; EL prose
+> wins; ratified amendments win where they exist) resolves them without founder action:
+
+- **C-01a — L13 authority.** RESOLVED: EL L13 prose ("Auditor/Runtime (mechanical) + Adversary",
+  "mechanical evidence is self-approving via EXEC signature", A-09) is canonical and wins over the
+  derived WSM YAML (role `builder`, `sonnet`). The deterministic Court is a faithful implementation
+  of that prose, not a conflict. Optional L19 blessing of the Court as canonical L13 → candidate
+  `proposals/PAEOS-IP-0014` (non-blocking; awaiting founder).
+- **C-01b — L15 role/artifacts.** RESOLVED: EL prose wins → role = **Runtime + Builder**; artifacts =
+  the prose list (Inventory Atlas, roadmaps, architecture diagrams, knowledge graph, decision logs).
+  The WSM's narrower `implementation_atlas` list is the derived form and is subordinate.
+- **C-01c — required-artifact differences** elsewhere in Part A vs B. RESOLVED: EL prose wins on any
+  divergence; a full sweep is noted for reference repair only (not a founder decision).
 - **C-02 — secondary-source numbering** (backlog reconstructions; "stage 11/12/14" IPs).
-  Reclassified: NOT a constitutional conflict — none are founder-ratified authorities. Outcome:
+  RESOLVED: NOT a constitutional conflict — none are founder-ratified authorities. Outcome:
   mark stale/superseded, repair references. No ratification needed.
 - **C-03 — narrowed** to genuinely unresolved ceremony edge cases ONLY: how v/r are evaluated,
   escalation, partial escalation, de-escalation, whether substantive execution can replace a
-  lawful discharge. The settled law (L02 assigns; v×r basis; Trace-A/B sets; stubs mandatory)
-  is NOT in conflict and is removed from C-03.
+  lawful discharge. These now live in **RB-CEREMONY-DEPTH-001** (research), not a conflict register.
 
-## 3. Seal terminology (resolved conceptually; founder to confirm)
+## 3. Seal terminology (resolved; documentation clarification, not a founder decision)
+
+> 2026-08-19: previously headed "founder to confirm". Both `SealRecord` and the L16 disposition
+> are independently well-defined in canonical sources (the EL L16 prose and kernel/seal.py), so
+> this is a terminology clarification, not an irreducible constitutional choice. No founder action
+> is required for the distinction itself; only the optional L13-Court ratification (IP-0014) and
+> any L16 promotion machinery remain open implementation/R4 items.
 
 - **Kernel `SealRecord`** (kernel/seal.py) = a cryptographic evidence attestation over
   bundle+verdict+adversary+ledger head. It is the L13→L14→L15 chain anchor.
@@ -53,8 +69,10 @@ Consequences (corrections to map v1):
 
 ## 4. Other founder-directed corrections adopted
 
-1. **No L02 coding yet.** If v/r mechanics are not already defined in the corpus,
-   `RB-CEREMONY-DEPTH-001` adjudicates the design first. Implement existing law; do not legislate.
+1. **No L02 coding yet.** The v/r mechanics ARE defined in the EL corpus (`(verifiability ×
+   reversibility)`, Trace-A/B, auto-discharge rule, `assigned_at: L02`). `RB-CEREMONY-DEPTH-001`
+   therefore performs canonical extraction + edge-case closure (how v/r is evaluated, escalation,
+   de-escalation), not greenfield design. Implement existing law; do not legislate.
 2. **L07 is a ceremony-routing consequence**, not an isolated reorder patch. Trace-A: L06+L07
    discharge with stubs. Trace-B: substantive L07 requires substantive L06 matrix. The
    unconditional MITIGATION→DESIGN path disappears once the ceremony contract executes.

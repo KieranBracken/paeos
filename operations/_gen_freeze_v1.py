@@ -1,7 +1,13 @@
-"""One-shot generator for operations/PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md.
+"""One-shot generator for operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md.
 
-Forensic, disk-to-disk: embeds byte-exact slices of the two frozen sources. No interpretation.
+Forensic, disk-to-disk: embeds byte-exact slices of the two sources. No interpretation.
 Run: .venv/bin/python operations/_gen_freeze_v1.py
+
+AUTHORITY NOTE (2026-08-19): the output is a DERIVED RESTATEMENT of the canonical sources.
+operations/ENGINEERING_LIFECYCLE.md (v1.3) is the canonical L01-L19 baseline; the output
+document carries NO independent authority. It was historically named "Canonical 19-Layer
+Freeze"; that name implied primacy and was retired. Do NOT regenerate over the archived
+provenance header (it is added manually after generation). See PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md Entry 146.
 """
 import hashlib
 import re
@@ -48,7 +54,7 @@ def ym_section(idx: int) -> str:
 parts: list[str] = []
 p = parts.append
 
-p("# PAEOS Canonical 19-Layer Freeze — v1.0")
+p("# PAEOS 19-Layer Lifecycle Extraction (ARCHIVED / DERIVED — generated; provenance header added manually)")
 p("")
 p("**Nature of this document:** forensic extraction ONLY. No interpretation, no amendment")
 p("proposals, no reconciliation of conflicts, no inference from implementation behavior.")
@@ -125,7 +131,7 @@ p("")
 p("---")
 p("End of Freeze v1.0.")
 
-dest = ROOT / "operations/PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md"
+dest = ROOT / "operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md"
 dest.write_text("\n".join(parts) + "\n", encoding="utf-8")
 print("written:", dest, dest.stat().st_size, "bytes")
 print("layers:", len(layer_heads), "| yaml states:", len(state_heads))

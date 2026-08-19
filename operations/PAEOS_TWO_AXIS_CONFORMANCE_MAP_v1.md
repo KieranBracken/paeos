@@ -1,14 +1,24 @@
 # PAEOS Two-Axis Conformance Map v1.0
 
-Date: 2026-08-19 · Read-only analysis (Step 2) · Companion to `PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md`
+> **Source-hierarchy note (2026-08-19):** the canonical L01–L19 obligation source is
+> `operations/ENGINEERING_LIFECYCLE.md` (v1.3), not any "Freeze" document. The verbatim
+> corpus used here is the archived derived extraction
+> `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` (a byte-faithful copy of the
+> EL + its WSM form). Where the EL prose and the derived WSM YAML differ, the **EL prose wins**.
+> See `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` Entry 146. (Revision of this map's reliance on the
+> invalid "Freeze"-as-authority framing.)
 
-Method: canonical obligations extracted in the Freeze (Part A/B verbatim) are compared against
+Date: 2026-08-19 · Read-only analysis (Step 2) · Canonical obligations from `ENGINEERING_LIFECYCLE.md` v1.3.
+
+Method: canonical obligations from the Engineering Lifecycle (per the verbatim extraction in
+`operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md`) are compared against
 implementation facts verified 2026-08-19 (file:line citations below). Two ORTHOGONAL axes per the
 founder's directive: (1) lifecycle conformance per layer; (2) autonomy-rung (R1–R5) readiness.
 Current dogfooding is labeled **R4-ALIGNED, NOT R4-CONFORMANT** until L02 ceremony assignment,
 lawful Trace-A discharge evidence, required L12–L16 execution, and applicable gates are
 demonstrated. A-08 is treated generically (model-family decorrelation — never vendor-locked).
-No code was modified; no conflicts resolved; nothing preserved merely by existing.
+No code was modified by this map; conflicts are resolved by the EL hierarchy where the EL already
+states the rule (C-01a/b/c mechanical), and otherwise left to ratified amendment.
 
 Status vocabulary: CONFORMANT_EXECUTED · CONFORMANT_DISCHARGED · DISCHARGEABLE_BUT_EVIDENCE_MISSING
 · WRONG_DEPTH_CLASSIFICATION · PARTIAL · BYPASSED · MISPLACED · MISSING · IMPLEMENTATION_EXTENSION
@@ -16,7 +26,7 @@ Status vocabulary: CONFORMANT_EXECUTED · CONFORMANT_DISCHARGED · DISCHARGEABLE
 
 ## Axis 1 — Lifecycle conformance (L01–L19)
 
-| Layer | Canonical obligation (Freeze) | Implemented component | Reachable? | Status | Rung | Remediation class |
+| Layer | Canonical obligation (Engineering Lifecycle v1.3) | Implemented component | Reachable? | Status | Rung | Remediation class |
 |---|---|---|---|---|---|---|
 | L01 Intake | Record objective, classify provenance | `ops/autonomous_run.py` backlog.json intake; ledger GOAL_CREATED rows | yes (runner) | PARTIAL — intake is external/manual; objective recorded but no intake artifact bundle | R3 | Implementation remediation |
 | L02 Triage | Weight class + **ceremony depth (v×r)** → Run Ceremony Contract | `runtime/triage.py` (ROUTINE/SUBSTANTIAL/KERNEL_TOUCHING + budget only); **zero ceremony/discharge code repo-wide** (grep: 0 hits) | yes | PARTIAL — depth assignment and ceremony contract absent | R4 | **R4 readiness gap** |
@@ -30,7 +40,7 @@ Status vocabulary: CONFORMANT_EXECUTED · CONFORMANT_DISCHARGED · DISCHARGEABLE
 | L10 Adversarial Design Review | Attack the DESIGN pre-implementation | no design-phase adversary | no | DISCHARGEABLE_BUT_EVIDENCE_MISSING (Trace-A) / MISSING (Trace-B) | R4 | R4 readiness gap |
 | L11 Formal Planning | Implementation contract incl. test strategy/acceptance | `StageId.PLAN` | yes | CONFORMANT_EXECUTED, but contract lacks mandated baseline-failing suite field | R4 | CANDIDATE IMPROVEMENT (L19 amendment) |
 | L12 Branch Implementation | Scoped implementation | `StageId.IMPLEMENT` on plan write_scopes, sandboxed workspace, ScopeViolation enforcement | yes | CONFORMANT_EXECUTED | R3 met | — |
-| L13 Verification | Verify claims vs artifact | Deterministic Court: re-executes commands, evidence binding, vacuity gate (`runtime/verification.py`, orchestrator §court) | yes | CONFORMANT_EXECUTED — run 7 genuinely REMANDED; deterministic semantics possibly stronger than canonical VERIFY text → recorded as CANONICAL_CONFLICT C-01 sub-item, not resolved here | R3/R4 | Candidate improvement (ratify via L19) |
+| L13 Verification | Verify claims vs artifact (EL: "Auditor/Runtime (mechanical) + Adversary"; "mechanical evidence is self-approving via EXEC signature"; A-09 independent evidence) | Deterministic Court: re-executes commands, evidence binding, vacuity gate (`runtime/verification.py`, orchestrator §court) | yes | **CONFORMANT_EXECUTED** — the Court is a faithful implementation of EL L13 prose (mechanical, self-approving, independent). Former "CANONICAL_CONFLICT C-01a" is **mechanically resolved**: EL prose wins over the derived WSM YAML. Optional L19 blessing → `proposals/PAEOS-IP-0014`. | R3/R4 | Candidate improvement (IP-0014, non-blocking) |
 | L14 Independent Audit | Post-build audit, **model-family decorrelation (A-08)** | post-build ADVERSARIAL_REVIEW over sealed bundle + evidence | yes | PARTIAL — machinery real (fail-closed BLOCK/REMAND), but single-family window (GLM-5.3 builder+auditor) violates A-08 decorrelation; `HybridRuntime` provides generic decorrelation when a second family is available | R4 | R4 readiness gap |
 | L15 Documentation & Ledger | Immutable record, promotion docs | append-only hash-chained ledger + seal; model attribution rows (2026-08-18); sidecar stage scores | yes | PARTIAL — ledger strong; documentation/promotion notes not automated | R4 | R4 readiness gap |
 | L16 Promotion Decision | Promote/supersede decision | `promote_to` field in seal payloads (null in all 25 seals) | partial | PARTIAL — field exists, decision machinery absent | R4 | R4 readiness gap |
@@ -57,7 +67,7 @@ Status vocabulary: CONFORMANT_EXECUTED · CONFORMANT_DISCHARGED · DISCHARGEABLE
      one Trace-B run.
 - **R5 Autonomous** — NOT BEGUN (by design; requires R4-conformant operation over time).
 
-## Remediation register (founder-decision input)
+## Remediation register
 
 **IMPLEMENTATION REMEDIATIONS (no legislation):** wire L02 ceremony classification; emit Trace-A
 stubs; fix MITIGATION input ordering; durable scar store (RB intake 1); evolution events to ledger.
@@ -65,9 +75,15 @@ stubs; fix MITIGATION input ordering; durable scar store (RB intake 1); evolutio
 **R4 READINESS GAPS:** items 1–7 above; L14 decorrelation via existing HybridRuntime routing
 (generic family rule — Builder family ≠ Auditor family, no specific vendor).
 
-**CANONICAL CONFLICTS (founder adjudication):** C-01 prose-vs-YAML semantics (incl. deterministic
-Court vs canonical VERIFY wording); C-02 secondary-source numbering (excluded by precedence);
-C-03 ceremony-depth legality edge cases. See Freeze Part C — deliberately unresolved.
+**CANONICAL CONFLICTS — RESOLVED MECHANICALLY BY HIERARCHY (2026-08-19):** the former
+C-01a/C-01b/C-01c prose-vs-YAML divergences, C-02 secondary-source numbering, and seal
+terminology are now resolved by the corrected source hierarchy — `ENGINEERING_LIFECYCLE.md` (v1.3)
+prose wins over the derived WSM YAML unless a ratified amendment states otherwise; secondary
+sources (backlog/IP reconstructions) are excluded by precedence; SealRecord (attestation) ≠ L16
+Seal disposition. No founder adjudication required. See Entry 146 and `proposals/PAEOS-IP-0014`
+for the one optional L13 ratification candidate. The genuinely-open ceremony *edge cases*
+(how v×r is evaluated, escalation, de-escalation, substantive-vs-discharge) remain in
+RB-CEREMONY-DEPTH-001 (research), not in a freeze conflict register.
 
 **CANDIDATE IMPROVEMENTS (L19 path):** TDD baseline-failing contract strengthening L11 + L13
 court-verified FAIL→PASS delta (no new state — CER v1.1 "add no state"); ratify deterministic
@@ -93,6 +109,7 @@ still needed once stub machinery + ceremony contract exist, before retaining or 
 - Scar persistence: in-memory default; no scar artifacts on disk; durable store = RB intake 1 in flight.
 - Runs 5–7 (GLM-5.3 single-family window, GPT quota exhausted 2026-08-18→~08-22):
   run 7 REMANDED by court with per-stage `model_ver` attribution — gates proven real.
-- Freeze v1.0 (this repo, `operations/`) anchors all canonical rows; hashes recorded therein.
+- Canonical obligation source: `operations/ENGINEERING_LIFECYCLE.md` (v1.3); verbatim extraction archived at
+  `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` (no independent authority); EL prose wins over the derived WSM.
 
 *End of conformance map v1.0. No code modified during production of this document.*

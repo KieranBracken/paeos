@@ -272,3 +272,20 @@ Executed Phase 1 of the remediation plan from hallucination-notebook Entry 138 (
 - Read-only analysis; no code changes. Follows the Freeze v1 (Entry 144).
 - Statuses use the expanded vocabulary (CONFORMANT_EXECUTED / DISCHARGEABLE_BUT_EVIDENCE_MISSING / MANDATORY_BUT_SKIPPED / etc.).
 - Remediation classes split: implementation remediation vs R4-readiness gap vs canonical conflict vs candidate improvement vs historical evidence defect.
+
+## 2026-08-19 (late) — Source-hierarchy reconciliation (founder-directed)
+
+Per founder directive (source hierarchy correction), engineering lifecycle provenance was forensically re-established and the incorrect "Freeze-as-authority" framing repaired. Evidence and reasoning: `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` Entry 146.
+
+**Changes (reconciliation of Phase 4):**
+- **Demoted/archived both "Freeze" files** (no longer at `operations/` root or repo root):
+  - `operations/PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md` → `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` (renamed + DERIVED/NOT-AN-AUTHORITY status header; byte-faithful extraction of ENGINEERING_LIFECYCLE.md + WSM).
+  - `PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md` (root) → `operations/archive/PAEOS_19_LAYER_FREEZE_DRAFT_v1.md` (renamed + SUPERSEDED status header; its recorded source hashes `6eb3b80b…`/`3a2d6a1c…` match no git revision — invalid).
+- **Updated `operations/_gen_freeze_v1.py`**: docstring authority note, output title/dest point to the archived extraction (generator NOT re-run; provenance header manual).
+- **`operations/CURRENT_STATE.md`**: Engineering Lifecycle v1.3 documented as THE canonical L01–L19 baseline; WSM as its derived form; archived extraction/draft noted; next-sequence re-expressed (C-01/C-02/seal mechanically resolved; RB-CEREMONY-DEPTH-001 is the live next step).
+- **`operations/PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md`**: obligations now cited to ENGINEERING_LIFECYCLE.md v1.3; L13 reclassified from CANONICAL_CONFLICT to CONFORMANT (deterministic Court = faithful EL-prose implementation); remediation register updated; freeze references removed.
+- **`operations/PAEOS_CONFORMANCE_MAP_2_1_ADDENDUM.md`**: sources corrected; C-01a/b/c + C-02 + seal terminology re-expressed as mechanically resolved by hierarchy (EL prose wins over derived WSM).
+- **`proposals/PAEOS-IP-0014-l13-deterministic-court-ratification.md`** (new): non-canonical candidate — ratify the deterministic Court as canonical L13 verification via L19. Awaiting founder; not applied.
+- **`PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`**: Entry 146 added (full evidence record); Entry 144 inline reclassification note.
+
+**No runtime code was changed by the reconciliation** (documentation/provenance repair only). The L13 Court, ledger, and gates behavior are unchanged and remain tested.

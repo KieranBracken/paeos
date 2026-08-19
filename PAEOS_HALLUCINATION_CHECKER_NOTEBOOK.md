@@ -2285,8 +2285,49 @@ the canonical home for failing-test-first is L11 contract + L13 court proof of f
 behavior used to infer intent. Step 2 (conformance map, expanded status vocabulary) and Step 3
 (founder decisions: remediations vs. conflicts vs. L19 amendment candidates) follow separately.
 
+> **RECLASSIFICATION (2026-08-19, later — see Entry 146).** The document above was reclassified as
+> a **DERIVED RESTATEMENT, NOT an authority**, and archived to
+> `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md`. **The canonical L01–L19 baseline
+> is `operations/ENGINEERING_LIFECYCLE.md` (v1.3)**; the WSM is its derived machine-executable form.
+> The phrase "Canonical 19-Layer Freeze" overstated authority and has been retired. C-01/C-02 and
+> seal terminology are mechanically resolved by the EL hierarchy (see Entry 146); no founder
+> adjudication is required for them.
+
 ### Entry 145 — Step 2: Two-Axis Conformance Map (2026-08-19)
 - **Artifact:** `operations/PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md` — L01–L19 lifecycle conformance x autonomy-rung (R1–R5) readiness, companion to the Freeze (Entry 144).
 - **Honest process note:** this document was nearly lost to an agent compaction/verification loop — the first write did not persist, and ~10 verification turns burned before a decisive single-turn write+verify. Recorded here because process failures in governance tooling are themselves hallucination-adjacent risks (unverified "done" claims).
 - **Headline findings (cited in-doc):** L02 ceremony-depth assignment absent repo-wide (PARTIAL, blocks R4); L14 audit machinery real but currently single-family (A-08 decorrelation unmet during the GPT-quota window); L17–L18 evolution layer invoked but zero ledger events/stubs ever recorded (DISCHARGEABLE_BUT_EVIDENCE_MISSING). Current state: **R4-ALIGNED, NOT R4-CONFORMANT**.
 - **Remediation classes** (per founder directive): implementation remediation (no legislation) / R4 readiness gap / canonical conflict (C-01..C-03, founder adjudication) / candidate improvement (L19 path) / historical evidence defect (seal reconciliation, evidence-driven, not pre-dispositioned).
+
+### Entry 146 — Source-hierarchy reconciliation: Engineering Lifecycle is the canonical L01–L19 authority; "Freeze" demoted (2026-08-19, founder-directed)
+
+**Trigger.** Founder provenance correction: a "Canonical Freeze" document must not be assumed an independent authority; the pre-existing Engineering Lifecycle document is the canonical baseline for L01–L19, superseded only by explicit ratified amendments. Future agents must not reconstruct the lifecycle from derived documents.
+
+**Forensic evidence (all verified on disk/git this entry).**
+
+1. **`operations/ENGINEERING_LIFECYCLE.md` is the canonical L01–L19 baseline.** Header: "FROZEN v1.0, 2026-07-20" (L3–9); contains the Constitutional Execution Rules CER-1..6 (L234–278); "Versioning — this is **v1.3**" and "Amendments to the lifecycle are L19 events on this document — scarred, falsifiable, founder-ratified. The machine-executable form is `operations/WORKFLOW_STATE_MACHINE.yaml`" (L302–310). Its sha256 at HEAD is `3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64`.
+2. **`WORKFLOW_STATE_MACHINE.yaml` is a DERIVED machine-executable form.** Header: "Machine-readable form of operations/ENGINEERING_LIFECYCLE.md" (L2); `version: 1.1`. Subordinate to the EL prose.
+3. **Ratified amendments** live in `proposals/PAEOS-IP-0002..0013` (RATIFIED BY FOUNDER), the A-01..A-19 set (`derivation/PAEOS-3.5-adversarial-ratification.md`), and ratified specs — the only valid sources that may supersede the EL (CER-2/5, proposals/README).
+4. **The `operations/` "Freeze" was a byte-faithful *extraction*** of EL (Part A) + WSM (Part B): its recorded EL hash `3c2d3e37…` and WSM hash `1a5dd9d7…` exactly match the live files. Part A/B are RESTATEMENT. Its Part C (C-01/C-02/C-03) is analytical framing, not doctrine.
+5. **The root `PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md` was a divergent DRAFT with INVALID source hashes.** It records EL hash `6eb3b80b…` and WSM hash `3a2d6a1c…` — **neither exists in any git revision** (EL history: `671206f`→`a1b9f850`, `54c3f33`/HEAD→`3c2d3e37`; WSM=`1a5dd9d7`). Its "verbatim" slices cannot be trusted to come from the real documents, and it treated "this Freeze" as an authority tier above implementation (contradicting CER-5). Preserved only as historical evidence.
+
+**Phase-3 re-evaluation — the former Founder Step 3 package is mechanically resolved (no founder decision required):**
+
+- **C-01a (L13 authority):** EL L13 prose ("Auditor/Runtime (mechanical) + Adversary"; "mechanical evidence is self-approving via EXEC signature"; A-09) is canonical and wins over the derived WSM YAML (role `builder`/`sonnet`). The deterministic Court is a faithful *implementation* of EL prose → L13 reclassified CONFORMANT. Optional L19 blessing of the Court = candidate `proposals/PAEOS-IP-0014` (awaiting founder, non-blocking).
+- **C-01b (L15 role/artifacts):** EL prose wins → Runtime + Builder; prose artifact list. Mechanical.
+- **C-01c (artifact sweep):** EL prose wins on any Part A/B divergence. Mechanical.
+- **C-02 (secondary-source numbering):** not constitutional (no founder-ratified authority); mark stale/repair references. Mechanical.
+- **Seal terminology:** `SealRecord` (attestation, kernel/seal.py) ≠ L16 Seal disposition — a documentation clarification, not a founder decision.
+- **RB-CEREMONY-DEPTH-001:** the ceremony doctrine already exists in the EL (`(verifiability × reversibility)`, Trace-A/B, auto-discharge rule "auto_discharge != skip" with mandatory evidence stubs; `assigned_at: L02`). It is an extraction + edge-case closure task, not greenfield design.
+
+**Phase-4 repairs performed (documentation/provenance only; no runtime code changed):**
+
+- `operations/PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md` → archived as `operations/archive/PAEOS_19_LAYER_LIFECYCLE_EXTRACTION_v1.md` with a DERIVED/NOT-AN-AUTHORITY provenance header.
+- root `PAEOS_CANONICAL_19_LAYER_FREEZE_v1.md` → archived as `operations/archive/PAEOS_19_LAYER_FREEZE_DRAFT_v1.md` with a SUPERSEDED (invalid-hash) provenance header.
+- `operations/_gen_freeze_v1.py` updated (docstring authority note + dest/title to the archived extraction; not re-run).
+- `operations/CURRENT_STATE.md`, `operations/PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md`, `operations/PAEOS_CONFORMANCE_MAP_2_1_ADDENDUM.md`, `MessyChangesNeedsReview.md` corrected to cite ENGINEERING_LIFECYCLE.md v1.3 as authority and to record the mechanical C-01/C-02/seal resolutions.
+- `proposals/PAEOS-IP-0014-l13-deterministic-court-ratification.md` filed (candidate, awaiting founder).
+
+**Phase-5 validation.** No implementation defect induced by the doc change: the L13 Court, ledger, gates are unchanged and remain tested. The L15 docs-partial capability gap and the L02 ceremony-depth implementation gap (R4) stand as implementation findings, now grounded in the EL directly.
+
+**Continuity.** Next step in the approved sequence is **RB-CEREMONY-DEPTH-001** (canonical ceremony-doctrine extraction from the EL). This entry persists the reconciliation so a later context can resume without repeating the forensic work.
