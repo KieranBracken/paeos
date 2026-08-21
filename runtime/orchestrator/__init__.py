@@ -67,16 +67,25 @@ GOAL_CREATED = "goal_created"
 LAYER_DISCHARGED = "layer_discharged"
 
 
-# Canonical front-end planner stages -> their lifecycle Layer (L07-L11).
-# Driven by the L02 ceremony contract (Step 4, EL L24-28): a DISCHARGE obligation records its
-# K1 stub and does NOT execute; only EXECUTE obligations run. The unconditional
-# MITIGATION->DESIGN->CRITIQUE->PLAN chain disappears on the Trace-A fast path as a
-# ceremony-routing consequence, not a hard-coded reorder patch (addendum §4.1).
+# Canonical front-end planner stages -> their lifecycle Layer (L03-L11).
+# Driven by the L02 ceremony contract (EL L24-28): a DISCHARGE obligation records its
+# K1 stub and does NOT execute; only EXECUTE obligations run.
 FRONTEND_PLANNER_STAGES: tuple[tuple[StageId, Layer], ...] = (
+    (StageId.RE_DERIVE, Layer.L03),
+    (StageId.IDEATE, Layer.L04),
+    (StageId.RESEARCH, Layer.L05),
+    (StageId.TRADEOFF, Layer.L06),
     (StageId.MITIGATION, Layer.L07),
     (StageId.DESIGN, Layer.L08),
     (StageId.CRITIQUE, Layer.L09),
+    (StageId.ADVERSARIAL_REVIEW, Layer.L10),
     (StageId.PLAN, Layer.L11),
+)
+
+# Canonical post-seal evolution stages -> their lifecycle Layer (L17-L18).
+POST_SEAL_EVOLUTION_STAGES: tuple[tuple[StageId, Layer], ...] = (
+    (StageId.RETROSPECT, Layer.L17),
+    (StageId.MEMORY_UPDATE, Layer.L18),
 )
 
 
@@ -309,13 +318,14 @@ class SoftLoop:
                 if decision.ceremony.obligation_for(layer) is Obligation.DISCHARGE:
                     continue
                 scars = self._scar_refs(goal_signature, stage)
+                session_name = "adversary" if stage is StageId.ADVERSARIAL_REVIEW else ("critic" if stage is StageId.CRITIQUE else "planner")
                 result = self._playbook.run_stage(
-                    goal_id=goal_id, run_id=run_id, stage=stage, session="planner",
+                    goal_id=goal_id, run_id=run_id, stage=stage, session=session_name,
                     budget=decision.budget, scars=scars, context_refs=tuple(planner_artifacts),
                     detail=goal_detail,
                 )
                 budget.charge(result.cost)
-                self._record_stage(run_id, goal_id, stage, "planner", result)
+                self._record_stage(run_id, goal_id, stage, session_name, result)
                 planner_artifacts.extend(result.artifacts)
                 # Entry 143: score the ARTIFACT the stage produced (not the goal objective,
                 # which is identical every stage and made all scores identical), and record
@@ -460,6 +470,51 @@ class SoftLoop:
             goal_id=goal_id, run_id=run_id, artifact_bundle=bundle.bundle_hash,
             verdict_ref=verdict_ref, adversary_ref=adversary.trace_ref,
         )
+
+        # --- Post-Seal Evolution Stages (EL L17-L18 / Trace-B): Retrospect & Memory Update ---
+        try:
+            for stage, layer in POST_SEAL_EVOLUTION_STAGES:
+                if decision.ceremony.obligation_for(layer) is Obligation.EXECUTE:
+                    evo_res = self._playbook.run_stage(
+                        goal_id=goal_id, run_id=run_id, stage=stage, session="evolution",
+                        budget=decision.budget, context_refs=(ArtifactRef(hash=seal.seal_hash, type="seal"),),
+                        detail=goal_detail,
+                    )
+                    budget.charge(evo_res.cost)
+                    self._record_stage(run_id, goal_id, stage, "evolution", evo_res)
+                    self._sidecar_scorer.score_stage(
+                        run_id=run_id,
+                        stage=stage,
+                        primary_model=evo_res.cost.model_ver,
+                        artifact_content=(
+                            self._cas.get(evo_res.artifacts[0].hash).decode("utf-8", errors="replace")
+                            if evo_res.artifacts
+                            else goal_detail
+                        ),
+                    )
+
+            # --- L19 (EVOLVE): Constitutional Evolution (Triggered for KERNEL_TOUCHING) ---
+            if decision.weight_class is WeightClass.KERNEL_TOUCHING:
+                evolve_res = self._playbook.run_stage(
+                    goal_id=goal_id, run_id=run_id, stage=StageId.EVOLVE, session="ratifier",
+                    budget=decision.budget, context_refs=(ArtifactRef(hash=seal.seal_hash, type="seal"),),
+                    detail=goal_detail,
+                )
+                budget.charge(evolve_res.cost)
+                self._record_stage(run_id, goal_id, StageId.EVOLVE, "ratifier", evolve_res)
+                self._sidecar_scorer.score_stage(
+                    run_id=run_id,
+                    stage=StageId.EVOLVE,
+                    primary_model=evolve_res.cost.model_ver,
+                    artifact_content=(
+                        self._cas.get(evolve_res.artifacts[0].hash).decode("utf-8", errors="replace")
+                        if evolve_res.artifacts
+                        else goal_detail
+                    ),
+                )
+        except BudgetExceeded as exc:
+            return RunOutcome(RunStatus.HALTED, goal_id, f"budget breach at evolution: {exc}", seal=seal, verdict=verdict)
+
         return RunOutcome(RunStatus.SEALED, goal_id, "sealed", seal=seal, verdict=verdict)
 
     def _record_stage(

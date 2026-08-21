@@ -11,9 +11,16 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
-# --- secrets / keys (PAEOS-8 §9 T2: signing keys live OUT of the repo) ---
+# --- secrets / keys (PAEOS-8 §9 T2: signing keys & API credentials live OUT of the repo) ---
 ops/keys/*
 !ops/keys/.gitkeep
+.env
+.env.*
+!.env.example
+*.key
+.config/
+
+
 
 # --- runtime content-addressable stores & transient state (immutable blobs, rebuildable; ledger stays tracked) ---
 .paeos_state/cas/

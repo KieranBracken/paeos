@@ -133,9 +133,9 @@ def test_invokers_fail_loud_on_cli_error() -> None:
     assert "timeout_transcript" not in HYBRID_SOURCE  # the silent timeout-transcript path is gone
 
 
-def test_root_submit_evidence_script_takes_real_arguments() -> None:
-    script = (REPO / "submit_evidence.py").read_text(encoding="utf-8")
+def test_submit_evidence_script_takes_real_arguments() -> None:
+    script = (REPO / "ops" / "submit_evidence.py").read_text(encoding="utf-8")
     assert "dummy_hash_for_now" not in script
     assert "dummy_env" not in script
-    assert "sys.argv" in script  # artifact + command are now required inputs
-    assert "artifact_path.read_bytes()" in script
+    assert "required=True" in script  # artifact + command are now required inputs
+    assert "--artifact-hash" in script

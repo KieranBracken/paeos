@@ -1,0 +1,142 @@
+"""
+PAEOS Model Router — Deterministic AIMD Rate & Admission Controller
+"""
+from __future__ import annotations
+
+import math
+import time
+from typing import Dict, Optional, Tuple
+
+from paeos.model_router.state import RouterStateDB
+from paeos.model_router.types import (
+    NormalizedError,
+    NormalizedErrorType,
+    ProviderHealth,
+    ProviderId,
+)
+
+
+# Configurable safety ceilings (fallback defaults, not immutable provider limits)
+DEFAULT_PUBLISHED_LIMITS: Dict[ProviderId, Dict[str, int]] = {
+    ProviderId.GOOGLE: {
+        "max_rpm": 12,       # Conservative 80% default for standard tier
+        "max_tpm": 800_000,
+        "max_rpd": 1200,
+    },
+    ProviderId.OPENROUTER: {
+        "max_rpm": 20,
+        "max_tpm": 200_000,
+        "max_rpd": 50,       # Strict 50 free req/day allowance
+    },
+}
+
+
+class AIMDController:
+    def __init__(
+        self,
+        state_db: RouterStateDB,
+        custom_limits: Optional[Dict[ProviderId, Dict[str, int]]] = None,
+    ):
+        self.state_db = state_db
+        self.limits = custom_limits or DEFAULT_PUBLISHED_LIMITS
+
+    def check_admission(
+        self,
+        provider_id: ProviderId,
+        estimated_tokens: int = 2000,
+    ) -> Tuple[bool, Optional[str]]:
+        """
+        Multidimensional admission check: (Concurrency) AND (RPM < Target) AND (TPM < Target) AND (RPD < Target)
+        """
+        state = self.state_db.get_provider_state(provider_id)
+        health = state["health_status"]
+
+        # 1. Health check & Cooldown recovery
+        now = time.time()
+        cooldown_until = state["cooldown_until"]
+        if health == ProviderHealth.COOLDOWN.value:
+            if cooldown_until and now >= cooldown_until:
+                # Recover conservatively at concurrency=1
+                self.state_db.set_health(provider_id, ProviderHealth.HEALTHY)
+                self.state_db.update_concurrency(provider_id, 1)
+                health = ProviderHealth.HEALTHY.value
+            else:
+                remaining = max(0.0, (cooldown_until - now) if cooldown_until else 0.0)
+                return False, f"Provider {provider_id.value} in COOLDOWN ({remaining:.1f}s remaining)"
+
+        if health in (ProviderHealth.EXHAUSTED.value, ProviderHealth.QUARANTINED.value, ProviderHealth.UNAVAILABLE.value):
+            return False, f"Provider {provider_id.value} is {health}"
+
+        # 2. Concurrency Limit Check
+        current_limit = state["current_concurrency"]
+        active = state["active_requests"]
+        if active >= current_limit:
+            return False, f"Concurrency limit reached ({active}/{current_limit})"
+
+        # 3. Dynamic Ceiling Check
+        limits = self.limits.get(provider_id)
+        if limits:
+            rpm, tpm, rpd, _ = self.state_db.get_window_usage(provider_id)
+            if limits.get("max_rpm") and rpm >= limits["max_rpm"]:
+                return False, f"RPM safety ceiling reached ({rpm}/{limits['max_rpm']})"
+            if limits.get("max_tpm") and (tpm + estimated_tokens) >= limits["max_tpm"]:
+                return False, f"TPM safety ceiling reached ({tpm + estimated_tokens}/{limits['max_tpm']})"
+            if limits.get("max_rpd") and rpd >= limits["max_rpd"]:
+                self.state_db.set_health(provider_id, ProviderHealth.EXHAUSTED)
+                return False, f"RPD allowance exhausted ({rpd}/{limits['max_rpd']})"
+
+        return True, None
+
+    def on_success(self, provider_id: ProviderId, latency_ms: float) -> None:
+        """
+        Additive Increase (+1): Increment concurrency after 60s of healthy operation
+        with 0 429s and error rate < 1%.
+        """
+        state = self.state_db.get_provider_state(provider_id)
+        now = time.time()
+        healthy_since = state["consecutive_healthy_since"] or now
+
+        # Ensure state is HEALTHY
+        if state["health_status"] != ProviderHealth.HEALTHY.value:
+            self.state_db.set_health(provider_id, ProviderHealth.HEALTHY)
+
+        if (now - healthy_since) >= 60.0:
+            metrics = self.state_db.get_recent_metrics(provider_id, window_seconds=60.0)
+            if metrics["recent_429_rate"] == 0.0 and metrics["error_rate"] < 0.01:
+                current = state["current_concurrency"]
+                max_c = state["max_concurrency"]
+                if current < max_c:
+                    new_c = current + 1
+                    self.state_db.update_concurrency(provider_id, new_c)
+                    self.state_db.set_health(provider_id, ProviderHealth.HEALTHY)
+
+    def on_rate_limit(self, provider_id: ProviderId, error: NormalizedError) -> float:
+        """
+        Multiplicative Decrease (x0.5): Halve concurrency on 429, enforce cooldown.
+        Returns cooldown duration in seconds.
+        """
+        state = self.state_db.get_provider_state(provider_id)
+        current = state["current_concurrency"]
+        new_c = max(1, math.floor(current * 0.5))
+
+        cooldown = error.retry_after if (error.retry_after and error.retry_after > 0) else 30.0
+
+        self.state_db.update_concurrency(provider_id, new_c)
+        self.state_db.set_health(
+            provider_id=provider_id,
+            health=ProviderHealth.COOLDOWN,
+            error_type=NormalizedErrorType.RATE_LIMITED,
+            cooldown_seconds=cooldown,
+        )
+        return cooldown
+
+    def on_error(self, provider_id: ProviderId, error: NormalizedError) -> None:
+        """Handle other non-429 errors."""
+        if error.error_type == NormalizedErrorType.AUTH_FAILED:
+            self.state_db.set_health(provider_id, ProviderHealth.QUARANTINED, error_type=error.error_type)
+        elif error.error_type == NormalizedErrorType.QUOTA_EXHAUSTED:
+            self.state_db.set_health(provider_id, ProviderHealth.EXHAUSTED, error_type=error.error_type)
+        elif error.error_type == NormalizedErrorType.PROVIDER_UNAVAILABLE:
+            self.state_db.set_health(
+                provider_id, ProviderHealth.COOLDOWN, error_type=error.error_type, cooldown_seconds=error.retry_after or 60.0
+            )

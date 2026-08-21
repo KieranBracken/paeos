@@ -64,6 +64,11 @@ def _evidence(claim_id: str, command: str, stdout: str) -> Evidence:
 
 def _writes(impl_path: str = "runtime/feature.py") -> dict[StageId, tuple[AgentWrite, ...]]:
     return {
+        StageId.RE_DERIVE: (AgentWrite("derive/derive.md", b"derivation"),),
+        StageId.IDEATE: (AgentWrite("ideate/ideate.md", b"ideation"),),
+        StageId.RESEARCH: (AgentWrite("research/research.md", b"research"),),
+        StageId.TRADEOFF: (AgentWrite("tradeoff/tradeoff.md", b"tradeoff"),),
+        StageId.MITIGATION: (AgentWrite("mitigation/mitigation.md", b"mitigation"),),
         StageId.DESIGN: (AgentWrite("design/design.md", b"design"),),
         StageId.CRITIQUE: (AgentWrite("critique/critique.md", b"critique"),),
         StageId.PLAN: (AgentWrite("plan/plan.md", b"plan"),),
@@ -71,6 +76,8 @@ def _writes(impl_path: str = "runtime/feature.py") -> dict[StageId, tuple[AgentW
         StageId.ADVERSARIAL_REVIEW: (
             AgentWrite("review/adversary_report.md", b"no dissent\nVERDICT: PASS\n"),
         ),
+        StageId.RETROSPECT: (AgentWrite("retrospect/retro.md", b"retrospect"),),
+        StageId.MEMORY_UPDATE: (AgentWrite("memory/scar.md", b"scar"),),
     }
 
 
@@ -106,12 +113,26 @@ def test_unattended_run_reaches_seal() -> None:
     assert outcome.status is RunStatus.SEALED
     assert outcome.seal is not None
     assert outcome.verdict is not None and outcome.verdict.outcome is VerdictOutcome.PASS
-    # all four roles ran, in order
+    # all required Trace-B stages ran, in exact canonical order
     assert runtime.stages_run == [
-        StageId.MITIGATION, StageId.DESIGN, StageId.CRITIQUE, StageId.PLAN, StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW,
+        StageId.RE_DERIVE,
+        StageId.IDEATE,
+        StageId.RESEARCH,
+        StageId.TRADEOFF,
+        StageId.MITIGATION,
+        StageId.DESIGN,
+        StageId.CRITIQUE,
+        StageId.ADVERSARIAL_REVIEW,
+        StageId.PLAN,
+        StageId.IMPLEMENT,
+        StageId.ADVERSARIAL_REVIEW,
+        StageId.RETROSPECT,
+        StageId.MEMORY_UPDATE,
     ]
-    # Planner and Builder roles were correctly scoped
+    # Planner, Critic, Adversary, Builder roles were correctly scoped
+    assert runtime.packages[StageId.RE_DERIVE].role is Role.PLANNER
     assert runtime.packages[StageId.DESIGN].role is Role.PLANNER
+    assert runtime.packages[StageId.CRITIQUE].role is Role.CRITIC
     assert runtime.packages[StageId.IMPLEMENT].role is Role.BUILDER
     assert runtime.packages[StageId.ADVERSARIAL_REVIEW].role is Role.ADVERSARY
     # Trace-B never discharges: no LAYER_DISCHARGED rows in the ledger
@@ -394,3 +415,83 @@ def test_file_court_evidence_pool_roundtrips(tmp_path: object) -> None:
     assert got[0].result == _GOOD_EVIDENCE[0].result
     # a fresh pool over the same dir reads the durably-persisted submissions (cross-process)
     assert len(FileCourtEvidencePool(Path(str(tmp_path)) / "court").evidence_for("r-1")) == 2
+
+
+def test_omitted_trace_b_stage_fails() -> None:
+    # Remand requirement: Prove that omitting any required Trace-B stage is strictly caught
+    runtime = ScriptedRuntime(_writes())
+    loop = _loop(runtime)
+    outcome = loop.run(
+        objective="add feature()", changed_paths=("runtime/feature.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,  # Trace-B full ceremony
+    )
+    assert outcome.status is RunStatus.SEALED
+    
+    # Assert every single canonical Trace-B obligation was executed
+    expected_obligations = [
+        StageId.RE_DERIVE, StageId.IDEATE, StageId.RESEARCH, StageId.TRADEOFF,
+        StageId.MITIGATION, StageId.DESIGN, StageId.CRITIQUE, StageId.ADVERSARIAL_REVIEW,
+        StageId.PLAN, StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW,
+        StageId.RETROSPECT, StageId.MEMORY_UPDATE,
+    ]
+    for required in expected_obligations:
+        assert required in runtime.stages_run, f"Trace-B failed: missing required obligation {required}"
+
+
+def test_l19_trigger_and_non_trigger_semantics() -> None:
+    # 1. Non-triggering run (SUBSTANTIAL): L19 is lawfully NOT executed
+    runtime_non_trigger = ScriptedRuntime(_writes())
+    loop_non_trigger = _loop(runtime_non_trigger)
+    outcome_non_trigger = loop_non_trigger.run(
+        objective="substantial non-kernel feature", changed_paths=("runtime/feature.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,  # Substantial weight class
+    )
+    assert outcome_non_trigger.status is RunStatus.SEALED
+    assert StageId.EVOLVE not in runtime_non_trigger.stages_run
+
+    # 2. Triggering run (KERNEL_TOUCHING): L19 is executed and records stage
+    writes_kernel = {
+        **_writes(impl_path="kernel/mod.py"),
+        StageId.EVOLVE: (AgentWrite("constitution/amendment.md", b"amendment"),),
+    }
+    runtime_trigger = ScriptedRuntime(writes_kernel)
+    loop_trigger = _loop(runtime_trigger)
+    outcome_trigger = loop_trigger.run(
+        objective="touch kernel", changed_paths=("kernel/mod.py",),
+        plan_write_scopes=("kernel/mod.py",), builder_evidence=_GOOD_EVIDENCE,
+    )
+    assert outcome_trigger.status is RunStatus.SEALED
+    assert StageId.EVOLVE in runtime_trigger.stages_run
+    assert runtime_trigger.packages[StageId.EVOLVE].role is Role.RATIFIER
+
+
+def test_l10_l14_discrimination() -> None:
+    # Remand requirement: Prove L10 (pre-build design review) and L14 (post-build verification)
+    # are unambiguously discriminated at their distinct execution sites
+    runtime = ScriptedRuntime(_writes())
+    loop = _loop(runtime)
+    outcome = loop.run(
+        objective="add feature()", changed_paths=("runtime/feature.py",),
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        reversible=False,
+    )
+    assert outcome.status is RunStatus.SEALED
+
+    # Find the two occurrences of ADVERSARIAL_REVIEW in the execution trace
+    adv_indices = [i for i, s in enumerate(runtime.stages_run) if s is StageId.ADVERSARIAL_REVIEW]
+    assert len(adv_indices) == 2
+    l10_idx, l14_idx = adv_indices
+
+    # L10 must execute before PLAN and IMPLEMENT
+    impl_idx = runtime.stages_run.index(StageId.IMPLEMENT)
+    plan_idx = runtime.stages_run.index(StageId.PLAN)
+    assert l10_idx < plan_idx < impl_idx
+
+    # L14 must execute after IMPLEMENT
+    assert impl_idx < l14_idx
+
+    # L10 receives design/critique context; L14 receives sealed IBM bundle
+    assert runtime.packages[StageId.ADVERSARIAL_REVIEW].role is Role.ADVERSARY
+    assert any(ref.type == "evidence" for ref in runtime.packages[StageId.ADVERSARIAL_REVIEW].context_refs)

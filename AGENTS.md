@@ -24,3 +24,12 @@
    * Parses open anomaly flags and Court remand root causes documented by the Auditor.
    * Executes necessary runtime/code remediations, verifies test suite pass status (`uv run pytest`), and logs resolution to the notebook and [`MessyChangesNeedsReview.md`](file:///Users/bob/GitHub/paeos/MessyChangesNeedsReview.md).
 
+3. **Pre-Prompt Anti-Drift Checkpoint Protocol (Mandatory Before Every Turn)**:
+   * Must reference and verify against [`docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md`](file:///Users/bob/GitHub/paeos/docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md) before dispatching any prompt, execution task, or architectural refactor.
+   * **Invariants to verify before every turn:**
+     1. *State Independence:* PAEOS owns local canonical state (tasks, history, tools, diffs, debt ledger). Models are stateless compute.
+     2. *Layer Separation:* Layer 3 (Antigravity/Supervisor) $\rightarrow$ Layer 2 (PAEOS Policy Router) $\rightarrow$ Layer 1 (LiteLLM Gateway @ localhost:4000).
+     3. *Heterogeneous Audit:* Reviewer family must differ from builder family (`Builder != Auditor`).
+     4. *Economy of Reasoning:* Match task criticality to model capability; preserve scarce high-reasoning quotas.
+
+
