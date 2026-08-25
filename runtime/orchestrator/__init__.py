@@ -207,6 +207,9 @@ class SoftLoop:
         cas: CAS,
         agent_runtime: AgentRuntime,
         budget_by_class: Mapping[WeightClass, Budget],
+        # DEBT-0057: persistence is explicit at the composition root — the loop never
+        # constructs its own scorer, so no repository-relative default can reappear here.
+        sidecar_scorer: SidecarStageScorer,
         court: Court | None = None,
         scar_store: ScarStore | None = None,
         ibm: InformationBarrierManager | None = None,
@@ -226,7 +229,7 @@ class SoftLoop:
         self._review = ReviewHarness(self._ibm, dispatcher)
         self._scars = scar_store if scar_store is not None else ScarStore()
         self._seal = SealAuthority(signing_key, ledger)
-        self._sidecar_scorer = SidecarStageScorer()
+        self._sidecar_scorer = sidecar_scorer  # DEBT-0057: injected — never self-constructed
 
     @property
     def scar_store(self) -> ScarStore:

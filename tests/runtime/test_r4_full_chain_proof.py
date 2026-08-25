@@ -16,6 +16,7 @@ from runtime.ceremony import Layer
 from runtime.court import VerdictOutcome
 from runtime.memory import ScarStore
 from runtime.orchestrator import RunStatus, SoftLoop
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
 
 
@@ -97,6 +98,7 @@ def _loop(runtime: ScriptedRuntime, *, scar_store: ScarStore | None = None) -> S
         agent_runtime=runtime,
         budget_by_class=_BUDGETS,
         scar_store=scar_store,
+        sidecar_scorer=SidecarStageScorer(None),  # DEBT-0057: explicitly non-persistent
     )
 
 

@@ -41,6 +41,7 @@ from runtime.scheduler import (
     GlobalBudget,
 )
 from runtime.selfhost import DEFAULT_BUDGETS, parse_backlog
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.transports.mcp.transport import McpWorkerTransport
 
 
@@ -109,6 +110,8 @@ def build_scheduler(
         agent_runtime=runtime,
         budget_by_class=DEFAULT_BUDGETS,
         repo_root=repo_root,  # B2.N: the court verifies each command in a workspace WITH the change
+        # DEBT-0057: persistence is explicit — state-dir-owned, never repository-relative.
+        sidecar_scorer=SidecarStageScorer(state_dir.resolve() / "evaluations"),
     )
     evolution = EvolutionLayer(scar_store=loop.scar_store)  # sole L3 author (Stage 17)
     evolution_lock = threading.Lock()  # IP-0005: serialize L3 authoring under parallel execution

@@ -16,6 +16,7 @@ from kernel.types import StageId, WeightClass
 from nacl.signing import SigningKey
 from runtime.claude_code import AgentWrite, RunOutput
 from runtime.orchestrator import EvidenceSource, RunStatus, SoftLoop
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
 from runtime.transport import WorkerTransport
 from runtime.transports.mcp.court_server import build_court_mcp_server
@@ -77,6 +78,7 @@ def test_soft_loop_seals_on_mcp_submitted_evidence(tmp_path: Path) -> None:
     loop = SoftLoop(
         ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
         cas=CAS(InMemoryCasStore()), agent_runtime=_Runtime(), budget_by_class=_BUDGETS,
+        sidecar_scorer=SidecarStageScorer(None),  # DEBT-0057: explicitly non-persistent
     )
     outcome = loop.run(
         objective="x", changed_paths=("runtime/f.py",),

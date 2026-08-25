@@ -15,6 +15,7 @@ from kernel.types import StageId, WeightClass
 from nacl.signing import SigningKey
 from runtime.claude_code import AgentWrite, RunOutput
 from runtime.orchestrator import RunStatus, SoftLoop
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
 from runtime.transport import WorkerTransport
 from runtime.transports.claude_cli import ClaudeCliWorkerTransport
@@ -86,6 +87,7 @@ def test_soft_loop_seals_autonomously_via_claude_cli_transport(tmp_path: Path) -
     loop = SoftLoop(
         ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
         cas=CAS(InMemoryCasStore()), agent_runtime=transport, budget_by_class=_BUDGETS,
+        sidecar_scorer=SidecarStageScorer(None),  # DEBT-0057: explicitly non-persistent
     )
     outcome = loop.run(
         objective="x", changed_paths=("runtime/f.py",),

@@ -6,6 +6,9 @@ across runs (soft-loop self-improvement), and every run is recorded on the share
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
 from kernel.cas import CAS, InMemoryCasStore, content_hash
 from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
 from kernel.ledger import InMemoryLedgerStore, Ledger
@@ -15,6 +18,7 @@ from runtime.claude_code import AgentWrite, RunOutput
 from runtime.evolution import EvolutionLayer
 from runtime.memory import ScarDraft, ScarStore
 from runtime.orchestrator import Intake, RunStatus, SelfHostRunner, SoftLoop
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
 
 _CODE = b"def x() -> int:\n    return 1\n"
@@ -66,6 +70,7 @@ def _runner(runtime: ScriptedRuntime, scar_store: ScarStore | None = None) -> Se
         ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
         cas=CAS(InMemoryCasStore()), agent_runtime=runtime, budget_by_class=_BUDGETS,
         scar_store=scar_store,
+        sidecar_scorer=SidecarStageScorer(None),  # DEBT-0057: explicitly non-persistent
     )
     return SelfHostRunner(loop)
 
@@ -132,4 +137,21 @@ def test_infer_write_scopes() -> None:
         explicit_scopes=(),
     )
     assert scopes == ("runtime/selfhost.py", "sakg/", "tests/")
+
+
+def test_selfhost_default_run_creates_no_repository_relative_evaluations(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from runtime.selfhost import run_backlog
+
+    monkeypatch.chdir(tmp_path)
+    outcomes = run_backlog(
+        [_intake(_GOOD)],
+        ledger=Ledger(InMemoryLedgerStore()),
+        signing_key=SigningKey.generate(),
+        cas=CAS(InMemoryCasStore()),
+        agent_runtime=ScriptedRuntime(),
+    )
+    assert outcomes
+    assert not (tmp_path / ".paeos_state").exists()
 

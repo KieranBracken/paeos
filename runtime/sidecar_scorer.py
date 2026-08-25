@@ -59,9 +59,19 @@ class SidecarScore:
 class SidecarStageScorer:
     """Evaluates and scores artifacts emitted at each stage using a decorrelated sidecar model."""
 
-    def __init__(self, storage_dir: Path | str = ".paeos_state/evaluations") -> None:
-        self._storage_dir = Path(storage_dir)
-        self._storage_dir.mkdir(parents=True, exist_ok=True)
+    def __init__(self, storage_dir: Path | str | None) -> None:
+        # DEBT-0057: persistence is EXPLICIT — `None` means non-persistent (hermetic) scoring;
+        # there is no repository-relative default. Production composition roots pass a
+        # state-dir-owned path; unit/self-host paths pass `None` or a fixture-owned directory.
+        self._storage_dir = None if storage_dir is None else Path(storage_dir).resolve()
+        if self._storage_dir is not None:
+            self._storage_dir.mkdir(parents=True, exist_ok=True)
+
+    def _persist(self, run_id: str, stage: StageId, payload: dict[str, Any]) -> None:
+        if self._storage_dir is None:
+            return
+        out_path = self._storage_dir / f"{run_id}_{stage.name}_score.json"
+        out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     def score_stage(
         self,
@@ -118,7 +128,6 @@ class SidecarStageScorer:
             suggestions=tuple(suggestions),
         )
 
-        out_path = self._storage_dir / f"{run_id}_{stage.name}_score.json"
-        out_path.write_text(json.dumps(score_obj.to_dict(), indent=2), encoding="utf-8")
+        self._persist(run_id, stage, score_obj.to_dict())
         logger.info("Sidecar scored stage %s for run %s: %d/100 (%s)", stage.name, run_id, overall, verdict.value)
         return score_obj

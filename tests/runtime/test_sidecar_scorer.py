@@ -3,8 +3,25 @@
 import json
 from pathlib import Path
 
+import pytest
 from kernel.types import StageId
 from runtime.sidecar_scorer import ScoreVerdict, SidecarScore, SidecarStageScorer
+
+
+def test_nonpersistent_scorer_creates_no_runtime_tree(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    scorer = SidecarStageScorer(storage_dir=None)
+
+    result = scorer.score_stage(
+        run_id="r-hermetic",
+        stage=StageId.RESEARCH,
+        artifact_content="objective test assertion",
+    )
+
+    assert result.stage == StageId.RESEARCH.name
+    assert not (tmp_path / ".paeos_state").exists()
 
 
 def test_sidecar_stage_scorer_evaluation(tmp_path: Path) -> None:

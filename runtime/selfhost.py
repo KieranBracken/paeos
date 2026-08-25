@@ -34,6 +34,7 @@ from runtime.evolution import EvolutionLayer
 from runtime.friction import FrictionCategory, classify_friction, record_friction
 from runtime.memory import ScarStore
 from runtime.orchestrator import Intake, RunOutcome, SelfHostRunner, SoftLoop
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget
 
 __all__ = [
@@ -198,6 +199,8 @@ def run_backlog(
         agent_runtime=agent_runtime,
         budget_by_class=budget_by_class if budget_by_class is not None else DEFAULT_BUDGETS,
         scar_store=scar_store,
+        # DEBT-0057: explicitly non-persistent (hermetic) — no repository-relative default.
+        sidecar_scorer=SidecarStageScorer(None),
         repo_root=repo_root,
     )
     runner = SelfHostRunner(loop)

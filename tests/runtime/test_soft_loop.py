@@ -17,6 +17,7 @@ from runtime.ceremony import Layer
 from runtime.court import VerdictOutcome
 from runtime.memory import ScarDraft, ScarStore
 from runtime.orchestrator import RunStatus, SoftLoop
+from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
 
 _CODE = b"def feature() -> int:\n    return 42\n"
@@ -88,6 +89,7 @@ def _loop(runtime: ScriptedRuntime, *, scar_store: ScarStore | None = None,
         cas=CAS(InMemoryCasStore()), agent_runtime=runtime,
         budget_by_class=budgets if budgets is not None else _BUDGETS,
         scar_store=scar_store,
+        sidecar_scorer=SidecarStageScorer(None),  # DEBT-0057: explicitly non-persistent
     )
 
 
@@ -247,6 +249,7 @@ def test_vacuous_evidence_remands_under_verification(tmp_path: object) -> None:
         ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
         cas=CAS(InMemoryCasStore()), agent_runtime=ScriptedRuntime(_writes()),
         budget_by_class=_BUDGETS, repo_root=repo,
+        sidecar_scorer=SidecarStageScorer(None),
     )
     outcome = loop.run(
         objective="x", changed_paths=("runtime/feature.py",),
