@@ -189,12 +189,12 @@ def freeze_historical_state(
     archive_dir = Path(archive_root) / archive_id
     try:
         archive_dir.parent.mkdir(parents=True, exist_ok=True)
-        os.mkdir(archive_dir)
+        os.mkdir(archive_dir, 0o700)
     except FileExistsError as exc:
         raise MigrationError(f"archive already exists: {archive_dir}") from exc
 
     state_root = archive_dir / "state"
-    os.mkdir(state_root)
+    os.mkdir(state_root, 0o700)
 
     initial = manifest_tree(source_root)
 

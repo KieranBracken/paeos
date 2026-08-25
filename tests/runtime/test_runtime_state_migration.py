@@ -36,6 +36,8 @@ def test_archive_is_byte_exact_and_manifest_contains_no_secret_bytes(tmp_path: P
         archive_id="baseline",
         source_commit="a" * 40,
     )
+    assert stat.S_IMODE(frozen.archive_root.stat().st_mode) == 0o700
+    assert stat.S_IMODE(frozen.state_root.stat().st_mode) == 0o700
     assert manifest_digest(manifest_tree(source)) == frozen.manifest_hash
     assert manifest_digest(manifest_tree(frozen.state_root)) == frozen.manifest_hash
     metadata = frozen.metadata_path.read_bytes()
