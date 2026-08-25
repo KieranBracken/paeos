@@ -490,6 +490,17 @@ def _validate_record(record: TransactionRecord) -> None:
     if not isinstance(record.state, TransactionState):
         raise _protocol_error("state must be a TransactionState")
 
+    if record.state in {
+        TransactionState.CLAIMED,
+        TransactionState.RESPONDED,
+        TransactionState.CONSUMED,
+    } and (
+        record.lease_owner is None or record.lease_expires_at is None
+    ):
+        raise _protocol_error(
+            f"{record.state.value} requires an active lease"
+        )
+
     if record.lease_owner is None:
         if record.lease_expires_at is not None:
             raise _protocol_error("lease expiry requires a lease owner")
@@ -956,6 +967,44 @@ class TransactionStore:
         target = self._transaction_path(record.request_id)
         if not target.exists():
             raise _protocol_error("save requires an existing transaction record")
+
+        existing = self.load(record.request_id)
+        if (
+            len(record.transitions) != len(existing.transitions) + 1
+            or record.transitions[:-1] != existing.transitions
+        ):
+            raise _protocol_error("save requires exactly one appended reducer transition")
+
+        transition = record.transitions[-1]
+        claim_lease_owner = (
+            record.lease_owner
+            if transition.event is TransactionEvent.CLAIM
+            else None
+        )
+        claim_lease_expires_at = (
+            record.lease_expires_at
+            if transition.event is TransactionEvent.CLAIM
+            else None
+        )
+        changed_side_effect = (
+            record.last_side_effect
+            if record.last_side_effect != existing.last_side_effect
+            else None
+        )
+        expected = reduce_transaction(
+            existing,
+            transition.event,
+            actor=transition.actor,
+            at=transition.at,
+            lease_owner=claim_lease_owner,
+            lease_expires_at=claim_lease_expires_at,
+            last_side_effect=changed_side_effect,
+        )
+        if expected != record:
+            raise _protocol_error(
+                "save record does not match the pure reducer result"
+            )
+
         payload = (canonical_json(record) + "\n").encode("utf-8")
         fd, temp_name = tempfile.mkstemp(
             prefix=f".{target.name}.",

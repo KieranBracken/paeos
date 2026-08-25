@@ -293,7 +293,7 @@ def test_reducer_accepts_the_single_happy_path() -> None:
     )
 
 
-def test_claim_requires_a_lease_owner() -> None:
+def test_claim_requires_a_lease_owner(tmp_path: Path) -> None:
     prepared = reduce_transaction(
         valid_record(),
         TransactionEvent.PREPARE,
@@ -316,6 +316,14 @@ def test_claim_requires_a_lease_owner() -> None:
                 lease_expires_at=lease_expires_at,
             )
         assert prepared.state is TransactionState.PREPARED
+
+    store = TransactionStore(BridgePaths(tmp_path / "state"))
+    invalid_claimed = replace(
+        valid_record(),
+        state=TransactionState.CLAIMED,
+    )
+    with pytest.raises(ProtocolViolation):
+        store.create(invalid_claimed)
 
 
 def test_uncertain_side_effect_requires_reconciliation() -> None:
@@ -554,3 +562,19 @@ def test_duplicate_transaction_key_cannot_create_second_active_request(
     )
     assert first_path.read_bytes()
     assert not (paths.transactions / "req-002.json").exists()
+
+    with pytest.raises(ProtocolViolation):
+        store.save(replace(first, state=TransactionState.PREPARED))
+
+    prepared_for_save = reduce_transaction(
+        first,
+        TransactionEvent.PREPARE,
+        actor="builder",
+        at="2026-08-25T10:00:00+00:00",
+    )
+    with pytest.raises(ProtocolViolation):
+        store.save(
+            replace(prepared_for_save, transaction_key="e" * 64, run_id="run-drift")
+        )
+
+    assert store.load(first.request_id) == first
