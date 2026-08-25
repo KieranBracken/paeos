@@ -1,18 +1,21 @@
 # PAEOS Temporary Overseer Control-Plane Recovery Design
 
-- **Status:** Founder-approved written specification; implementation remains gated by the
-  subproject plan and per-task Overseer review
+- **Status:** Founder-approved written specification, including the guarded Codex-to-Antigravity
+  handoff amendment; implementation remains gated by the subproject plans and per-task review
 - **Classification:** `OPERATIONAL_RECOVERY_ONLY`
-- **Recovery branch:** `codex/control-plane-recovery-spec`
+- **Recovery implementation branch:** `codex/control-plane-recovery-s1-clean`
 - **Baseline commit:** `af83198192aef72e1ef88615e4ca586a449acb71`
 - **Founder approval:** 2026-08-25, Europe/London
+- **Founder-approved handoff amendment:** 2026-08-25, Europe/London
 
 ## 1. Purpose
 
 Restore a fail-closed control plane while Codex GPT-5.6 Sol temporarily assumes the
-Architect/Overseer role from Antigravity. Cline remains implementation-only. The recovery must
-remove the Chrome, clipboard, screen-lock, and unbound-terminal dependencies from the control
-path without changing the founder-ratified 19-layer engineering lifecycle.
+Architect/Overseer role from Antigravity. Cline remains implementation-only. Codex and
+Antigravity must be replaceable overseer adapters over the same local canonical state so quota or
+session rotation never strands the workflow inside a conversation. The recovery must remove the
+Chrome, clipboard, screen-lock, and unbound-terminal dependencies from the control path without
+changing the founder-ratified 19-layer engineering lifecycle.
 
 This is not a claim that PAEOS is R4-conformant, that SoftLoop implements all nineteen layers, or
 that historical seals are valid. The current recovery frontier remains:
@@ -101,13 +104,16 @@ Builder/Auditor pairing.
 
 ## 4. Recovery Decomposition
 
-The recovery is implemented as four independently reviewable subprojects. Failure in any
-subproject blocks the next one.
+The recovery is implemented as four independently reviewable subprojects. Their original numbers
+are retained for traceability, but the post-L17 safety order is **1 state migration -> 3 worker
+admission -> 2 overseer adapter -> 4 canary**. The overseer adapter may be implemented against
+fakes earlier, but it may not activate until worker admission passes. Failure at any gate blocks
+later activation.
 
 1. **State isolation and transaction safety foundation.** Make state roots injectable, introduce
    an explicit fail-closed transaction reducer, and prevent test writes to production state.
-2. **Codex overseer request/response adapter.** Replace browser copy/paste with an atomic file
-   queue consumed by a Codex automation.
+2. **Provider-neutral overseer request/response adapter and quota handoff.** Replace browser
+   copy/paste with an atomic local queue consumed by one active Codex or Antigravity adapter.
 3. **Cline worker admission and model provenance.** Admit only workers that demonstrate real tool
    execution, artifact creation, exact-command compliance, and attributable physical identity.
 4. **Controlled end-to-end canary.** Exercise the real path through a disposable intake before
@@ -218,36 +224,132 @@ outer loop stops processing that transaction immediately. It does not sleep and 
 exception text, transaction state, request envelope hash, and last confirmed side effect are
 preserved before the halt.
 
-## 6. Subproject 2 — Codex Overseer Adapter
+### 5.5 Evidence-aware tracked-state migration
 
-The temporary adapter replaces Chrome and Terminal automation; it does not wrap them. Execution
-and oversight remain separate planes:
+The 622 baseline paths beneath `.paeos_state` are historical runtime evidence, not source code.
+Migration is intentionally two-part:
+
+1. Freeze the existing tree into a dated external forensic archive. Record a sorted path, size,
+   mode, and SHA-256 manifest plus the source repository commit. Verify the copied archive before
+   changing the Git index. Secret bytes are never printed or embedded in the manifest.
+2. Remove every `.paeos_state` runtime path from Git tracking without rewriting repository
+   history, ignore the entire repository-local runtime root, and prove a clean checkout contains
+   no runtime state. Existing working files remain recoverable until the external archive is
+   independently verified.
+
+The archived `seal.key` belongs to a closed historical trust domain. It may verify archived
+records but may not mint new seals. Future execution starts under an explicit external state root
+with a newly generated signing key and new ledger genesis. The old public-key fingerprint,
+archive manifest, and trust cutoff are retained; the old seed is never copied back into an active
+state root. Credential-bearing provider settings are not inspected by migration code. Rotation
+of the separately exposed Cline credential remains a Founder/operator action and blocks live use
+until confirmed.
+
+Every component that can persist runtime data receives an explicit destination. In particular,
+`SoftLoop` may not construct a scorer that writes to a repository-relative default. Production
+entry points inject `<state_root>/evaluations`; unit tests either inject a fixture-owned directory
+or an explicitly non-persistent scorer.
+
+## 6. Subproject 2 — Provider-Neutral Overseer Adapter and Quota Handoff
+
+The temporary control plane replaces Chrome and Terminal automation; it does not wrap them.
+Execution and oversight remain separate planes, and overseer identity is an injected adapter
+binding rather than a hard-coded provider:
 
 Data flow:
 
 ```text
 Execution: PAEOS runtime -> bound Cline worker -> artifact/evidence -> PAEOS runtime
-Oversight: PAEOS runtime/worker event -> immutable request -> Codex automation
-           -> immutable response -> PAEOS runtime
+Oversight: PAEOS runtime/worker event -> immutable request -> active overseer adapter
+           (Codex or Antigravity) -> immutable response -> PAEOS runtime
 ```
 
-The Codex automation:
+### 6.1 Common adapter contract
+
+Codex and Antigravity implement the same narrow consumer contract. An adapter:
 
 1. Runs every two minutes, distinct from the fixed 60-minute forensic audit. If the automation
    backend cannot guarantee that fixed interval, subproject 2 stops for a Founder decision; it
    does not fall back to GUI automation.
 2. Ingests the notebook, inference-mesh spec, and canonical lifecycle before claiming work.
-3. Claims at most one unexpired request whose workspace and role bindings are exact.
+3. Proves it is the currently selected adapter and claims at most one unexpired request whose
+   workspace and role bindings are exact.
 4. Reviews the worker output and evidence without editing implementation files.
 5. Writes one correlated response atomically.
 6. Leaves remands as healthy back-pressure and reports exact counts.
 7. Refuses constitutional ratification, main/trunk promotion, unbound requests, and unknown model
    provenance.
 
-If the Codex task surface cannot expose a raw provider/model-family receipt, Codex may continue as
-Architect/Overseer but its response cannot serve as L14 decorrelated-audit proof. The request is
-then remanded for an independently attributable auditor; a task label or configured model name is
-not substituted for physical provenance.
+The provider drivers contain only scheduling and model-session invocation. Queue discovery,
+claim arbitration, correlation, disposition validation, checkpoint validation, and transaction
+updates live in one provider-neutral core. `runtime/integrations/antigravity.py` is an
+implementation-worker `AgentRuntime`; it is not silently reused as the overseer driver.
+
+### 6.2 Durable overseer checkpoint
+
+No continuation-critical state may exist only in a Codex or Antigravity conversation. Before a
+clean rotation, the active adapter atomically writes a canonical checkpoint beneath the injected
+state root. The checkpoint contains:
+
+- schema version, checkpoint ID, creation time, and previous-checkpoint hash;
+- repository path, branch, HEAD, worktree-status digest, and approved spec/plan hashes;
+- canonical lifecycle, inference-mesh spec, and notebook digests;
+- current subproject, implementation-plan task/step, last completed commit, and next authorized
+  action;
+- exact open debt, remands, incidents, decisions, and unresolved Founder/operator actions;
+- every nonterminal transaction ID, state, record digest, lease owner/expiry, and last confirmed
+  side effect;
+- raw test/evidence/log locations with hashes, never worker-authored summaries as authority;
+- active adapter ID, provider/model receipt when available, quota/session health, and handoff
+  reason.
+
+A human-readable handoff view is derived from this JSON checkpoint. The machine checkpoint is
+canonical. It complements `operations/CURRENT_STATE.md` and satisfies
+`operations/SESSION_CONTINUITY_PROTOCOL.md`; it does not create a twentieth lifecycle state.
+
+The incoming adapter must verify the checkpoint chain, governance hashes, repository state, and
+transaction digests, then emit a sentinel acceptance record before it can claim work. A mismatch
+produces `NEEDS_FOUNDER` and zero delivery attempts.
+
+### 6.3 Guarded activation and failover
+
+Exactly one adapter ID is selected in the local overseer registry. Selection does not transfer an
+in-flight request lease. Per-transaction commits use a cross-process lock and expected-prior
+digest so competing claimants cannot both report success; this repays DEBT-0059.
+
+A deterministic local activation coordinator—not either reasoning model—verifies checkpoints,
+sentinel records, transaction state, and the registry compare-and-swap. Codex and Antigravity may
+request a rotation or report quota state; neither may select itself or rewrite the activation
+preconditions.
+
+Guarded automatic Codex-to-Antigravity activation is allowed only when all of the following are
+machine-proven:
+
+1. A physical quota-exhaustion receipt or explicit clean-rotation request exists.
+2. The outgoing checkpoint is fully committed and verifies.
+3. The outgoing adapter owns no active `CLAIMED` transaction.
+4. The incoming Antigravity adapter verifies the checkpoint and writes its sentinel acceptance.
+5. The registry compare-and-swap records the old and new adapter IDs and checkpoint hash exactly
+   once.
+
+If any condition is absent, automatic failover is forbidden. A one-command Founder/operator
+activation remains available after the same verification. Timer expiry alone never changes the
+active adapter.
+
+If Codex stops after a possible external side effect, the deterministic coordinator moves the
+affected transaction to `RECONCILIATION_REQUIRED` after the lease is stale. Antigravity may resume
+unrelated authorized work from the durable checkpoint, but may not replay or transfer that
+transaction. Only explicit recovery authority may create a successor transaction. A stale claim
+with a fully correlated immutable response may be reconciled by consuming that response; it is
+not resent.
+
+### 6.4 Provenance and audit eligibility
+
+If an adapter surface cannot expose a raw provider/model-family receipt, it may continue in the
+Architect/Overseer role but its response cannot serve as L14 decorrelated-audit proof. The request
+is remanded for an independently attributable auditor; a task label, configured model name, or
+adapter ID is not substituted for physical provenance. Builder/Auditor family inequality is
+checked before dispatch and again from physical receipts after dispatch.
 
 The existing hourly `paeos-temporary-overseer` automation remains read-only and independent. A
 failure of the transaction adapter cannot disable or alter the hourly audit.
@@ -328,7 +430,15 @@ Subproject 1 is not complete until fresh evidence proves all of the following:
 
 - Running the full test suite in an isolated worktree leaves every production `.paeos_state` hash
   unchanged.
+- The external forensic archive manifest matches the preserved historical tree before any Git
+  index removal, and no secret bytes appear in the manifest or command output.
+- `git ls-files .paeos_state` returns no paths, a clean checkout contains no runtime state, and the
+  archived historical trust domain remains readable but is not used for new execution.
+- A new external state root creates a new signing key and ledger genesis without copying the old
+  seed; the historical trust cutoff and public-key fingerprint are recorded.
 - Test bridge state exists only under `tmp_path` and is cleaned by the test fixture.
+- Test scoring is fixture-owned or explicitly non-persistent; running the full suite creates no
+  repository-local evaluation files.
 - A duplicate logical event produces zero additional external sends.
 - An exception after a simulated send produces `RECONCILIATION_REQUIRED` and zero retries.
 - Missing or malformed acknowledgement fails closed.
@@ -338,6 +448,22 @@ Subproject 1 is not complete until fresh evidence proves all of the following:
 - Clean checkout test collection succeeds without relying on uncommitted files.
 - The focused tests pass, the full suite passes, and a mutation of each new safety check causes its
   corresponding test to fail.
+
+Subprojects 2 and 3 additionally require fresh evidence that:
+
+- two real competing claimant processes produce exactly one committed claim and one fail-closed
+  conflict, with no overwritten lease or duplicate response;
+- an inactive overseer adapter produces zero claims and zero responses;
+- a clean Codex-to-Antigravity rotation preserves the checkpoint chain and resumes at the exact
+  next authorized step without reissuing completed work;
+- a forced stop with an active claim enters `RECONCILIATION_REQUIRED` and produces zero replay;
+- a governance, repository, plan, or transaction digest mismatch causes `NEEDS_FOUNDER` before
+  any request claim;
+- automatic activation is impossible without a verified quota/rotation receipt, clean checkpoint,
+  zero outgoing active claims, incoming sentinel acceptance, and one registry compare-and-swap;
+- the worker admission probe preserves raw argv, stdout, stderr, exit status, tool events, artifact
+  hash, and physical model receipt independently of worker prose; and
+- Builder/Auditor inequality passes from physical receipts before and after dispatch.
 
 The verifier records commands, exit codes, stdout/stderr hashes, environment identity, git commit,
 and before/after production-state hashes. A bare "tests pass" statement is not evidence.
@@ -368,9 +494,16 @@ This recovery does not:
 ## 13. Review Gates
 
 1. Founder reviewed and approved this written specification on 2026-08-25.
-2. Architect writes the implementation plan for subproject 1 only.
-3. Cline implements the plan in an isolated recovery worktree using test-first steps.
-4. Codex independently reviews the diff and runs fresh verification.
-5. Founder decides whether to proceed to subproject 2.
+2. Subproject 1 implementation and L17 review identified DEBT-0057, DEBT-0058, and DEBT-0059;
+   the branch remains isolated and unpromoted.
+3. Founder approved guarded Codex-to-Antigravity failover and continuation of recovery on
+   2026-08-25.
+4. Architect writes a separate implementation plan for tracked-state migration, worker admission,
+   and the provider-neutral overseer adapter; each plan remains bounded by this specification.
+5. Cline implements approved production changes in the isolated recovery worktree using
+   failing-test-first steps. Codex supervises and preserves raw evidence.
+6. Every subproject receives fresh L13 verification, decorrelated L14 audit, and L17 review.
+7. Controlled canary, SAKG resumption, merge, push, and main/trunk promotion remain separately
+   gated by a later Founder decision.
 
 No later gate is implied by approval of an earlier gate.
