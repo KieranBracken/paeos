@@ -1,6 +1,0 @@
-Completed the IMPLEMENT stage for L06. 
-1. Added `TradeOffArtifact` contract to `kernel/types.py`.
-2. Appended `StageId.TRADEOFF` expectation to `test_soft_loop.py` tests.
-3. Updated `_TRADEOFF` in `runtime/agents/__init__.py` to dual output to `ops/backlogs/` and `tradeoff/`.
-4. Tests pass successfully in the sandbox.
-5. Submitted a non-vacuous, probative test evidence `grep TradeOffArtifact kernel/types.py` to the Court pool.

@@ -77,6 +77,9 @@ jobs:
           if git ls-files | grep -E '(^|/)ops/keys/.+' | grep -v '\.gitkeep$'; then
             echo "key material committed under ops/keys/ (§9 T2)"; exit 1
           fi
+          if git ls-files -- .paeos_state | grep -q .; then
+            echo "runtime state committed beneath .paeos_state"; exit 1
+          fi
           echo "F3 GREEN: lockfile present; no committed key material"
 
       - name: 'Architectural invariants (IP-0010 — AI-001..011 executed)'

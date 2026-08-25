@@ -22,9 +22,8 @@ ops/keys/*
 
 
 
-# --- runtime content-addressable stores & transient state (immutable blobs, rebuildable; ledger stays tracked) ---
-.paeos_state/cas/
-.paeos_state/evaluations/
+# Runtime state and evidence live under an explicit external state root.
+.paeos_state/
 .state/
 state_sakg/
 
