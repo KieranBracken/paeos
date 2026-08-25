@@ -90,6 +90,7 @@ def build_scheduler(
         from runtime.integrations.chat_bridge import ChatBridgeRuntime
 
         runtime = ChatBridgeRuntime(
+            state_root=state_dir.resolve(),
             workspace_source=repo_root,
             artifact_resolver=cas.get,
         )
