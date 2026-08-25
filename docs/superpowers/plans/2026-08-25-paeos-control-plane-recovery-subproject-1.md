@@ -23,8 +23,8 @@ pytest, Ruff, Pyright.
 
 - Classification is OPERATIONAL_RECOVERY_ONLY.
 - The code baseline is af83198192aef72e1ef88615e4ca586a449acb71. The implementation
-  branch starts from approved contract commit b8bdc65476a939da9b42ed430f87c6384a127f09
-  so the L11 design and plan remain traceable in the branch.
+  branch starts from the immutable tag paeos-control-plane-recovery-s1-contract-v1 so the
+  approved L11 design and this corrected plan remain traceable in the branch.
 - Implementation happens in a new isolated worktree on a codex/ branch. Never work in the dirty
   main checkout and never promote to main or trunk.
 - Cline paeos-code is the implementation worker. Codex GPT-5.6 Sol supervises, reviews, remands,
@@ -52,23 +52,24 @@ Before Task 1, Cline creates a clean worktree from the approved baseline:
 
     git worktree add -b codex/control-plane-recovery-s1 \
       /private/tmp/paeos-control-plane-recovery-s1 \
-      b8bdc65476a939da9b42ed430f87c6384a127f09
+      paeos-control-plane-recovery-s1-contract-v1
 
 Then verify:
 
     git -C /private/tmp/paeos-control-plane-recovery-s1 status --short --branch
-    git -C /private/tmp/paeos-control-plane-recovery-s1 rev-parse HEAD
+    git -C /private/tmp/paeos-control-plane-recovery-s1 \
+      describe --tags --exact-match HEAD
 
 Expected:
 
     ## codex/control-plane-recovery-s1
-    b8bdc65476a939da9b42ed430f87c6384a127f09
+    paeos-control-plane-recovery-s1-contract-v1
 
 Prove the approved contract commit changed no code relative to the code baseline:
 
     git diff --quiet \
       af83198192aef72e1ef88615e4ca586a449acb71 \
-      b8bdc65476a939da9b42ed430f87c6384a127f09 \
+      paeos-control-plane-recovery-s1-contract-v1 \
       -- . ':(exclude)docs/superpowers/specs/**' ':(exclude)docs/superpowers/plans/**'
 
 Expected: exit 0.
@@ -1151,9 +1152,9 @@ Hash every preserved transcript:
 
     git status --short --branch
     git log --oneline \
-      b8bdc65476a939da9b42ed430f87c6384a127f09..HEAD
+      paeos-control-plane-recovery-s1-contract-v1..HEAD
     git diff --stat \
-      b8bdc65476a939da9b42ed430f87c6384a127f09..HEAD
+      paeos-control-plane-recovery-s1-contract-v1..HEAD
 
 Expected: a clean codex/control-plane-recovery-s1 branch containing exactly the four reviewed
 implementation commits. Do not merge, rebase onto main, cherry-pick into main, push, or promote.
