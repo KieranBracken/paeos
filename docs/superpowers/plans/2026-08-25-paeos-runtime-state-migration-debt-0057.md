@@ -1,8 +1,8 @@
 # PAEOS Runtime-State Migration (DEBT-0057) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this
-> plan task-by-task. The current recovery contract forbids unrequested subagents. Steps use
-> checkbox (`- [ ]`) syntax for tracking.
+> **Execution control:** Cline receives one bounded implementation task at a time and performs no
+> skill or subagent routing. Codex applies the execution-plan discipline, independently verifies
+> each task, and accepts or remands it. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Preserve the historical `.paeos_state` evidence outside source control, establish a new
 external signing trust domain, eliminate repository-relative runtime writes, and prove that a
