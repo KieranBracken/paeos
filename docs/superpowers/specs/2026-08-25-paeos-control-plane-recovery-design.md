@@ -1,6 +1,7 @@
 # PAEOS Temporary Overseer Control-Plane Recovery Design
 
-- **Status:** Founder-approved design, pending Founder review of this written specification
+- **Status:** Founder-approved written specification; implementation remains gated by the
+  subproject plan and per-task Overseer review
 - **Classification:** `OPERATIONAL_RECOVERY_ONLY`
 - **Recovery branch:** `codex/control-plane-recovery-spec`
 - **Baseline commit:** `af83198192aef72e1ef88615e4ca586a449acb71`
@@ -366,7 +367,7 @@ This recovery does not:
 
 ## 13. Review Gates
 
-1. Founder reviews and approves this written specification.
+1. Founder reviewed and approved this written specification on 2026-08-25.
 2. Architect writes the implementation plan for subproject 1 only.
 3. Cline implements the plan in an isolated recovery worktree using test-first steps.
 4. Codex independently reviews the diff and runs fresh verification.
