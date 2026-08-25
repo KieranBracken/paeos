@@ -372,5 +372,13 @@ def derive_family_from_actual_model(
     if "nemotron" in model_lower:
         return ModelFamily.NEMOTRON
     
+    # Qwen patterns
+    if "qwen" in model_lower:
+        return ModelFamily.QWEN
+
+    # GPT patterns
+    if "gpt-" in model_lower or model_lower.startswith("gpt"):
+        return ModelFamily.GPT
+
     # Cannot determine family from model string
     return ModelFamily.UNKNOWN

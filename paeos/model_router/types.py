@@ -55,6 +55,8 @@ class ModelFamily(str, Enum):
     LAGUNA = "laguna"
     HY3 = "hy3"
     NEMOTRON = "nemotron"
+    GPT = "gpt"
+    QWEN = "qwen"
     UNKNOWN = "unknown"
 
 
