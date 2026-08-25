@@ -22,7 +22,9 @@ pytest, Ruff, Pyright.
 **Global Constraints:**
 
 - Classification is OPERATIONAL_RECOVERY_ONLY.
-- Baseline is commit af83198192aef72e1ef88615e4ca586a449acb71.
+- The code baseline is af83198192aef72e1ef88615e4ca586a449acb71. The implementation
+  branch starts from approved contract commit b8bdc65476a939da9b42ed430f87c6384a127f09
+  so the L11 design and plan remain traceable in the branch.
 - Implementation happens in a new isolated worktree on a codex/ branch. Never work in the dirty
   main checkout and never promote to main or trunk.
 - Cline paeos-code is the implementation worker. Codex GPT-5.6 Sol supervises, reviews, remands,
@@ -50,7 +52,7 @@ Before Task 1, Cline creates a clean worktree from the approved baseline:
 
     git worktree add -b codex/control-plane-recovery-s1 \
       /private/tmp/paeos-control-plane-recovery-s1 \
-      af83198192aef72e1ef88615e4ca586a449acb71
+      b8bdc65476a939da9b42ed430f87c6384a127f09
 
 Then verify:
 
@@ -60,7 +62,16 @@ Then verify:
 Expected:
 
     ## codex/control-plane-recovery-s1
-    af83198192aef72e1ef88615e4ca586a449acb71
+    b8bdc65476a939da9b42ed430f87c6384a127f09
+
+Prove the approved contract commit changed no code relative to the code baseline:
+
+    git diff --quiet \
+      af83198192aef72e1ef88615e4ca586a449acb71 \
+      b8bdc65476a939da9b42ed430f87c6384a127f09 \
+      -- . ':(exclude)docs/superpowers/specs/**' ':(exclude)docs/superpowers/plans/**'
+
+Expected: exit 0.
 
 Record the known clean-baseline collection failure once:
 
@@ -882,7 +893,7 @@ Create:
 
 1. test_unhealthy_report_performs_no_mutation
 2. test_stale_pid_file_is_preserved
-3. test_watchdog_source_contains_no_recovery_side_effects
+3. test_run_watchdog_reports_issues_without_recovery_actions
 
 For the first test monkeypatch diagnostic functions to return stopped/stale conditions and
 monkeypatch subprocess.Popen, subprocess.run, os.kill, Path.unlink, and Path.write_text to raise
@@ -893,17 +904,19 @@ For the second test write a nonexistent numeric PID to tmp_path/bridge.pid, call
 check_bridge_monitor, and assert the return value is (False, that_pid) and the PID file bytes are
 unchanged.
 
-For the third test parse watchdog.py with ast and fail if it contains:
+For the third test, create a fixed unhealthy WatchdogReport and replace collect_report with a
+test double returning that complete real-shaped report. Replace subprocess.Popen, os.kill,
+Path.unlink, Path.write_text, and Path.touch with sentinels that raise AssertionError. Call
+run_watchdog, assert it returns the same report, assert the warning log contains every issue, and
+assert no mutation sentinel fired. This test guards the observable boundary; do not test source
+text or private symbol names.
 
-- subprocess.Popen
-- os.kill
-- Path.unlink
-- pbcopy
-- osascript
-- restart_bridge_monitor
-- relaunch_chrome
-- nudge_cline
-- the words healed or healing, case-insensitively
+During Codex review, separately inspect the diff and run:
+
+    rg -n 'Popen|os\\.kill|\\.unlink\\(|pbcopy|osascript|restart_bridge_monitor|relaunch_chrome|nudge_cline|heal(ed|ing)' \
+      ops/chatgpt_bridge/watchdog.py
+
+Expected: no matches. This is a review check, not a behavioral unit test.
 
 ### Step 4.2: Run tests to verify RED
 
@@ -1086,7 +1099,8 @@ next mutation.
        git restore --source=HEAD -- runtime/integrations/chat_bridge.py
 
 4. Add a subprocess.Popen call to run_watchdog. Run
-   test_watchdog_source_contains_no_recovery_side_effects. Expected: FAIL. Restore with:
+   test_run_watchdog_reports_issues_without_recovery_actions. Expected: FAIL because the
+   no-mutation sentinel is triggered. Restore with:
 
        git restore --source=HEAD -- ops/chatgpt_bridge/watchdog.py
 
@@ -1137,9 +1151,9 @@ Hash every preserved transcript:
 
     git status --short --branch
     git log --oneline \
-      af83198192aef72e1ef88615e4ca586a449acb71..HEAD
+      b8bdc65476a939da9b42ed430f87c6384a127f09..HEAD
     git diff --stat \
-      af83198192aef72e1ef88615e4ca586a449acb71..HEAD
+      b8bdc65476a939da9b42ed430f87c6384a127f09..HEAD
 
 Expected: a clean codex/control-plane-recovery-s1 branch containing exactly the four reviewed
 implementation commits. Do not merge, rebase onto main, cherry-pick into main, push, or promote.
