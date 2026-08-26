@@ -1,8 +1,9 @@
 # PAEOS Cline Worker Admission Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` to implement
-> this plan task-by-task. Every production change follows RED → GREEN, and every Cline session is
-> bound to the isolated recovery worktree. Do not route this work through the legacy GUI bridge.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
+> (recommended) or `superpowers:executing-plans` to implement this plan task-by-task. Every
+> production change follows RED → GREEN, and every Cline session is bound to the isolated recovery
+> worktree. Do not route this work through the legacy GUI bridge.
 
 **Goal:** Repay DEBT-0058 by admitting only a Cline implementation worker whose tool execution,
 artifact, verification result, and physical provider/model family are mechanically proven from
@@ -19,15 +20,17 @@ hash-bound receipt. No worker request reaches the overseer queue unless that rec
 **Tech Stack:** Python 3.12, frozen dataclasses, `pathlib`, `hashlib`, `json`, `subprocess`,
 `threading`, Cline CLI 3.0.56 desktop tool-approval IPC, pytest, Ruff, Pyright.
 
-**Spec:** `docs/superpowers/specs/2026-08-25-paeos-control-plane-recovery-design.md`
+**Spec:** `docs/superpowers/specs/2026-08-26-paeos-ai-supervised-autonomy-design.md` section 8.1,
+with recovery mechanics inherited from
+`docs/superpowers/specs/2026-08-25-paeos-control-plane-recovery-design.md`
 
 ## Global Constraints
 
 - Classification remains `OPERATIONAL_RECOVERY_ONLY`.
 - Work only in `/private/tmp/paeos-control-plane-recovery-s1-clean` on
   `codex/control-plane-recovery-s1-clean`; never edit the dirty main checkout.
-- The implementation baseline for this subproject is commit
-  `5d7dc099e790b25335a40533f7fa176e43444bae`.
+- The approved architectural baseline is commit
+  `ff306f5`; Task 1 is already implemented by commit `ae2921e`.
 - Cline is implementation-only. Codex GPT-5.6 Sol specifies, supervises, independently verifies,
   remands, and audits. Neither self-ratifies.
 - The existing recovery exception permits this isolated repair without the broken legacy bridge.
@@ -53,6 +56,23 @@ hash-bound receipt. No worker request reaches the overseer queue unless that rec
   transaction; the probe utility itself performs exactly one probe and contains no retry loop.
 - Admission does not authorize audit work. A-08 is checked again before and after every later
   auditor dispatch using physical receipts.
+- Admission does not authorize production implementation. It qualifies one route tuple only;
+  production work additionally requires the later ledger-fencing, supervisor-admission, frozen
+  L11 `TaskPackage`, `CapabilityToken`, typed-broker, and sandbox gates.
+- Bind admission to the exact Cline binary hash, adapter/policy versions, sandbox profile, task
+  class, tool capability, provider, physical model ID, and model family. An opaque alias is
+  `UNVERIFIED_PHYSICAL_IDENTITY` and cannot pass this plan.
+- The exact one-edit/one-command contract remains a disposable route probe. Do not broaden it into
+  the production worker policy.
+
+## Program Reconciliation
+
+This is Gate A of
+`docs/superpowers/plans/2026-08-26-paeos-ai-supervised-autonomy-program.md`. Its output is a
+hash-bound route-admission receipt, not a worker permission. The untracked
+`tests/runtime/test_worker_admission.py` is the intentional Task 2 RED artifact and must remain
+outside planning-only commits. Live probes remain blocked until credential rotation/revocation is
+attested without exposing secret values.
 
 ---
 
@@ -70,7 +90,7 @@ hash-bound receipt. No worker request reaches the overseer queue unless that rec
 - Produces: `derive_family_from_actual_model(actual_model, catalog) -> ModelFamily`
 - Consumed by: Task 2 receipt validation and Task 5 pre/post-dispatch A-08 checks
 
-- [ ] **Step 1.1: Write the failing family tests**
+- [x] **Step 1.1: Write the failing family tests**
 
 Create `tests/model_router/test_worker_receipt_families.py`:
 
@@ -101,7 +121,7 @@ def test_unattributable_receipt_remains_unknown() -> None:
     )
 ```
 
-- [ ] **Step 1.2: Run RED once**
+- [x] **Step 1.2: Run RED once**
 
 Run:
 
@@ -112,7 +132,7 @@ Run:
 
 Expected: collection fails because `ModelFamily.QWEN` and `ModelFamily.GPT` do not exist.
 
-- [ ] **Step 1.3: Add the minimal family members and parsing rules**
+- [x] **Step 1.3: Add the minimal family members and parsing rules**
 
 Add these enum values to `ModelFamily` in `paeos/model_router/types.py`:
 
@@ -133,7 +153,7 @@ if "gpt-" in model_lower or model_lower.startswith("gpt"):
 Do not infer GPT merely from provider name `openai`; the physical model identifier must carry a
 recognizable family marker.
 
-- [ ] **Step 1.4: Run GREEN and static checks**
+- [x] **Step 1.4: Run GREEN and static checks**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -151,7 +171,7 @@ recognizable family marker.
 
 Expected: every command exits 0 with no warnings or errors.
 
-- [ ] **Step 1.5: Commit**
+- [x] **Step 1.5: Commit**
 
 ```bash
 git add paeos/model_router/types.py \
