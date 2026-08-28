@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -306,3 +308,176 @@ def test_no_files_outside_tmp_path(
         for f in files:
             full = Path(root) / f
             assert full.is_relative_to(tmp_path)
+
+
+def test_malformed_json_fires_breaker_and_terminates_exact_process(
+    broker: DesktopApprovalBroker,
+    broker_dirs: dict[str, Path],
+) -> None:
+    """A parser denial is still a denial and must halt the exact child."""
+    broker_dirs["approval_dir"].mkdir(parents=True, exist_ok=True)
+    bad_path = broker_dirs["approval_dir"] / "session-001.request.call-bad.json"
+    bad_path.write_bytes(b"not valid json {{{")
+    fake_proc = FakeProcess(alive=True)
+
+    decision = broker.process_request(bad_path, process=fake_proc)
+
+    assert not decision.approved
+    assert broker.circuit_breaker_fired
+    assert fake_proc.terminate_count == 1
+    assert fake_proc.kill_count == 0
+
+
+@pytest.mark.parametrize(
+    ("session_id", "tool_call_id"),
+    [
+        ("../escape", "call-001"),
+        (SESSION_ID, "../../escape"),
+        ("", "call-001"),
+        (SESSION_ID, ""),
+        (123, "call-001"),
+        (SESSION_ID, ["call-001"]),
+    ],
+)
+def test_invalid_identifiers_are_denied_before_decision_path_construction(
+    broker: DesktopApprovalBroker,
+    broker_dirs: dict[str, Path],
+    contract: ProbeContract,
+    session_id: object,
+    tool_call_id: object,
+) -> None:
+    """Untrusted identifiers cannot become path components or bind a session."""
+    broker_dirs["approval_dir"].mkdir(parents=True, exist_ok=True)
+    request_path = broker_dirs["approval_dir"] / "safe.request.safe.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "requestId": "safe",
+                "sessionId": session_id,
+                "createdAt": "2026-08-26T10:00:00+00:00",
+                "toolCallId": tool_call_id,
+                "toolName": "editor",
+                "input": _editor_input(contract),
+                "iteration": 1,
+            }
+        )
+    )
+    fake_proc = FakeProcess(alive=True)
+
+    decision = broker.process_request(request_path, process=fake_proc)
+
+    assert not decision.approved
+    assert decision.reason_code == "INVALID_IDENTIFIER"
+    assert broker.circuit_breaker_fired
+    assert fake_proc.terminate_count == 1
+    assert not (broker_dirs["approval_dir"].parent / "escape.decision.call-001.json").exists()
+
+
+def test_existing_decision_protocol_violation_halts_process(
+    broker: DesktopApprovalBroker,
+    broker_dirs: dict[str, Path],
+    contract: ProbeContract,
+) -> None:
+    """A pre-existing decision is ambiguous and cannot leave Cline running."""
+    broker_dirs["approval_dir"].mkdir(parents=True, exist_ok=True)
+    decision_path = broker_dirs["approval_dir"] / f"{SESSION_ID}.decision.call-001.json"
+    sentinel = b'{"approved": false, "reason": "PREEXISTING"}'
+    decision_path.write_bytes(sentinel)
+    request_path = _write_request(
+        broker_dirs["approval_dir"], SESSION_ID, "call-001", "editor",
+        _editor_input(contract),
+    )
+    fake_proc = FakeProcess(alive=True)
+
+    decision = broker.process_request(request_path, process=fake_proc)
+
+    assert not decision.approved
+    assert decision.reason_code == "DECISION_ALREADY_EXISTS"
+    assert broker.circuit_breaker_fired
+    assert fake_proc.terminate_count == 1
+    assert decision_path.read_bytes() == sentinel
+
+
+def test_decision_publish_is_no_replace_under_race(
+    contract: ProbeContract,
+    broker_dirs: dict[str, Path],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Two brokers racing one tool call yield one approval and one denial."""
+    request_path = _write_request(
+        broker_dirs["approval_dir"], SESSION_ID, "call-001", "editor",
+        _editor_input(contract),
+    )
+    brokers = [
+        DesktopApprovalBroker(contract=contract, **broker_dirs),
+        DesktopApprovalBroker(contract=contract, **broker_dirs),
+    ]
+    original_rename = os.rename
+    publish_barrier = threading.Barrier(2)
+
+    def racing_rename(source: str | bytes, destination: str | bytes) -> None:
+        publish_barrier.wait(timeout=2)
+        original_rename(source, destination)
+
+    monkeypatch.setattr(os, "rename", racing_rename)
+    results: list[object] = []
+
+    def process(broker: DesktopApprovalBroker) -> None:
+        results.append(broker.process_request(request_path))
+
+    threads = [threading.Thread(target=process, args=(broker,)) for broker in brokers]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=3)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert len(results) == 2
+    decisions = [result for result in results if hasattr(result, "approved")]
+    assert sum(decision.approved for decision in decisions) == 1
+    assert {decision.reason_code for decision in decisions if not decision.approved} == {
+        "DECISION_ALREADY_EXISTS"
+    }
+
+
+def test_serve_deadline_halts_hung_process(
+    contract: ProbeContract,
+    broker_dirs: dict[str, Path],
+) -> None:
+    """The approval server cannot wait forever for a silent child."""
+    broker = DesktopApprovalBroker(
+        contract=contract,
+        poll_seconds=0,
+        max_wait_seconds=0,
+        **broker_dirs,
+    )
+    fake_proc = FakeProcess(alive=True)
+
+    decisions = broker.serve(fake_proc)
+
+    assert decisions == ()
+    assert broker.circuit_breaker_fired
+    assert fake_proc.terminate_count == 1
+
+
+def test_timeout_expired_during_termination_escalates_to_kill(
+    broker: DesktopApprovalBroker,
+    broker_dirs: dict[str, Path],
+    contract: ProbeContract,
+) -> None:
+    """subprocess.TimeoutExpired is the real Popen timeout type."""
+    request_path = _write_request(
+        broker_dirs["approval_dir"], SESSION_ID, "call-001", "unknown_tool", {},
+    )
+    fake_proc = FakeProcess(alive=True)
+
+    def timeout_wait(timeout: float | None = None) -> int:
+        raise subprocess.TimeoutExpired(cmd="cline", timeout=timeout or 0)
+
+    fake_proc.wait = timeout_wait  # type: ignore[method-assign]
+
+    decision = broker.process_request(request_path, process=fake_proc)
+
+    assert not decision.approved
+    assert fake_proc.terminate_count == 1
+    assert fake_proc.kill_count == 1

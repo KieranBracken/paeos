@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
+import subprocess
 import tempfile
 import time
 from pathlib import Path
@@ -20,6 +22,13 @@ from runtime.worker_admission import (
     ToolDecisionRecord,
     evaluate_tool_request,
 )
+
+_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
+
+
+def _valid_identifier(value: object) -> bool:
+    """Return whether an untrusted IPC identifier is one safe path component."""
+    return isinstance(value, str) and _IDENTIFIER_RE.fullmatch(value) is not None
 
 
 class ProcessHandle(Protocol):
@@ -49,12 +58,14 @@ class DesktopApprovalBroker:
         quarantine_dir: Path,
         journal_path: Path,
         poll_seconds: float = 0.05,
+        max_wait_seconds: float = 300.0,
     ) -> None:
         self._contract = contract
         self._approval_dir = approval_dir
         self._quarantine_dir = quarantine_dir
         self._journal_path = journal_path
         self._poll_seconds = poll_seconds
+        self._max_wait_seconds = max_wait_seconds
         self._bound_session_id: str | None = None
         self._prior_decisions: list[ToolDecisionRecord] = []
         self.circuit_breaker_fired: bool = False
@@ -90,10 +101,32 @@ class DesktopApprovalBroker:
                 decision=decision, tool_call_id="unknown",
                 session_id="unknown",
             )
+            self._halt_process(process)
             return decision
 
         session_id = request_data.get("sessionId", "unknown")
         tool_call_id = request_data.get("toolCallId", "unknown")
+
+        if not _valid_identifier(session_id) or not _valid_identifier(tool_call_id):
+            decision = ToolDecisionRecord(
+                tool_name=str(request_data.get("toolName", "<unknown>")),
+                approved=False,
+                reason_code="INVALID_IDENTIFIER",
+            )
+            safe_tool_call = f"invalid-{request_hash[:16]}"
+            self._journal_and_write_decision(
+                path,
+                request_data,
+                request_hash,
+                decision,
+                safe_tool_call,
+                "invalid",
+            )
+            self._halt_process(process)
+            return decision
+
+        assert isinstance(session_id, str)
+        assert isinstance(tool_call_id, str)
 
         # Session binding: first well-formed request locks the session ID
         if self._bound_session_id is None:
@@ -129,6 +162,7 @@ class DesktopApprovalBroker:
                 tool_call_id=tool_call_id,
                 session_id=session_id,
             )
+            self._halt_process(process)
             return decision
 
         # Delegate to pure policy evaluator
@@ -139,19 +173,35 @@ class DesktopApprovalBroker:
         )
 
         # Write decision and journal
-        self._journal_and_write_decision(
-            path, request_data, request_hash, decision,
-            tool_call_id, session_id,
-        )
+        try:
+            self._journal_and_write_decision(
+                path, request_data, request_hash, decision,
+                tool_call_id, session_id,
+            )
+        except FileExistsError:
+            decision = ToolDecisionRecord(
+                tool_name=request_data.get("toolName", "<unknown>"),
+                approved=False,
+                reason_code="DECISION_ALREADY_EXISTS",
+            )
+            existing_path = self._decision_path(session_id, tool_call_id)
+            existing_hash = hashlib.sha256(existing_path.read_bytes()).hexdigest()
+            self._journal_entry(
+                request_hash=request_hash,
+                decision=decision,
+                decision_hash=existing_hash,
+                tool_call_id=tool_call_id,
+                session_id=session_id,
+            )
+            self._halt_process(process)
+            return decision
 
         # Track decisions for ordering
         self._prior_decisions.append(decision)
 
         # On denial: fire circuit breaker and terminate
         if not decision.approved:
-            self.circuit_breaker_fired = True
-            if process is not None:
-                self._terminate_process(process)
+            self._halt_process(process)
 
         return decision
 
@@ -166,8 +216,12 @@ class DesktopApprovalBroker:
         """
         decisions: list[ToolDecisionRecord] = []
         seen_requests: set[str] = set()
+        deadline = time.monotonic() + self._max_wait_seconds
 
         while process.poll() is None and not self.circuit_breaker_fired:
+            if time.monotonic() >= deadline:
+                self._halt_process(process)
+                break
             self._approval_dir.mkdir(parents=True, exist_ok=True)
             for req_file in sorted(self._approval_dir.glob("*.request.*.json")):
                 if str(req_file) not in seen_requests:
@@ -221,7 +275,8 @@ class DesktopApprovalBroker:
         decision_bytes = json.dumps(decision_data).encode()
         decision_hash = hashlib.sha256(decision_bytes).hexdigest()
 
-        # Atomic write: temp file, fsync, rename
+        # Atomic no-replace publish: temp file, fsync, hard-link, unlink temp.
+        # os.link fails with FileExistsError if another broker won the race.
         fd, tmp_path = tempfile.mkstemp(
             dir=str(self._approval_dir),
             prefix=".decision_",
@@ -234,10 +289,9 @@ class DesktopApprovalBroker:
         finally:
             os.close(fd)
 
-        # Create without replacement — existing file is a protocol violation
-        if not final_path.exists():
-            os.rename(tmp_path, final_path)
-        else:
+        try:
+            os.link(tmp_path, final_path)
+        finally:
             os.unlink(tmp_path)
 
         return decision_hash
@@ -293,5 +347,11 @@ class DesktopApprovalBroker:
         process.terminate()
         try:
             process.wait(timeout=2.0)
-        except (TimeoutError, OSError):
+        except (subprocess.TimeoutExpired, TimeoutError, OSError):
             process.kill()
+
+    def _halt_process(self, process: ProcessHandle | None) -> None:
+        """Trip the broker breaker and terminate only the bound child, if present."""
+        self.circuit_breaker_fired = True
+        if process is not None:
+            self._terminate_process(process)
