@@ -21,6 +21,12 @@ plumbing commands, provider-neutral headless adapters.
 
 **Spec:** `docs/superpowers/specs/2026-08-26-paeos-ai-supervised-autonomy-design.md`
 
+**Bootstrap handoff:**
+`docs/superpowers/specs/2026-08-28-paeos-gates-b-g-worker-handoff.md`
+
+**Disposable worker prompt:**
+`docs/superpowers/handoffs/2026-08-28-cline-glm53-gates-b-g-worker-prompt.md`
+
 ## Global Constraints
 
 - Work only in `/private/tmp/paeos-control-plane-recovery-s1-clean` on
@@ -42,8 +48,11 @@ plumbing commands, provider-neutral headless adapters.
   for a zero-remand target.
 - Each plan uses RED -> GREEN -> focused verification -> full applicable gates -> independent L14
   audit -> L17 review. A later plan cannot use an earlier plan's claims in place of evidence.
-- The untracked `tests/runtime/test_worker_admission.py` is the intentional RED artifact for the
-  worker-admission plan. Planning commits must not stage, alter, or delete it.
+- Gate A Tasks 1-4 are committed at reviewed baseline `277902c`. Task 5, three live probes, L14,
+  and L17 remain incomplete. Later gate design does not discharge these requirements.
+- Until Gates B-E are implemented, use the isolated bootstrap execution envelope in the handoff
+  specification instead of asking the incomplete chat bridge, transaction loop, or watchdog to
+  supervise its own repair.
 - Before any live Cline probe, the exposed recovery credential must be rotated/refreshed and the
   old material revoked without reading or logging secret values.
 - Before bootstrap integration, repository-wide Ruff/Pyright gates must either be green or be
@@ -75,6 +84,9 @@ Architect proposal   Cline implementation  Safe recovery decision
 ```
 
 ## Ordered Plan Set
+
+The six remaining program gates are B-G. Gate A closure remains a prerequisite where this index
+states it; naming B-G as the remaining six does not imply Gate A is sealed.
 
 ### Gate A — Route qualification
 
