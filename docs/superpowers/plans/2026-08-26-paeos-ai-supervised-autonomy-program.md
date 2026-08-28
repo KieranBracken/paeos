@@ -109,16 +109,22 @@ Exit criteria:
 
 ### Gate C — Interchangeable architect supervision
 
-Plan: `docs/superpowers/plans/2026-08-26-paeos-headless-supervisor-adapters.md`
+Plans, in order:
+
+1. `docs/superpowers/plans/2026-08-28-paeos-provider-adapter-registry.md`
+2. `docs/superpowers/plans/2026-08-26-paeos-headless-supervisor-adapters.md`
 
 Depends on: Gate B.
 
-Output: provider-neutral supervisor protocol, versioned admission, physical receipts, durable
-checkpoints, Codex/Antigravity adapter seams, and degraded Trace-A-only eligibility.
+Output: open provider registration with legacy compatibility; provider-neutral supervisor
+protocol; versioned admission; physical receipts; durable checkpoints; Codex/Antigravity adapter
+wrappers; and degraded Trace-A-only eligibility.
 
 Exit criteria:
 
 - opaque or conflicting lineage is refused;
+- a synthetic new provider and supervisor adapter can be registered without coordinator, reducer,
+  lifecycle, or audit-policy source edits;
 - quota loss in every transaction state preserves durable state;
 - one simulated clean adapter rotation and one forced quota-stop/resume pass without replay;
 - partial, injected, or out-of-envelope model output is quarantined.

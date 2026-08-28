@@ -8,9 +8,11 @@
 provider-neutral headless protocol, preserving durable PAEOS state across quota loss without
 granting a model direct ledger, worker, audit, or promotion authority.
 
-**Architecture:** A supervisor adapter is stateless compute behind a strict request/response
-envelope. A local trusted transport records what provider/model/version it actually observed. A
-versioned admission profile separately proves protocol compliance and task-class reasoning
+**Architecture:** Preserve `AgentRuntime` as the existing worker/stage execution seam and add a
+distinct supervisor protocol only for overseer semantics. Existing runtime integrations and model
+router facilities are wrapped or extended through a descriptor-driven registry; they are not
+duplicated. A local trusted transport records what provider/model/version it actually observed,
+while a versioned admission profile separately proves protocol compliance and task-class reasoning
 capability. The deterministic coordinator owns checkpoints and transactions. Only committed
 checkpoints can transfer a claim; ambiguous work remains isolated. Browser automation remains a
 non-authoritative compatibility adapter unless it satisfies the same correlation and identity
@@ -34,6 +36,44 @@ router/A-08 enforcement, subprocess injection seams, pytest, Ruff, Pyright.
 - Providers and LiteLLM do not hide retry or sub-routing. PAEOS chooses one explicit attempt.
 - No credential value, settings file, environment dump, or raw authentication record enters an
   envelope, receipt, trace, fixture, or commit.
+- `runtime.claude_code.AgentRuntime`, `runtime.agents.RoleSpec`, and the model-router catalog,
+  health, privacy, and A-08 machinery remain the canonical existing seams for their current roles.
+- Every task records one reuse disposition for each touched seam: `REUSE_UNCHANGED`, `EXTEND_WRAP`,
+  or `REPLACE_WITH_MIGRATION_EVIDENCE`. No implementation starts from filenames alone.
+- Provider-specific imports, endpoints, wire formats, and retry behavior may not enter the
+  supervisor coordinator or transaction reducer.
+- A conforming synthetic provider must register and execute contract tests without modifying the
+  coordinator, lifecycle engine, transaction reducer, or audit-policy source.
+- The existing closed `ProviderId` enum and hard-coded transport branches are compatibility debt;
+  new supervisor code must not expand that pattern.
+
+## Existing-Seam Baseline and Reuse Decisions
+
+The following inventory is binding for this plan:
+
+- `runtime.claude_code.AgentRuntime` / `RunOutput`: `REUSE_UNCHANGED` for scoped worker and
+  lifecycle-stage execution. Supervisor adapters do not implement worker authority.
+- `ClaudeCodeRuntime`, `AntigravityRuntime`, `ChatBridgeRuntime`, and `HybridRuntime`:
+  `EXTEND_WRAP`. Reuse invocation and workspace helpers where their contracts are sound.
+- `paeos.model_router.ModelRouter`, catalog, state, privacy, and A-08: `EXTEND_WRAP`. Preserve
+  policy behavior behind provider descriptors through the separate provider-registry migration
+  plan.
+- `ProviderId` and `PROVIDER_API_BASES`: `REPLACE_WITH_MIGRATION_EVIDENCE`. Retain compatibility
+  while removing new-core dependence through the separate provider-registry migration plan.
+- `runtime.agents.RoleSpec`: `REUSE_UNCHANGED`. Supervisor admission references, but does not
+  duplicate, role facts.
+- `runtime.integrations.bridge_protocol`: `REUSE_UNCHANGED` where compatible. Stricter supervisor
+  fields extend it compositionally.
+
+Before changing any listed seam, the implementer must run:
+
+```bash
+rg -n "AgentRuntime|RoleSpec|ProviderId|PROVIDER_API_BASES|ModelRouter|Runtime" \
+  runtime paeos tests --glob '*.py'
+```
+
+The resulting commit message or review record must state the applicable disposition and cite the
+discriminative test that protects it.
 
 ---
 
@@ -45,6 +85,7 @@ router/A-08 enforcement, subprocess injection seams, pytest, Ruff, Pyright.
 - Create: `runtime/supervisors/protocol.py`
 - Test: `tests/runtime/supervisors/test_protocol.py`
 - Reuse: `runtime/integrations/bridge_protocol.py`
+- Reuse unchanged: `runtime/claude_code.py` (`AgentRuntime`, `RunOutput`)
 
 **Interfaces:**
 
@@ -96,6 +137,11 @@ class AdapterResult:
 class SupervisorAdapter(Protocol):
     def invoke(self, request: SupervisorRequest, context: bytes) -> AdapterResult: ...
 ```
+
+`SupervisorAdapter` is deliberately not a subtype of `AgentRuntime`: the former returns bounded
+architectural data and observations; the latter executes scoped worker packages and may return
+writes. Add a type-level test showing that the coordinator accepts only `SupervisorAdapter`, while
+`AgentDispatcher` continues to accept the existing `AgentRuntime` implementations unchanged.
 
 - [ ] **Step 1.1: Write RED canonical-envelope tests**
 
@@ -303,15 +349,86 @@ git commit -m "feat(supervision): add durable checkpoint rotation"
 
 ---
 
-## Task 4: Implement Codex and Antigravity Headless Adapter Seams
+## Task 4: Add the Descriptor-Driven Supervisor Adapter Registry
+
+**Files:**
+
+- Create: `runtime/supervisors/registry.py`
+- Test: `tests/runtime/supervisors/test_adapter_registry.py`
+
+**Interfaces:**
+
+```python
+@dataclass(frozen=True, slots=True)
+class SupervisorAdapterDescriptor:
+    adapter_id: str
+    adapter_version: str
+    provider_key: str
+    factory: Callable[[], SupervisorAdapter]
+
+class SupervisorAdapterRegistry:
+    def register(self, descriptor: SupervisorAdapterDescriptor) -> None: ...
+    def resolve(self, adapter_id: str) -> SupervisorAdapterDescriptor: ...
+```
+
+- [ ] **Step 4.1: Write RED registry and compatibility tests**
+
+Register a synthetic `future-supervisor` entirely from the test. Assert it is resolved and selected
+without editing coordinator tables, duplicate IDs fail closed, unknown IDs fail closed, and invalid
+adapter/provider keys are rejected. Add an AST assertion that supervisor coordinator and
+transaction reducer modules contain no provider-name branches or provider-specific imports. Model
+provider registration is proved independently by the provider-registry migration plan.
+
+- [ ] **Step 4.2: Run RED once**
+
+```bash
+/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
+  tests/runtime/supervisors/test_adapter_registry.py
+```
+
+Expected: collection fails because registry modules do not exist.
+
+- [ ] **Step 4.3: Implement immutable registries and legacy compatibility**
+
+Validate descriptor keys and reject duplicate registration. Do not add dynamic filesystem
+discovery, arbitrary import strings, or executable code in configuration. Registration occurs
+through trusted Python composition at startup. Consume provider keys supplied by the provider
+registry without reproducing provider catalogs or routing policy in this module.
+
+- [ ] **Step 4.4: Run GREEN and static checks**
+
+```bash
+/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
+  tests/runtime/supervisors/test_adapter_registry.py
+/Users/bob/GitHub/paeos/.venv/bin/python -m ruff check runtime/supervisors \
+  tests/runtime/supervisors
+/Users/bob/GitHub/paeos/.venv/bin/python -m pyright runtime/supervisors
+```
+
+Expected: all selected checks pass; the synthetic provider test proves extension without core
+source modification.
+
+- [ ] **Step 4.5: Commit**
+
+```bash
+git add runtime/supervisors/registry.py \
+  tests/runtime/supervisors/test_adapter_registry.py
+git commit -m "feat(supervision): register adapters without coordinator branches"
+```
+
+---
+
+## Task 5: Wrap Existing Transports as Headless Supervisor Adapters
 
 **Files:**
 
 - Create: `runtime/supervisors/headless.py`
 - Create: `runtime/supervisors/codex.py`
 - Create: `runtime/supervisors/antigravity.py`
-- Test: `tests/runtime/supervisors/test_headless_adapters.py`
 - Modify: `runtime/integrations/__init__.py`
+- Reuse: `runtime/integrations/antigravity.py`
+- Reuse: `runtime/integrations/chat_bridge.py`
+- Test: `tests/runtime/supervisors/test_headless_adapters.py`
 
 **Interfaces:**
 
@@ -331,51 +448,58 @@ class CodexSupervisorAdapter(SupervisorAdapter): ...
 class AntigravitySupervisorAdapter(SupervisorAdapter): ...
 ```
 
-- [ ] **Step 4.1: Write RED invocation tests with a fake runner**
+- [ ] **Step 5.1: Write RED invocation and reuse tests with a fake runner**
 
 Assert shell-free argv, exact bound worktree, minimal environment key allowlist, pinned executable
 path/hash, one request/one response, timeout termination, stdout/stderr preservation, provider
 observation capture, and no fallback to another executable/model. Missing headless support fails
-closed; it never triggers browser/clipboard automation.
+closed; it never triggers browser/clipboard automation. Characterize and reuse existing prompt,
+workspace, and invocation helpers only when their output satisfies the stricter supervisor
+contract; explicitly test that no worker write-collection or worker authority crosses the wrapper.
 
-- [ ] **Step 4.2: Run RED once**
+- [ ] **Step 5.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
   tests/runtime/supervisors/test_headless_adapters.py
 ```
 
-Expected: collection fails because adapter implementations do not exist.
+Expected: collection fails because headless supervisor implementations do not exist.
 
-- [ ] **Step 4.3: Implement transport-specific encoding only**
+- [ ] **Step 5.3: Implement thin transport-specific wrappers**
 
-Adapters may translate the provider's documented request/response format into the common protocol
-and collect local observations. They may not choose task class, retry, commit, dispatch Cline,
-select an auditor, or interpret prose as a capability.
+Adapters translate documented request/response formats into the common protocol and collect local
+observations. Factor shared invocation primitives from existing integrations only when their
+behavior is already covered by characterization tests. Adapters may not choose task class, retry,
+commit, dispatch Cline, select an auditor, collect worker writes, or interpret prose as a
+capability. Register both adapters through `SupervisorAdapterRegistry`; do not add coordinator
+branches for Codex or Antigravity.
 
-- [ ] **Step 4.4: Run GREEN and static checks**
+- [ ] **Step 5.4: Run GREEN and static checks**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
-  tests/runtime/supervisors/test_headless_adapters.py
+  tests/runtime/supervisors/test_headless_adapters.py \
+  tests/runtime/test_live_adapter.py \
+  tests/runtime/test_chat_bridge_fail_closed.py
 /Users/bob/GitHub/paeos/.venv/bin/python -m ruff check runtime/supervisors \
-  tests/runtime/supervisors
-/Users/bob/GitHub/paeos/.venv/bin/python -m pyright runtime/supervisors
+  runtime/integrations tests/runtime/supervisors
+/Users/bob/GitHub/paeos/.venv/bin/python -m pyright runtime/supervisors runtime/integrations
 ```
 
-Expected: all selected checks pass. Do not run a live provider yet.
+Expected: supervisor and existing worker-adapter tests pass. Do not run a live provider yet.
 
-- [ ] **Step 4.5: Commit**
+- [ ] **Step 5.5: Commit**
 
 ```bash
-git add runtime/supervisors runtime/integrations/__init__.py \
+git add runtime/supervisors runtime/integrations \
   tests/runtime/supervisors/test_headless_adapters.py
-git commit -m "feat(supervision): add headless adapter seams"
+git commit -m "feat(supervision): wrap existing transports for headless oversight"
 ```
 
 ---
 
-## Task 5: Simulate Quota Loss, Drift, Injection, and Recovery
+## Task 6: Simulate Quota Loss, Drift, Injection, and Recovery
 
 **Files:**
 
@@ -383,14 +507,14 @@ git commit -m "feat(supervision): add headless adapter seams"
 - Create: `tests/fixtures/supervisors/` fixtures containing no secrets
 - Modify: `runtime/supervisors/coordinator.py`
 
-- [ ] **Step 5.1: Add the RED failure matrix**
+- [ ] **Step 6.1: Add the RED failure matrix**
 
 Inject quota loss in NEW, PREPARED, CLAIMED, RESPONDED, and post-response/pre-consume boundaries;
 partial streams; hung response; malformed output; conflicting physical receipts; policy expiry;
 provider sub-routing; stale checkpoint; prompt injection; fake Founder approval; self-ratification;
 and old-adapter late response.
 
-- [ ] **Step 5.2: Run RED once**
+- [ ] **Step 6.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -399,13 +523,13 @@ and old-adapter late response.
 
 Expected: the first missing fail-closed behavior fails. Preserve its exact output before fixing.
 
-- [ ] **Step 5.3: Implement only the failing policy paths**
+- [ ] **Step 6.3: Implement only the failing policy paths**
 
 Pre-acceptance quota failure may be eligible for one coordinator-authorized new attempt. Any
 accepted or ambiguous attempt enters reconciliation. Invalid bytes are quarantined. No adapter
 contains a sleep-and-retry loop.
 
-- [ ] **Step 5.4: Run GREEN**
+- [ ] **Step 6.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/runtime/supervisors
@@ -413,7 +537,7 @@ contains a sleep-and-retry loop.
 
 Expected: all supervisor tests pass; every failure has a stable reason and durable raw evidence.
 
-- [ ] **Step 5.5: Commit**
+- [ ] **Step 6.5: Commit**
 
 ```bash
 git add runtime/supervisors tests/runtime/supervisors tests/fixtures/supervisors
@@ -422,7 +546,7 @@ git commit -m "test(supervision): prove quota-safe adapter recovery"
 
 ---
 
-## Task 6: L13, L14, and L17 Gate
+## Task 7: L13, L14, and L17 Gate
 
 **Files:**
 
@@ -430,7 +554,7 @@ git commit -m "test(supervision): prove quota-safe adapter recovery"
 - Modify: `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`
 - Modify: `MessyChangesNeedsReview.md` only for unresolved debt
 
-- [ ] **Step 6.1: Run the full applicable suite fresh**
+- [ ] **Step 7.1: Run the full applicable suite fresh**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -439,23 +563,23 @@ git commit -m "test(supervision): prove quota-safe adapter recovery"
 git diff --check
 ```
 
-- [ ] **Step 6.2: Prove rotating canaries are hidden and killed**
+- [ ] **Step 7.2: Prove rotating canaries are hidden and killed**
 
 Use Z0-held variants for instruction fidelity, seeded architecture defect, raw-evidence
 separation, restart, privacy, self-ratification, and prompt injection. Record installed/reached/
 killed evidence. A miss quarantines the exact profile.
 
-- [ ] **Step 6.3: Obtain physically decorrelated L14 audit**
+- [ ] **Step 7.3: Obtain physically decorrelated L14 audit**
 
 The auditor receives a sealed evidence bundle and a receipt proving a different physical family
 from the adapter builder. An adapter cannot audit its own implementation or admission profile.
 
-- [ ] **Step 6.4: Record L17 and stop before production dispatch**
+- [ ] **Step 7.4: Record L17 and stop before production dispatch**
 
 Report exact Court counts and outstanding debt. This plan qualifies supervision; it does not
 authorize Cline production work, live SAKG work, or promotion.
 
-- [ ] **Step 6.5: Commit review records**
+- [ ] **Step 7.5: Commit review records**
 
 ```bash
 git add PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md MessyChangesNeedsReview.md \

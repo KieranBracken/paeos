@@ -115,6 +115,35 @@ deterministic coordinator is an implementation of the existing Execution Layer r
 not an additional authority. It evaluates claim arbitration, fencing, retry eligibility, adapter
 activation, and promotion preconditions; only the kernel's single-writer path commits events.
 
+### 4.1 Existing Adapter Reuse and Extension Boundary
+
+PAEOS already has three relevant extension seams and they remain authoritative:
+
+- `runtime.claude_code.AgentRuntime` is the worker/stage execution narrow waist. Existing Claude,
+  Antigravity, chat-bridge, and hybrid runtimes continue to implement that contract.
+- `paeos.model_router` owns model catalog, eligibility, provider health, routing, and A-08 family
+  separation.
+- `runtime.agents.RoleSpec` owns lifecycle-stage roles and capability profiles.
+
+The supervisor protocol does not replace any of those seams. It is a separate narrow waist only
+because an overseer has different semantics: bounded architectural requests, task-class admission,
+durable checkpoints, quota rotation, stale-adapter fencing, and no direct execution or ledger
+authority. Existing transports and runtime integrations must be wrapped or factored behind this
+protocol rather than copied.
+
+Provider integration must be descriptor-driven. Adding a conforming future provider or model
+adapter must not require editing the supervisor coordinator, transaction reducer, lifecycle engine,
+or audit policy. Provider-specific request/response normalization belongs in the adapter. Core
+policy consumes only validated descriptors, observations, admission profiles, and model-family
+facts. The existing closed provider enum and transport conditionals are a compatibility boundary to
+migrate behind a registry, not a pattern to reproduce in the new supervisor control plane.
+
+Every implementation task starts with a reuse decision: **reuse unchanged**, **extend/wrap**, or
+**replace with migration evidence**. Replacement requires discriminative evidence that the existing
+seam cannot satisfy the approved contract and must preserve compatibility until its consumers are
+migrated. A contract test must prove that a synthetic provider can be registered and selected
+without changing coordinator or router source code.
+
 ## 5. Durable Transaction Model
 
 The reviewed recovery reducer remains the transaction state machine:
