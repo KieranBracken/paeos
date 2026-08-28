@@ -8,6 +8,8 @@ No worker prose is trusted. Unknown, absent, or conflicting identity fails close
 from __future__ import annotations
 
 import hashlib
+import json
+import shlex
 from dataclasses import dataclass, fields
 from enum import StrEnum
 from pathlib import Path
@@ -103,6 +105,30 @@ class ToolDecisionRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class VerificationReceipt:
+    """Hash-only evidence for baseline/candidate/mutation/restoration verification."""
+
+    argv: tuple[str, ...]
+    argv_hash: str
+    baseline_artifact_hash: str
+    baseline_exit_code: int
+    baseline_stdout_hash: str
+    baseline_stderr_hash: str
+    candidate_artifact_hash: str
+    candidate_exit_code: int
+    candidate_stdout_hash: str
+    candidate_stderr_hash: str
+    mutation_hash: str
+    mutation_exit_code: int
+    mutation_stdout_hash: str
+    mutation_stderr_hash: str
+    artifact_restored_hash: str
+    restored_exit_code: int
+    restored_stdout_hash: str
+    restored_stderr_hash: str
+
+
+@dataclass(frozen=True, slots=True)
 class RawWorkerRun:
     """Structured evidence from a completed worker probe invocation."""
 
@@ -112,6 +138,7 @@ class RawWorkerRun:
     artifact_name: str
     artifact_hash: str
     artifact_size: int
+    verification: VerificationReceipt
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,10 +179,6 @@ def validate_physical_receipt(
             f"family mismatch: derived {derived} != receipt {receipt.actual_family}"
         )
 
-    # Family must match contract expectation
-    if receipt.actual_family != contract.expected_family:
-        raise AdmissionError("family mismatch: actual does not match contract expected")
-
     # Configured must match contract
     if receipt.configured_provider_id != contract.provider_id:
         raise AdmissionError("provider mismatch: configured does not match contract")
@@ -167,6 +190,11 @@ def validate_physical_receipt(
         raise AdmissionError("provider mismatch: actual does not match configured")
     if receipt.actual_model_id != receipt.configured_model_id:
         raise AdmissionError("model mismatch: actual does not match configured")
+
+    # Family must match contract expectation after exact identity has been
+    # reconciled, so a substituted model is reported as an identity conflict.
+    if receipt.actual_family != contract.expected_family:
+        raise AdmissionError("family mismatch: actual does not match contract expected")
 
     # Manifest must match configured
     if receipt.manifest_provider_id != receipt.configured_provider_id:
@@ -365,6 +393,49 @@ def assess_worker_run(
 
     if run.artifact_size == 0:
         reasons.append("artifact is empty")
+
+    verification = run.verification
+    if verification.argv != tuple(shlex.split(contract.verification_command)):
+        reasons.append("verification argv mismatch")
+    expected_argv_hash = hashlib.sha256(
+        json.dumps(verification.argv, separators=(",", ":")).encode()
+    ).hexdigest()
+    if verification.argv_hash != expected_argv_hash:
+        reasons.append("verification argv hash mismatch")
+    if verification.baseline_artifact_hash != hashlib.sha256(
+        contract.initial_bytes
+    ).hexdigest():
+        reasons.append("verification baseline artifact mismatch")
+    if verification.candidate_artifact_hash != expected_hash:
+        reasons.append("verification candidate artifact mismatch")
+    if verification.artifact_restored_hash != expected_hash:
+        reasons.append("verification restoration artifact mismatch")
+    if verification.mutation_hash != hashlib.sha256(
+        b"seeded-mutation\n"
+    ).hexdigest():
+        reasons.append("verification mutation hash mismatch")
+    if verification.baseline_exit_code == 0:
+        reasons.append("baseline verification did not fail")
+    if verification.candidate_exit_code != 0:
+        reasons.append("candidate verification did not pass")
+    if verification.mutation_exit_code == 0:
+        reasons.append("seeded mutation verification did not fail")
+    if verification.restored_exit_code != 0:
+        reasons.append("restored verification did not pass")
+    for name in (
+        "argv_hash",
+        "baseline_stdout_hash",
+        "baseline_stderr_hash",
+        "candidate_stdout_hash",
+        "candidate_stderr_hash",
+        "mutation_hash",
+        "mutation_stdout_hash",
+        "mutation_stderr_hash",
+        "restored_stdout_hash",
+        "restored_stderr_hash",
+    ):
+        if not _is_hex64(getattr(verification, name)):
+            reasons.append(f"invalid verification hash: {name}")
 
     if reasons:
         return AdmissionResult(

@@ -10,6 +10,7 @@ editor input keys are path/old_text/new_text.
 """
 
 import hashlib
+import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from runtime.worker_admission import (
     ProbeContract,
     RawWorkerRun,
     ToolDecisionRecord,
+    VerificationReceipt,
     assess_worker_run,
     evaluate_tool_request,
     validate_physical_receipt,
@@ -193,7 +195,24 @@ def admitted_run(contract, receipt=None) -> RawWorkerRun:
         probe_id=contract.probe_id, receipt=receipt or physical_receipt(contract),
         tool_decisions=(ok_editor(contract), ok_runner(contract)),
         artifact_name=contract.artifact_name, artifact_hash=EXPECTED_HASH,
-        artifact_size=len(EXPECTED_BYTES))
+        artifact_size=len(EXPECTED_BYTES), verification=VerificationReceipt(
+            argv=("python3", "verify_probe.py"),
+            argv_hash=hashlib.sha256(
+                json.dumps(
+                    ("python3", "verify_probe.py"), separators=(",", ":")
+                ).encode()
+            ).hexdigest(),
+            baseline_artifact_hash=hashlib.sha256(OLD_TEXT.encode()).hexdigest(),
+            baseline_exit_code=1, baseline_stdout_hash="1" * 64,
+            baseline_stderr_hash="2" * 64,
+            candidate_artifact_hash=EXPECTED_HASH, candidate_exit_code=0,
+            candidate_stdout_hash="3" * 64, candidate_stderr_hash="4" * 64,
+            mutation_hash=hashlib.sha256(b"seeded-mutation\n").hexdigest(),
+            mutation_exit_code=1, mutation_stdout_hash="5" * 64,
+            mutation_stderr_hash="6" * 64, artifact_restored_hash=EXPECTED_HASH,
+            restored_exit_code=0, restored_stdout_hash="7" * 64,
+            restored_stderr_hash="8" * 64,
+        ))
 
 
 def assert_rejected(run: RawWorkerRun, contract) -> AdmissionResult:
@@ -226,6 +245,24 @@ def test_assess_validates_receipt_independently(contract):
     bad = replace(physical_receipt(contract),
                   message_models=("cline-pass/deepseek-v4-flash",))
     assert_rejected(admitted_run(contract, receipt=bad), contract)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("baseline_exit_code", 0),
+        ("candidate_exit_code", 1),
+        ("mutation_exit_code", 0),
+        ("restored_exit_code", 1),
+        ("artifact_restored_hash", "0" * 64),
+        ("argv_hash", "0" * 64),
+        ("mutation_hash", "0" * 64),
+    ],
+)
+def test_assess_requires_discriminative_verification(contract, field, value):
+    run = admitted_run(contract)
+    bad_verification = replace(run.verification, **{field: value})
+    assert_rejected(replace(run, verification=bad_verification), contract)
 
 
 @pytest.mark.parametrize("artifact_name,artifact_hash,artifact_size", [
