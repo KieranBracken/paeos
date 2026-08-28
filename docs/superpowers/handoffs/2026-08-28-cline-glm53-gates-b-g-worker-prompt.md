@@ -106,7 +106,8 @@ Stop after this one task. Do not start the next numbered task even if all checks
 The next implementation task is Gate A Task 5, not Gate B. Bind the placeholders as follows after
 an independent architectural/adversarial review:
 
-- Parent SHA: `277902c`
+- Parent SHA: `[EXACT_HANDOFF_CHECKPOINT_SHA]` — it must contain this prompt and the architecture
+  handoff; do not bind the worker to the older implementation baseline `277902c`
 - Gate: `A`
 - Plan:
   `/private/tmp/paeos-control-plane-recovery-s1-clean/docs/superpowers/plans/2026-08-26-paeos-cline-worker-admission.md`
