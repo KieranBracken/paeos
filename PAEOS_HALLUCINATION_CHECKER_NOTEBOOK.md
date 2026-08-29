@@ -2436,3 +2436,43 @@ No data loss, no process crashes, no test regressions.
 
 **Watchdog improvement applied:** `get_repo_idle_minutes()` now uses
 `git status --short` instead of `find` to avoid hanging on the large misc/ tree.
+
+### Entry 155 — 2026-08-29: Gate A Live Worker Admission Rejected Before Tool Execution
+
+**Scope:** Founder-authorized Gate A Task 6 on isolated branch
+`codex/control-plane-recovery-s1-clean-recovered` at reviewed Task 5 commit `07e4264`. The Founder
+confirmed credential rotation/refresh and revocation of the old material before invocation; no
+secret was read or logged. Entries 151–154 exist on the later main-line forensic history and are
+intentionally not duplicated in this recovery branch.
+
+**Single invocation:** `qwen3-8-admission-01` targeted Cline `3.0.60`, provider `cline-pass`, model
+`cline-pass/qwen3.8-max`, expected family `qwen`. Result: **REJECTED**, empty receipt hash, reason
+code `ADMISSION_REJECTED`. Evidence root:
+`/Users/bob/.local/share/paeos/runtime-v2/worker-admission/qwen3-8-admission-01/`.
+
+**Exact failure:** Raw stdout and stderr report `Unauthorized: Please make sure you're using the
+latest version of Cline and re-authenticate your Cline account.` The failure occurred before any
+assistant message or tool request. No approval journal exists, no receipt was created, and the
+artifact remained `baseline-worker\n` at SHA-256
+`ff0173a8152f11c80852de3314b0344918e64274da84dbc058534117e0f8a9aa`.
+
+**Additional falsification findings:**
+
+1. The isolated `--data-dir` did not inherit or receive usable authentication after the
+   operator-level credential rotation. The live-probe design therefore lacks a safe non-secret
+   authentication handoff into its isolated Cline state domain.
+2. The Cline `3.0.60` manifest recorded `enable_spawn: true` and `enable_teams: true`, contradicting
+   the admission contract's required false values. A successful provider call would still have
+   failed closed at manifest validation.
+3. Raw stdout contains two identical unrecoverable `Unauthorized` attempts inside one CLI
+   invocation. The assumption that the planned flags produce no autonomous retry is false for
+   this version/error path.
+4. The structured `admission-result.json` preserves only generic `ADMISSION_REJECTED`; the exact
+   normalized `AUTH_FAILED` cause is recoverable only from the raw streams. This weakens automated
+   adjudication and must be addressed in the remediation design.
+
+**Circuit-breaker disposition:** Probe 01 was not retried; probes 02 and 03 were not executed.
+No runtime/source remediation, lifecycle advancement, merge, push, or promotion occurred.
+DEBT-0058 remains **OPEN**. Worker-admission counts are exactly
+**Admitted: 0 | Rejected: 1 | Remediated: 0**. Court counts are not applicable:
+**Sealed: 0 | Remanded: 0 | Remediated: 0**.
