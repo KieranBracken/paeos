@@ -15,6 +15,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from paeos.model_router.a08_enforcer import A08EnforcementResult, A08Verdict
 from paeos.model_router.types import ModelFamily
 from runtime.worker_admission import (
     AdmissionError,
@@ -25,7 +26,10 @@ from runtime.worker_admission import (
     RawWorkerRun,
     ToolDecisionRecord,
     VerificationReceipt,
+    WorkerBinding,
+    admitted_worker_binding,
     assess_worker_run,
+    enforce_receipt_decorrelation,
     evaluate_tool_request,
     validate_physical_receipt,
 )
@@ -274,3 +278,134 @@ def test_assess_requires_exact_nonempty_artifact(
     assert_rejected(replace(admitted_run(contract), artifact_name=artifact_name,
                             artifact_hash=artifact_hash, artifact_size=artifact_size),
                     contract)
+
+
+# ---------------------------------------------------------------------------
+# Task 5: admitted worker bindings and receipt decorrelation
+# ---------------------------------------------------------------------------
+
+
+def evidence_binding(
+    provider: str,
+    model: str,
+    family: ModelFamily,
+    session: str = SESSION_ID,
+    pid: int = PID,
+    transport: str = TRANSPORT,
+) -> WorkerBinding:
+    """An authoritative binding built from valid contract + RawWorkerRun evidence."""
+    contract = ProbeContract(
+        probe_id="probe-001", sandbox=Path("/probe/sandbox"), provider_id=provider,
+        model_id=model, expected_family=family, artifact_name="artifact.txt",
+        initial_bytes=OLD_TEXT.encode(), expected_bytes=EXPECTED_BYTES,
+        verification_command=VERIFY)
+    # Built from the actual parameters — the module-level physical_receipt()
+    # helper is hard-wired to the PROVIDER/MODEL probe constants.
+    receipt = PhysicalModelReceipt(
+        transport_id=transport, session_id=session, pid=pid,
+        configured_provider_id=provider, configured_model_id=model,
+        actual_provider_id=provider, actual_model_id=model, actual_family=family,
+        manifest_provider_id=provider, manifest_model_id=model,
+        message_models=(model,), **HASHES)
+    return WorkerBinding(contract, admitted_run(contract, receipt=receipt))
+
+
+def qwen_builder() -> WorkerBinding:
+    return evidence_binding(PROVIDER, MODEL, ModelFamily.QWEN)
+
+
+def gpt_auditor() -> WorkerBinding:
+    return evidence_binding("codex", "gpt-5.6-sol", ModelFamily.GPT,
+                            session="session-002", pid=4243,
+                            transport="headless:codex-cli")
+
+
+def test_binding_requires_admitted_verdict(contract):
+    binding = admitted_worker_binding(contract, admitted_run(contract))
+    assert isinstance(binding, WorkerBinding)
+    rejected = replace(admitted_run(contract), artifact_hash="f" * 64)
+    with pytest.raises(AdmissionError, match="worker not admitted"):
+        admitted_worker_binding(contract, rejected)
+
+
+def test_binding_identity_comes_from_validated_receipt_only(contract):
+    receipt = physical_receipt(contract)
+    binding = admitted_worker_binding(contract, admitted_run(contract, receipt=receipt))
+    assert (binding.transport, binding.session, binding.pid) == (
+        receipt.transport_id, receipt.session_id, receipt.pid)
+    assert binding.tty is None  # headless probe receipts carry no TTY evidence
+    assert (binding.provider, binding.model) == (
+        receipt.actual_provider_id, receipt.actual_model_id)
+    assert binding.family is receipt.actual_family
+    assert binding.receipt_hash == receipt.receipt_hash
+
+
+def test_binding_rejects_receipt_that_fails_revalidation(contract):
+    tampered = replace(physical_receipt(contract), actual_family=ModelFamily.GPT)
+    with pytest.raises(AdmissionError, match="family mismatch"):
+        admitted_worker_binding(contract, admitted_run(contract, receipt=tampered))
+
+
+def test_enforce_receipt_decorrelation_returns_a08_result():
+    result = enforce_receipt_decorrelation(qwen_builder(), gpt_auditor())
+    assert isinstance(result, A08EnforcementResult)
+    assert result.verdict is A08Verdict.PASS and result.passed
+
+
+def test_enforce_receipt_decorrelation_fails_same_physical_family():
+    same = evidence_binding(PROVIDER, MODEL, ModelFamily.QWEN,
+                            session="session-003", pid=4243)
+    result = enforce_receipt_decorrelation(qwen_builder(), same)
+    assert result.verdict is A08Verdict.FAIL_SAME_FAMILY and not result.passed
+
+
+def test_unknown_family_evidence_fails_closed_before_dispatch():
+    """Unknown family evidence cannot form an authoritative binding at all: the
+    constructor boundary fails closed before A-08 is consulted. A08Enforcer
+    retains its FAIL_UNKNOWN_* verdicts as defense in depth for direct calls."""
+    with pytest.raises(AdmissionError, match="unknown physical family"):
+        evidence_binding("openrouter", "free-router-selected-model",
+                         ModelFamily.UNKNOWN)
+
+
+def test_opaque_or_conflicting_family_evidence_fails_closed():
+    # Opaque model identifiers cannot produce an attributable receipt binding.
+    with pytest.raises(AdmissionError, match="unknown physical family"):
+        evidence_binding("openrouter", "free-router-selected-model",
+                         ModelFamily.UNKNOWN)
+    # A claimed family that conflicts with the physical model identifier is
+    # rejected by receipt re-validation on every construction path.
+    with pytest.raises(AdmissionError, match="family mismatch"):
+        evidence_binding(PROVIDER, MODEL, ModelFamily.GPT)
+
+
+def test_binding_revalidates_admission_on_any_construction_path(contract):
+    # Every construction path re-assesses admission, so tampered evidence and
+    # replace()-style forgery of an existing binding both fail closed.
+    forged = replace(admitted_run(contract), artifact_hash="f" * 64)
+    with pytest.raises(AdmissionError, match="worker not admitted"):
+        WorkerBinding(contract, forged)
+    binding = admitted_worker_binding(contract, admitted_run(contract))
+    with pytest.raises(AdmissionError, match="worker not admitted"):
+        replace(binding, run=forged)
+
+
+def test_assess_rejects_cross_probe_replay(contract):
+    replayed = replace(admitted_run(contract), probe_id="probe-999")
+    result = assess_worker_run(contract, replayed)
+    assert result.verdict is AdmissionVerdict.REJECTED
+    assert "probe ID mismatch" in result.reasons
+
+
+def test_binding_cannot_be_constructed_from_cross_probe_replay(contract):
+    with pytest.raises(AdmissionError, match="probe ID mismatch"):
+        admitted_worker_binding(
+            contract, replace(admitted_run(contract), probe_id="probe-999"))
+
+
+def test_binding_rejects_direct_identity_construction():
+    with pytest.raises(TypeError):
+        WorkerBinding(
+            transport="headless:forge", session="forged-session", pid=1, tty=None,
+            provider=PROVIDER, model=MODEL, family=ModelFamily.QWEN,
+            receipt_hash="c" * 64)

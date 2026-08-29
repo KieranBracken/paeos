@@ -14,7 +14,11 @@ from dataclasses import dataclass, fields
 from enum import StrEnum
 from pathlib import Path
 
-from paeos.model_router.a08_enforcer import derive_family_from_actual_model
+from paeos.model_router.a08_enforcer import (
+    A08EnforcementResult,
+    A08Enforcer,
+    derive_family_from_actual_model,
+)
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.types import ModelFamily
 
@@ -363,6 +367,10 @@ def assess_worker_run(
     """Assess a completed worker run. Returns ADMITTED or REJECTED with reasons."""
     reasons: list[str] = []
 
+    # A run is evidence only for its own probe; cross-probe replay fails closed.
+    if run.probe_id != contract.probe_id:
+        reasons.append("probe ID mismatch")
+
     # Validate receipt independently
     try:
         validate_physical_receipt(run.receipt, contract)
@@ -443,3 +451,94 @@ def assess_worker_run(
         )
 
     return AdmissionResult(verdict=AdmissionVerdict.ADMITTED, reasons=())
+
+
+# ---------------------------------------------------------------------------
+# Task 5: admitted worker bindings and receipt decorrelation
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True, slots=True)
+class WorkerBinding:
+    """Validated worker identity backed by admitted probe evidence.
+
+    The constructor accepts only the evidence pair (ProbeContract,
+    RawWorkerRun) and re-assesses admission on every construction path, so
+    identity fields are never caller-supplied and no binding can exist without
+    an AdmissionVerdict.ADMITTED assessment. Identity is derived internally
+    from the validated structured physical receipt.
+    """
+
+    contract: ProbeContract
+    run: RawWorkerRun
+
+    def __post_init__(self) -> None:
+        result = assess_worker_run(self.contract, self.run)
+        if result.verdict is not AdmissionVerdict.ADMITTED:
+            raise AdmissionError("worker not admitted: " + "; ".join(result.reasons))
+
+    @property
+    def transport(self) -> str:
+        return self.run.receipt.transport_id
+
+    @property
+    def session(self) -> str:
+        return self.run.receipt.session_id
+
+    @property
+    def pid(self) -> int:
+        return self.run.receipt.pid
+
+    @property
+    def tty(self) -> str | None:
+        return None  # headless probe receipts carry no TTY evidence
+
+    @property
+    def provider(self) -> str:
+        return self.run.receipt.actual_provider_id
+
+    @property
+    def model(self) -> str:
+        return self.run.receipt.actual_model_id
+
+    @property
+    def family(self) -> ModelFamily:
+        return self.run.receipt.actual_family
+
+    @property
+    def receipt_hash(self) -> str:
+        return self.run.receipt.receipt_hash
+
+
+def admitted_worker_binding(
+    contract: ProbeContract, run: RawWorkerRun
+) -> WorkerBinding:
+    """Return the validated binding for an admitted worker run.
+
+    Delegates to the WorkerBinding evidence constructor, which re-assesses
+    admission and rejects anything other than AdmissionVerdict.ADMITTED.
+    Identity is derived only from the validated structured physical receipt —
+    never from caller arguments or worker prose.
+    """
+    return WorkerBinding(contract, run)
+
+
+def enforce_receipt_decorrelation(
+    builder: WorkerBinding, auditor: WorkerBinding
+) -> A08EnforcementResult:
+    """Fail-closed A-08 decorrelation between builder and auditor bindings.
+
+    Provider, model, and family facts come exclusively from evidence-backed
+    WorkerBinding instances — every construction path re-assessed admission —
+    and are delegated to the existing A08Enforcer, which fails closed on same
+    or unknown families. Usable both before auditor dispatch (candidate
+    receipt) and against the auditor's post-dispatch physical receipt.
+    """
+    return A08Enforcer(ModelCatalog()).enforce(
+        builder_provider=builder.provider,
+        builder_model_id=builder.model,
+        builder_family=builder.family,
+        auditor_provider=auditor.provider,
+        auditor_model_id=auditor.model,
+        auditor_family=auditor.family,
+    )

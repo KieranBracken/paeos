@@ -4,11 +4,14 @@ Approved contract:
 docs/superpowers/plans/2026-08-25-paeos-control-plane-recovery-subproject-1.md
 """
 
+import hashlib
+import json
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
 import pytest
+from paeos.model_router.types import ModelFamily
 from runtime.integrations.bridge_protocol import (
     SCHEMA_VERSION,
     BridgePaths,
@@ -21,6 +24,7 @@ from runtime.integrations.bridge_protocol import (
     TransactionRecord,
     TransactionState,
     TransactionStore,
+    bind_request_to_admitted_worker,
     canonical_json,
     content_hash,
     correlate_response,
@@ -31,8 +35,19 @@ from runtime.integrations.bridge_protocol import (
     transaction_key,
     validate_request,
     validate_response,
+    worker_evidence_manifest,
     write_once_bytes,
     write_once_json,
+)
+from runtime.worker_admission import (
+    AdmissionError,
+    PhysicalModelReceipt,
+    ProbeContract,
+    RawWorkerRun,
+    ToolDecisionRecord,
+    VerificationReceipt,
+    WorkerBinding,
+    admitted_worker_binding,
 )
 
 
@@ -578,3 +593,298 @@ def test_duplicate_transaction_key_cannot_create_second_active_request(
         )
 
     assert store.load(first.request_id) == first
+
+
+# ---------------------------------------------------------------------------
+# Task 5: bind admitted worker receipts into bridge requests
+# ---------------------------------------------------------------------------
+
+
+def evidence_pair(
+    provider: str = "cline-pass",
+    model: str = "cline-pass/qwen3.8-max",
+    family: ModelFamily = ModelFamily.QWEN,
+    session: str = "session-001",
+    pid: int = 4242,
+    transport: str = "headless:cline-cli-3.0.56",
+    stdout_hash: str = "b" * 64,
+) -> tuple[ProbeContract, RawWorkerRun]:
+    """Valid (contract, run) evidence that passes admission assessment."""
+    contract = ProbeContract(
+        probe_id="probe-001",
+        sandbox=Path("/probe/sandbox"),
+        provider_id=provider,
+        model_id=model,
+        expected_family=family,
+        artifact_name="artifact.txt",
+        initial_bytes=b"old\n",
+        expected_bytes=b"new\n",
+        verification_command="python3 verify_probe.py",
+    )
+    receipt = PhysicalModelReceipt(
+        transport_id=transport,
+        session_id=session,
+        pid=pid,
+        configured_provider_id=provider,
+        configured_model_id=model,
+        actual_provider_id=provider,
+        actual_model_id=model,
+        actual_family=family,
+        manifest_provider_id=provider,
+        manifest_model_id=model,
+        message_models=(model,),
+        argv_hash="a" * 64,
+        stdout_hash=stdout_hash,
+        stderr_hash="c" * 64,
+        manifest_hash="d" * 64,
+        messages_hash="e" * 64,
+    )
+    argv = ("python3", "verify_probe.py")
+    artifact_hash = hashlib.sha256(b"new\n").hexdigest()
+    run = RawWorkerRun(
+        probe_id=contract.probe_id,
+        receipt=receipt,
+        tool_decisions=(
+            ToolDecisionRecord(tool_name="editor", approved=True, reason_code=""),
+            ToolDecisionRecord(
+                tool_name="run_commands", approved=True, reason_code=""
+            ),
+        ),
+        artifact_name="artifact.txt",
+        artifact_hash=artifact_hash,
+        artifact_size=4,
+        verification=VerificationReceipt(
+            argv=argv,
+            argv_hash=hashlib.sha256(
+                json.dumps(argv, separators=(",", ":")).encode()
+            ).hexdigest(),
+            baseline_artifact_hash=hashlib.sha256(b"old\n").hexdigest(),
+            baseline_exit_code=1,
+            baseline_stdout_hash="1" * 64,
+            baseline_stderr_hash="2" * 64,
+            candidate_artifact_hash=artifact_hash,
+            candidate_exit_code=0,
+            candidate_stdout_hash="3" * 64,
+            candidate_stderr_hash="4" * 64,
+            mutation_hash=hashlib.sha256(b"seeded-mutation\n").hexdigest(),
+            mutation_exit_code=1,
+            mutation_stdout_hash="5" * 64,
+            mutation_stderr_hash="6" * 64,
+            artifact_restored_hash=artifact_hash,
+            restored_exit_code=0,
+            restored_stdout_hash="8" * 64,
+            restored_stderr_hash="9" * 64,
+        ),
+    )
+    return contract, run
+
+
+def admitted_binding(**overrides: object) -> WorkerBinding:
+    """An authoritative binding built only through admitted probe evidence."""
+    return WorkerBinding(*evidence_pair(**overrides))
+
+
+def receipt_bound_request(binding: WorkerBinding, **changes: object) -> RequestEnvelope:
+    """A protocol-valid request whose canonical manifest is unbound (no receipt hash)."""
+    request = valid_request(
+        worker_transport_id=binding.transport,
+        worker_session_id=binding.session,
+        worker_pid=binding.pid,
+        worker_tty=binding.tty,
+        worker_model_provider=binding.provider,
+        worker_model_id=binding.model,
+        worker_model_family=binding.family.value,
+    )
+    unbound_hash = content_hash(worker_evidence_manifest(request))
+    request = replace(request, evidence_manifest_hash=unbound_hash)
+    request = replace(
+        request,
+        transaction_key=transaction_key(
+            request_id=request.request_id,
+            run_id=request.run_id,
+            stage_id=request.stage_id,
+            semantic_hash=request.semantic_hash,
+            evidence_manifest_hash=unbound_hash,
+            payload_hash=request.payload_hash,
+        ),
+    )
+    if changes:
+        request = replace(request, **changes)
+    return request
+
+
+def test_worker_receipt_hash_is_bound_into_the_evidence_manifest() -> None:
+    binding = admitted_binding()
+    request = receipt_bound_request(binding)
+    result = bind_request_to_admitted_worker(request, binding)
+    bound = result.request
+
+    manifest = worker_evidence_manifest(bound, worker_receipt_hash=binding.receipt_hash)
+    assert manifest["worker_receipt_hash"] == binding.receipt_hash
+    assert bound.evidence_manifest_hash == content_hash(manifest)
+    assert bound.evidence_manifest_hash != request.evidence_manifest_hash
+    assert bound.transaction_key != request.transaction_key
+    assert bound.transaction_key == transaction_key(
+        request_id=bound.request_id,
+        run_id=bound.run_id,
+        stage_id=bound.stage_id,
+        semantic_hash=bound.semantic_hash,
+        evidence_manifest_hash=bound.evidence_manifest_hash,
+        payload_hash=bound.payload_hash,
+    )
+    validate_request(bound)
+
+
+def test_binding_is_idempotent_for_an_already_bound_request() -> None:
+    binding = admitted_binding()
+    first = bind_request_to_admitted_worker(receipt_bound_request(binding), binding)
+    again = bind_request_to_admitted_worker(first.request, binding)
+    assert again.request == first.request
+
+
+def test_binding_rejects_conflicting_existing_worker_identity() -> None:
+    binding = admitted_binding()
+    request = receipt_bound_request(binding, worker_model_provider="other-provider")
+    with pytest.raises(ProtocolViolation, match="worker identity"):
+        bind_request_to_admitted_worker(request, binding)
+
+
+def test_binding_rejects_conflicting_existing_manifest_hash() -> None:
+    binding = admitted_binding()
+    request = receipt_bound_request(binding, evidence_manifest_hash="e" * 64)
+    with pytest.raises(ProtocolViolation, match="manifest"):
+        bind_request_to_admitted_worker(request, binding)
+
+
+def test_binding_rejects_conflicting_existing_transaction_binding() -> None:
+    binding = admitted_binding()
+    request = receipt_bound_request(binding, transaction_key="e" * 64)
+    with pytest.raises(ProtocolViolation, match="transaction binding"):
+        bind_request_to_admitted_worker(request, binding)
+
+
+def test_unvalidated_receipt_cannot_produce_a_binding_or_bound_request() -> None:
+    binding = admitted_binding()
+    # Identity fields are not constructor inputs, so a receipt hash cannot be
+    # injected into a binding — and no binding can be manufactured without
+    # admitted probe evidence.
+    with pytest.raises(TypeError):
+        WorkerBinding(
+            transport=binding.transport, session=binding.session, pid=binding.pid,
+            tty=None, provider=binding.provider, model=binding.model,
+            family=ModelFamily.QWEN, receipt_hash="not-a-hex-receipt")
+
+
+def test_rejected_admission_cannot_bind_any_request(tmp_path: Path) -> None:
+    contract = ProbeContract(
+        probe_id="probe-001",
+        sandbox=tmp_path / "sandbox",
+        provider_id="cline-pass",
+        model_id="cline-pass/qwen3.8-max",
+        expected_family=ModelFamily.QWEN,
+        artifact_name="artifact.txt",
+        initial_bytes=b"old\n",
+        expected_bytes=b"new\n",
+        verification_command="python3 verify_probe.py",
+    )
+    receipt = PhysicalModelReceipt(
+        transport_id="headless:cline-cli-3.0.56",
+        session_id="session-001",
+        pid=4242,
+        configured_provider_id="cline-pass",
+        configured_model_id="cline-pass/qwen3.8-max",
+        actual_provider_id="cline-pass",
+        actual_model_id="cline-pass/qwen3.8-max",
+        actual_family=ModelFamily.QWEN,
+        manifest_provider_id="cline-pass",
+        manifest_model_id="cline-pass/qwen3.8-max",
+        message_models=("cline-pass/qwen3.8-max",),
+        argv_hash="a" * 64,
+        stdout_hash="b" * 64,
+        stderr_hash="c" * 64,
+        manifest_hash="d" * 64,
+        messages_hash="e" * 64,
+    )
+    rejected_run = RawWorkerRun(
+        probe_id="probe-001",
+        receipt=receipt,
+        tool_decisions=(),
+        artifact_name="artifact.txt",
+        artifact_hash="0" * 64,
+        artifact_size=4,
+        verification=VerificationReceipt(
+            argv=("python3", "verify_probe.py"),
+            argv_hash="a" * 64,
+            baseline_artifact_hash="b" * 64,
+            baseline_exit_code=1,
+            baseline_stdout_hash="1" * 64,
+            baseline_stderr_hash="2" * 64,
+            candidate_artifact_hash="0" * 64,
+            candidate_exit_code=0,
+            candidate_stdout_hash="3" * 64,
+            candidate_stderr_hash="4" * 64,
+            mutation_hash="5" * 64,
+            mutation_exit_code=1,
+            mutation_stdout_hash="6" * 64,
+            mutation_stderr_hash="7" * 64,
+            artifact_restored_hash="0" * 64,
+            restored_exit_code=0,
+            restored_stdout_hash="8" * 64,
+            restored_stderr_hash="9" * 64,
+        ),
+    )
+    with pytest.raises(AdmissionError, match="worker not admitted"):
+        admitted_worker_binding(contract, rejected_run)
+
+
+def test_bound_result_manifest_bytes_are_exact_evidence() -> None:
+    binding = admitted_binding()
+    result = bind_request_to_admitted_worker(receipt_bound_request(binding), binding)
+    manifest_bytes = result.evidence_manifest_bytes
+    assert (
+        hashlib.sha256(manifest_bytes).hexdigest()
+        == result.request.evidence_manifest_hash
+    )
+    parsed = json.loads(manifest_bytes)
+    assert parsed["worker_receipt_hash"] == binding.receipt_hash
+    assert not manifest_bytes.endswith(b"\n")
+
+
+def test_changing_the_receipt_changes_manifest_hash_and_transaction_key() -> None:
+    first = admitted_binding(stdout_hash="b" * 64)
+    second = admitted_binding(stdout_hash="f" * 64)
+    assert first.receipt_hash != second.receipt_hash
+    result_a = bind_request_to_admitted_worker(receipt_bound_request(first), first)
+    result_b = bind_request_to_admitted_worker(receipt_bound_request(first), second)
+    assert (
+        result_a.request.evidence_manifest_hash
+        != result_b.request.evidence_manifest_hash
+    )
+    assert result_a.request.transaction_key != result_b.request.transaction_key
+    assert (
+        json.loads(result_a.evidence_manifest_bytes)["worker_receipt_hash"]
+        == first.receipt_hash
+    )
+    assert (
+        json.loads(result_b.evidence_manifest_bytes)["worker_receipt_hash"]
+        == second.receipt_hash
+    )
+
+
+def test_already_bound_request_returns_identical_manifest_bytes() -> None:
+    binding = admitted_binding()
+    first = bind_request_to_admitted_worker(receipt_bound_request(binding), binding)
+    again = bind_request_to_admitted_worker(first.request, binding)
+    assert again.request == first.request
+    assert again.evidence_manifest_bytes == first.evidence_manifest_bytes
+
+
+def test_binder_cannot_operate_without_a_valid_admission() -> None:
+    # Cross-probe replay: the evidence constructor re-assesses probe identity.
+    contract, run = evidence_pair()
+    with pytest.raises(AdmissionError, match="probe ID mismatch"):
+        WorkerBinding(replace(contract, probe_id="probe-002"), run)
+
+    # Tampered evidence cannot survive re-assessment on any construction path.
+    with pytest.raises(AdmissionError, match="worker not admitted"):
+        WorkerBinding(contract, replace(run, artifact_hash="f" * 64))

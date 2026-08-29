@@ -16,6 +16,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import cast
 
+from runtime.worker_admission import WorkerBinding
+
 SCHEMA_VERSION = "paeos-bridge-v2"
 
 _IDENTIFIER = re.compile(r"[A-Za-z0-9_.:-]+")
@@ -404,6 +406,137 @@ def validate_response(response: ResponseEnvelope) -> None:
     if response.response_hash != content_hash(response.response_text):
         raise ProtocolViolation("response_hash does not match response_text")
     _parse_aware_timestamp(response.completed_at, "completed_at")
+
+
+@dataclass(frozen=True, slots=True)
+class AdmittedWorkerRequest:
+    """A request bound to an admitted worker, with its manifest evidence bytes.
+
+    evidence_manifest_bytes are the exact canonical UTF-8 bytes whose SHA-256
+    equals request.evidence_manifest_hash. They contain the admitted worker
+    receipt hash, so a later verifier can recover and persist the exact
+    manifest without recomputing policy.
+    """
+
+    request: RequestEnvelope
+    evidence_manifest_bytes: bytes
+
+
+def worker_evidence_manifest(
+    request: RequestEnvelope,
+    worker_receipt_hash: str | None = None,
+) -> dict[str, object]:
+    """Canonical evidence-manifest snapshot for a request.
+
+    This mapping is the canonical object whose hash is assigned to
+    `RequestEnvelope.evidence_manifest_hash`. Before admission binding the
+    worker receipt hash is null; `bind_request_to_admitted_worker` inserts the
+    admitted worker receipt hash and recomputes the hash. No new
+    RequestEnvelope field is introduced: the receipt travels only through this
+    hash-addressed manifest.
+    """
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "request_id": request.request_id,
+        "run_id": request.run_id,
+        "stage_id": request.stage_id,
+        "worker_transport_id": request.worker_transport_id,
+        "worker_session_id": request.worker_session_id,
+        "worker_pid": request.worker_pid,
+        "worker_tty": request.worker_tty,
+        "worker_model_provider": request.worker_model_provider,
+        "worker_model_id": request.worker_model_id,
+        "worker_model_family": request.worker_model_family,
+        "semantic_hash": request.semantic_hash,
+        "payload_hash": request.payload_hash,
+        "worker_receipt_hash": worker_receipt_hash,
+    }
+
+
+def bind_request_to_admitted_worker(
+    request: RequestEnvelope,
+    binding: WorkerBinding,
+) -> AdmittedWorkerRequest:
+    """Bind an admitted worker receipt into a request's evidence manifest.
+
+    Returns an AdmittedWorkerRequest carrying the bound envelope and the exact
+    canonical manifest bytes whose SHA-256 is the bound evidence_manifest_hash.
+
+    Fails closed unless the request's existing worker identity matches the
+    admitted binding, the existing transaction_key binds the request's current
+    canonical fields, and the existing evidence_manifest_hash is the canonical
+    unbound manifest hash (or the already-bound hash, making binding
+    idempotent). The admitted receipt hash is inserted into the canonical
+    evidence-manifest snapshot, which is serialized, parsed, and reserialized
+    before the bytes are returned (no trailing newline); evidence_manifest_hash
+    is recomputed and the transaction_key is recomputed from the resulting
+    canonical request.
+    """
+    _validate_hash(binding.receipt_hash, "worker receipt hash")
+    validate_request(request)
+
+    identity_matches = (
+        request.worker_transport_id == binding.transport
+        and request.worker_session_id == binding.session
+        and request.worker_pid == binding.pid
+        and request.worker_tty == binding.tty
+        and request.worker_model_provider == binding.provider
+        and request.worker_model_id == binding.model
+        and request.worker_model_family == binding.family.value
+    )
+    if not identity_matches:
+        raise ProtocolViolation(
+            "request worker identity conflicts with the admitted receipt binding"
+        )
+
+    def _recomputed_key(evidence_manifest_hash: str) -> str:
+        return transaction_key(
+            request_id=request.request_id,
+            run_id=request.run_id,
+            stage_id=request.stage_id,
+            semantic_hash=request.semantic_hash,
+            evidence_manifest_hash=evidence_manifest_hash,
+            payload_hash=request.payload_hash,
+        )
+
+    unbound_hash = content_hash(worker_evidence_manifest(request))
+    bound_manifest = worker_evidence_manifest(
+        request, worker_receipt_hash=binding.receipt_hash
+    )
+    # Serialize, parse, and reserialize the canonical snapshot so the returned
+    # bytes are exactly the canonical evidence. No trailing newline is added.
+    snapshot = canonical_json(bound_manifest)
+    reparsed: dict[str, object] = json.loads(snapshot)
+    reserialized = canonical_json(reparsed)
+    if reserialized != snapshot:
+        raise ProtocolViolation("evidence-manifest snapshot is not canonically stable")
+    manifest_bytes = reserialized.encode("utf-8")
+    bound_hash = content_hash(manifest_bytes)
+
+    if request.evidence_manifest_hash == bound_hash:
+        if request.transaction_key != _recomputed_key(bound_hash):
+            raise ProtocolViolation(
+                "bound evidence manifest conflicts with the existing transaction binding"
+            )
+        return AdmittedWorkerRequest(
+            request=request, evidence_manifest_bytes=manifest_bytes
+        )
+    if request.evidence_manifest_hash != unbound_hash:
+        raise ProtocolViolation(
+            "existing evidence_manifest_hash conflicts with the canonical manifest"
+        )
+    if request.transaction_key != _recomputed_key(unbound_hash):
+        raise ProtocolViolation(
+            "existing transaction binding does not bind the request's canonical fields"
+        )
+    return AdmittedWorkerRequest(
+        request=dataclasses.replace(
+            request,
+            evidence_manifest_hash=bound_hash,
+            transaction_key=_recomputed_key(bound_hash),
+        ),
+        evidence_manifest_bytes=manifest_bytes,
+    )
 
 
 def write_once_bytes(path: Path, payload: bytes) -> None:
