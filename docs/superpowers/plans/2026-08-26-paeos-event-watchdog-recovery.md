@@ -329,27 +329,27 @@ git commit -m "feat(control-plane): halt safely on storage pressure"
 - Modify: `ops/chatgpt_bridge/watchdog_cron.sh`
 - Create: `tests/ops/test_control_plane_watchdog_cli.py`
 
-- [ ] **Step 5.1: Write RED CLI tests**
+- [x] **Step 5.1: Write RED CLI tests**
 
 Assert run-once behavior, verified state-root binding, machine-readable output, no clipboard,
 AppleScript, CDP, terminal keystrokes, browser polling, autonomous retry, or unbounded sleep. A
 missing/invalid projection returns nonzero and preserves diagnostics.
 
-- [ ] **Step 5.2: Run RED once**
+- [x] **Step 5.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
   tests/ops/test_control_plane_watchdog_cli.py
 ```
 
-- [ ] **Step 5.3: Implement a run-once deterministic CLI**
+- [x] **Step 5.3: Implement a run-once deterministic CLI**
 
 `ops/control_plane_watchdog.py` reads one verified snapshot, prints one canonical report, submits
 at most one typed recovery proposal to the coordinator, and exits. External scheduling controls
 frequency. Replace `monitor_loop.py` with a deprecation/error entry point that cannot copy/paste
 or dispatch; preserve the old source in Git history, not as active code.
 
-- [ ] **Step 5.4: Run GREEN and static source assertions**
+- [x] **Step 5.4: Run GREEN and static source assertions**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -359,7 +359,7 @@ or dispatch; preserve the old source in Git history, not as active code.
 Expected: all pass; active control-plane code contains no `pbcopy`, `osascript`, CDP, browser tab,
 or terminal paste path.
 
-- [ ] **Step 5.5: Commit**
+- [x] **Step 5.5: Commit**
 
 ```bash
 git add ops/control_plane_watchdog.py ops/chatgpt_bridge/monitor_loop.py \

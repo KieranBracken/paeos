@@ -1,19 +1,9 @@
 #!/bin/bash
-# PAEOS Watchdog — called by cron every hour
-# Needs PATH set explicitly since cron has a minimal environment
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export HOME="/Users/bob"
-
-LOCK="/tmp/.paeos_watchdog.lock"
-if [ -f "$LOCK" ]; then
-    PID=$(cat "$LOCK")
-    if kill -0 "$PID" 2>/dev/null; then
-        exit 0  # already running
-    fi
-fi
-echo $$ > "$LOCK"
-trap "rm -f $LOCK" EXIT
-
-/Users/bob/.pyenv/versions/3.10.13/bin/python3 \
-    /Users/bob/GitHub/paeos/ops/chatgpt_bridge/watchdog.py \
-    >> /Users/bob/GitHub/paeos/ops/chatgpt_bridge/watchdog.log 2>&1
+# PAEOS event watchdog — one run per scheduler tick; no GUI or terminal automation.
+set -u
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
+PYTHON_BIN="${PAEOS_PYTHON_BIN:-$REPO_ROOT/.venv/bin/python}"
+STATE_ROOT="${PAEOS_STATE_ROOT:-$REPO_ROOT/.paeos_state}"
+exec "$PYTHON_BIN" "$REPO_ROOT/ops/control_plane_watchdog.py" \
+    --state-root "$STATE_ROOT"
