@@ -238,7 +238,7 @@ git commit -m "refactor(routing): isolate provider wire transports"
 def build_builtin_provider_registry() -> ProviderRegistry: ...
 ```
 
-- [ ] **Step 3.1: Write RED behavior-parity and extension tests**
+- [x] **Step 3.1: Write RED behavior-parity and extension tests**
 
 Freeze existing candidate ordering for representative `paeos-auto`, `paeos-code`, and
 `paeos-cheap` requests, including privacy exclusions, quota state, and AIMD. Register a synthetic
@@ -254,7 +254,7 @@ provider with explicit routing facts and verify it participates without changes 
 
 Expected: tests fail because built-in policy still uses provider-name tables and branches.
 
-- [ ] **Step 3.3: Move provider facts into built-in descriptors**
+- [x] **Step 3.3: Move provider facts into built-in descriptors**
 
 Populate trusted built-in descriptors with credential references, data policy, rate defaults, and
 routing facts. Make catalog filtering, credential lookup, AIMD initialization, observability, and
@@ -273,7 +273,16 @@ logic as policy; only provider-name-specific facts move.
 /Users/bob/GitHub/paeos/.venv/bin/python -m pyright paeos/model_router
 ```
 
-- [ ] **Step 3.5: Commit**
+Descriptor-policy tests and the non-gateway model-router suite pass (897 collected). Whole-package
+Pyright is clean after adding the optional-gateway import annotations and repairing the existing
+`audit.py`/`server.py` type seams. The full repository-wide Ruff command still reports inherited
+findings in legacy router modules; those findings are recorded in the notebook and are not
+silently waived. The separate RED transcript is not retained as a standalone artifact.
+
+- [x] **Step 3.5: Commit**
+
+Implementation was committed in `f05aa78` and `7061ca7`; the static Ruff baseline remains an
+explicit evidence gap for this candidate rather than a claim of a fully sealed milestone.
 
 ```bash
 git add paeos/model_router/catalog.py paeos/model_router/credentials.py \

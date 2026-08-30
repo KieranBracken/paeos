@@ -24,7 +24,7 @@ class AuditRouteResult:
     """Result of heterogeneous auditor routing with A-08 enforcement."""
     builder_family: ModelFamily
     auditor_family: ModelFamily
-    auditor_model: ModelCatalogEntry
+    auditor_model: Optional[ModelCatalogEntry]
     eligible: bool
     a08_result: Optional[A08EnforcementResult] = None
     rejection_reason: Optional[str] = None

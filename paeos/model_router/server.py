@@ -9,7 +9,7 @@ import argparse
 import json
 import os
 import time
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from typing import Any, Dict, Optional
 
 from paeos.model_router.catalog import ModelCatalog

@@ -2741,3 +2741,25 @@ Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **
 36 remaining**. Gate B Task 5 still awaits decorrelated L14/L17 verification, Gate C Task 1 still
 has the 38-finding legacy `types.py` Ruff baseline, and Gate A's authenticated live-admission
 prerequisite remains open. No production dispatch, gate closure, or SAKG resumption is authorized.
+
+### Entry 168 — 2026-08-30: Gate C Descriptor-Policy Candidate Checkpoint
+
+The isolated recovery branch continued Gate C Task 3 in commits `f05aa78` and `7061ca7`.
+Provider-specific policy facts are now sourced through the validated descriptor registry for
+catalog privacy, credential environment lookup, AIMD limits, logical-model preference ordering,
+and quota telemetry. Legacy enum and compatibility tables remain intact; no provider behavior was
+silently deleted.
+
+Fresh verification: descriptor-policy plus registry/catalog/routing/state tests passed **31 tests**;
+the complete non-gateway model-router suite passed **897 tests**; whole-package Pyright returned
+**0 errors, 0 warnings, 0 informations**. The full `ruff check paeos/model_router tests/model_router`
+scope still reports **306 findings**, inherited across legacy router and test modules; no broad
+auto-fix was applied. The standalone RED transcript remains unavailable, so the plan records that
+evidence gap explicitly.
+
+No provider was invoked and no credential was read. Worker counts remain **Admitted: 0 | Rejected:
+1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
+`DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**;
+Gate B Task 5 and Gate C Tasks 1–3 still require independent evidence/audit before they can count
+toward sealed progress. Gate A's authenticated live-admission prerequisite remains open. No
+production dispatch, gate closure, or SAKG resumption is authorized.

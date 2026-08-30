@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Protocol
 
-import litellm
+import litellm  # type: ignore[reportMissingImports]  # optional gateway dependency
 import requests
 from paeos.model_router.a08_enforcer import derive_family_from_actual_model
 from paeos.model_router.auditor_receipt import request_fingerprint, response_fingerprint
