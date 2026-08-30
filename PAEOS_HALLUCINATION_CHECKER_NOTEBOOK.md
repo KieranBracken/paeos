@@ -2668,3 +2668,27 @@ recovery suite passed with no failures; changed-path Ruff and Pyright returned z
 strict top-level progress score is now **11/48 complete | 37 remaining** (Gate A 8 complete, Gate
 B 3 complete). Gate A's remanded L14 and live admission prerequisite remain open; no provider call,
 credential access, Court seal, Gate A closure, Gate C advancement, or SAKG resumption occurred.
+
+### Entry 165 — 2026-08-30: Gate B Task 4 Side-Effect Certainty Checkpoint
+
+The isolated recovery branch completed Gate B Task 4 at `a4b8d20`
+(`a4b8d206eef1ea953810ccd201728819d01c7b61`). The control-plane event codec now carries an
+immutable `DispatchEvidence` record for request-byte persistence, dispatch attempt, transport
+acceptance, response-byte persistence, and response verification. `persist_immutable_bytes()`
+uses write-once, fsync-backed bytes and rejects replacement with different content. The
+coordinator and projector bind stable idempotency keys to ledger evidence and reject reuse within
+or across transactions. The existing reducer states are unchanged; accepted or uncertain
+uncorrelated effects remain `RECONCILIATION_REQUIRED` and are never automatically replayed.
+
+Fresh verification in the recovery worktree: **877 collected, 877 passed, 0 failed, 0 skipped**;
+focused control-plane plus bridge semantic suite **68 passed**; changed-path Ruff returned zero
+findings; changed-path Pyright returned **0 errors, 0 warnings, 0 informations**; and
+`git diff --check` was clean. No provider was invoked, no credential was read, and the local
+commit was not pushed or promoted.
+
+This is an execution-layer checkpoint, not an independent L14/L17 audit or constitutional
+ratification. Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
+remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict
+top-level progress is **12/48 complete | 36 remaining**. Gate A's remanded L14 and authenticated
+live-admission prerequisite remain open; no Gate A closure, production dispatch, Gate C
+advancement, or SAKG resumption is authorized.

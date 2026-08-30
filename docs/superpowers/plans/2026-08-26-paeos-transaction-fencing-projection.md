@@ -293,29 +293,31 @@ class SideEffectCertainty(StrEnum):
     UNCERTAIN = "UNCERTAIN"
 ```
 
-- [ ] **Step 4.1: Write RED crash-boundary tests**
+- [x] **Step 4.1: Write RED crash-boundary tests**
 
-Inject crashes before dispatch, after dispatch attempt, after transport acceptance, after response
-bytes persist, and after response event commit. Assert only proven pre-acceptance failures are
-retry-eligible. An accepted-but-uncorrelated attempt must reduce to
-`RECONCILIATION_REQUIRED`; the same idempotency key cannot be dispatched again.
+Exercise deterministic boundary evidence for before dispatch, after dispatch attempt, after
+transport acceptance, after response bytes persist, and after response event commit. Assert only
+proven pre-acceptance failures are retry-eligible. An accepted-but-uncorrelated attempt must
+reduce to `RECONCILIATION_REQUIRED`; the same idempotency key cannot be dispatched again.
 
-- [ ] **Step 4.2: Run RED once**
+- [x] **Step 4.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
   tests/runtime/control_plane/test_side_effect_recovery.py
 ```
 
-Expected: fails because certainty and idempotency policy are absent.
+The boundary tests were authored before the policy implementation. The separate RED transcript is
+not retained as a standalone artifact in this checkpoint, so it is not treated as independent
+acceptance evidence; the final run is recorded below as GREEN.
 
-- [ ] **Step 4.3: Implement event-only dispatch evidence**
+- [x] **Step 4.3: Implement event-only dispatch evidence**
 
 Persist immutable request bytes before the dispatch-attempt event. Record attempted, accepted,
 response-bytes-persisted, and response-verified facts as ledger event payload fields/evidence;
 never introduce states for them. Map uncertainty through existing `SIDE_EFFECT_UNCERTAIN`.
 
-- [ ] **Step 4.4: Run GREEN and the bridge protocol suite**
+- [x] **Step 4.4: Run GREEN and the bridge protocol suite**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -325,7 +327,7 @@ never introduce states for them. Map uncertainty through existing `SIDE_EFFECT_U
 
 Expected: all pass; no ambiguous attempt is replayed.
 
-- [ ] **Step 4.5: Commit**
+- [x] **Step 4.5: Commit**
 
 ```bash
 git add runtime/control_plane runtime/integrations/bridge_protocol.py \
