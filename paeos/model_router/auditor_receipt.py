@@ -340,6 +340,8 @@ def capture_auditor_interaction(
         raise AuditorReceiptError("transport request fingerprint mismatch")
     if response.transport_response_sha256 != response_fingerprint(response):
         raise AuditorReceiptError("transport response fingerprint mismatch")
+    if not response.content.strip():
+        raise AuditorReceiptError("audit response is empty")
     if response.actual_model is None or not response.actual_model:
         raise AuditorReceiptError("physical auditor model is missing")
     derived_family = derive_family_from_actual_model(response.actual_model, router.catalog)
@@ -415,6 +417,8 @@ def persist_auditor_report(content: str, path: Path) -> Path:
 
     if not path.is_absolute():
         raise AuditorReceiptError("audit report path must be absolute")
+    if not content.strip():
+        raise AuditorReceiptError("audit report is empty")
     if path.exists() and path.is_symlink():
         raise AuditorReceiptError("audit report path cannot be a symlink")
     payload = content.encode("utf-8")

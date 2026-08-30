@@ -13,6 +13,7 @@ from paeos.model_router.auditor_receipt import (
     AUDITOR_RECEIPT_SCHEMA,
     AuditorReceiptContract,
     AuditorReceiptError,
+    capture_auditor_interaction,
     capture_auditor_receipt,
     load_auditor_receipt,
     persist_auditor_receipt,
@@ -271,6 +272,14 @@ def test_capture_rejects_transport_request_hash_mismatch() -> None:
         capture_auditor_receipt(FakeRouter(response, _catalog()), _contract(request), request)
 
 
+def test_capture_rejects_empty_audit_response() -> None:
+    request = _request()
+    response = _response(request, content="   \n")
+
+    with pytest.raises(AuditorReceiptError, match="audit response is empty"):
+        capture_auditor_interaction(FakeRouter(response, _catalog()), _contract(request), request)
+
+
 def test_receipt_persistence_is_canonical_create_only_and_content_free(tmp_path) -> None:
     request = _request()
     response = _response(request)
@@ -300,6 +309,11 @@ def test_auditor_report_persistence_is_separate_and_create_only(tmp_path) -> Non
     assert path.read_text(encoding="utf-8") == "finding: remand"
     with pytest.raises(FileExistsError):
         persist_auditor_report("replacement", path)
+
+
+def test_auditor_report_persistence_rejects_empty_content(tmp_path) -> None:
+    with pytest.raises(AuditorReceiptError, match="audit report is empty"):
+        persist_auditor_report(" \n\t", tmp_path / "empty-report.md")
 
 
 def test_tampered_receipt_hash_fails_closed(tmp_path) -> None:

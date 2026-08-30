@@ -2556,6 +2556,33 @@ L13/static/environment findings are reconciled. Worker counts remain **Admitted:
 Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; DEBT-0058 remains
 **OPEN**.
 
+### Entry 161 — 2026-08-30: Antigravity Physical Receipt Capture — Incomplete Report Artifact
+
+The Founder supplied Antigravity's one-shot Task 9A capture result for candidate
+`adf76c61972554f71f2c863b3113f07d19dd1a52`. The persisted receipt was independently loaded and
+validated against the Task 9A contract. It proves physical provider provenance and A-08
+decorrelation: provider `google`, model `gemini-3.6-flash`, family `gemini`, versus the recorded
+builder `cline-pass` / `z-ai/glm-5.3-flash`, family `glm`; provider attempts = 1 and fallback
+chain = `["google:gemini-3.6-flash"]`. Receipt schema and canonical receipt hash validation
+passed. Receipt file SHA-256 is
+`150b066178d3a0af41c05eca5d1965d6c637801b796e4f3db11746c5540dbcda`; the embedded canonical
+receipt hash is `a2b0c07ae7c6cc41d8c4e437ba8f34c7004cfb0ad4bae0d3a5d2eff2344f7bbd`.
+
+The separately required audit report artifact
+`/private/tmp/paeos-l14-audit-report-adf76c6.md` is **0 bytes** (SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). It contains no findings,
+no explicit L14 disposition, and cannot establish that the candidate was actually reviewed.
+This is preserved as raw failure evidence; the physical receipt is not treated as an L14 pass.
+The Task 9A capture path was amended to reject empty/whitespace auditor responses and empty
+reports before persisting either artifact. Focused receipt/CLI tests are **17 passed** and the
+full repository suite is **834 passed** in the recovery environment. L14 disposition remains
+**BLOCKED_UNQUALIFIABLE** pending a fresh one-shot capture producing a non-empty, candidate-bound
+report and receipt, followed by reconciliation of the existing L13/static/environment findings.
+
+Worker-admission counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**. Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**. DEBT-0058 remains **OPEN**. No Gate A closure,
+Task 10, or Gates B–G advancement is authorized.
+
 ### Entry 160 — 2026-08-30: Task 9A Report Artifact Refinement
 
 The Task 9A CLI was refined so the single routed auditor response is preserved as a separate,
