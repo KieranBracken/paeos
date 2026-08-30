@@ -99,10 +99,11 @@ and **54** is the detailed execution-task count. A milestone is complete only af
 tests, L13/L14/L17 evidence, and disposition pass; implementation or a remand does not earn
 completion credit.
 
-At recovery checkpoint `49edd4c` on the isolated branch, the first eight Gate A milestones have
-implementation evidence. Gate A milestone 9 is in independent-audit remediation after an explicit
-Antigravity `REMAND_WITH_AMENDMENTS`, and milestone 10 is blocked on fresh authenticated probes.
-The current strict score is therefore **8/48 complete; 40 top-level milestones remain**.
+At recovery checkpoint `278f98c` on the isolated branch, the first eight Gate A milestones and the
+first three Gate B milestones have implementation evidence. Gate A milestone 9 is in
+independent-audit remediation after an explicit Antigravity `REMAND_WITH_AMENDMENTS`, and milestone
+10 is blocked on fresh authenticated probes. The current strict score is therefore **11/48 complete;
+37 top-level milestones remain**.
 
 ### Gate A — Route qualification
 

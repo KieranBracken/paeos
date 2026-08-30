@@ -2649,3 +2649,22 @@ Task 10, Gate B-G advancement, SAKG resumption, credential access, or promotion 
 only next live action is a fresh, separately authorized SDK probe after the operator supplies a
 dedicated authenticated Cline profile's non-secret UUID and auth epoch. The probe sequence must
 use a frozen route tuple and three new IDs, stop at the first rejection, and preserve raw evidence.
+
+### Entry 164 — 2026-08-30: Gate B Transaction Projection and Fencing Checkpoint
+
+The isolated recovery branch completed Gate B milestones 1–3 at `278f98c` (with supporting commits
+`a5a8889`, `becbc3e`, `09f262a`, `e4f9737`, `d3486c7`, `1fea8bf`). The new control-plane package
+encodes complete `CONTROL_PLANE_TRANSACTION` events, replays them through the existing
+`reduce_transaction()` function, rejects stale digests, reused/decreasing fences, duplicate
+transaction keys, malformed schemas, invalid transitions, and terminal follow-ups, and rebuilds
+from the verified ledger chain. The replaceable SQLite projection uses WAL/full synchronization,
+ledger-head metadata, source row hashes, canonical record bytes, and fail-closed corruption checks.
+The coordinator serializes expected-head comparison, append, and projection recovery; independent
+SQLite connections cannot append a stale competing claim, and an injected post-append projection
+failure rebuilds without emitting a second ledger row.
+
+Fresh verification: control-plane, bridge semantic, and SQLite-ledger tests passed; the full
+recovery suite passed with no failures; changed-path Ruff and Pyright returned zero findings. The
+strict top-level progress score is now **11/48 complete | 37 remaining** (Gate A 8 complete, Gate
+B 3 complete). Gate A's remanded L14 and live admission prerequisite remain open; no provider call,
+credential access, Court seal, Gate A closure, Gate C advancement, or SAKG resumption occurred.
