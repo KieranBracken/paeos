@@ -4,16 +4,14 @@ Zero-Secret Leakage Guarantee
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import ProviderId
-
-
-from datetime import datetime, timezone
 
 # Canonical Free Tier Quota Limits (RPD: Requests Per Day)
 FREE_TIER_DAILY_LIMITS: Dict[ProviderId, Optional[int]] = {
@@ -65,7 +63,10 @@ class ObservabilityDiagnostics:
             if st["cooldown_until"] and st["cooldown_until"] > now:
                 cooldown_rem = st["cooldown_until"] - now
 
-            quota_limit = FREE_TIER_DAILY_LIMITS.get(p)
+            try:
+                quota_limit = self.catalog.provider_registry.resolve(p).max_rpd
+            except KeyError:
+                quota_limit = FREE_TIER_DAILY_LIMITS.get(p)
             if quota_limit is not None and quota_limit > 0:
                 quota_pct = round((rpd / quota_limit) * 100.0, 1)
             else:

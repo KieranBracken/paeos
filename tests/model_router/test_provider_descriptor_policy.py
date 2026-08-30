@@ -5,6 +5,7 @@ from pathlib import Path
 from paeos.model_router.aimd import AIMDController
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
+from paeos.model_router.observability import ObservabilityDiagnostics
 from paeos.model_router.policy import RoutingPolicyEngine
 from paeos.model_router.providers import ProviderDescriptor, ProviderRegistry
 from paeos.model_router.state import RouterStateDB
@@ -138,3 +139,26 @@ def test_aimd_limits_are_loaded_from_descriptor_for_unlisted_legacy_defaults(
         "max_tpm": 20_000,
         "max_rpd": 90,
     }
+
+
+def test_observability_uses_descriptor_quota_limit(tmp_path: Path) -> None:
+    registry = ProviderRegistry(
+        [
+            provider_descriptor(
+                "kilo",
+                "SYNTHETIC_KILO_KEY",
+                strong_rank=0,
+                allows_internal=False,
+                trains_on_inputs=True,
+            )
+        ]
+    )
+    catalog = ModelCatalog(provider_registry=registry)
+    credentials = CredentialStore(tmp_path / "missing.env", provider_registry=registry)
+    diagnostics = ObservabilityDiagnostics(
+        RouterStateDB(tmp_path / "router.sqlite3"),
+        catalog,
+        credentials,
+    )
+    status = diagnostics.get_mesh_status()
+    assert status["providers"]["kilo"]["daily_limit_rpd"] == 90
