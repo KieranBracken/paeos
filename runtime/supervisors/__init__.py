@@ -6,6 +6,16 @@ from runtime.supervisors.admission import (
     SupervisorAdmissionProfile,
     decide_supervisor_admission,
 )
+from runtime.supervisors.checkpoint import (
+    SCHEMA_VERSION as CHECKPOINT_SCHEMA_VERSION,
+)
+from runtime.supervisors.checkpoint import (
+    SupervisorCheckpoint,
+    SupervisorCoordinator,
+    SupervisorRotationError,
+    repository_digest,
+    verify_checkpoint,
+)
 from runtime.supervisors.protocol import (
     AdapterResult,
     SupervisorAdapter,
@@ -21,13 +31,17 @@ from runtime.supervisors.protocol import (
 )
 
 __all__ = [
+    "CHECKPOINT_SCHEMA_VERSION",
     "MAX_PROFILE_TTL_SECONDS",
     "AdapterResult",
     "SupervisorAdapter",
     "SupervisorAdmissionDecision",
     "SupervisorAdmissionProfile",
+    "SupervisorCheckpoint",
+    "SupervisorCoordinator",
     "SupervisorRequest",
     "SupervisorResponse",
+    "SupervisorRotationError",
     "SupervisorTier",
     "TransportObservation",
     "decide_supervisor_admission",
@@ -35,5 +49,7 @@ __all__ = [
     "decode_response",
     "encode_request",
     "encode_response",
+    "repository_digest",
     "validate_response",
+    "verify_checkpoint",
 ]
