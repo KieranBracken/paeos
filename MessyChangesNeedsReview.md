@@ -366,3 +366,12 @@ Commit `e354bd9` adds the deterministic fault matrix for hung reasoning/tools, t
 quota loss, process death, pre/post-side-effect crashes, projection poison, storage exhaustion,
 unrelated goals, and repeated observations. The matrix and recovery tests pass. This is candidate
 evidence only; DEBT-0060 remains open pending independent L14/L17 audit and canary authorization.
+
+## 2026-08-30 — Candidate 13f695b L13 reproduction reconciliation
+
+Read-only worker reproduction evidence was reconciled against the isolated candidate. The control,
+bridge, and non-gateway runs exited `0` with exact totals **83**, **35**, and **1,006** respectively;
+the latter was independently confirmed by collection-only and raw progress-dot counts. The prior
+995 checkpoint was stale by the 11 fault-matrix tests added in `e354bd9`. No runtime or source files
+were changed. This remains GLM-family worker evidence, not a decorrelated L14 audit or gate seal;
+the four open recovery debts and **12/48** strict sealed progress are unchanged.

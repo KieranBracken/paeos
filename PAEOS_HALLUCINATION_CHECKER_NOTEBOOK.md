@@ -2983,3 +2983,34 @@ This is candidate implementation evidence, not independent L14/L17 evidence. Wor
 Remediated: 0**. DEBT-0060 remains **OPEN** pending independent audit and canary authorization;
 strict sealed progress remains **12/48 complete | 36 remaining**. No Gate C seal, Gate D–G
 advancement, production dispatch, or SAKG resumption is authorized.
+
+### Entry 179 — 2026-08-30: Candidate 13f695b L13 Read-Only Reproduction Reconciled
+
+The implementation worker supplied a read-only L13 reproduction report bound to candidate
+`13f695b5dffa6b1e6682666928539bf82c39dab9` in the isolated recovery worktree. The report states
+that the worktree was clean before and after execution, no source/test/evidence/governance files
+were modified, and no provider, credential, browser, clipboard, AppleScript, or live gateway was
+used. This is reproduction evidence only; it issues no L13/L14/L17, Gate, or ratification verdict.
+
+The preserved raw logs and exit files independently reconcile as follows:
+
+- `tests/runtime/control_plane/`: **83 collected / 83 passed**, exit `0`;
+- `tests/chatgpt_bridge/`: **35 collected / 35 passed**, exit `0`;
+- `tests/ --ignore=tests/model_router/test_gateway_server.py`: **1,006 collected / 1,006 passed**,
+  exit `0` (the control-plane and bridge sets overlap this total by construction).
+
+The 1,006 total was independently reproduced with collection-only from the candidate worktree and
+matches the raw progress-dot count. The earlier 995 figure in Entry 177 is stale by the 11 tests
+introduced by the fault-matrix commit; it is not a test failure or a count mutation. Raw evidence
+remains at `/private/tmp/task5-s1-evidence/` (control log SHA-256
+`3f384efc38ce43974978e9aced983f1fdf98684d494c5d09e5a1df12f4658741`, bridge log SHA-256
+`23814bd54c3f40e10907bbb3fbbf634b818152cf7afb3d0013ebceb07460326b`, full log SHA-256
+`48bc6c92d80a9882e003501f581626163ece868ccf2ccd3ecc1e7216f79ba3e9`).
+
+Builder and Auditor remain the same GLM family for this run (`cline-pass` / `z-ai/glm-5.3-flash`),
+so no decorrelated audit is claimed or satisfied. A candidate-bound physical non-GLM L14 audit and
+the required L17 constitutional review remain outstanding. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain **OPEN**. Strict
+sealed progress remains **12/48 complete | 36 remaining**. No Gate C seal, Gate D–G advancement,
+production dispatch, or SAKG resumption is authorized.

@@ -3,7 +3,7 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-08-30 (isolated recovery debt-hardening checkpoint)
+> **Last updated:** 2026-08-30 (isolated recovery L13 evidence reconciliation)
 
 ## 1. What just happened (session arc, condensed)
 
@@ -103,3 +103,8 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   projection, storage, process-death, and repeated-observation cases. This satisfies the local
   implementation proof only; DEBT-0060 remains open pending independent L14/L17 audit and canary
   authorization.
+- 2026-08-30 candidate `13f695b` received read-only GLM worker reproduction evidence. Raw logs and
+  independent collection reconcile to **83** control-plane, **35** bridge, and **1,006** non-gateway
+  tests, all exit `0`; the earlier **995** checkpoint was stale by the 11 fault-matrix tests. This
+  is not decorrelated L14 evidence, a gate seal, or ratification. Worker/Court counts remain
+  **0/1/0** and **0/0/0**; DEBT-0058 through DEBT-0061 remain open.
