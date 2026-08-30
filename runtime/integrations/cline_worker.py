@@ -22,6 +22,12 @@ from typing import Any, Protocol
 from paeos.model_router.a08_enforcer import derive_family_from_actual_model
 from paeos.model_router.catalog import ModelCatalog
 
+from runtime.worker_adapter import (
+    ADAPTER_PROTOCOL_VERSION,
+    AdapterFailureKind,
+    AdapterFailureReceipt,
+    SideEffectCertainty,
+)
 from runtime.worker_admission import (
     AdmissionError,
     AdmissionVerdict,
@@ -109,8 +115,11 @@ class DesktopApprovalBroker:
                 reason_code="MALFORMED_JSON",
             )
             self._journal_and_write_decision(
-                path, request_data={}, request_hash=request_hash,
-                decision=decision, tool_call_id="unknown",
+                path,
+                request_data={},
+                request_hash=request_hash,
+                decision=decision,
+                tool_call_id="unknown",
                 session_id="unknown",
             )
             self._halt_process(process)
@@ -151,8 +160,12 @@ class DesktopApprovalBroker:
             )
             self.circuit_breaker_fired = True
             self._journal_and_write_decision(
-                path, request_data, request_hash, decision,
-                tool_call_id, session_id,
+                path,
+                request_data,
+                request_hash,
+                decision,
+                tool_call_id,
+                session_id,
             )
             if process is not None:
                 self._terminate_process(process)
@@ -187,8 +200,12 @@ class DesktopApprovalBroker:
         # Write decision and journal
         try:
             self._journal_and_write_decision(
-                path, request_data, request_hash, decision,
-                tool_call_id, session_id,
+                path,
+                request_data,
+                request_hash,
+                decision,
+                tool_call_id,
+                session_id,
             )
         except FileExistsError:
             decision = ToolDecisionRecord(
@@ -344,7 +361,9 @@ class DesktopApprovalBroker:
     ) -> None:
         """Write decision file and journal entry together."""
         decision_hash = self._write_decision_file(
-            session_id, tool_call_id, decision,
+            session_id,
+            tool_call_id,
+            decision,
         )
         self._journal_entry(
             request_hash=request_hash,
@@ -377,9 +396,7 @@ def _sha256(data: bytes) -> str:
 
 
 def _canonical_json_hash(value: object) -> str:
-    return _sha256(
-        json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
-    )
+    return _sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode())
 
 
 def _run_verifier(argv: tuple[str, ...], sandbox: Path) -> subprocess.CompletedProcess[bytes]:
@@ -444,12 +461,32 @@ def run_discriminative_verification(contract: ProbeContract) -> VerificationRece
 
 
 class ClineWorkerTransport:
-    """One-shot Cline admission-probe transport."""
+    """Historical CLI diagnostic transport; never an admission authority."""
+
+    admission_capable = False
 
     def __init__(self, *, timeout_seconds: int = 300) -> None:
         self._timeout_seconds = timeout_seconds
 
-    def run_probe(self, contract: ProbeContract, evidence_root: Path) -> RawWorkerRun:
+    def run_probe(self, contract: ProbeContract, evidence_root: Path) -> AdapterFailureReceipt:
+        """Reject admission without launching the legacy CLI transport."""
+
+        empty_hash = _sha256(b"")
+        return AdapterFailureReceipt(
+            protocol_version=ADAPTER_PROTOCOL_VERSION,
+            invocation_id=contract.probe_id,
+            contract_id=contract.probe_id,
+            adapter_failure=AdapterFailureKind.ADAPTER_VERSION_UNQUALIFIED,
+            normalized_error=None,
+            additional_findings=(),
+            side_effect_certainty=SideEffectCertainty.NOT_DISPATCHED,
+            raw_stdout_sha256=empty_hash,
+            raw_stderr_sha256=empty_hash,
+            observation_sha256=empty_hash,
+        )
+
+    def run_diagnostic_probe(self, contract: ProbeContract, evidence_root: Path) -> RawWorkerRun:
+        """Retain the old CLI path solely for bounded diagnostic reproduction."""
         cline_path = shutil.which("cline")
         if cline_path is None:
             raise FileNotFoundError("cline binary not found")
@@ -462,23 +499,33 @@ class ClineWorkerTransport:
         prompt = self._prompt(contract)
         argv = [
             cline_path,
-            "-P", contract.provider_id,
-            "-m", contract.model_id,
+            "-P",
+            contract.provider_id,
+            "-m",
+            contract.model_id,
             "--json",
-            "--auto-approve", "false",
-            "--retries", "1",
-            "--thinking", "medium",
-            "-t", str(self._timeout_seconds),
-            "-c", str(contract.sandbox),
-            "--data-dir", str(cline_data_dir),
+            "--auto-approve",
+            "false",
+            "--retries",
+            "1",
+            "--thinking",
+            "medium",
+            "-t",
+            str(self._timeout_seconds),
+            "-c",
+            str(contract.sandbox),
+            "--data-dir",
+            str(cline_data_dir),
             prompt,
         ]
         env = os.environ.copy()
-        env.update({
-            "CLINE_TOOL_APPROVAL_MODE": "desktop",
-            "CLINE_TOOL_APPROVAL_DIR": str(approval_dir),
-            "CLINE_SANDBOX": "1",
-        })
+        env.update(
+            {
+                "CLINE_TOOL_APPROVAL_MODE": "desktop",
+                "CLINE_TOOL_APPROVAL_DIR": str(approval_dir),
+                "CLINE_SANDBOX": "1",
+            }
+        )
         broker = DesktopApprovalBroker(
             contract=contract,
             approval_dir=approval_dir,
@@ -768,8 +815,6 @@ class ClineWorkerTransport:
                 or request.get("toolName") != tool_name
             ):
                 raise AdmissionError("approval request identity mismatch")
-            journal_uses.append(
-                (call_id, tool_name, _canonical_json_hash(request.get("input")))
-            )
+            journal_uses.append((call_id, tool_name, _canonical_json_hash(request.get("input"))))
         if tuple(journal_uses) != tool_uses:
             raise AdmissionError("tool-use mismatch with approval journal")

@@ -16,6 +16,7 @@ from runtime.integrations.cline_worker import (
     VerificationReceipt,
     run_discriminative_verification,
 )
+from runtime.worker_adapter import AdapterFailureKind, AdapterFailureReceipt
 from runtime.worker_admission import AdmissionError, ProbeContract, RawWorkerRun
 
 OLD_TEXT = "baseline-worker\n"
@@ -51,7 +52,7 @@ def sandbox(contract: ProbeContract) -> Path:
     contract.sandbox.mkdir(parents=True)
     (contract.sandbox / contract.artifact_name).write_bytes(contract.expected_bytes)
     (contract.sandbox / "verify_probe.py").write_text(
-        'import sys\n'
+        "import sys\n"
         'actual = open("artifact.txt", "rb").read()\n'
         'print("verified" if actual == b"admitted-worker\\n" else "rejected")\n'
         'sys.exit(0 if actual == b"admitted-worker\\n" else 1)\n'
@@ -165,11 +166,15 @@ class FakeClineProcess:
 
         (sandbox / "artifact.txt").write_bytes(NEW_TEXT.encode())
         requests = (
-            ("call-001", "editor", {
-                "path": str((sandbox / "artifact.txt").resolve()),
-                "old_text": OLD_TEXT,
-                "new_text": NEW_TEXT,
-            }),
+            (
+                "call-001",
+                "editor",
+                {
+                    "path": str((sandbox / "artifact.txt").resolve()),
+                    "old_text": OLD_TEXT,
+                    "new_text": NEW_TEXT,
+                },
+            ),
             ("call-002", "run_commands", {"commands": [VERIFY]}),
         )
         for call_id, tool_name, tool_input in requests:
@@ -182,29 +187,31 @@ class FakeClineProcess:
                 "input": tool_input,
                 "iteration": 1,
             }
-            (approval_dir / f"{SESSION}.request.{call_id}.json").write_text(
-                json.dumps(payload)
-            )
+            (approval_dir / f"{SESSION}.request.{call_id}.json").write_text(json.dumps(payload))
 
         manifest_path = session_dir / f"{SESSION}.json"
         messages_path = session_dir / f"{SESSION}.messages.json"
-        manifest_path.write_text(json.dumps({
-            "version": 1,
-            "session_id": SESSION,
-            "source": "cli",
-            "pid": self.pid,
-            "exit_code": returncode,
-            "status": "completed" if returncode == 0 else "failed",
-            "interactive": False,
-            "provider": PROVIDER,
-            "model": manifest_model,
-            "cwd": str(sandbox),
-            "workspace_root": str(sandbox),
-            "enable_tools": True,
-            "enable_spawn": False,
-            "enable_teams": False,
-            "messages_path": str(messages_path),
-        }))
+        manifest_path.write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "session_id": SESSION,
+                    "source": "cli",
+                    "pid": self.pid,
+                    "exit_code": returncode,
+                    "status": "completed" if returncode == 0 else "failed",
+                    "interactive": False,
+                    "provider": PROVIDER,
+                    "model": manifest_model,
+                    "cwd": str(sandbox),
+                    "workspace_root": str(sandbox),
+                    "enable_tools": True,
+                    "enable_spawn": False,
+                    "enable_teams": False,
+                    "messages_path": str(messages_path),
+                }
+            )
+        )
         if extra_manifest:
             (session_dir / "other.json").write_text("{}")
 
@@ -221,26 +228,39 @@ class FakeClineProcess:
             }
             for index, name in enumerate(message_tool_names, start=1)
         ]
-        messages_path.write_text(json.dumps({
-            "version": 1,
-            "sessionId": SESSION,
-            "origin": {"source": "cli", "sessionId": SESSION, "version": "3.0.56"},
-            "agent": "lead",
-            "messages": [{
-                "id": "assistant-001",
-                "role": "assistant",
-                "modelInfo": {"provider": message_provider, "id": message_model},
-                "content": tool_uses,
-            }],
-        }))
+        messages_path.write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "sessionId": SESSION,
+                    "origin": {"source": "cli", "sessionId": SESSION, "version": "3.0.56"},
+                    "agent": "lead",
+                    "messages": [
+                        {
+                            "id": "assistant-001",
+                            "role": "assistant",
+                            "modelInfo": {"provider": message_provider, "id": message_model},
+                            "content": tool_uses,
+                        }
+                    ],
+                }
+            )
+        )
 
-        stdout.write((json.dumps({
-            "type": "run_result",
-            "finishReason": finish_reason,
-            "model": {"provider": PROVIDER, "id": run_model},
-            "usage": {"inputTokens": 10, "outputTokens": 2},
-            "text": "worker prose is not evidence",
-        }) + "\n").encode())
+        stdout.write(
+            (
+                json.dumps(
+                    {
+                        "type": "run_result",
+                        "finishReason": finish_reason,
+                        "model": {"provider": PROVIDER, "id": run_model},
+                        "usage": {"inputTokens": 10, "outputTokens": 2},
+                        "text": "worker prose is not evidence",
+                    }
+                )
+                + "\n"
+            ).encode()
+        )
         stdout.flush()
         stderr.write(b"fixture-stderr\n")
         stderr.flush()
@@ -292,7 +312,7 @@ def test_missing_cline_binary_fails_before_request(
     monkeypatch.setattr("runtime.integrations.cline_worker.shutil.which", lambda _name: None)
 
     with pytest.raises(FileNotFoundError, match="cline"):
-        ClineWorkerTransport().run_probe(contract, evidence_root)
+        ClineWorkerTransport().run_diagnostic_probe(contract, evidence_root)
 
     assert not evidence_root.exists()
 
@@ -304,7 +324,7 @@ def test_transport_captures_structured_receipt_and_exact_invocation(
 ) -> None:
     created = _patch_popen(monkeypatch)
 
-    run = ClineWorkerTransport(timeout_seconds=300).run_probe(contract, evidence_root)
+    run = ClineWorkerTransport(timeout_seconds=300).run_diagnostic_probe(contract, evidence_root)
 
     assert isinstance(run, RawWorkerRun)
     assert run.probe_id == contract.probe_id
@@ -313,9 +333,7 @@ def test_transport_captures_structured_receipt_and_exact_invocation(
     assert run.receipt.actual_provider_id == PROVIDER
     assert run.receipt.actual_model_id == MODEL
     assert run.receipt.message_models == (MODEL,)
-    assert [decision.tool_name for decision in run.tool_decisions] == [
-        "editor", "run_commands"
-    ]
+    assert [decision.tool_name for decision in run.tool_decisions] == ["editor", "run_commands"]
     assert all(decision.approved for decision in run.tool_decisions)
     assert run.verification.candidate_exit_code == 0
     assert run.verification.mutation_exit_code != 0
@@ -323,15 +341,23 @@ def test_transport_captures_structured_receipt_and_exact_invocation(
     argv = created[0].args
     assert argv[:-1] == [
         "/opt/homebrew/bin/cline",
-        "-P", PROVIDER,
-        "-m", MODEL,
+        "-P",
+        PROVIDER,
+        "-m",
+        MODEL,
         "--json",
-        "--auto-approve", "false",
-        "--retries", "1",
-        "--thinking", "medium",
-        "-t", "300",
-        "-c", str(contract.sandbox),
-        "--data-dir", str(evidence_root / "cline-data"),
+        "--auto-approve",
+        "false",
+        "--retries",
+        "1",
+        "--thinking",
+        "medium",
+        "-t",
+        "300",
+        "-c",
+        str(contract.sandbox),
+        "--data-dir",
+        str(evidence_root / "cline-data"),
     ]
     assert "Perform exactly two tool calls" in argv[-1]
     assert created[0].env["CLINE_TOOL_APPROVAL_MODE"] == "desktop"
@@ -368,7 +394,7 @@ def test_transport_rejects_structural_or_identity_conflicts(
     _patch_popen(monkeypatch, **overrides)
 
     with pytest.raises(AdmissionError, match=reason):
-        ClineWorkerTransport().run_probe(contract, evidence_root)
+        ClineWorkerTransport().run_diagnostic_probe(contract, evidence_root)
 
 
 def test_worker_prose_cannot_override_structured_identity(
@@ -378,8 +404,22 @@ def test_worker_prose_cannot_override_structured_identity(
 ) -> None:
     _patch_popen(monkeypatch)
 
-    run = ClineWorkerTransport().run_probe(contract, evidence_root)
+    run = ClineWorkerTransport().run_diagnostic_probe(contract, evidence_root)
 
     stdout = (evidence_root / "stdout.raw").read_text()
     assert "worker prose is not evidence" in stdout
     assert run.receipt.actual_model_id == MODEL
+
+
+def test_legacy_cli_transport_is_mechanically_incapable_of_admission(
+    contract: ProbeContract,
+    evidence_root: Path,
+) -> None:
+    transport = ClineWorkerTransport()
+
+    result = transport.run_probe(contract, evidence_root)
+
+    assert transport.admission_capable is False
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is AdapterFailureKind.ADAPTER_VERSION_UNQUALIFIED
+    assert not evidence_root.exists()

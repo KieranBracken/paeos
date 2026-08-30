@@ -186,6 +186,9 @@ async function main() {
   emit("hello", { host: "cline_sdk_host", host_protocol: 1 }, false);
 
   const observedFetch = async (input, init) => {
+    if (currentTurn > config.max_declared_model_turns) {
+      throw new ProtocolError("declared model-turn budget exhausted");
+    }
     attemptOrdinal += 1;
     const correlationId = randomUUID();
     const turnId = `turn-${currentTurn}`;
@@ -206,7 +209,7 @@ async function main() {
       throw new ProtocolError("retry budget exhausted");
     }
     try {
-      const response = await globalThis.fetch(input, init);
+      const response = await globalThis.fetch(await input, init);
       emit("provider_attempt_finished", {
         attempt_ordinal: attemptOrdinal,
         correlation_id: correlationId,
@@ -268,9 +271,6 @@ async function main() {
     }
     currentTurn += 1;
     attemptOrdinal = 0;
-    if (currentTurn > config.max_declared_model_turns) {
-      throw new ProtocolError("declared model-turn budget exhausted");
-    }
     return { approved: response.payload.approved, result: response.payload.result };
   };
 
@@ -327,10 +327,11 @@ async function main() {
     manifest_path: result.manifestPath,
     messages_path: result.messagesPath,
   });
-  emit(ended.type === "session_failed" ? "failure" : "terminal", {
-    result: ended.result ?? {},
-    status: ended.type,
-  });
+  const terminalPayload = { result: ended.result ?? {}, status: ended.type };
+  if (["AUTH_FAILED", "RATE_LIMITED", "QUOTA_EXHAUSTED"].includes(ended.normalizedError)) {
+    terminalPayload.normalized_error = ended.normalizedError;
+  }
+  emit(ended.type === "session_failed" ? "failure" : "terminal", terminalPayload);
   unsubscribe();
   await core.stop(sessionId);
 }
