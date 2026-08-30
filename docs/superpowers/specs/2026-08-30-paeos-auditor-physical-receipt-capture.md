@@ -26,6 +26,11 @@ credentials or changing worker admission, Court, or lifecycle authority.
 - The one audit response is returned to the caller as a separate report payload. If an operational
   caller persists it, the report is a distinct create-only artifact; it is never embedded in the
   physical receipt and must be reviewed for secret leakage before publication.
+- If post-capture report or receipt validation fails, the operational CLI must preserve the exact
+  response in a private create-only `*.rejected` report, preserve the unbound physical receipt in a
+  distinct private create-only `*.rejected` receipt, and write a content-free `*.rejection.json`
+  record binding their hashes to the exact validator reason. These quarantine artifacts are not a
+  valid report/receipt pair and cannot authorize a retry, audit pass, or gate advancement.
 - A-08 is re-evaluated from the physical builder and auditor families. Unknown or same-family
   results fail closed.
 - Receipt persistence is create-only, canonical JSON, mode `0600`, and fsync-backed. Existing

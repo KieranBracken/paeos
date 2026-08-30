@@ -3116,3 +3116,28 @@ The candidate remains `bdff183accf2a87f78c960f8be75fa54d91d0735`; bundle SHA-256
 Remediated: 0**; all four debts remain **OPEN** and strict sealed progress remains **12/48 complete |
 36 remaining**. Gate C and downstream advancement remain blocked pending a separately authorized,
 successfully persisted candidate-bound non-GLM receipt/report pair.
+
+### Entry 185 — 2026-08-31: Rejected Auditor Response Quarantine Implemented
+
+Commit `55cc2baf204665b355f4a5c356b0aa8853c3c3b2` repairs the evidence-loss boundary exposed by
+Entry 184. Root cause: `ops/auditor_receipt_capture.py` held the completed provider response only in
+memory, validated it before persistence, and discarded `interaction.response_content` whenever
+post-capture report/receipt validation raised `AuditorReceiptError`.
+
+The test-first repair preserves three private, create-only artifacts on that exact failure path:
+the byte-exact rejected report (`*.rejected`), the unbound physical receipt (`*.rejected`), and a
+canonical content-free `*.rejection.json` record binding audit/candidate/evidence identities,
+report and receipt hashes, paths, and the exact validator reason. Normal valid report/receipt paths
+remain absent on rejection; validation is not relaxed; routing, retry, fallback, and provider logic
+are unchanged.
+
+The RED regression failed because no rejected report existed. GREEN verification: focused
+receipt/CLI suites passed **24/24**; targeted Ruff passed; targeted Pyright reported **0 errors, 0
+warnings, 0 informations**; the full non-gateway suite collected and passed **1,008/1,008** with
+exit `0`. No provider, credential, browser, clipboard, AppleScript, terminal paste, retry, or
+promotion was invoked.
+
+This is an implementation checkpoint, not L14/L17 evidence. The consumed Gemini attempt remains
+**BLOCKED_UNQUALIFIABLE** and is not reconstructed retroactively. Worker counts remain **Admitted:
+0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
+all four debts remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.

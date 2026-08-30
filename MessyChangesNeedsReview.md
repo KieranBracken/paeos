@@ -431,3 +431,18 @@ candidate-bound report or physical receipt under `/private/tmp`; its detached ex
 validator/persistence error text. This is operationally **BLOCKED_UNQUALIFIABLE**, not an L14 pass
 or remand. No second provider request, retry, fallback, workaround, or fabricated evidence was
 attempted. Worker/Court counts and **12/48** strict sealed progress are unchanged.
+
+## 2026-08-31 — Rejected auditor response quarantine repair
+
+Commit `55cc2baf204665b355f4a5c356b0aa8853c3c3b2` changes only
+`ops/auditor_receipt_capture.py` and its operational regression test. After a physical response is
+captured, any report/receipt validation failure now preserves the byte-exact rejected report, the
+unbound physical receipt, and a canonical content-free rejection record with the exact reason and
+hash bindings. All artifacts are create-only and mode `0600`; normal valid report/receipt paths
+remain absent. Validation and provider routing are unchanged.
+
+The regression was observed RED before implementation and GREEN afterward. Focused suites passed
+**24/24**; full non-gateway verification passed **1,008/1,008**; changed-path Ruff and Pyright are
+clean. No provider call or retry occurred. This is implementation evidence only; the earlier
+Gemini response remains unqualifiable, counts remain **0/1/0** and **0/0/0**, and strict sealed
+progress remains **12/48 complete | 36 remaining**.

@@ -135,3 +135,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   detached execution boundary. Operational disposition is **BLOCKED_UNQUALIFIABLE**; no second
   provider request, retry, fallback, or fabricated report is allowed. Worker/Court counts remain
   **0/1/0** and **0/0/0**; strict sealed progress remains **12/48 complete | 36 remaining**.
+- 2026-08-31 commit `55cc2ba` closes the local evidence-loss implementation gap: rejected
+  post-capture auditor output, its unbound physical receipt, and an exact content-free reason record
+  are now private, create-only quarantine artifacts. The RED probe failed on absent evidence; focused
+  tests passed **24/24**, the non-gateway suite passed **1,008/1,008**, and changed-path Ruff/Pyright
+  are clean. This does not repair the consumed audit retroactively or authorize another provider
+  call; strict sealed progress remains **12/48 complete | 36 remaining**.
