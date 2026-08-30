@@ -2498,3 +2498,18 @@ closure, Court seal, debt repayment, canary, or Gates B–G advancement is autho
 
 Worker-admission counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**. Court counts remain
 **Sealed: 0 | Remanded: 0 | Remediated: 0**. DEBT-0058 remains **OPEN**.
+
+### Entry 157 — 2026-08-30: Auditor-Receipt Path Recheck
+
+The existing model-router state was inspected read-only after the Task 9 checkpoint. Its
+`routing_observations` schema stores provider/model/family, task/logical model, latency, token
+counts, success, and normalized error, but no invocation-bound physical receipt, transcript hash,
+or auditor identity binding. The router and LiteLLM transport likewise expose derived model family
+on `RouterResponse` without producing the candidate-bound receipt required by L14.
+
+The local provider-health table is operational telemetry only: it cannot establish that a specific
+auditor session ran, nor that it reviewed candidate `adf76c6` (or any later candidate). Historical
+Gemini/Llama observations are unrelated to this review. No provider was invoked, no credential was
+read, and no receipt was fabricated. L14 therefore remains **BLOCKED_UNQUALIFIABLE** and Task 10
+remains blocked under Checkpoint 4. Worker-admission counts remain **Admitted: 0 | Rejected: 1 |
+Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**.
