@@ -350,3 +350,12 @@ repository-wide inherited static debt is not waived. DEBT-0059/0061 remain open 
 external repayment conditions. DEBT-0060 was traced to the legacy GUI monitor writing outside the
 injected bridge response path; the event-watchdog plan remains the approved fix and no GUI path was
 re-enabled.
+
+## 2026-08-30 — Event-watchdog recovery candidate (isolated branch)
+
+Commits `55000cf`, `53a96a5`, `b29f6ec`, `3f865a3`, `873f8c2`, and `0857a13` implement the
+test-first event watchdog, fenced recovery controller, storage back-pressure, and run-once
+state-root-bound CLI. The legacy GUI monitor is disabled; no clipboard, AppleScript, CDP, browser,
+or automatic restart path is active. Focused checks and the full non-gateway suite (**995
+collected/passed**) are green. DEBT-0060 remains open pending fault-matrix and independent L14/L17
+evidence; no gate seal or production dispatch is claimed.

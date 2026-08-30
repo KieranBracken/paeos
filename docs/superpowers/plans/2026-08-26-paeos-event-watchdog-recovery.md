@@ -377,7 +377,7 @@ git commit -m "fix(ops): replace GUI monitor with event watchdog"
 - Modify: `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`
 - Modify: `MessyChangesNeedsReview.md` only for unresolved debt
 
-- [ ] **Step 6.1: Run focused and full verification fresh**
+- [x] **Step 6.1: Run focused and full verification fresh**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \

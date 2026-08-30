@@ -93,3 +93,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   legacy GUI monitor writing outside the injected bridge response path; the event-watchdog plan
   remains the approved remediation. Strict sealed progress is **12/48 complete | 36 remaining**;
   no Gate C seal, Gate D–G advancement, production dispatch, or SAKG resumption is authorized.
+- 2026-08-30 event-watchdog candidate: commits `55000cf`, `53a96a5`, `b29f6ec`, `3f865a3`,
+  `873f8c2`, and `0857a13` add monotonic liveness, typed read-only recovery decisions, fenced
+  recovery application, storage back-pressure, and a run-once state-root-bound CLI; the legacy
+  GUI monitor is disabled. Fresh non-gateway verification collected **995** and passed. This is
+  not a gate seal: DEBT-0060 remains open pending the liveness fault matrix and independent
+  L14/L17 evidence; strict sealed progress remains **12/48 complete | 36 remaining**.

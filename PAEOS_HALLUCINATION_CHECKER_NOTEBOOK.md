@@ -2948,3 +2948,23 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 **Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and
 `DEBT-0061` remain **OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**.
 No Gate C seal, Gate D–G advancement, production dispatch, or SAKG resumption is authorized.
+
+### Entry 177 — 2026-08-30: Event-Watchdog Recovery Candidate Implemented
+
+The isolated recovery branch implemented the approved event-watchdog remediation for DEBT-0060
+in commits `55000cf`, `53a96a5`, `b29f6ec`, `3f865a3`, `873f8c2`, and `0857a13`. The candidate
+replaces repository/log/process-idle heuristics as control authority with monotonic meaningful
+events, typed liveness assessments, read-only recovery proposals, compare-before-commit recovery,
+storage back-pressure, and a state-root-bound run-once CLI. The legacy GUI monitor is disabled;
+the cron wrapper invokes only the event CLI and retains its executable bit.
+
+Fresh verification: the full non-gateway suite collected **995** and passed; focused control-plane
+and bridge tests passed; changed files passed Ruff and Pyright. No provider, credential, browser,
+clipboard, AppleScript, terminal paste, live worker, restart, or automatic retry was invoked.
+
+This remains an implementation candidate, not a sealed lifecycle milestone. The liveness fault
+matrix and physically decorrelated L14/L17 audit are outstanding, so DEBT-0060 remains **OPEN**.
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; strict sealed progress remains
+**12/48 complete | 36 remaining**. No Gate C seal, Gate D–G advancement, production dispatch, or
+SAKG resumption is authorized.
