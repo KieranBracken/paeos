@@ -7,16 +7,12 @@ It is integrated with paeos.model_router.a08_enforcer for fail-closed verificati
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
+from collections.abc import Sequence
+from typing import Optional
 
-from paeos.model_router.a08_enforcer import (
-    A08Enforcer,
-    A08EnforcementResult,
-    A08Verdict,
-    resolve_logical_model_family,
-)
+from paeos.model_router.a08_enforcer import A08Enforcer, A08EnforcementResult
 from paeos.model_router.catalog import ModelCatalog
-from paeos.model_router.types import ModelCatalogEntry, ModelFamily, ProviderId
+from paeos.model_router.types import ModelCatalogEntry, ModelFamily
 
 
 @dataclass
@@ -30,31 +26,17 @@ class AuditRouteResult:
     rejection_reason: Optional[str] = None
 
 
-# Preferred Heterogeneous Auditor Mapping
-# Strict Invariant: Auditor Family MUST NEVER equal Builder Family
-AUDITOR_MAPPING = {
-    ModelFamily.DEEPSEEK: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.LAGUNA],
-    ModelFamily.MINIMAX: [ModelFamily.GEMINI, ModelFamily.GLM],
-    ModelFamily.GEMINI: [ModelFamily.GLM, ModelFamily.DEEPSEEK, ModelFamily.LAGUNA],
-    ModelFamily.GLM: [ModelFamily.GEMINI, ModelFamily.DEEPSEEK],
-    ModelFamily.LAGUNA: [ModelFamily.GEMINI, ModelFamily.GLM],
-    ModelFamily.HY3: [ModelFamily.GEMINI, ModelFamily.GLM],
-    ModelFamily.NEMOTRON: [ModelFamily.GEMINI, ModelFamily.GLM],
-    ModelFamily.UNKNOWN: [],  # Unknown builder family = FAIL CLOSED
-}
-
-
 def select_heterogeneous_auditor(
     builder_family: ModelFamily,
     catalog: ModelCatalog,
-    available_providers: List[ProviderId],
+    available_providers: Sequence[str] | None = None,
 ) -> Optional[ModelCatalogEntry]:
     """
     Selects an auditor from a strictly distinct model family from the builder.
     Uses A-08 enforcer for fail-closed semantics.
     """
     enforcer = A08Enforcer(catalog)
-    result = enforcer.select_auditor(builder_family, available_providers)
+    result = enforcer.select_auditor(builder_family, list(available_providers or ()))
     
     if result is None:
         return None
@@ -68,7 +50,7 @@ def select_heterogeneous_auditor_with_enforcement(
     builder_provider: str,
     builder_model_id: str,
     catalog: ModelCatalog,
-    available_providers: List[ProviderId],
+    available_providers: Sequence[str] | None = None,
 ) -> AuditRouteResult:
     """
     Select a heterogeneous auditor with full A-08 enforcement.
@@ -79,7 +61,7 @@ def select_heterogeneous_auditor_with_enforcement(
     enforcer = A08Enforcer(catalog)
     
     # Attempt to select a heterogeneous auditor
-    selection_result = enforcer.select_auditor(builder_family, available_providers)
+    selection_result = enforcer.select_auditor(builder_family, list(available_providers or ()))
     
     if selection_result is None:
         # No eligible heterogeneous auditor found
@@ -98,7 +80,7 @@ def select_heterogeneous_auditor_with_enforcement(
         builder_provider=builder_provider,
         builder_model_id=builder_model_id,
         builder_family=builder_family,
-        auditor_provider=auditor_model.provider_id.value,
+        auditor_provider=str(getattr(auditor_model.provider_id, "value", auditor_model.provider_id)),
         auditor_model_id=auditor_model.model_id,
         auditor_family=auditor_family,
     )
@@ -141,7 +123,7 @@ def verify_audit_route(
 
 def verify_fallback_chain(
     builder_family: ModelFamily,
-    fallback_chain: List[tuple],
+    fallback_chain: list[tuple],
     catalog: ModelCatalog,
 ) -> A08EnforcementResult:
     """

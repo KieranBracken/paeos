@@ -22,7 +22,6 @@ from paeos.model_router.types import (
     NormalizedError,
     NormalizedErrorType,
     ProviderHealth,
-    ProviderId,
     RouterResponse,
     TaskClass,
     TaskRequest,

@@ -17,7 +17,6 @@ from paeos.model_router.types import (
     ModelCatalogEntry,
     ModelFamily,
     ProviderHealth,
-    ProviderId,
     TaskClass,
     TaskRequest,
 )

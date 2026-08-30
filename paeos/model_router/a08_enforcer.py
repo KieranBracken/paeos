@@ -17,9 +17,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from collections.abc import Sequence
 from typing import List, Optional, Tuple
 
 from paeos.model_router.catalog import ModelCatalog
+from paeos.model_router.providers import normalize_provider_key
 from paeos.model_router.types import ModelCatalogEntry, ModelFamily, ProviderId
 
 
@@ -29,6 +31,7 @@ class A08Verdict(Enum):
     FAIL_SAME_FAMILY = "FAIL_SAME_FAMILY"
     FAIL_UNKNOWN_BUILDER = "FAIL_UNKNOWN_BUILDER"
     FAIL_UNKNOWN_AUDITOR = "FAIL_UNKNOWN_AUDITOR"
+    FAIL_CONFLICTING_EVIDENCE = "FAIL_CONFLICTING_EVIDENCE"
     FAIL_NO_ELIGIBLE_AUDITOR = "FAIL_NO_ELIGIBLE_AUDITOR"
 
 
@@ -119,7 +122,7 @@ class A08Enforcer:
             model_id=auditor_model_id,
             family=auditor_family,
         )
-        
+
         # Check for unknown builder family - FAIL CLOSED
         if builder_family == ModelFamily.UNKNOWN:
             return A08EnforcementResult(
@@ -137,6 +140,26 @@ class A08Enforcer:
                 auditor_provenance=auditor_prov,
                 reason="Auditor family unknown - heterogeneous independence unverified. FAIL CLOSED.",
             )
+
+        # A catalog entry is an additional integrity witness.  Dynamic aliases intentionally carry
+        # UNKNOWN catalog families, so only a known catalog family can conflict with a receipt.
+        for provenance in (builder_prov, auditor_prov):
+            catalog_entry = self._catalog.get(provenance.model_id)
+            if catalog_entry is None or catalog_entry.family == ModelFamily.UNKNOWN:
+                continue
+            catalog_provider = normalize_provider_key(
+                getattr(catalog_entry.provider_id, "value", catalog_entry.provider_id)
+            )
+            if catalog_provider != normalize_provider_key(provenance.provider) or catalog_entry.family != provenance.family:
+                return A08EnforcementResult(
+                    verdict=A08Verdict.FAIL_CONFLICTING_EVIDENCE,
+                    builder_provenance=builder_prov,
+                    auditor_provenance=auditor_prov,
+                    reason=(
+                        f"Catalog provenance conflicts with supplied physical receipt for "
+                        f"{provenance.model_id}; A-08 evidence rejected."
+                    ),
+                )
         
         # Check for same family - FAIL/REMAND
         if builder_family == auditor_family:
@@ -158,7 +181,7 @@ class A08Enforcer:
     def select_auditor(
         self,
         builder_family: ModelFamily,
-        available_providers: Optional[List[ProviderId]] = None,
+        available_providers: Optional[Sequence[str | ProviderId]] = None,
     ) -> Optional[Tuple[ModelCatalogEntry, ModelFamily]]:
         """
         Select a heterogeneous auditor for a given builder family.
@@ -170,6 +193,13 @@ class A08Enforcer:
             # Unknown builder family - no eligible auditor
             return None
         
+        allowed_providers: set[str] | None = None
+        if available_providers:
+            try:
+                allowed_providers = {normalize_provider_key(provider) for provider in available_providers}
+            except (TypeError, ValueError):
+                return None
+
         # Get preferred auditor families for this builder
         preferred_families = AUDITOR_MAPPING.get(builder_family, [])
         
@@ -185,7 +215,9 @@ class A08Enforcer:
                     continue
                 if not model.available:
                     continue
-                if available_providers and model.provider_id not in available_providers:
+                if allowed_providers is not None and normalize_provider_key(
+                    getattr(model.provider_id, "value", model.provider_id)
+                ) not in allowed_providers:
                     continue
                 return (model, target_family)
         
@@ -197,7 +229,9 @@ class A08Enforcer:
                 continue
             if not model.available:
                 continue
-            if available_providers and model.provider_id not in available_providers:
+            if allowed_providers is not None and normalize_provider_key(
+                getattr(model.provider_id, "value", model.provider_id)
+            ) not in allowed_providers:
                 continue
             return (model, model.family)
         
