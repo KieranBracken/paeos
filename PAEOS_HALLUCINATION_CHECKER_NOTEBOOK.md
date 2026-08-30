@@ -2763,3 +2763,62 @@ No provider was invoked and no credential was read. Worker counts remain **Admit
 Gate B Task 5 and Gate C Tasks 1–3 still require independent evidence/audit before they can count
 toward sealed progress. Gate A's authenticated live-admission prerequisite remains open. No
 production dispatch, gate closure, or SAKG resumption is authorized.
+
+### Entry 169 — 2026-08-30: Gate C Durable-State Compatibility Candidate
+
+The isolated recovery branch implemented Gate C Task 4 in local commits `6553ba9` and `1574c3e`.
+Router state now accepts validated normalized string keys while preserving `ProviderId` compatibility,
+seeds only trusted registry descriptors, and rejects invalid identities before any persistence
+operation. Existing SQLite text rows and schema remain unchanged. Observability and the probe harness
+iterate registry snapshots rather than a compiled provider list; future-provider rows and diagnostics
+are covered without provider calls.
+
+Fresh verification: the migration suite passed **4 tests**; the complete non-gateway repository suite
+collected **901 tests** and passed; whole-package Pyright returned **0 errors, 0 warnings,
+0 informations**. No live provider was invoked and no credential was read. The standalone RED
+transcript is not retained, so Step 4.2 remains an explicit evidence gap.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 |
+Remanded: 0 | Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains
+**12/48 complete | 36 remaining**; Gate B Task 5 and Gate C Tasks 1–4 require independent
+evidence/audit before counting toward sealed progress. Gate A's authenticated live-admission
+prerequisite remains open. No production dispatch, gate closure, or SAKG resumption is authorized.
+
+### Entry 170 — 2026-08-30: Gate C A-08 Architecture Candidate
+
+The isolated recovery branch implemented Gate C Task 5 in local commit `647a016`
+(`647a016e72f87cc21b1b4141e479cf5740c1067b`). A-08 now has one canonical family-decorrelation
+mapping; audit wrappers no longer maintain a duplicate provider/family table. Core router/policy/
+transport/coordinator/lifecycle/audit modules are checked for provider-enum branches and built-in
+provider literals. A catalog-vs-receipt family/provider conflict is rejected with a dedicated
+fail-closed verdict, while dynamic aliases with UNKNOWN catalog families retain their existing
+physical-family behavior. Persisted-key validation follow-up is `1574c3e`.
+
+Fresh verification: architecture, A-08 integration, and generic-decorrelation tests passed
+**53 tests**; the complete non-gateway repository suite passed **903 tests**; whole-package
+Pyright returned **0 errors, 0 warnings, 0 informations**; `git diff --check` was clean. The
+model-router/test Ruff baseline remains **306 findings** and is not silently waived. No provider
+was invoked and no credential was read. The standalone RED transcript is not retained.
+
+This remains an implementation candidate, not a sealed Gate C milestone. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
+36 remaining**; Gate B Task 5, Gate C Tasks 1–5, and the Gate C migration audit remain open. No
+production dispatch, gate closure, or SAKG resumption is authorized.
+
+### Entry 171 — 2026-08-30: Gate C Migration Audit Checkpoint
+
+The Gate C implementation/audit checkpoint is recorded in
+`reviews/tasks/PAEOS_PROVIDER_ADAPTER_REGISTRY_review.md` for candidate
+`1574c3ec5e558b368211e2c7b79560c36ee37963`. Applicable model-router/runtime verification passed
+**643 tests** with the restricted loopback gateway test excluded; the complete non-gateway
+repository suite passed **903 tests**. Full repository static baselines remain non-green:
+**637 Ruff findings** and **111 Pyright diagnostics**. No standalone RED transcripts or
+candidate-bound physical non-GLM L14 receipt are available, and no descriptor snapshot has been
+constitutionally approved.
+
+Disposition is **CHECKPOINT_RECORDED — NOT A CONSTITUTIONAL RATIFICATION**. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
+36 remaining**. Gate C is not sealed and no Gate D–G implementation may claim Gate C closure;
+production dispatch and SAKG resumption remain unauthorized.

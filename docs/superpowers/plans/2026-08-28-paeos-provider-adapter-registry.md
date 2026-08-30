@@ -305,7 +305,7 @@ git commit -m "refactor(routing): derive provider policy from descriptors"
 - Test: `tests/model_router/test_provider_state_migration.py`
 - Test: `tests/model_router/test_state_and_aimd.py`
 
-- [ ] **Step 4.1: Write RED legacy-state migration tests**
+- [x] **Step 4.1: Write RED legacy-state migration tests**
 
 Create a state database containing every existing provider key using the current schema. Open it
 with the migrated code and assert identical health, cooldown, concurrency, quota-window, and usage
@@ -321,13 +321,13 @@ record or fail startup before routing; they must never be silently normalized to
 
 Expected: the future-provider persistence case fails against enum-bound state APIs.
 
-- [ ] **Step 4.3: Migrate state APIs to normalized string keys**
+- [x] **Step 4.3: Migrate state APIs to normalized string keys**
 
 Keep the SQLite representation unchanged when it already stores text. Normalize and validate at
 API boundaries, preserve old rows byte-for-byte, and update the probe harness to use registry
 snapshots rather than a compiled provider list.
 
-- [ ] **Step 4.4: Run GREEN**
+- [x] **Step 4.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -335,7 +335,14 @@ snapshots rather than a compiled provider list.
   tests/model_router/test_state_and_aimd.py
 ```
 
-- [ ] **Step 4.5: Commit**
+- [x] **Step 4.5: Commit**
+
+The migration suite and complete non-gateway model-router suite pass; the standalone RED transcript
+is not retained. Invalid provider identities fail closed at the persistence boundary. The SQLite
+schema and existing built-in rows remain unchanged.
+
+Implementation was committed locally in `6553ba9`; the exact evidence is recorded in the audit
+notebook.
 
 ```bash
 git add paeos/model_router/state.py paeos/model_router/observability.py \
@@ -356,7 +363,7 @@ git commit -m "refactor(routing): persist open provider keys compatibly"
 - Modify: `tests/model_router/test_a08_integration.py`
 - Modify: `tests/model_router/test_generic_decorrelation.py`
 
-- [ ] **Step 5.1: Write RED architecture and A-08 tests**
+- [x] **Step 5.1: Write RED architecture and A-08 tests**
 
 Add an AST test prohibiting built-in provider names and `ProviderId` branches in router, policy,
 transport, coordinator, lifecycle, and audit-policy modules. Register a synthetic provider whose
@@ -374,7 +381,7 @@ Register the same provider with unknown or conflicting family evidence and prove
 Expected: architecture checks fail on remaining hard-coded provider branches or duplicated auditor
 mapping.
 
-- [ ] **Step 5.3: Centralize family decorrelation policy and remove remaining core branches**
+- [x] **Step 5.3: Centralize family decorrelation policy and remove remaining core branches**
 
 Keep one canonical family-decorrelation mapping in A-08 and make audit consume it. Remove
 provider-name decisions from core modules while preserving explicit built-in descriptor assembly.
@@ -392,7 +399,14 @@ git diff --check
 Expected: all checks pass. The synthetic provider participates in routing but cannot enter a
 protected role without verified physical-family evidence.
 
-- [ ] **Step 5.5: Commit**
+The model-router tests, architecture scan, Pyright, and `git diff --check` pass. The repository
+Ruff baseline remains non-zero (306 findings in the model-router/test scope), so this step stays
+open until that inherited debt is remediated or explicitly dispositioned by Court.
+
+- [x] **Step 5.5: Commit**
+
+Implementation and tests were committed locally in `647a016`; the fail-closed persisted-key
+validation follow-up is `1574c3e`.
 
 ```bash
 git add paeos/model_router/a08_enforcer.py paeos/model_router/audit.py \
@@ -422,6 +436,10 @@ git commit -m "test(routing): prove provider plug-in independence"
 git diff --check
 ```
 
+Applicable model-router/runtime tests pass when the restricted loopback gateway test is excluded;
+the complete non-gateway repository suite is green. The full-repository static commands are not
+green (`ruff`: 637 findings; `pyright`: 111 diagnostics), so this step remains open.
+
 - [ ] **Step 6.2: Run discriminative baseline/candidate proof**
 
 Run the synthetic-provider contract against the parent commit and candidate. The parent must fail
@@ -440,10 +458,17 @@ Record exact Court counts, remands, remediations, compatibility debt, and the ap
 descriptor snapshot hash. This gate proves extensibility; adding or enabling a live provider still
 requires its own policy, credential, physical-identity, canary, and admission evidence.
 
-- [ ] **Step 6.5: Commit review records**
+Counts and unresolved debt are recorded in `reviews/tasks/PAEOS_PROVIDER_ADAPTER_REGISTRY_review.md`.
+No candidate-bound physical receipt or approved descriptor snapshot hash is available, so this
+step remains open.
+
+- [x] **Step 6.5: Commit review records**
 
 ```bash
 git add PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md MessyChangesNeedsReview.md \
   reviews/tasks/PAEOS_PROVIDER_ADAPTER_REGISTRY_review.md
 git commit -m "docs(review): record provider registry migration disposition"
 ```
+
+The review record is a checkpoint, not constitutional ratification: L14/L17 physical evidence,
+RED transcripts, and static debt remain unresolved.
