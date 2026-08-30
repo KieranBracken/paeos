@@ -165,7 +165,7 @@ class ProviderTransportRegistry:
     def resolve(self, adapter_id: str) -> ProviderTransport: ...
 ```
 
-- [ ] **Step 2.1: Write RED transport parity and synthetic-provider tests**
+- [x] **Step 2.1: Write RED transport parity and synthetic-provider tests**
 
 Capture existing Google, NVIDIA, Kilo, OpenRouter, and Cline request/response fixtures. Assert exact
 endpoint, message normalization, ZDR headers, Cline envelope parsing, usage/model observation, and
@@ -182,14 +182,14 @@ uses it without a provider-name conditional.
 
 Expected: collection fails because transport adapters do not exist.
 
-- [ ] **Step 2.3: Extract generic and Cline transports, then inject the registry**
+- [x] **Step 2.3: Extract generic and Cline transports, then inject the registry**
 
 Implement one configurable OpenAI-compatible transport and one Cline-envelope transport. Convert
 `LiteLLMTransport` into a dispatcher that resolves the provider descriptor, obtains the credential,
 and delegates exactly once. Move provider-specific error predicates into the applicable adapter or
 descriptor. Preserve raw response/error evidence and do not add retries.
 
-- [ ] **Step 2.4: Run GREEN and assert removal of provider branches**
+- [x] **Step 2.4: Run GREEN and assert removal of provider branches**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -203,7 +203,10 @@ rg -n "ProviderId\.(GOOGLE|CLINE|NVIDIA|KILO|OPENROUTER)" \
 Expected: tests pass and the final `rg` produces no matches. Record its exit code `1` as the
 expected no-match result, not a failed verification.
 
-- [ ] **Step 2.5: Commit**
+The adapter parity suite passes. Provider-specific error normalization remains in the compatibility
+normalizer for this step and will be descriptor-backed during Task 3; no error rule was deleted.
+
+- [x] **Step 2.5: Commit**
 
 ```bash
 git add paeos/model_router/provider_transports.py paeos/model_router/transport.py \

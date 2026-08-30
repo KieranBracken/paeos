@@ -2715,3 +2715,29 @@ No provider was invoked and no credential was read. Worker counts remain **Admit
 Gate B Task 5 still awaits decorrelated L14/L17 verification, and Gate A's authenticated live
 admission prerequisite remains open. No production dispatch, Gate closure, or SAKG resumption is
 authorized.
+
+### Entry 167 — 2026-08-30: Gate C Transport Extraction Candidate
+
+The isolated recovery branch implemented Gate C Task 2 in local commit `343eb5b`
+(`343eb5b21b67b7f466beacc9c27547bdc4d1df2a`). Provider wire behavior now lives behind an explicit
+`ProviderTransportRegistry`: a configurable OpenAI-compatible adapter preserves endpoint,
+NVIDIA single-tool-call normalization, OpenRouter confidential ZDR, and response fingerprints;
+the Cline adapter preserves its `data` envelope and exact `/chat/completions` endpoint. The
+`LiteLLMTransport` seam now resolves a bound adapter and delegates once, with no
+`ProviderId.GOOGLE/CLINE/NVIDIA/KILO/OPENROUTER` branches (`rg` returned expected exit 1).
+Synthetic provider binding is covered without adding an enum member. Existing transport patch
+points remain import-compatible.
+
+Fresh verification: transport/error/A-08/receipt parity tests passed **41 tests**; the broader
+non-gateway suite passed **891 tests**. Ruff and Pyright passed on all changed/new transport files.
+The four gateway tests remain blocked by the sandbox loopback `PermissionError`; no provider was
+called and no credential was read. The separate RED transcript is not retained. Provider-specific
+error predicates remain in the compatibility normalizer pending descriptor migration in Task 3;
+no behavior was silently removed.
+
+This is an implementation candidate, not a sealed Gate C milestone. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
+36 remaining**. Gate B Task 5 still awaits decorrelated L14/L17 verification, Gate C Task 1 still
+has the 38-finding legacy `types.py` Ruff baseline, and Gate A's authenticated live-admission
+prerequisite remains open. No production dispatch, gate closure, or SAKG resumption is authorized.
