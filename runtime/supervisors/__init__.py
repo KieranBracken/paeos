@@ -29,12 +29,15 @@ from runtime.supervisors.protocol import (
     encode_response,
     validate_response,
 )
+from runtime.supervisors.registry import SupervisorAdapterDescriptor, SupervisorAdapterRegistry
 
 __all__ = [
     "CHECKPOINT_SCHEMA_VERSION",
     "MAX_PROFILE_TTL_SECONDS",
     "AdapterResult",
     "SupervisorAdapter",
+    "SupervisorAdapterDescriptor",
+    "SupervisorAdapterRegistry",
     "SupervisorAdmissionDecision",
     "SupervisorAdmissionProfile",
     "SupervisorCheckpoint",
