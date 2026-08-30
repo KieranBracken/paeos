@@ -11,6 +11,7 @@ from runtime.control_plane.coordinator import (
     StaleFence,
     TransactionCoordinator,
 )
+from runtime.control_plane.projection import ProjectionError
 from runtime.control_plane.sqlite_projection import SqliteControlPlaneProjection
 from runtime.integrations.bridge_protocol import (
     TransactionEvent,
@@ -167,5 +168,34 @@ def test_recover_projection_replays_committed_ledger(tmp_path: Path) -> None:
     assert coordinator.recover_projection() == prepared.ledger_head
     assert (
         projection.get("req-001", verified_ledger_head=prepared.ledger_head).record.state
+        is TransactionState.PREPARED
+    )
+
+
+def test_projection_failure_after_append_rebuilds_without_second_event(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    coordinator, ledger, projection = coordinator_case(tmp_path)
+
+    def fail_after_append(*_args: object, **_kwargs: object) -> None:
+        raise ProjectionError("injected projection crash")
+
+    monkeypatch.setattr(projection, "apply_committed", fail_after_append)
+    receipt = coordinator.prepare(
+        TransactionRecord(
+            schema_version="paeos-bridge-v2",
+            request_id="req-001",
+            transaction_key="a" * 64,
+            run_id="run-001",
+            stage_id="L14",
+            payload_hash="b" * 64,
+        ),
+        expected_ledger_head=ledger.head_hash(),
+    )
+
+    assert len(ledger.read()) == 1
+    assert (
+        projection.get("req-001", verified_ledger_head=receipt.ledger_head).record.state
         is TransactionState.PREPARED
     )
