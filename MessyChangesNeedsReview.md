@@ -391,3 +391,22 @@ the latter was independently confirmed by collection-only and raw progress-dot c
 995 checkpoint was stale by the 11 fault-matrix tests added in `e354bd9`. No runtime or source files
 were changed. This remains GLM-family worker evidence, not a decorrelated L14 audit or gate seal;
 the four open recovery debts and **12/48** strict sealed progress are unchanged.
+
+## 2026-08-31 — Headless qualification/static baseline checkpoint
+
+The isolated recovery branch ran the bounded headless worker/control-plane qualification set with
+no provider, credentials, browser, clipboard, AppleScript, terminal paste, or live adapter. The
+collection-only total was **234**, and the execution passed all collected tests (exit `0`). This is
+implementation evidence only; worker admission and Builder != Auditor remain unproven.
+
+Separate checks recorded an inherited static baseline: Ruff emitted **5 findings** (I001, E501,
+and three F841 findings) in the existing `tests/model_router/test_a08_integration.py`; the venv
+Pyright run emitted **36 diagnostics** across existing control-plane/Cline SDK/A08 test fixtures.
+No unrelated source/test cleanup was performed, and no static-clean claim is made. The initial
+Pyright path list contained a nonexistent `ops/worker_admission_probe_sdk.py`; that invocation was
+stopped and the corrected path list was run once. No identical failed command was retried.
+
+This checkpoint does not change worker/Court counts (**0/1/0**, **0/0/0**) or strict sealed
+progress (**12/48 complete | 36 remaining**). All four recovery debts remain open and the
+candidate-bound non-GLM L14/L17 invocation remains blocked pending destination-specific
+authorization.

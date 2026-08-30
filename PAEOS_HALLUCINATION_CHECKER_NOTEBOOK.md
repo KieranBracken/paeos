@@ -3048,3 +3048,29 @@ or workaround occurred. This is not an auditor result and does not satisfy A-08,
 prepared prompt and bundle remain available for an explicitly authorized one-shot invocation.
 Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0
 | Remanded: 0 | Remediated: 0**; strict sealed progress remains **12/48 complete | 36 remaining**.
+
+### Entry 182 — 2026-08-31: Headless Qualification and Inherited Static Baseline
+
+The isolated recovery worktree ran the bounded headless worker/control-plane qualification set
+without a provider, credential, browser, clipboard, AppleScript, terminal paste, or live adapter.
+Collection-only reconciliation reported **234 tests**, and the execution completed with all
+collected tests passing (exit `0`). This is local implementation evidence only; it does not admit a
+worker or satisfy Builder != Auditor.
+
+Separate static checks were run against the same headless/control-plane scope. Ruff reported five
+findings, all in the existing `tests/model_router/test_a08_integration.py` test module (I001, E501,
+and three F841 unused-value findings). Pyright reported **36 diagnostics**, all in existing test
+fixtures/modules (primarily typed helper fixtures in `tests/runtime/control_plane/`, plus the A08,
+Cline SDK protocol/approval/transport tests). These findings are preserved as an inherited static
+baseline; no unrelated test cleanup was introduced and no claim of static cleanliness is made.
+
+The direct `pyright` executable was absent from PATH; the repository venv executable was used for
+the separate check. One initial invocation contained a nonexistent path
+(`ops/worker_admission_probe_sdk.py`) and was stopped; the corrected invocation ran once. No
+identical failed command was retried.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0
+| Remanded: 0 | Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain
+**OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**. The non-GLM L14/L17
+audit is still blocked on destination-specific authorization and a fresh candidate-bound bundle;
+no Gate C seal or downstream dispatch is authorized.

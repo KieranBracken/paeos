@@ -117,3 +117,10 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   before process start by the execution boundary because its Google Gemini destination and internal
   metadata payload lacked destination-specific authorization. No provider call or retry occurred;
   the audit remains blocked and the prepared bundle is preserved in `/private/tmp`.
+- 2026-08-31 the bounded headless worker/control-plane qualification set collected **234 tests**
+  and passed all collected tests with exit `0`, without provider, credential, browser, clipboard,
+  AppleScript, terminal-paste, or live-adapter use. Separate static checks recorded an inherited
+  baseline of **5 Ruff findings** in `tests/model_router/test_a08_integration.py` and **36 Pyright
+  diagnostics** across existing test fixtures/modules. These are not waived or claimed clean; no
+  unrelated cleanup was introduced. Worker/Court counts remain **0/1/0** and **0/0/0**; strict
+  sealed progress remains **12/48 complete | 36 remaining** and all four recovery debts remain open.
