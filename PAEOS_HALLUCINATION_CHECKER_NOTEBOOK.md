@@ -2843,3 +2843,18 @@ Disposition is **CHECKPOINT_RECORDED — NOT A CONSTITUTIONAL RATIFICATION**. Wo
 Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
 36 remaining**. Gate C remains unsealed; Gate D–G work cannot claim Gate C closure, production
 dispatch, or SAKG resumption.
+
+### Entry 173 — 2026-08-30: Physical L14 Audit Invocation Blocked by Approval Boundary
+
+One candidate-bound audit invocation was prepared for `l14-headless-9fd72db-001` against candidate
+`9fd72db21f7ae893211059a8a87f6e772d4b6de6`, but the execution-approval layer rejected the command
+before process start because it could send candidate/evidence metadata through the configured
+router and use credentials without destination/payload-specific authorization. No provider call,
+credential read, repository mutation, retry, or fallback occurred. The raw rejection is preserved
+in the session output; this is not evidence of an auditor result.
+
+L14 therefore remains **BLOCKED_UNQUALIFIABLE** for this candidate. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
+36 remaining**. No Gate C seal, Gate D advancement, production dispatch, or SAKG resumption is
+authorized without an explicit one-shot audit authorization or a valid external receipt.
