@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import select
 import shlex
 import subprocess
@@ -74,6 +75,10 @@ _FAILURE_EVIDENCE: ContextVar[tuple[bytes, bytes]] = ContextVar(
     "cline_sdk_failure_evidence", default=(b"", b"")
 )
 
+_AUTH_FAILURE_RE = re.compile(
+    r"\b(?:AUTH_FAILED|UNAUTHORIZED|UNAUTHORISED|AUTHENTICATION FAILED|RE-?AUTHENTICATE)\b"
+)
+
 
 def _sha_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
@@ -124,8 +129,21 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             )
         except AdmissionError as error:
             message = str(error)
+            raw_stdout, raw_stderr = _FAILURE_EVIDENCE.get()
+            failure_stdout = getattr(error, "raw_stdout", raw_stdout)
+            failure_stderr = getattr(error, "raw_stderr", raw_stderr)
+            failure_text = "\n".join(
+                (
+                    message,
+                    failure_stderr.decode("utf-8", errors="replace"),
+                )
+            ).upper()
             normalized_error: NormalizedErrorType | None = None
-            if "tool denied" in message:
+            if _AUTH_FAILURE_RE.search(failure_text):
+                kind = None
+                normalized_error = NormalizedErrorType.AUTH_FAILED
+                certainty = SideEffectCertainty.PROVIDER_ACCEPTED
+            elif "tool denied" in message:
                 kind = AdapterFailureKind.TOOL_DENIED
                 certainty = SideEffectCertainty.PROVIDER_ACCEPTED
             elif "command expansion" in message:
@@ -137,10 +155,6 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             elif "qualification" in message:
                 kind = AdapterFailureKind.ADAPTER_VERSION_UNQUALIFIED
                 certainty = SideEffectCertainty.NOT_DISPATCHED
-            elif "AUTH_FAILED" in message:
-                kind = None
-                normalized_error = NormalizedErrorType.AUTH_FAILED
-                certainty = SideEffectCertainty.PROVIDER_ACCEPTED
             elif "manifest provider" in message or "manifest model" in message:
                 kind = AdapterFailureKind.MODEL_MISMATCH
                 certainty = SideEffectCertainty.TOOL_EFFECT_POSSIBLE
@@ -153,9 +167,8 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             else:
                 kind = AdapterFailureKind.TRANSPORT_FAILED
                 certainty = SideEffectCertainty.UNKNOWN
-            raw_stdout, raw_stderr = _FAILURE_EVIDENCE.get()
-            stdout_hash = _sha_bytes(getattr(error, "raw_stdout", raw_stdout))
-            stderr_hash = _sha_bytes(getattr(error, "raw_stderr", raw_stderr))
+            stdout_hash = _sha_bytes(failure_stdout)
+            stderr_hash = _sha_bytes(failure_stderr)
             return AdapterFailureReceipt(
                 protocol_version=ADAPTER_PROTOCOL_VERSION,
                 invocation_id=contract.probe_id,

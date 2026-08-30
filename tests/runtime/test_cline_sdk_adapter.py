@@ -13,6 +13,7 @@ from pathlib import Path
 from uuid import UUID
 
 import pytest
+import runtime.integrations.cline_sdk as cline_sdk
 from paeos.model_router.types import ModelFamily, NormalizedErrorType
 from runtime.integrations.cline_sdk import ClineSdkAdapterConfig, ClineSdkAdmissionAdapter
 from runtime.integrations.cline_sdk_protocol import read_frame
@@ -220,6 +221,28 @@ def test_structured_auth_failure_remains_auth_failed(
     result = adapter.run_probe(replace(contract, probe_id="probe-auth-failed"))
 
     assert isinstance(result, AdapterFailureReceipt)
+    assert result.normalized_error is NormalizedErrorType.AUTH_FAILED
+
+
+def test_raw_auth_failure_remains_auth_failed_when_transport_message_is_generic(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    adapter, contract = adapter_case
+
+    def fail(_contract: ProbeContract) -> RawWorkerRun:
+        raise cline_sdk._ProbeFailure(
+            "SDK terminal failure: failure",
+            b"provider frame",
+            b"Unauthorized: re-authenticate the Cline account",
+        )
+
+    monkeypatch.setattr(adapter, "_run_probe", fail)
+
+    result = adapter.run_probe(replace(contract, probe_id="probe-raw-auth-failed"))
+
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is None
     assert result.normalized_error is NormalizedErrorType.AUTH_FAILED
 
 
