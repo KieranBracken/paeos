@@ -108,3 +108,8 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   tests, all exit `0`; the earlier **995** checkpoint was stale by the 11 fault-matrix tests. This
   is not decorrelated L14 evidence, a gate seal, or ratification. Worker/Court counts remain
   **0/1/0** and **0/0/0**; DEBT-0058 through DEBT-0061 remain open.
+- 2026-08-30 DEBT-0059 coordinator race remediation: a deterministic two-process RED probe
+  reproduced duplicate claims; the GREEN state-root-local process lock now yields exactly one
+  durable claim and one fail-closed loser. Focused suites passed **58** and the non-gateway suite
+  passed **1,006**. This is implementation repayment evidence, not debt closure or independent
+  L14/L17 evidence; all four debts and **12/48** strict sealed progress remain open.

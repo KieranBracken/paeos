@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import fcntl
+import os
 import threading
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
@@ -47,6 +50,9 @@ class TransactionCoordinator:
         self._ledger = ledger
         self._projection = projection
         self._commit_lock = threading.Lock()
+        self._process_lock_path = projection.path.with_name(
+            f".{projection.path.name}.commit.lock"
+        )
 
     def prepare(
         self,
@@ -76,15 +82,28 @@ class TransactionCoordinator:
         *,
         expected_ledger_head: str,
     ) -> CommitReceipt:
-        with self._commit_lock:
+        with self._commit_lock, self._process_lock():
             return self._apply_locked(command, expected_ledger_head=expected_ledger_head)
 
     def recover_projection(self) -> str:
-        with self._commit_lock:
+        with self._commit_lock, self._process_lock():
             head = self._ledger.verify_chain()
             rows = self._ledger.read()
             self._projection.replace_from_verified_ledger(rows, head)
             return head
+
+    @contextmanager
+    def _process_lock(self):
+        """Serialize coordinator critical sections across independent adapter processes."""
+
+        self._process_lock_path.parent.mkdir(parents=True, exist_ok=True)
+        descriptor = os.open(self._process_lock_path, os.O_RDWR | os.O_CREAT, 0o600)
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            yield
+        finally:
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
+            os.close(descriptor)
 
     def _apply_locked(
         self,

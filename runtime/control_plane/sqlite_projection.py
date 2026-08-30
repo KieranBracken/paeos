@@ -62,6 +62,12 @@ class SqliteControlPlaneProjection:
                 """
             )
 
+    @property
+    def path(self) -> Path:
+        """Return the projection database path used for the control-plane lock boundary."""
+
+        return self._path
+
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self._path)
         connection.execute("PRAGMA journal_mode=WAL")

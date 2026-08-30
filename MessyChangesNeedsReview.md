@@ -367,6 +367,15 @@ quota loss, process death, pre/post-side-effect crashes, projection poison, stor
 unrelated goals, and repeated observations. The matrix and recovery tests pass. This is candidate
 evidence only; DEBT-0060 remains open pending independent L14/L17 audit and canary authorization.
 
+## 2026-08-30 — DEBT-0059 coordinator race remediation
+
+Added a deterministic two-process stale-preflight/late-append regression to the coordinator suite.
+The RED run reproduced the duplicate-claim race (three ledger rows); the GREEN fix adds a
+state-root-local POSIX process lock around coordinator commit/recovery and reduces the result to
+one durable claim plus one fail-closed loser. Focused recovery suites passed **58** and the full
+non-gateway suite passed **1,006**. This is implementation repayment evidence only; independent
+physical L14/L17 review, adapter qualification, and gate closure remain open.
+
 ## 2026-08-30 — Candidate 13f695b L13 reproduction reconciliation
 
 Read-only worker reproduction evidence was reconciled against the isolated candidate. The control,

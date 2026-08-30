@@ -3014,3 +3014,22 @@ the required L17 constitutional review remain outstanding. Worker counts remain
 Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain **OPEN**. Strict
 sealed progress remains **12/48 complete | 36 remaining**. No Gate C seal, Gate D–G advancement,
 production dispatch, or SAKG resumption is authorized.
+
+### Entry 180 — 2026-08-30: DEBT-0059 Coordinator Race Repaid at Implementation Level
+
+The isolated candidate now includes a deterministic two-process coordinator probe for the
+cross-process claim race. Its RED execution forced both processes past the same head check before
+append and produced three ledger rows (prepare plus two claims), proving the prior implementation
+could duplicate a claim. The GREEN implementation adds a state-root-local POSIX process lock
+around coordinator prepare/apply/recovery. The same probe then produced exactly one committed
+claim, one fail-closed rejection, two durable ledger rows, and one winning lease owner.
+
+Fresh verification after the fix: coordinator/recovery/side-effect/bridge semantic suites passed
+**58**; the non-gateway repository suite passed **1,006/1,006** with exit `0`; changed-path Ruff
+and Pyright were clean. No provider, credential, browser, clipboard, AppleScript, terminal paste,
+or live adapter was used. This satisfies DEBT-0059's implementation-level repayment condition for
+the canonical coordinator seam, but not constitutional closure: adapter activation and a physical
+non-GLM L14/L17 audit remain outstanding. Worker counts remain **Admitted: 0 | Rejected: 1 |
+Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; strict sealed
+progress remains **12/48 complete | 36 remaining**. No Gate B/C seal, production dispatch, or SAKG
+resumption is authorized.
