@@ -79,7 +79,7 @@ class ProviderRegistry:
     def snapshot(self) -> tuple[ProviderDescriptor, ...]: ...
 ```
 
-- [ ] **Step 1.1: Write RED validation and compatibility tests**
+- [x] **Step 1.1: Write RED validation and compatibility tests**
 
 Test lowercase ASCII keys, rejection of empty/path/control-character keys, duplicate registration,
 unknown lookup, deterministic snapshots, secret-free descriptor representation, and lookup through
@@ -95,7 +95,7 @@ member is required.
 
 Expected: collection fails because `paeos.model_router.providers` does not exist.
 
-- [ ] **Step 1.3: Implement provider-key normalization and immutable registry behavior**
+- [x] **Step 1.3: Implement provider-key normalization and immutable registry behavior**
 
 Normalize legacy `StrEnum` values through `.value`, validate against
 `^[a-z][a-z0-9-]{0,62}$`, reject duplicates, and return snapshots sorted by key. Keep the existing
@@ -115,7 +115,12 @@ providers to that enum.
   paeos/model_router/providers.py paeos/model_router/types.py
 ```
 
-- [ ] **Step 1.5: Commit**
+The registry and compatibility tests pass, and the new registry files pass Ruff and Pyright. The
+combined Ruff command still reports **38 pre-existing findings** in `types.py` (legacy enum and
+typing style); those unrelated findings are preserved rather than mass-repaired. The separate RED
+transcript is not retained as a standalone artifact in this checkpoint.
+
+- [x] **Step 1.5: Commit**
 
 ```bash
 git add paeos/model_router/providers.py paeos/model_router/types.py \

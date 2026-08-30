@@ -2692,3 +2692,26 @@ remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058` remains **OPEN**
 top-level progress is **12/48 complete | 36 remaining**. Gate A's remanded L14 and authenticated
 live-admission prerequisite remain open; no Gate A closure, production dispatch, Gate C
 advancement, or SAKG resumption is authorized.
+
+### Entry 166 — 2026-08-30: Gate C Provider Registry Candidate
+
+The isolated recovery branch implemented Gate C Task 1 in local commit `e1c42cb`
+(`e1c42cbea328798634812943d86d48e8ac5cdb62`). The new provider registry accepts validated,
+extensible lowercase provider keys (including future providers without enum members), preserves
+`ProviderId` compatibility lookup, freezes descriptor policy mappings, rejects duplicate or unsafe
+keys, and returns deterministic snapshots. No existing catalog, router, credential, transport, or
+adapter behavior was deleted or changed.
+
+Fresh verification: the model-router suite passed **106 tests**; new registry files and package
+exports passed Ruff; Pyright returned **0 errors, 0 warnings, 0 informations**. The exact combined
+Ruff command requested by the plan still reports **38 pre-existing findings** in the legacy
+`paeos/model_router/types.py` (enum and typing style), which were not mass-repaired. The separate
+RED transcript is not retained as a standalone artifact. This is therefore an implementation
+candidate, not a sealed Gate C milestone.
+
+No provider was invoked and no credential was read. Worker counts remain **Admitted: 0 | Rejected:
+1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
+`DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**;
+Gate B Task 5 still awaits decorrelated L14/L17 verification, and Gate A's authenticated live
+admission prerequisite remains open. No production dispatch, Gate closure, or SAKG resumption is
+authorized.
