@@ -8,6 +8,7 @@ import time
 from typing import Any, Dict, List, Optional
 
 from paeos.model_router.aimd import AIMDController
+from paeos.model_router.auditor_receipt import response_fingerprint
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.policy import RoutingPolicyEngine
@@ -71,6 +72,9 @@ class ModelRouter:
             try:
                 resp = self._dispatch_with_single_retry(candidate, request)
                 resp.fallback_chain = attempted_chain
+                # The router adds the definitive attempted-candidate chain after transport
+                # returns; refresh the content-free response fingerprint before exposing it.
+                resp.transport_response_sha256 = response_fingerprint(resp)
                 return resp
             except NormalizedError as err:
                 last_error = err

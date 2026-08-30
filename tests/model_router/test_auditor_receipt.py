@@ -179,7 +179,7 @@ def test_capture_uses_router_audit_policy_and_records_selected_family(tmp_path) 
                 actual_model=model_entry.model_id,
                 actual_family=model_entry.family,
                 attempts=1,
-                fallback_chain=[f"{model_entry.provider_id.value}:{model_entry.model_id}"],
+                fallback_chain=[],
             )
             response.transport_request_sha256 = request_fingerprint(request)
             response.transport_response_sha256 = response_fingerprint(response)
