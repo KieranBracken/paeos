@@ -6,6 +6,7 @@ from runtime.supervisors.admission import (
     SupervisorAdmissionProfile,
     decide_supervisor_admission,
 )
+from runtime.supervisors.antigravity import AntigravitySupervisorAdapter
 from runtime.supervisors.checkpoint import (
     SCHEMA_VERSION as CHECKPOINT_SCHEMA_VERSION,
 )
@@ -15,6 +16,14 @@ from runtime.supervisors.checkpoint import (
     SupervisorRotationError,
     repository_digest,
     verify_checkpoint,
+)
+from runtime.supervisors.codex import CodexSupervisorAdapter
+from runtime.supervisors.headless import (
+    HeadlessInvocation,
+    HeadlessResult,
+    HeadlessRunner,
+    HeadlessSupervisorAdapter,
+    SupervisorAdapterError,
 )
 from runtime.supervisors.protocol import (
     AdapterResult,
@@ -35,8 +44,15 @@ __all__ = [
     "CHECKPOINT_SCHEMA_VERSION",
     "MAX_PROFILE_TTL_SECONDS",
     "AdapterResult",
+    "AntigravitySupervisorAdapter",
+    "CodexSupervisorAdapter",
+    "HeadlessInvocation",
+    "HeadlessResult",
+    "HeadlessRunner",
+    "HeadlessSupervisorAdapter",
     "SupervisorAdapter",
     "SupervisorAdapterDescriptor",
+    "SupervisorAdapterError",
     "SupervisorAdapterRegistry",
     "SupervisorAdmissionDecision",
     "SupervisorAdmissionProfile",
