@@ -20,6 +20,7 @@ from paeos.model_router.auditor_receipt import (
     persist_auditor_receipt,
     persist_auditor_report,
     request_fingerprint,
+    validate_auditor_report,
 )
 from paeos.model_router.router import ModelRouter
 from paeos.model_router.types import (
@@ -102,6 +103,7 @@ def run(argv: list[str] | None = None) -> int:
             builder_family=ModelFamily.GLM,
         )
         interaction = capture_auditor_interaction(ModelRouter(), contract, request)
+        validate_auditor_report(interaction.response_content, contract)
         persist_auditor_report(interaction.response_content, args.report_path)
         persist_auditor_receipt(interaction.receipt, args.receipt_path)
     except AuditorReceiptError as error:

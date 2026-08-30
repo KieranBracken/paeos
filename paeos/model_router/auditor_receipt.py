@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
 import uuid
 from dataclasses import dataclass
@@ -34,6 +35,14 @@ from paeos.model_router.types import (
 
 AUDITOR_RECEIPT_SCHEMA = "paeos.auditor-physical-receipt/1"
 _MAX_RECEIPT_BYTES = 1_048_576
+_L14_STATUS_RE = re.compile(
+    r"^\s*`?L14_STATUS`?\s*:\s*(?:\*\*)?"
+    r"(PASS|REMAND_WITH_AMENDMENTS|BLOCKED_UNQUALIFIABLE)"
+    r"(?:\*\*)?\s*$",
+    re.MULTILINE,
+)
+_L14_INVARIANT_RE = re.compile(r"^\s*INVARIANT:\s*\S", re.MULTILINE)
+_L14_REPRODUCTION_RE = re.compile(r"^\s*REPRODUCTION:\s*\S", re.MULTILINE)
 
 
 class AuditorReceiptError(ValueError):
@@ -410,6 +419,26 @@ def capture_auditor_receipt(
     """Capture one completed router response and return only its physical receipt."""
 
     return capture_auditor_interaction(router, contract, request).receipt
+
+
+def validate_auditor_report(content: str, contract: AuditorReceiptContract) -> None:
+    """Reject an unbound or vacuous L14 report before it becomes evidence."""
+
+    _validate_contract(contract)
+    if not content.strip():
+        raise AuditorReceiptError("audit report is empty")
+    if contract.candidate_sha256 not in content:
+        raise AuditorReceiptError("audit report does not bind candidate")
+    if contract.evidence_bundle_sha256 not in content:
+        raise AuditorReceiptError("audit report does not bind evidence bundle")
+    statuses = _L14_STATUS_RE.findall(content)
+    if len(statuses) != 1:
+        raise AuditorReceiptError("audit report must contain exactly one L14_STATUS")
+    if statuses[0] == "REMAND_WITH_AMENDMENTS":
+        if _L14_INVARIANT_RE.search(content) is None:
+            raise AuditorReceiptError("remand report must name an INVARIANT")
+        if _L14_REPRODUCTION_RE.search(content) is None:
+            raise AuditorReceiptError("remand report must include REPRODUCTION")
 
 
 def persist_auditor_report(content: str, path: Path) -> Path:

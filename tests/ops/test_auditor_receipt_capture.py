@@ -51,7 +51,13 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         provider_attempt_count=1,
     )
 
-    interaction = SimpleNamespace(receipt=receipt, response_content="independent findings")
+    report = (
+        f"Candidate SHA: {_CANDIDATE}\n"
+        f"Evidence Bundle SHA-256: {_EVIDENCE}\n"
+        "`L14_STATUS`: **PASS**\n"
+        "Findings: independent findings\n"
+    )
+    interaction = SimpleNamespace(receipt=receipt, response_content=report)
 
     def fake_capture(router: object, contract: object, request: object) -> object:
         calls.append((router, contract, request))
@@ -63,7 +69,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         return path
 
     def fake_persist_report(content: str, path: Path) -> Path:
-        assert content == "independent findings"
+        assert content == report
         path.write_text(content, encoding="utf-8")
         return path
 

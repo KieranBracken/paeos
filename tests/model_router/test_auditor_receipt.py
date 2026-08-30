@@ -21,6 +21,7 @@ from paeos.model_router.auditor_receipt import (
     request_fingerprint,
     response_fingerprint,
     validate_auditor_receipt,
+    validate_auditor_report,
 )
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
@@ -314,6 +315,36 @@ def test_auditor_report_persistence_is_separate_and_create_only(tmp_path) -> Non
 def test_auditor_report_persistence_rejects_empty_content(tmp_path) -> None:
     with pytest.raises(AuditorReceiptError, match="audit report is empty"):
         persist_auditor_report(" \n\t", tmp_path / "empty-report.md")
+
+
+def test_auditor_report_validator_accepts_bound_remand() -> None:
+    request = _request()
+    contract = _contract(request)
+    report = f"""# L14 audit
+Candidate SHA: {contract.candidate_sha256}
+Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
+`L14_STATUS`: **REMAND_WITH_AMENDMENTS**
+INVARIANT: worker admission must be proven before Gate A closure
+REPRODUCTION: ops/worker_admission_probe.py --transport cline-sdk
+"""
+
+    validate_auditor_report(report, contract)
+
+
+@pytest.mark.parametrize(
+    "report",
+    [
+        "`L14_STATUS`: **PASS**\nEvidence only",
+        f"Candidate SHA: {_CANDIDATE}\nEvidence Bundle SHA-256: {_EVIDENCE}",
+        (
+            f"Candidate SHA: {_CANDIDATE}\nEvidence Bundle SHA-256: {_EVIDENCE}\n"
+            "`L14_STATUS`: **REMAND_WITH_AMENDMENTS**\n"
+        ),
+    ],
+)
+def test_auditor_report_validator_rejects_vacuous_or_unbound_report(report: str) -> None:
+    with pytest.raises(AuditorReceiptError):
+        validate_auditor_report(report, _contract(_request()))
 
 
 def test_tampered_receipt_hash_fails_closed(tmp_path) -> None:
