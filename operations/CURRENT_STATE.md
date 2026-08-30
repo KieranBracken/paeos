@@ -99,3 +99,7 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   GUI monitor is disabled. Fresh non-gateway verification collected **995** and passed. This is
   not a gate seal: DEBT-0060 remains open pending the liveness fault matrix and independent
   L14/L17 evidence; strict sealed progress remains **12/48 complete | 36 remaining**.
+- 2026-08-30 liveness fault matrix commit `e354bd9` passes the deterministic timeout, side-effect,
+  projection, storage, process-death, and repeated-observation cases. This satisfies the local
+  implementation proof only; DEBT-0060 remains open pending independent L14/L17 audit and canary
+  authorization.

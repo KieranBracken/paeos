@@ -2968,3 +2968,18 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 **Sealed: 0 | Remanded: 0 | Remediated: 0**; strict sealed progress remains
 **12/48 complete | 36 remaining**. No Gate C seal, Gate D–G advancement, production dispatch, or
 SAKG resumption is authorized.
+
+### Entry 178 — 2026-08-30: Event-Watchdog Liveness Fault Matrix
+
+Commit `e354bd9` adds and executes the deterministic liveness fault matrix. It covers hung
+reasoning, hung tools, token-only streams, quota loss before acceptance, process death,
+pre-side-effect and post-side-effect crashes, projection poison, storage exhaustion, unrelated
+healthy goals, and deterministic repeated observations. Existing recovery tests prove stale
+decisions append no second event. The matrix passed; no provider, credential, browser, clipboard,
+AppleScript, terminal paste, or live restart was invoked.
+
+This is candidate implementation evidence, not independent L14/L17 evidence. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**. DEBT-0060 remains **OPEN** pending independent audit and canary authorization;
+strict sealed progress remains **12/48 complete | 36 remaining**. No Gate C seal, Gate D–G
+advancement, production dispatch, or SAKG resumption is authorized.

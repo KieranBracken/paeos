@@ -359,3 +359,10 @@ state-root-bound CLI. The legacy GUI monitor is disabled; no clipboard, AppleScr
 or automatic restart path is active. Focused checks and the full non-gateway suite (**995
 collected/passed**) are green. DEBT-0060 remains open pending fault-matrix and independent L14/L17
 evidence; no gate seal or production dispatch is claimed.
+
+## 2026-08-30 — Event-watchdog liveness fault matrix (isolated branch)
+
+Commit `e354bd9` adds the deterministic fault matrix for hung reasoning/tools, token-only streams,
+quota loss, process death, pre/post-side-effect crashes, projection poison, storage exhaustion,
+unrelated goals, and repeated observations. The matrix and recovery tests pass. This is candidate
+evidence only; DEBT-0060 remains open pending independent L14/L17 audit and canary authorization.
