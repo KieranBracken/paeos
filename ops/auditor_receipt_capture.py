@@ -8,12 +8,15 @@ the receipt layer rejects retries/fallbacks and persists only hashes and identit
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 from paeos.model_router.auditor_receipt import (
+    AuditorCaptureResult,
     AuditorReceiptContract,
     AuditorReceiptError,
     bind_auditor_report,
@@ -36,6 +39,7 @@ from paeos.model_router.types import (
 _SHA40 = re.compile(r"^[0-9a-f]{40}$")
 _SHA64 = re.compile(r"^[0-9a-f]{64}$")
 _MAX_PROMPT_BYTES = 4 * 1024 * 1024
+_REJECTION_SCHEMA = "paeos.auditor-rejection/1"
 
 
 def _absolute_regular_file(path: Path, label: str) -> Path:
@@ -44,6 +48,55 @@ def _absolute_regular_file(path: Path, label: str) -> Path:
     if path.stat().st_size > _MAX_PROMPT_BYTES:
         raise AuditorReceiptError(f"{label} exceeds size limit")
     return path
+
+
+def _write_once_private_json(path: Path, payload: dict[str, object]) -> Path:
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    encoded = (
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n"
+    ).encode("utf-8")
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        written = 0
+        while written < len(encoded):
+            count = os.write(descriptor, encoded[written:])
+            if count <= 0:
+                raise AuditorReceiptError("auditor rejection write made no progress")
+            written += count
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    return path
+
+
+def _persist_rejected_interaction(
+    interaction: AuditorCaptureResult,
+    contract: AuditorReceiptContract,
+    error: AuditorReceiptError,
+    report_path: Path,
+    receipt_path: Path,
+) -> None:
+    rejected_report_path = report_path.with_name(f"{report_path.name}.rejected")
+    rejected_receipt_path = receipt_path.with_name(f"{receipt_path.name}.rejected")
+    rejection_path = receipt_path.with_name(f"{receipt_path.name}.rejection.json")
+    persist_auditor_report(interaction.response_content, rejected_report_path)
+    persist_auditor_receipt(interaction.receipt, rejected_receipt_path)
+    _write_once_private_json(
+        rejection_path,
+        {
+            "audit_id": contract.audit_id,
+            "candidate_sha256": contract.candidate_sha256,
+            "evidence_bundle_sha256": contract.evidence_bundle_sha256,
+            "reason": str(error),
+            "receipt_path": str(rejected_receipt_path),
+            "receipt_sha256": interaction.receipt.receipt_sha256,
+            "report_path": str(rejected_report_path),
+            "report_sha256": hashlib.sha256(
+                interaction.response_content.encode("utf-8")
+            ).hexdigest(),
+            "schema": _REJECTION_SCHEMA,
+        },
+    )
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -108,11 +161,17 @@ def run(argv: list[str] | None = None) -> int:
         )
         router = ModelRouter()
         interaction = capture_auditor_interaction(router, contract, request)
-        validate_auditor_report(interaction.response_content, contract)
-        receipt = bind_auditor_report(interaction.receipt, interaction.response_content)
-        validate_auditor_receipt(
-            receipt, contract, router.catalog, require_report_binding=True
-        )
+        try:
+            validate_auditor_report(interaction.response_content, contract)
+            receipt = bind_auditor_report(interaction.receipt, interaction.response_content)
+            validate_auditor_receipt(
+                receipt, contract, router.catalog, require_report_binding=True
+            )
+        except AuditorReceiptError as error:
+            _persist_rejected_interaction(
+                interaction, contract, error, args.report_path, args.receipt_path
+            )
+            raise
         persist_auditor_report(interaction.response_content, args.report_path)
         persist_auditor_receipt(receipt, args.receipt_path)
     except AuditorReceiptError as error:
