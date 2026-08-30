@@ -3093,3 +3093,26 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 | Remanded: 0 | Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain
 **OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**. Gate C and all
 downstream advancement remain blocked.
+
+### Entry 184 — 2026-08-31: Gemini Provider Response Unqualifiable at Receipt Boundary
+
+Following the Founder-authorized one-shot, the local router ledger records one successful physical
+Google audit observation for audit id `l14-l17-bdff183-gemini-002` (observation id `1048`, model
+`gemini-3.6-flash`, family `gemini`, provider `google`, `success=1`, approximately 113,435 ms,
+537 prompt tokens, 790 completion tokens). This proves a provider response occurred once; it does
+not prove a valid L14 audit.
+
+The receipt-capture wrapper terminated without persisting either the expected report
+`/private/tmp/paeos-l14-l17-report-bdff183.md` or receipt
+`/private/tmp/paeos-l14-l17-receipt-bdff183.json`. No stdout/stderr rejection detail was retained by
+the detached execution boundary, so the exact validator/persistence failure cannot be asserted.
+The absence of the candidate-bound physical receipt/report pair makes the result
+**BLOCKED_UNQUALIFIABLE** operationally. No second provider request, fallback, retry, workaround,
+or fabricated report was attempted.
+
+The candidate remains `bdff183accf2a87f78c960f8be75fa54d91d0735`; bundle SHA-256 is
+`b6d992aa35d01684a6c4b70344a1d246484676d3ed60b9b62e717c00a8ffda20`. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; all four debts remain **OPEN** and strict sealed progress remains **12/48 complete |
+36 remaining**. Gate C and downstream advancement remain blocked pending a separately authorized,
+successfully persisted candidate-bound non-GLM receipt/report pair.

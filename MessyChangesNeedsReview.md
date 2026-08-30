@@ -421,3 +421,13 @@ No provider call, credential access, report/receipt artifact, retry, fallback, w
 repository mutation occurred. This is not an L14/L17 result. A new attempt requires explicit
 authorization for this exact payload and destination; worker/Court counts and **12/48** strict
 sealed progress are unchanged.
+
+## 2026-08-31 — Gemini audit response unqualifiable
+
+The Founder-authorized one-shot audit reached Google Gemini once. The local router observation
+`1048` records `gemini-3.6-flash` / family `gemini`, `success=1`, approximately 113,435 ms, 537
+prompt tokens, and 790 completion tokens. The capture wrapper then exited without creating the
+candidate-bound report or physical receipt under `/private/tmp`; its detached execution retained no
+validator/persistence error text. This is operationally **BLOCKED_UNQUALIFIABLE**, not an L14 pass
+or remand. No second provider request, retry, fallback, workaround, or fabricated evidence was
+attempted. Worker/Court counts and **12/48** strict sealed progress are unchanged.

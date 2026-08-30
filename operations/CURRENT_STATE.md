@@ -129,3 +129,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   metadata to Google Gemini requires destination-specific authorization. No provider call, report,
   receipt, retry, fallback, or workaround occurred. The fresh bundle and prompt remain in
   `/private/tmp`; no new audit result exists and no identical retry is authorized.
+- 2026-08-31 the authorized one-shot reached Google Gemini once (router observation `1048`,
+  `success=1`, `gemini-3.6-flash`, ~113,435 ms), but the receipt-capture wrapper persisted neither
+  its report nor physical receipt. The exact validator/persistence error was not retained by the
+  detached execution boundary. Operational disposition is **BLOCKED_UNQUALIFIABLE**; no second
+  provider request, retry, fallback, or fabricated report is allowed. Worker/Court counts remain
+  **0/1/0** and **0/0/0**; strict sealed progress remains **12/48 complete | 36 remaining**.
