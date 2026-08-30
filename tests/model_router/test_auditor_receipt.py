@@ -22,6 +22,8 @@ from paeos.model_router.auditor_receipt import (
 )
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
+from paeos.model_router.router import ModelRouter
+from paeos.model_router.state import RouterStateDB
 from paeos.model_router.transport import LiteLLMTransport
 from paeos.model_router.types import (
     DataClass,
@@ -153,6 +155,48 @@ def test_litellm_transport_captures_content_free_fingerprints(tmp_path) -> None:
     assert captured.transport_request_sha256 == request_fingerprint(request)
     assert captured.transport_response_sha256 == response_fingerprint(captured)
     assert captured.raw_response is response
+
+
+def test_capture_uses_router_audit_policy_and_records_selected_family(tmp_path) -> None:
+    request = _request()
+    credentials = CredentialStore(tmp_path / "router.env")
+    credentials._keys = {
+        "GEMINI_API_KEY": "test-google-key",
+        "CLINE_API_KEY": "test-cline-key",
+        "NVIDIA_API_KEY": "test-nvidia-key",
+        "KILO_API_KEY": "test-kilo-key",
+        "OPENROUTER_API_KEY": "test-openrouter-key",
+    }
+
+    class DeterministicTransport(LiteLLMTransport):
+        def dispatch(self, model_entry, request, timeout=60.0):
+            del timeout
+            response = RouterResponse(
+                content=f"audit response from {model_entry.model_id}",
+                model_id=model_entry.model_id,
+                provider_id=model_entry.provider_id,
+                family=model_entry.family,
+                actual_model=model_entry.model_id,
+                actual_family=model_entry.family,
+                attempts=1,
+                fallback_chain=[f"{model_entry.provider_id.value}:{model_entry.model_id}"],
+            )
+            response.transport_request_sha256 = request_fingerprint(request)
+            response.transport_response_sha256 = response_fingerprint(response)
+            return response
+
+    catalog = _catalog()
+    router = ModelRouter(
+        credentials=credentials,
+        catalog=catalog,
+        state_db=RouterStateDB(tmp_path / "router.sqlite3"),
+        transport=DeterministicTransport(credentials, catalog),
+    )
+    receipt = capture_auditor_receipt(router, _contract(request), request)
+
+    assert receipt.actual_family is ModelFamily.GEMINI
+    assert receipt.actual_provider_id is ProviderId.GOOGLE
+    assert receipt.provider_attempt_count == 1
 
 
 def test_capture_rejects_same_family_auditor() -> None:
