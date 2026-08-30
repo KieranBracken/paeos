@@ -16,6 +16,7 @@ from paeos.model_router.auditor_receipt import (
     capture_auditor_receipt,
     load_auditor_receipt,
     persist_auditor_receipt,
+    persist_auditor_report,
     request_fingerprint,
     response_fingerprint,
     validate_auditor_receipt,
@@ -290,6 +291,15 @@ def test_receipt_persistence_is_canonical_create_only_and_content_free(tmp_path)
 
     with pytest.raises(FileExistsError):
         persist_auditor_receipt(receipt, path)
+
+
+def test_auditor_report_persistence_is_separate_and_create_only(tmp_path) -> None:
+    path = tmp_path / "audit-report.md"
+
+    assert persist_auditor_report("finding: remand", path) == path
+    assert path.read_text(encoding="utf-8") == "finding: remand"
+    with pytest.raises(FileExistsError):
+        persist_auditor_report("replacement", path)
 
 
 def test_tampered_receipt_hash_fails_closed(tmp_path) -> None:

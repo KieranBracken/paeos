@@ -16,8 +16,9 @@ from pathlib import Path
 from paeos.model_router.auditor_receipt import (
     AuditorReceiptContract,
     AuditorReceiptError,
-    capture_auditor_receipt,
+    capture_auditor_interaction,
     persist_auditor_receipt,
+    persist_auditor_report,
     request_fingerprint,
 )
 from paeos.model_router.router import ModelRouter
@@ -48,6 +49,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--candidate-sha", required=True)
     parser.add_argument("--evidence-sha", required=True)
     parser.add_argument("--prompt-file", required=True, type=Path)
+    parser.add_argument("--report-path", required=True, type=Path)
     parser.add_argument("--receipt-path", required=True, type=Path)
     parser.add_argument("--max-tokens", type=int, default=2_000)
     args = parser.parse_args(argv)
@@ -68,6 +70,8 @@ def run(argv: list[str] | None = None) -> int:
         prompt_file = _absolute_regular_file(args.prompt_file, "--prompt-file")
         if not args.receipt_path.is_absolute():
             raise AuditorReceiptError("--receipt-path must be absolute")
+        if not args.report_path.is_absolute():
+            raise AuditorReceiptError("--report-path must be absolute")
         prompt = prompt_file.read_text(encoding="utf-8")
         request = TaskRequest(
             messages=[
@@ -97,8 +101,9 @@ def run(argv: list[str] | None = None) -> int:
             builder_model_id="z-ai/glm-5.3-flash",
             builder_family=ModelFamily.GLM,
         )
-        receipt = capture_auditor_receipt(ModelRouter(), contract, request)
-        persist_auditor_receipt(receipt, args.receipt_path)
+        interaction = capture_auditor_interaction(ModelRouter(), contract, request)
+        persist_auditor_report(interaction.response_content, args.report_path)
+        persist_auditor_receipt(interaction.receipt, args.receipt_path)
     except AuditorReceiptError as error:
         print(f"AUDITOR_RECEIPT_REJECTED:{error}", file=sys.stderr)
         return 2
@@ -113,11 +118,12 @@ def run(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 "receipt_path": str(args.receipt_path),
-                "receipt_sha256": receipt.receipt_sha256,
-                "actual_provider": receipt.actual_provider_id.value,
-                "actual_model": receipt.actual_model_id,
-                "actual_family": receipt.actual_family.value,
-                "provider_attempt_count": receipt.provider_attempt_count,
+                "report_path": str(args.report_path),
+                "receipt_sha256": interaction.receipt.receipt_sha256,
+                "actual_provider": interaction.receipt.actual_provider_id.value,
+                "actual_model": interaction.receipt.actual_model_id,
+                "actual_family": interaction.receipt.actual_family.value,
+                "provider_attempt_count": interaction.receipt.provider_attempt_count,
             },
             sort_keys=True,
         )

@@ -207,6 +207,14 @@ class PhysicalAuditorReceipt:
         return payload
 
 
+@dataclass(frozen=True, slots=True)
+class AuditorCaptureResult:
+    """The receipt plus the one response body that produced the audit findings."""
+
+    receipt: PhysicalAuditorReceipt
+    response_content: str
+
+
 def _validate_contract(contract: AuditorReceiptContract) -> None:
     if not contract.audit_id or any(character.isspace() for character in contract.audit_id):
         raise AuditorReceiptError("audit identity missing or contains whitespace")
@@ -300,12 +308,12 @@ def validate_auditor_receipt(
     return result
 
 
-def capture_auditor_receipt(
+def capture_auditor_interaction(
     router: _RouterLike,
     contract: AuditorReceiptContract,
     request: TaskRequest,
-) -> PhysicalAuditorReceipt:
-    """Capture one completed router response as a candidate-bound L14 receipt."""
+) -> AuditorCaptureResult:
+    """Capture one completed router response and retain its report for separate evidence storage."""
 
     _validate_contract(contract)
     if request.task_class is not TaskClass.AUDIT:
@@ -389,7 +397,42 @@ def capture_auditor_receipt(
         a08_verdict=a08_result.verdict.value,
     )
     validate_auditor_receipt(receipt, contract, router.catalog)
-    return receipt
+    return AuditorCaptureResult(receipt=receipt, response_content=response.content)
+
+
+def capture_auditor_receipt(
+    router: _RouterLike,
+    contract: AuditorReceiptContract,
+    request: TaskRequest,
+) -> PhysicalAuditorReceipt:
+    """Capture one completed router response and return only its physical receipt."""
+
+    return capture_auditor_interaction(router, contract, request).receipt
+
+
+def persist_auditor_report(content: str, path: Path) -> Path:
+    """Persist the model's audit findings separately from the content-free physical receipt."""
+
+    if not path.is_absolute():
+        raise AuditorReceiptError("audit report path must be absolute")
+    if path.exists() and path.is_symlink():
+        raise AuditorReceiptError("audit report path cannot be a symlink")
+    payload = content.encode("utf-8")
+    if len(payload) > 4 * _MAX_RECEIPT_BYTES:
+        raise AuditorReceiptError("audit report exceeds size limit")
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        written = 0
+        while written < len(payload):
+            count = os.write(descriptor, payload[written:])
+            if count <= 0:
+                raise AuditorReceiptError("audit report write made no progress")
+            written += count
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    return path
 
 
 def persist_auditor_receipt(receipt: PhysicalAuditorReceipt, path: Path) -> Path:

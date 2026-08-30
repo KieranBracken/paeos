@@ -3,12 +3,14 @@ PAEOS Model Router & Free Inference Mesh Subsystem
 """
 from paeos.model_router.auditor_receipt import (
     AUDITOR_RECEIPT_SCHEMA,
+    AuditorCaptureResult,
     AuditorReceiptContract,
     AuditorReceiptError,
     PhysicalAuditorReceipt,
     capture_auditor_receipt,
     load_auditor_receipt,
     persist_auditor_receipt,
+    persist_auditor_report,
     request_fingerprint,
     response_fingerprint,
     validate_auditor_receipt,
@@ -35,6 +37,7 @@ from paeos.model_router.types import (
 
 __all__ = [
     "AUDITOR_RECEIPT_SCHEMA",
+    "AuditorCaptureResult",
     "AuditorReceiptContract",
     "AuditorReceiptError",
     "CredentialStore",
@@ -57,6 +60,7 @@ __all__ = [
     "capture_auditor_receipt",
     "load_auditor_receipt",
     "persist_auditor_receipt",
+    "persist_auditor_report",
     "request_fingerprint",
     "response_fingerprint",
     "run_gateway_server",

@@ -23,6 +23,9 @@ credentials or changing worker admission, Court, or lifecycle authority.
   the receipt. The request must explicitly name the candidate and evidence hash.
 - Receipt payloads contain identifiers, hashes, counts, and disposition only. Prompt text,
   response text, credentials, headers, and raw provider bodies are never persisted.
+- The one audit response is returned to the caller as a separate report payload. If an operational
+  caller persists it, the report is a distinct create-only artifact; it is never embedded in the
+  physical receipt and must be reviewed for secret leakage before publication.
 - A-08 is re-evaluated from the physical builder and auditor families. Unknown or same-family
   results fail closed.
 - Receipt persistence is create-only, canonical JSON, mode `0600`, and fsync-backed. Existing
@@ -48,7 +51,7 @@ change Cline admission, close Gate A, execute Task 10, alter Gate B–G, or prom
 
 1. Run focused and mutation tests for the receipt contract.
 2. Run one approved non-GLM audit through the PAEOS router and persist its machine-captured
-   receipt against the exact Task 8 candidate.
+   receipt plus its separate audit report against the exact Task 8 candidate.
 3. Re-run the independent L13 matrix and reconcile static/environment findings.
 4. Re-run L14. Only a physically proven non-GLM receipt plus a green/dispositioned L13 can release
    Task 10's three fresh Cline SDK probes.

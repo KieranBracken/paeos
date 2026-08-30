@@ -25,6 +25,8 @@ def test_parse_args_rejects_noncanonical_hashes() -> None:
                 _EVIDENCE,
                 "--prompt-file",
                 "/tmp/prompt.md",
+                "--report-path",
+                "/tmp/report.md",
                 "--receipt-path",
                 "/tmp/receipt.json",
             ]
@@ -39,6 +41,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         f"Audit candidate { _CANDIDATE } with evidence {_EVIDENCE}.", encoding="utf-8"
     )
     receipt_path = tmp_path / "receipt.json"
+    report_path = tmp_path / "report.md"
     calls: list[tuple[object, object, object]] = []
     receipt = SimpleNamespace(
         receipt_sha256="r" * 64,
@@ -48,17 +51,25 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         provider_attempt_count=1,
     )
 
+    interaction = SimpleNamespace(receipt=receipt, response_content="independent findings")
+
     def fake_capture(router: object, contract: object, request: object) -> object:
         calls.append((router, contract, request))
-        return receipt
+        return interaction
 
     def fake_persist(value: object, path: Path) -> Path:
         assert value is receipt
         path.write_text("{}\n", encoding="utf-8")
         return path
 
+    def fake_persist_report(content: str, path: Path) -> Path:
+        assert content == "independent findings"
+        path.write_text(content, encoding="utf-8")
+        return path
+
     monkeypatch.setattr(cli, "ModelRouter", lambda: "router")
-    monkeypatch.setattr(cli, "capture_auditor_receipt", fake_capture)
+    monkeypatch.setattr(cli, "capture_auditor_interaction", fake_capture)
+    monkeypatch.setattr(cli, "persist_auditor_report", fake_persist_report)
     monkeypatch.setattr(cli, "persist_auditor_receipt", fake_persist)
 
     assert (
@@ -72,6 +83,8 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
                 _EVIDENCE,
                 "--prompt-file",
                 str(prompt_path),
+                "--report-path",
+                str(report_path),
                 "--receipt-path",
                 str(receipt_path),
             ]
@@ -80,6 +93,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
     )
     output = capsys.readouterr()
     assert "gemini-3.6-flash" in output.out
+    assert str(report_path) in output.out
     assert "audit result" not in output.out
     assert output.err == ""
     assert len(calls) == 1
@@ -102,6 +116,8 @@ def test_run_rejects_prompt_symlink(tmp_path: Path) -> None:
                 _EVIDENCE,
                 "--prompt-file",
                 str(link),
+                "--report-path",
+                str(tmp_path / "report.md"),
                 "--receipt-path",
                 str(tmp_path / "receipt.json"),
             ]
