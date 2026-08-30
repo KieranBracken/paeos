@@ -142,13 +142,13 @@ class SqliteControlPlaneProjection:
     def recorded_head(self) -> tuple[int, str] | None: ...
 ```
 
-- [ ] **Step 2.1: Write RED persistence and poison tests**
+- [x] **Step 2.1: Write RED persistence and poison tests**
 
 Test WAL/full-sync configuration, atomic replacement, restart, ledger-ahead/projection-behind,
 projection-ahead, forged row digest, forged recorded head, missing row, extra row, and crash after
 ledger append but before projection update. A poisoned projection must answer no claim query.
 
-- [ ] **Step 2.2: Run RED once**
+- [x] **Step 2.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -157,7 +157,7 @@ ledger append but before projection update. A poisoned projection must answer no
 
 Expected: collection fails because `SqliteControlPlaneProjection` does not exist.
 
-- [ ] **Step 2.3: Implement replaceable projection storage**
+- [x] **Step 2.3: Implement replaceable projection storage**
 
 Use `BEGIN IMMEDIATE`, `PRAGMA journal_mode=WAL`, and `PRAGMA synchronous=FULL`. Store the source
 `ledger_seq`, `ledger_head`, event row hash, projected digest, fence, and canonical record JSON.
@@ -166,7 +166,7 @@ No projection API may accept an unverified caller-supplied state record.
 Keep `TransactionStore` as a compatibility/materialization seam only. Mark its module docstring and
 call sites accordingly; new coordinator code must not treat its mutable JSON as canonical.
 
-- [ ] **Step 2.4: Run GREEN and crash-gap tests**
+- [x] **Step 2.4: Run GREEN and crash-gap tests**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -177,7 +177,7 @@ call sites accordingly; new coordinator code must not treat its mutable JSON as 
 Expected: all pass; deleting or corrupting the projection causes deterministic rebuild or a
 fail-closed error, never a second ledger event.
 
-- [ ] **Step 2.5: Commit**
+- [x] **Step 2.5: Commit**
 
 ```bash
 git add runtime/control_plane/sqlite_projection.py \

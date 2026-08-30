@@ -1,4 +1,9 @@
-"""Immutable protocol envelopes and write-once storage for the PAEOS bridge."""
+"""Immutable protocol envelopes and write-once storage for the PAEOS bridge.
+
+``TransactionStore`` remains a compatibility/materialization seam for legacy bridge files. The
+ledger-derived control-plane projection is canonical for new coordination code; mutable JSON
+materializations must never be used as transaction authority.
+"""
 
 from __future__ import annotations
 
