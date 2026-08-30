@@ -58,6 +58,7 @@ class SqliteLedgerStore:
         self._lock = threading.RLock()
         self._db.execute("PRAGMA journal_mode=WAL")
         self._db.execute("PRAGMA synchronous=FULL")
+        self._db.execute("PRAGMA busy_timeout=5000")
         self._db.executescript(_SCHEMA)
 
     def acquire_writer(self, owner: str) -> None:
