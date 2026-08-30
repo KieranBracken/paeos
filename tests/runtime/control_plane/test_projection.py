@@ -100,6 +100,19 @@ def test_projector_folds_exact_happy_path() -> None:
     assert rebuild_projection([first, second]) == {"req-001": result}
 
 
+def test_projector_rejects_invalid_transition_from_new() -> None:
+    invalid = command(
+        event=TransactionEvent.CLAIM,
+        actor="worker",
+        at="2026-08-30T10:01:00+00:00",
+        fencing_token=1,
+        lease_owner="worker-1",
+        lease_expires_at="2026-08-30T10:05:00+00:00",
+    )
+    with pytest.raises(ProjectionError, match="new transaction must begin with PREPARE"):
+        project_row(None, row_for(invalid))
+
+
 @pytest.mark.parametrize(
     "changes, message",
     [
