@@ -18,6 +18,11 @@ from runtime.supervisors.checkpoint import (
     verify_checkpoint,
 )
 from runtime.supervisors.codex import CodexSupervisorAdapter
+from runtime.supervisors.coordinator import (
+    RecoveryAction,
+    RecoveryDecision,
+    SupervisorRecoveryCoordinator,
+)
 from runtime.supervisors.headless import (
     HeadlessInvocation,
     HeadlessResult,
@@ -50,6 +55,8 @@ __all__ = [
     "HeadlessResult",
     "HeadlessRunner",
     "HeadlessSupervisorAdapter",
+    "RecoveryAction",
+    "RecoveryDecision",
     "SupervisorAdapter",
     "SupervisorAdapterDescriptor",
     "SupervisorAdapterError",
@@ -58,6 +65,7 @@ __all__ = [
     "SupervisorAdmissionProfile",
     "SupervisorCheckpoint",
     "SupervisorCoordinator",
+    "SupervisorRecoveryCoordinator",
     "SupervisorRequest",
     "SupervisorResponse",
     "SupervisorRotationError",
