@@ -4,7 +4,7 @@
 **Task**: Repay the coordinator-side cross-process claim race in DEBT-0059
 **Reviewer Role**: Temporary Architect/Overseer — self-adversarial L17 review
 **Builder Role**: Codex recovery implementation (isolated branch)
-**Candidate**: isolated recovery branch tip after the implementation commit
+**Candidate**: `272f0bd003d4f218ea40686b6dbe5561492dedc4`
 **Disposition**: `IMPLEMENTATION_CHECKPOINT — INDEPENDENT L14/L17 AUDIT REQUIRED`
 
 ## Summary of Findings
