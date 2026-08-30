@@ -2476,3 +2476,25 @@ No runtime/source remediation, lifecycle advancement, merge, push, or promotion 
 DEBT-0058 remains **OPEN**. Worker-admission counts are exactly
 **Admitted: 0 | Rejected: 1 | Remediated: 0**. Court counts are not applicable:
 **Sealed: 0 | Remanded: 0 | Remediated: 0**.
+
+### Entry 156 — 2026-08-30: Independent Cline SDK L13/L14 Checkpoint
+
+**Candidate:** `adf76c61972554f71f2c863b3113f07d19dd1a52` in detached clean checkout
+`/private/tmp/paeos-cline-sdk-l13-adf76c6`.
+
+**L13 reproduction:** 817 tests collected. The new adversarial/mutation suites produced **46
+passed, 0 failed, 0 skipped, 0 xfailed, 0 xpassed**. The restricted full run produced **813 passed,
+4 errors**; all four errors are `PermissionError` while binding the existing loopback gateway test
+port. With explicit loopback permission, that gateway file produced **4 passed, 0 failed**. Targeted
+Task 7–8 Ruff and Pyright checks and Node syntax checks passed. Repository-wide Ruff independently
+reported **658 findings** and Pyright **74 diagnostics**; those baseline findings were not mass-
+repaired in this recovery checkpoint.
+
+**L14 disposition:** **BLOCKED_UNQUALIFIABLE**. The implementation builder is recorded as
+Cline/GLM-5.3 (GLM family), but no machine-captured physical receipt exists for the temporary
+Codex/OpenAI auditor session. Router history contains unrelated Gemini/Llama observations, not a
+candidate-bound auditor receipt. Model labels cannot substitute for physical provenance. No Gate A
+closure, Court seal, debt repayment, canary, or Gates B–G advancement is authorized.
+
+Worker-admission counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**. Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**. DEBT-0058 remains **OPEN**.
