@@ -21,6 +21,8 @@ live admission probes were used.
 | `pytest tests/model_router/test_gateway_server.py` with loopback permission | 0 | **4 passed; 0 failed** | `64881b85155f91ae975308351fc3f0654cccab5567c2d0ada11cc50002456d26` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | targeted Ruff (Task 7–8 files) | 0 | **All checks passed** | `82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | targeted Pyright (Task 8 files) | 0 | **0 errors, 0 warnings, 0 informations** | `6d88a1b220adb7a3d62092b6e38431f0b3fe8babe9864fab90e5849766260332` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| repository-wide `ruff check .` | 1 | **658 findings** | `ed993c221589aa233390a36aec603c1ad26097c772f83ed8142dc2c9e5f188e4` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| repository-wide `pyright` | 1 | **74 errors, 0 warnings, 0 informations** | `b9bba26616af38a3c5997ceb3a035f666d55d711408cc1872ee911e7e4c037a4` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | `node --check runtime/integrations/cline_sdk_host.mjs` | 0 | syntax valid | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 
 The restricted full run has no skips, xfails, or xpasses. Its four errors are environmental socket
