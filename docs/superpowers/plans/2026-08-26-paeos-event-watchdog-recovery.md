@@ -152,13 +152,13 @@ def decide_recovery(
 ) -> WatchdogDecision: ...
 ```
 
-- [ ] **Step 2.1: Write RED decision-matrix tests**
+- [x] **Step 2.1: Write RED decision-matrix tests**
 
 Cover each action, ambiguous side effect, poisoned projection, ledger-chain failure, stale fence,
 terminal transaction, unrelated-goal isolation, rate limit before/after acceptance, deterministic
 bad request, scope violation, provenance conflict, circuit breaker, and identical failed command.
 
-- [ ] **Step 2.2: Run RED once**
+- [x] **Step 2.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -168,13 +168,13 @@ bad request, scope violation, provenance conflict, circuit breaker, and identica
 
 Expected: new tests fail. Existing legacy observer tests describe compatibility behavior only.
 
-- [ ] **Step 2.3: Implement pure decisions and demote legacy signals**
+- [x] **Step 2.3: Implement pure decisions and demote legacy signals**
 
 Make `ops/chatgpt_bridge/watchdog.py` explicitly report `compatibility_diagnostics`; remove any
 claim that a stale repository or response file is canonical health. Do not add restart or write
 behavior to the legacy observer.
 
-- [ ] **Step 2.4: Run GREEN**
+- [x] **Step 2.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -182,7 +182,7 @@ behavior to the legacy observer.
   tests/chatgpt_bridge/test_watchdog_observer.py
 ```
 
-- [ ] **Step 2.5: Commit**
+- [x] **Step 2.5: Commit**
 
 ```bash
 git add runtime/control_plane/watchdog.py ops/chatgpt_bridge/watchdog.py \

@@ -75,6 +75,8 @@ class LivenessSnapshot:
     active_tool_deadline_monotonic: float | None
     transaction_deadline_monotonic: float
     side_effect_certainty: SideEffectCertainty
+    observed_ledger_head: str = ""
+    evidence_hashes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(self.transaction_key, str) or not self.transaction_key.strip():
@@ -95,6 +97,12 @@ class LivenessSnapshot:
         )
         if not isinstance(self.side_effect_certainty, SideEffectCertainty):
             raise TypeError("side_effect_certainty must be a SideEffectCertainty")
+        if not isinstance(self.observed_ledger_head, str):
+            raise TypeError("observed_ledger_head must be a string")
+        if not isinstance(self.evidence_hashes, tuple) or any(
+            not isinstance(value, str) or not value for value in self.evidence_hashes
+        ):
+            raise TypeError("evidence_hashes must be a tuple of non-empty strings")
 
 
 class LivenessStatus(StrEnum):

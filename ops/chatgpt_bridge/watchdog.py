@@ -1,6 +1,8 @@
-"""Observer-only health reporting for the PAEOS bridge control plane.
+"""Compatibility-only health diagnostics for the legacy PAEOS bridge.
 
-The module reads process, file-age, and repository signals without changing them.
+The module reads process, file-age, and repository signals without changing them.  These signals
+are explicitly diagnostic and never represent canonical transaction progress or authorize
+recovery; the event-based control-plane watchdog owns those decisions.
 """
 
 from __future__ import annotations
@@ -35,6 +37,7 @@ class WatchdogReport:
     repo_idle_minutes: float | None
     response_age_minutes: float | None
     issues: tuple[str, ...]
+    compatibility_diagnostics: tuple[str, ...] = ()
 
 
 # ---------------------------------------------------------------------------
@@ -177,6 +180,7 @@ def collect_report(repo_root: Path, bridge_dir: Path) -> WatchdogReport:
         repo_idle_minutes=repo_idle,
         response_age_minutes=response_age,
         issues=tuple(issues),
+        compatibility_diagnostics=tuple(issues),
     )
 
 
@@ -189,7 +193,7 @@ def run_watchdog(repo_root: Path, bridge_dir: Path) -> WatchdogReport:
 
     if report.issues:
         for issue in report.issues:
-            logger.warning("watchdog issue: %s", issue)
+            logger.warning("compatibility watchdog diagnostic: %s", issue)
     else:
         logger.info("watchdog healthy")
 

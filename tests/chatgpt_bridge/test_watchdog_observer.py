@@ -56,6 +56,7 @@ def test_unhealthy_report_performs_no_mutation(monkeypatch):
     assert "cline process missing" in text
     assert "repository stale" in text
     assert "response stale" in text
+    assert report.compatibility_diagnostics == report.issues
 
 
 # ---------------------------------------------------------------------------
