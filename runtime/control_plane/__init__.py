@@ -27,6 +27,12 @@ from runtime.control_plane.projection import (
     rebuild_projection,
 )
 from runtime.control_plane.recovery import RecoveryController, RecoveryReceipt
+from runtime.control_plane.storage_policy import (
+    StorageDisposition,
+    StorageObservation,
+    StoragePolicy,
+    decide_storage,
+)
 
 __all__ = [
     "CONTROL_PLANE_EVENT_SCHEMA",
@@ -43,8 +49,12 @@ __all__ = [
     "RecoveryController",
     "RecoveryReceipt",
     "SideEffectCertainty",
+    "StorageDisposition",
+    "StorageObservation",
+    "StoragePolicy",
     "TransactionCommand",
     "assess_liveness",
+    "decide_storage",
     "evaluate_liveness",
     "idempotency_key",
     "project_row",

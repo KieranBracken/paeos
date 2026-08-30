@@ -284,33 +284,33 @@ class StorageDisposition(StrEnum):
 def decide_storage(observation: StorageObservation, policy: StoragePolicy) -> StorageDisposition: ...
 ```
 
-- [ ] **Step 4.1: Write RED quota tests**
+- [x] **Step 4.1: Write RED quota tests**
 
 Test soft/hard boundaries, overflow/negative values, growing quarantine, low disk, concurrent new
 dispatch, terminal evidence retention, and projection rebuild. No policy may delete raw evidence
 to make a test pass.
 
-- [ ] **Step 4.2: Run RED once**
+- [x] **Step 4.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
   tests/runtime/control_plane/test_storage_policy.py
 ```
 
-- [ ] **Step 4.3: Implement back-pressure only**
+- [x] **Step 4.3: Implement back-pressure only**
 
 At hard pressure, refuse NEW/PREPARE dispatches while allowing already-committed evidence flush
 and read-only reconciliation. Retention/deletion requires a separately reviewed policy and is not
 implemented by this plan.
 
-- [ ] **Step 4.4: Run GREEN**
+- [x] **Step 4.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
   tests/runtime/control_plane/test_storage_policy.py
 ```
 
-- [ ] **Step 4.5: Commit**
+- [x] **Step 4.5: Commit**
 
 ```bash
 git add runtime/control_plane/storage_policy.py runtime/control_plane/watchdog.py \

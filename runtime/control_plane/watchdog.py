@@ -21,6 +21,12 @@ from runtime.control_plane.liveness import (
     LivenessStatus,
     assess_liveness,
 )
+from runtime.control_plane.storage_policy import (
+    StorageDisposition,
+    StorageObservation,
+    StoragePolicy,
+    decide_storage,
+)
 
 
 class RecoveryAction(StrEnum):
@@ -102,6 +108,8 @@ def decide_recovery(
     policy: DeadlinePolicy | None = None,
     trace_b: bool = False,
     last_checkpoint_monotonic: float | None = None,
+    storage_observation: StorageObservation | None = None,
+    storage_policy: StoragePolicy | None = None,
 ) -> WatchdogDecision:
     """Return one typed, side-effect-free recovery proposal.
 
@@ -130,6 +138,18 @@ def decide_recovery(
             reason="PROJECTION_UNVERIFIED",
         )
 
+    if storage_observation is not None:
+        disposition = decide_storage(
+            storage_observation,
+            StoragePolicy() if storage_policy is None else storage_policy,
+        )
+        if disposition is StorageDisposition.HALT_NEW_DISPATCH:
+            return _decision(
+                snapshot,
+                action=RecoveryAction.HALT_SHARED_CONTROL_PLANE,
+                reason="STORAGE_HARD_PRESSURE",
+            )
+
     assessment = assess_liveness(
         snapshot,
         now_monotonic=now_monotonic,
@@ -138,6 +158,15 @@ def decide_recovery(
         last_checkpoint_monotonic=last_checkpoint_monotonic,
     )
     status = assessment.status
+    if storage_observation is not None and decide_storage(
+        storage_observation,
+        StoragePolicy() if storage_policy is None else storage_policy,
+    ) is StorageDisposition.BACKPRESSURE and status is LivenessStatus.HEALTHY:
+        return _decision(
+            snapshot,
+            action=RecoveryAction.DIAGNOSE,
+            reason="STORAGE_BACKPRESSURE",
+        )
     if status is LivenessStatus.TERMINAL:
         return _decision(snapshot, action=RecoveryAction.NONE, reason="TRANSACTION_TERMINAL")
     if status is LivenessStatus.HEALTHY:

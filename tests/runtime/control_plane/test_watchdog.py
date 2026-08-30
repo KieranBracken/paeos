@@ -7,6 +7,7 @@ from runtime.control_plane.liveness import (
     LivenessStatus,
     assess_liveness,
 )
+from runtime.control_plane.storage_policy import StorageObservation, StoragePolicy
 from runtime.control_plane.watchdog import RecoveryAction, decide_recovery
 from runtime.integrations.bridge_protocol import TransactionState
 
@@ -106,6 +107,32 @@ def test_shared_integrity_failure_halts_even_for_unrelated_transaction() -> None
     )
     assert result.action is RecoveryAction.HALT_SHARED_CONTROL_PLANE
     assert result.reason_code == "SHARED_INTEGRITY_FAILURE"
+
+
+def test_storage_hard_pressure_halts_new_dispatch() -> None:
+    result = decide_recovery(
+        snapshot(),
+        now_monotonic=700.0,
+        projection_verified=True,
+        shared_integrity_healthy=True,
+        storage_observation=StorageObservation(1_700, 100, 100, 100, 1_000_000),
+        storage_policy=StoragePolicy(soft_total_bytes=1_000, hard_total_bytes=2_000),
+    )
+    assert result.action is RecoveryAction.HALT_SHARED_CONTROL_PLANE
+    assert result.reason_code == "STORAGE_HARD_PRESSURE"
+
+
+def test_storage_soft_pressure_is_diagnostic_when_liveness_is_healthy() -> None:
+    result = decide_recovery(
+        snapshot(),
+        now_monotonic=700.0,
+        projection_verified=True,
+        shared_integrity_healthy=True,
+        storage_observation=StorageObservation(800, 100, 100, 100, 1_000_000_000),
+        storage_policy=StoragePolicy(soft_total_bytes=1_000, hard_total_bytes=2_000),
+    )
+    assert result.action is RecoveryAction.DIAGNOSE
+    assert result.reason_code == "STORAGE_BACKPRESSURE"
 
 
 def test_decision_binds_snapshot_identity_and_evidence() -> None:
