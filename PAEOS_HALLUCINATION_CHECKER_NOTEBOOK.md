@@ -2596,3 +2596,24 @@ from the receipt and must be reviewed before publication. L14 remains **BLOCKED_
 an approved non-GLM routed audit produces both artifacts and the existing L13/static/environment
 conditions are reconciled. Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**;
 Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; DEBT-0058 remains **OPEN**.
+
+### Entry 162 — 2026-08-30: Antigravity L14 Receipt With Explicit Remand
+
+The Founder supplied a second one-shot physical audit capture for candidate
+`adf76c61972554f71f2c863b3113f07d19dd1a52` using the fail-closed Task 9A implementation at
+`88d99064702c02c39489aa58210eda4799c07640`. The receipt artifact is 1,331 bytes with file
+SHA-256 `040ec69856437204ee4d493cd601cce9e32ec7b65cd01cb0353feab70686191b`; its embedded
+canonical receipt hash is `ee6d7c7271436175bc586bbac449490247cbc9bef141dc4c34a9122f340b5128`.
+Independent loading and validation returned A-08 **PASS**: physical auditor `google /
+gemini-3.6-flash` (family `gemini`) differs from builder `cline-pass / z-ai/glm-5.3-flash`
+(family `glm`), with one provider attempt and no fallback.
+
+The report artifact is 1,455 bytes with SHA-256
+`e0ee88075523e3e33b6cf1f442d3dce117cb41b92e3b018b6ce3122dbd12412f`. It is candidate/evidence
+bound and gives the exact disposition **`REMAND_WITH_AMENDMENTS`**, citing the existing worker
+admission rejection and reporting **Admitted: 0 | Rejected: 1 | Remediated: 0** and
+**Sealed: 0 | Remanded: 0 | Remediated: 0**. The report does not provide a concrete reproduction
+command or a detailed violated-invariant identifier as required by the L14 plan, so it is
+accepted as a non-vacuous remand signal, not as a clean L14 pass. Gate A remains open; the
+worker rejection, DEBT-0058, repository static findings, and prior L13 environment findings
+must be remediated or formally dispositioned before Task 10 or any Gate B-G advancement.
