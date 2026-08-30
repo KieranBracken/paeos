@@ -113,3 +113,7 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   durable claim and one fail-closed loser. Focused suites passed **58** and the non-gateway suite
   passed **1,006**. This is implementation repayment evidence, not debt closure or independent
   L14/L17 evidence; all four debts and **12/48** strict sealed progress remain open.
+- 2026-08-30 the prepared candidate-bound non-GLM L14/L17 invocation for `00c610b` was rejected
+  before process start by the execution boundary because its Google Gemini destination and internal
+  metadata payload lacked destination-specific authorization. No provider call or retry occurred;
+  the audit remains blocked and the prepared bundle is preserved in `/private/tmp`.

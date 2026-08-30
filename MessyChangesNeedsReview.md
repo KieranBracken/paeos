@@ -376,6 +376,13 @@ one durable claim plus one fail-closed loser. Focused recovery suites passed **5
 non-gateway suite passed **1,006**. This is implementation repayment evidence only; independent
 physical L14/L17 review, adapter qualification, and gate closure remain open.
 
+## 2026-08-30 — Candidate L14/L17 invocation blocked
+
+The prepared one-shot non-GLM audit request for candidate `00c610b` was rejected by the execution
+boundary before process start because the Google Gemini destination and metadata payload required
+specific authorization. No provider, credential, retry, fallback, or workaround occurred; the
+raw rejection is preserved in Notebook Entry 181.
+
 ## 2026-08-30 — Candidate 13f695b L13 reproduction reconciliation
 
 Read-only worker reproduction evidence was reconciled against the isolated candidate. The control,

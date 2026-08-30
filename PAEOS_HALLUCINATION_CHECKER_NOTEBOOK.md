@@ -3033,3 +3033,18 @@ non-GLM L14/L17 audit remain outstanding. Worker counts remain **Admitted: 0 | R
 Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; strict sealed
 progress remains **12/48 complete | 36 remaining**. No Gate B/C seal, production dispatch, or SAKG
 resumption is authorized.
+
+### Entry 181 — 2026-08-30: Candidate L14/L17 Router Invocation Blocked by Payload Boundary
+
+One explicit, no-fallback audit invocation was prepared for candidate
+`00c610bf79710be8838ef1f3ac5a5f2dbb83bee2` with evidence bundle
+`a803380b78db801d19fdbdd13f87d51ec14f1197f144e262b796175448ac2a49`, targeting the configured
+non-GLM audit route (expected Google Gemini). The execution-approval boundary rejected the command
+before process start because transmitting internal candidate, repository-path, test, debt, and
+audit metadata to that external destination requires destination/payload-specific authorization.
+
+No provider call, credential read, report or receipt write, repository mutation, retry, fallback,
+or workaround occurred. This is not an auditor result and does not satisfy A-08, L14, or L17. The
+prepared prompt and bundle remain available for an explicitly authorized one-shot invocation.
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0
+| Remanded: 0 | Remediated: 0**; strict sealed progress remains **12/48 complete | 36 remaining**.
