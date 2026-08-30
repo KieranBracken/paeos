@@ -387,7 +387,7 @@ git commit -m "fix(ops): replace GUI monitor with event watchdog"
 git diff --check
 ```
 
-- [ ] **Step 6.2: Run the liveness fault matrix**
+- [x] **Step 6.2: Run the liveness fault matrix**
 
 Inject hung reasoning, hung tool, token-only stream, quota loss, process death, stale fence,
 projection poison, disk exhaustion, pre/post-side-effect crash, unrelated transaction, and
