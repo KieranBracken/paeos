@@ -3074,3 +3074,22 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 **OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**. The non-GLM L14/L17
 audit is still blocked on destination-specific authorization and a fresh candidate-bound bundle;
 no Gate C seal or downstream dispatch is authorized.
+
+### Entry 183 — 2026-08-31: Fresh L14/L17 Dispatch Blocked by Destination Authorization
+
+A fresh candidate-bound bundle was prepared for clean tip `15aa17689bbfabc8526b857d1839e9106e5d2cdc`
+with evidence SHA-256 `8742f33e8cdf51539865cfaf6e0f52e7b4d2884c9ae116a1a4154f6857195535`. One
+explicit receipt-capture invocation targeted the configured Google Gemini non-GLM route using
+`/private/tmp/paeos-l14-l17-prompt-15aa176.md`; the execution-approval boundary rejected it before
+process start because the payload transmits internal candidate, repository, test, debt, and audit
+metadata to an external destination without destination-specific authorization.
+
+No provider call, credential read, report or receipt write, retry, fallback, workaround, or
+repository mutation occurred. No report/receipt artifacts were created. This is an execution
+boundary block, not an L14/L17 result, and it does not satisfy Builder != Auditor. A new attempt is
+forbidden until the Founder explicitly authorizes this exact payload and Google Gemini destination.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0
+| Remanded: 0 | Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain
+**OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**. Gate C and all
+downstream advancement remain blocked.

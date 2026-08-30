@@ -124,3 +124,8 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   diagnostics** across existing test fixtures/modules. These are not waived or claimed clean; no
   unrelated cleanup was introduced. Worker/Court counts remain **0/1/0** and **0/0/0**; strict
   sealed progress remains **12/48 complete | 36 remaining** and all four recovery debts remain open.
+- 2026-08-31 a fresh candidate-bound L14/L17 receipt-capture attempt for `15aa176` was blocked
+  before process start by the execution boundary: sending internal candidate/repository/test/debt
+  metadata to Google Gemini requires destination-specific authorization. No provider call, report,
+  receipt, retry, fallback, or workaround occurred. The fresh bundle and prompt remain in
+  `/private/tmp`; no new audit result exists and no identical retry is authorized.

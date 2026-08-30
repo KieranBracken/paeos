@@ -410,3 +410,14 @@ This checkpoint does not change worker/Court counts (**0/1/0**, **0/0/0**) or st
 progress (**12/48 complete | 36 remaining**). All four recovery debts remain open and the
 candidate-bound non-GLM L14/L17 invocation remains blocked pending destination-specific
 authorization.
+
+## 2026-08-31 — Fresh non-GLM audit dispatch blocked
+
+A fresh candidate-bound L14/L17 bundle was prepared for `15aa17689bbfabc8526b857d1839e9106e5d2cdc`
+(bundle SHA-256 `8742f33e8cdf51539865cfaf6e0f52e7b4d2884c9ae116a1a4154f6857195535`). The one-shot
+receipt-capture command targeting Google Gemini was rejected before process start because its
+internal candidate/repository/test/debt/audit payload lacked destination-specific authorization.
+No provider call, credential access, report/receipt artifact, retry, fallback, workaround, or
+repository mutation occurred. This is not an L14/L17 result. A new attempt requires explicit
+authorization for this exact payload and destination; worker/Court counts and **12/48** strict
+sealed progress are unchanged.
