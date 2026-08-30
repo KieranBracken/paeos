@@ -3,7 +3,7 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-08-19 (handoff — new logged session)
+> **Last updated:** 2026-08-30 (isolated recovery debt-hardening checkpoint)
 
 ## 1. What just happened (session arc, condensed)
 
@@ -85,3 +85,11 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
 - New requirement ≠ new architectural state (CER v1.1: "governs every state; add no state").
 - TDD belongs in L11 contract + L13 court obligation, not a new StageId.
 - Any doc produced by an agent must be verified on disk before reporting it done.
+- 2026-08-30 isolated recovery checkpoint: commit `87a33067bff8ed23c68bbbd7042aea1da5181257`
+  binds new L14 reports to their physical receipts and enforces caller-supplied canonical
+  accounting; it also adds a state-root-local transaction lock and required prior-digest CAS.
+  Focused checks and the full non-gateway suite (**955 passed**) are green, but DEBT-0059 and
+  DEBT-0061 remain open pending their external repayment conditions. DEBT-0060 is traced to the
+  legacy GUI monitor writing outside the injected bridge response path; the event-watchdog plan
+  remains the approved remediation. Strict sealed progress is **12/48 complete | 36 remaining**;
+  no Gate C seal, Gate D–G advancement, production dispatch, or SAKG resumption is authorized.

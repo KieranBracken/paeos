@@ -2917,3 +2917,34 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 **Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058` and `DEBT-0061` remain **OPEN**;
 strict sealed progress remains **12/48 complete | 36 remaining**. Gate C remains unsealed and
 Gate D–G advancement, production dispatch, and SAKG resumption remain unauthorized.
+
+### Entry 176 — 2026-08-30: Debt Hardening Checkpoint and Bridge Timeout Root Cause
+
+The isolated branch commit `87a33067bff8ed23c68bbbd7042aea1da5181257` implements two narrow,
+test-first remediations:
+
+1. **DEBT-0061:** L14 reports can now be bound to receipts by exact UTF-8 report digest;
+   persisted receipt/report pairs are validated together; and expected worker/Court counts are
+   rejected when missing, ambiguous, or contradictory. The capture CLI binds the report before
+   persisting the receipt and requires the current canonical counts. The external false-count
+   report is rejected; no false `Admitted` or `Sealed` count is accepted. Legacy receipts remain
+   explicitly unbound.
+2. **DEBT-0059:** transaction saves now require an exact prior file digest, reload the record while
+   holding a state-root-local POSIX lock, and fail closed on a concurrent change. A stale-claim
+   regression and a real two-process lock test pass.
+
+Focused control-plane/model-router/bridge tests pass; the full non-gateway suite collected
+**955** and passed. Targeted Ruff and Pyright are clean. These are implementation checkpoints,
+not debt closure or gate seals: DEBT-0061 still needs a fresh corrected L14/L17 bundle, and
+DEBT-0059 still needs an end-to-end competing-claim probe through every adapter caller.
+
+The DEBT-0060 investigation traced the bootstrap timeout to a protocol boundary mismatch:
+`ChatBridgeRuntime` waits under the injected state root, while the legacy GUI monitor watches
+`cline_output.log` and writes `chatgpt_response.md` outside that protocol. Its poll/idle/browser
+waits explain long hesitation. The event-watchdog plan is the approved remediation; no GUI
+mutation or autonomous retry was introduced. DEBT-0060 remains open.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and
+`DEBT-0061` remain **OPEN**. Strict sealed progress remains **12/48 complete | 36 remaining**.
+No Gate C seal, Gate D–G advancement, production dispatch, or SAKG resumption is authorized.

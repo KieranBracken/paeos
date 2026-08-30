@@ -339,3 +339,14 @@ infrastructure, and test repairs.
 ### Next step for new session
 `runtime/orchestrator/__init__.py` — walk `CeremonyContract.obligation_plan()` instead of
 hard-coded SoftLoop stages. This is item 3 in §3 of `operations/CURRENT_STATE.md`.
+
+## 2026-08-30 — Recovery debt hardening (isolated branch)
+
+Commit `87a33067bff8ed23c68bbbd7042aea1da5181257` modifies the L14 receipt capture/validator,
+bridge transaction store, and their tests. Receipt/report pairs now carry a report digest and
+canonical accounting checks; transaction saves require a prior digest and a state-root-local
+cross-process lock. Focused checks and the full non-gateway suite (**955 passed**) are clean;
+repository-wide inherited static debt is not waived. DEBT-0059/0061 remain open pending their
+external repayment conditions. DEBT-0060 was traced to the legacy GUI monitor writing outside the
+injected bridge response path; the event-watchdog plan remains the approved fix and no GUI path was
+re-enabled.

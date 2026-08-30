@@ -79,3 +79,12 @@ Remediated: 0`; `Sealed: 0 | Remanded: 0 | Remediated: 0`). The report is theref
 The receipt also lacks a report-content digest, so receipt validity does not cryptographically
 bind the persisted report bytes. This validator/schema gap is documented in `PAEOS-IP-0015` and
 `DEBT-0061`. Hidden canaries, L17, and the report correction remain outstanding.
+
+## Debt-hardening checkpoint (2026-08-30)
+
+Commit `87a33067bff8ed23c68bbbd7042aea1da5181257` hardens receipt/report binding and transaction
+CAS semantics. Focused control-plane/model-router/bridge tests pass and the full non-gateway suite
+collected **955** and passed. The malformed external report is now deterministically rejected for
+false worker accounting. A two-process lock test and stale-digest test prove the local fencing
+primitive. DEBT-0061 and DEBT-0059 remain open pending fresh candidate-bound L14/L17 evidence and
+an end-to-end adapter competition probe; no Gate C seal is claimed.
