@@ -2879,3 +2879,41 @@ candidate-bound external receipt is required. Worker counts remain **Admitted: 0
 Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
 `DEBT-0058` remains **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
 No Gate C seal, Gate D advancement, production dispatch, or SAKG resumption is authorized.
+
+### Entry 175 — 2026-08-30: External L14 Receipt Valid, Auditor Report Remanded for False Counts
+
+Candidate-bound artifacts subsequently appeared at the prepared paths after the earlier approval
+boundary rejection:
+
+- Receipt: `/private/tmp/paeos-l14-audit-receipt-headless-9fd72db.json` (file SHA-256
+  `8f112189e9475108374de3124b8ad49f65e127534ef2ef21fec389363e9552b9`; embedded canonical
+  receipt SHA-256 `f0633879fcbcc2f8aac257c2c3d9d2e52c55fa9b3e3ed665cb4f96f6b2b34c55`).
+- Report: `/private/tmp/paeos-l14-audit-report-headless-9fd72db.md` (SHA-256
+  `3dd59551987c508d314269dddb0db6c49ec2d82f7d5bf2d8da360e32a29d83df`).
+- Prompt: `/private/tmp/paeos-l14-audit-prompt-headless-9fd72db.md` (SHA-256
+  `953fac8c41b096a0763f5845a222d4ea9a54a3e1f2e384e1ea0a05989ecac83d`).
+
+Independent local checks loaded the receipt with `load_auditor_receipt()` and
+`validate_auditor_receipt()`: schema, candidate/evidence bindings, actual provider/model family
+(`google`/`gemini`), one-attempt/no-fallback telemetry, and A-08 (`gemini != glm`) all validate.
+The report also passes the current `validate_auditor_report()` function's limited binding/status
+checks. This establishes physical provenance evidence, not constitutional ratification.
+
+The report nevertheless violates its own prompt's exact-count requirement and the durable
+canonical ledger: it states `Worker: Admitted: 1 | Rejected: 0 | Remediated: 0` and
+`Court: Sealed: 1 | Remanded: 0 | Remediated: 0`, while the authoritative counts remain
+`Worker: Admitted: 0 | Rejected: 1 | Remediated: 0` and `Court: Sealed: 0 | Remanded: 0 |
+Remediated: 0`. This is a non-vacuous evidence-integrity failure, not a count update. The
+overseer disposition is **REMAND_WITH_AMENDMENTS** for the report; no second invocation or
+automatic correction is permitted.
+
+Additional evidence gap: the receipt schema binds transport request/response digests but does
+not include a report-content digest, and `validate_auditor_report()` does not enforce the exact
+accounting fields. Therefore the receipt alone cannot prove that the persisted report bytes are
+the captured response or that its operational counts are truthful. This is recorded as
+`PAEOS-IP-0015` and `DEBT-0061` for a future, separately authorized hardening task.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058` and `DEBT-0061` remain **OPEN**;
+strict sealed progress remains **12/48 complete | 36 remaining**. Gate C remains unsealed and
+Gate D–G advancement, production dispatch, and SAKG resumption remain unauthorized.

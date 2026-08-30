@@ -60,3 +60,22 @@ is preserved verbatim in Notebook Entry 174 and is not an audit disposition or p
 The candidate remains `BLOCKED_UNQUALIFIABLE` at L14. No Gate C seal, Gate D–G advancement,
 production dispatch, or SAKG resumption is authorized. A destination/payload-specific approval
 or an independently captured candidate-bound non-GLM receipt remains required.
+
+## External receipt and report review (2026-08-30)
+
+The candidate-bound receipt now present at `/private/tmp/paeos-l14-audit-receipt-headless-9fd72db.json`
+loads and validates locally. Its embedded canonical digest is
+`f0633879fcbcc2f8aac257c2c3d9d2e52c55fa9b3e3ed665cb4f96f6b2b34c55`; the file digest is
+`8f112189e9475108374de3124b8ad49f65e127534ef2ef21fec389363e9552b9`; actual provenance is
+`google` / `gemini-3.6-flash`, one attempt, no fallback, and A-08 passes against the GLM builder.
+
+The paired report is not admissible as a clean L14 result. Although the current report validator
+accepts its bindings and single `L14_STATUS`, it reports `Worker: Admitted: 1 | Rejected: 0 |
+Remediated: 0` and `Court: Sealed: 1 | Remanded: 0 | Remediated: 0`, contradicting both the
+prompt's required counts and the canonical recovery ledger (`Admitted: 0 | Rejected: 1 |
+Remediated: 0`; `Sealed: 0 | Remanded: 0 | Remediated: 0`). The report is therefore
+`REMAND_WITH_AMENDMENTS`; no count is changed and no Gate C seal is claimed.
+
+The receipt also lacks a report-content digest, so receipt validity does not cryptographically
+bind the persisted report bytes. This validator/schema gap is documented in `PAEOS-IP-0015` and
+`DEBT-0061`. Hidden canaries, L17, and the report correction remain outstanding.

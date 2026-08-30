@@ -94,4 +94,7 @@ amendment may change constitutional law.
   low-quality shortcuts or remanding prematurely. Cost is conserved (drawn from remaining parent tokens); time is the
   only buffer (waiting longer for session limit reset). Status: **RATIFIED BY FOUNDER** (2026-08-05).
 
+- `PAEOS-IP-0015-l14-report-binding-and-accounting.md` — Cryptographically bind L14 reports to
+  physical receipts and enforce canonical worker/Court accounting (source: Gate C headless
+  supervisor L14 review). Status: **AWAITING FOUNDER RATIFICATION**.
 
