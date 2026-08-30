@@ -218,14 +218,14 @@ class TransactionCoordinator:
     def recover_projection(self) -> str: ...
 ```
 
-- [ ] **Step 3.1: Write RED contention tests**
+- [x] **Step 3.1: Write RED contention tests**
 
 Use independent SQLite connections and processes. Two claimants start from the same projected
 digest: exactly one may append `CLAIM`; the other receives `StaleComparison` or `StaleFence` and
 does not create a ledger row. Cover stale owner after handoff, old process waking after a newer
 fence, and a crash immediately before and after append.
 
-- [ ] **Step 3.2: Run RED once**
+- [x] **Step 3.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -236,7 +236,7 @@ fence, and a crash immediately before and after append.
 Expected: new coordinator tests fail because comparison/fencing is absent; existing ledger tests
 remain green.
 
-- [ ] **Step 3.3: Implement the coordinator without a second writer**
+- [x] **Step 3.3: Implement the coordinator without a second writer**
 
 The coordinator owns the sole `Ledger`. Within one serialized commit section it:
 
@@ -251,7 +251,7 @@ The coordinator owns the sole `Ledger`. Within one serialized commit section it:
 Do not let adapter/watchdog processes instantiate competing `Ledger` writers. They submit typed
 commands to this coordinator seam.
 
-- [ ] **Step 3.4: Run GREEN repeatedly for concurrency only**
+- [x] **Step 3.4: Run GREEN repeatedly for concurrency only**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -262,7 +262,7 @@ commands to this coordinator seam.
 Expected: all pass. A repeat loop is authorized here only for the passing race/property test and
 must use generated distinct transaction IDs; it must not repeat a failed external action.
 
-- [ ] **Step 3.5: Commit**
+- [x] **Step 3.5: Commit**
 
 ```bash
 git add runtime/control_plane/coordinator.py kernel/ledger_sqlite.py \
