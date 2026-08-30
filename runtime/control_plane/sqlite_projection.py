@@ -146,6 +146,19 @@ class SqliteControlPlaneProjection:
         except KeyError as exc:
             raise KeyError(request_id) from exc
 
+    def find_by_transaction_key(
+        self,
+        transaction_key: str,
+        *,
+        verified_ledger_head: str,
+    ) -> ProjectedTransaction:
+        """Return the projection bound to ``transaction_key`` from a verified snapshot."""
+
+        for projected in self._checked_snapshot(verified_ledger_head).values():
+            if projected.record.transaction_key == transaction_key:
+                return projected
+        raise KeyError(transaction_key)
+
     def claimable(self, *, verified_ledger_head: str) -> tuple[ProjectedTransaction, ...]:
         projections = self._checked_snapshot(verified_ledger_head)
         return tuple(

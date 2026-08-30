@@ -10,7 +10,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
-from runtime.control_plane.events import side_effect_retry_eligible
+from runtime.control_plane.events import (
+    DispatchEvidence,
+    SideEffectCertainty,
+    side_effect_retry_eligible,
+)
 from runtime.control_plane.liveness import (
     DeadlinePolicy,
     LivenessSnapshot,
@@ -37,8 +41,14 @@ class WatchdogDecision:
     reason_code: str
     observed_ledger_head: str
     evidence_hashes: tuple[str, ...]
+    request_id: str = ""
+    side_effect_certainty: SideEffectCertainty = SideEffectCertainty.NOT_ATTEMPTED
+    idempotency_key: str | None = None
+    dispatch_evidence: DispatchEvidence | None = None
 
     def __post_init__(self) -> None:
+        if not isinstance(self.request_id, str):
+            raise TypeError("request_id must be a string")
         if not isinstance(self.transaction_key, str) or not self.transaction_key.strip():
             raise ValueError("transaction_key must be non-empty")
         if isinstance(self.fencing_token, bool) or not isinstance(self.fencing_token, int):
@@ -55,6 +65,14 @@ class WatchdogDecision:
             not isinstance(value, str) or not value for value in self.evidence_hashes
         ):
             raise TypeError("evidence_hashes must be a tuple of non-empty strings")
+        if not isinstance(self.side_effect_certainty, SideEffectCertainty):
+            raise TypeError("side_effect_certainty must be a SideEffectCertainty")
+        if self.idempotency_key is not None and not self.idempotency_key.strip():
+            raise ValueError("idempotency_key must be non-empty when present")
+        if self.dispatch_evidence is not None and not isinstance(
+            self.dispatch_evidence, DispatchEvidence
+        ):
+            raise TypeError("dispatch_evidence must be DispatchEvidence or None")
 
 
 def _decision(
@@ -64,12 +82,14 @@ def _decision(
     reason: str,
 ) -> WatchdogDecision:
     return WatchdogDecision(
+        request_id=snapshot.request_id,
         transaction_key=snapshot.transaction_key,
         fencing_token=snapshot.fencing_token,
         action=action,
         reason_code=reason,
         observed_ledger_head=snapshot.observed_ledger_head,
         evidence_hashes=snapshot.evidence_hashes,
+        side_effect_certainty=snapshot.side_effect_certainty,
     )
 
 

@@ -217,13 +217,13 @@ class RecoveryController:
     def apply(self, decision: WatchdogDecision) -> RecoveryReceipt: ...
 ```
 
-- [ ] **Step 3.1: Write RED stale-decision and crash tests**
+- [x] **Step 3.1: Write RED stale-decision and crash tests**
 
 Test decision head changed, fence changed, already recovered, crash before commit, crash after
 commit, adapter restart failure, provider rotation without eligible profile, lease expiry after a
 side effect becomes possible, and duplicate application. A decision is advisory until committed.
 
-- [ ] **Step 3.2: Run RED once**
+- [x] **Step 3.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -232,13 +232,13 @@ side effect becomes possible, and duplicate application. A decision is advisory 
 
 Expected: fails because the recovery controller does not exist.
 
-- [ ] **Step 3.3: Implement compare-before-commit recovery**
+- [x] **Step 3.3: Implement compare-before-commit recovery**
 
 Re-verify ledger head, transaction digest, fence, and side-effect certainty. Safe lease expiry
 increments the fence before a new claim. Ambiguity appends `SIDE_EFFECT_UNCERTAIN`. Shared
 integrity failure halts new dispatch globally; local route failure quarantines only that tuple.
 
-- [ ] **Step 3.4: Run GREEN with transaction tests**
+- [x] **Step 3.4: Run GREEN with transaction tests**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -247,7 +247,7 @@ integrity failure halts new dispatch globally; local route failure quarantines o
   tests/runtime/control_plane/test_side_effect_recovery.py
 ```
 
-- [ ] **Step 3.5: Commit**
+- [x] **Step 3.5: Commit**
 
 ```bash
 git add runtime/control_plane/recovery.py runtime/control_plane/coordinator.py \

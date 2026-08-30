@@ -97,6 +97,7 @@ class TransactionState(StrEnum):
 class TransactionEvent(StrEnum):
     PREPARE = "PREPARE"
     CLAIM = "CLAIM"
+    EXPIRE_LEASE = "EXPIRE_LEASE"
     RESPOND = "RESPOND"
     CONSUME = "CONSUME"
     SIDE_EFFECT_UNCERTAIN = "SIDE_EFFECT_UNCERTAIN"
@@ -623,6 +624,7 @@ _TRANSITIONS: dict[
 ] = {
     (TransactionState.NEW, TransactionEvent.PREPARE): TransactionState.PREPARED,
     (TransactionState.PREPARED, TransactionEvent.CLAIM): TransactionState.CLAIMED,
+    (TransactionState.CLAIMED, TransactionEvent.EXPIRE_LEASE): TransactionState.PREPARED,
     (TransactionState.CLAIMED, TransactionEvent.RESPOND): TransactionState.RESPONDED,
     (TransactionState.RESPONDED, TransactionEvent.CONSUME): TransactionState.CONSUMED,
 }
@@ -801,6 +803,13 @@ def reduce_transaction(
         )
         if lease_expiry <= at_value:
             raise _protocol_error(f"{event.value} lease is stale")
+    elif event is TransactionEvent.EXPIRE_LEASE:
+        if record.state is not TransactionState.CLAIMED:
+            raise _protocol_error("EXPIRE_LEASE requires a CLAIMED transaction")
+        if record.lease_owner is None or record.lease_expires_at is None:
+            raise _protocol_error("EXPIRE_LEASE requires an active lease")
+        next_lease_owner = None
+        next_lease_expires_at = None
 
     entry = TransitionEntry(
         at=at,

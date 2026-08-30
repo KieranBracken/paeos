@@ -26,6 +26,7 @@ from runtime.control_plane.projection import (
     project_row,
     rebuild_projection,
 )
+from runtime.control_plane.recovery import RecoveryController, RecoveryReceipt
 
 __all__ = [
     "CONTROL_PLANE_EVENT_SCHEMA",
@@ -39,6 +40,8 @@ __all__ = [
     "ProgressKind",
     "ProjectedTransaction",
     "ProjectionError",
+    "RecoveryController",
+    "RecoveryReceipt",
     "SideEffectCertainty",
     "TransactionCommand",
     "assess_liveness",
