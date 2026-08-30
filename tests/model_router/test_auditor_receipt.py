@@ -13,6 +13,7 @@ from paeos.model_router.auditor_receipt import (
     AUDITOR_RECEIPT_SCHEMA,
     AuditorReceiptContract,
     AuditorReceiptError,
+    bind_auditor_report,
     capture_auditor_interaction,
     capture_auditor_receipt,
     load_auditor_receipt,
@@ -20,6 +21,7 @@ from paeos.model_router.auditor_receipt import (
     persist_auditor_report,
     request_fingerprint,
     response_fingerprint,
+    validate_auditor_artifact_pair,
     validate_auditor_receipt,
     validate_auditor_report,
 )
@@ -329,6 +331,57 @@ REPRODUCTION: ops/worker_admission_probe.py --transport cline-sdk
 """
 
     validate_auditor_report(report, contract)
+
+
+def test_auditor_report_validator_rejects_false_accounting() -> None:
+    request = _request()
+    contract = _contract(
+        request,
+        expected_worker_counts=(0, 1, 0),
+        expected_court_counts=(0, 0, 0),
+    )
+    report = f"""# L14 audit
+Candidate SHA: {contract.candidate_sha256}
+Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
+- **Worker**: Admitted: 1 | Rejected: 0 | Remediated: 0
+- **Court**: Sealed: 1 | Remanded: 0 | Remediated: 0
+`L14_STATUS`: **PASS**
+"""
+
+    with pytest.raises(AuditorReceiptError, match="worker accounting"):
+        validate_auditor_report(report, contract)
+
+
+def test_receipt_binds_report_content_and_rejects_swaps(tmp_path) -> None:
+    request = _request()
+    contract = _contract(
+        request,
+        expected_worker_counts=(0, 1, 0),
+        expected_court_counts=(0, 0, 0),
+    )
+    response = _response(request)
+    report = f"""# L14 audit
+Candidate SHA: {contract.candidate_sha256}
+Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
+- **Worker**: Admitted: 0 | Rejected: 1 | Remediated: 0
+- **Court**: Sealed: 0 | Remanded: 0 | Remediated: 0
+`L14_STATUS`: **PASS**
+"""
+    receipt = capture_auditor_receipt(FakeRouter(response, _catalog()), contract, request)
+    bound = bind_auditor_report(receipt, report)
+    report_path = tmp_path / "audit-report.md"
+    receipt_path = tmp_path / "audit-receipt.json"
+    persist_auditor_report(report, report_path)
+    persist_auditor_receipt(bound, receipt_path)
+
+    assert validate_auditor_artifact_pair(
+        receipt_path, report_path, contract, _catalog()
+    ).passed
+
+    report_path.unlink()
+    persist_auditor_report(report + "\n# swapped bytes\n", report_path)
+    with pytest.raises(AuditorReceiptError, match="report digest"):
+        validate_auditor_artifact_pair(receipt_path, report_path, contract, _catalog())
 
 
 @pytest.mark.parametrize(

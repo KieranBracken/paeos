@@ -6,6 +6,9 @@ docs/superpowers/plans/2026-08-25-paeos-control-plane-recovery-subproject-1.md
 
 import hashlib
 import json
+import subprocess
+import sys
+import time
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -593,6 +596,78 @@ def test_duplicate_transaction_key_cannot_create_second_active_request(
         )
 
     assert store.load(first.request_id) == first
+
+
+def test_transaction_save_rejects_stale_prior_digest_and_preserves_winner(
+    tmp_path: Path,
+) -> None:
+    paths = BridgePaths(tmp_path / "state")
+    store = TransactionStore(paths)
+    first = valid_record()
+    store.create(first)
+    prepared = reduce_transaction(
+        first,
+        TransactionEvent.PREPARE,
+        actor="builder",
+        at="2026-08-25T10:00:00+00:00",
+    )
+    prior_digest = store.digest(first.request_id)
+    store.save(prepared, expected_prior_digest=prior_digest)
+
+    claimed = reduce_transaction(
+        prepared,
+        TransactionEvent.CLAIM,
+        actor="codex-overseer",
+        at="2026-08-25T10:00:30+00:00",
+        lease_owner="codex-overseer",
+        lease_expires_at="2026-08-25T10:05:00+00:00",
+    )
+    with pytest.raises(ProtocolViolation, match="changed concurrently"):
+        store.save(claimed, expected_prior_digest=prior_digest)
+
+    assert store.load(first.request_id) == prepared
+
+
+def test_transaction_lock_serializes_competing_processes(tmp_path: Path) -> None:
+    state_root = tmp_path / "state"
+    first_marker = tmp_path / "first.marker"
+    second_marker = tmp_path / "second.marker"
+    child = """
+import sys
+import time
+from pathlib import Path
+from runtime.integrations.bridge_protocol import BridgePaths, TransactionStore
+
+state_root = Path(sys.argv[1])
+marker = Path(sys.argv[2])
+with TransactionStore(BridgePaths(state_root))._transaction_lock():
+    marker.write_text("acquired", encoding="utf-8")
+    time.sleep(0.25)
+    marker.write_text("released", encoding="utf-8")
+"""
+    first = subprocess.Popen([sys.executable, "-c", child, str(state_root), str(first_marker)])
+    try:
+        deadline = time.monotonic() + 3.0
+        while not first_marker.exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        assert first_marker.read_text(encoding="utf-8") == "acquired"
+        second = subprocess.Popen(
+            [sys.executable, "-c", child, str(state_root), str(second_marker)]
+        )
+        try:
+            time.sleep(0.05)
+            assert not second_marker.exists()
+            assert first.wait(timeout=3) == 0
+            assert second.wait(timeout=3) == 0
+            assert second_marker.read_text(encoding="utf-8") == "released"
+        finally:
+            if second.poll() is None:
+                second.kill()
+                second.wait(timeout=3)
+    finally:
+        if first.poll() is None:
+            first.kill()
+            first.wait(timeout=3)
 
 
 # ---------------------------------------------------------------------------

@@ -16,10 +16,12 @@ from pathlib import Path
 from paeos.model_router.auditor_receipt import (
     AuditorReceiptContract,
     AuditorReceiptError,
+    bind_auditor_report,
     capture_auditor_interaction,
     persist_auditor_receipt,
     persist_auditor_report,
     request_fingerprint,
+    validate_auditor_receipt,
     validate_auditor_report,
 )
 from paeos.model_router.router import ModelRouter
@@ -101,11 +103,18 @@ def run(argv: list[str] | None = None) -> int:
             builder_provider="cline-pass",
             builder_model_id="z-ai/glm-5.3-flash",
             builder_family=ModelFamily.GLM,
+            expected_worker_counts=(0, 1, 0),
+            expected_court_counts=(0, 0, 0),
         )
-        interaction = capture_auditor_interaction(ModelRouter(), contract, request)
+        router = ModelRouter()
+        interaction = capture_auditor_interaction(router, contract, request)
         validate_auditor_report(interaction.response_content, contract)
+        receipt = bind_auditor_report(interaction.receipt, interaction.response_content)
+        validate_auditor_receipt(
+            receipt, contract, router.catalog, require_report_binding=True
+        )
         persist_auditor_report(interaction.response_content, args.report_path)
-        persist_auditor_receipt(interaction.receipt, args.receipt_path)
+        persist_auditor_receipt(receipt, args.receipt_path)
     except AuditorReceiptError as error:
         print(f"AUDITOR_RECEIPT_REJECTED:{error}", file=sys.stderr)
         return 2
@@ -121,11 +130,11 @@ def run(argv: list[str] | None = None) -> int:
             {
                 "receipt_path": str(args.receipt_path),
                 "report_path": str(args.report_path),
-                "receipt_sha256": interaction.receipt.receipt_sha256,
-                "actual_provider": interaction.receipt.actual_provider_id.value,
-                "actual_model": interaction.receipt.actual_model_id,
-                "actual_family": interaction.receipt.actual_family.value,
-                "provider_attempt_count": interaction.receipt.provider_attempt_count,
+                "receipt_sha256": receipt.receipt_sha256,
+                "actual_provider": receipt.actual_provider_id.value,
+                "actual_model": receipt.actual_model_id,
+                "actual_family": receipt.actual_family.value,
+                "provider_attempt_count": receipt.provider_attempt_count,
             },
             sort_keys=True,
         )

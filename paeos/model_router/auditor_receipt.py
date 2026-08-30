@@ -13,7 +13,7 @@ import os
 import re
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -43,6 +43,18 @@ _L14_STATUS_RE = re.compile(
 )
 _L14_INVARIANT_RE = re.compile(r"^\s*INVARIANT:\s*\S", re.MULTILINE)
 _L14_REPRODUCTION_RE = re.compile(r"^\s*REPRODUCTION:\s*\S", re.MULTILINE)
+_WORKER_COUNTS_RE = re.compile(
+    r"^\s*(?:-\s*)?(?:\*\*)?Worker(?:\*\*)?:\s*Admitted:\s*(\d+)\s*\|\s*"
+    r"Rejected:\s*(\d+)\s*\|\s*"
+    r"Remediated:\s*(\d+)\s*$",
+    re.MULTILINE,
+)
+_COURT_COUNTS_RE = re.compile(
+    r"^\s*(?:-\s*)?(?:\*\*)?Court(?:\*\*)?:\s*Sealed:\s*(\d+)\s*\|\s*"
+    r"Remanded:\s*(\d+)\s*\|\s*"
+    r"Remediated:\s*(\d+)\s*$",
+    re.MULTILINE,
+)
 
 
 class AuditorReceiptError(ValueError):
@@ -151,6 +163,8 @@ class AuditorReceiptContract:
     builder_provider: str
     builder_model_id: str
     builder_family: ModelFamily
+    expected_worker_counts: tuple[int, int, int] | None = None
+    expected_court_counts: tuple[int, int, int] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -180,6 +194,7 @@ class PhysicalAuditorReceipt:
     transcript_sha256: str
     captured_at_unix: float
     a08_verdict: str
+    report_sha256: str | None = None
 
     @property
     def receipt_sha256(self) -> str:
@@ -211,6 +226,8 @@ class PhysicalAuditorReceipt:
             "transport_response_sha256": self.transport_response_sha256,
             "transcript_sha256": self.transcript_sha256,
         }
+        if self.report_sha256 is not None:
+            payload["report_sha256"] = self.report_sha256
         if include_hash:
             payload["receipt_sha256"] = self.receipt_sha256
         return payload
@@ -250,6 +267,8 @@ def validate_auditor_receipt(
     receipt: PhysicalAuditorReceipt,
     contract: AuditorReceiptContract,
     catalog: ModelCatalog,
+    *,
+    require_report_binding: bool = False,
 ) -> A08EnforcementResult:
     """Validate every binding and return the physical A-08 result; fail closed on any mismatch."""
 
@@ -300,6 +319,10 @@ def validate_auditor_receipt(
         _require_hex(value, field_name)
     if receipt.a08_verdict != "PASS":
         raise AuditorReceiptError(f"receipt A-08 disposition is {receipt.a08_verdict}")
+    if receipt.report_sha256 is not None:
+        _require_hex(receipt.report_sha256, "report")
+    elif require_report_binding:
+        raise AuditorReceiptError("report binding is required")
     expected_hash = receipt.receipt_sha256
     if not _is_hex(expected_hash, 64):
         raise AuditorReceiptError("receipt hash could not be computed")
@@ -439,6 +462,53 @@ def validate_auditor_report(content: str, contract: AuditorReceiptContract) -> N
             raise AuditorReceiptError("remand report must name an INVARIANT")
         if _L14_REPRODUCTION_RE.search(content) is None:
             raise AuditorReceiptError("remand report must include REPRODUCTION")
+    for label, pattern, expected in (
+        ("worker", _WORKER_COUNTS_RE, contract.expected_worker_counts),
+        ("Court", _COURT_COUNTS_RE, contract.expected_court_counts),
+    ):
+        if expected is None:
+            continue
+        matches = pattern.findall(content)
+        if len(matches) != 1:
+            raise AuditorReceiptError(f"{label} accounting is missing or ambiguous")
+        observed = tuple(int(value) for value in matches[0])
+        if observed != expected:
+            raise AuditorReceiptError(f"{label} accounting mismatch")
+
+
+def bind_auditor_report(
+    receipt: PhysicalAuditorReceipt, content: str
+) -> PhysicalAuditorReceipt:
+    """Return a receipt bound to the exact UTF-8 bytes of one persisted report."""
+
+    if not content.strip():
+        raise AuditorReceiptError("audit report is empty")
+    return replace(receipt, report_sha256=_sha256(content.encode("utf-8")))
+
+
+def validate_auditor_artifact_pair(
+    receipt_path: Path,
+    report_path: Path,
+    contract: AuditorReceiptContract,
+    catalog: ModelCatalog,
+) -> A08EnforcementResult:
+    """Validate one persisted receipt and the exact report bytes it claims to capture."""
+
+    receipt = load_auditor_receipt(receipt_path)
+    if not report_path.is_absolute() or report_path.is_symlink() or not report_path.is_file():
+        raise AuditorReceiptError("audit report path is not a regular absolute file")
+    try:
+        content = report_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as error:
+        raise AuditorReceiptError("audit report is unreadable") from error
+    validate_auditor_report(content, contract)
+    if receipt.report_sha256 is None:
+        raise AuditorReceiptError("report binding is missing")
+    if receipt.report_sha256 != _sha256(content.encode("utf-8")):
+        raise AuditorReceiptError("report digest mismatch")
+    return validate_auditor_receipt(
+        receipt, contract, catalog, require_report_binding=True
+    )
 
 
 def persist_auditor_report(content: str, path: Path) -> Path:
@@ -547,7 +617,8 @@ def load_auditor_receipt(path: Path) -> PhysicalAuditorReceipt:
         "transport_response_sha256",
         "transcript_sha256",
     }
-    if set(payload) != required:
+    allowed = required | {"report_sha256"}
+    if set(payload) not in (required, allowed):
         raise AuditorReceiptError("receipt schema keys are not exact")
     fallback = payload.get("fallback_chain")
     if not isinstance(fallback, list) or not all(isinstance(item, str) for item in fallback):
@@ -583,6 +654,11 @@ def load_auditor_receipt(path: Path) -> PhysicalAuditorReceipt:
             transcript_sha256=_string_value(payload, "transcript_sha256"),
             captured_at_unix=float(captured_at),
             a08_verdict=_string_value(payload, "a08_verdict"),
+            report_sha256=(
+                _string_value(payload, "report_sha256")
+                if "report_sha256" in payload
+                else None
+            ),
         )
     except (KeyError, TypeError, ValueError, OverflowError) as error:
         raise AuditorReceiptError("receipt field types are invalid") from error

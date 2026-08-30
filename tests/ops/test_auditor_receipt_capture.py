@@ -50,10 +50,19 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         actual_family=ModelFamily.GEMINI,
         provider_attempt_count=1,
     )
+    bound_receipt = SimpleNamespace(
+        receipt_sha256="b" * 64,
+        actual_provider_id=ProviderId.GOOGLE,
+        actual_model_id="gemini-3.6-flash",
+        actual_family=ModelFamily.GEMINI,
+        provider_attempt_count=1,
+    )
 
     report = (
         f"Candidate SHA: {_CANDIDATE}\n"
         f"Evidence Bundle SHA-256: {_EVIDENCE}\n"
+        "Worker: Admitted: 0 | Rejected: 1 | Remediated: 0\n"
+        "Court: Sealed: 0 | Remanded: 0 | Remediated: 0\n"
         "`L14_STATUS`: **PASS**\n"
         "Findings: independent findings\n"
     )
@@ -64,7 +73,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         return interaction
 
     def fake_persist(value: object, path: Path) -> Path:
-        assert value is receipt
+        assert value is bound_receipt
         path.write_text("{}\n", encoding="utf-8")
         return path
 
@@ -73,8 +82,23 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         path.write_text(content, encoding="utf-8")
         return path
 
-    monkeypatch.setattr(cli, "ModelRouter", lambda: "router")
+    def fake_bind(value: object, content: str) -> object:
+        assert value is receipt
+        assert content == report
+        return bound_receipt
+
+    def fake_validate(
+        value: object, contract: object, catalog: object, *, require_report_binding: bool
+    ) -> object:
+        assert value is bound_receipt
+        assert require_report_binding is True
+        return SimpleNamespace(passed=True)
+
+    router = SimpleNamespace(catalog=object())
+    monkeypatch.setattr(cli, "ModelRouter", lambda: router)
     monkeypatch.setattr(cli, "capture_auditor_interaction", fake_capture)
+    monkeypatch.setattr(cli, "bind_auditor_report", fake_bind)
+    monkeypatch.setattr(cli, "validate_auditor_receipt", fake_validate)
     monkeypatch.setattr(cli, "persist_auditor_report", fake_persist_report)
     monkeypatch.setattr(cli, "persist_auditor_receipt", fake_persist)
 

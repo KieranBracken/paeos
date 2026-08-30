@@ -8,13 +8,14 @@ materializations must never be used as transaction authority.
 from __future__ import annotations
 
 import dataclasses
+import fcntl
 import hashlib
 import json
 import os
 import re
 import tempfile
 from collections.abc import Mapping
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
@@ -1132,65 +1133,98 @@ class TransactionStore:
             )
             raise
 
-    def save(self, record: TransactionRecord) -> None:
+    def digest(self, request_id: str) -> str:
+        """Return the exact current transaction-file digest for a compare-and-swap save."""
+
+        raw = self._transaction_path(request_id).read_bytes()
+        return hashlib.sha256(raw).hexdigest()
+
+    @contextmanager
+    def _transaction_lock(self):
+        lock_path = self._paths.bridge_root / ".transactions.lock"
+        descriptor = os.open(lock_path, os.O_RDWR | os.O_CREAT, 0o600)
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            yield
+        finally:
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
+            os.close(descriptor)
+
+    def save(
+        self,
+        record: TransactionRecord,
+        *,
+        expected_prior_digest: str | None = None,
+    ) -> None:
+        if expected_prior_digest is None:
+            raise _protocol_error("save requires expected_prior_digest")
+        _validate_hash(expected_prior_digest, "expected_prior_digest")
         _validate_record(record)
         target = self._transaction_path(record.request_id)
-        if not target.exists():
-            raise _protocol_error("save requires an existing transaction record")
-
-        existing = self.load(record.request_id)
-        if (
-            len(record.transitions) != len(existing.transitions) + 1
-            or record.transitions[:-1] != existing.transitions
-        ):
-            raise _protocol_error("save requires exactly one appended reducer transition")
-
-        transition = record.transitions[-1]
-        claim_lease_owner = (
-            record.lease_owner
-            if transition.event is TransactionEvent.CLAIM
-            else None
-        )
-        claim_lease_expires_at = (
-            record.lease_expires_at
-            if transition.event is TransactionEvent.CLAIM
-            else None
-        )
-        changed_side_effect = (
-            record.last_side_effect
-            if record.last_side_effect != existing.last_side_effect
-            else None
-        )
-        expected = reduce_transaction(
-            existing,
-            transition.event,
-            actor=transition.actor,
-            at=transition.at,
-            lease_owner=claim_lease_owner,
-            lease_expires_at=claim_lease_expires_at,
-            last_side_effect=changed_side_effect,
-        )
-        if expected != record:
-            raise _protocol_error(
-                "save record does not match the pure reducer result"
+        with self._transaction_lock():
+            if not target.exists():
+                raise _protocol_error("save requires an existing transaction record")
+            raw = target.read_bytes()
+            actual_prior_digest = hashlib.sha256(raw).hexdigest()
+            if actual_prior_digest != expected_prior_digest:
+                raise _protocol_error(
+                    "transaction changed concurrently; reconciliation required"
+                )
+            existing = _record_from_mapping(
+                _json_object_from_bytes(raw, source=str(target))
             )
+            if (
+                len(record.transitions) != len(existing.transitions) + 1
+                or record.transitions[:-1] != existing.transitions
+            ):
+                raise _protocol_error("save requires exactly one appended reducer transition")
 
-        payload = (canonical_json(record) + "\n").encode("utf-8")
-        fd, temp_name = tempfile.mkstemp(
-            prefix=f".{target.name}.",
-            suffix=".tmp",
-            dir=self._paths.transactions,
-        )
-        temp_path = Path(temp_name)
-        try:
-            with os.fdopen(fd, "wb") as handle:
-                handle.write(payload)
-                handle.flush()
-                os.fsync(handle.fileno())
-            os.replace(temp_path, target)
-        finally:
-            with suppress(FileNotFoundError):
-                os.unlink(temp_path)
+            transition = record.transitions[-1]
+            claim_lease_owner = (
+                record.lease_owner
+                if transition.event is TransactionEvent.CLAIM
+                else None
+            )
+            claim_lease_expires_at = (
+                record.lease_expires_at
+                if transition.event is TransactionEvent.CLAIM
+                else None
+            )
+            changed_side_effect = (
+                record.last_side_effect
+                if record.last_side_effect != existing.last_side_effect
+                else None
+            )
+            expected = reduce_transaction(
+                existing,
+                transition.event,
+                actor=transition.actor,
+                at=transition.at,
+                lease_owner=claim_lease_owner,
+                lease_expires_at=claim_lease_expires_at,
+                last_side_effect=changed_side_effect,
+            )
+            if expected != record:
+                raise _protocol_error(
+                    "save record does not match the pure reducer result"
+                )
+
+            payload = (canonical_json(record) + "\n").encode("utf-8")
+            fd, temp_name = tempfile.mkstemp(
+                prefix=f".{target.name}.",
+                suffix=".tmp",
+                dir=self._paths.transactions,
+            )
+            temp_path = Path(temp_name)
+            try:
+                with os.fdopen(fd, "wb") as handle:
+                    handle.write(payload)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                os.replace(temp_path, target)
+            finally:
+                with suppress(FileNotFoundError):
+                    os.unlink(temp_path)
 
     def persist_request(self, request: RequestEnvelope) -> Path:
         validate_request(request)
