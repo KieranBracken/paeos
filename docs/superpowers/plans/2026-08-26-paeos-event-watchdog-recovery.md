@@ -76,13 +76,13 @@ class LivenessSnapshot:
     side_effect_certainty: SideEffectCertainty
 ```
 
-- [ ] **Step 1.1: Write RED pure-policy tests with a fake clock**
+- [x] **Step 1.1: Write RED pure-policy tests with a fake clock**
 
 Test exact threshold boundaries, tokens without progress, authorized long-tool progress, clock
 regression, missing heartbeat, missing meaningful event, tool timeout, task timeout, Trace-B
 checkpoint, terminal state, and side-effect certainty. No test sleeps.
 
-- [ ] **Step 1.2: Run RED once**
+- [x] **Step 1.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -91,19 +91,19 @@ checkpoint, terminal state, and side-effect certainty. No test sleeps.
 
 Expected: collection fails because `runtime.control_plane.liveness` does not exist.
 
-- [ ] **Step 1.3: Implement pure time evaluation**
+- [x] **Step 1.3: Implement pure time evaluation**
 
 Convert monotonic observations into typed facts before persistence. The canonical ledger stores
 logical event ordering and policy/deadline facts; it does not claim wall-clock order is authority.
 
-- [ ] **Step 1.4: Run GREEN**
+- [x] **Step 1.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
   tests/runtime/control_plane/test_liveness_policy.py
 ```
 
-- [ ] **Step 1.5: Commit**
+- [x] **Step 1.5: Commit**
 
 ```bash
 git add runtime/control_plane/liveness.py \
