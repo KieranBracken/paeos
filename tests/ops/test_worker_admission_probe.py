@@ -6,6 +6,7 @@ Tests argument validation and safety constraints without launching Cline.
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -78,13 +79,59 @@ def _admitted_run() -> RawWorkerRun:
     )
 
 
+def _sdk_args(tmp_path: Path) -> list[str]:
+    profile = tmp_path / "profile"
+    profile.mkdir(mode=0o700)
+    qualification = tmp_path / "qualification.json"
+    qualification.write_text(
+        json.dumps(
+            {
+                "schema": "paeos.cline-sdk-qualification/1",
+                "cline_version": "3.0.60",
+                "sdk_version": "0.0.81",
+                "core_version": "0.0.81",
+                "node_version": "24.1.0",
+                "node_executable": "/usr/bin/node",
+                "node_sha256": "a" * 64,
+                "package_root": str(tmp_path),
+                "sdk_entrypoint": "/usr/bin/node",
+                "core_entrypoint": "/usr/bin/node",
+                "files": [],
+                "required_symbols": [],
+                "record_sha256": "b" * 64,
+            }
+        )
+    )
+    return [
+        "--transport",
+        "cline-sdk",
+        "--qualification-record",
+        str(qualification),
+        "--profile-root",
+        str(profile),
+        "--profile-uuid",
+        "12345678-1234-5678-1234-567812345678",
+        "--auth-epoch",
+        "1",
+        "--node-executable",
+        "/usr/bin/node",
+    ]
+
+
 def _run_probe_cli(*args: str) -> subprocess.CompletedProcess[str]:
     """Run the probe CLI utility and return the result."""
     return subprocess.run(
-        [sys.executable, "-m", "ops.worker_admission_probe", *args],
+        [
+            sys.executable,
+            "-m",
+            "ops.worker_admission_probe",
+            "--transport",
+            "cline-cli-diagnostic",
+            *args,
+        ],
         capture_output=True,
         text=True,
-        cwd="/private/tmp/paeos-control-plane-recovery-s1-clean",
+        cwd=Path(__file__).parents[2],
         timeout=10,
     )
 
@@ -92,12 +139,20 @@ def _run_probe_cli(*args: str) -> subprocess.CompletedProcess[str]:
 def test_refuses_state_root_inside_git_worktree() -> None:
     """State root inside the Git worktree should be refused."""
     result = _run_probe_cli(
-        "--state-root", "/private/tmp/paeos-control-plane-recovery-s1-clean/state",
-        "--probe-id", "test-probe",
-        "--provider", "cline-pass",
-        "--model", "cline-pass/qwen3.8-max",
-        "--expected-family", "qwen",
-        "--timeout-seconds", "300",
+        "--state-root",
+        str(Path(__file__).parents[2] / "state"),
+        "--probe-id",
+        "test-probe",
+        "--provider",
+        "cline-pass",
+        "--model",
+        "cline-pass/qwen3.8-max",
+        "--expected-family",
+        "qwen",
+        "--timeout-seconds",
+        "300",
+        "--transport",
+        "cline-cli-diagnostic",
     )
     assert result.returncode != 0
     assert "worktree" in result.stderr.lower() or "inside" in result.stderr.lower()
@@ -110,11 +165,16 @@ def test_refuses_existing_probe_id(tmp_path: Path) -> None:
     probe_dir.mkdir(parents=True)
 
     result = _run_probe_cli(
-        "--state-root", str(state_root),
-        "--probe-id", "existing-probe",
-        "--provider", "cline-pass",
-        "--model", "cline-pass/qwen3.8-max",
-        "--expected-family", "qwen",
+        "--state-root",
+        str(state_root),
+        "--probe-id",
+        "existing-probe",
+        "--provider",
+        "cline-pass",
+        "--model",
+        "cline-pass/qwen3.8-max",
+        "--expected-family",
+        "qwen",
     )
     assert result.returncode != 0
     assert "exist" in result.stderr.lower()
@@ -136,12 +196,20 @@ def test_refuses_unsafe_or_unknown_arguments(
     message: str,
 ) -> None:
     argv = [
-        "--state-root", str(tmp_path / "state"),
-        "--probe-id", "test-probe",
-        "--provider", "cline-pass",
-        "--model", "cline-pass/qwen3.8-max",
-        "--expected-family", "qwen",
-        "--timeout-seconds", "300",
+        "--state-root",
+        str(tmp_path / "state"),
+        "--probe-id",
+        "test-probe",
+        "--provider",
+        "cline-pass",
+        "--model",
+        "cline-pass/qwen3.8-max",
+        "--expected-family",
+        "qwen",
+        "--timeout-seconds",
+        "300",
+        "--transport",
+        "cline-cli-diagnostic",
     ]
     option = argv.index(args[0])
     argv[option + 1] = args[1]
@@ -159,23 +227,32 @@ def test_one_shot_success_writes_atomic_hash_only_result(
     run = _admitted_run()
 
     class FakeTransport:
-        def __init__(self, *, timeout_seconds: int) -> None:
-            assert timeout_seconds == 17
+        def __init__(self, config: object) -> None:
+            assert config is not None
 
-        def run_probe(self, contract: object, evidence_root: Path) -> RawWorkerRun:
-            calls.append((contract, evidence_root))
+        def run_probe(self, contract: object) -> RawWorkerRun:
+            calls.append((contract, tmp_path / "state" / "worker-admission" / "test-probe"))
             return run
 
-    monkeypatch.setattr(worker_admission_probe, "ClineWorkerTransport", FakeTransport)
+    monkeypatch.setattr(worker_admission_probe, "ClineSdkAdmissionAdapter", FakeTransport)
     state_root = tmp_path / "state"
-    code = worker_admission_probe.main([
-        "--state-root", str(state_root),
-        "--probe-id", "test-probe",
-        "--provider", "cline-pass",
-        "--model", "cline-pass/qwen3.8-max",
-        "--expected-family", "qwen",
-        "--timeout-seconds", "17",
-    ])
+    code = worker_admission_probe.main(
+        [
+            "--state-root",
+            str(state_root),
+            "--probe-id",
+            "test-probe",
+            "--provider",
+            "cline-pass",
+            "--model",
+            "cline-pass/qwen3.8-max",
+            "--expected-family",
+            "qwen",
+            "--timeout-seconds",
+            "17",
+            *_sdk_args(tmp_path),
+        ]
+    )
 
     assert code == 0
     assert len(calls) == 1
@@ -193,8 +270,15 @@ def test_one_shot_success_writes_atomic_hash_only_result(
     output = capsys.readouterr()
     assert output.err == ""
     assert set(line.split("=", 1)[0] for line in output.out.splitlines()) == {
-        "probe_id", "verdict", "provider", "model", "family", "receipt_hash",
+        "probe_id",
+        "verdict",
+        "provider",
+        "model",
+        "family",
+        "receipt_hash",
         "evidence_dir",
+        "worker_counts",
+        "court_counts",
     }
 
 
@@ -206,25 +290,31 @@ def test_one_shot_admission_failure_is_stable_and_not_retried(
     calls = 0
 
     class RejectingTransport:
-        def __init__(self, *, timeout_seconds: int) -> None:
+        def __init__(self, config: object) -> None:
             pass
 
-        def run_probe(self, contract: object, evidence_root: Path) -> RawWorkerRun:
+        def run_probe(self, contract: object) -> RawWorkerRun:
             nonlocal calls
             calls += 1
             raise AdmissionError("raw model output must not be printed")
 
-    monkeypatch.setattr(
-        worker_admission_probe, "ClineWorkerTransport", RejectingTransport
-    )
+    monkeypatch.setattr(worker_admission_probe, "ClineSdkAdmissionAdapter", RejectingTransport)
     state_root = tmp_path / "state"
-    code = worker_admission_probe.main([
-        "--state-root", str(state_root),
-        "--probe-id", "test-probe",
-        "--provider", "cline-pass",
-        "--model", "cline-pass/qwen3.8-max",
-        "--expected-family", "qwen",
-    ])
+    code = worker_admission_probe.main(
+        [
+            "--state-root",
+            str(state_root),
+            "--probe-id",
+            "test-probe",
+            "--provider",
+            "cline-pass",
+            "--model",
+            "cline-pass/qwen3.8-max",
+            "--expected-family",
+            "qwen",
+            *_sdk_args(tmp_path),
+        ]
+    )
 
     assert code == 1
     assert calls == 1
