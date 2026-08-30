@@ -2822,3 +2822,24 @@ Disposition is **CHECKPOINT_RECORDED — NOT A CONSTITUTIONAL RATIFICATION**. Wo
 Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
 36 remaining**. Gate C is not sealed and no Gate D–G implementation may claim Gate C closure;
 production dispatch and SAKG resumption remain unauthorized.
+
+### Entry 172 — 2026-08-30: Headless Supervisor Adapter Checkpoint
+
+The second Gate C plan implemented the provider-neutral supervisor protocol, task-scoped admission,
+CAS checkpoint/rotation fencing, explicit adapter registry, shell-free Codex/Antigravity wrappers,
+and deterministic quota-safe recovery policy through local commits `83fe998`, `f5aa861`, `dc64995`,
+`30bf909`, `13e7e74`, and `d9dd932`.
+
+Fresh verification: supervisor protocol/admission/checkpoint/registry/headless/recovery tests
+passed **48**; applicable supervisor + control-plane + model-router tests passed **136** with the
+restricted loopback gateway test excluded; complete non-gateway repository suite passed **951**;
+supervisor Ruff returned **0 findings** and supervisor Pyright returned **0 errors, 0 warnings,
+0 informations**. No provider or credential was invoked. Hidden rotating canaries and a
+candidate-bound physical non-GLM L14/L17 receipt were not produced; standalone RED transcripts are
+not retained.
+
+Disposition is **CHECKPOINT_RECORDED — NOT A CONSTITUTIONAL RATIFICATION**. Worker counts remain
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
+Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
+36 remaining**. Gate C remains unsealed; Gate D–G work cannot claim Gate C closure, production
+dispatch, or SAKG resumption.

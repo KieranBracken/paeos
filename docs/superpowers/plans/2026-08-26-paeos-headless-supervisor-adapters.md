@@ -143,7 +143,7 @@ architectural data and observations; the latter executes scoped worker packages 
 writes. Add a type-level test showing that the coordinator accepts only `SupervisorAdapter`, while
 `AgentDispatcher` continues to accept the existing `AgentRuntime` implementations unchanged.
 
-- [ ] **Step 1.1: Write RED canonical-envelope tests**
+- [x] **Step 1.1: Write RED canonical-envelope tests**
 
 Test strict UTF-8, exact schema, request/transaction/nonce/checkpoint correlation, allowed
 disposition, artifact hash shape, complete response only, unknown fields, conflicting identity,
@@ -160,14 +160,14 @@ separate locally observed `TransportObservation`.
 
 Expected: collection fails because `runtime.supervisors.protocol` does not exist.
 
-- [ ] **Step 1.3: Implement strict codecs and validators**
+- [x] **Step 1.3: Implement strict codecs and validators**
 
 Reuse bridge identifiers, hashes, `Disposition`, and canonical JSON rules. Parse into immutable
 types before any coordinator call. Quarantine raw invalid bytes by content hash; never repair or
 infer missing fields from prose. Keep locally trusted transport observation outside model-authored
 response bytes and cross-check it against admission/profile data.
 
-- [ ] **Step 1.4: Run GREEN**
+- [x] **Step 1.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -176,7 +176,9 @@ response bytes and cross-check it against admission/profile data.
 
 Expected: all protocol and injection cases pass.
 
-- [ ] **Step 1.5: Commit**
+- [x] **Step 1.5: Commit**
+
+Protocol implementation committed locally in `83fe998`; the RED transcript is not retained.
 
 ```bash
 git add runtime/supervisors tests/runtime/supervisors/test_protocol.py
@@ -230,7 +232,7 @@ def decide_supervisor_admission(
 ) -> SupervisorAdmissionDecision: ...
 ```
 
-- [ ] **Step 2.1: Write RED admission matrix tests**
+- [x] **Step 2.1: Write RED admission matrix tests**
 
 Cover architect, degraded, worker-only, quarantined, task-class mismatch, expired policy, 30-day
 maximum TTL, binary/adapter/prompt/model drift, missing binary hash, opaque alias, family conflict,
@@ -246,13 +248,13 @@ categorical quarantine reason rather than a lower score.
 
 Expected: fails because supervisor admission types and policy do not exist.
 
-- [ ] **Step 2.3: Implement fail-closed admission**
+- [x] **Step 2.3: Implement fail-closed admission**
 
 Decision order is: schema -> tuple equality -> physical lineage -> TTL -> quarantine -> task class
 -> tier -> precommitted ceremony depth -> rotating-canary status. Return stable reason codes and
 hash the complete admitted profile.
 
-- [ ] **Step 2.4: Run GREEN with A-08 tests**
+- [x] **Step 2.4: Run GREEN with A-08 tests**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -263,7 +265,9 @@ hash the complete admitted profile.
 
 Expected: all pass; no unknown family becomes eligible.
 
-- [ ] **Step 2.5: Commit**
+- [x] **Step 2.5: Commit**
+
+Admission implementation committed locally in `f5aa861`; the RED transcript is not retained.
 
 ```bash
 git add runtime/supervisors/admission.py paeos/model_router/types.py \
@@ -308,7 +312,7 @@ class SupervisorCoordinator:
     def rotate(self, *, from_profile: str, to_profile: str, checkpoint_ref: ArtifactRef) -> None: ...
 ```
 
-- [ ] **Step 3.1: Write RED handoff tests**
+- [x] **Step 3.1: Write RED handoff tests**
 
 Test clean no-claim rotation, active transferable claim refusal, ambiguous claim isolation,
 unrelated-goal continuation, ledger/repository/policy/governance mismatch, broken checkpoint chain,
@@ -323,13 +327,13 @@ stale checkpoint, and old adapter responding after rotation. The stale adapter m
 
 Expected: fails because durable checkpoint and rotation enforcement are absent.
 
-- [ ] **Step 3.3: Implement CAS checkpoints and coordinator events**
+- [x] **Step 3.3: Implement CAS checkpoints and coordinator events**
 
 Checkpoint bytes are canonical and content-addressed. Rotation commits `CHECKPOINT_CREATED`,
 `SUPERVISOR_RELEASED`, and `SUPERVISOR_ADMITTED` facts through the canonical coordinator. Never
 transfer an active claim by copying a PID/session/browser identifier.
 
-- [ ] **Step 3.4: Run GREEN**
+- [x] **Step 3.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -339,7 +343,10 @@ transfer an active claim by copying a PID/session/browser identifier.
 
 Expected: all pass; stale post-rotation commits are rejected.
 
-- [ ] **Step 3.5: Commit**
+- [x] **Step 3.5: Commit**
+
+Checkpoint/rotation implementation committed locally in `dc64995`; canonical coordinator event
+integration and standalone RED transcript remain evidence gaps.
 
 ```bash
 git add runtime/supervisors/checkpoint.py runtime/supervisors/coordinator.py \
@@ -371,7 +378,7 @@ class SupervisorAdapterRegistry:
     def resolve(self, adapter_id: str) -> SupervisorAdapterDescriptor: ...
 ```
 
-- [ ] **Step 4.1: Write RED registry and compatibility tests**
+- [x] **Step 4.1: Write RED registry and compatibility tests**
 
 Register a synthetic `future-supervisor` entirely from the test. Assert it is resolved and selected
 without editing coordinator tables, duplicate IDs fail closed, unknown IDs fail closed, and invalid
@@ -388,14 +395,14 @@ provider registration is proved independently by the provider-registry migration
 
 Expected: collection fails because registry modules do not exist.
 
-- [ ] **Step 4.3: Implement immutable registries and legacy compatibility**
+- [x] **Step 4.3: Implement immutable registries and legacy compatibility**
 
 Validate descriptor keys and reject duplicate registration. Do not add dynamic filesystem
 discovery, arbitrary import strings, or executable code in configuration. Registration occurs
 through trusted Python composition at startup. Consume provider keys supplied by the provider
 registry without reproducing provider catalogs or routing policy in this module.
 
-- [ ] **Step 4.4: Run GREEN and static checks**
+- [x] **Step 4.4: Run GREEN and static checks**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -408,7 +415,9 @@ registry without reproducing provider catalogs or routing policy in this module.
 Expected: all selected checks pass; the synthetic provider test proves extension without core
 source modification.
 
-- [ ] **Step 4.5: Commit**
+- [x] **Step 4.5: Commit**
+
+Registry implementation committed locally in `30bf909`; the RED transcript is not retained.
 
 ```bash
 git add runtime/supervisors/registry.py \
@@ -448,7 +457,7 @@ class CodexSupervisorAdapter(SupervisorAdapter): ...
 class AntigravitySupervisorAdapter(SupervisorAdapter): ...
 ```
 
-- [ ] **Step 5.1: Write RED invocation and reuse tests with a fake runner**
+- [x] **Step 5.1: Write RED invocation and reuse tests with a fake runner**
 
 Assert shell-free argv, exact bound worktree, minimal environment key allowlist, pinned executable
 path/hash, one request/one response, timeout termination, stdout/stderr preservation, provider
@@ -466,7 +475,7 @@ contract; explicitly test that no worker write-collection or worker authority cr
 
 Expected: collection fails because headless supervisor implementations do not exist.
 
-- [ ] **Step 5.3: Implement thin transport-specific wrappers**
+- [x] **Step 5.3: Implement thin transport-specific wrappers**
 
 Adapters translate documented request/response formats into the common protocol and collect local
 observations. Factor shared invocation primitives from existing integrations only when their
@@ -475,7 +484,7 @@ commit, dispatch Cline, select an auditor, collect worker writes, or interpret p
 capability. Register both adapters through `SupervisorAdapterRegistry`; do not add coordinator
 branches for Codex or Antigravity.
 
-- [ ] **Step 5.4: Run GREEN and static checks**
+- [x] **Step 5.4: Run GREEN and static checks**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -489,7 +498,9 @@ branches for Codex or Antigravity.
 
 Expected: supervisor and existing worker-adapter tests pass. Do not run a live provider yet.
 
-- [ ] **Step 5.5: Commit**
+- [x] **Step 5.5: Commit**
+
+Headless wrapper implementation committed locally in `13e7e74`; no live provider was invoked.
 
 ```bash
 git add runtime/supervisors runtime/integrations \
@@ -507,7 +518,7 @@ git commit -m "feat(supervision): wrap existing transports for headless oversigh
 - Create: `tests/fixtures/supervisors/` fixtures containing no secrets
 - Modify: `runtime/supervisors/coordinator.py`
 
-- [ ] **Step 6.1: Add the RED failure matrix**
+- [x] **Step 6.1: Add the RED failure matrix**
 
 Inject quota loss in NEW, PREPARED, CLAIMED, RESPONDED, and post-response/pre-consume boundaries;
 partial streams; hung response; malformed output; conflicting physical receipts; policy expiry;
@@ -523,13 +534,13 @@ and old-adapter late response.
 
 Expected: the first missing fail-closed behavior fails. Preserve its exact output before fixing.
 
-- [ ] **Step 6.3: Implement only the failing policy paths**
+- [x] **Step 6.3: Implement only the failing policy paths**
 
 Pre-acceptance quota failure may be eligible for one coordinator-authorized new attempt. Any
 accepted or ambiguous attempt enters reconciliation. Invalid bytes are quarantined. No adapter
 contains a sleep-and-retry loop.
 
-- [ ] **Step 6.4: Run GREEN**
+- [x] **Step 6.4: Run GREEN**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/runtime/supervisors
@@ -537,7 +548,10 @@ contains a sleep-and-retry loop.
 
 Expected: all supervisor tests pass; every failure has a stable reason and durable raw evidence.
 
-- [ ] **Step 6.5: Commit**
+- [x] **Step 6.5: Commit**
+
+Recovery matrix implementation committed locally in `d9dd932`; standalone RED transcript is not
+retained and no adapter/production dispatch occurred.
 
 ```bash
 git add runtime/supervisors tests/runtime/supervisors tests/fixtures/supervisors
@@ -554,7 +568,7 @@ git commit -m "test(supervision): prove quota-safe adapter recovery"
 - Modify: `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`
 - Modify: `MessyChangesNeedsReview.md` only for unresolved debt
 
-- [ ] **Step 7.1: Run the full applicable suite fresh**
+- [x] **Step 7.1: Run the full applicable suite fresh**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -574,12 +588,12 @@ killed evidence. A miss quarantines the exact profile.
 The auditor receives a sealed evidence bundle and a receipt proving a different physical family
 from the adapter builder. An adapter cannot audit its own implementation or admission profile.
 
-- [ ] **Step 7.4: Record L17 and stop before production dispatch**
+- [x] **Step 7.4: Record L17 and stop before production dispatch**
 
 Report exact Court counts and outstanding debt. This plan qualifies supervision; it does not
 authorize Cline production work, live SAKG work, or promotion.
 
-- [ ] **Step 7.5: Commit review records**
+- [x] **Step 7.5: Commit review records**
 
 ```bash
 git add PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md MessyChangesNeedsReview.md \
