@@ -2555,3 +2555,17 @@ remains **BLOCKED_UNQUALIFIABLE** until a real candidate-bound non-GLM receipt i
 L13/static/environment findings are reconciled. Worker counts remain **Admitted: 0 | Rejected: 1 |
 Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; DEBT-0058 remains
 **OPEN**.
+
+### Entry 160 — 2026-08-30: Task 9A Report Artifact Refinement
+
+The Task 9A CLI was refined so the single routed auditor response is preserved as a separate,
+create-only `0600` report artifact while the physical receipt remains content-free and hash-bound.
+This prevents a receipt-only call from proving transport identity while discarding the actual L14
+findings. The refinement is committed as `ff6596e` after `5e4d71d`; post-commit focused verification
+is **15 passed**, with Task 9A Ruff/Pyright still clean.
+
+No provider call was made. The new report path does not weaken the no-secret rule: it is separate
+from the receipt and must be reviewed before publication. L14 remains **BLOCKED_UNQUALIFIABLE** until
+an approved non-GLM routed audit produces both artifacts and the existing L13/static/environment
+conditions are reconciled. Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**;
+Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; DEBT-0058 remains **OPEN**.
