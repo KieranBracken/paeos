@@ -18,6 +18,13 @@ from paeos.model_router.auditor_receipt import (
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.observability import ObservabilityDiagnostics
+from paeos.model_router.provider_transports import (
+    ClineEnvelopeTransport,
+    OpenAICompatibleConfig,
+    OpenAICompatibleTransport,
+    ProviderTransportRegistry,
+    build_builtin_transport_registry,
+)
 from paeos.model_router.providers import (
     ProviderDescriptor,
     ProviderRegistry,
@@ -45,6 +52,7 @@ __all__ = [
     "AuditorCaptureResult",
     "AuditorReceiptContract",
     "AuditorReceiptError",
+    "ClineEnvelopeTransport",
     "CredentialStore",
     "DataClass",
     "LogicalModel",
@@ -55,15 +63,19 @@ __all__ = [
     "NormalizedError",
     "NormalizedErrorType",
     "ObservabilityDiagnostics",
+    "OpenAICompatibleConfig",
+    "OpenAICompatibleTransport",
     "PhysicalAuditorReceipt",
     "ProviderDescriptor",
     "ProviderHealth",
     "ProviderId",
     "ProviderRegistry",
+    "ProviderTransportRegistry",
     "RouterResponse",
     "RouterStateDB",
     "TaskClass",
     "TaskRequest",
+    "build_builtin_transport_registry",
     "capture_auditor_receipt",
     "load_auditor_receipt",
     "normalize_provider_key",
