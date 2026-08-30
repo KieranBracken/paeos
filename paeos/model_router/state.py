@@ -13,18 +13,35 @@ from paeos.model_router.types import (
     ModelFamily,
     NormalizedErrorType,
     ProviderHealth,
+    ProviderKey,
     ProviderId,
 )
+from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry, normalize_provider_key
 
 
 DEFAULT_DB_PATH = Path.home() / ".local" / "share" / "paeos" / "model-router" / "state.sqlite3"
 
 
 class RouterStateDB:
-    def __init__(self, db_path: Optional[Path] = None):
+    def __init__(
+        self,
+        db_path: Optional[Path] = None,
+        provider_registry: Optional[ProviderRegistry] = None,
+    ):
         self.db_path = db_path or DEFAULT_DB_PATH
+        self.provider_registry = provider_registry or build_builtin_provider_registry()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
+
+    @staticmethod
+    def _provider_key(provider_id: ProviderId | ProviderKey) -> ProviderKey:
+        """Normalize provider identity at the persistence boundary.
+
+        SQLite stores canonical text keys.  The legacy ``ProviderId`` enum remains accepted for
+        callers, while validated future-provider strings can be persisted without an enum change.
+        """
+
+        return normalize_provider_key(provider_id)
 
     def _get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(str(self.db_path), timeout=10.0)
@@ -80,21 +97,22 @@ class RouterStateDB:
             CREATE INDEX IF NOT EXISTS idx_obs_prov ON routing_observations(provider_id, success);
             """)
 
-            for p in ProviderId:
+            for descriptor in self.provider_registry.snapshot():
                 conn.execute("""
                 INSERT OR IGNORE INTO providers (
                     provider_id, health_status, current_concurrency, max_concurrency, min_concurrency,
                     active_requests, consecutive_healthy_since
                 ) VALUES (?, 'HEALTHY', 2, 10, 1, 0, ?)
-                """, (p.value, time.time()))
+                """, (descriptor.key, time.time()))
 
-    def get_provider_state(self, provider_id: ProviderId) -> Dict[str, Any]:
+    def get_provider_state(self, provider_id: ProviderId | ProviderKey) -> Dict[str, Any]:
+        provider_key = self._provider_key(provider_id)
         with self._get_connection() as conn:
-            row = conn.execute("SELECT * FROM providers WHERE provider_id = ?", (provider_id.value,)).fetchone()
+            row = conn.execute("SELECT * FROM providers WHERE provider_id = ?", (provider_key,)).fetchone()
             if row:
                 return dict(row)
             return {
-                "provider_id": provider_id.value,
+                "provider_id": provider_key,
                 "health_status": ProviderHealth.HEALTHY.value,
                 "current_concurrency": 2,
                 "max_concurrency": 10,
@@ -110,11 +128,12 @@ class RouterStateDB:
 
     def set_health(
         self,
-        provider_id: ProviderId,
+        provider_id: ProviderId | ProviderKey,
         health: ProviderHealth,
         error_type: Optional[NormalizedErrorType] = None,
         cooldown_seconds: Optional[float] = None,
     ) -> None:
+        provider_key = self._provider_key(provider_id)
         now = time.time()
         cooldown_until = (now + cooldown_seconds) if cooldown_seconds else None
 
@@ -126,7 +145,7 @@ class RouterStateDB:
                     cooldown_until = NULL,
                     consecutive_healthy_since = COALESCE(consecutive_healthy_since, ?)
                 WHERE provider_id = ?
-                """, (now, provider_id.value))
+                """, (now, provider_key))
             else:
                 conn.execute("""
                 UPDATE providers
@@ -142,21 +161,23 @@ class RouterStateDB:
                     error_type.value if error_type else None,
                     error_type.value if error_type else None,
                     now,
-                    provider_id.value,
+                    provider_key,
                 ))
 
-    def update_concurrency(self, provider_id: ProviderId, new_concurrency: int) -> None:
+    def update_concurrency(self, provider_id: ProviderId | ProviderKey, new_concurrency: int) -> None:
+        provider_key = self._provider_key(provider_id)
         with self._get_connection() as conn:
             conn.execute("""
             UPDATE providers
             SET current_concurrency = ?
             WHERE provider_id = ?
-            """, (new_concurrency, provider_id.value))
+            """, (new_concurrency, provider_key))
 
-    def acquire_slot(self, provider_id: ProviderId) -> bool:
+    def acquire_slot(self, provider_id: ProviderId | ProviderKey) -> bool:
+        provider_key = self._provider_key(provider_id)
         now = time.time()
         with self._get_connection() as conn:
-            row = conn.execute("SELECT health_status, current_concurrency, active_requests, cooldown_until FROM providers WHERE provider_id = ?", (provider_id.value,)).fetchone()
+            row = conn.execute("SELECT health_status, current_concurrency, active_requests, cooldown_until FROM providers WHERE provider_id = ?", (provider_key,)).fetchone()
             if not row:
                 return False
 
@@ -172,7 +193,7 @@ class RouterStateDB:
                         current_concurrency = 1,
                         consecutive_healthy_since = ?
                     WHERE provider_id = ?
-                    """, (now, provider_id.value))
+                    """, (now, provider_key))
                     health = ProviderHealth.HEALTHY.value
                 else:
                     return False
@@ -183,19 +204,21 @@ class RouterStateDB:
             limit = row["current_concurrency"]
             active = row["active_requests"]
             if active < limit:
-                conn.execute("UPDATE providers SET active_requests = active_requests + 1 WHERE provider_id = ?", (provider_id.value,))
+                conn.execute("UPDATE providers SET active_requests = active_requests + 1 WHERE provider_id = ?", (provider_key,))
                 return True
             return False
 
-    def release_slot(self, provider_id: ProviderId) -> None:
+    def release_slot(self, provider_id: ProviderId | ProviderKey) -> None:
+        provider_key = self._provider_key(provider_id)
         with self._get_connection() as conn:
             conn.execute("""
             UPDATE providers
             SET active_requests = MAX(0, active_requests - 1)
             WHERE provider_id = ?
-            """, (provider_id.value,))
+            """, (provider_key,))
 
-    def record_usage(self, provider_id: ProviderId, prompt_tokens: int, completion_tokens: int) -> None:
+    def record_usage(self, provider_id: ProviderId | ProviderKey, prompt_tokens: int, completion_tokens: int) -> None:
+        provider_key = self._provider_key(provider_id)
         now = time.time()
         min_window = (now // 60) * 60
         day_window = (now // 86400) * 86400
@@ -207,7 +230,7 @@ class RouterStateDB:
             SET total_requests_today = total_requests_today + 1,
                 total_tokens_today = total_tokens_today + ?
             WHERE provider_id = ?
-            """, (total_tokens, provider_id.value))
+            """, (total_tokens, provider_key))
 
             conn.execute("""
             INSERT INTO provider_windows (provider_id, window_type, window_start, request_count, token_count)
@@ -215,7 +238,7 @@ class RouterStateDB:
             ON CONFLICT(provider_id, window_type, window_start) DO UPDATE SET
                 request_count = request_count + 1,
                 token_count = token_count + ?
-            """, (provider_id.value, min_window, total_tokens, total_tokens))
+            """, (provider_key, min_window, total_tokens, total_tokens))
 
             conn.execute("""
             INSERT INTO provider_windows (provider_id, window_type, window_start, request_count, token_count)
@@ -223,9 +246,10 @@ class RouterStateDB:
             ON CONFLICT(provider_id, window_type, window_start) DO UPDATE SET
                 request_count = request_count + 1,
                 token_count = token_count + ?
-            """, (provider_id.value, day_window, total_tokens, total_tokens))
+            """, (provider_key, day_window, total_tokens, total_tokens))
 
-    def get_window_usage(self, provider_id: ProviderId) -> Tuple[int, int, int, int]:
+    def get_window_usage(self, provider_id: ProviderId | ProviderKey) -> Tuple[int, int, int, int]:
+        provider_key = self._provider_key(provider_id)
         now = time.time()
         min_window = (now // 60) * 60
         day_window = (now // 86400) * 86400
@@ -234,12 +258,12 @@ class RouterStateDB:
             m_row = conn.execute("""
             SELECT request_count, token_count FROM provider_windows
             WHERE provider_id = ? AND window_type = 'minute' AND window_start = ?
-            """, (provider_id.value, min_window)).fetchone()
+            """, (provider_key, min_window)).fetchone()
 
             d_row = conn.execute("""
             SELECT request_count, token_count FROM provider_windows
             WHERE provider_id = ? AND window_type = 'day' AND window_start = ?
-            """, (provider_id.value, day_window)).fetchone()
+            """, (provider_key, day_window)).fetchone()
 
             rpm = m_row["request_count"] if m_row else 0
             tpm = m_row["token_count"] if m_row else 0
@@ -252,7 +276,7 @@ class RouterStateDB:
         task_class: str,
         logical_model: Optional[str],
         model_id: str,
-        provider_id: ProviderId,
+        provider_id: ProviderId | ProviderKey,
         family: ModelFamily,
         latency_ms: float,
         prompt_tokens: int,
@@ -260,6 +284,7 @@ class RouterStateDB:
         success: bool,
         normalized_error: Optional[str] = None,
     ) -> None:
+        provider_key = self._provider_key(provider_id)
         with self._get_connection() as conn:
             conn.execute("""
             INSERT INTO routing_observations (
@@ -271,7 +296,7 @@ class RouterStateDB:
                 task_class,
                 logical_model,
                 model_id,
-                provider_id.value,
+                provider_key,
                 family.value,
                 latency_ms,
                 prompt_tokens,
@@ -280,14 +305,15 @@ class RouterStateDB:
                 normalized_error,
             ))
 
-    def get_recent_metrics(self, provider_id: ProviderId, window_seconds: float = 300.0) -> Dict[str, Any]:
+    def get_recent_metrics(self, provider_id: ProviderId | ProviderKey, window_seconds: float = 300.0) -> Dict[str, Any]:
+        provider_key = self._provider_key(provider_id)
         cutoff = time.time() - window_seconds
         with self._get_connection() as conn:
             rows = conn.execute("""
             SELECT success, normalized_error, latency_ms
             FROM routing_observations
             WHERE provider_id = ? AND timestamp >= ?
-            """, (provider_id.value, cutoff)).fetchall()
+            """, (provider_key, cutoff)).fetchall()
 
             total = len(rows)
             if total == 0:

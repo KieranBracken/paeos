@@ -10,8 +10,9 @@ from typing import Any, Dict, List, Optional
 
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
+from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.state import RouterStateDB
-from paeos.model_router.types import ProviderId
+from paeos.model_router.types import ProviderId, ProviderKey
 
 # Canonical Free Tier Quota Limits (RPD: Requests Per Day)
 FREE_TIER_DAILY_LIMITS: Dict[ProviderId, Optional[int]] = {
@@ -40,10 +41,12 @@ class ObservabilityDiagnostics:
         state_db: RouterStateDB,
         catalog: ModelCatalog,
         credentials: CredentialStore,
+        provider_registry: ProviderRegistry | None = None,
     ):
         self.state_db = state_db
         self.catalog = catalog
         self.credentials = credentials
+        self.provider_registry = provider_registry or catalog.provider_registry or build_builtin_provider_registry()
 
     def get_mesh_status(self) -> Dict[str, Any]:
         """Produces comprehensive structured telemetry dictionary with quota tracking & reset times."""
@@ -51,28 +54,41 @@ class ObservabilityDiagnostics:
         seconds_to_reset, reset_countdown = time_to_next_utc_midnight()
         providers_status = {}
 
-        for p in ProviderId:
-            st = self.state_db.get_provider_state(p)
-            rpm, tpm, rpd, tpd = self.state_db.get_window_usage(p)
-            metrics = self.state_db.get_recent_metrics(p, window_seconds=300.0)
-            has_key = self.credentials.has_key(p)
-            models = [m.model_id for m in self.catalog.list_models(p)]
-            live_models = [m.model_id for m in self.catalog.list_models(p) if m.live_verified and m.available]
+        for descriptor in self.provider_registry.snapshot():
+            provider_key: ProviderKey = descriptor.key
+            st = self.state_db.get_provider_state(provider_key)
+            rpm, tpm, rpd, tpd = self.state_db.get_window_usage(provider_key)
+            metrics = self.state_db.get_recent_metrics(provider_key, window_seconds=300.0)
+            has_key = self.credentials.has_key(provider_key)
+            models = [
+                m.model_id
+                for m in self.catalog.list_models()
+                if getattr(m.provider_id, "value", m.provider_id) == provider_key
+            ]
+            live_models = [
+                m.model_id
+                for m in self.catalog.list_models()
+                if getattr(m.provider_id, "value", m.provider_id) == provider_key
+                and m.live_verified
+                and m.available
+            ]
 
             cooldown_rem = 0.0
             if st["cooldown_until"] and st["cooldown_until"] > now:
                 cooldown_rem = st["cooldown_until"] - now
 
-            try:
-                quota_limit = self.catalog.provider_registry.resolve(p).max_rpd
-            except KeyError:
-                quota_limit = FREE_TIER_DAILY_LIMITS.get(p)
+            quota_limit = descriptor.max_rpd
+            if quota_limit is None:
+                try:
+                    quota_limit = FREE_TIER_DAILY_LIMITS.get(ProviderId(provider_key))
+                except ValueError:
+                    quota_limit = None
             if quota_limit is not None and quota_limit > 0:
                 quota_pct = round((rpd / quota_limit) * 100.0, 1)
             else:
                 quota_pct = 0.0  # Unmetered / zero-cost model
 
-            providers_status[p.value] = {
+            providers_status[provider_key] = {
                 "credential_configured": has_key,
                 "health_status": st["health_status"] if has_key else "UNCONFIGURED",
                 "current_concurrency": st["current_concurrency"],

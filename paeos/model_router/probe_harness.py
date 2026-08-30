@@ -20,6 +20,12 @@ from paeos.model_router.types import (
 )
 
 
+def _provider_key(provider_id: ProviderId | str) -> str:
+    """Render enum and extensible provider identities uniformly in probe evidence."""
+
+    return provider_id.value if isinstance(provider_id, ProviderId) else provider_id
+
+
 def probe_single_model(
     model_entry: ModelCatalogEntry,
     credentials: CredentialStore,
@@ -41,7 +47,7 @@ def probe_single_model(
         latency_ms = (time.time() - start_time) * 1000.0
         return {
             "model_id": model_entry.model_id,
-            "provider_id": model_entry.provider_id.value,
+            "provider_id": _provider_key(model_entry.provider_id),
             "family": model_entry.family.value,
             "success": True,
             "latency_ms": round(latency_ms, 1),
@@ -57,7 +63,7 @@ def probe_single_model(
         latency_ms = (time.time() - start_time) * 1000.0
         return {
             "model_id": model_entry.model_id,
-            "provider_id": model_entry.provider_id.value,
+            "provider_id": _provider_key(model_entry.provider_id),
             "family": model_entry.family.value,
             "success": False,
             "latency_ms": round(latency_ms, 1),
@@ -73,7 +79,7 @@ def probe_single_model(
         latency_ms = (time.time() - start_time) * 1000.0
         return {
             "model_id": model_entry.model_id,
-            "provider_id": model_entry.provider_id.value,
+            "provider_id": _provider_key(model_entry.provider_id),
             "family": model_entry.family.value,
             "success": False,
             "latency_ms": round(latency_ms, 1),
@@ -94,23 +100,24 @@ def run_all_probes(
     """Runs probes across primary model candidates for each configured provider."""
     creds = credentials or CredentialStore()
     cat = catalog or ModelCatalog()
-    transport = LiteLLMTransport(creds)
+    transport = LiteLLMTransport(creds, cat)
 
     results = []
+    # The registry is the source of provider identity.  Catalog entries are selected by their
+    # normalized key, so adding a future provider does not require editing this harness.
     targets = [
-        ("gemini-3.6-flash", ProviderId.GOOGLE),
-        ("meta/llama-3.1-8b-instruct", ProviderId.NVIDIA),
-        ("minimax/minimax-m2.5", ProviderId.CLINE),
-        ("poolside/laguna-s-2.1:free", ProviderId.CLINE),
-        ("kilo-auto/free", ProviderId.KILO),
-        ("openrouter/free", ProviderId.OPENROUTER),
+        entry
+        for descriptor in cat.provider_registry.snapshot()
+        for entry in cat.list_models()
+        if _provider_key(entry.provider_id) == descriptor.key
     ]
 
-    for model_id, provider_id in targets:
+    for entry in targets:
+        provider_id = _provider_key(entry.provider_id)
         if not creds.has_key(provider_id):
             results.append({
-                "model_id": model_id,
-                "provider_id": provider_id.value,
+                "model_id": entry.model_id,
+                "provider_id": provider_id,
                 "family": "unknown",
                 "success": False,
                 "latency_ms": 0.0,
@@ -122,10 +129,6 @@ def run_all_probes(
                 "available": False,
                 "error": "[AUTH_FAILED] Missing or unconfigured API credential",
             })
-            continue
-
-        entry = cat.get(model_id)
-        if not entry:
             continue
 
         res = probe_single_model(entry, creds, transport)
