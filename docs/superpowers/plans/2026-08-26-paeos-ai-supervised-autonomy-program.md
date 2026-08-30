@@ -88,9 +88,26 @@ Architect proposal   Cline implementation  Safe recovery decision
 The six remaining program gates are B-G. Gate A closure remains a prerequisite where this index
 states it; naming B-G as the remaining six does not imply Gate A is sealed.
 
+### Canonical progress ledger: 48 top-level milestones / 54 detailed tasks
+
+Progress is reported against 48 top-level milestones: Gate A has 10, Gate B has 5, Gate C has 7,
+Gate D has 7, Gate E has 6, Gate F has 8, and Gate G has 5. Gate C's provider-adapter-registry
+plan contains six detailed implementation tasks that are mandatory substages of its seven
+top-level milestones; they are retained, verified, and never deleted, but are not counted as
+additional top-level milestones. Thus both numbers are valid: **48** is the progress denominator
+and **54** is the detailed execution-task count. A milestone is complete only after its applicable
+tests, L13/L14/L17 evidence, and disposition pass; implementation or a remand does not earn
+completion credit.
+
+At recovery checkpoint `49edd4c` on the isolated branch, the first eight Gate A milestones have
+implementation evidence. Gate A milestone 9 is in independent-audit remediation after an explicit
+Antigravity `REMAND_WITH_AMENDMENTS`, and milestone 10 is blocked on fresh authenticated probes.
+The current strict score is therefore **8/48 complete; 40 top-level milestones remain**.
+
 ### Gate A — Route qualification
 
-Plan: `docs/superpowers/plans/2026-08-26-paeos-cline-worker-admission.md`
+Plan: `docs/superpowers/plans/2026-08-29-paeos-cline-sdk-admission-adapter.md` (the earlier
+worker-admission plan remains historical compatibility context)
 
 Output: three fresh-session disposable Cline probes whose raw receipts prove the full admitted
 route tuple. This gate grants no production task authority.
@@ -125,6 +142,9 @@ Plans, in order:
 
 1. `docs/superpowers/plans/2026-08-28-paeos-provider-adapter-registry.md`
 2. `docs/superpowers/plans/2026-08-26-paeos-headless-supervisor-adapters.md`
+
+The provider-adapter-registry plan is the six-task detailed substage set nested inside Gate C's
+seven top-level milestones; its work is mandatory for the plug-and-play provider requirement.
 
 Depends on: Gate B.
 
