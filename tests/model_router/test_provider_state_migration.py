@@ -99,6 +99,11 @@ def test_invalid_provider_key_fails_closed_and_never_aliases(tmp_path: Path) -> 
             "SELECT COUNT(*) FROM providers WHERE provider_id IN ('Future_Provider', '../google')"
         ).fetchone()[0] == 0
 
+    with sqlite3.connect(db_file) as conn:
+        conn.execute("INSERT INTO providers (provider_id) VALUES ('Future_Provider')")
+    with pytest.raises(ValueError, match="invalid provider identities"):
+        RouterStateDB(db_file)
+
 
 def test_observability_and_probe_harness_use_registry_snapshot(tmp_path: Path) -> None:
     registry = _future_registry()

@@ -97,6 +97,24 @@ class RouterStateDB:
             CREATE INDEX IF NOT EXISTS idx_obs_prov ON routing_observations(provider_id, success);
             """)
 
+            # Existing state is authoritative but must still satisfy the provider-key grammar.
+            # Refuse startup on malformed rows rather than silently aliasing them to a valid key.
+            persisted_keys = set()
+            for table in ("providers", "provider_windows", "routing_observations"):
+                rows = conn.execute(f"SELECT DISTINCT provider_id FROM {table}").fetchall()
+                persisted_keys.update(row[0] for row in rows)
+            invalid_keys = []
+            for key in persisted_keys:
+                try:
+                    normalize_provider_key(key)
+                except (TypeError, ValueError):
+                    invalid_keys.append(repr(key))
+            if invalid_keys:
+                raise ValueError(
+                    "invalid provider identities in durable state; refusing startup: "
+                    + ", ".join(sorted(invalid_keys))
+                )
+
             for descriptor in self.provider_registry.snapshot():
                 conn.execute("""
                 INSERT OR IGNORE INTO providers (
