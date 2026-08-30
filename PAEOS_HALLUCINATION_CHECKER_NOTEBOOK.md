@@ -2531,3 +2531,27 @@ gateway rerun 4 passed, repository-wide Ruff 658 findings, and Pyright 74 diagno
 was invoked and no credentials were read. This handoff does not seal or ratify L14. Worker counts
 remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 |
 Remediated: 0**; DEBT-0058 remains **OPEN**.
+
+### Entry 159 — 2026-08-30: Task 9A Receipt Capture Implemented
+
+Under the Founder-authorized isolated recovery amendment, Task 9A was implemented and committed
+on `codex/control-plane-recovery-s1-clean-recovered`:
+
+- `1784a74` — physical auditor receipt contract, transport fingerprints, create-only persistence,
+  operational one-shot capture CLI, and focused tests.
+- `e950a3a` — router-policy integration test.
+- `f784665` — response-fingerprint sequencing fix after router fallback telemetry is finalized.
+
+Post-commit focused verification: **14 passed** across receipt and CLI tests; Task 9A files passed
+Ruff and Pyright (`0 errors, 0 warnings, 0 informations`). The router-policy and Cline SDK
+adversarial/mutation regressions also passed outside the known gateway fixture restriction. Full
+collection is **830 tests**; restricted execution remains **826 passed, 4 loopback-bind errors**.
+Repository-wide Ruff remains **658 findings**. Repository-wide Pyright produced **73 diagnostics**
+when run against the recovery virtualenv interpreter; the prior candidate evidence recorded 74
+under its earlier environment, so this is not treated as debt repayment or a green static gate.
+
+The new CLI is one-shot and fail-closed; it has not been invoked against a provider. L14 therefore
+remains **BLOCKED_UNQUALIFIABLE** until a real candidate-bound non-GLM receipt is captured and the
+L13/static/environment findings are reconciled. Worker counts remain **Admitted: 0 | Rejected: 1 |
+Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; DEBT-0058 remains
+**OPEN**.
