@@ -2617,3 +2617,35 @@ command or a detailed violated-invariant identifier as required by the L14 plan,
 accepted as a non-vacuous remand signal, not as a clean L14 pass. Gate A remains open; the
 worker rejection, DEBT-0058, repository static findings, and prior L13 environment findings
 must be remediated or formally dispositioned before Task 10 or any Gate B-G advancement.
+
+### Entry 163 — 2026-08-30: Gate A Remand Reconciliation and Recovery Boundary
+
+The isolated recovery branch `codex/control-plane-recovery-s1-clean-recovered` advanced to
+`b3f3345` with two narrowly scoped remediations. The Cline SDK adapter now classifies explicit
+authentication failures found in the already-captured transport message or stderr as
+`AUTH_FAILED`, preserving raw-stream hashes without retrying or persisting secret content. The
+Task 9A CLI now validates an auditor report before persistence: it must be non-empty, bind the
+exact candidate and evidence hashes, contain exactly one allowed `L14_STATUS`, and include both
+`INVARIANT:` and `REPRODUCTION:` detail for a remand. Focused tests, Ruff, and Pyright passed;
+the full recovery suite collected and passed **839 tests**.
+
+The second Antigravity capture remains a real, non-vacuous remand signal but is not a clean L14
+pass. Receipt file `/private/tmp/paeos-l14-audit-receipt-adf76c6-002.json` has SHA-256
+`040ec69856437204ee4d493cd601cce9e32ec7b65cd01cb0353feab70686191b` and embedded canonical
+receipt hash `ee6d7c7271436175bc586bbac449490247cbc9bef141dc4c34a9122f340b5128`. Report file
+`/private/tmp/paeos-l14-audit-report-adf76c6-002.md` has SHA-256
+`e0ee88075523e3e33b6cf1f442d3dce117cb41b92e3b018b6ce3122dbd12412f`; it binds candidate
+`adf76c61972554f71f2c863b3113f07d19dd1a52` and evidence bundle
+`b4e0134de7cefe7628a97b1867a95a62b2a4a87996c9628fc0b1127abe6c0fa3`, proves the explicit
+disposition `REMAND_WITH_AMENDMENTS`, and reports Worker **Admitted: 0 | Rejected: 1 | Remediated:
+0** and Court **Sealed: 0 | Remanded: 0 | Remediated: 0**. The report fails the new validator
+because it omits a concrete `INVARIANT:` identifier and `REPRODUCTION:` command. This is a
+report-quality amendment requirement, not evidence to discard or silently rewrite.
+
+The physical receipt itself remains valid for A-08: auditor `google/gemini-3.6-flash` (family
+`gemini`) differs from builder `cline-pass/z-ai/glm-5.3-flash` (family `glm`), with one provider
+attempt and no fallback. DEBT-0058 remains **OPEN**; no admission, Court seal, Gate A closure,
+Task 10, Gate B-G advancement, SAKG resumption, credential access, or promotion occurred. The
+only next live action is a fresh, separately authorized SDK probe after the operator supplies a
+dedicated authenticated Cline profile's non-secret UUID and auth epoch. The probe sequence must
+use a frozen route tuple and three new IDs, stop at the first rejection, and preserve raw evidence.

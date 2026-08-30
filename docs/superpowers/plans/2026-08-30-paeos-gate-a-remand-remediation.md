@@ -67,10 +67,10 @@
 - Consumes: the independently verified receipt/report hashes and Task 1-2 test outputs.
 - Produces: durable evidence stating `REMAND_WITH_AMENDMENTS`, exact worker/Court counts, open static/L13 findings, and the non-secret operator prerequisite for a fresh probe.
 
-- [ ] Step 1: Copy the exact receipt/report digests and disposition without changing the Court or debt status.
-- [ ] Step 2: State that the report is a remand signal but not a clean L14 pass until the invariant/reproduction detail is present.
-- [ ] Step 3: Record the only allowed next live action: a fresh SDK probe after a dedicated profile is authenticated and its non-secret UUID/auth epoch are supplied.
-- [ ] Step 4: Run repository status and evidence-hash checks; commit as `docs(audit): reconcile gate a remand`.
+- [x] Step 1: Copy the exact receipt/report digests and disposition without changing the Court or debt status.
+- [x] Step 2: State that the report is a remand signal but not a clean L14 pass until the invariant/reproduction detail is present.
+- [x] Step 3: Record the only allowed next live action: a fresh SDK probe after a dedicated profile is authenticated and its non-secret UUID/auth epoch are supplied.
+- [x] Step 4: Run repository status and evidence-hash checks; commit as `docs(audit): reconcile gate a remand`.
 
 ### Stop Condition
 
