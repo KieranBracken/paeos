@@ -563,6 +563,38 @@ def write_once_bytes(path: Path, payload: bytes) -> None:
             os.unlink(temp_path)
 
 
+def persist_immutable_bytes(path: Path, payload: bytes) -> str:
+    """Durably persist content once and return its content hash.
+
+    A repeated write is accepted only when the existing bytes are identical.  A
+    different payload at the same path is a protocol violation, which prevents a
+    crashed or retried dispatch from silently replacing the request evidence.
+    """
+
+    target = Path(path)
+    if not isinstance(payload, bytes):
+        raise TypeError("payload must be bytes")
+    if not target.parent.is_dir():
+        raise ProtocolViolation(
+            CircuitBreaker.WRITE_ATTEMPT_OUTSIDE_CURRENT_ALLOWLIST,
+            f"immutable evidence parent does not exist: {target.parent}",
+        )
+    try:
+        write_once_bytes(target, payload)
+    except FileExistsError:
+        try:
+            existing = target.read_bytes()
+        except OSError as exc:
+            raise ProtocolViolation("immutable evidence cannot be read") from exc
+        if existing != payload:
+            raise ProtocolViolation(
+                CircuitBreaker.WRITE_ATTEMPT_OUTSIDE_CURRENT_ALLOWLIST,
+                "immutable evidence already exists with different bytes",
+            ) from None
+        return content_hash(existing)
+    return content_hash(payload)
+
+
 def write_once_json(path: Path, value: object) -> None:
     payload = (canonical_json(value) + "\n").encode("utf-8")
     write_once_bytes(path, payload)

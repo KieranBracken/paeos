@@ -8,6 +8,8 @@ from kernel.ledger import GENESIS_HASH, Event, LedgerRow, compute_row_hash
 from runtime.control_plane.events import (
     CONTROL_PLANE_TRANSACTION,
     INITIAL_TRANSACTION_DIGEST,
+    DispatchEvidence,
+    SideEffectCertainty,
     TransactionCommand,
     transaction_event,
 )
@@ -71,6 +73,9 @@ def test_transaction_event_is_canonical_and_complete() -> None:
         "lease_owner",
         "lease_expires_at",
         "last_side_effect",
+        "side_effect_certainty",
+        "idempotency_key",
+        "dispatch_evidence",
     }
 
 
@@ -190,7 +195,15 @@ def test_projector_preserves_terminal_states_and_rejects_follow_up() -> None:
         at="2026-08-30T10:02:00+00:00",
         expected_prior_digest=claimed.digest,
         fencing_token=3,
-        last_side_effect="dispatch:worker-1",
+        last_side_effect="c" * 64,
+        side_effect_certainty=SideEffectCertainty.ACCEPTED,
+        idempotency_key="c" * 64,
+        dispatch_evidence=DispatchEvidence(
+            request_bytes_persisted=True,
+            request_bytes_hash="d" * 64,
+            attempted=True,
+            accepted=True,
+        ),
     )
     uncertain = project_row(
         claimed,

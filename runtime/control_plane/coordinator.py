@@ -98,6 +98,10 @@ class TransactionCoordinator:
         rows = self._ledger.read()
         projections = rebuild_projection(rows)
         current = projections.get(command.request_id)
+        if command.idempotency_key is not None:
+            for projected in projections.values():
+                if projected.record.last_side_effect == command.idempotency_key:
+                    raise StaleComparison("idempotency_key was already committed")
         if current is not None:
             if command.fencing_token <= current.fencing_token:
                 raise StaleFence("fencing token is reused or stale")

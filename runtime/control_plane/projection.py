@@ -12,6 +12,8 @@ from runtime.control_plane.events import (
     CONTROL_PLANE_EVENT_SCHEMA,
     CONTROL_PLANE_TRANSACTION,
     INITIAL_TRANSACTION_DIGEST,
+    DispatchEvidence,
+    SideEffectCertainty,
     TransactionCommand,
 )
 from runtime.integrations.bridge_protocol import (
@@ -37,6 +39,9 @@ _COMMAND_KEYS = frozenset(
         "lease_owner",
         "lease_expires_at",
         "last_side_effect",
+        "side_effect_certainty",
+        "idempotency_key",
+        "dispatch_evidence",
     }
 )
 
@@ -72,6 +77,59 @@ def _as_optional_string(payload: Mapping[str, JsonValue], key: str) -> str | Non
     return value
 
 
+def _dispatch_evidence(payload: Mapping[str, JsonValue]) -> DispatchEvidence | None:
+    raw = payload.get("dispatch_evidence")
+    if raw is None:
+        return None
+    if not isinstance(raw, Mapping):
+        raise _fail("dispatch_evidence must be an object or null")
+    expected_keys = {
+        "request_bytes_persisted",
+        "request_bytes_hash",
+        "attempted",
+        "accepted",
+        "response_bytes_persisted",
+        "response_bytes_hash",
+        "response_verified",
+    }
+    if set(raw) != expected_keys:
+        raise _fail("dispatch_evidence is incomplete or contains unknown fields")
+    flags: dict[str, bool] = {}
+    for key in (
+        "request_bytes_persisted",
+        "attempted",
+        "accepted",
+        "response_bytes_persisted",
+        "response_verified",
+    ):
+        value = raw.get(key)
+        if not isinstance(value, bool):
+            raise _fail(f"dispatch_evidence.{key} must be a boolean")
+        flags[key] = value
+    request_bytes_hash: str | None = None
+    response_bytes_hash: str | None = None
+    for key in ("request_bytes_hash", "response_bytes_hash"):
+        value = raw.get(key)
+        if value is not None and not isinstance(value, str):
+            raise _fail(f"dispatch_evidence.{key} must be a string or null")
+        if key == "request_bytes_hash":
+            request_bytes_hash = value
+        else:
+            response_bytes_hash = value
+    try:
+        return DispatchEvidence(
+            request_bytes_persisted=flags["request_bytes_persisted"],
+            request_bytes_hash=request_bytes_hash,
+            attempted=flags["attempted"],
+            accepted=flags["accepted"],
+            response_bytes_persisted=flags["response_bytes_persisted"],
+            response_bytes_hash=response_bytes_hash,
+            response_verified=flags["response_verified"],
+        )
+    except (TypeError, ValueError) as exc:
+        raise _fail(str(exc)) from exc
+
+
 def _as_fence(payload: Mapping[str, JsonValue]) -> int:
     value = payload.get("fencing_token")
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
@@ -91,6 +149,10 @@ def _command_from_event(event: Event) -> TransactionCommand:
         event_kind = TransactionEvent(_as_string(payload, "event"))
     except ValueError as exc:
         raise _fail("control-plane event contains an invalid transaction event") from exc
+    try:
+        certainty = SideEffectCertainty(_as_string(payload, "side_effect_certainty"))
+    except ValueError as exc:
+        raise _fail("control-plane event contains an invalid side-effect certainty") from exc
     return TransactionCommand(
         request_id=_as_string(payload, "request_id"),
         transaction_key=_as_string(payload, "transaction_key"),
@@ -105,6 +167,9 @@ def _command_from_event(event: Event) -> TransactionCommand:
         lease_owner=_as_optional_string(payload, "lease_owner"),
         lease_expires_at=_as_optional_string(payload, "lease_expires_at"),
         last_side_effect=_as_optional_string(payload, "last_side_effect"),
+        side_effect_certainty=certainty,
+        idempotency_key=_as_optional_string(payload, "idempotency_key"),
+        dispatch_evidence=_dispatch_evidence(payload),
     )
 
 
@@ -178,6 +243,31 @@ def project_row(
 
     if command.fencing_token <= prior_fence:
         raise _fail("fencing_token is reused or decreasing")
+    if command.event is TransactionEvent.SIDE_EFFECT_UNCERTAIN:
+        if command.side_effect_certainty not in {
+            SideEffectCertainty.ACCEPTED,
+            SideEffectCertainty.UNCERTAIN,
+        }:
+            raise _fail("uncertain side effect requires accepted or uncertain certainty")
+        if command.idempotency_key is None:
+            raise _fail("uncertain side effect requires an idempotency_key")
+        if command.dispatch_evidence is None or not command.dispatch_evidence.attempted:
+            raise _fail("uncertain side effect requires dispatch attempt evidence")
+        if (
+            command.side_effect_certainty is SideEffectCertainty.ACCEPTED
+            and not command.dispatch_evidence.accepted
+        ):
+            raise _fail("accepted side effect requires transport acceptance evidence")
+    elif command.side_effect_certainty in {
+        SideEffectCertainty.ACCEPTED,
+        SideEffectCertainty.UNCERTAIN,
+    }:
+        raise _fail("accepted or uncertain side effect must enter reconciliation")
+    if command.idempotency_key is not None:
+        if command.last_side_effect != command.idempotency_key:
+            raise _fail("idempotency_key must match last_side_effect")
+        if current is not None and current.record.last_side_effect == command.idempotency_key:
+            raise _fail("idempotency_key was already committed for this transaction")
     try:
         next_record = reduce_transaction(
             record,
@@ -204,6 +294,7 @@ def rebuild_projection(rows: Iterable[LedgerRow]) -> dict[str, ProjectedTransact
 
     projections: dict[str, ProjectedTransaction] = {}
     transaction_keys: dict[str, str] = {}
+    side_effect_keys: dict[str, str] = {}
     previous_hash = GENESIS_HASH
     expected_seq = 1
     last_hash = GENESIS_HASH
@@ -219,6 +310,10 @@ def rebuild_projection(rows: Iterable[LedgerRow]) -> dict[str, ProjectedTransact
         if row.event.kind != CONTROL_PLANE_TRANSACTION:
             continue
         command = _command_from_event(row.event)
+        if command.idempotency_key is not None:
+            prior_request = side_effect_keys.get(command.idempotency_key)
+            if prior_request is not None:
+                raise _fail("idempotency_key was already committed")
         prior = projections.get(command.request_id)
         if prior is None and command.transaction_key in transaction_keys:
             raise _fail("duplicate transaction_key")
@@ -228,6 +323,8 @@ def rebuild_projection(rows: Iterable[LedgerRow]) -> dict[str, ProjectedTransact
             raise _fail("duplicate transaction_key")
         projections[command.request_id] = projected
         transaction_keys[projected.record.transaction_key] = command.request_id
+        if command.idempotency_key is not None:
+            side_effect_keys[command.idempotency_key] = command.request_id
 
     if projections and last_hash != GENESIS_HASH:
         projections = {
