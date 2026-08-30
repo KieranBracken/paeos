@@ -3141,3 +3141,43 @@ This is an implementation checkpoint, not L14/L17 evidence. The consumed Gemini 
 **BLOCKED_UNQUALIFIABLE** and is not reconstructed retroactively. Worker counts remain **Admitted:
 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
 all four debts remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
+
+### Entry 186 — 2026-08-31: Candidate `a6e7270` L14/L17 Audit Blocked by Bundle Packaging
+
+Following the Founder's destination- and payload-specific authorization, exactly one new audit
+request was sent through the PAEOS router for candidate
+`a6e72702c09e30b87553da4ed4a0be5952119bb7` and evidence-bundle SHA-256
+`70f42ace335f7d1df482159c03708de3d54a4b805cc867338aba3e54ad6baef5`. Router observation
+`1049` records one successful physical Google invocation using `gemini-3.6-flash` (Gemini family),
+with 719 prompt tokens, 292 completion tokens, and no recorded provider error. The persisted
+receipt reports exactly one provider attempt and the sole route
+`google:gemini-3.6-flash`; no second request, retry, or fallback was performed.
+
+The candidate-bound physical artifacts are:
+
+- report `/private/tmp/paeos-l14-l17-report-a6e7270.md`, file SHA-256
+  `e5010ad3660ae15486db37171d79b6c3ba6f41cfc7e34dd291d8b1f03933090d`;
+- receipt `/private/tmp/paeos-l14-l17-receipt-a6e7270.json`, file SHA-256
+  `cff25a169acf185048ee5e696e5538663a7e0ccfaa5c0a29a2b3e6d1d85dd35e`, embedded canonical
+  receipt SHA-256 `5d796395140d006f99bcfe4abb90ba60bb59c265c03f0f2cd5383c2c983d55c1`;
+- prompt `/private/tmp/paeos-l14-l17-prompt-a6e7270.md`, SHA-256
+  `aff507bfb651d3e5db7fde4fa20d4ecd84d8b627e31c2709e4f784daa5cace10`.
+
+Independent local validation confirms the exact report/receipt pair is cryptographically bound,
+the expected candidate/evidence/accounting lines are present, and A-08 passes physically
+(`builder=glm`, `auditor=gemini`). Rejected-artifact quarantine paths are absent because the
+response passed the receipt/report validators.
+
+The auditor's substantive disposition is nevertheless exactly
+`L14_STATUS: BLOCKED_UNQUALIFIABLE`. The transmitted prompt referenced the 3,535-byte evidence
+bundle by host-local path but did not embed its contents, while simultaneously prohibiting tool
+execution. Gemini therefore correctly reported that it could not inspect the bundle. This is an
+audit-packaging defect, not L14/L17 evidence and not a Gate pass. The authorization was consumed;
+no retry, fallback, code change, gate advancement, or promotion followed.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and
+`DEBT-0061` remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
+Before any separately authorized future attempt, the immutable prompt must embed the complete
+evidence bundle (or use a transport-proven attachment) so the external auditor can inspect the
+evidence without host tools. Gate C and downstream advancement remain blocked.
