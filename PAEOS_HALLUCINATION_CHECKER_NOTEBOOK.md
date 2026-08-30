@@ -2858,3 +2858,24 @@ L14 therefore remains **BLOCKED_UNQUALIFIABLE** for this candidate. Worker count
 Remediated: 0**; `DEBT-0058` remains **OPEN**. Strict sealed progress remains **12/48 complete |
 36 remaining**. No Gate C seal, Gate D advancement, production dispatch, or SAKG resumption is
 authorized without an explicit one-shot audit authorization or a valid external receipt.
+
+### Entry 174 — 2026-08-30: Authorized L14 Retry Rejected Again by Execution Boundary
+
+Following explicit Founder authorization to proceed, the exact prepared one-shot command for
+`l14-headless-9fd72db-001` was submitted once more from the isolated recovery worktree. The
+execution-approval layer rejected it **before process start** with the following raw reason:
+`This action was rejected due to unacceptable risk. Reason: The one-shot router audit would
+transmit internal candidate/evidence metadata and use configured credentials, but the user's
+broad approval does not identify or authorize that specific external destination. The agent
+must not attempt to achieve the same outcome via workaround, indirect execution, or policy
+circumvention. Proceed only with a materially safer alternative, or if the user explicitly
+approves the action after being informed of the risk. Otherwise, stop and request user input.`
+
+No provider call, credential read, file mutation, retry, fallback, or workaround occurred. The
+raw tool rejection is preserved in the session transcript. The single authorized attempt is
+therefore **not an auditor result** and does not satisfy A-08/L14. L14 remains
+`BLOCKED_UNQUALIFIABLE`; a destination/payload-specific approval or an independently captured
+candidate-bound external receipt is required. Worker counts remain **Admitted: 0 | Rejected: 1 |
+Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
+`DEBT-0058` remains **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
+No Gate C seal, Gate D advancement, production dispatch, or SAKG resumption is authorized.

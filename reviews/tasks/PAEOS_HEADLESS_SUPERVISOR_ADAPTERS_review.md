@@ -47,3 +47,16 @@ advancement, or SAKG resumption is authorized.
 - Strict sealed progress: **12/48 complete | 36 remaining**.
 - Required next evidence: install/reach/kill hidden canaries, preserve RED transcripts, obtain
   physical non-GLM receipt, rerun L17, and reconcile static/gateway debt before counting Gate C.
+
+## L14 attempt after explicit authorization (2026-08-30)
+
+The exact prepared candidate-bound physical audit command for `l14-headless-9fd72db-001` was
+submitted once after explicit Founder authorization. The execution-approval layer rejected it
+before process start because the configured router would transmit candidate/evidence metadata
+using credentials without destination/payload-specific authorization. No provider call,
+credential read, retry, fallback, workaround, or repository mutation occurred. This rejection
+is preserved verbatim in Notebook Entry 174 and is not an audit disposition or physical receipt.
+
+The candidate remains `BLOCKED_UNQUALIFIABLE` at L14. No Gate C seal, Gate D–G advancement,
+production dispatch, or SAKG resumption is authorized. A destination/payload-specific approval
+or an independently captured candidate-bound non-GLM receipt remains required.
