@@ -40,6 +40,11 @@ class ProviderId(str, Enum):
     OPENROUTER = "openrouter"
 
 
+# Canonical provider identity is an extensible validated string; ProviderId remains a
+# compatibility enum for existing callers.
+ProviderKey = str
+
+
 class CostTier(str, Enum):
     FREE = "FREE"                                    # Zero monetary entitlement required
     SUBSCRIPTION_INCLUDED = "SUBSCRIPTION_INCLUDED"  # Already-paid subscription ($0 marginal inference cost)

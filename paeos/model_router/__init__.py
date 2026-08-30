@@ -18,6 +18,11 @@ from paeos.model_router.auditor_receipt import (
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.observability import ObservabilityDiagnostics
+from paeos.model_router.providers import (
+    ProviderDescriptor,
+    ProviderRegistry,
+    normalize_provider_key,
+)
 from paeos.model_router.router import ModelRouter
 from paeos.model_router.server import run_gateway_server
 from paeos.model_router.state import RouterStateDB
@@ -51,14 +56,17 @@ __all__ = [
     "NormalizedErrorType",
     "ObservabilityDiagnostics",
     "PhysicalAuditorReceipt",
+    "ProviderDescriptor",
     "ProviderHealth",
     "ProviderId",
+    "ProviderRegistry",
     "RouterResponse",
     "RouterStateDB",
     "TaskClass",
     "TaskRequest",
     "capture_auditor_receipt",
     "load_auditor_receipt",
+    "normalize_provider_key",
     "persist_auditor_receipt",
     "persist_auditor_report",
     "request_fingerprint",
