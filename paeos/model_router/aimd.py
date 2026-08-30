@@ -7,6 +7,7 @@ import math
 import time
 from typing import Dict, Optional, Tuple
 
+from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import (
     NormalizedError,
@@ -14,7 +15,6 @@ from paeos.model_router.types import (
     ProviderHealth,
     ProviderId,
 )
-
 
 # Configurable safety ceilings (fallback defaults, not immutable provider limits)
 DEFAULT_PUBLISHED_LIMITS: Dict[ProviderId, Dict[str, int]] = {
@@ -36,9 +36,28 @@ class AIMDController:
         self,
         state_db: RouterStateDB,
         custom_limits: Optional[Dict[ProviderId, Dict[str, int]]] = None,
+        provider_registry: ProviderRegistry | None = None,
     ):
         self.state_db = state_db
+        self.provider_registry = provider_registry or build_builtin_provider_registry()
         self.limits = custom_limits or DEFAULT_PUBLISHED_LIMITS
+
+    def limits_for(self, provider_id: ProviderId) -> Dict[str, int]:
+        """Resolve rate ceilings from descriptor facts with legacy fallback."""
+
+        configured = self.limits.get(provider_id)
+        if configured is not None:
+            return configured
+        descriptor = self.provider_registry.resolve(provider_id)
+        return {
+            field_name: value
+            for field_name, value in (
+                ("max_rpm", descriptor.max_rpm),
+                ("max_tpm", descriptor.max_tpm),
+                ("max_rpd", descriptor.max_rpd),
+            )
+            if value is not None
+        }
 
     def check_admission(
         self,
@@ -74,7 +93,7 @@ class AIMDController:
             return False, f"Concurrency limit reached ({active}/{current_limit})"
 
         # 3. Dynamic Ceiling Check
-        limits = self.limits.get(provider_id)
+        limits = self.limits_for(provider_id)
         if limits:
             rpm, tpm, rpd, _ = self.state_db.get_window_usage(provider_id)
             if limits.get("max_rpm") and rpm >= limits["max_rpm"]:

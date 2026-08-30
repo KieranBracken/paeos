@@ -4,6 +4,7 @@ import pytest
 from paeos.model_router.providers import (
     ProviderDescriptor,
     ProviderRegistry,
+    build_builtin_provider_registry,
     normalize_provider_key,
 )
 from paeos.model_router.types import LogicalModel, ProviderId, TaskClass
@@ -64,3 +65,17 @@ def test_synthetic_provider_requires_no_enum_member_and_has_secret_free_repr() -
     assert candidate.key == "future-provider"
     assert "sk-" not in repr(candidate)
     assert candidate.credential_env == "PAEOS_GOOGLE_API_KEY"
+
+
+def test_builtin_registry_preserves_legacy_provider_facts() -> None:
+    registry = build_builtin_provider_registry()
+    assert tuple(item.key for item in registry.snapshot()) == (
+        "cline",
+        "google",
+        "kilo",
+        "nvidia",
+        "openrouter",
+    )
+    assert registry.resolve(ProviderId.KILO).allows_internal is False
+    assert registry.resolve(ProviderId.OPENROUTER).credential_env == "OPENROUTER_API_KEY"
+    assert registry.resolve(ProviderId.GOOGLE).preference_rank[LogicalModel.PAEOS_STRONG] == 0

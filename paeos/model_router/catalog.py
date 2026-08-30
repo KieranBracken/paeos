@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
+from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.types import (
     CostTier,
     ModelCatalogEntry,
@@ -12,7 +13,6 @@ from paeos.model_router.types import (
     ProviderDataPolicy,
     ProviderId,
 )
-
 
 PROVIDER_DATA_POLICIES: Dict[ProviderId, ProviderDataPolicy] = {
     ProviderId.GOOGLE: ProviderDataPolicy(
@@ -201,8 +201,13 @@ INITIAL_MODEL_CATALOG: List[ModelCatalogEntry] = [
 
 
 class ModelCatalog:
-    def __init__(self, entries: Optional[List[ModelCatalogEntry]] = None):
+    def __init__(
+        self,
+        entries: Optional[List[ModelCatalogEntry]] = None,
+        provider_registry: ProviderRegistry | None = None,
+    ):
         self._catalog: Dict[str, ModelCatalogEntry] = {}
+        self.provider_registry = provider_registry or build_builtin_provider_registry()
         entries = entries if entries is not None else INITIAL_MODEL_CATALOG
         for e in entries:
             self.register(e)
@@ -239,13 +244,20 @@ class ModelCatalog:
         return models
 
     def get_data_policy(self, provider_id: ProviderId) -> ProviderDataPolicy:
-        return PROVIDER_DATA_POLICIES.get(
-            provider_id,
-            ProviderDataPolicy(
+        try:
+            descriptor = self.provider_registry.resolve(provider_id)
+        except KeyError:
+            return ProviderDataPolicy(
                 provider_id=provider_id,
                 trains_on_inputs=True,
                 retains_prompts=True,
                 allows_internal=False,
                 allows_confidential=False,
-            ),
+            )
+        return ProviderDataPolicy(
+            provider_id=provider_id,
+            trains_on_inputs=descriptor.trains_on_inputs,
+            retains_prompts=descriptor.retains_prompts,
+            allows_internal=descriptor.allows_internal,
+            allows_confidential=descriptor.allows_confidential,
         )

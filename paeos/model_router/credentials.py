@@ -9,8 +9,8 @@ import os
 from pathlib import Path
 from typing import Dict, Optional
 
+from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.types import ProviderId
-
 
 DEFAULT_CONFIG_PATH = Path.home() / ".config" / "paeos" / "model-router.env"
 
@@ -31,8 +31,13 @@ def mask_secret(secret: Optional[str]) -> str:
 
 
 class CredentialStore:
-    def __init__(self, env_file: Optional[Path] = None):
+    def __init__(
+        self,
+        env_file: Optional[Path] = None,
+        provider_registry: Optional[ProviderRegistry] = None,
+    ):
         self.env_file = env_file or DEFAULT_CONFIG_PATH
+        self.provider_registry = provider_registry or build_builtin_provider_registry()
         self._keys: Dict[str, str] = {}
         self.reload()
 
@@ -78,13 +83,19 @@ class CredentialStore:
             except Exception:
                 pass
 
-    def get_key(self, provider_id: ProviderId) -> Optional[str]:
-        env_var = PROVIDER_ENV_MAPPING.get(provider_id)
-        if not env_var:
+    def get_key(self, provider_id: ProviderId | str) -> Optional[str]:
+        try:
+            env_var = self.provider_registry.resolve(provider_id).credential_env
+        except (KeyError, ValueError):
+            if isinstance(provider_id, ProviderId):
+                env_var = PROVIDER_ENV_MAPPING.get(provider_id)
+            else:
+                env_var = None
+        if env_var is None:
             return None
         return self._keys.get(env_var)
 
-    def has_key(self, provider_id: ProviderId) -> bool:
+    def has_key(self, provider_id: ProviderId | str) -> bool:
         key = self.get_key(provider_id)
         return bool(key and len(key.strip()) > 0)
 

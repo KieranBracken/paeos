@@ -130,29 +130,49 @@ class RoutingPolicyEngine:
     ) -> List[ModelCatalogEntry]:
         filtered = []
         for m in candidates:
-            if m.provider_id == ProviderId.GOOGLE:
-                rpm, _, rpd, _ = self.state_db.get_window_usage(ProviderId.GOOGLE)
-                limits = self.aimd.limits.get(ProviderId.GOOGLE, {})
-                max_rpd = limits.get("max_rpd", 1200)
-
-                if request.task_class == TaskClass.ROUTINE and rpd >= int(max_rpd * 0.70):
-                    continue
-                if request.task_class in (TaskClass.IMPLEMENTATION, TaskClass.CODE_REVIEW) and rpd >= int(max_rpd * 0.90):
+            descriptor = self.catalog.provider_registry.resolve(m.provider_id)
+            _, _, rpd, _ = self.state_db.get_window_usage(m.provider_id)
+            max_rpd = descriptor.max_rpd
+            if max_rpd is not None:
+                threshold = 0.70 if request.task_class is TaskClass.ROUTINE else 0.90
+                if request.task_class in {
+                    TaskClass.ROUTINE,
+                    TaskClass.IMPLEMENTATION,
+                    TaskClass.CODE_REVIEW,
+                } and rpd >= int(max_rpd * threshold):
                     continue
             filtered.append(m)
         return filtered
 
     def _order_strong_tier(self, candidates: List[ModelCatalogEntry]) -> List[ModelCatalogEntry]:
-        pref_order = [ProviderId.GOOGLE, ProviderId.NVIDIA, ProviderId.CLINE, ProviderId.KILO, ProviderId.OPENROUTER]
-        return sorted(candidates, key=lambda m: (pref_order.index(m.provider_id) if m.provider_id in pref_order else 99, -m.base_quality_score))
+        return sorted(
+            candidates,
+            key=lambda m: (
+                self.catalog.provider_registry.resolve(m.provider_id).preference_rank.get(
+                    LogicalModel.PAEOS_STRONG, 99
+                ),
+                -m.base_quality_score,
+            ),
+        )
 
     def _order_code_tier(self, candidates: List[ModelCatalogEntry]) -> List[ModelCatalogEntry]:
-        pref_order = [ProviderId.CLINE, ProviderId.OPENROUTER, ProviderId.KILO, ProviderId.GOOGLE, ProviderId.NVIDIA]
-        return sorted(candidates, key=lambda m: (pref_order.index(m.provider_id) if m.provider_id in pref_order else 99, -m.base_quality_score))
+        return sorted(
+            candidates,
+            key=lambda m: (
+                self.catalog.provider_registry.resolve(m.provider_id).preference_rank.get(
+                    LogicalModel.PAEOS_CODE, 99
+                ),
+                -m.base_quality_score,
+            ),
+        )
 
     def _order_cheap_tier(self, candidates: List[ModelCatalogEntry]) -> List[ModelCatalogEntry]:
-        pref_order = [ProviderId.KILO, ProviderId.OPENROUTER, ProviderId.CLINE, ProviderId.NVIDIA, ProviderId.GOOGLE]
-        return sorted(candidates, key=lambda m: (pref_order.index(m.provider_id) if m.provider_id in pref_order else 99))
+        return sorted(
+            candidates,
+            key=lambda m: self.catalog.provider_registry.resolve(m.provider_id).preference_rank.get(
+                LogicalModel.PAEOS_CHEAP, 99
+            ),
+        )
 
     def _score_and_rank(
         self,
@@ -162,23 +182,10 @@ class RoutingPolicyEngine:
         def calculate_score(m: ModelCatalogEntry) -> float:
             st = self.state_db.get_provider_state(m.provider_id)
             health_mult = 1.0 if st["health_status"] == ProviderHealth.HEALTHY.value else 0.4
-
-            task_fit = 1.0
-            if request.task_class == TaskClass.ARCHITECTURE and m.family in (ModelFamily.GEMINI, ModelFamily.GLM):
-                task_fit = 1.5
-            elif request.task_class == TaskClass.IMPLEMENTATION and m.family in (ModelFamily.DEEPSEEK, ModelFamily.MINIMAX, ModelFamily.LAGUNA, ModelFamily.LLAMA):
-                task_fit = 1.4
-            elif request.task_class == TaskClass.ROUTINE:
-                task_fit = 1.2 if m.provider_id in (ProviderId.KILO, ProviderId.OPENROUTER) else 0.8
-
-            opp_cost = 1.0
-            if m.provider_id == ProviderId.GOOGLE:
-                opp_cost = 2.5
-            elif m.provider_id == ProviderId.NVIDIA:
-                opp_cost = 1.5
-            elif m.provider_id in (ProviderId.KILO, ProviderId.OPENROUTER):
-                opp_cost = 0.5
-
-            return (task_fit * m.base_quality_score * health_mult) / opp_cost
+            descriptor = self.catalog.provider_registry.resolve(m.provider_id)
+            task_fit = descriptor.task_fit.get(request.task_class, 1.0)
+            quality = m.base_quality_score + descriptor.quality_bias
+            latency_cost = 1.0 + descriptor.latency_bias
+            return (task_fit * quality * health_mult) / latency_cost
 
         return sorted(candidates, key=calculate_score, reverse=True)
