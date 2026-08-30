@@ -78,13 +78,13 @@ def project_row(current: ProjectedTransaction | None, row: LedgerRow) -> Project
 def rebuild_projection(rows: Iterable[LedgerRow]) -> dict[str, ProjectedTransaction]: ...
 ```
 
-- [ ] **Step 1.1: Write RED reducer-projection tests**
+- [x] **Step 1.1: Write RED reducer-projection tests**
 
 Cover exact happy-path folding, invalid transition, stale `expected_prior_digest`, decreasing or
 reused fence, duplicate `transaction_key`, malformed payload, unknown schema, and both terminal
 states. Assert the existing `reduce_transaction()` remains the only state-transition function.
 
-- [ ] **Step 1.2: Run RED once**
+- [x] **Step 1.2: Run RED once**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -93,14 +93,14 @@ states. Assert the existing `reduce_transaction()` remains the only state-transi
 
 Expected: collection fails because `runtime.control_plane.events` and `.projection` do not exist.
 
-- [ ] **Step 1.3: Implement the minimal event codec and projector**
+- [x] **Step 1.3: Implement the minimal event codec and projector**
 
 Use `SCHEMA_VERSION`, `canonical_json()`, and `reduce_transaction()` from the reviewed protocol.
 The canonical event kind is `CONTROL_PLANE_TRANSACTION`; the payload contains the complete
 command and no model-authored free-form authority. Compute the projected digest from canonical
 record bytes plus fence and ledger sequence.
 
-- [ ] **Step 1.4: Run GREEN and property tests**
+- [x] **Step 1.4: Run GREEN and property tests**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q \
@@ -111,7 +111,7 @@ record bytes plus fence and ledger sequence.
 Expected: all selected tests pass; generated invalid event sequences never create an unreviewed
 state or move out of a terminal state.
 
-- [ ] **Step 1.5: Commit**
+- [x] **Step 1.5: Commit**
 
 ```bash
 git add runtime/control_plane tests/runtime/control_plane/test_projection.py
