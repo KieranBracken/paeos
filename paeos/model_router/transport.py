@@ -10,6 +10,9 @@ from typing import Any, Dict, List, Optional
 import litellm
 import requests
 
+from paeos.model_router.a08_enforcer import derive_family_from_actual_model
+from paeos.model_router.auditor_receipt import request_fingerprint, response_fingerprint
+from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.errors import normalize_error
 from paeos.model_router.types import (
@@ -22,8 +25,6 @@ from paeos.model_router.types import (
     RouterResponse,
     TaskRequest,
 )
-from paeos.model_router.catalog import ModelCatalog
-from paeos.model_router.a08_enforcer import derive_family_from_actual_model
 
 
 litellm.num_retries = 0
@@ -148,7 +149,7 @@ class LiteLLMTransport:
             actual_model = getattr(resp, 'model', None) or model_entry.model_id
             actual_family = derive_family_from_actual_model(actual_model, self.catalog)
             
-            return RouterResponse(
+            result = RouterResponse(
                 content=content,
                 model_id=model_entry.model_id,
                 actual_model=actual_model,
@@ -163,6 +164,9 @@ class LiteLLMTransport:
                 finish_reason=finish_reason,
                 raw_response=resp,
             )
+            result.transport_request_sha256 = request_fingerprint(request)
+            result.transport_response_sha256 = response_fingerprint(result)
+            return result
 
         except Exception as e:
             status_code = getattr(e, "status_code", getattr(e, "http_status", None))
@@ -245,7 +249,7 @@ class LiteLLMTransport:
             actual_model = res_json.get("model") or res_json.get("data", {}).get("model") or model_entry.model_id
             actual_family = derive_family_from_actual_model(actual_model, self.catalog)
             
-            return RouterResponse(
+            result = RouterResponse(
                 content=content,
                 model_id=model_entry.model_id,
                 actual_model=actual_model,
@@ -260,6 +264,9 @@ class LiteLLMTransport:
                 finish_reason=finish_reason,
                 raw_response=res_json,
             )
+            result.transport_request_sha256 = request_fingerprint(request)
+            result.transport_response_sha256 = response_fingerprint(result)
+            return result
 
         except Exception as e:
             if isinstance(e, NormalizedError):

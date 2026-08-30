@@ -888,6 +888,23 @@ git commit -m "docs(review): audit cline sdk admission adapter"
 **Checkpoint 4 — hard stop:** Task 10 is blocked on any L13 failure, L14 remand, unknown family,
 qualification drift, or unavailable non-secret authenticated profile.
 
+## Approved Amendment — Task 9A: Capture a Physical Auditor Receipt
+
+**Founder authorization:** On 2026-08-30 the Founder explicitly authorized a bounded recovery
+exception to add candidate-bound physical auditor-receipt capture in the isolated recovery
+worktree because the existing router could not produce an L14 receipt. The amendment is specified
+in `docs/superpowers/specs/2026-08-30-paeos-auditor-physical-receipt-capture.md`.
+
+Task 9A may add only the provider-neutral receipt contract, transport fingerprints, create-only
+receipt persistence, focused tests, and a one-shot operational capture command. It may not run a
+provider call during implementation, alter worker admission, repair unrelated static debt, close
+Gate A, execute Task 10, or advance Gates B–G.
+
+The amended Checkpoint 4 remains in force: Task 10 is blocked until a fresh L13 matrix is green or
+formally dispositioned, a machine-captured receipt proves a non-GLM physical auditor against the
+exact candidate/evidence bundle, the static/environment findings are reconciled, and the
+non-secret authenticated Cline profile prerequisite is satisfied.
+
 ---
 
 ## Task 10: Run Three Fresh One-Shot Probes and Record L15/L17 Disposition

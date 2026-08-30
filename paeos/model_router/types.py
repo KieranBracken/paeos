@@ -158,3 +158,7 @@ class RouterResponse:
     tool_calls: Optional[List[Dict[str, Any]]] = None
     finish_reason: str = "stop"
     raw_response: Any = None
+    # Content-free hashes captured at the transport boundary.  These are optional for
+    # backwards-compatible diagnostic responses, but required by Task 9A physical receipts.
+    transport_request_sha256: Optional[str] = None
+    transport_response_sha256: Optional[str] = None
