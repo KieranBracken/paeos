@@ -110,7 +110,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--prompt-file", required=True, type=Path)
     parser.add_argument("--report-path", required=True, type=Path)
     parser.add_argument("--receipt-path", required=True, type=Path)
-    parser.add_argument("--max-tokens", type=int, default=2_000)
+    parser.add_argument("--max-tokens", type=int, default=512)
     args = parser.parse_args(argv)
     if not args.audit_id or any(character.isspace() for character in args.audit_id):
         parser.error("--audit-id must be non-empty and contain no whitespace")
@@ -140,7 +140,11 @@ def run(argv: list[str] | None = None) -> int:
                     "content": (
                         "Perform an independent Layer 14 audit. Do not modify files, "
                         "execute tools, "
-                        "or claim Gate A closure. Return concise findings and disposition."
+                        "or claim Gate A closure. The first six non-blank lines of your response "
+                        "must be the Candidate SHA, Evidence Bundle SHA-256, L14_STATUS, "
+                        "INVARIANT, REPRODUCTION, and the exact Worker/Court accounting lines. "
+                        "Do not emit a preamble, analysis, file list, or markdown heading before "
+                        "those lines. Return only concise findings after them."
                     ),
                 },
                 {"role": "user", "content": prompt},

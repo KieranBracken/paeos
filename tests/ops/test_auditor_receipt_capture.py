@@ -185,6 +185,10 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
     request = calls[0][2]
     assert request.retry_policy is RetryPolicy.NONE
     assert request.allow_fallback is False
+    assert request.max_tokens == 512
+    system_content = request.messages[0]["content"]
+    assert "first six non-blank lines" in system_content
+    assert "Do not emit a preamble" in system_content
     assert json.loads(output.out)["qualified"] is False
 
 
