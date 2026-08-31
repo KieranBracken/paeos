@@ -3631,6 +3631,23 @@ candidate-bound compact bundle and audit ID; it may increase the completion budg
 one-shot/no-fallback semantics. Canonical Worker/Court counts remain **0/1/0** and **0/0/0**;
 strict progress remains **12/48 complete | 36 remaining**.
 
+### Entry 211 — 2026-08-31: Gemini Compact Bundle Still Returned Truncated Review Text
+
+The fresh one-shot Gemini capture for candidate `e7c701ad8b70251679fd64233bcca67ffcf07480`
+using compact evidence and `--max-tokens 2048` reached Google once with physical A-08
+`gemini != glm`, one attempt, and no fallback. The provider returned 325 bytes (six lines) of
+mid-review text beginning `` `, `candidate`, `verifier`) with verifier manifest hashing. `` and
+ending before the required Candidate SHA, Evidence Bundle SHA-256, L14 status, invariant,
+reproduction, and accounting lines. The validator rejected it as `audit report does not bind
+candidate` and preserved the report, receipt, and rejection metadata.
+
+The larger completion budget did not correct the response-channel failure. This remains
+`BLOCKED_UNQUALIFIABLE`; the physical receipt's A-08 `PASS` is not a substantive audit result.
+No identical retry, fallback, gate advancement, or SAKG resumption occurred. A final materially
+different attempt may use a source-focused bundle with less embedded narrative, but it must still
+use a fresh candidate-bound package and one-shot/no-fallback semantics. Canonical Worker/Court
+counts remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**.
+
 ### Entry 209 — 2026-08-31: Alternate-Route Preflight After NVIDIA Failure
 
 Read-only model-router inspection after the NVIDIA transport failure found the following local

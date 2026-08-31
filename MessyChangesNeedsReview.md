@@ -620,6 +620,14 @@ quarantined the report, receipt, and rejection metadata. No retry or fallback oc
 `BLOCKED_UNQUALIFIABLE`; Worker/Court counts remain **0/1/0** and **0/0/0**, and strict progress
 remains **12/48**.
 
+## 2026-08-31 — Gemini compact-bundle response truncation
+
+The fresh Gemini one-shot for candidate `e7c701ad8b70251679fd64233bcca67ffcf07480` used the
+compact evidence package and `--max-tokens 2048`. Physical A-08 provenance passed, but the
+provider returned only 325 bytes of mid-review text, omitting candidate/evidence bindings and
+the structured disposition. The validator rejected and quarantined the artifacts; no retry or
+fallback occurred. This remains `BLOCKED_UNQUALIFIABLE`, Worker/Court **0/1/0** and **0/0/0**,
+strict progress **12/48**.
 
 
 

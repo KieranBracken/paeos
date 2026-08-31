@@ -280,3 +280,10 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   and quarantined report/receipt/rejection artifacts. No retry or fallback occurred; this remains
   `BLOCKED_UNQUALIFIABLE`, with Worker/Court **0/1/0** and **0/0/0**, strict progress **12/48**,
   and no gate or SAKG advancement.
+- 2026-08-31 the Gemini compact-bundle attempt for candidate `e7c701a` reached the provider once
+  with physical A-08 `gemini != glm`, but returned 325 bytes of mid-review text and omitted every
+  required candidate/evidence/status/accounting line. The validator quarantined the report,
+  receipt, and rejection metadata. The larger `--max-tokens 2048` budget did not fix the response
+  channel; this remains `BLOCKED_UNQUALIFIABLE` with no retry/fallback. Worker/Court remain
+  **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and no gate
+  or SAKG advancement occurred.
