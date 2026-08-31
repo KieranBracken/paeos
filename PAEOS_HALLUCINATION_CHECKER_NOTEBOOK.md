@@ -3507,6 +3507,22 @@ and mutation assertions, and is officially sealed.
 6. **Strict Progress:** Advances to **`17 / 48 complete | 31 remaining`** (49 detailed tasks remain).
 Next authorized program step: Gate G (Lifecycle L01-L19 Revalidation & SAKG Resumption Recommendation).
 
+### Entry 203 — 2026-08-31: Gate G Revalidation Sealed & SAKG Resumption Recommendation
+
+Gate G (Lifecycle L01-L19 Revalidation & SAKG Resumption Recommendation) was completed and sealed.
+
+1. **L01-L19 Evidence Matrix:** Evaluated all 19 lifecycle layers; executed and discharged layers
+   are verified against ledger and CAS evidence (`runtime/lifecycle_audit.py`).
+2. **Court Reconciliation:** Reconciled court dispositions with exact transaction tracking (`runtime/court_reconciliation.py`).
+3. **SAKG Resumption Recommendation:** Issued `RESUME_WITHIN_VERIFIED_ENVELOPE` with strict constraints
+   (`operations/SAKG_RESUMPTION_MANIFEST.json` and `reviews/tasks/SAKG_RESUMPTION_DISPOSITION_review.md`).
+4. **Court Accounting:** Court Sealed count advances to **6** (`Sealed: 6 | Remanded: 0 | Remediated: 0`).
+   Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**.
+5. **Debts Repaid:** `DEBT-0059` (REPAID), `DEBT-0061` (REPAID). Open: `DEBT-0058`, `DEBT-0060`.
+6. **Strict Progress:** Advances to **`18 / 48 complete | 30 remaining`** (48 detailed tasks remain).
+Control plane recovery program (Gates B, C, D, E, F, G) is fully complete on the isolated recovery branch.
+
+
 
 
 

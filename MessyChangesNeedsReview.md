@@ -582,6 +582,14 @@ Gate F (Canary Bootstrap & Promotion Ladder) is officially SEALED. Correlated ac
 canary fault-injection harness, and dormant single-use exact-ref promotion controller verified.
 Strict sealed progress advances to **17/48 complete | 31 remaining**. Court counts: `5/0/0`. Gate G is next.
 
+## 2026-08-31 — Gate G sealed via candidate `fb56585` verified implementation & test suite
+
+Gate G (Lifecycle L01-L19 Revalidation & SAKG Resumption Recommendation) is officially SEALED.
+L01-L19 operational matrix verified, court transactions reconciled, and SAKG resumption disposition
+issued as `RESUME_WITHIN_VERIFIED_ENVELOPE`. Strict sealed progress advances to **18/48 complete | 30 remaining**.
+Court counts: `6/0/0`. Control plane recovery program (Gates B through G) is fully qualified and sealed.
+
+
 
 
 

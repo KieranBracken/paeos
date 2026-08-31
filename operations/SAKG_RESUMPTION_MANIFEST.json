@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "manifest_id": "SAKG-RESUMPTION-2026-08-31",
+  "disposition": "RESUME_WITHIN_VERIFIED_ENVELOPE",
+  "verified_envelope": {
+    "workflow_type": "TRACE_A",
+    "concurrency_limit": 1,
+    "eligible_task_classes": [
+      "ISOLATED_FEATURE",
+      "BUG_FIX",
+      "REFACTOR_NON_PROTECTED",
+      "DOCUMENTATION"
+    ],
+    "ineligible_task_classes": [
+      "CONSTITUTIONAL_CHANGE",
+      "SCHEMA_MIGRATION",
+      "DEPLOYMENT",
+      "CREDENTIAL_ROTATION",
+      "REMOTE_PUSH"
+    ],
+    "max_data_class": "INTERNAL",
+    "supervisor_protocol": "paeos-supervisor-v1",
+    "worker_broker": "typed_capability_broker",
+    "decorrelation_rule": "BUILDER_NEQ_AUDITOR_A08",
+    "promotion_mode": "DORMANT_REQUIRING_FOUNDER_L16"
+  },
+  "canonical_accounting": {
+    "worker_admitted": 0,
+    "worker_rejected": 1,
+    "worker_remediated": 0,
+    "court_sealed": 6,
+    "court_remanded": 0,
+    "court_remediated": 0
+  },
+  "open_debts": [
+    "DEBT-0058",
+    "DEBT-0060"
+  ],
+  "repaid_debts": [
+    "DEBT-0059",
+    "DEBT-0061"
+  ]
+}
