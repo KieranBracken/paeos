@@ -18,7 +18,7 @@ import subprocess
 import time
 from collections.abc import Mapping
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import BinaryIO, cast
@@ -27,12 +27,15 @@ from paeos.model_router.types import ModelFamily
 
 from .bridge_protocol import (
     SCHEMA_VERSION,
+    BridgePaths,
     Disposition,
     RequestEnvelope,
     ResponseEnvelope,
     canonical_json,
     load_json,
     validate_request,
+    validate_response,
+    write_once_bytes,
 )
 from .cline_sdk_protocol import (
     MAX_FRAME_BYTES,
@@ -45,6 +48,7 @@ from .cline_sdk_protocol import (
 __all__ = [
     "BoundWorkerConfig",
     "HandoffRecord",
+    "QuarantineRecord",
     "ResponseEnvelope",
     "SideEffectCertainty",
     "TransportFailure",
@@ -55,6 +59,9 @@ __all__ = [
     "WorkerDispatchSuccess",
     "WorkerToolPolicy",
     "_load_policy",
+    "_persist_handoff_once",
+    "_persist_response_once",
+    "_quarantine_failure_once",
     "_validate_binding",
     "_validate_paths",
     "_validate_policy",
@@ -162,6 +169,15 @@ class HandoffRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class QuarantineRecord:
+    request_id: str
+    transaction_key: str
+    failure_kind: TransportFailureKind
+    failure_hash: str
+    path: Path
+
+
+@dataclass(frozen=True, slots=True)
 class WorkerDispatchSuccess:
     request_id: str
     transaction_key: str
@@ -179,7 +195,7 @@ class WorkerDispatchFailure:
     request_id: str
     transaction_key: str
     failure: TransportFailure
-    quarantine: object | None = None
+    quarantine: QuarantineRecord | None = None
     handoff: HandoffRecord | None = None
 
 
@@ -584,6 +600,91 @@ def _failure(
             exit_code=exit_code,
         ),
     )
+
+
+def _fsync_directory(path: Path) -> None:
+    descriptor = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _safe_component(value: str) -> str:
+    return value if re.fullmatch(r"[A-Za-z0-9_.:-]+", value) else "unknown"
+
+
+def _persist_response_once(paths: BridgePaths, response: ResponseEnvelope) -> Path:
+    """Persist one validated response create-only and reject conflicting bytes."""
+
+    try:
+        validate_response(response)
+    except Exception as exc:
+        raise TransportProtocolError(f"response validation failed: {exc}") from exc
+    paths.ensure()
+    target = paths.responses / f"{_safe_component(response.request_id)}.json"
+    payload = (canonical_json(response) + "\n").encode("utf-8")
+    try:
+        write_once_bytes(target, payload)
+    except FileExistsError:
+        try:
+            existing = target.read_bytes()
+        except OSError as exc:
+            raise TransportProtocolError("existing response cannot be read") from exc
+        if existing != payload:
+            raise TransportProtocolError("duplicate response has different content") from None
+    _fsync_directory(paths.responses)
+    return target
+
+
+def _quarantine_failure_once(
+    paths: BridgePaths,
+    failure: TransportFailure,
+) -> QuarantineRecord:
+    """Persist only typed, hash-based failure metadata; never worker prose."""
+
+    paths.ensure()
+    metadata = {
+        "schema_version": "paeos-bound-cline-quarantine/1",
+        "request_id": _safe_component(failure.request_id),
+        "transaction_key": failure.transaction_key,
+        "failure_kind": failure.kind.value,
+        "side_effect_certainty": failure.side_effect_certainty.value,
+        "stdout_hash": failure.stdout_hash,
+        "stderr_hash": failure.stderr_hash,
+        "exit_code": failure.exit_code,
+    }
+    failure_hash = _hash_bytes((canonical_json(metadata) + "\n").encode("utf-8"))
+    target = paths.quarantine / f"{_safe_component(failure.request_id)}--{failure_hash}.json"
+    payload = (canonical_json({**metadata, "failure_hash": failure_hash}) + "\n").encode("utf-8")
+    try:
+        write_once_bytes(target, payload)
+    except FileExistsError:
+        if target.read_bytes() != payload:
+            raise TransportProtocolError("quarantine record collision") from None
+    _fsync_directory(paths.quarantine)
+    return QuarantineRecord(
+        request_id=failure.request_id,
+        transaction_key=failure.transaction_key,
+        failure_kind=failure.kind,
+        failure_hash=failure_hash,
+        path=target,
+    )
+
+
+def _persist_handoff_once(paths: BridgePaths, handoff: HandoffRecord) -> Path:
+    """Persist a secret-blind, create-only continuity handoff."""
+
+    paths.ensure()
+    target = paths.transactions / f"{_safe_component(handoff.request_id)}.handoff.json"
+    payload = (canonical_json(asdict(handoff)) + "\n").encode("utf-8")
+    try:
+        write_once_bytes(target, payload)
+    except FileExistsError:
+        if target.read_bytes() != payload:
+            raise TransportProtocolError("handoff collision with different content") from None
+    _fsync_directory(paths.transactions)
+    return target
 
 
 def _send_cancel(stream: BinaryIO, invocation_id: str, session_id: str, sequence: int) -> None:
