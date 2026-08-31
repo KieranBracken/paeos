@@ -488,3 +488,15 @@ field and adds a regression test for positional callers. The corrected focused s
 **46/46** and the complete non-gateway suite passed **1,023/1,023**; critical Ruff/Pyright checks
 were clean. No external activity or promotion occurred. This does not change worker/Court counts,
 debt status, L14/L17 disposition, or strict progress (**12/48 complete | 36 remaining**).
+
+## 2026-08-31 — Gate B discriminative mutation evidence
+
+Gate B Task 5.2 was executed in the isolated recovery worktree with five one-at-a-time mutations,
+each restored before the next. Non-strict fencing (projector semantic guards), removed projection
+head validation, project-before-append ordering, unsafe retry eligibility for `UNCERTAIN`, and a
+terminal-state quarantine escape were all killed by focused tests. A coordinator-only non-strict
+fence variant was behaviorally equivalent because the projector independently enforces the same
+strict invariant; this was preserved as an explicit equivalent-mutant note. Restored focused
+control-plane/bridge/ledger verification passed **137/137**. No source mutation remains and no
+external/provider activity occurred. This is implementation evidence only: L14/L17, Gate B seal,
+debt closure, and strict **12/48** progress are unchanged.

@@ -163,3 +163,10 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   implementation evidence only: L14/L17, Gate B Task 5, and Gate C canary evidence are open;
   counts remain **0/1/0** and **0/0/0**, all debts remain open, and strict progress remains
   **12/48 complete | 36 remaining**.
+- 2026-08-31 Gate B Task 5.2 discriminative mutation evidence completed on the isolated recovery
+  branch. Five one-at-a-time mutations (strict fencing, projection-head binding, ledger-before-
+  projection ordering, uncertain-side-effect retry eligibility, and terminal-state quarantine)
+  were killed by focused probes; the coordinator-only strict-fence variant was documented as an
+  equivalent mutant because the projector repeats the invariant. All mutations were restored and
+  the Gate B focused suite passed **137/137**. This is local evidence only; L14/L17, Gate B seal,
+  debt closure, and strict progress remain unchanged at **12/48 complete | 36 remaining**.

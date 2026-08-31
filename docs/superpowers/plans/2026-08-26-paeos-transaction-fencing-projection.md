@@ -361,11 +361,20 @@ git diff --check
 Expected: focused tests and new-code static checks pass. Record full-suite/static failures exactly;
 do not conceal inherited debt.
 
-- [ ] **Step 5.2: Run discriminative mutations**
+- [x] **Step 5.2: Run discriminative mutations**
 
 One at a time, prove tests kill: fence comparison `<=` changed to `<`, projection head validation
 removed, event appended after projection, uncertain side effect made retryable, and a terminal
 state allowed to transition. Restore each mutation before the next.
+
+Evidence recorded at commit `a30019f`: the non-strict-fence mutation was exercised at the
+projector's semantic guards and was killed by `test_projector_rejects_stale_digest_or_fence`;
+the coordinator-only variant is behaviorally equivalent because `project_row` independently
+enforces the same invariant. Projection-head-validation removal was killed by two head-binding
+tests; unsafe project-before-append ordering was killed by an isolated append-failure probe;
+adding `UNCERTAIN` to retryable certainty was killed by the fail-closed retry matrix; and allowing
+a consumed terminal record to quarantine was killed by an isolated terminal-state probe. Every
+mutation was restored before the next; the restored Gate B suite passed **137/137** with exit `0`.
 
 - [ ] **Step 5.3: Obtain physically decorrelated L14 audit**
 

@@ -3295,3 +3295,22 @@ credential, browser, clipboard, AppleScript, terminal-paste, retry, fallback, or
 invoked. This is a local compatibility correction, not gate evidence: the prior Gemini result
 remains `BLOCKED_UNQUALIFIABLE`, worker/Court counts remain **0/1/0** and **0/0/0**, all four debts
 remain **OPEN**, and strict progress remains **12/48 complete | 36 remaining**.
+
+### Entry 192 — 2026-08-31: Gate B Discriminative Mutation Evidence
+
+Gate B Task 5.2 was executed in the isolated recovery worktree with one mutation at a time and
+full restoration before the next. The projector's strict-fence guards were mutated from `<=` to
+`<` and the stale-fence test failed as expected; a coordinator-only equivalent variant remained
+behaviorally unchanged because `project_row` independently enforces the same strict invariant.
+Removing projection-head validation was killed by two head-binding tests. Moving projection before
+the ledger append was killed by an isolated append-failure probe that detected an advanced cache.
+Adding `UNCERTAIN` to retry-eligible certainty was killed by the retry matrix. Allowing a
+`CONSUMED` terminal record to quarantine was killed by an isolated terminal-state probe. All five
+mutations were restored before subsequent execution, and the restored focused Gate B suite passed
+**137/137** with exit `0`.
+
+This is local implementation/mutation evidence only; no provider, credential, browser, clipboard,
+AppleScript, terminal-paste, retry, fallback, or promotion activity occurred. The prior Gemini
+audit remains `BLOCKED_UNQUALIFIABLE`; worker counts remain **Admitted: 0 | Rejected: 1 |
+Remediated: 0**, Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**, all four debts
+remain **OPEN**, and strict progress remains **12/48 complete | 36 remaining**.

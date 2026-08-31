@@ -36,3 +36,23 @@ admission prerequisite remain open; no production dispatch or lifecycle advancem
 - Court: **Sealed: 0 | Remanded: 0 | Remediated: 0**.
 - `DEBT-0058`: **OPEN**.
 - Top-level progress after this checkpoint: **12/48 complete | 36 remaining**.
+
+## Task 5.2 Mutation Evidence Addendum — 2026-08-31
+
+Candidate baseline: `a30019fc944dea409d6de80a18e9b757f3175711` (clean isolated recovery branch).
+Five one-at-a-time fault injections were applied only to the disposable worktree and restored
+before the next mutation. The non-strict fence comparison was exercised at the projector's
+semantic guards and was killed by `test_projector_rejects_stale_digest_or_fence`; a
+coordinator-only equivalent variant was also checked and correctly remained behaviorally
+equivalent because the projector repeats the strict check. Removing the SQLite verified-head
+check was killed by both head-binding tests. Projecting before the ledger append was killed by
+an isolated append-failure probe that observed a forbidden advanced projection. Making
+`UNCERTAIN` retryable was killed by the retry-policy matrix. Allowing `CONSUMED` to quarantine was
+killed by an isolated terminal-state probe. No mutation survived with a semantic escape;
+equivalent redundancy is explicitly noted rather than counted as a false kill.
+
+Restored verification: Gate B focused control-plane/bridge/ledger suite **137 passed**, exit `0`.
+No external provider, credentials, GUI automation, clipboard, terminal paste, retry, fallback,
+or promotion occurred. This is local mutation evidence only and does not satisfy L14/L17, close
+Gate B, repay any debt, or change the **0/1/0** worker, **0/0/0** Court, or **12/48** strict sealed
+counts.
