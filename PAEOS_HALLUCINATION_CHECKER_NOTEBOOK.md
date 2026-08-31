@@ -3923,3 +3923,18 @@ This is implementation/recovery evidence only. Worker/Court remain **0/1/0** and
 strict progress remains **12/48 complete | 36 remaining** (`54` granular tasks); `DEBT-0058`
 and `DEBT-0060` remain **OPEN**; L14/L17 and Court/L16 remain outstanding; no gate seal or SAKG
 resumption is authorized.
+
+### Entry 227 — 2026-09-01: L14 report completion-boundary hardening
+
+The current-candidate Gemini audit for `c4f54ca` produced a physically qualified receipt and
+`L14_STATUS: PASS`, but the report ended mid-finding. The existing validator accepted the pair
+because it checked binding, status, and accounting without proving response completion. This was
+recorded as a non-vacuous-evidence defect; no gate credit was taken from that pair.
+
+Recovery commit `42f670b` adds a required terminal `AUDIT_COMPLETE: true` marker, requires it to be
+the final non-blank line, and requires substantive findings text. The generated prompt and caller
+system instruction now carry the same contract. The RED probe failed before the fix; the focused
+audit/prompt suite passed **39/39**, the complete non-gateway suite passed **1,094/1,094**, Ruff
+was clean on changed paths, and Pyright reported **0 diagnostics**. No provider retry, Court row,
+gate seal, debt closure, promotion, or SAKG resumption occurred. A fresh candidate-bound audit is
+required for the hardened lineage.

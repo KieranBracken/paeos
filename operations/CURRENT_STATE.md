@@ -436,3 +436,14 @@ This remains implementation evidence only. The old GUI/CDP/clipboard/AppleScript
 reactivated. Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete |
 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open. No gate closure, lifecycle advancement, or
 SAKG resumption is authorized.
+
+## 2026-09-01 — L14 report completion-boundary hardening
+
+The current-candidate Gemini response for `c4f54ca` had a valid physical receipt but ended
+mid-finding. It was not consumed as gate evidence. Recovery commit `42f670b` requires every audit
+report to include substantive findings and a final `AUDIT_COMPLETE: true` marker; the prompt and
+capture CLI carry the same requirement. Focused audit/prompt checks passed **39/39** and the full
+non-gateway suite passed **1,094/1,094** (exit `0`); changed Ruff/Pyright are clean. Worker/Court
+remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and
+`DEBT-0058`/`DEBT-0060` remain open. A fresh current-candidate L14/L17 audit is required; no
+Court/L16 row, gate seal, promotion, or SAKG resumption is authorized.

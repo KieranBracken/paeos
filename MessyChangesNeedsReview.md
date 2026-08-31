@@ -735,6 +735,15 @@ current-candidate L14/L17, or Court/L16 evidence exists; Worker/Court remain **0
 **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060`
 remain open.
 
+## 2026-09-01 — L14 completion-boundary hardening
+
+The Gemini response for candidate `c4f54ca` was physically attributable but visibly truncated
+mid-finding. Commit `42f670b` hardens `paeos/model_router/auditor_receipt.py` so a report must have
+concrete findings and a final `AUDIT_COMPLETE: true` marker. The prompt builder and capture CLI
+now instruct the same contract. Focused audit/prompt checks passed **39/39** and the complete
+non-gateway suite passed **1,094/1,094**; changed Ruff/Pyright are clean. This is a control-plane
+hardening change, not a seal or Court disposition. A fresh non-GLM audit is required.
+
 ## 2026-08-31 — Historical ledger reality check
 
 The read-only lifecycle CLI inspected the external historical ledger at
