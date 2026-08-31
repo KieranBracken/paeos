@@ -252,6 +252,13 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   `afc73d9b74ddf2a3496f003083e1151335ef99bbfe9a779400fa5db50a890e72`, prompt bytes `254410`.
   No provider call or retry occurred after the rejection; the new package is unsent and awaits a
   separately authorized one-shot.
-
+- 2026-08-31 the repeated Gemini truncation was not retried. The capture CLI now accepts an
+  explicit `--auditor-model` so a fresh one-shot can use a different physically decorrelated
+  family while preserving `RetryPolicy.NONE` and `allow_fallback=false`. A fresh package is bound
+  to candidate `b7e27611c522109dfab2556a9b943f1dd99bc300`: evidence SHA-256
+  `ca78d9d75341b0afbba7b0a627494b63a06e7bd823eb9663fe19e89fd6c02465`, prompt SHA-256
+  `c84e61086f29d18bf8d05d9fa9588cd60dbbcc9877b2796d3c331272d095542d`, prompt bytes `259626`.
+  The package is unsent. Candidate alternatives must be checked for live availability and exact
+  physical receipt; no gate seal or SAKG resumption is authorized by transport success alone.
 
 

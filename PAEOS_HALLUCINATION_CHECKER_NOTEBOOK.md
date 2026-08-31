@@ -3577,6 +3577,19 @@ bundle `b5476885425429b6ec68e5c9a3eb742e486e95a74e35656104f36411c1c3bfa4`, promp
 **Worker 0/1/0; Court 0/0/0; strict progress 12/48**. No provider call, retry, fallback, or
 promotion occurred.
 
+### Entry 207 — 2026-08-31: Explicit Auditor-Model Route Prepared
+
+The second Gemini attempt for candidate `2cd3b68` returned a 35-byte partial candidate line and
+was rejected as `BLOCKED_UNQUALIFIABLE`. No identical retry is authorized. Commit `b7e2761` adds
+an explicit `--auditor-model` selector to the receipt-capture CLI, allowing a fresh route to a
+different non-GLM family without fallback or retry. Capture/model-router tests pass **50/50**;
+Ruff and Pyright are clean.
+
+A fresh unsent package is bound to candidate `b7e27611c522109dfab2556a9b943f1dd99bc300`:
+bundle `ca78d9d75341b0afbba7b0a627494b63a06e7bd823eb9663fe19e89fd6c02465`, prompt
+`c84e61086f29d18bf8d05d9fa9588cd60dbbcc9877b2796d3c331272d095542d`, size `259626` bytes.
+Canonical accounting remains **Worker 0/1/0; Court 0/0/0; strict progress 12/48**. A different
+physical provider/model must be verified by its receipt; transport completion alone is not proof.
 
 
 
