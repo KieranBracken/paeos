@@ -3314,3 +3314,15 @@ AppleScript, terminal-paste, retry, fallback, or promotion activity occurred. Th
 audit remains `BLOCKED_UNQUALIFIABLE`; worker counts remain **Admitted: 0 | Rejected: 1 |
 Remediated: 0**, Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**, all four debts
 remain **OPEN**, and strict progress remains **12/48 complete | 36 remaining**.
+
+### Entry 193 — 2026-08-31: Provider Registry Compatibility Recheck
+
+The local provider-registry compatibility scope passed **16/16** (`test_provider_registry.py` and
+`test_catalog_and_privacy.py`), exit `0`. Pyright on `paeos/model_router/providers.py` and
+`types.py` reported **0 errors, 0 warnings, 0 informations**. Ruff reported **38 inherited
+findings** in the legacy `types.py` surface (enum modernization, typing aliases, and line length);
+none were introduced or silently waived. No provider, credential, browser, clipboard, AppleScript,
+terminal-paste, retry, fallback, or promotion activity occurred. This recheck does not close the
+provider-adapter migration or any gate: L14/L17 remain outstanding, worker/Court counts remain
+**0/1/0** and **0/0/0**, all four debts remain **OPEN**, and strict progress remains
+**12/48 complete | 36 remaining**.

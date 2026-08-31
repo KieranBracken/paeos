@@ -500,3 +500,11 @@ strict invariant; this was preserved as an explicit equivalent-mutant note. Rest
 control-plane/bridge/ledger verification passed **137/137**. No source mutation remains and no
 external/provider activity occurred. This is implementation evidence only: L14/L17, Gate B seal,
 debt closure, and strict **12/48** progress are unchanged.
+
+## 2026-08-31 — Provider registry compatibility recheck
+
+The provider-registry/catalog compatibility scope passed **16/16**. Pyright on the provider
+registry and legacy model-router types passed with zero diagnostics. Ruff still reports **38
+inherited findings** in `paeos/model_router/types.py`; these remain explicitly dispositioned debt,
+not a clean claim. No source changes or external activity occurred, and L14/L17, gate seals,
+debt closure, and strict **12/48** progress are unchanged.

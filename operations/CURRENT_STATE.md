@@ -170,3 +170,7 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   equivalent mutant because the projector repeats the invariant. All mutations were restored and
   the Gate B focused suite passed **137/137**. This is local evidence only; L14/L17, Gate B seal,
   debt closure, and strict progress remain unchanged at **12/48 complete | 36 remaining**.
+- 2026-08-31 provider-registry compatibility recheck passed **16/16** and Pyright reported zero
+  diagnostics on the registry/types scope. Ruff retains **38 inherited findings** in legacy
+  `paeos/model_router/types.py`; no clean-static claim is made. This does not close Gate C or
+  alter L14/L17, debt, worker/Court, or **12/48** sealed progress.
