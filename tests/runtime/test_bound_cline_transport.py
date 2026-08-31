@@ -2,17 +2,120 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 from paeos.model_router.types import ModelFamily
 from runtime.integrations.bound_cline_transport import (
     BoundWorkerConfig,
+    TransportFailureKind,
     TransportProtocolError,
+    WorkerDispatchFailure,
+    WorkerDispatchSuccess,
     _validate_binding,
     _validate_paths,
+    dispatch_once,
 )
 from runtime.integrations.bridge_protocol import Disposition, RequestEnvelope
+
+_FAKE_HOST = r"""
+import json
+import struct
+import sys
+import time
+
+def read_frame():
+    header = sys.stdin.buffer.read(4)
+    if len(header) != 4:
+        raise SystemExit(3)
+    size = struct.unpack(">I", header)[0]
+    payload = sys.stdin.buffer.read(size)
+    if len(payload) != size:
+        raise SystemExit(3)
+    return json.loads(payload)
+
+def emit(invocation_id, sequence, message_type, payload, session_id=None):
+    message = {
+        "invocation_id": invocation_id,
+        "payload": payload,
+        "protocol_version": "paeos-worker-admission/1",
+        "sequence": sequence,
+        "type": message_type,
+    }
+    if session_id is not None:
+        message["session_id"] = session_id
+    encoded = json.dumps(message, sort_keys=True, separators=(",", ":")).encode()
+    sys.stdout.buffer.write(struct.pack(">I", len(encoded)) + encoded)
+    sys.stdout.buffer.flush()
+
+start = read_frame()
+invocation_id = start["invocation_id"]
+session_id = start["payload"]["session_id"]
+prompt = start["payload"]["prompt"]
+workspace = start["payload"]["cwd"]
+if "partial_frame" in prompt:
+    sys.stdout.buffer.write(struct.pack(">I", 100) + b"partial")
+    sys.stdout.buffer.flush()
+    time.sleep(10)
+    raise SystemExit(0)
+emit(invocation_id, 0, "hello", {"host": "fake"})
+emit(invocation_id, 1, "session_created", {}, session_id)
+
+def attempt(sequence, turn, correlation):
+    emit(invocation_id, sequence, "provider_attempt_started", {
+        "attempt_ordinal": 1,
+        "correlation_id": correlation,
+        "turn_id": turn,
+    }, session_id)
+    emit(invocation_id, sequence + 1, "provider_attempt_finished", {
+        "attempt_ordinal": 1,
+        "correlation_id": correlation,
+        "status_class": "2xx",
+        "turn_id": turn,
+    }, session_id)
+
+if "duplicate_attempt" in prompt:
+    attempt(2, "turn-1", "a1")
+    attempt(4, "turn-1", "a2")
+    raise SystemExit(0)
+
+attempt(2, "turn-1", "a1")
+if "unknown_tool" in prompt:
+    tool = "read_files"
+    tool_input = {"path": "artifact.txt"}
+elif "command_mismatch" in prompt:
+    tool = "run_commands"
+    tool_input = {"command": "cd /tmp && pytest"}
+else:
+    tool = "editor"
+    tool_input = {"path": workspace + "/artifact.txt", "old_text": "initial", "new_text": "updated"}
+emit(
+    invocation_id,
+    4,
+    "tool_request",
+    {"call_id": "c1", "input": tool_input, "tool_name": tool},
+    session_id,
+)
+read_frame()
+
+if "success" in prompt:
+    attempt(5, "turn-2", "a2")
+    emit(
+        invocation_id,
+        7,
+        "tool_request",
+        {"call_id": "c2", "input": {"command": "true"}, "tool_name": "run_commands"},
+        session_id,
+    )
+    read_frame()
+emit(invocation_id, 8, "terminal", {"result": {"status": "ok"}}, session_id)
+if "post_terminal" in prompt:
+    emit(invocation_id, 9, "hello", {"host": "fake"})
+"""
 
 
 def _request(tmp_path: Path, *, workspace: Path | None = None) -> RequestEnvelope:
@@ -55,7 +158,7 @@ def _config(tmp_path: Path, *, branch_name: str = "codex/recovery") -> BoundWork
         path = package / name
         path.write_text("synthetic", encoding="utf-8")
         files[name] = path
-    policy = package / "policy.json"
+    policy = state_root / "policy.json"
     policy.write_text("{}", encoding="utf-8")
     return BoundWorkerConfig(
         state_root=state_root,
@@ -105,3 +208,78 @@ def test_symlinked_host_and_prompt_are_rejected(tmp_path: Path) -> None:
     request = _request(tmp_path, workspace=config.recovery_worktree / "sandbox")
     with pytest.raises(TransportProtocolError, match="symlink"):
         _validate_paths(request, config, prompt_path=prompt, host_path=link)
+
+
+def _dispatch_fixture(tmp_path: Path, mode: str) -> tuple[Path, Path, BoundWorkerConfig]:
+    config = _config(tmp_path)
+    host = config.host_module
+    host.write_text(_FAKE_HOST, encoding="utf-8")
+    host.chmod(0o700)
+    config = replace(config, node_executable=Path(sys.executable), host_module=host)
+    workspace = config.recovery_worktree / "sandbox"
+    request = _request(tmp_path, workspace=workspace)
+    request_path = config.state_root / "request.json"
+    request_path.write_text(canonical_request(request), encoding="utf-8")
+    prompt_path = config.state_root / "prompt.md"
+    prompt_path.write_text(mode, encoding="utf-8")
+    policy = {
+        "allowed_tools": ["editor", "run_commands"],
+        "artifact_path": "artifact.txt",
+        "request_payload_hash": request.payload_hash,
+        "verification_command": "true",
+        "write_scopes": ["artifact.txt"],
+    }
+    policy_bytes = (json.dumps(policy, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    config.policy_path.write_bytes(policy_bytes)
+    config = replace(config, policy_sha256=hashlib.sha256(policy_bytes).hexdigest())
+    (workspace / "artifact.txt").write_text("initial", encoding="utf-8")
+    return request_path, prompt_path, config
+
+
+def canonical_request(request: RequestEnvelope) -> str:
+    from runtime.integrations.bridge_protocol import canonical_json
+
+    return canonical_json(request) + "\n"
+
+
+def test_dispatch_executes_only_preapproved_editor_and_exact_command(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "success")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchSuccess)
+    assert (config.recovery_worktree / "sandbox" / "artifact.txt").read_text() == "updated"
+    assert len(result.tool_decisions) == 2
+
+
+def test_unknown_tool_is_rejected_before_execution(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "unknown_tool")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.TOOL_DENIED
+
+
+def test_extra_cd_or_separator_is_rejected(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "command_mismatch")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.COMMAND_MISMATCH
+
+
+def test_second_provider_attempt_in_one_turn_is_rejected(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "duplicate_attempt")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.PROVIDER_ATTEMPT_OVERFLOW
+
+
+def test_partial_frame_honors_deadline_and_is_not_success(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "partial_frame")
+    result = dispatch_once(request_path, prompt_path, replace(config, timeout_seconds=0.1))
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.TIMEOUT
+
+
+def test_post_terminal_frame_is_rejected(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "post_terminal")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.PROTOCOL_VIOLATION
