@@ -274,3 +274,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   Google Gemini one-shot as the next eligible decorrelated route. No provider call occurred during
   preflight. Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete |
   36 remaining**, and L14/L17 plus `DEBT-0058`/`DEBT-0060` remain open.
+- 2026-08-31 the fresh Gemini attempt for candidate `b8d6f05` reached the provider once with
+  physical A-08 `gemini != glm`, but returned only the 43-byte fragment
+  `plans/2026-08-31-paeos-seal-reconciliation-`. The report validator rejected the unbound output
+  and quarantined report/receipt/rejection artifacts. No retry or fallback occurred; this remains
+  `BLOCKED_UNQUALIFIABLE`, with Worker/Court **0/1/0** and **0/0/0**, strict progress **12/48**,
+  and no gate or SAKG advancement.

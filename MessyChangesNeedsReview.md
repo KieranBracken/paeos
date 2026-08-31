@@ -611,6 +611,14 @@ for A-08. Google Gemini remains the next eligible non-GLM family. No provider ca
 preflight, and a fresh candidate-bound package must be used for any future one-shot. Canonical
 Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress remains **12/48**.
 
+## 2026-08-31 — Gemini compact-response rejection
+
+The fresh Gemini one-shot for candidate `b8d6f0548f85d12d8368bb97654203ac79e1ae99` reached the
+provider once with physical A-08 `gemini != glm`, but returned only the 43-byte fragment
+`plans/2026-08-31-paeos-seal-reconciliation-`. The validator rejected the unbound report and
+quarantined the report, receipt, and rejection metadata. No retry or fallback occurred. This is
+`BLOCKED_UNQUALIFIABLE`; Worker/Court counts remain **0/1/0** and **0/0/0**, and strict progress
+remains **12/48**.
 
 
 

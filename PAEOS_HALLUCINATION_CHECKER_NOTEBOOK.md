@@ -3614,6 +3614,23 @@ Canonical accounting remains **Worker 0/1/0; Court 0/0/0; strict progress 12/48 
 36 remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. No gate seal, SAKG resumption,
 promotion, or main/trunk mutation is authorized by this attempt.
 
+### Entry 210 — 2026-08-31: Gemini Compact-Response Attempt Rejected as 43-Byte Unbound Fragment
+
+The one-shot Gemini capture for candidate `b8d6f0548f85d12d8368bb97654203ac79e1ae99` and
+evidence bundle `5d8b74bccf163dc157cee18b08675af0f9d372b692c6acf68ded906cbdd0e61f`
+(`l14-l17-b8d6f05-gemini-001`) reached Google once with physical A-08 provenance
+`gemini != glm`, one attempt, and no fallback. The provider response was only 43 bytes:
+`plans/2026-08-31-paeos-seal-reconciliation-`. It omitted the candidate/evidence bindings,
+status, invariant, reproduction, and accounting lines. The validator rejected it with
+`audit report does not bind candidate` and preserved the report, receipt, and rejection metadata.
+
+This is a response-compliance/truncation failure, not a substantive PASS or REMAND. The physical
+receipt itself is not sufficient evidence. No retry of this invocation occurred, no gate advanced,
+and no downstream historical seal was revived. The next attempt, if authorized, must use a fresh
+candidate-bound compact bundle and audit ID; it may increase the completion budget, but must keep
+one-shot/no-fallback semantics. Canonical Worker/Court counts remain **0/1/0** and **0/0/0**;
+strict progress remains **12/48 complete | 36 remaining**.
+
 ### Entry 209 — 2026-08-31: Alternate-Route Preflight After NVIDIA Failure
 
 Read-only model-router inspection after the NVIDIA transport failure found the following local
@@ -3631,4 +3648,3 @@ eligible route, with no fallback and no retry; it must be bound to the freshly r
 candidate/package hashes and still requires a valid physical receipt plus report before any gate
 can advance. Canonical Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress
 remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain OPEN.
-
