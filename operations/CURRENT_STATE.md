@@ -236,7 +236,13 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   **Sealed: 0 | Remanded: 0 | Remediated: 0**, worker **0/1/0**, and strict progress
   **12/48 complete | 36 remaining**. SAKG resumption is held pending fresh Gate G
   revalidation; no provider call, retry, fallback, promotion, or main/trunk mutation occurred.
-
+- 2026-08-31 a fresh current-candidate L14/L17 package was generated locally after the
+  reconciliation and hardening commits. Candidate `58dc64f78ef3a44e1c4d9c28ddcd1be6947f251f`;
+  evidence bundle SHA-256 `b4149b88bdf5b05447fab22b50766dcfc95e14f9cfc22104f5138700cc0433ee`;
+  prompt SHA-256 `cd0a5c7021f16cdee11171517d939e1503dd358dc9136b34f9b06d92e91b3681`; prompt size
+  248,113 bytes (~62k tokens). The package is locally validated and remains unsent pending an
+  explicitly authorized one-shot to a physically decorrelated auditor. Canonical counts remain
+  Court **0/0/0**, worker **0/1/0**, strict progress **12/48 complete | 36 remaining**.
 
 
 
