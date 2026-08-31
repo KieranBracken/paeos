@@ -563,6 +563,13 @@ CAS checkpoints/rotation, descriptor registry, and Codex/Antigravity headless ad
 `DEBT-0061` is REPAID. Strict sealed progress advances to **14/48 complete | 34 remaining**.
 Court counts: `2/0/0`. Gate D is next.
 
+## 2026-08-31 — Gate D sealed via candidate `3e44133` qualified L14/L17 audit
+
+Gate D (Event Watchdog & Safe Recovery) is officially SEALED. Liveness deadlines, pure recovery
+decision engine, forensic storage back-pressure, and deterministic CLI qualified.
+Strict sealed progress advances to **15/48 complete | 33 remaining**. Court counts: `3/0/0`. Gate E is next.
+
+
 
 
 

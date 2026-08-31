@@ -211,6 +211,10 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   ratification of candidate `3e44133b087ce8deffcc53d99677307f578a4b8c` L14/L17 qualified audit.
   DEBT-0061 is REPAID. Strict sealed progress advances to **14/48 complete | 34 remaining**.
   Court counts: `2/0/0`. Gate D is next.
+- 2026-08-31 Gate D (Event Watchdog & Safe Recovery) is officially SEALED. Deterministic monotonic
+  deadlines, pure recovery engine, and forensic storage back-pressure verified. Strict sealed progress
+  advances to **15/48 complete | 33 remaining**. Court counts: `3/0/0`. Gate E is next.
+
 
 
 

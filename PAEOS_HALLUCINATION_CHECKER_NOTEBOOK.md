@@ -3447,6 +3447,23 @@ Following the qualified L14 physical audit capture on candidate `3e44133b087ce8d
 8. **Strict Progress:** Advances to **`14 / 48 complete | 34 remaining`** (52 detailed tasks remain).
 Next authorized program step: Gate D (Event Watchdog & Liveness Recovery).
 
+### Entry 200 — 2026-08-31: Gate D L14/L17 Ratification & Gate D Sealed
+
+Following independent physical audit qualification on candidate `3e44133b087ce8deffcc53d99677307f578a4b8c`
+(report `e44e2ab0...`, receipt `8fa43166...`, `L14_STATUS: PASS`, `A-08 PASS`), Gate D (Event Watchdog & Safe Recovery)
+was ratified and sealed.
+
+1. **Liveness Policy:** Verified monotonic clock evaluation, progress kinds, and deadline hierarchies (`runtime/control_plane/liveness.py`).
+2. **Watchdog Decision Engine:** Verified pure recovery decisions (`WatchdogDecision`, `RecoveryAction`) without state mutation.
+3. **Fenced Recovery Controller:** Verified compare-before-commit ledger head and fence validation (`RecoveryController`).
+4. **Forensic Storage Policy:** Verified back-pressure on new dispatches without deleting raw evidence or logs (`decide_storage`).
+5. **Deterministic CLI:** Verified run-once `ops/control_plane_watchdog.py` and deprecation of legacy GUI monitor.
+6. **Court Accounting:** Court Sealed count advances to **3** (`Sealed: 3 | Remanded: 0 | Remediated: 0`). Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**.
+7. **Gate Disposition:** **`GATE D SEALED`** (Milestones 1–6 complete).
+8. **Strict Progress:** Advances to **`15 / 48 complete | 33 remaining`** (51 detailed tasks remain).
+Next authorized program step: Gate E (Runtime Confinement & Worker Sandbox Hardening).
+
+
 
 
 
