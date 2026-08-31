@@ -403,3 +403,11 @@ no gate, Court count, debt, or SAKG status changes.
   evidence only; current L13/L14/L17, Court/L16, and end-to-end L01-L19 evidence remain absent.
   Strict progress remains **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and
   **0/0/0**; `DEBT-0058`/`DEBT-0060` remain open.
+
+- 2026-08-31 full non-gateway reconciliation: an initial run recorded four SQLite setup errors
+  caused by a disk-full host condition (~77 MiB free), not test assertions. After removing only
+  five disposable pytest sandboxes, the affected coordinator scope passed **7/7** and the fresh
+  full non-gateway suite passed **1,070/1,070** (exit `0`); collect-only reconciliation also totals
+  **1,070**. `tests/model_router/test_gateway_server.py` remains excluded by policy. No code,
+  ledger, provider, or gate state changed; strict progress remains **12/48 complete | 36 remaining**
+  and Worker/Court remain **0/1/0** and **0/0/0**.

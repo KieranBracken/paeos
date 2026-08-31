@@ -10,6 +10,9 @@
 - Existing lifecycle evidence-matrix and Court reconciliation tests: **8/8 passed**, exit `0`.
 - New `ops/revalidate_paeos_lifecycle.py` contract tests: **5/5 passed**, exit `0`.
 - Combined Gate G implementation-focused suite: **13/13 passed**, exit `0`.
+- Fresh non-gateway repository suite after reclaiming disposable pytest sandboxes: **1,070/1,070
+  passed**, exit `0`; the four earlier SQLite `disk I/O error` results were environmental and
+  disappeared after the filesystem was no longer exhausted.
 - Ruff on lifecycle/Court auditor code, the CLI, and all related tests: **0 findings**.
 - Pyright on the same changed-path scope: **0 errors, 0 warnings, 0 informations**.
 - The CLI opens the state-root-bound SQLite ledger in read-only/query-only mode, verifies dense

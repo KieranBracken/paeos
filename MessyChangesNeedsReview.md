@@ -746,6 +746,18 @@ This is implementation evidence only. Historical L01-L19 claims remain remanded;
 L13/L14/L17 or Court/L16 evidence exists. Worker/Court remain **0/1/0** and **0/0/0**, strict
 progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
 
+## 2026-08-31 — Full non-gateway reconciliation after disk recovery
+
+The first full run hit four SQLite setup errors because the host filesystem was exhausted; no
+test assertion failed. Only five disposable pytest sandbox directories (about 136 MiB) were
+removed. The affected coordinator tests passed **7/7**, and a fresh full non-gateway run passed
+**1,070/1,070**, exit `0`; collection also totals **1,070**. The gateway-server fixture remains
+excluded under the restricted loopback policy.
+
+This is reproduction evidence only. It does not advance strict progress (**12/48 complete | 36
+remaining**) or alter Worker/Court counts (**0/1/0**, **0/0/0**); `DEBT-0058` and `DEBT-0060` remain
+open.
+
 ## 2026-08-31 — Gate E current watchdog revalidation
 
 The control-plane, watchdog CLI, and bridge-observer scope passed **125/125** (exit `0`). Ruff

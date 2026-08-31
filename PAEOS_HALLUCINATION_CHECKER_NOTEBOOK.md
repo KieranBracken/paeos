@@ -3857,6 +3857,21 @@ rotation/quota-stop evidence, bootstrap disposition, fresh current-candidate L14
 Court/L16 remain outstanding. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains
 **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
 
+### Entry 224 — 2026-08-31: Full Non-Gateway Reconciliation After Disk Recovery
+
+The first full non-gateway run stopped with four SQLite `disk I/O error` setup failures because
+the filesystem had only about 77 MiB free. Those failures were preserved as environmental output;
+no test assertion failed. Only five disposable pytest sandbox directories created by these runs
+(about 136 MiB total) were removed. The affected coordinator scope then passed **7/7**. A fresh
+full command, `/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q -rA tests
+--ignore=tests/model_router/test_gateway_server.py`, passed **1,070/1,070**, exit `0`. Collection
+reconciliation also totals **1,070**. The gateway-server fixture remains intentionally excluded
+under the restricted loopback policy.
+
+This is mechanical reproduction evidence only; it does not create a Court row or alter strict
+progress. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete |
+36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+
 ### Entry 223 — 2026-08-31: Gate G Current Lifecycle CLI Checkpoint
 
 The lifecycle evidence-matrix and Court-reconciliation tests plus the new read-only lifecycle CLI
