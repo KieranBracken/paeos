@@ -20,20 +20,33 @@ class CourtCounts:
 
 
 def reconcile_court_counts(rows: Sequence[LedgerRow]) -> CourtCounts:
-    sealed = 0
-    remanded = 0
-    remediated = 0
+    claims: dict[str, dict[str, bool]] = {}
 
     for row in rows:
         etype = row.event.kind if hasattr(row, "event") else getattr(row, "event_type", "")
+        payload = (
+            getattr(row.event, "payload", {})
+            if hasattr(row, "event")
+            else getattr(row, "payload", {})
+        )
+        claim_id = payload.get("claim_id")
+        if not isinstance(claim_id, str) or not claim_id:
+            continue
+        state = claims.setdefault(
+            claim_id, {"sealed": False, "remanded": False, "remediated": False}
+        )
         if etype == "COURT_SEALED":
-            sealed += 1
+            state["sealed"] = True
         elif etype == "COURT_REMANDED":
-            remanded += 1
-        elif etype == "COURT_REMEDIATED":
-            remediated += 1
+            state["remanded"] = True
+        elif etype == "COURT_REMEDIATED" and state["remanded"]:
+            state["remediated"] = True
 
-    return CourtCounts(sealed=sealed, remanded=remanded, remediated=remediated)
+    return CourtCounts(
+        sealed=sum(1 for state in claims.values() if state["sealed"]),
+        remanded=sum(1 for state in claims.values() if state["remanded"]),
+        remediated=sum(1 for state in claims.values() if state["remediated"]),
+    )
 
 
 def verify_builder_auditor_receipts(
@@ -54,14 +67,17 @@ def verify_builder_auditor_receipts(
             if "auditor_family" in payload:
                 auditor_family = str(payload["auditor_family"])
 
+    unknown_families = {"unknown", "none"}
     if (
-        builder_family is not None
-        and auditor_family is not None
-        and builder_family == auditor_family
+        not builder_family
+        or not auditor_family
+        or builder_family.lower() in unknown_families
+        or auditor_family.lower() in unknown_families
     ):
+        raise DecorrelationError("missing Builder/Auditor physical identity")
+    if builder_family == auditor_family:
         raise DecorrelationError(
             f"Builder and Auditor share the same family ({builder_family})"
         )
 
-
-    return (builder_family or "unknown", auditor_family or "unknown")
+    return (builder_family, auditor_family)

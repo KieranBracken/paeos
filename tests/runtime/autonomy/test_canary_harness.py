@@ -27,7 +27,11 @@ def test_adjudicate_canary_installed_reached_killed() -> None:
         Event(
             schema_ver=1,
             kind="CANARY_KILLED",
-            payload={"canary_id": "CANARY-001", "observed_failure_code": "FENCE_EXPIRED"},
+            payload={
+                "canary_id": "CANARY-001",
+                "observed_failure_code": "FENCE_EXPIRED",
+                "evidence_ref": "evidence-001",
+            },
         ),
     ]
 
@@ -64,3 +68,60 @@ def test_adjudicate_canary_survived_when_missing_kill() -> None:
     assert result.installed is True
     assert result.reached is True
     assert result.killed is False
+
+
+def test_canary_kill_without_ordered_install_and_reach_is_not_admissible() -> None:
+    from runtime.autonomy.canary import CanaryManifest, adjudicate_canary
+
+    manifest = CanaryManifest(
+        canary_id="CANARY-003",
+        version="1.0",
+        target_hash="t" * 64,
+        mutation_hash="m" * 64,
+        expected_failure_code="FENCE_EXPIRED",
+        installer_hash="i" * 64,
+    )
+
+    events = [
+        Event(
+            schema_ver=1,
+            kind="CANARY_KILLED",
+            payload={
+                "canary_id": "CANARY-003",
+                "observed_failure_code": "FENCE_EXPIRED",
+                "evidence_ref": "evidence-003",
+            },
+        ),
+        Event(schema_ver=1, kind="CANARY_INSTALLED", payload={"canary_id": "CANARY-003"}),
+        Event(schema_ver=1, kind="CANARY_REACHED", payload={"canary_id": "CANARY-003"}),
+    ]
+
+    result = adjudicate_canary(manifest, events)
+
+    assert result.installed is True
+    assert result.reached is True
+    assert result.killed is False
+
+
+def test_canary_requires_nonempty_evidence_reference() -> None:
+    from runtime.autonomy.canary import CanaryManifest, adjudicate_canary
+
+    manifest = CanaryManifest(
+        canary_id="CANARY-004",
+        version="1.0",
+        target_hash="t" * 64,
+        mutation_hash="m" * 64,
+        expected_failure_code="SCOPE_ESCAPE",
+        installer_hash="i" * 64,
+    )
+    events = [
+        Event(schema_ver=1, kind="CANARY_INSTALLED", payload={"canary_id": "CANARY-004"}),
+        Event(schema_ver=1, kind="CANARY_REACHED", payload={"canary_id": "CANARY-004"}),
+        Event(
+            schema_ver=1,
+            kind="CANARY_KILLED",
+            payload={"canary_id": "CANARY-004", "observed_failure_code": "SCOPE_ESCAPE"},
+        ),
+    ]
+
+    assert adjudicate_canary(manifest, events).killed is False

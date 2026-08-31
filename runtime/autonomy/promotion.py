@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
@@ -31,10 +32,19 @@ class PromotionController:
 
     def __init__(self, capability_broker: CapabilityBroker | None = None) -> None:
         self._broker = capability_broker or CapabilityBroker()
+        self._consumed_tokens: set[str] = set()
+        self._lock = threading.Lock()
 
     def promote(
-        self, intent: PromotionIntent, token: CapabilityToken, *, current_seq: int
+        self,
+        intent: PromotionIntent,
+        token: CapabilityToken,
+        *,
+        current_seq: int,
+        current_target_head: str,
     ) -> PromotionReceipt:
+        if current_target_head != intent.expected_target_head:
+            raise PromotionError("target head changed; reconciliation required")
         expected_op = promotion_operation(intent)
         try:
             self._broker.verify(
@@ -49,6 +59,12 @@ class PromotionController:
             )
         except CapabilityError as e:
             raise PromotionError(f"promotion not permitted by capability: {e}") from e
+
+        token_id = hashlib.sha256(token.token.encode("ascii")).hexdigest()
+        with self._lock:
+            if token_id in self._consumed_tokens:
+                raise PromotionError("single-use promotion token already consumed")
+            self._consumed_tokens.add(token_id)
 
         now_iso = datetime.now(UTC).isoformat()
         payload = {

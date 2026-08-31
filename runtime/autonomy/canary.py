@@ -34,6 +34,7 @@ def adjudicate_canary(
     installed = False
     reached = False
     killed = False
+    invalid_sequence = False
     observed_failure_code = None
     evidence_refs: list[str] = []
 
@@ -41,21 +42,37 @@ def adjudicate_canary(
         payload = event.payload or {}
         if payload.get("canary_id") == manifest.canary_id:
             if event.kind == "CANARY_INSTALLED":
-                installed = True
+                if installed or reached or killed:
+                    invalid_sequence = True
+                else:
+                    installed = True
             elif event.kind == "CANARY_REACHED":
-                reached = True
+                if not installed or reached or killed:
+                    invalid_sequence = True
+                else:
+                    reached = True
             elif event.kind == "CANARY_KILLED":
                 observed_code = str(payload.get("observed_failure_code", ""))
-                if observed_code == manifest.expected_failure_code:
+                evidence_ref = payload.get("evidence_ref")
+                if (
+                    not installed
+                    or not reached
+                    or killed
+                    or observed_code != manifest.expected_failure_code
+                    or not isinstance(evidence_ref, str)
+                    or not evidence_ref.strip()
+                ):
+                    invalid_sequence = True
+                else:
                     killed = True
                     observed_failure_code = observed_code
-                evidence_refs.append(str(payload.get("evidence_ref", "")))
+                    evidence_refs.append(evidence_ref)
 
     return CanaryResult(
         canary_id=manifest.canary_id,
         installed=installed,
         reached=reached,
-        killed=killed,
+        killed=killed and not invalid_sequence,
         observed_failure_code=observed_failure_code,
         evidence_refs=tuple(evidence_refs),
     )
