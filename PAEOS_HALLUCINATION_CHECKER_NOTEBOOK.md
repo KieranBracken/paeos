@@ -3839,3 +3839,20 @@ The constitutional review is recorded at
 fresh candidate-bound L14/L17 evidence and Court/L16 disposition remain required before Gate E
 completion credit. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48
 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+
+### Entry 222 — 2026-08-31: Gate F Current Canary Runner Checkpoint
+
+The current recovery lineage revalidated the existing activation, canary, and dormant-promotion
+primitives plus the new no-promotion synthetic runner. The combined focused suite passed **14/14**,
+exit `0` (9 existing autonomy/promotion tests and 5 runner contract tests); Ruff and Pyright are
+clean on the changed-path scope. The runner accepts only verifier-owned JSON inputs under an
+external state root, requires a bounded sandbox directory and task-package hash, preserves raw
+manifest/observation bytes, refuses transaction reuse, and returns `REMAND`/exit `2` for an
+incomplete installed/reached/killed sequence. No provider, credential, browser, clipboard, worker,
+ref-update, or promotion activity occurred.
+
+The constitutional review is recorded at
+`reviews/tasks/PAEOS_GATE_F_CURRENT_REVALIDATION_review.md`. Live end-to-end canaries, supervisor
+rotation/quota-stop evidence, bootstrap disposition, fresh current-candidate L14/L17, and
+Court/L16 remain outstanding. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains
+**12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.

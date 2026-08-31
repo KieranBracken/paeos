@@ -722,6 +722,19 @@ This is implementation evidence only. Platform-capable sandbox proof, fresh inde
 and Court/L16 remain required; Worker/Court remain **0/1/0** and **0/0/0**, strict progress
 remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
 
+## 2026-08-31 — Gate F current canary runner checkpoint
+
+Existing activation/canary/dormant-promotion tests and the new no-promotion synthetic runner
+passed **14/14** (exit `0`); changed-path Ruff and Pyright are clean. The runner is bound to an
+external state root, persists raw verifier inputs exactly once, refuses duplicate canary IDs, and
+returns a nonzero remand for incomplete canary evidence. Review:
+`reviews/tasks/PAEOS_GATE_F_CURRENT_REVALIDATION_review.md`.
+
+This is implementation evidence only. No live canary, rotation, quota-stop, bootstrap,
+current-candidate L14/L17, or Court/L16 evidence exists; Worker/Court remain **0/1/0** and
+**0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060`
+remain open.
+
 ## 2026-08-31 — Gate E current watchdog revalidation
 
 The control-plane, watchdog CLI, and bridge-observer scope passed **125/125** (exit `0`). Ruff

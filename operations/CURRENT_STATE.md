@@ -386,3 +386,12 @@ no gate, Court count, debt, or SAKG status changes.
   test-factory typing correction. This is implementation evidence only. Fresh current-candidate
   L14/L17 and Court/L16 remain outstanding; `DEBT-0058`/`DEBT-0060` remain open, Worker/Court
   remain **0/1/0** and **0/0/0**, and strict progress remains **12/48 complete | 36 remaining**.
+
+- 2026-08-31 Gate F current checkpoint: existing activation/canary/dormant-promotion tests plus
+  the new no-promotion synthetic runner passed **14/14** (exit `0`); changed-path Ruff and
+  Pyright are clean. The runner is external-state-root bound, preserves raw verifier inputs,
+  refuses duplicate canary transactions, and cannot perform provider, browser, clipboard, worker,
+  ref-update, or promotion actions. This is implementation evidence only; live canaries,
+  bootstrap, current-candidate L14/L17, and Court/L16 remain outstanding. Strict progress remains
+  **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and **0/0/0**; `DEBT-0058`/
+  `DEBT-0060` remain open.
