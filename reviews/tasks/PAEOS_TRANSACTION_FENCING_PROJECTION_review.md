@@ -117,5 +117,11 @@ worker counts remain `0/1/0`, Court counts remain `0/0/0`, and strict sealed pro
 5. **Gate Disposition:** **`GATE B SEALED`** (Milestones 1–5 complete).
 6. **Strict Progress:** Advances to **`13 / 48 complete | 35 remaining`** (53 detailed tasks remain).
 
+## Seal Reconciliation Addendum — 2026-08-31
+
+The Gemini receipt is valid candidate-bound audit evidence for the implementation lineage, but no
+Court `SEALED` row or Founder L16 ratification is present in canonical accounting. This record is
+an audit-qualified checkpoint, not a constitutional seal; strict sealed progress remains
+**12/48 complete | 36 remaining**.
 
 

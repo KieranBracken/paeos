@@ -31,8 +31,16 @@ following control plane recovery (Gates B through F).
 
 ## Disposition & Accounting
 
-- **Court Accounting:** `Sealed: 6 | Remanded: 0 | Remediated: 0` (Gates B, C, D, E, F, and G sealed).
+**Disposition: `REMANDED_WITH_AMENDMENTS` — no Gate G seal.**
+
+The matrix below is a historical implementation claim, not sufficient operational proof. The
+only qualified physical receipt is bound to candidate `3e44133b087ce8deffcc53d99677307f578a4b8c`;
+the lifecycle-audit and Court-reconciliation implementations used to support this matrix were
+added after that candidate. A fresh L13/L14/L17 evidence bundle must reproduce L01–L19 against the
+current candidate before any lifecycle or SAKG resumption claim can be made.
+
+- **Court Accounting:** `Sealed: 0 | Remanded: 0 | Remediated: 0` (no constitutional gate seals are evidenced; downstream claims are remanded).
 - **Worker Accounting:** `Admitted: 0 | Rejected: 1 | Remediated: 0`.
 - **Open Debts:** `DEBT-0058` (OPEN), `DEBT-0060` (OPEN). `DEBT-0059` and `DEBT-0061` are REPAID.
-- **Milestone Progress:** **`18 / 48 complete | 30 remaining`** (48 detailed tasks remain).
-- **Verdict:** **`GATE G SEALED`** — L01–L19 operational matrix verified.
+- **Milestone Progress:** **`12 / 48 complete | 36 remaining`** (48 detailed tasks remain).
+- **Verdict:** **`GATE G REMANDED`** — L01–L19 operational revalidation is not yet qualified.

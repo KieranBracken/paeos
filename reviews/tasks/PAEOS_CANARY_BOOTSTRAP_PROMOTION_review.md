@@ -28,3 +28,10 @@
 - **Open Debts:** `DEBT-0058` (OPEN), `DEBT-0060` (OPEN). `DEBT-0059` and `DEBT-0061` are REPAID.
 - **Gate Disposition:** **`GATE F SEALED`** (Milestones 1–6 complete).
 - **Strict Sealed Progress:** **`17 / 48 complete | 31 remaining`** (49 detailed tasks remain).
+
+## Seal Reconciliation Addendum — 2026-08-31
+
+**Disposition: `REMANDED_WITH_AMENDMENTS` — historical Gate F seal withdrawn.** The receipt cited
+by this review is bound to candidate `3e44133b`, before the canary and promotion implementation
+existed. Local canary/promotion tests are implementation evidence only; a fresh candidate-bound
+L13/L14/L17 audit is required before Gate F can be sealed.

@@ -112,3 +112,8 @@ an end-to-end adapter competition probe; no Gate C seal is claimed.
 7. **Gate Disposition:** **`GATE C SEALED`** (Milestones 1–7 complete).
 8. **Strict Progress:** Advances to **`14 / 48 complete | 34 remaining`** (52 detailed tasks remain).
 
+## Seal Reconciliation Addendum — 2026-08-31
+
+The candidate-bound Gemini receipt supports implementation review for this candidate, but no Court
+`SEALED` row or Founder L16 ratification is present. Gate C is an audit-qualified checkpoint, not a
+constitutional seal; strict sealed progress remains **12/48 complete | 36 remaining**.

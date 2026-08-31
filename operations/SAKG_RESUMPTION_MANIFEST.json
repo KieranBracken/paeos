@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "manifest_id": "SAKG-RESUMPTION-2026-08-31",
-  "disposition": "RESUME_WITHIN_VERIFIED_ENVELOPE",
+  "disposition": "HOLD_PENDING_GATE_G_REVALIDATION",
   "verified_envelope": {
     "workflow_type": "TRACE_A",
     "concurrency_limit": 1,
@@ -28,7 +28,7 @@
     "worker_admitted": 0,
     "worker_rejected": 1,
     "worker_remediated": 0,
-    "court_sealed": 6,
+    "court_sealed": 0,
     "court_remanded": 0,
     "court_remediated": 0
   },

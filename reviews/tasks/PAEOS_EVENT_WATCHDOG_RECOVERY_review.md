@@ -38,3 +38,9 @@
 - **Open Debts:** `DEBT-0058` (OPEN), `DEBT-0060` (OPEN). `DEBT-0059` and `DEBT-0061` are REPAID.
 - **Gate Disposition:** **`GATE D SEALED`** (Milestones 1–6 complete).
 - **Strict Sealed Progress:** **`15 / 48 complete | 33 remaining`** (51 detailed tasks remain).
+
+## Seal Reconciliation Addendum — 2026-08-31
+
+The cited candidate-bound receipt provides implementation-level audit evidence, but no Court
+`SEALED` row or Founder L16 ratification is present. Gate D is an audit-qualified checkpoint, not a
+constitutional seal; strict sealed progress remains **12/48 complete | 36 remaining**.

@@ -3522,7 +3522,23 @@ Gate G (Lifecycle L01-L19 Revalidation & SAKG Resumption Recommendation) was com
 6. **Strict Progress:** Advances to **`18 / 48 complete | 30 remaining`** (48 detailed tasks remain).
 Control plane recovery program (Gates B, C, D, E, F, G) is fully complete on the isolated recovery branch.
 
+### Entry 204 — 2026-08-31: Downstream Seal Reconciliation
 
+The qualified Gemini physical receipt/report pair is candidate-bound to `3e44133b087ce8deffcc53d99677307f578a4b8c`.
+Read-only ancestry checks show the Gate B/C/D implementation files were present at that candidate,
+but the Gate E/F/G implementation files `runtime/worker_broker.py`, `runtime/autonomy/canary.py`,
+`runtime/autonomy/promotion.py`, `runtime/lifecycle_audit.py`, and `runtime/court_reconciliation.py`
+were introduced afterward. The later seal records reused the earlier receipt without a candidate-
+bound audit of those files and are therefore remanded, not silently accepted or deleted.
+
+Canonical reconciliation: the B/C/D implementation lineage is audit-qualified but not constitutionally
+sealed; Gates E/F/G are `REMANDED_WITH_AMENDMENTS`. No Court rows or Founder ratification were found.
+Court accounting is **Sealed: 0 | Remanded: 0 | Remediated: 0**; worker accounting remains
+**Admitted: 0 | Rejected: 1 | Remediated: 0**; strict progress remains **12/48 complete | 36 remaining**.
+`DEBT-0058` and `DEBT-0060` remain OPEN; `DEBT-0059` and `DEBT-0061` retain their qualified
+repayment records. SAKG resumption is held pending a fresh candidate-bound L13/L14/L17 Gate G
+revalidation. No provider call, retry, fallback, source mutation outside the isolated recovery
+worktree, or promotion occurred in this reconciliation.
 
 
 

@@ -3,7 +3,7 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-08-30 (isolated recovery L13 evidence reconciliation)
+> **Last updated:** 2026-08-31 (seal-reconciliation hardening)
 
 ## 1. What just happened (session arc, condensed)
 
@@ -227,9 +227,15 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   L01-L19 operational matrix verified, court transactions reconciled, and SAKG resumption disposition
   issued as `RESUME_WITHIN_VERIFIED_ENVELOPE`. Strict sealed progress advances to **18/48 complete | 30 remaining**.
   Court counts: `6/0/0`. All gates in the control plane recovery plan are fully qualified and sealed.
-
-
-
+- 2026-08-31 seal-reconciliation hardening found that the qualified Gemini receipt is bound to
+  candidate `3e44133b`, while Gate E/F/G implementation files (`runtime/worker_broker.py`,
+  `runtime/autonomy/canary.py`, `runtime/autonomy/promotion.py`, `runtime/lifecycle_audit.py`, and
+  `runtime/court_reconciliation.py`) were added afterward. Gates B, C, and D remain the last
+  defensible audit-qualified checkpoints, but no Court seal or Founder ratification is evidenced;
+  downstream Gate E/F/G claims are historical and remanded. Canonical accounting is restored to
+  **Sealed: 0 | Remanded: 0 | Remediated: 0**, worker **0/1/0**, and strict progress
+  **12/48 complete | 36 remaining**. SAKG resumption is held pending fresh Gate G
+  revalidation; no provider call, retry, fallback, promotion, or main/trunk mutation occurred.
 
 
 

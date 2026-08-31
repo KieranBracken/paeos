@@ -30,5 +30,13 @@
 - **Court Accounting:** `Sealed: 4 | Remanded: 0 | Remediated: 0` (Gates B, C, D, and E sealed).
 - **Worker Accounting:** `Admitted: 0 | Rejected: 1 | Remediated: 0`.
 - **Open Debts:** `DEBT-0058` (OPEN), `DEBT-0060` (OPEN). `DEBT-0059` and `DEBT-0061` are REPAID.
+
 - **Gate Disposition:** **`GATE E SEALED`** (Milestones 1–7 complete).
 - **Strict Sealed Progress:** **`16 / 48 complete | 32 remaining`** (50 detailed tasks remain).
+
+## Seal Reconciliation Addendum — 2026-08-31
+
+**Disposition: `REMANDED_WITH_AMENDMENTS` — historical Gate E seal withdrawn.** The qualified
+receipt is bound to candidate `3e44133b`; this Gate E implementation was added after that
+candidate and is not covered by the receipt. Preserve the implementation and local tests, but
+obtain a fresh candidate-bound L14/L17 audit before counting Gate E or advancing to Gate F.
