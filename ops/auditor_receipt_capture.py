@@ -15,10 +15,12 @@ import re
 import sys
 from pathlib import Path
 
+from paeos.model_router.audit_prompt import validate_substantive_audit_prompt
 from paeos.model_router.auditor_receipt import (
     AuditorCaptureResult,
     AuditorReceiptContract,
     AuditorReceiptError,
+    adjudicate_auditor_artifact_pair,
     bind_auditor_report,
     capture_auditor_interaction,
     persist_auditor_receipt,
@@ -32,6 +34,7 @@ from paeos.model_router.types import (
     DataClass,
     LogicalModel,
     ModelFamily,
+    RetryPolicy,
     TaskClass,
     TaskRequest,
 )
@@ -129,6 +132,7 @@ def run(argv: list[str] | None = None) -> int:
         if not args.report_path.is_absolute():
             raise AuditorReceiptError("--report-path must be absolute")
         prompt = prompt_file.read_text(encoding="utf-8")
+        validate_substantive_audit_prompt(prompt, args.candidate_sha, args.evidence_sha)
         request = TaskRequest(
             messages=[
                 {
@@ -147,6 +151,8 @@ def run(argv: list[str] | None = None) -> int:
             builder_family=ModelFamily.GLM,
             max_tokens=args.max_tokens,
             temperature=0.0,
+            retry_policy=RetryPolicy.NONE,
+            allow_fallback=False,
         )
         contract = AuditorReceiptContract(
             audit_id=args.audit_id,
@@ -174,6 +180,9 @@ def run(argv: list[str] | None = None) -> int:
             raise
         persist_auditor_report(interaction.response_content, args.report_path)
         persist_auditor_receipt(receipt, args.receipt_path)
+        adjudication = adjudicate_auditor_artifact_pair(
+            args.receipt_path, args.report_path, contract, router.catalog
+        )
     except AuditorReceiptError as error:
         print(f"AUDITOR_RECEIPT_REJECTED:{error}", file=sys.stderr)
         return 2
@@ -194,6 +203,9 @@ def run(argv: list[str] | None = None) -> int:
                 "actual_model": receipt.actual_model_id,
                 "actual_family": receipt.actual_family.value,
                 "provider_attempt_count": receipt.provider_attempt_count,
+                "report_status": adjudication.report_status.value,
+                "a08_verdict": adjudication.a08_verdict,
+                "qualified": adjudication.qualified,
             },
             sort_keys=True,
         )

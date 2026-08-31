@@ -10,12 +10,15 @@ from types import SimpleNamespace
 
 import ops.auditor_receipt_capture as cli
 import pytest
+from paeos.model_router.audit_prompt import build_substantive_audit_prompt
 from paeos.model_router.auditor_receipt import (
     AUDITOR_RECEIPT_SCHEMA,
+    AuditorArtifactAdjudication,
+    AuditorReportStatus,
     PhysicalAuditorReceipt,
     load_auditor_receipt,
 )
-from paeos.model_router.types import ModelFamily, ProviderId
+from paeos.model_router.types import ModelFamily, ProviderId, RetryPolicy, TaskRequest
 
 _CANDIDATE = "adf76c61972554f71f2c863b3113f07d19dd1a52"
 _EVIDENCE = "e" * 64
@@ -74,11 +77,18 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
 ) -> None:
     prompt_path = tmp_path / "prompt.md"
     prompt_path.write_text(
-        f"Audit candidate { _CANDIDATE } with evidence {_EVIDENCE}.", encoding="utf-8"
+        build_substantive_audit_prompt(
+            candidate_sha=_CANDIDATE,
+            evidence_sha256=_EVIDENCE,
+            evidence_content="sealed evidence",
+            worker_counts=(0, 1, 0),
+            court_counts=(0, 0, 0),
+        ),
+        encoding="utf-8",
     )
     receipt_path = tmp_path / "receipt.json"
     report_path = tmp_path / "report.md"
-    calls: list[tuple[object, object, object]] = []
+    calls: list[tuple[object, object, TaskRequest]] = []
     receipt = SimpleNamespace(
         receipt_sha256="r" * 64,
         actual_provider_id=ProviderId.GOOGLE,
@@ -104,7 +114,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
     )
     interaction = SimpleNamespace(receipt=receipt, response_content=report)
 
-    def fake_capture(router: object, contract: object, request: object) -> object:
+    def fake_capture(router: object, contract: object, request: TaskRequest) -> object:
         calls.append((router, contract, request))
         return interaction
 
@@ -135,6 +145,15 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
     monkeypatch.setattr(cli, "capture_auditor_interaction", fake_capture)
     monkeypatch.setattr(cli, "bind_auditor_report", fake_bind)
     monkeypatch.setattr(cli, "validate_auditor_receipt", fake_validate)
+    monkeypatch.setattr(
+        cli,
+        "adjudicate_auditor_artifact_pair",
+        lambda receipt_path, report_path, contract, catalog: AuditorArtifactAdjudication(
+            report_status=AuditorReportStatus.BLOCKED_UNQUALIFIABLE,
+            a08_verdict="PASS",
+            qualified=False,
+        ),
+    )
     monkeypatch.setattr(cli, "persist_auditor_report", fake_persist_report)
     monkeypatch.setattr(cli, "persist_auditor_receipt", fake_persist)
 
@@ -163,6 +182,46 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
     assert "audit result" not in output.out
     assert output.err == ""
     assert len(calls) == 1
+    request = calls[0][2]
+    assert request.retry_policy is RetryPolicy.NONE
+    assert request.allow_fallback is False
+    assert json.loads(output.out)["qualified"] is False
+
+
+def test_invalid_phase_prompt_fails_before_router_construction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    prompt_path = tmp_path / "prompt.md"
+    prompt_path.write_text("review /private/tmp/bundle; receipt required", encoding="utf-8")
+    constructed = False
+
+    def forbidden_router() -> object:
+        nonlocal constructed
+        constructed = True
+        pytest.fail("router constructed")
+
+    monkeypatch.setattr(cli, "ModelRouter", forbidden_router)
+
+    assert (
+        cli.run(
+            [
+                "--audit-id",
+                "audit-1",
+                "--candidate-sha",
+                _CANDIDATE,
+                "--evidence-sha",
+                _EVIDENCE,
+                "--prompt-file",
+                str(prompt_path),
+                "--report-path",
+                str(tmp_path / "report.md"),
+                "--receipt-path",
+                str(tmp_path / "receipt.json"),
+            ]
+        )
+        == 2
+    )
+    assert constructed is False
 
 
 def test_run_rejects_prompt_symlink(tmp_path: Path) -> None:
@@ -197,7 +256,14 @@ def test_run_quarantines_invalid_provider_report_with_exact_reason(
 ) -> None:
     prompt_path = tmp_path / "prompt.md"
     prompt_path.write_text(
-        f"Audit candidate {_CANDIDATE} with evidence {_EVIDENCE}.", encoding="utf-8"
+        build_substantive_audit_prompt(
+            candidate_sha=_CANDIDATE,
+            evidence_sha256=_EVIDENCE,
+            evidence_content="sealed evidence",
+            worker_counts=(0, 1, 0),
+            court_counts=(0, 0, 0),
+        ),
+        encoding="utf-8",
     )
     report_path = tmp_path / "report.md"
     receipt_path = tmp_path / "receipt.json"
