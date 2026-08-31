@@ -42,8 +42,16 @@ passed the entire non-gateway suite, so the first failure is classified as a tim
 probe flake under the test's 15-second SDK timeout, not silently discarded.
 
 The gateway-server suite was excluded because it binds a loopback socket that is denied in this
-restricted verifier environment. This exclusion is explicit; it is not converted to a pass. A
-separate elevated-loopback run remains the appropriate evidence for those four tests.
+restricted verifier environment. A direct current-candidate run recorded **4 setup errors** (all
+`PermissionError: [Errno 1] Operation not permitted` while binding `127.0.0.1:4098`), exit code `1`:
+
+- log: `/private/tmp/l13-9e0c2bd-gateway-restricted.log`, 11,533 bytes,
+  SHA-256 `cdcb83bf8cf57877ffa2cd023e4ae7ae7bdfa8c170fd8a9aa58f2b8b73506b46`
+- exit record: `/private/tmp/l13-9e0c2bd-gateway-restricted.exit`, contents `1`,
+  SHA-256 `4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865`
+
+This exclusion is explicit and is not converted to a pass. A separate elevated-loopback run
+remains the appropriate evidence for those four tests.
 
 ## L13 boundary
 

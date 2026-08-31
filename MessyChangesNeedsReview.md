@@ -661,4 +661,12 @@ SAKG. Combined with the qualified source-focused L14/A-08 evidence, it is ready 
 Court/L16 reconciliation. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains
 **12/48 complete | 36 remaining**; `DEBT-0058`/`DEBT-0060` remain open.
 
+## 2026-08-31 — Restricted gateway fixture result
+
+The direct current-candidate gateway-server run recorded four fixture-setup errors while binding
+`127.0.0.1:4098` (`PermissionError: [Errno 1] Operation not permitted`), exit `1`. Log SHA-256:
+`cdcb83bf8cf57877ffa2cd023e4ae7ae7bdfa8c170fd8a9aa58f2b8b73506b46`; exit record SHA-256:
+`4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865` (contents `1`). The four
+errors are not converted to passes; an elevated-loopback run is still required for gateway
+evidence. Non-gateway L13 remains **1,058/1,058**, with no accounting or gate advancement.
 

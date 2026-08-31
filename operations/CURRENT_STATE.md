@@ -321,3 +321,12 @@ result is L13 mechanical reproduction only. With the qualified L14/A-08 pair now
 next step is explicit Court/L16 reconciliation; no seal or SAKG resumption is implied. Worker/Court
 remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and
 `DEBT-0058`/`DEBT-0060` remain open.
+
+## 2026-08-31 — Restricted gateway fixture result
+
+The exact candidate's four gateway-server tests were run separately and failed during setup while
+binding `127.0.0.1:4098` (`PermissionError: [Errno 1] Operation not permitted`), exit `1`. Raw
+log SHA-256 is `cdcb83bf8cf57877ffa2cd023e4ae7ae7bdfa8c170fd8a9aa58f2b8b73506b46`; exit record
+contents `1`, SHA-256 `4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865`.
+This remains an explicit environment limitation. Non-gateway reproduction is **1,058/1,058**;
+no gate, Court count, debt, or SAKG status changes.

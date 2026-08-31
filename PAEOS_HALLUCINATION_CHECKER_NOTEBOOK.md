@@ -3707,3 +3707,15 @@ worker admission, create Court rows, seal a gate, or resume SAKG. Together with 
 the L13/L14 evidence pair available for explicit Court/L16 reconciliation. Worker/Court counts
 remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and
 `DEBT-0058`/`DEBT-0060` remain open.
+
+### Entry 214 — 2026-08-31: Gateway Fixture Boundary Reproduced
+
+The exact current candidate's excluded gateway suite was run separately in the detached verifier.
+All four tests failed during fixture setup with `PermissionError: [Errno 1] Operation not
+permitted` binding `127.0.0.1:4098`; exit code `1`. Raw log is
+`/private/tmp/l13-9e0c2bd-gateway-restricted.log` (SHA-256
+`cdcb83bf8cf57877ffa2cd023e4ae7ae7bdfa8c170fd8a9aa58f2b8b73506b46`), and exit record is
+`/private/tmp/l13-9e0c2bd-gateway-restricted.exit` (contents `1`, SHA-256
+`4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865`). This is an environment
+limitation, not a pass or a source defect. The non-gateway L13 reproduction remains **1,058/1,058**;
+Worker/Court counts and strict progress remain unchanged.
