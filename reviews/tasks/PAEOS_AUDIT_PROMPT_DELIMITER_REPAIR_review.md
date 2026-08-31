@@ -3,7 +3,7 @@
 ## Candidate
 
 - Branch: `codex/control-plane-recovery-s1-clean-recovered`
-- Candidate commit: pending documentation commit
+- Candidate commit: `a3dcf9b2e98061ddebe7072897261bd6377f711f`
 - Scope: `paeos/model_router/audit_prompt.py` and its regression tests
 
 ## Finding and repair
@@ -37,3 +37,7 @@ promotion, or external transmission occurred. Existing blocked Gemini results ar
 Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
 **Sealed: 0 | Remanded: 0 | Remediated: 0**; strict progress remains **12/48 complete | 36
 remaining**.
+
+The regenerated current bundle is bound to this candidate: evidence SHA-256
+`af2f1dff0627db847ff190cad2de0b800b3267278afc0fbda2097261657fd3bc`; prompt SHA-256
+`892d911f14dea82e6bbfadea6fb4501ed0ddef17ef61588b8bd057b66a168092`.

@@ -501,6 +501,14 @@ control-plane/bridge/ledger verification passed **137/137**. No source mutation 
 external/provider activity occurred. This is implementation evidence only: L14/L17, Gate B seal,
 debt closure, and strict **12/48** progress are unchanged.
 
+## 2026-08-31 — Rebound audit package to current candidate
+
+The first locally prepared package was discarded as stale after commit `a3dcf9b` changed the
+candidate. A fresh self-contained bundle and prompt were generated and validator/secret-scanned
+against the exact new HEAD: bundle SHA `af2f1dff0627db847ff190cad2de0b800b3267278afc0fbda2097261657fd3bc`,
+prompt SHA `892d911f14dea82e6bbfadea6fb4501ed0ddef17ef61588b8bd057b66a168092`. No external call or
+retry occurred; L14/L17, gate seals, debt status, and strict **12/48** progress are unchanged.
+
 ## 2026-08-31 — Embedded-audit delimiter repair and local bundle preparation
 
 The self-contained audit prompt validator was repaired after a local bundle exposed false duplicate

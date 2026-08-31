@@ -3347,3 +3347,17 @@ This remains implementation evidence only. No external activity occurred; the pr
 remains `BLOCKED_UNQUALIFIABLE`, worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**,
 Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**, all four debts remain **OPEN**,
 and strict progress remains **12/48 complete | 36 remaining**.
+
+### Entry 195 — 2026-08-31: Current Bundle Rebound to `a3dcf9b`
+
+After the delimiter repair was committed, the previously prepared bundle was correctly treated as
+stale because it was bound to the pre-repair candidate. A new local bundle/prompt pair was generated
+and validated against candidate `a3dcf9b2e98061ddebe7072897261bd6377f711f` with no provider call:
+bundle SHA-256 `af2f1dff0627db847ff190cad2de0b800b3267278afc0fbda2097261657fd3bc` (1,061,250 bytes),
+prompt SHA-256 `892d911f14dea82e6bbfadea6fb4501ed0ddef17ef61588b8bd057b66a168092` (1,062,665 bytes).
+The secret scan passed after credential-shaped fixture redaction. This pair is prepared only and
+has not been transmitted.
+
+Counts and disposition are unchanged: the prior Gemini audit remains `BLOCKED_UNQUALIFIABLE`,
+worker **0/1/0**, Court **0/0/0**, all four debts **OPEN**, and strict progress **12/48 complete |
+36 remaining**.

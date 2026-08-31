@@ -183,3 +183,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   diagnostics on the registry/types scope. Ruff retains **38 inherited findings** in legacy
   `paeos/model_router/types.py`; no clean-static claim is made. This does not close Gate C or
   alter L14/L17, debt, worker/Court, or **12/48** sealed progress.
+- 2026-08-31 the local audit package was regenerated after commit `a3dcf9b` so its candidate
+  binding is current. Bundle SHA-256 is
+  `af2f1dff0627db847ff190cad2de0b800b3267278afc0fbda2097261657fd3bc`; prompt SHA-256 is
+  `892d911f14dea82e6bbfadea6fb4501ed0ddef17ef61588b8bd057b66a168092`. Secret scanning passed;
+  no provider call or transmission occurred. L14/L17, debts, worker/Court counts, and **12/48**
+  progress remain unchanged.
