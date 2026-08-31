@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
-# cline_wrapper.sh — Run Cline/DeepSeek and capture all output to a log file
-#                    so the ChatGPT bridge can monitor it.
+# cline_wrapper.sh — Historical output capture helper for Cline/DeepSeek.
+#                    It is not a transport or control-plane component.
 #
 # Usage:
 #   chmod +x cline_wrapper.sh
@@ -10,7 +10,7 @@
 # This wrapper:
 #   1. Captures all Cline stdout/stderr to cline_output.log (with timestamps)
 #   2. Displays output in the terminal as normal (using `tee`)
-#   3. Works with the bridge.py watcher
+#   3. Does not transmit, paste, or authorize any response
 # =============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,8 +22,8 @@ echo "[wrapper] Logging Cline output to: $LOG_FILE"
 echo "[wrapper] Start time: $(date)"
 echo "---" >> "$LOG_FILE"
 
-# If Cline writes to a specific log, just symlink or tail that instead.
-# Otherwise, run cline with tee:
+# If Cline writes to a specific log, just archive or inspect that instead.
+# Otherwise, run a worker command with tee:
 # Replace "cline ..." with your actual Cline launch command.
 
 # ── Option A: If you launch Cline via npm/npx ─────────────────────────────

@@ -691,3 +691,22 @@ Targeted Ruff passed with no findings, and targeted Pyright reported `0 errors, 
 0 informations`. This is local implementation/readiness evidence only; it does not create a
 Court/L16 disposition, close `DEBT-0058` or `DEBT-0060`, or authorize a live canary. No source,
 ledger, provider, credential, gate, or SAKG state changed.
+
+## 2026-08-31 — Legacy GUI bridge retired (DEBT-0060 checkpoint)
+
+The historical `ops/chatgpt_bridge/bridge.py` browser/clipboard loop and its two launch helpers
+were the remaining unbound control path behind the sluggish copy/paste behavior. In the approved
+isolated recovery worktree they were replaced with deterministic fail-closed entrypoints that
+return status `2` before argument handling or any external side effect. `cline_wrapper.sh` and its
+README now explicitly describe output capture/history only, not transport or authorization.
+
+The new regression test first failed against the old argparse behavior (RED), then passed with the
+replacement. Focused control-plane checks passed **23/23**; the full non-gateway suite passed
+**1,060/1,060**, exit `0`; changed Ruff and Pyright are clean; direct probes of all three retired
+entrypoints returned `2`. No provider, credential, browser, clipboard, terminal, ledger, or
+promotion activity occurred. Review: `reviews/tasks/PAEOS_LEGACY_GUI_BRIDGE_RETIREMENT_review.md`.
+
+This is implementation evidence only. `DEBT-0060` remains open until a coordinator-backed
+liveness/recovery transaction is independently reproduced and admitted by Court. Worker/Court
+remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**; SAKG
+remains held. The isolated worktree is the only modified target; `main`/`trunk` were untouched.

@@ -3756,3 +3756,24 @@ errors, 0 warnings, 0 informations**. No provider or credential activity occurre
 This is implementation/readiness evidence only. It does not create a Court/L16 row, close
 `DEBT-0058` or `DEBT-0060`, authorize a live canary, or advance the strict count. Worker/Court
 remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**.
+
+### Entry 217 — 2026-08-31: Legacy GUI Bridge Retired at the Control-Plane Boundary
+
+The historical `ops/chatgpt_bridge/bridge.py` loop was confirmed as an unsafe and sluggish
+control-plane path: it drove browser debugging, polled for up to 180 seconds, and pasted into the
+frontmost terminal without transaction binding. Under the explicitly authorized isolated recovery
+exception, the Python entrypoint and its two launch helpers now fail closed with exit status `2`
+before any argument handling, network, process, clipboard, or terminal side effect.
+`cline_wrapper.sh` and the README are explicitly marked as output-capture/history only.
+
+TDD RED reproduced the old `bridge.py --help` success; GREEN verification passed **23/23** focused
+tests and **1,060/1,060** non-gateway tests (exit `0`). Changed Python Ruff and Pyright are clean;
+direct probes of all three retired entrypoints returned `2`. No provider, credential, browser, or
+clipboard activity occurred. The mandatory L17 review is recorded at
+`reviews/tasks/PAEOS_LEGACY_GUI_BRIDGE_RETIREMENT_review.md`.
+
+This is a DEBT-0060 remediation checkpoint, not a Court/L16 disposition or gate seal. The debt
+remains open until a coordinator-backed liveness/recovery transaction is independently reproduced.
+Canonical accounting remains Worker **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; strict progress **12/48 complete | 36 remaining**.
+SAKG remains held pending fresh candidate-bound L13/L14/L16 reconciliation.

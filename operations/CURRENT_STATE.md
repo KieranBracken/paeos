@@ -3,7 +3,7 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-08-31 (seal-reconciliation hardening)
+> **Last updated:** 2026-08-31 (legacy GUI bridge retirement checkpoint)
 
 ## 1. What just happened (session arc, condensed)
 
@@ -345,3 +345,13 @@ no gate, Court count, debt, or SAKG status changes.
   implementation evidence only. No Court/L16 row exists, so `DEBT-0058`/`DEBT-0060` remain open,
   Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36
   remaining**, and no live canary, gate seal, or SAKG resumption is authorized.
+
+- 2026-08-31 the historical GUI/CDP/clipboard bridge was retired in the approved isolated
+  recovery worktree. `ops/chatgpt_bridge/bridge.py`, `cron_bridge.sh`, and
+  `launch_chrome_debug.sh` now exit `2` before any external side effect; the wrapper and README
+  identify themselves as historical output capture only. TDD focused checks passed **23/23** and
+  the full non-gateway suite passed **1,060/1,060** (exit `0`); changed Ruff/Pyright are clean.
+  This materially mitigates `DEBT-0060` but does not close it: a coordinator-backed liveness and
+  recovery transaction still needs independent reproduction and Court admission. No provider,
+  credential, browser, clipboard, ledger, gate, or SAKG state changed. Strict progress remains
+  **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and **0/0/0**.
