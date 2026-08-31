@@ -134,9 +134,9 @@ class TaskRequest:
     stream: bool = False
     max_tokens: Optional[int] = None
     temperature: float = 0.7
+    metadata: Dict[str, Any] = field(default_factory=dict)
     retry_policy: RetryPolicy = RetryPolicy.SINGLE_RATE_LIMIT
     allow_fallback: bool = True
-    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass

@@ -103,6 +103,29 @@ def test_logical_model_paeos_strong(mock_router):
     assert resp.model_id == "gemini-3.6-flash"
 
 
+def test_task_request_preserves_legacy_positional_metadata() -> None:
+    request = TaskRequest(
+        [{"role": "user", "content": "legacy"}],
+        TaskClass.ROUTINE,
+        DataClass.PUBLIC,
+        None,
+        None,
+        None,
+        False,
+        False,
+        None,
+        None,
+        False,
+        None,
+        0.1,
+        {"legacy": True},
+    )
+
+    assert request.metadata == {"legacy": True}
+    assert request.retry_policy is RetryPolicy.SINGLE_RATE_LIMIT
+    assert request.allow_fallback is True
+
+
 def test_explicit_physical_model_selection(mock_router):
     """Requesting an explicit physical model strictly selects that model."""
     router, transport = mock_router
