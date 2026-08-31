@@ -111,6 +111,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--report-path", required=True, type=Path)
     parser.add_argument("--receipt-path", required=True, type=Path)
     parser.add_argument("--max-tokens", type=int, default=512)
+    parser.add_argument("--auditor-model")
     args = parser.parse_args(argv)
     if not args.audit_id or any(character.isspace() for character in args.audit_id):
         parser.error("--audit-id must be non-empty and contain no whitespace")
@@ -120,6 +121,10 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--evidence-sha must be a lowercase 64-character SHA-256")
     if args.max_tokens <= 0:
         parser.error("--max-tokens must be positive")
+    if args.auditor_model is not None and (
+        not args.auditor_model or any(character.isspace() for character in args.auditor_model)
+    ):
+        parser.error("--auditor-model must be non-empty and contain no whitespace")
     return args
 
 
@@ -152,6 +157,7 @@ def run(argv: list[str] | None = None) -> int:
             task_class=TaskClass.AUDIT,
             data_class=DataClass.INTERNAL,
             logical_model=LogicalModel.PAEOS_AUDIT,
+            explicit_model=args.auditor_model,
             builder_family=ModelFamily.GLM,
             max_tokens=args.max_tokens,
             temperature=0.0,

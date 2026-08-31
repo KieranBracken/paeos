@@ -172,6 +172,8 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
                 str(report_path),
                 "--receipt-path",
                 str(receipt_path),
+                "--auditor-model",
+                "meta/llama-3.1-8b-instruct",
             ]
         )
         == 0
@@ -185,6 +187,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
     request = calls[0][2]
     assert request.retry_policy is RetryPolicy.NONE
     assert request.allow_fallback is False
+    assert request.explicit_model == "meta/llama-3.1-8b-instruct"
     assert request.max_tokens == 512
     system_content = request.messages[0]["content"]
     assert "first six non-blank lines" in system_content
