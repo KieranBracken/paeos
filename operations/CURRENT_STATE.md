@@ -196,4 +196,11 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   Router observation `1053` recorded the failure; no report or receipt was generated. L14/L17 status
   remains `BLOCKED_UNQUALIFIABLE`. All four recovery debts remain OPEN; worker/Court counts remain
   `0/1/0` and `0/0/0`; strict progress remains `12/48 complete | 36 remaining`. Gate B is not closed.
+- 2026-08-31 Candidate `cf64b920d13f7087842810dc39fb4425efae91c2` Gate B Task 5.3 physical audit capture
+  (`l14-l17-cf64b92-antigravity-001`) was executed against Google Gemini (`gemini-3.6-flash`). Router
+  observation `1054` recorded transport completion, but the provider response was truncated (233 bytes)
+  and omitted candidate binding. The validator failed closed with `audit report does not bind candidate`,
+  and rejected artifacts were quarantined. L14/L17 status remains `BLOCKED_UNQUALIFIABLE`. Worker/Court
+  counts remain `0/1/0` and `0/0/0`; all debts remain OPEN; strict progress remains `12/48 complete`.
+
 

@@ -3381,3 +3381,26 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 `DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
 Gate B Task 5.4/5.5, Gate B closure, Gate C advancement, production dispatch, and SAKG resumption remain unauthorized.
 
+### Entry 197 — 2026-08-31: Candidate `cf64b92` Physical Audit Captured and Quarantined on Report Truncation
+
+A compact, candidate-bound evidence bundle (630,238 bytes, ~157,913 tokens) was generated locally for candidate
+`cf64b920d13f7087842810dc39fb4425efae91c2` (evidence SHA-256 `9f4632eda3e98364c689fb81a941614e480688159e81c2362acf42d57a453e06`,
+prompt SHA-256 `267ec333c3a268a24eaf459c13677138a0101edf3074b96d375f12655534fcb9`).
+One-shot physical capture (`l14-l17-cf64b92-antigravity-001`) was dispatched to Google Gemini (`gemini-3.6-flash`).
+
+Router observation `1054` recorded transport success (191,343 prompt tokens, 80 completion tokens, single attempt,
+no fallback, physical A-08 `gemini != glm`). However, the returned provider response was truncated (233 bytes) and
+did not include the required candidate binding lines, status, or invariant markers.
+
+The post-capture validator failed closed with `AuditorReceiptError: audit report does not bind candidate`.
+The rejection quarantine machinery preserved three byte-exact artifacts:
+- Report: `/private/tmp/paeos-l14-l17-report-cf64b92.md.rejected` (SHA-256 `1a9a272df8a7047335860b735545269c1a111b414ccd62f7a8eab3b0b5137e2f`)
+- Receipt: `/private/tmp/paeos-l14-l17-receipt-cf64b92.json.rejected` (SHA-256 `8fe8266fb9ce5b34187bd747ecffb3942762d8fc2030c75c231929317cd9ba43`)
+- Rejection: `/private/tmp/paeos-l14-l17-receipt-cf64b92.json.rejection.json`
+
+Disposition: **`BLOCKED_UNQUALIFIABLE`** (truncated auditor response quarantined; report failed candidate-binding validation).
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
+all four debts (`DEBT-0058` through `DEBT-0061`) remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
+Gate B Tasks 5.4/5.5, Gate B seal, Gate C advancement, production dispatch, and SAKG resumption remain unauthorized.
+
+

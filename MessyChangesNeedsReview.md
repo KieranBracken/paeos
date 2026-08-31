@@ -540,3 +540,12 @@ with no fallback. No receipt or report artifact was created on disk. L14/L17 sta
 Gate B Tasks 5.4/5.5 remain pending; debts `DEBT-0058` through `DEBT-0061` remain OPEN; worker/Court counts
 remain 0/1/0 and 0/0/0; strict sealed progress remains 12/48 complete.
 
+## 2026-08-31 — Candidate `cf64b92` physical audit captured and quarantined on report truncation
+
+Physical audit capture for candidate `cf64b920d13f7087842810dc39fb4425efae91c2` (evidence bundle `9f4632eda3e98364c689fb81a941614e480688159e81c2362acf42d57a453e06`)
+was executed against Google Gemini (`gemini-3.6-flash`). Observation `1054` recorded transport completion, but the provider
+response was truncated to 233 bytes, omitting required candidate binding lines. The validator failed closed with
+`audit report does not bind candidate`, and rejected artifacts were quarantined. L14/L17 status remains BLOCKED_UNQUALIFIABLE;
+all debts remain OPEN; worker/Court counts remain 0/1/0 and 0/0/0; strict progress remains 12/48 complete.
+
+

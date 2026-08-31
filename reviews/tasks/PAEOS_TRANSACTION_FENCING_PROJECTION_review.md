@@ -78,3 +78,22 @@ are not completed, Gate B remains unsealed, all four recovery debts remain OPEN,
 `Admitted: 0 | Rejected: 1 | Remediated: 0`, Court counts remain `Sealed: 0 | Remanded: 0 | Remediated: 0`,
 and strict sealed progress remains `12/48 complete | 36 remaining`.
 
+## Candidate `cf64b92` Audit Capture & Quarantine — 2026-08-31
+
+Candidate commit: `cf64b920d13f7087842810dc39fb4425efae91c2`  
+Evidence bundle SHA-256: `9f4632eda3e98364c689fb81a941614e480688159e81c2362acf42d57a453e06`  
+Prompt file: `/private/tmp/paeos-l14-l17-prompt-current.md` (SHA-256 `267ec333c3a268a24eaf459c13677138a0101edf3074b96d375f12655534fcb9`)  
+Audit invocation ID: `l14-l17-cf64b92-antigravity-001`  
+Target provider/model: `google:gemini-3.6-flash` (Gemini family, A-08 decorrelation)  
+
+Result: **`BLOCKED_UNQUALIFIABLE`**
+
+The one-shot physical capture completed transport (Router observation `1054`, 191,343 prompt tokens, 80 completion tokens).
+The provider returned a truncated response (233 bytes) omitting required candidate binding lines. Post-capture validator
+failed closed (`audit report does not bind candidate`). Rejected artifacts were quarantined at
+`/private/tmp/paeos-l14-l17-report-cf64b92.md.rejected` and `/private/tmp/paeos-l14-l17-receipt-cf64b92.json.rejected`.
+
+Gate B Tasks 5.4/5.5 remain uncompleted, Gate B remains unsealed, debts `DEBT-0058` through `DEBT-0061` remain OPEN,
+worker counts remain `0/1/0`, Court counts remain `0/0/0`, and strict sealed progress remains `12/48 complete | 36 remaining`.
+
+
