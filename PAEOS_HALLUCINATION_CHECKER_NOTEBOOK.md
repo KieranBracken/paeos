@@ -3280,3 +3280,18 @@ This evidence is local implementation reproduction, not independent L14/L17 adju
 Task 5 and Gate C canary/audit gates remain open; worker counts remain **Admitted: 0 | Rejected: 1 |
 Remediated: 0**, Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**, all recovery
 debts remain **OPEN**, and strict progress remains **12/48 complete | 36 remaining**.
+
+### Entry 191 — 2026-08-31: Router Request Compatibility Correction
+
+The two-phase audit repair exposed one compatibility risk: adding the new retry/fallback fields
+before the legacy `TaskRequest.metadata` field would have changed positional-constructor meaning.
+Commit `a2c781d` moves the new fields after `metadata` and adds a regression test proving legacy
+positional metadata remains intact while typed defaults stay `SINGLE_RATE_LIMIT` and fallback
+enabled.
+
+The corrected candidate passes **46/46** focused router/prompt/receipt/CLI tests and **1,023/1,023**
+complete non-gateway tests (exit `0`). Critical Ruff checks and Pyright remain clean; no provider,
+credential, browser, clipboard, AppleScript, terminal-paste, retry, fallback, or promotion was
+invoked. This is a local compatibility correction, not gate evidence: the prior Gemini result
+remains `BLOCKED_UNQUALIFIABLE`, worker/Court counts remain **0/1/0** and **0/0/0**, all four debts
+remain **OPEN**, and strict progress remains **12/48 complete | 36 remaining**.

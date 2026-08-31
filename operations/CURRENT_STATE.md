@@ -157,3 +157,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   Ruff findings**. No external/provider activity occurred. L14/L17, Gate B Task 5, and Gate C
   canary evidence remain open; counts stay **0/1/0** and **0/0/0**, and strict progress stays
   **12/48 complete | 36 remaining**.
+- 2026-08-31 commit `a2c781d` preserves positional `TaskRequest.metadata` compatibility after
+  adding typed retry/fallback controls. The focused repair suite passes **46/46** and the complete
+  non-gateway suite passes **1,023/1,023**; critical Ruff/Pyright checks are clean. This remains
+  implementation evidence only: L14/L17, Gate B Task 5, and Gate C canary evidence are open;
+  counts remain **0/1/0** and **0/0/0**, all debts remain open, and strict progress remains
+  **12/48 complete | 36 remaining**.

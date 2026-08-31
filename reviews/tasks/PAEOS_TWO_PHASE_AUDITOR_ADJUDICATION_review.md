@@ -2,8 +2,8 @@
 
 **Review class:** local implementation review only  
 **Candidate branch:** `codex/control-plane-recovery-s1-clean-recovered`  
-**Commits reviewed:** `1ef08b2`, `cd8fc05`, `9bfc31f`, `851218d`  
-**Disposition:** `IMPLEMENTATION_REVIEW_ONLY`  
+**Commits reviewed:** `1ef08b2`, `cd8fc05`, `9bfc31f`, `851218d`, `a2c781d`
+**Disposition:** `IMPLEMENTATION_REVIEW_ONLY`
 **L14/L17 status:** not established; fresh physically captured non-GLM evidence remains required
 
 ## Falsification dimensions
@@ -28,12 +28,14 @@
    substantive `PASS` plus A-08 `PASS` qualifies.
 10. **Authority boundary:** the adjudication object has no Court, seal, gate, ratification,
     promotion, or main/trunk mutation method.
+11. **Compatibility:** the new request controls follow the legacy `metadata` field, preserving
+    positional `TaskRequest` callers while retaining typed defaults.
 
 ## Verification record
 
-- Focused router/prompt/receipt/CLI tests: **45 passed, 0 failed**.
+- Focused router/prompt/receipt/CLI tests: **46 passed, 0 failed**.
 - Complete non-gateway suite (gateway server excluded by the established constraint):
-  **1,022 passed, 0 failed**, exit `0`.
+  **1,023 passed, 0 failed**, exit `0`.
 - Changed-path Ruff: clean.
 - Changed-path Pyright: `0 errors, 0 warnings, 0 informations`.
 - `git diff --check`: clean.

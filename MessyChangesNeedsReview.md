@@ -480,3 +480,11 @@ supervisor-only Ruff/Pyright checks were clean; broader `runtime/integrations` R
 inherited findings**. No provider, credential, GUI, clipboard, terminal-paste, retry, fallback, or
 promotion activity occurred. This does not satisfy L14/L17 or seal a gate; counts remain `0/1/0`
 and `0/0/0`, all debts remain open, and strict progress remains `12/48 complete | 36 remaining`.
+
+## 2026-08-31 — Router positional-compatibility correction
+
+Commit `a2c781d` moves the typed retry/fallback controls after the legacy `TaskRequest.metadata`
+field and adds a regression test for positional callers. The corrected focused suite passed
+**46/46** and the complete non-gateway suite passed **1,023/1,023**; critical Ruff/Pyright checks
+were clean. No external activity or promotion occurred. This does not change worker/Court counts,
+debt status, L14/L17 disposition, or strict progress (**12/48 complete | 36 remaining**).
