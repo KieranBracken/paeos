@@ -78,6 +78,11 @@ files, starts at most one worker process, and returns without creating Court or 
 The response writer is private to the module. Success and failure results both carry the immutable
 request ID and transaction key; only success may create the correlated response file.
 
+**Normative execution order:** implement and verify Task 1, then Task 2, then return to the
+downstream Task 3, Task 4, and Task 5 sections below. The downstream sections are grouped before
+the foundational sections in this document only to keep their persistence, CLI, and review details
+together; their numeric order is authoritative.
+
 ---
 
 ### Task 3: Persist Correlated Responses, Quarantine Failures, and Write Handoffs
