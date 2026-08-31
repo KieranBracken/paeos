@@ -710,3 +710,15 @@ This is implementation evidence only. `DEBT-0060` remains open until a coordinat
 liveness/recovery transaction is independently reproduced and admitted by Court. Worker/Court
 remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**; SAKG
 remains held. The isolated worktree is the only modified target; `main`/`trunk` were untouched.
+
+## 2026-08-31 — Gate C current revalidation checkpoint
+
+At candidate `f546eb1`, the provider-registry and headless-supervisor suites passed **69/69**
+without provider or credential activity; Pyright reported **0 diagnostics**. Ruff reports **81
+inherited findings** in the legacy model-router/supervisor scope, so no repository-wide static
+clean claim is made. The mandatory review is
+`reviews/tasks/PAEOS_GATE_C_CURRENT_REVALIDATION_review.md`.
+
+This is implementation evidence only. No current-candidate L14/L17 receipt or Court/L16 row
+exists, so Gate C remains unsealed; Worker/Court remain **0/1/0** and **0/0/0**, strict progress
+remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.

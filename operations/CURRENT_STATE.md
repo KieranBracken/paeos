@@ -365,3 +365,11 @@ no gate, Court count, debt, or SAKG status changes.
   because this exact internal bundle/destination needs explicit outbound authorization. No workaround,
   retry, or fallback occurred. L14/L17, Court/L16, `DEBT-0058`, and `DEBT-0060` remain open; no
   gate seal or SAKG resumption is authorized.
+
+- 2026-08-31 Gate C current revalidation at `f546eb1`: provider-registry and headless-supervisor
+  suites passed **69/69** without provider or credential activity; Pyright reported **0
+  diagnostics**. Ruff reports **81 inherited findings** in the legacy model-router/supervisor
+  scope, so no clean repository-wide static claim is made. Review is recorded at
+  `reviews/tasks/PAEOS_GATE_C_CURRENT_REVALIDATION_review.md`. This remains implementation
+  evidence only: no current-candidate L14/L17 receipt or Court/L16 row exists. `DEBT-0058` and
+  `DEBT-0060` remain open; strict progress remains **12/48 complete | 36 remaining**.
