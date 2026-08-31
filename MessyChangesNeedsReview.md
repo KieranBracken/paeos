@@ -683,3 +683,11 @@ Founder-disposition rows; `reconcile_court_counts` returns `0/0/0` for each. Exa
 Focused `tests/runtime/test_court_reconciliation.py` and `tests/runtime/test_lifecycle_audit.py`
 passed **8/8**. The notebook records this as Entry 215. A transient SQLite WAL/SHM removal caused
 by inspection was repaired from `HEAD`; the worktree is clean.
+
+## 2026-08-31 — Gate F/DEBT-0060 readiness evidence
+
+The exact candidate's detached control-plane and autonomy suites passed **92/92** (exit `0`).
+Targeted Ruff passed with no findings, and targeted Pyright reported `0 errors, 0 warnings,
+0 informations`. This is local implementation/readiness evidence only; it does not create a
+Court/L16 disposition, close `DEBT-0058` or `DEBT-0060`, or authorize a live canary. No source,
+ledger, provider, credential, gate, or SAKG state changed.

@@ -76,3 +76,17 @@ and update the strict count from the verified ledger facts.
 Opening the tracked SQLite copies for inspection caused SQLite to remove their companion WAL/SHM
 files. The four files were restored byte-for-byte from `HEAD`; no ledger database content was
 changed, and the recovery worktree is clean.
+
+## Readiness evidence collected after reconciliation
+
+The exact candidate was rechecked in detached verifier worktree
+`/private/tmp/paeos-l13-9e0c2bd` without provider or credential activity:
+
+- `tests/runtime/control_plane` + `tests/runtime/autonomy`: **92/92 passed**, exit `0`.
+- Targeted Ruff for control-plane, autonomy, worker, lifecycle, and reconciliation paths:
+  **All checks passed**, exit `0`.
+- Targeted Pyright for the same paths: **0 errors, 0 warnings, 0 informations**, exit `0`.
+
+This is implementation/readiness evidence for the Gate F/DEBT-0060 boundary. It does not replace
+the missing Court/L16 disposition, close `DEBT-0058` or `DEBT-0060`, or authorize a canary,
+promotion, gate seal, or SAKG resumption.

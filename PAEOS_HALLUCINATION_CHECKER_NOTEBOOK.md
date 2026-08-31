@@ -3745,3 +3745,14 @@ Worker accounting remains **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court r
 remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. The next valid action is a canonical
 candidate-bound Court/L16 transaction followed by the Founder disposition; no gate or SAKG
 resumption is authorized by this reconciliation.
+
+### Entry 216 — 2026-08-31: Gate F/DEBT-0060 Readiness Evidence
+
+At the exact candidate `9e0c2bd`, the detached verifier ran the control-plane and autonomy test
+sets: **92/92 passed**, exit `0`. Targeted Ruff over control-plane, autonomy, worker, lifecycle,
+and Court-reconciliation paths reported **All checks passed**; targeted Pyright reported **0
+errors, 0 warnings, 0 informations**. No provider or credential activity occurred.
+
+This is implementation/readiness evidence only. It does not create a Court/L16 row, close
+`DEBT-0058` or `DEBT-0060`, authorize a live canary, or advance the strict count. Worker/Court
+remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**.
