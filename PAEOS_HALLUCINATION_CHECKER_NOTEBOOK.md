@@ -3559,6 +3559,23 @@ Remediated: 0** and strict progress remains **12/48 complete | 36 remaining**. N
 retry, fallback, browser/clipboard automation, or promotion occurred; external audit transmission
 remains a separate one-shot authorization step.
 
+### Entry 206 — 2026-08-31: Auditor Response-Format Hardening
+
+The one-shot audit for candidate `58dc64f` returned a physically captured Gemini receipt with
+`A-08 PASS`, but the 384-byte report was a truncated narrative and omitted the candidate/evidence
+binding lines. The validator correctly persisted the raw report, receipt, and rejection metadata
+and returned `BLOCKED_UNQUALIFIABLE`; the invocation was not retried.
+
+The recovery branch then added a regression-checked response contract: the system instruction
+requires the first six non-blank response lines to contain the candidate, evidence, status,
+invariant, reproduction, and accounting fields, and the CLI default completion budget is 512
+tokens. Capture/model-router checks pass **50/50**; Ruff/Pyright are clean.
+
+A fresh unsent package is bound to candidate `2cd3b68ee54b79f56ab83cf0d34f0632846859f5`:
+bundle `b5476885425429b6ec68e5c9a3eb742e486e95a74e35656104f36411c1c3bfa4`, prompt
+`afc73d9b74ddf2a3496f003083e1151335ef99bbfe9a779400fa5db50a890e72`. Canonical accounting remains
+**Worker 0/1/0; Court 0/0/0; strict progress 12/48**. No provider call, retry, fallback, or
+promotion occurred.
 
 
 

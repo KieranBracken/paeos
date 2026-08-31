@@ -243,7 +243,15 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   248,113 bytes (~62k tokens). The package is locally validated and remains unsent pending an
   explicitly authorized one-shot to a physically decorrelated auditor. Canonical counts remain
   Court **0/0/0**, worker **0/1/0**, strict progress **12/48 complete | 36 remaining**.
-
+- 2026-08-31 the rejected Gemini response exposed a model-output compliance gap (truncated
+  narrative before required bindings), not a provenance failure. The capture CLI now requires the
+  binding/accounting lines first and defaults to a bounded **512-token** completion; its focused
+  capture/model-router checks pass **50/50**, with Ruff and Pyright clean. A fresh package was then
+  generated for candidate `2cd3b68ee54b79f56ab83cf0d34f0632846859f5`: evidence SHA-256
+  `b5476885425429b6ec68e5c9a3eb742e486e95a74e35656104f36411c1c3bfa4`, prompt SHA-256
+  `afc73d9b74ddf2a3496f003083e1151335ef99bbfe9a779400fa5db50a890e72`, prompt bytes `254410`.
+  No provider call or retry occurred after the rejection; the new package is unsent and awaits a
+  separately authorized one-shot.
 
 
 
