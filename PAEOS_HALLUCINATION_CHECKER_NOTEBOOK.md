@@ -3665,3 +3665,25 @@ eligible route, with no fallback and no retry; it must be bound to the freshly r
 candidate/package hashes and still requires a valid physical receipt plus report before any gate
 can advance. Canonical Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress
 remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain OPEN.
+
+### Entry 212 — 2026-08-31: Source-Focused Gemini L14/L17 Audit Qualified
+
+The fresh one-shot source-focused audit for candidate
+`9e0c2bdfd6a80523bf176bc719843c611430b218` completed successfully through Google Gemini
+(`gemini-3.6-flash`, family `gemini`) with exactly one provider attempt and no fallback. The
+builder is recorded as `cline-pass` / `z-ai/glm-5.3-flash` / family `glm`; physical A-08
+decorrelation is `PASS` (`gemini != glm`).
+
+The report `/private/tmp/paeos-l14-l17-report-9e0c2bd.md` is bound to evidence bundle SHA-256
+`0f4039b70a176430834eab9c6b972ac89db67fb9702737d1a8a44d133e078060` and has SHA-256
+`43bdb17df1aa0a2b6aac595d56035537291504035e0b64badbf43aee603915ae`. The physical receipt
+`/private/tmp/paeos-l14-l17-receipt-9e0c2bd.json` has canonical receipt SHA-256
+`a88a0ca660bccc07efe68f8d333e1fd3f92aec5b9f978843693be11c4e94e2c3` and report binding equal to
+the report hash. Local validators returned report `PASS`, A-08 `PASS`, and pair `qualified=True`.
+
+The audit is qualified evidence for the exact candidate and source-focused scope; it does not
+create a Court row, seal a gate, ratify promotion, or resume SAKG. Current focused reproduction is
+**272 passed, 0 failed**. Canonical accounting remains Worker **0/1/0**, Court **0/0/0**, strict
+progress **12/48 complete | 36 remaining**. `DEBT-0058` and `DEBT-0060` remain open; prior
+negative/truncated provider attempts remain preserved and are not erased. Next work is the
+committed L17 record plus fresh L13/Court reconciliation before any gate advancement.

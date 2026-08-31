@@ -629,6 +629,23 @@ the structured disposition. The validator rejected and quarantined the artifacts
 fallback occurred. This remains `BLOCKED_UNQUALIFIABLE`, Worker/Court **0/1/0** and **0/0/0**,
 strict progress **12/48**.
 
+## 2026-08-31 — Candidate `9e0c2bd` source-focused L14/L17 audit qualified
+
+The fresh source-focused one-shot reached Google Gemini once with no fallback and produced a
+complete candidate-bound report/receipt pair. Candidate:
+`9e0c2bdfd6a80523bf176bc719843c611430b218`; evidence SHA-256:
+`0f4039b70a176430834eab9c6b972ac89db67fb9702737d1a8a44d133e078060`; report SHA-256:
+`43bdb17df1aa0a2b6aac595d56035537291504035e0b64badbf43aee603915ae`; canonical receipt SHA-256:
+`a88a0ca660bccc07efe68f8d333e1fd3f92aec5b9f978843693be11c4e94e2c3`. Auditor provenance is
+Google `gemini-3.6-flash` / `gemini`; builder provenance is Cline `z-ai/glm-5.3-flash` / `glm`;
+A-08 is `PASS`. Local validators returned report `PASS`, receipt A-08 `PASS`, and pair
+`qualified=True`.
+
+The review is recorded at
+`reviews/tasks/PAEOS_L14_L17_9E0C2BD_GEMINI_SOURCE_review.md`. This evidence is not a Court seal,
+Founder ratification, gate closure, or SAKG resumption. Worker/Court remain **0/1/0** and
+**0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060`
+remain open. Next is fresh L13 reproduction and explicit Court/L16 reconciliation.
 
 
 

@@ -287,3 +287,22 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   channel; this remains `BLOCKED_UNQUALIFIABLE` with no retry/fallback. Worker/Court remain
   **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and no gate
   or SAKG advancement occurred.
+
+## 2026-08-31 — Candidate `9e0c2bd` source-focused L14/L17 audit qualified
+
+The fresh one-shot source-focused audit for candidate
+`9e0c2bdfd6a80523bf176bc719843c611430b218` completed through Google Gemini
+(`gemini-3.6-flash`, family `gemini`) with one provider attempt and no fallback. The builder is
+`cline-pass` / `z-ai/glm-5.3-flash` / family `glm`; physical A-08 decorrelation is `PASS`.
+The report is bound to evidence SHA-256
+`0f4039b70a176430834eab9c6b972ac89db67fb9702737d1a8a44d133e078060` and report SHA-256
+`43bdb17df1aa0a2b6aac595d56035537291504035e0b64badbf43aee603915ae`; the receipt's canonical
+SHA-256 is `a88a0ca660bccc07efe68f8d333e1fd3f92aec5b9f978843693be11c4e94e2c3` and its report
+binding matches. Local report/receipt validators and conjunctive pair adjudication returned
+`PASS`, `PASS`, and `qualified=True` respectively.
+
+This is qualified L14/A-08 evidence for the exact candidate and source-focused scope, not a Court
+seal or Founder ratification. Current focused reproduction is **272 passed, 0 failed**. Canonical
+accounting remains Worker **0/1/0**, Court **0/0/0**, strict progress **12/48 complete | 36
+remaining**. `DEBT-0058` and `DEBT-0060` remain open; SAKG remains held pending fresh L13/L17/Court
+reconciliation.
