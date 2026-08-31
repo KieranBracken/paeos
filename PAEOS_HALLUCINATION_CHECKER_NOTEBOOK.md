@@ -3489,6 +3489,25 @@ focused unit/integration tests and discriminative mutation proofs, and is offici
 10. **Strict Progress:** Advances to **`16 / 48 complete | 32 remaining`** (50 detailed tasks remain).
 Next authorized program step: Gate F (Canary Bootstrap & Promotion Ladder).
 
+### Entry 202 — 2026-08-31: Gate F Canary Bootstrap & Promotion Ladder Sealed
+
+Gate F (Canary Bootstrap & Promotion Ladder) implementation was verified across unit tests
+and mutation assertions, and is officially sealed.
+
+1. **Evidence-Derived Activation:** `evaluate_activation()` derives activation stages solely from
+   ledger events (`ROUTE_PROBE_ADMITTED`, `TRACE_A_CANARY_PASSED`, etc.) without trusting model claims
+   (`runtime/autonomy/activation.py`).
+2. **Canary Adjudication:** `adjudicate_canary()` requires all three facts: `installed`, `reached`,
+   and `killed` with exact failure reason code match (`runtime/autonomy/canary.py`).
+3. **Dormant Exact-Ref Promotion:** `PromotionController` enforces single-use capability token validation
+   before executing ref updates (`runtime/autonomy/promotion.py`).
+4. **Court Accounting:** Court Sealed count advances to **5** (`Sealed: 5 | Remanded: 0 | Remediated: 0`).
+   Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**.
+5. **Gate Disposition:** **`GATE F SEALED`** (Milestones 1–6 complete).
+6. **Strict Progress:** Advances to **`17 / 48 complete | 31 remaining`** (49 detailed tasks remain).
+Next authorized program step: Gate G (Lifecycle L01-L19 Revalidation & SAKG Resumption Recommendation).
+
+
 
 
 

@@ -219,6 +219,11 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   typed worker broker, OS sandbox confinement, and isolated verification proof views verified.
   Strict sealed progress advances to **16/48 complete | 32 remaining**. Court counts: `4/0/0`.
   Gate F is next.
+- 2026-08-31 Gate F (Canary Bootstrap & Promotion Ladder) is officially SEALED. Correlated activation
+  derivation, canary fault-injection harness, and dormant single-use exact-ref promotion controller
+  verified. Strict sealed progress advances to **17/48 complete | 31 remaining**. Court counts: `5/0/0`.
+  Gate G is next.
+
 
 
 
