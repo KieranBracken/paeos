@@ -589,6 +589,18 @@ L01-L19 operational matrix verified, court transactions reconciled, and SAKG res
 issued as `RESUME_WITHIN_VERIFIED_ENVELOPE`. Strict sealed progress advances to **18/48 complete | 30 remaining**.
 Court counts: `6/0/0`. Control plane recovery program (Gates B through G) is fully qualified and sealed.
 
+## 2026-08-31 — NVIDIA alternate auditor transport failure observability
+
+The one-shot L14/L17 route for candidate `b7e27611c522109dfab2556a9b943f1dd99bc300` using
+`meta/llama-3.1-8b-instruct` exited `2` with `AUDITOR_RECEIPT_FAILED:NormalizedError` before
+creating a report or receipt. No retry or fallback occurred; the cause is intentionally not
+classified beyond the surfaced transport failure because no provider status/body was retained.
+The isolated recovery branch now emits a private create-only `receipt.json.transport-failure.json`
+artifact on future `NormalizedError` paths. It records hashes and redacted error metadata plus an
+optional raw-response digest, never raw provider content. Added regression coverage verifies
+candidate/evidence binding, credential redaction, file mode `0600`, and unchanged no-retry behavior.
+Focused capture/router tests pass **23/23**; changed-path Ruff/Pyright and `git diff --check` are
+clean. Canonical counts remain Worker **0/1/0**, Court **0/0/0**, strict progress **12/48**.
 
 
 

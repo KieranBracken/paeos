@@ -3591,5 +3591,27 @@ bundle `ca78d9d75341b0afbba7b0a627494b63a06e7bd823eb9663fe19e89fd6c02465`, promp
 Canonical accounting remains **Worker 0/1/0; Court 0/0/0; strict progress 12/48**. A different
 physical provider/model must be verified by its receipt; transport completion alone is not proof.
 
+### Entry 208 — 2026-08-31: NVIDIA Alternate Auditor Route Failed Before Receipt Serialization
+
+The authorized one-shot alternate L14/L17 capture for candidate
+`b7e27611c522109dfab2556a9b943f1dd99bc300` (evidence bundle SHA-256
+`ca78d9d75341b0afbba7b0a627494b63a06e7bd823eb9663fe19e89fd6c02465`) targeted the explicit
+non-GLM route `meta/llama-3.1-8b-instruct`. Invocation
+`l14-l17-b7e2761-nvidia-llama-001` exited `2` with the surfaced error
+`AUDITOR_RECEIPT_FAILED:NormalizedError`. No report or physical receipt was created, so
+physical provenance and A-08 decorrelation are **unqualifiable**; no L14/L17 disposition was
+issued and no gate advanced. The command used `RetryPolicy.NONE` and `allow_fallback=false`,
+and no retry or fallback occurred.
+
+The failure did not expose a provider HTTP status, normalized error class, or raw body in the
+detached report. It is therefore recorded only as a transport/endpoint failure; authentication,
+quota, and model-availability causes remain unresolved rather than guessed. A control-plane
+hardening change now writes a private create-only `*.transport-failure.json` artifact for future
+`NormalizedError` failures. The artifact records candidate/evidence/request hashes and redacted
+error metadata plus an optional raw-body digest, never the raw body or credentials.
+
+Canonical accounting remains **Worker 0/1/0; Court 0/0/0; strict progress 12/48 complete |
+36 remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. No gate seal, SAKG resumption,
+promotion, or main/trunk mutation is authorized by this attempt.
 
 

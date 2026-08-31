@@ -34,6 +34,7 @@ from paeos.model_router.types import (
     DataClass,
     LogicalModel,
     ModelFamily,
+    NormalizedError,
     RetryPolicy,
     TaskClass,
     TaskRequest,
@@ -43,6 +44,12 @@ _SHA40 = re.compile(r"^[0-9a-f]{40}$")
 _SHA64 = re.compile(r"^[0-9a-f]{64}$")
 _MAX_PROMPT_BYTES = 4 * 1024 * 1024
 _REJECTION_SCHEMA = "paeos.auditor-rejection/1"
+_TRANSPORT_FAILURE_SCHEMA = "paeos.auditor-transport-failure/1"
+_BEARER_SECRET_RE = re.compile(r"(?i)\bBearer\s+[^\s,;]+")
+_ASSIGNED_SECRET_RE = re.compile(
+    r"(?i)(\b(?:api[_ -]?key|authorization|secret|token)\b\s*[:=]\s*)(?!Bearer\b)[^\s,;]+"
+)
+_KEYLIKE_SECRET_RE = re.compile(r"(?i)\b(?:sk|key|token)-[A-Za-z0-9_-]{8,}\b")
 
 
 def _absolute_regular_file(path: Path, label: str) -> Path:
@@ -70,6 +77,51 @@ def _write_once_private_json(path: Path, payload: dict[str, object]) -> Path:
     finally:
         os.close(descriptor)
     return path
+
+
+def _redact_secret_text(value: str) -> str:
+    """Remove credential-shaped values before diagnostic text leaves the process."""
+
+    redacted = _BEARER_SECRET_RE.sub("Bearer <REDACTED>", value)
+    redacted = _ASSIGNED_SECRET_RE.sub(r"\1<REDACTED>", redacted)
+    return _KEYLIKE_SECRET_RE.sub("<REDACTED>", redacted)
+
+
+def _persist_transport_failure(
+    error: NormalizedError,
+    contract: AuditorReceiptContract,
+    receipt_path: Path,
+) -> Path:
+    """Persist content-free normalized transport evidence exactly once.
+
+    Provider response bodies are intentionally not written: they may contain credentials or
+    account metadata.  A digest is retained when a body existed so a later forensic capture can
+    prove whether the raw payload changed without exposing it in the repository or quarantine.
+    """
+
+    failure_path = receipt_path.with_name(f"{receipt_path.name}.transport-failure.json")
+    raw_response = error.raw_response or ""
+    provider_id = getattr(error.provider_id, "value", None)
+    _write_once_private_json(
+        failure_path,
+        {
+            "audit_id": contract.audit_id,
+            "candidate_sha256": contract.candidate_sha256,
+            "evidence_bundle_sha256": contract.evidence_bundle_sha256,
+            "error_type": error.error_type.value,
+            "provider_id": provider_id,
+            "model_id": error.model_id,
+            "http_status": error.http_status,
+            "retry_after": error.retry_after,
+            "message": _redact_secret_text(error.message),
+            "raw_response_sha256": hashlib.sha256(raw_response.encode("utf-8")).hexdigest()
+            if raw_response
+            else None,
+            "review_scope_sha256": contract.review_scope_sha256,
+            "schema": _TRANSPORT_FAILURE_SCHEMA,
+        },
+    )
+    return failure_path
 
 
 def _persist_rejected_interaction(
@@ -130,6 +182,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def run(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
+    contract: AuditorReceiptContract | None = None
     try:
         prompt_file = _absolute_regular_file(args.prompt_file, "--prompt-file")
         if not args.receipt_path.is_absolute():
@@ -195,6 +248,20 @@ def run(argv: list[str] | None = None) -> int:
         )
     except AuditorReceiptError as error:
         print(f"AUDITOR_RECEIPT_REJECTED:{error}", file=sys.stderr)
+        return 2
+    except NormalizedError as error:
+        failure_path: Path | None = None
+        if contract is not None:
+            try:
+                failure_path = _persist_transport_failure(error, contract, args.receipt_path)
+            except (AuditorReceiptError, OSError) as write_error:
+                print(
+                    f"AUDITOR_RECEIPT_FAILURE_ARTIFACT_ERROR:{type(write_error).__name__}",
+                    file=sys.stderr,
+                )
+        print(f"AUDITOR_RECEIPT_FAILED:{_redact_secret_text(str(error))}", file=sys.stderr)
+        if failure_path is not None:
+            print(f"AUDITOR_RECEIPT_FAILURE_ARTIFACT:{failure_path}", file=sys.stderr)
         return 2
     except OSError as error:
         print(f"AUDITOR_RECEIPT_IO_ERROR:{type(error).__name__}", file=sys.stderr)

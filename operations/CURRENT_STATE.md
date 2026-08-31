@@ -260,5 +260,12 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   `c84e61086f29d18bf8d05d9fa9588cd60dbbcc9877b2796d3c331272d095542d`, prompt bytes `259626`.
   The package is unsent. Candidate alternatives must be checked for live availability and exact
   physical receipt; no gate seal or SAKG resumption is authorized by transport success alone.
-
+- 2026-08-31 the alternate NVIDIA L14/L17 route for candidate `b7e2761` (`meta/llama-3.1-8b-instruct`)
+  exited `2` with the surfaced `AUDITOR_RECEIPT_FAILED:NormalizedError` before receipt or report
+  serialization. No provider status or raw body was exposed, so the cause is recorded as an
+  unresolved transport/endpoint failure rather than guessed. No retry or fallback occurred.
+  A create-only private transport-failure artifact is now emitted for future normalized failures,
+  with redacted metadata and an optional raw-body digest but no raw response. Focused capture and
+  router tests pass; canonical Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress
+  remains **12/48 complete | 36 remaining**, and L14/L17 plus `DEBT-0058`/`DEBT-0060` remain open.
 

@@ -18,7 +18,14 @@ from paeos.model_router.auditor_receipt import (
     PhysicalAuditorReceipt,
     load_auditor_receipt,
 )
-from paeos.model_router.types import ModelFamily, ProviderId, RetryPolicy, TaskRequest
+from paeos.model_router.types import (
+    ModelFamily,
+    NormalizedError,
+    NormalizedErrorType,
+    ProviderId,
+    RetryPolicy,
+    TaskRequest,
+)
 
 _CANDIDATE = "adf76c61972554f71f2c863b3113f07d19dd1a52"
 _EVIDENCE = "e" * 64
@@ -256,6 +263,86 @@ def test_run_rejects_prompt_symlink(tmp_path: Path) -> None:
         )
         == 2
     )
+
+
+def test_run_preserves_normalized_transport_failure_without_raw_response(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    prompt_path = tmp_path / "prompt.md"
+    prompt_path.write_text(
+        build_substantive_audit_prompt(
+            candidate_sha=_CANDIDATE,
+            evidence_sha256=_EVIDENCE,
+            evidence_content="sealed evidence",
+            worker_counts=(0, 1, 0),
+            court_counts=(0, 0, 0),
+        ),
+        encoding="utf-8",
+    )
+    receipt_path = tmp_path / "receipt.json"
+    report_path = tmp_path / "report.md"
+    transport_error = NormalizedError(
+        error_type=NormalizedErrorType.AUTH_FAILED,
+        message="Authorization: Bearer secret-provider-token",
+        provider_id=ProviderId.NVIDIA,
+        model_id="meta/llama-3.1-8b-instruct",
+        http_status=401,
+        raw_response='{"error":"Authorization: Bearer secret-provider-token"}',
+    )
+
+    def fail_capture(router: object, contract: object, request: TaskRequest) -> object:
+        raise transport_error
+
+    monkeypatch.setattr(cli, "ModelRouter", lambda: SimpleNamespace(catalog=object()))
+    monkeypatch.setattr(cli, "capture_auditor_interaction", fail_capture)
+
+    assert (
+        cli.run(
+            [
+                "--audit-id",
+                "audit-transport-failure",
+                "--candidate-sha",
+                _CANDIDATE,
+                "--evidence-sha",
+                _EVIDENCE,
+                "--prompt-file",
+                str(prompt_path),
+                "--report-path",
+                str(report_path),
+                "--receipt-path",
+                str(receipt_path),
+                "--auditor-model",
+                "meta/llama-3.1-8b-instruct",
+            ]
+        )
+        == 2
+    )
+
+    failure_path = receipt_path.with_name("receipt.json.transport-failure.json")
+    failure = json.loads(failure_path.read_text(encoding="utf-8"))
+    assert failure["schema"] == "paeos.auditor-transport-failure/1"
+    assert failure["audit_id"] == "audit-transport-failure"
+    assert failure["candidate_sha256"] == _CANDIDATE
+    assert failure["evidence_bundle_sha256"] == _EVIDENCE
+    assert failure["error_type"] == "AUTH_FAILED"
+    assert failure["provider_id"] == "nvidia"
+    assert failure["model_id"] == "meta/llama-3.1-8b-instruct"
+    assert failure["http_status"] == 401
+    assert failure["message"] == "Authorization: Bearer <REDACTED>"
+    raw_response = transport_error.raw_response or ""
+    assert failure["raw_response_sha256"] == hashlib.sha256(
+        raw_response.encode("utf-8")
+    ).hexdigest()
+    assert "secret-provider-token" not in failure_path.read_text(encoding="utf-8")
+    assert stat.S_IMODE(failure_path.stat().st_mode) == 0o600
+    assert not receipt_path.exists()
+    assert not report_path.exists()
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert output.err.startswith("AUDITOR_RECEIPT_FAILED:[AUTH_FAILED]")
+    assert f"AUDITOR_RECEIPT_FAILURE_ARTIFACT:{failure_path}" in output.err
 
 
 def test_run_quarantines_invalid_provider_report_with_exact_reason(
