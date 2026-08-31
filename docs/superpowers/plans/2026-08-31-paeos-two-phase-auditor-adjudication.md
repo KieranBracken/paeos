@@ -273,7 +273,7 @@ Commit message: `feat(audit): combine report and physical receipt`
 - CLI requests `RetryPolicy.NONE` and `allow_fallback=False`.
 - CLI output adds `report_status` and `qualified` without changing receipt schema.
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 ```python
 def test_invalid_phase_prompt_fails_before_router_construction(tmp_path, monkeypatch):
@@ -328,25 +328,25 @@ assert request.allow_fallback is False
 assert json.loads(capsys.readouterr().out)["qualified"] is False
 ```
 
-- [ ] **Step 2: Run RED tests and verify the intended failures**
+- [x] **Step 2: Run RED tests and verify the intended failures**
 
 Run: `/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/ops/test_auditor_receipt_capture.py`
 
-- [ ] **Step 3: Implement minimal CLI integration and spec amendment**
+- [x] **Step 3: Implement minimal CLI integration and spec amendment**
 
 Keep rejection quarantine behavior unchanged. Update the Task 9A spec to state the two phases and
 router-native one-shot policy.
 
-- [ ] **Step 4: Run full verification**
+- [x] **Step 4: Run full verification**
 
 Run focused tests; full non-gateway pytest; changed-path Ruff; changed-path Pyright;
 `git diff --check`; and `git status --short`. Preserve exact counts and inherited static debt.
 
-- [ ] **Step 5: Record L17 review and checkpoint**
+- [x] **Step 5: Record L17 review and checkpoint**
 
 The review must attempt to falsify all ten protocol dimensions and must state that a fresh physical
 non-GLM audit is still required. Do not change `12/48`, worker counts, Court counts, or debt status.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Commit message: `fix(audit): separate substantive and physical gates`

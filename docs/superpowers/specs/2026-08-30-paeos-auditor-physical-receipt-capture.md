@@ -60,3 +60,18 @@ change Cline admission, close Gate A, execute Task 10, alter Gate B–G, or prom
 3. Re-run the independent L13 matrix and reconcile static/environment findings.
 4. Re-run L14. Only a physically proven non-GLM receipt plus a green/dispositioned L13 can release
    Task 10's three fresh Cline SDK probes.
+
+## 6. Two-phase adjudication amendment — 2026-08-31
+
+The receipt task now separates the auditor's substantive evidence review from physical provenance
+validation. The substantive request must embed the evidence bytes and carry the exact candidate and
+evidence bindings; it must not require the auditor's own future receipt. After the response returns,
+the caller captures the physical provider/model/family receipt and validates A-08. A pair qualifies
+only when the report status is `PASS` and the report-bound physical receipt is valid and decorrelated.
+
+Capture requests express `RetryPolicy.NONE` and `allow_fallback=False` on `TaskRequest`, so a
+provider failure cannot silently create a second transmission. Existing reports and receipts are
+immutable: a valid receipt never upgrades a prior `REMAND_WITH_AMENDMENTS` or
+`BLOCKED_UNQUALIFIABLE` report. The CLI rejects non-canonical or path-only prompts before router
+construction and emits `report_status`, `a08_verdict`, and `qualified` as evidence metadata only;
+it does not seal a Court result, close a gate, or authorize promotion.

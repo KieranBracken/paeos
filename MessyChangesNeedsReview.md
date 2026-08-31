@@ -446,3 +446,26 @@ The regression was observed RED before implementation and GREEN afterward. Focus
 clean. No provider call or retry occurred. This is implementation evidence only; the earlier
 Gemini response remains unqualifiable, counts remain **0/1/0** and **0/0/0**, and strict sealed
 progress remains **12/48 complete | 36 remaining**.
+
+## 2026-08-31 — Two-phase auditor adjudication recovery
+
+The isolated recovery branch repaired the causal mismatch between substantive auditor findings and
+post-response physical provenance in commits `1ef08b2`, `cd8fc05`, `9bfc31f`, and `851218d`.
+
+- `paeos/model_router/types.py` and `router.py` now carry typed per-request retry/fallback limits;
+  audit capture can fail closed after the first provider failure.
+- `paeos/model_router/audit_prompt.py` builds and validates a self-contained evidence prompt with
+  exact phase markers, bindings, counts, and path-only/self-referential rejection.
+- `paeos/model_router/auditor_receipt.py` returns parsed report status and a typed conjunctive
+  adjudication; a valid receipt never upgrades a blocked or remanded report.
+- `ops/auditor_receipt_capture.py` validates prompts before router construction, dispatches one
+  request, and emits report status plus qualification metadata after persisting the exact pair.
+- Tests cover the new boundaries and preserve existing default retry/fallback behavior.
+
+Verification: focused suites **45/45** passed; the complete non-gateway suite **1,022/1,022**
+passed; changed-path Ruff/Pyright and `git diff --check` passed. No external provider call,
+credential access, GUI automation, clipboard, terminal paste, retry, fallback, or promotion was
+used. This remains implementation evidence only: the consumed Gemini audit is still
+`BLOCKED_UNQUALIFIABLE`, counts remain **0/1/0** and **0/0/0**, all four debts remain open, and
+strict sealed progress remains **12/48 complete | 36 remaining**. Fresh L14/L17 evidence remains
+required before any gate closure or downstream dispatch.

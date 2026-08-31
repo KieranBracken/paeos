@@ -141,3 +141,12 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   tests passed **24/24**, the non-gateway suite passed **1,008/1,008**, and changed-path Ruff/Pyright
   are clean. This does not repair the consumed audit retroactively or authorize another provider
   call; strict sealed progress remains **12/48 complete | 36 remaining**.
+- 2026-08-31 commits `1ef08b2`, `cd8fc05`, `9bfc31f`, and `851218d` repair the two-phase auditor
+  seam: typed no-retry/no-fallback requests, self-contained prompt validation, conjunctive
+  report/receipt adjudication, and CLI integration. Focused suites passed **45/45**; the complete
+  non-gateway suite collected and passed **1,022/1,022**. Changed-path Ruff/Pyright and
+  `git diff --check` are clean. This is local implementation evidence only; the prior Gemini
+  response remains `BLOCKED_UNQUALIFIABLE`, worker/Court counts remain **0/1/0** and **0/0/0**,
+  all four recovery debts remain open, and strict sealed progress remains **12/48 complete | 36
+  remaining**. A new external non-GLM audit is still separately authorized work and no gate is
+  closed by this repair.

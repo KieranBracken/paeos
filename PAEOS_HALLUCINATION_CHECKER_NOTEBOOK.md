@@ -3231,3 +3231,33 @@ both results fail-closed.
 Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
 **Sealed: 0 | Remanded: 0 | Remediated: 0**. Strict sealed progress remains **12/48 complete |
 36 remaining**; the one audit invocation completed no implementation task.
+
+### Entry 188 — 2026-08-31: Two-Phase Auditor Adjudication Repair
+
+The isolated recovery branch completed the approved local repair for the receipt-causality defect.
+The implementation is split into four auditable commits: `1ef08b2` adds typed per-request
+`RetryPolicy` and no-fallback enforcement; `cd8fc05` adds the canonical self-contained substantive
+audit prompt and fail-closed validator; `9bfc31f` adds conjunctive report/receipt adjudication; and
+`851218d` integrates the one-shot CLI. The amended Task 9A specification and implementation plan
+are recorded alongside this checkpoint.
+
+The prompt validator requires one each of the substantive-review, post-response-receipt, and
+provenance-absence markers; exact candidate/evidence bindings; and non-empty embedded evidence. It
+rejects path-only packages and instructions requiring an auditor's future receipt. The router now
+honors `RetryPolicy.NONE` and `allow_fallback=False` before any second attempt or candidate route.
+The adjudicator returns `qualified=true` only for a validated substantive `PASS` paired with a
+report-bound physical A-08 `PASS`; blocked/remanded statuses remain unqualified.
+
+Verification evidence is local implementation evidence only: focused router/prompt/receipt/CLI
+suites passed **45/45**, and the complete non-gateway suite collected and passed **1,022/1,022**
+with exit `0`. Changed-path Ruff and Pyright both passed cleanly; `git diff --check` passed. No
+provider, credential, browser, clipboard, AppleScript, terminal-paste, retry, fallback, or
+promotion was invoked during this repair. The prior Gemini response remains
+`BLOCKED_UNQUALIFIABLE`; no report was upgraded retroactively.
+
+This checkpoint does not satisfy L14/L17, close Gate A, or authorize downstream gates. Worker
+counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 |
+Remanded: 0 | Remediated: 0**; `DEBT-0058` through `DEBT-0061` remain **OPEN**; strict sealed
+progress remains **12/48 complete | 36 remaining**. A fresh external non-GLM audit still requires
+its own explicit destination/payload authorization and must produce a new candidate-bound report
+and physical receipt through this repaired path.
