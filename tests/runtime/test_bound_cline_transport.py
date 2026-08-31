@@ -55,6 +55,8 @@ def _config(tmp_path: Path, *, branch_name: str = "codex/recovery") -> BoundWork
         path = package / name
         path.write_text("synthetic", encoding="utf-8")
         files[name] = path
+    policy = package / "policy.json"
+    policy.write_text("{}", encoding="utf-8")
     return BoundWorkerConfig(
         state_root=state_root,
         recovery_worktree=worktree,
@@ -65,6 +67,8 @@ def _config(tmp_path: Path, *, branch_name: str = "codex/recovery") -> BoundWork
         sdk_entrypoint=files["sdk.mjs"],
         core_entrypoint=files["core.mjs"],
         qualification_record=files["qualification.json"],
+        policy_path=policy,
+        policy_sha256="f" * 64,
         provider_id="cline-pass",
         model_id="z-ai/glm-5.3-flash",
         model_family=ModelFamily.GLM,

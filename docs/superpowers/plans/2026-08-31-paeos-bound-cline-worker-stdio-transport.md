@@ -24,7 +24,8 @@
 
 ## File Map
 
-- Create `runtime/integrations/bound_cline_transport.py`: typed configuration, request validation, one-shot framed process execution, response/quarantine persistence, and secret-blind handoff records.
+- Create `runtime/integrations/bound_cline_transport.py`: typed configuration, request/policy validation, one-shot framed process execution, response/quarantine persistence, and secret-blind handoff records.
+- Create `tests/runtime/test_bound_cline_transport_policy.py`: canonical policy sidecar and prompt/policy binding tests.
 - Create `tests/runtime/test_bound_cline_transport.py`: unit tests for contracts, path binding, process/event handling, and failure classification.
 - Create `tests/runtime/test_bound_cline_transport_persistence.py`: atomic response, quarantine, and handoff persistence tests.
 - Create `ops/bound_cline_worker.py`: explicit one-shot CLI boundary around the transport.
@@ -58,17 +59,29 @@ class TransportFailureKind(StrEnum):
 class BoundWorkerConfig:
     state_root: Path
     recovery_worktree: Path
+    branch_name: str
+    candidate_head: str
     node_executable: Path
     host_module: Path
     sdk_entrypoint: Path
     core_entrypoint: Path
     qualification_record: Path
+    policy_path: Path
+    policy_sha256: str
     provider_id: str
     model_id: str
     model_family: ModelFamily
     session_id: str
     timeout_seconds: float = 300.0
     max_declared_model_turns: int = 2
+
+@dataclass(frozen=True, slots=True)
+class WorkerToolPolicy:
+    request_payload_hash: str
+    allowed_tools: tuple[str, ...]
+    write_scopes: tuple[str, ...]
+    verification_command: str | None
+    artifact_path: str | None
 
 def dispatch_once(request_path: Path, prompt_path: Path, config: BoundWorkerConfig) -> WorkerDispatchResult: ...
 ```

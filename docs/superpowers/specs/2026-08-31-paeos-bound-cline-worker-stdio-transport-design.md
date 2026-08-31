@@ -73,7 +73,8 @@ binding, state root, recovery worktree, provider/model tuple, and session identi
 Add `runtime/integrations/bound_cline_transport.py` with a small, run-once
 `BoundClineWorkerTransport` dispatcher and a `dispatch_once(...)` entry point that:
 
-- accepts an already-created request envelope and its immutable prompt;
+- accepts an already-created request envelope, immutable prompt, and separately hash-bound tool
+  policy;
 - validates that the request and all paths are beneath the supplied absolute state root;
 - requires an isolated recovery worktree and refuses `main`/`trunk` or a path outside the
   worktree allowlist;
@@ -86,6 +87,15 @@ Add `runtime/integrations/bound_cline_transport.py` with a small, run-once
 
 The dispatcher never interprets worker prose as authority. A worker response is data until the
 overseer and the Court independently verify it.
+
+The policy sidecar is canonical JSON and contains allowed tool names, write scopes, the exact
+verification command (when applicable), the artifact path, and the request payload hash. Its
+SHA-256 is included in the launch handoff and must match the configured policy digest; a prompt
+cannot expand this policy.
+
+The sidecar maps to a frozen `WorkerToolPolicy` record with fields
+`request_payload_hash`, `allowed_tools`, `write_scopes`, `verification_command`, and
+`artifact_path`. It is loaded once before launch and is never replaced during an invocation.
 
 The public result type is a tagged union: `WorkerDispatchSuccess(response: ResponseEnvelope,
 handoff: HandoffRecord)` or `WorkerDispatchFailure(failure: TransportFailure,
@@ -162,8 +172,9 @@ exit `2` for any rejected, quarantined, or uncertain transaction.
 
 ## Data Flow
 
-1. PAEOS creates a transaction and immutable request under the dedicated external state root.
-2. The dispatcher validates the request binding and confirms the recovery worktree is clean and
+1. PAEOS creates a transaction, immutable request, and immutable policy sidecar under the dedicated
+   external state root.
+2. The dispatcher validates the request/policy binding and confirms the recovery worktree is clean and
    not `main`/`trunk`.
 3. The dispatcher acquires the session lease and starts the host with the frozen tuple.
 4. The host emits a `hello` event and ordered provider/tool/terminal events over framed stdio.

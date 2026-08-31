@@ -6,6 +6,8 @@ execution and response persistence are added in later plan tasks.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from dataclasses import dataclass
 from enum import StrEnum
@@ -20,12 +22,17 @@ __all__ = [
     "ResponseEnvelope",
     "TransportFailureKind",
     "TransportProtocolError",
+    "WorkerToolPolicy",
+    "_load_policy",
     "_validate_binding",
     "_validate_paths",
+    "_validate_policy",
 ]
 
 _HEX40 = re.compile(r"^[0-9a-f]{40}$")
 _UNKNOWN = frozenset({"", "unknown", "none", "null", "unavailable"})
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
+_FORBIDDEN_COMMAND = re.compile(r"(?:^|\s)(?:cd|exec|env)(?:\s|$)|[;&|<>`$]")
 
 
 class TransportProtocolError(ValueError):
@@ -62,12 +69,25 @@ class BoundWorkerConfig:
     sdk_entrypoint: Path
     core_entrypoint: Path
     qualification_record: Path
+    policy_path: Path
+    policy_sha256: str
     provider_id: str
     model_id: str
     model_family: ModelFamily
     session_id: str
     timeout_seconds: float = 300.0
     max_declared_model_turns: int = 2
+
+
+@dataclass(frozen=True, slots=True)
+class WorkerToolPolicy:
+    """Canonical, immutable tool policy bound to one request payload."""
+
+    request_payload_hash: str
+    allowed_tools: tuple[str, ...]
+    write_scopes: tuple[str, ...]
+    verification_command: str | None
+    artifact_path: str | None
 
 
 def _absolute(path: Path, label: str) -> Path:
@@ -105,6 +125,108 @@ def _within(path: Path, root: Path) -> bool:
 def _attributable(value: str, label: str) -> None:
     if not isinstance(value, str) or value.strip().lower() in _UNKNOWN:
         raise TransportProtocolError(f"{label} must be attributable")
+
+
+def _canonical_policy_bytes(policy: WorkerToolPolicy) -> bytes:
+    payload = {
+        "allowed_tools": list(policy.allowed_tools),
+        "artifact_path": policy.artifact_path,
+        "request_payload_hash": policy.request_payload_hash,
+        "verification_command": policy.verification_command,
+        "write_scopes": list(policy.write_scopes),
+    }
+    return (json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+
+
+def _load_policy(path: Path) -> WorkerToolPolicy:
+    """Load and validate one canonical policy sidecar without executing it."""
+
+    _regular_non_symlink(path, "policy_path")
+    try:
+        raw = path.read_bytes()
+        parsed = json.loads(raw.decode("utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise TransportProtocolError("policy is not valid UTF-8 JSON") from exc
+    if not isinstance(parsed, dict):
+        raise TransportProtocolError("policy must be a JSON object")
+    expected = {
+        "allowed_tools",
+        "artifact_path",
+        "request_payload_hash",
+        "verification_command",
+        "write_scopes",
+    }
+    if set(parsed) != expected:
+        raise TransportProtocolError("policy schema mismatch")
+    allowed = parsed["allowed_tools"]
+    scopes = parsed["write_scopes"]
+    if (
+        not isinstance(allowed, list)
+        or not allowed
+        or any(not isinstance(item, str) for item in allowed)
+        or len(set(allowed)) != len(allowed)
+        or any(item not in {"editor", "run_commands"} for item in allowed)
+    ):
+        raise TransportProtocolError("policy contains an unknown or duplicate tool")
+    if (
+        not isinstance(scopes, list)
+        or not scopes
+        or any(
+            not isinstance(item, str)
+            or not item.strip()
+            or Path(item).is_absolute()
+            or ".." in Path(item).parts
+            for item in scopes
+        )
+        or len(set(scopes)) != len(scopes)
+    ):
+        raise TransportProtocolError("policy write scopes are invalid")
+    command = parsed["verification_command"]
+    if command is not None and (
+        not isinstance(command, str) or not command.strip() or _FORBIDDEN_COMMAND.search(command)
+    ):
+        raise TransportProtocolError("policy verification command is invalid")
+    artifact = parsed["artifact_path"]
+    if artifact is not None and (
+        not isinstance(artifact, str)
+        or not artifact.strip()
+        or Path(artifact).is_absolute()
+        or ".." in Path(artifact).parts
+    ):
+        raise TransportProtocolError("policy artifact path is invalid")
+    return WorkerToolPolicy(
+        request_payload_hash=parsed["request_payload_hash"],
+        allowed_tools=tuple(allowed),
+        write_scopes=tuple(scopes),
+        verification_command=command,
+        artifact_path=artifact,
+    )
+
+
+def _validate_policy(
+    policy: WorkerToolPolicy,
+    request: RequestEnvelope,
+    config: BoundWorkerConfig,
+) -> None:
+    _validate_binding(request, config)
+    if not _HEX64.fullmatch(policy.request_payload_hash):
+        raise TransportProtocolError("policy payload hash is invalid")
+    if policy.request_payload_hash != request.payload_hash:
+        raise TransportProtocolError("policy payload hash does not match request")
+    try:
+        policy_hash = hashlib.sha256(_canonical_policy_bytes(policy)).hexdigest()
+        file_hash = hashlib.sha256(config.policy_path.read_bytes()).hexdigest()
+    except OSError as exc:
+        raise TransportProtocolError("policy cannot be read") from exc
+    if file_hash != policy_hash or config.policy_sha256 != file_hash:
+        raise TransportProtocolError("policy hash mismatch")
+    if "run_commands" in policy.allowed_tools and not policy.verification_command:
+        raise TransportProtocolError("run_commands requires a verification command")
+    if policy.artifact_path is not None and not any(
+        policy.artifact_path == scope or policy.artifact_path.startswith(scope.rstrip("/") + "/")
+        for scope in policy.write_scopes
+    ):
+        raise TransportProtocolError("policy artifact path is outside write scopes")
 
 
 def _validate_binding(request: RequestEnvelope, config: BoundWorkerConfig) -> None:
