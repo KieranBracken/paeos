@@ -3181,3 +3181,53 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 Before any separately authorized future attempt, the immutable prompt must embed the complete
 evidence bundle (or use a transport-proven attachment) so the external auditor can inspect the
 evidence without host tools. Gate C and downstream advancement remain blocked.
+
+### Entry 187 — 2026-08-31: Self-Contained `a6e7270` Audit Exposes Receipt Causality Defect
+
+The Founder explicitly authorized one external transmission of the self-contained 275,385-byte
+evidence package for candidate `a6e72702c09e30b87553da4ed4a0be5952119bb7`. The sealed evidence
+SHA-256 is `e1ed6d441b7773af33ddd93c395e7e1e2c67ba9b9fa56f993d55c8c08f34be2d`; the embedding prompt
+SHA-256 is `28f3319203faea3f068af06208cc7faccf5a2a8f25c0bb87ddc402e9576868aa`.
+The package embeds the canonical lifecycle, L17 protocol, router specification, candidate state,
+lineage, changed-file manifest, and an 80-line-context source/test diff. A high-confidence secret
+pattern scan was clean.
+
+One initial local runner start failed during module import with `ModuleNotFoundError` before router
+construction or provider contact. The corrected process bound `PYTHONPATH` to the isolated
+worktree and used a temporary non-repository runner that retained the PAEOS policy pipeline,
+pinned the only eligible physical model to `gemini-3.6-flash`, and replaced the router's internal
+retry method with exactly one transport dispatch. No repository source was changed.
+
+Router observation `1050` records the sole physical request: provider `google`, model
+`gemini-3.6-flash`, family `gemini`, 80,309 prompt tokens, 1,421 completion tokens, approximately
+39,454 ms, and `success=1`. The receipt records exactly one provider attempt and the sole route
+`google:gemini-3.6-flash`; no provider retry or fallback occurred.
+
+The resulting private, create-only artifacts are:
+
+- report `/private/tmp/paeos-l14-l17-report-a6e7270-v2.md`, file SHA-256
+  `b5d6d5577e5c2bd651f467eb79821ad57cebba5195b296f2b21f28c9661776b2`;
+- receipt `/private/tmp/paeos-l14-l17-receipt-a6e7270-v2.json`, file SHA-256
+  `4f8835cdd549f82773f3578305178f843958cf75c028d2b8e710f128d88d5080`, embedded canonical
+  receipt SHA-256 `e43eb7d8dffd27ebd857b5b835d6984d6915ad3ddedd5121eef3c8cdc123f93b`.
+
+Local pair validation passes the exact report digest, candidate/evidence bindings, expected
+accounting, one-attempt route, physical family derivation, and A-08 (`builder=glm`,
+`auditor=gemini`). The report's substantive disposition is nevertheless exactly
+`L14_STATUS: BLOCKED_UNQUALIFIABLE`. Gemini treated the absence of its own physical receipt inside
+the pre-dispatch evidence package as a blocker, even though that receipt can only be created after
+the provider returns the report and is now validly bound to that exact response. This exposes a
+causality defect in the audit protocol: auditor report generation and post-response physical
+provenance adjudication are separate phases, but the prompt allowed the auditor to require the
+future receipt as input to its own disposition.
+
+The valid receipt does not authorize the Overseer to rewrite or upgrade the auditor's explicit
+blocked status. No L14/L17 pass, Court seal, debt closure, task completion, gate advancement,
+promotion, production dispatch, or SAKG resumption is claimed. Before another external audit is
+authorized, the contract must state that the auditor judges the supplied implementation evidence
+only, while the caller independently validates the post-response physical receipt and combines
+both results fail-closed.
+
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain
+**Sealed: 0 | Remanded: 0 | Remediated: 0**. Strict sealed progress remains **12/48 complete |
+36 remaining**; the one audit invocation completed no implementation task.
