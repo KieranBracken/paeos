@@ -95,6 +95,11 @@ def build_scheduler(
             workspace_source=repo_root,
             artifact_resolver=cas.get,
         )
+    elif runtime_type == "bound-cline":
+        raise ValueError(
+            "bound-cline requires an explicit BoundClineWorkerRuntime configuration; "
+            "autonomous_run will not infer provider, profile, qualification, or worktree values"
+        )
     else:
         runtime = ClaudeCodeRuntime(
             workspace_source=repo_root,
@@ -145,13 +150,16 @@ def build_scheduler(
                 print(f"[RB-0008] Friction recorded: {path}", file=sys.stderr)
         if friction.high_leverage_intake is not None:
             from dataclasses import replace
+
             outcome = replace(outcome, high_leverage_intake=friction.high_leverage_intake)
         return outcome
 
     governor = EconomicGovernor(global_budget)
     scheduler: ContinuousScheduler | ConcurrentScheduler = (
         ConcurrentScheduler(
-            run_one, governor=governor, budget_by_class=DEFAULT_BUDGETS,
+            run_one,
+            governor=governor,
+            budget_by_class=DEFAULT_BUDGETS,
             max_concurrency=max_concurrency,
         )
         if max_concurrency > 1
@@ -165,7 +173,8 @@ def main(argv: list[str] | None = None) -> int:
     if not 2 <= len(argv) <= 5:
         print(
             "usage: python ops/autonomous_run.py <backlog.json> <state_dir> "
-            "[max_concurrency] [max_runs] [runtime_type: claude|codex|hybrid|glm|chat-bridge]",
+            "[max_concurrency] [max_runs] "
+            "[runtime_type: claude|codex|hybrid|glm|chat-bridge|bound-cline]",
             file=sys.stderr,
         )
         return 64
