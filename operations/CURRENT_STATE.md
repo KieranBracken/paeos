@@ -268,4 +268,9 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   with redacted metadata and an optional raw-body digest but no raw response. Focused capture and
   router tests pass; canonical Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress
   remains **12/48 complete | 36 remaining**, and L14/L17 plus `DEBT-0058`/`DEBT-0060` remain open.
-
+- 2026-08-31 read-only route preflight after the NVIDIA failure found Cline `EXHAUSTED` with
+  `QUOTA_EXHAUSTED`; its static Minimax entry is therefore filtered by the provider-health gate.
+  Kilo is ineligible for INTERNAL evidence and OpenRouter has UNKNOWN family, leaving a fresh
+  Google Gemini one-shot as the next eligible decorrelated route. No provider call occurred during
+  preflight. Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete |
+  36 remaining**, and L14/L17 plus `DEBT-0058`/`DEBT-0060` remain open.

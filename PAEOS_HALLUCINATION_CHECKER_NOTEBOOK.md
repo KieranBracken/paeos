@@ -3614,4 +3614,21 @@ Canonical accounting remains **Worker 0/1/0; Court 0/0/0; strict progress 12/48 
 36 remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. No gate seal, SAKG resumption,
 promotion, or main/trunk mutation is authorized by this attempt.
 
+### Entry 209 — 2026-08-31: Alternate-Route Preflight After NVIDIA Failure
+
+Read-only model-router inspection after the NVIDIA transport failure found the following local
+state: Cline is `EXHAUSTED` with `last_error_type=QUOTA_EXHAUSTED`; Google is `HEALTHY` with a
+historical `RATE_LIMITED` record; NVIDIA is `HEALTHY` but its latest observation is a failed
+`UNKNOWN` dispatch for `meta/llama-3.1-8b-instruct`. The catalog confirms Cline Minimax is
+available/live/key-present in static metadata, but the provider-health gate correctly excludes it
+while Cline is exhausted. Kilo is not eligible for INTERNAL evidence under its data policy, and
+OpenRouter's family is UNKNOWN, so neither is a valid A-08 auditor route.
+
+The current candidate-bound package was regenerated locally after the transport-failure
+observability commit (`b77ab56`) and passed prompt validation and secret scanning. No provider
+transmission occurred during this preflight. A new one-shot Google Gemini request is the next
+eligible route, with no fallback and no retry; it must be bound to the freshly regenerated
+candidate/package hashes and still requires a valid physical receipt plus report before any gate
+can advance. Canonical Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress
+remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain OPEN.
 

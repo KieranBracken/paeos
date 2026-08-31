@@ -602,6 +602,14 @@ candidate/evidence binding, credential redaction, file mode `0600`, and unchange
 Focused capture/router tests pass **23/23**; changed-path Ruff/Pyright and `git diff --check` are
 clean. Canonical counts remain Worker **0/1/0**, Court **0/0/0**, strict progress **12/48**.
 
+## 2026-08-31 — Alternate-route preflight
+
+Read-only router inspection after the NVIDIA attempt found Cline `EXHAUSTED` with
+`QUOTA_EXHAUSTED`, so the otherwise catalog-eligible Minimax route is filtered fail-closed.
+Kilo cannot receive INTERNAL evidence under its data policy, and OpenRouter's family is UNKNOWN
+for A-08. Google Gemini remains the next eligible non-GLM family. No provider call occurred during
+preflight, and a fresh candidate-bound package must be used for any future one-shot. Canonical
+Worker/Court counts remain **0/1/0** and **0/0/0**, strict progress remains **12/48**.
 
 
 
