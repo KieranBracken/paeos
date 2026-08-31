@@ -373,3 +373,10 @@ no gate, Court count, debt, or SAKG status changes.
   `reviews/tasks/PAEOS_GATE_C_CURRENT_REVALIDATION_review.md`. This remains implementation
   evidence only: no current-candidate L14/L17 receipt or Court/L16 row exists. `DEBT-0058` and
   `DEBT-0060` remain open; strict progress remains **12/48 complete | 36 remaining**.
+
+- 2026-08-31 Gate D current revalidation through `c06f99c`: worker-confinement contract,
+  provenance, data-policy, compiler, broker, mutation, verifier-view, evidence/profile, and
+  sandbox tests passed **40/40**; Ruff and Pyright are clean on the scope. This is implementation
+  evidence only. Platform-capable sandbox proof, current-candidate L14/L17, and Court/L16 remain
+  outstanding; `DEBT-0058`/`DEBT-0060` remain open and strict progress remains **12/48 complete |
+  36 remaining**.

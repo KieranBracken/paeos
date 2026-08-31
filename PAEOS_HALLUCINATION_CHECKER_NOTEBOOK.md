@@ -3811,3 +3811,17 @@ This is implementation evidence only: no physical L14/L17 receipt, Court/L16 row
 Founder ratification exists for the current candidate. Worker/Court remain **0/1/0** and
 **0/0/0**; strict progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and
 `DEBT-0060` remain open.
+
+### Entry 220 — 2026-08-31: Gate D Current Confinement Revalidation Checkpoint
+
+At the current recovery lineage through `c06f99c`, the TaskPackage contract/provenance,
+data-policy, task-compiler, worker-broker, confinement-mutation, verification-workspace,
+worker-evidence/profile, and sandbox suites passed **40/40**, exit `0`. Ruff over the Gate D
+implementation/tests passed; Pyright reported **0 diagnostics**. No provider, credential, browser,
+clipboard, or production-worker activity occurred.
+
+The constitutional review is recorded at `reviews/tasks/PAEOS_GATE_D_CURRENT_REVALIDATION_review.md`.
+This is local implementation evidence only. Platform-capable sandbox proof, fresh candidate-bound
+L14/L17 evidence, and Court/L16 disposition remain required before Gate D completion credit.
+Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36
+remaining**; `DEBT-0058` and `DEBT-0060` remain open.

@@ -711,6 +711,17 @@ liveness/recovery transaction is independently reproduced and admitted by Court.
 remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**; SAKG
 remains held. The isolated worktree is the only modified target; `main`/`trunk` were untouched.
 
+## 2026-08-31 — Gate D current confinement revalidation
+
+At the current recovery lineage through `c06f99c`, the TaskPackage worker-confinement scope passed
+**40/40** tests, exit `0`; Ruff and Pyright are clean for the changed scope. No provider,
+credential, browser, clipboard, or production-worker activity occurred. Review:
+`reviews/tasks/PAEOS_GATE_D_CURRENT_REVALIDATION_review.md`.
+
+This is implementation evidence only. Platform-capable sandbox proof, fresh independent L14/L17,
+and Court/L16 remain required; Worker/Court remain **0/1/0** and **0/0/0**, strict progress
+remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
+
 ## 2026-08-31 — Gate C current revalidation checkpoint
 
 At candidate `f546eb1`, the provider-registry and headless-supervisor suites passed **69/69**
