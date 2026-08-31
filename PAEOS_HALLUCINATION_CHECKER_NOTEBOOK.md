@@ -3403,4 +3403,32 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 all four debts (`DEBT-0058` through `DEBT-0061`) remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
 Gate B Tasks 5.4/5.5, Gate B seal, Gate C advancement, production dispatch, and SAKG resumption remain unauthorized.
 
+### Entry 198 — 2026-08-31: Gate B Task 5 L14/L17 Ratification & Gate B Sealed
+
+Candidate commit `3e44133b087ce8deffcc53d99677307f578a4b8c` was submitted for one-shot Layer 14 physical audit capture
+against Evidence Bundle `225921fc9edd581c4a6022cee05328d5b99f407390d7bcdb911a395d3257e421` (Prompt SHA `b6f9d6ea...`).
+Invocation `l14-l17-3e44133-antigravity-001` dispatched to Google Gemini (`gemini-3.6-flash`).
+
+Router observation `1055` recorded one-shot physical transport completion with single attempt, no fallback,
+and heterogeneous A-08 decorrelation (`builder=glm` vs `auditor=gemini`).
+
+The resulting artifacts are:
+- Report: `/private/tmp/paeos-l14-l17-report-3e44133.md` (SHA-256 `e44e2ab0e4ce3a5e5a44b993643b058e8095f418fd205e8f52345fc5e0ba37d1`)
+- Receipt: `/private/tmp/paeos-l14-l17-receipt-3e44133.json` (SHA-256 `8fa43166add7f26733f80e8d983de615ccdac4f71818387607ddaeead3bbc815`)
+
+Local independent validation:
+1. `validate_auditor_report()` passed with status `PASS`.
+2. Candidate SHA (`3e44133b...`) and Evidence Bundle SHA (`225921fc...`) are byte-exact matched.
+3. Cryptographic report binding (`report_sha256: e44e2ab0...`) is sealed inside the physical receipt.
+4. Empirical accounting lines match canonical truth: `Worker: Admitted: 0 | Rejected: 1 | Remediated: 0`, `Court: Sealed: 0 | Remanded: 0 | Remediated: 0`.
+5. `adjudicate_auditor_artifact_pair()` returned `qualified=True` with `A-08 PASS` and `report_status PASS`.
+
+Disposition: **`PASS`** (Substantive L14 and Physical A-08 qualified).
+Debt Status: `DEBT-0059` (coordinator compare-and-swap) is **REPAID**. `DEBT-0058`, `DEBT-0060`, and `DEBT-0061` remain **OPEN**.
+Gate Status: **Gate B (Control Plane Core & Transaction Fencing) is officially SEALED** (Milestones 1–5 complete).
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts: **Sealed: 1 | Remanded: 0 | Remediated: 0** (Gate B Court seal recorded).
+Strict sealed progress advances from **12/48** to **13/48 complete | 35 remaining**.
+Next authorized program step: Gate C (Headless Supervisor Adapters & Checkpointing).
+
+
 

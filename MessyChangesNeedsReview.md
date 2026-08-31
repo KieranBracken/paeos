@@ -548,4 +548,13 @@ response was truncated to 233 bytes, omitting required candidate binding lines. 
 `audit report does not bind candidate`, and rejected artifacts were quarantined. L14/L17 status remains BLOCKED_UNQUALIFIABLE;
 all debts remain OPEN; worker/Court counts remain 0/1/0 and 0/0/0; strict progress remains 12/48 complete.
 
+## 2026-08-31 — Gate B sealed via candidate `3e44133` qualified L14/L17 audit
+
+Candidate `3e44133b087ce8deffcc53d99677307f578a4b8c` (evidence bundle `225921fc9edd581c4a6022cee05328d5b99f407390d7bcdb911a395d3257e421`)
+was independently audited by Google Gemini (`gemini-3.6-flash`). Physical receipt `8fa43166...` and report `e44e2ab0...`
+are cryptographically bound and validated. Substantive `L14_STATUS: PASS`, physical `A-08 PASS`.
+`DEBT-0059` is REPAID. Gate B is officially SEALED. Strict sealed progress advances to **13/48 complete | 35 remaining**.
+Court counts: `1/0/0`. Gate C is next.
+
+
 
