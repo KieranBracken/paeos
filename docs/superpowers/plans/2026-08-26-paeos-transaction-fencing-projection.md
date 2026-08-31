@@ -345,7 +345,7 @@ git commit -m "feat(control-plane): preserve side-effect certainty"
 - Create: `reviews/tasks/PAEOS_TRANSACTION_FENCING_PROJECTION_review.md`
 - Modify: `MessyChangesNeedsReview.md` only if unresolved debt remains
 
-- [ ] **Step 5.1: Run focused and full applicable gates fresh**
+- [x] **Step 5.1: Run focused and full applicable gates fresh**
 
 ```bash
 /Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/runtime/control_plane \
