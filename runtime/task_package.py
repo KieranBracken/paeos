@@ -102,6 +102,8 @@ class TaskPackage:
     budget: Budget
     forbidden: tuple[str, ...] = ()  # documentation of intent; enforcement is by capability (T1)
     ephemeral_context: ExecutionContext = field(default_factory=ExecutionContext)
+    execution_binding: object | None = None
+
 
 
 class TaskStatus(Enum):
