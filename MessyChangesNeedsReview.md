@@ -469,3 +469,15 @@ used. This remains implementation evidence only: the consumed Gemini audit is st
 `BLOCKED_UNQUALIFIABLE`, counts remain **0/1/0** and **0/0/0**, all four debts remain open, and
 strict sealed progress remains **12/48 complete | 36 remaining**. Fresh L14/L17 evidence remains
 required before any gate closure or downstream dispatch.
+
+## 2026-08-31 — Gate B/C local verification reconciliation
+
+Fresh local reproduction passed Gate B's control-plane/bridge/ledger scope **137/137** and Gate
+C's restricted-loopback model-router/supervisor/live-adapter scope **213/213**. The broader Gate C
+command produced four sandbox `PermissionError` setup errors while binding the gateway server on
+`127.0.0.1:4098`; these are retained as environmental findings. Supervisor-only and Gate B scoped
+static checks were clean; broader `runtime/integrations` Ruff retains **22 inherited findings**.
+No external provider, credential, GUI, clipboard, terminal-paste, retry, fallback, or promotion was
+used. These are local implementation checks only; L14/L17 remains outstanding, counts remain
+`0/1/0` and `0/0/0`, all debts remain open, and strict progress remains `12/48 complete | 36
+remaining`.

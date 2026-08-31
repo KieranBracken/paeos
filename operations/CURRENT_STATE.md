@@ -150,3 +150,11 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   all four recovery debts remain open, and strict sealed progress remains **12/48 complete | 36
   remaining**. A new external non-GLM audit is still separately authorized work and no gate is
   closed by this repair.
+- 2026-08-31 fresh local gate reproduction passed Gate B's focused scope **137/137** and Gate C's
+  restricted-loopback scope **213/213**. The mixed Gate C invocation additionally hit four expected
+  `PermissionError` loopback-bind setup errors on `127.0.0.1:4098`; these are environment findings.
+  Supervisor-only Ruff/Pyright and Gate B scoped static checks are clean; the broader
+  `runtime/integrations` Ruff run retains **22 inherited findings**. No provider or credential
+  activity occurred. This does not satisfy L14/L17 or advance strict sealed progress, which remains
+  **12/48 complete | 36 remaining**; worker/Court counts remain **0/1/0** and **0/0/0** and all
+  recovery debts remain open.

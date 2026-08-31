@@ -3261,3 +3261,25 @@ Remanded: 0 | Remediated: 0**; `DEBT-0058` through `DEBT-0061` remain **OPEN**; 
 progress remains **12/48 complete | 36 remaining**. A fresh external non-GLM audit still requires
 its own explicit destination/payload authorization and must produce a new candidate-bound report
 and physical receipt through this repaired path.
+
+### Entry 189 — 2026-08-31: Gate B/C Local Verification Reconciled
+
+Fresh local reproduction of the previously implemented control-plane gates completed on the clean
+recovery branch. Gate B's focused control-plane, bridge-semantic, and ledger suites passed
+**137/137** (exit `0`); its scoped Ruff check passed and `pyright runtime/control_plane` reported
+`0 errors, 0 warnings, 0 informations`.
+
+Gate C's established restricted-loopback scope (all `tests/model_router` except the gateway-server
+module, plus supervisor/live-adapter/fail-closed bridge tests) passed **213/213** (exit `0`).
+Supervisor-only Ruff and Pyright both passed cleanly. A broader mixed invocation collected 213
+passing tests plus four gateway setup errors (`PermissionError: [Errno 1] Operation not permitted`)
+from the sandbox refusing binds on `127.0.0.1:4098`; these are preserved as environment findings,
+not suppressed implementation failures. The broader `runtime/integrations` Ruff command reports
+**22 inherited findings**; no unrelated cleanup was introduced. No provider, credential, browser,
+clipboard, AppleScript, terminal-paste, retry, fallback, or promotion was invoked.
+
+This is local reproduction evidence only and does not satisfy Gate B Task 5 or Gate C's L14/L17
+requirements. Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
+remain **Sealed: 0 | Remanded: 0 | Remediated: 0**; all four recovery debts remain **OPEN**;
+strict sealed progress remains **12/48 complete | 36 remaining**. The next release condition is a
+fresh candidate-bound report plus physical non-GLM receipt through the repaired two-phase path.
