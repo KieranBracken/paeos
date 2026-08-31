@@ -21,6 +21,7 @@ from paeos.model_router.types import (
     NormalizedErrorType,
     ProviderHealth,
     ProviderId,
+    RetryPolicy,
     RouterResponse,
     TaskClass,
     TaskRequest,
@@ -254,3 +255,66 @@ def test_aimd_retry_non_429_failure_updates_error(mock_router):
 
     st = router.state_db.get_provider_state(ProviderId.GOOGLE)
     assert st["health_status"] == ProviderHealth.QUARANTINED.value
+
+
+def test_no_retry_policy_stops_after_first_short_429(mock_router):
+    """A one-shot request must not repeat a short-429 provider call."""
+
+    router, transport = mock_router
+    google_route = (ProviderId.GOOGLE, "gemini-3.6-flash")
+    transport.responses[google_route] = [
+        NormalizedError(
+            error_type=NormalizedErrorType.RATE_LIMITED,
+            message="short 429",
+            provider_id=ProviderId.GOOGLE,
+            model_id="gemini-3.6-flash",
+            http_status=429,
+            retry_after=0.05,
+        ),
+        RouterResponse(
+            content="second call must never happen",
+            model_id="gemini-3.6-flash",
+            provider_id=ProviderId.GOOGLE,
+            family=ModelFamily.GEMINI,
+        ),
+    ]
+    request = TaskRequest(
+        messages=[{"role": "user", "content": "one shot"}],
+        logical_model=LogicalModel.PAEOS_STRONG,
+        data_class=DataClass.PUBLIC,
+    )
+    request.retry_policy = RetryPolicy.NONE
+    request.allow_fallback = False
+
+    with pytest.raises(NormalizedError) as captured:
+        router.route(request)
+
+    assert captured.value.error_type is NormalizedErrorType.RATE_LIMITED
+    assert transport.call_history == [google_route]
+
+
+def test_no_fallback_stops_after_first_candidate_failure(mock_router):
+    """A no-fallback request must not dispatch a second provider."""
+
+    router, transport = mock_router
+    google_route = (ProviderId.GOOGLE, "gemini-3.6-flash")
+    transport.responses[google_route] = NormalizedError(
+        error_type=NormalizedErrorType.RATE_LIMITED,
+        message="no fallback",
+        provider_id=ProviderId.GOOGLE,
+        model_id="gemini-3.6-flash",
+        http_status=429,
+        retry_after=30.0,
+    )
+    request = TaskRequest(
+        messages=[{"role": "user", "content": "one route"}],
+        logical_model=LogicalModel.PAEOS_STRONG,
+        data_class=DataClass.PUBLIC,
+    )
+    request.allow_fallback = False
+
+    with pytest.raises(NormalizedError) as captured:
+        router.route(request)
+
+    assert captured.value.error_type is NormalizedErrorType.RATE_LIMITED
+    assert transport.call_history == [google_route]

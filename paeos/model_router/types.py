@@ -4,7 +4,7 @@ PAEOS Model Router & Free Inference Mesh — Type Definitions
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any, Dict, List, Optional
 
 
@@ -78,6 +78,11 @@ class NormalizedErrorType(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class RetryPolicy(StrEnum):
+    NONE = "none"
+    SINGLE_RATE_LIMIT = "single-rate-limit"
+
+
 class ProviderHealth(str, Enum):
     HEALTHY = "HEALTHY"
     THROTTLED = "THROTTLED"
@@ -129,6 +134,8 @@ class TaskRequest:
     stream: bool = False
     max_tokens: Optional[int] = None
     temperature: float = 0.7
+    retry_policy: RetryPolicy = RetryPolicy.SINGLE_RATE_LIMIT
+    allow_fallback: bool = True
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 

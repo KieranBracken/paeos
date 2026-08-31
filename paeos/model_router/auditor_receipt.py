@@ -28,6 +28,7 @@ from paeos.model_router.types import (
     LogicalModel,
     ModelFamily,
     ProviderId,
+    RetryPolicy,
     RouterResponse,
     TaskClass,
     TaskRequest,
@@ -69,7 +70,10 @@ class _RouterLike(Protocol):
 
 
 def _json_default(value: object) -> object:
-    if isinstance(value, (DataClass, LogicalModel, ModelFamily, ProviderId, TaskClass)):
+    if isinstance(
+        value,
+        (DataClass, LogicalModel, ModelFamily, ProviderId, RetryPolicy, TaskClass),
+    ):
         return value.value
     raise TypeError(f"unsupported value for canonical JSON: {type(value).__name__}")
 
@@ -111,6 +115,8 @@ def _request_payload(request: TaskRequest) -> dict[str, object]:
         "stream": request.stream,
         "max_tokens": request.max_tokens,
         "temperature": request.temperature,
+        "retry_policy": request.retry_policy.value,
+        "allow_fallback": request.allow_fallback,
     }
 
 

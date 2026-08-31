@@ -22,6 +22,7 @@ from paeos.model_router.types import (
     NormalizedError,
     NormalizedErrorType,
     ProviderHealth,
+    RetryPolicy,
     RouterResponse,
     TaskClass,
     TaskRequest,
@@ -54,6 +55,8 @@ class ModelRouter:
                 error_type=NormalizedErrorType.MODEL_UNAVAILABLE,
                 message="No eligible models available matching task constraints, privacy rules, and provider health",
             )
+        if not request.allow_fallback:
+            candidates = candidates[:1]
 
         attempted_chain: List[str] = []
         last_error: Optional[NormalizedError] = None
@@ -115,7 +118,11 @@ class ModelRouter:
             if e.error_type == NormalizedErrorType.RATE_LIMITED:
                 cooldown = self.aimd.on_rate_limit(candidate.provider_id, e)
                 # If short retry-after (< 3s), perform ONE bounded retry with jitter
-                if e.retry_after and e.retry_after <= 3.0:
+                if (
+                    request.retry_policy is RetryPolicy.SINGLE_RATE_LIMIT
+                    and e.retry_after
+                    and e.retry_after <= 3.0
+                ):
                     time.sleep(e.retry_after + random.uniform(0.1, 0.5))
                     try:
                         resp = self.transport.dispatch(candidate, request)

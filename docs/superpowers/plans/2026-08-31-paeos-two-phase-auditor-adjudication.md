@@ -40,7 +40,7 @@ evidence.
 - Produces: `TaskRequest.retry_policy` and `TaskRequest.allow_fallback` with compatible defaults.
 - Consumed by: `ModelRouter.route()`, `_dispatch_with_single_retry()`, and request fingerprints.
 
-- [ ] **Step 1: Write failing router behavior tests**
+- [x] **Step 1: Write failing router behavior tests**
 
 ```python
 def test_no_retry_policy_stops_after_first_short_429(mock_router):
@@ -93,7 +93,7 @@ def test_no_fallback_stops_after_first_candidate_failure(mock_router):
     assert len(transport.call_history) == 1
 ```
 
-- [ ] **Step 2: Run RED tests**
+- [x] **Step 2: Run RED tests**
 
 Run: `/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/model_router/test_routing_policy.py -k 'no_retry or no_fallback'`
 
@@ -101,18 +101,18 @@ Expected: test failures because the current router retries or falls back despite
 one-shot attributes. After GREEN, replace the literal with `RetryPolicy.NONE` without changing the
 behavioral assertion.
 
-- [ ] **Step 3: Implement the minimal typed routing controls**
+- [x] **Step 3: Implement the minimal typed routing controls**
 
 Add the enum and compatible request defaults. Truncate the candidate chain when fallback is false;
 skip the short-429 retry when retry policy is `NONE`. Add both values to `_request_payload()`.
 
-- [ ] **Step 4: Run GREEN and compatibility tests**
+- [x] **Step 4: Run GREEN and compatibility tests**
 
 Run: `/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/model_router/test_routing_policy.py tests/model_router/test_auditor_receipt.py`
 
 Expected: all collected tests pass, including the existing default retry/fallback tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Commit message: `feat(router): enforce one-shot request policy`
 

@@ -35,6 +35,7 @@ from paeos.model_router.types import (
     LogicalModel,
     ModelFamily,
     ProviderId,
+    RetryPolicy,
     RouterResponse,
     TaskClass,
     TaskRequest,
@@ -116,6 +117,17 @@ def _response(request: TaskRequest, **changes: object) -> RouterResponse:
         setattr(result, key, value)
     result.transport_response_sha256 = response_fingerprint(result)
     return result
+
+
+def test_request_fingerprint_binds_retry_and_fallback_policy() -> None:
+    request = _request()
+
+    assert request_fingerprint(request) != request_fingerprint(
+        replace(request, retry_policy=RetryPolicy.NONE)
+    )
+    assert request_fingerprint(request) != request_fingerprint(
+        replace(request, allow_fallback=False)
+    )
 
 
 def test_capture_binds_candidate_and_physical_non_glm_identity() -> None:
