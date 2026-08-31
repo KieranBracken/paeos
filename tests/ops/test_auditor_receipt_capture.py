@@ -118,6 +118,7 @@ def test_run_uses_router_capture_and_emits_only_receipt_metadata(
         "Court: Sealed: 0 | Remanded: 0 | Remediated: 0\n"
         "`L14_STATUS`: **PASS**\n"
         "Findings: independent findings\n"
+        "AUDIT_COMPLETE: true\n"
     )
     interaction = SimpleNamespace(receipt=receipt, response_content=report)
 
@@ -370,6 +371,8 @@ def test_run_quarantines_invalid_provider_report_with_exact_reason(
         "Worker: Admitted: 1 | Rejected: 0 | Remediated: 0\n"
         "Court: Sealed: 0 | Remanded: 0 | Remediated: 0\n"
         "L14_STATUS: PASS\n"
+        "Findings: provider accounting is inconsistent\n"
+        "AUDIT_COMPLETE: true\n"
     )
     receipt = _physical_receipt()
     interaction = SimpleNamespace(receipt=receipt, response_content=invalid_report)

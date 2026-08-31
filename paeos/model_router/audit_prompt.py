@@ -102,6 +102,9 @@ REPRODUCTION: <finding>
 {_accounting_line("Worker", worker_counts)}
 {_accounting_line("Court", court_counts)}
 
+Add a `### Audit Findings` section with at least one concrete evidence-based finding. End your
+response with the exact final line `AUDIT_COMPLETE: true`; do not emit any text after that marker.
+
 
 {EVIDENCE_BEGIN_MARKER}
 {evidence}

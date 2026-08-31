@@ -201,8 +201,10 @@ def run(argv: list[str] | None = None) -> int:
                         "or claim Gate A closure. The first six non-blank lines of your response "
                         "must be the Candidate SHA, Evidence Bundle SHA-256, L14_STATUS, "
                         "INVARIANT, REPRODUCTION, and the exact Worker/Court accounting lines. "
+                        "Then include a `### Audit Findings` section with at least one concrete "
+                        "finding and end with the exact final line `AUDIT_COMPLETE: true`. "
                         "Do not emit a preamble, analysis, file list, or markdown heading before "
-                        "those lines. Return only concise findings after them."
+                        "those lines, and emit nothing after the completion marker."
                     ),
                 },
                 {"role": "user", "content": prompt},

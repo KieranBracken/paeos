@@ -57,6 +57,9 @@ _COURT_COUNTS_RE = re.compile(
     r"Remediated:\s*(\d+)\s*$",
     re.MULTILINE,
 )
+_AUDIT_COMPLETE_RE = re.compile(r"^\s*AUDIT_COMPLETE:\s*true\s*$", re.MULTILINE)
+_FINDINGS_LINE_RE = re.compile(r"^\s*Findings:\s*\S", re.MULTILINE)
+_FINDINGS_HEADER_RE = re.compile(r"^\s*###\s+Audit Findings\s*$", re.MULTILINE)
 
 
 class AuditorReceiptError(ValueError):
@@ -490,6 +493,21 @@ def validate_auditor_report(
             raise AuditorReceiptError("remand report must name an INVARIANT")
         if _L14_REPRODUCTION_RE.search(content) is None:
             raise AuditorReceiptError("remand report must include REPRODUCTION")
+    completion_matches = _AUDIT_COMPLETE_RE.findall(content)
+    if len(completion_matches) != 1:
+        raise AuditorReceiptError("audit report must contain exactly one completion marker")
+    non_blank_lines = [line.strip() for line in content.splitlines() if line.strip()]
+    if not non_blank_lines or non_blank_lines[-1] != "AUDIT_COMPLETE: true":
+        raise AuditorReceiptError("completion marker must be the final non-blank line")
+    if _FINDINGS_LINE_RE.search(content) is None and _FINDINGS_HEADER_RE.search(content) is None:
+        raise AuditorReceiptError("audit report must contain substantive findings")
+    if _FINDINGS_HEADER_RE.search(content) is not None:
+        header_index = next(
+            index for index, line in enumerate(non_blank_lines) if line == "### Audit Findings"
+        )
+        completion_index = len(non_blank_lines) - 1
+        if completion_index <= header_index + 1:
+            raise AuditorReceiptError("audit findings section must contain substantive text")
     for label, pattern, expected in (
         ("worker", _WORKER_COUNTS_RE, contract.expected_worker_counts),
         ("Court", _COURT_COUNTS_RE, contract.expected_court_counts),

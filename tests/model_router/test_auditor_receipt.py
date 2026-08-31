@@ -126,6 +126,8 @@ def _bound_report(contract: AuditorReceiptContract, status: str) -> str:
         "Worker: Admitted: 0 | Rejected: 1 | Remediated: 0\n"
         "Court: Sealed: 0 | Remanded: 0 | Remediated: 0\n"
         f"L14_STATUS: {status}\n"
+        "Findings: evidence was reviewed against the contract\n"
+        "AUDIT_COMPLETE: true\n"
     )
 
 
@@ -350,6 +352,8 @@ Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
 `L14_STATUS`: **REMAND_WITH_AMENDMENTS**
 INVARIANT: worker admission must be proven before Gate A closure
 REPRODUCTION: ops/worker_admission_probe.py --transport cline-sdk
+Findings: the admission receipt is not yet present
+AUDIT_COMPLETE: true
 """
 
     validate_auditor_report(report, contract)
@@ -368,6 +372,8 @@ Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
 - **Worker**: Admitted: 1 | Rejected: 0 | Remediated: 0
 - **Court**: Sealed: 1 | Remanded: 0 | Remediated: 0
 `L14_STATUS`: **PASS**
+Findings: all reviewed invariants are satisfied
+AUDIT_COMPLETE: true
 """
 
     with pytest.raises(AuditorReceiptError, match="worker accounting"):
@@ -388,6 +394,8 @@ Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
 - **Worker**: Admitted: 0 | Rejected: 1 | Remediated: 0
 - **Court**: Sealed: 0 | Remanded: 0 | Remediated: 0
 `L14_STATUS`: **PASS**
+Findings: all reviewed invariants are satisfied
+AUDIT_COMPLETE: true
 """
     receipt = capture_auditor_receipt(FakeRouter(response, _catalog()), contract, request)
     bound = bind_auditor_report(receipt, report)
@@ -401,7 +409,10 @@ Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
     ).passed
 
     report_path.unlink()
-    persist_auditor_report(report + "\n# swapped bytes\n", report_path)
+    persist_auditor_report(
+        report.replace("AUDIT_COMPLETE: true", "# swapped bytes\nAUDIT_COMPLETE: true"),
+        report_path,
+    )
     with pytest.raises(AuditorReceiptError, match="report digest"):
         validate_auditor_artifact_pair(receipt_path, report_path, contract, _catalog())
 
@@ -476,6 +487,22 @@ def test_substantive_pass_and_valid_a08_pair_qualify(tmp_path) -> None:
 def test_auditor_report_validator_rejects_vacuous_or_unbound_report(report: str) -> None:
     with pytest.raises(AuditorReceiptError):
         validate_auditor_report(report, _contract(_request()))
+
+
+def test_auditor_report_requires_terminal_completion_marker() -> None:
+    request = _request()
+    contract = _contract(request)
+    report = (
+        f"Candidate SHA: {contract.candidate_sha256}\n"
+        f"Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}\n"
+        "Worker: Admitted: 0 | Rejected: 1 | Remediated: 0\n"
+        "Court: Sealed: 0 | Remanded: 0 | Remediated: 0\n"
+        "L14_STATUS: PASS\n"
+        "Findings: the transport policy is bounded\n"
+    )
+
+    with pytest.raises(AuditorReceiptError, match="completion"):
+        validate_auditor_report(report, contract)
 
 
 def test_tampered_receipt_hash_fails_closed(tmp_path) -> None:
