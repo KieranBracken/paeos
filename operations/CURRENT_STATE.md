@@ -330,3 +330,12 @@ log SHA-256 is `cdcb83bf8cf57877ffa2cd023e4ae7ae7bdfa8c170fd8a9aa58f2b8b73506b46
 contents `1`, SHA-256 `4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865`.
 This remains an explicit environment limitation. Non-gateway reproduction is **1,058/1,058**;
 no gate, Court count, debt, or SAKG status changes.
+
+- 2026-08-31 read-only L16/Court reconciliation for candidate `9e0c2bd` verified the qualified
+  L14/L17 report/receipt and independent L13 reproduction, then scanned all three available
+  ledgers. Every chain is valid, but no correlated Court or Founder-disposition row exists, so
+  the exact disposition is `BLOCKED_UNQUALIFIABLE`; no seal can be created from documentation or
+  test output. Focused Court/lifecycle tests pass **8/8**. Worker/Court counts remain **0/1/0**
+  and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, debts `DEBT-0058`
+  and `DEBT-0060` remain open, and SAKG remains held. Full details:
+  `reviews/tasks/PAEOS_L16_COURT_RECONCILIATION_9E0C2BD_review.md`.

@@ -3719,3 +3719,29 @@ permitted` binding `127.0.0.1:4098`; exit code `1`. Raw log is
 `4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865`). This is an environment
 limitation, not a pass or a source defect. The non-gateway L13 reproduction remains **1,058/1,058**;
 Worker/Court counts and strict progress remain unchanged.
+
+### Entry 215 — 2026-08-31: L16/Court Reconciliation Remains Unqualifiable
+
+The current candidate-bound evidence pair was reconciled without provider activity. Candidate
+`9e0c2bdfd6a80523bf176bc719843c611430b218` has independent non-gateway L13 reproduction
+`1,058/1,058` (exit `0`) and a qualified Gemini L14/L17 report/receipt pair with A-08
+`gemini != glm`. The focused local Court/lifecycle reconciliation tests passed **8/8**.
+
+The hash chain was verified for each available ledger copy. `.paeos_state_investigation/ledger.db`
+contains 1 row, `misc/.state_rb0026/ledger.db` contains 1 row, and
+`misc/_state_sakg/state_sakg/ledger.db` contains 290 rows. None contains a correlated
+`COURT_SEALED`, `COURT_REMANDED`, `COURT_REMEDIATED`, promotion, or Founder-disposition row;
+`reconcile_court_counts` returns `Sealed: 0 | Remanded: 0 | Remediated: 0` for all three.
+
+The exact L16 disposition is therefore **`BLOCKED_UNQUALIFIABLE`**: evidence exists, but no
+canonical Court/L16 disposition exists to authorize a seal. A read-only reconciliation record is
+committed at `reviews/tasks/PAEOS_L16_COURT_RECONCILIATION_9E0C2BD_review.md`; it does not create
+ledger state or self-ratify. During inspection SQLite removed tracked WAL/SHM companions; they
+were restored byte-for-byte from `HEAD`, no ledger database content changed, and the recovery tree
+is clean.
+
+Worker accounting remains **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court remains
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; strict progress remains **12/48 complete | 36
+remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. The next valid action is a canonical
+candidate-bound Court/L16 transaction followed by the Founder disposition; no gate or SAKG
+resumption is authorized by this reconciliation.

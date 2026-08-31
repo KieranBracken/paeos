@@ -670,3 +670,16 @@ The direct current-candidate gateway-server run recorded four fixture-setup erro
 errors are not converted to passes; an elevated-loopback run is still required for gateway
 evidence. Non-gateway L13 remains **1,058/1,058**, with no accounting or gate advancement.
 
+## 2026-08-31 — L16/Court reconciliation packet for candidate `9e0c2bd`
+
+Created `reviews/tasks/PAEOS_L16_COURT_RECONCILIATION_9E0C2BD_review.md` as a read-only,
+candidate-bound reconciliation record. The L13 evidence is **1,058/1,058** non-gateway tests
+(exit `0`); restricted gateway setup remains four loopback-bind errors. The qualified Gemini
+L14/L17 report/receipt pair is bound to candidate `9e0c2bd` and passes A-08 (`gemini != glm`).
+
+All three available ledger copies have valid hash chains but contain no correlated Court or
+Founder-disposition rows; `reconcile_court_counts` returns `0/0/0` for each. Exact disposition:
+`L16_STATUS: BLOCKED_UNQUALIFIABLE`. No ledger, source, promotion, gate, or SAKG state changed.
+Focused `tests/runtime/test_court_reconciliation.py` and `tests/runtime/test_lifecycle_audit.py`
+passed **8/8**. The notebook records this as Entry 215. A transient SQLite WAL/SHM removal caused
+by inspection was repaired from `HEAD`; the worktree is clean.
