@@ -214,6 +214,12 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
 - 2026-08-31 Gate D (Event Watchdog & Safe Recovery) is officially SEALED. Deterministic monotonic
   deadlines, pure recovery engine, and forensic storage back-pressure verified. Strict sealed progress
   advances to **15/48 complete | 33 remaining**. Court counts: `3/0/0`. Gate E is next.
+- 2026-08-31 Gate E (TaskPackage Worker Confinement & Sandbox Hardening) is officially SEALED.
+  Frozen implementation contract, execution binding, egress policy, capability-token task compiler,
+  typed worker broker, OS sandbox confinement, and isolated verification proof views verified.
+  Strict sealed progress advances to **16/48 complete | 32 remaining**. Court counts: `4/0/0`.
+  Gate F is next.
+
 
 
 

@@ -3463,6 +3463,33 @@ was ratified and sealed.
 8. **Strict Progress:** Advances to **`15 / 48 complete | 33 remaining`** (51 detailed tasks remain).
 Next authorized program step: Gate E (Runtime Confinement & Worker Sandbox Hardening).
 
+### Entry 201 — 2026-08-31: Gate E TaskPackage Worker Confinement Sealed
+
+Gate E (TaskPackage Worker Confinement & Sandbox Hardening) implementation was verified across
+focused unit/integration tests and discriminative mutation proofs, and is officially sealed.
+
+1. **Frozen Implementation Contract:** Immutable schema and canonical SHA-256 hash validate allowed paths,
+   required artifacts, acceptance commands, and rollback actions (`runtime/implementation_contract.py`).
+2. **Execution Binding:** Cryptographically binds transaction key, contract hash, base commit, worktree,
+   worker profile hash, supervisor profile hash, policy hash, and egress manifest hash.
+3. **Data Classification & Egress Policy:** Enforces `PUBLIC`, `INTERNAL`, `CONFIDENTIAL`, and `SECRET` data
+   classes; `SECRET` data is strictly forbidden from remote egress (`runtime/data_policy.py`).
+4. **Production Task Authority:** `ProductionTaskCompiler` mints exact Ed25519 `CapabilityToken` grants
+   (`file:read:<path>`, `patch:apply:<path>`, `test:run:<cmd>`, `scope:request`, `artifact:submit:<art>`)
+   through `CapabilityBroker` (`runtime/task_compiler.py`).
+5. **Typed Worker Broker:** `WorkerOperationBroker` mediates all worker actions through capability checks
+   and workspace containment, preventing arbitrary shell escapes (`runtime/worker_broker.py`).
+6. **OS Sandbox Confinement:** `PortableSandboxBackend` applies POSIX process group isolation and `setrlimit`
+   resource caps (CPU, memory, open files, file size) (`kernel/sandbox_backend.py`).
+7. **Isolated Proof Views:** `create_verification_views()` generates distinct baseline, candidate, and verifier
+   directory views with verifier manifest hashing (`runtime/verification_workspace.py`).
+8. **Court Accounting:** Court Sealed count advances to **4** (`Sealed: 4 | Remanded: 0 | Remediated: 0`).
+   Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**.
+9. **Gate Disposition:** **`GATE E SEALED`** (Milestones 1–7 complete).
+10. **Strict Progress:** Advances to **`16 / 48 complete | 32 remaining`** (50 detailed tasks remain).
+Next authorized program step: Gate F (Canary Bootstrap & Promotion Ladder).
+
+
 
 
 

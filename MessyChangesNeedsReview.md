@@ -569,6 +569,14 @@ Gate D (Event Watchdog & Safe Recovery) is officially SEALED. Liveness deadlines
 decision engine, forensic storage back-pressure, and deterministic CLI qualified.
 Strict sealed progress advances to **15/48 complete | 33 remaining**. Court counts: `3/0/0`. Gate E is next.
 
+## 2026-08-31 — Gate E sealed via candidate `b2ea143` verified implementation & test suite
+
+Gate E (TaskPackage Worker Confinement & Sandbox Hardening) is officially SEALED. Frozen implementation
+contract, execution binding, egress policy, capability-token task compiler, typed worker broker,
+OS sandbox confinement, and isolated verification proof views verified.
+Strict sealed progress advances to **16/48 complete | 32 remaining**. Court counts: `4/0/0`. Gate F is next.
+
+
 
 
 
