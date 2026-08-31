@@ -529,3 +529,14 @@ registry and legacy model-router types passed with zero diagnostics. Ruff still 
 inherited findings** in `paeos/model_router/types.py`; these remain explicitly dispositioned debt,
 not a clean claim. No source changes or external activity occurred, and L14/L17, gate seals,
 debt closure, and strict **12/48** progress are unchanged.
+
+## 2026-08-31 — Candidate `eadca24` Gate B Task 5.3 audit blocked by upstream token limit
+
+The authorized one-shot L14/L17 audit capture against candidate `eadca244fa7d34f211c50ddc42e6e7abe1f3d617`
+(evidence bundle `f348c86610ef7f62f03fae4154f3c6dbd7c6f5df4a2ea7c742eccedfa861f33f`) failed with
+HTTP 429 (`RATE_LIMITED` / `RESOURCE_EXHAUSTED`) at the transport boundary because the 1.06 MB payload
+exceeded Google AI Studio's 250,000 input tokens/min quota. Observation `1053` recorded the single attempt
+with no fallback. No receipt or report artifact was created on disk. L14/L17 status is BLOCKED_UNQUALIFIABLE;
+Gate B Tasks 5.4/5.5 remain pending; debts `DEBT-0058` through `DEBT-0061` remain OPEN; worker/Court counts
+remain 0/1/0 and 0/0/0; strict sealed progress remains 12/48 complete.
+

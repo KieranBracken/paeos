@@ -56,3 +56,25 @@ No external provider, credentials, GUI automation, clipboard, terminal paste, re
 or promotion occurred. This is local mutation evidence only and does not satisfy L14/L17, close
 Gate B, repay any debt, or change the **0/1/0** worker, **0/0/0** Court, or **12/48** strict sealed
 counts.
+
+## Task 5.3 Audit Attempt and Reconciliation — 2026-08-31
+
+Candidate commit: `eadca244fa7d34f211c50ddc42e6e7abe1f3d617`  
+Evidence bundle SHA-256: `f348c86610ef7f62f03fae4154f3c6dbd7c6f5df4a2ea7c742eccedfa861f33f`  
+Prompt file: `/private/tmp/paeos-l14-l17-prompt-current.md` (SHA-256 `8ff54cb6cd0be88dfd89b34cbdbd7b47b1a7960c697b48cf3f2f34e4e04262c7`)  
+Audit invocation ID: `l14-l17-eadca24-antigravity-001`  
+Target provider/model: `google:gemini-3.6-flash` (Gemini family, A-08 decorrelation)  
+
+Result: **`BLOCKED_UNQUALIFIABLE`**
+
+The single-shot audit dispatch failed at the transport boundary with `AUDITOR_RECEIPT_FAILED: NormalizedError`
+due to HTTP 429 `RESOURCE_EXHAUSTED` (Router observation `1053`). Root cause: the 1,066,172-byte prompt
+(~265,747 input tokens) exceeded Google AI Studio free tier's per-minute quota limit of 250,000 input tokens
+(`generativelanguage.googleapis.com/generate_content_free_tier_input_token_count`). Zero retries and zero
+fallbacks occurred (`RetryPolicy.NONE`, `allow_fallback=False`). No receipt or report artifact was produced.
+
+Because substantive L14 is not PASS and physical A-08 is unproven for this candidate, Gate B Tasks 5.4/5.5
+are not completed, Gate B remains unsealed, all four recovery debts remain OPEN, worker counts remain
+`Admitted: 0 | Rejected: 1 | Remediated: 0`, Court counts remain `Sealed: 0 | Remanded: 0 | Remediated: 0`,
+and strict sealed progress remains `12/48 complete | 36 remaining`.
+

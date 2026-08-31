@@ -189,3 +189,11 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   `892d911f14dea82e6bbfadea6fb4501ed0ddef17ef61588b8bd057b66a168092`. Secret scanning passed;
   no provider call or transmission occurred. L14/L17, debts, worker/Court counts, and **12/48**
   progress remain unchanged.
+- 2026-08-31 Candidate `eadca244fa7d34f211c50ddc42e6e7abe1f3d617` Gate B Task 5.3 one-shot L14/L17 audit
+  invocation (`l14-l17-eadca24-antigravity-001`) was dispatched to Google Gemini (`gemini-3.6-flash`).
+  The upstream gateway returned HTTP 429 (`RATE_LIMITED` / `RESOURCE_EXHAUSTED`) because the 1.06 MB
+  self-contained prompt payload (~265k tokens) exceeded the 250k input tokens/min free-tier ceiling.
+  Router observation `1053` recorded the failure; no report or receipt was generated. L14/L17 status
+  remains `BLOCKED_UNQUALIFIABLE`. All four recovery debts remain OPEN; worker/Court counts remain
+  `0/1/0` and `0/0/0`; strict progress remains `12/48 complete | 36 remaining`. Gate B is not closed.
+

@@ -3361,3 +3361,23 @@ has not been transmitted.
 Counts and disposition are unchanged: the prior Gemini audit remains `BLOCKED_UNQUALIFIABLE`,
 worker **0/1/0**, Court **0/0/0**, all four debts **OPEN**, and strict progress **12/48 complete |
 36 remaining**.
+
+### Entry 196 — 2026-08-31: Candidate `eadca24` Gate B Task 5.3 Audit Blocked by Upstream Quota Limit
+
+Following the Founder's explicit authorization for one-shot transmission against candidate
+`eadca244fa7d34f211c50ddc42e6e7abe1f3d617` with evidence bundle `f348c86610ef7f62f03fae4154f3c6dbd7c6f5df4a2ea7c742eccedfa861f33f`
+and prompt `/private/tmp/paeos-l14-l17-prompt-current.md` (SHA-256 `8ff54cb6cd0be88dfd89b34cbdbd7b47b1a7960c697b48cf3f2f34e4e04262c7`),
+the one-shot invocation (`audit_id: l14-l17-eadca24-antigravity-001`) was dispatched via `ops.auditor_receipt_capture`
+to Google AI Studio (`gemini-3.6-flash`).
+
+Router observation `1053` recorded `RATE_LIMITED` (`HTTP 429 RESOURCE_EXHAUSTED`). Root cause:
+The self-contained prompt payload (1,066,172 bytes / ~265,747 input tokens) exceeds the Google AI Studio
+free-tier per-minute ceiling of 250,000 input tokens (`generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 250000`).
+The transport failed at the gateway boundary prior to response generation; no report or receipt artifact was created.
+No unapproved retries or fallback candidates were executed (`RetryPolicy.NONE`, `allow_fallback=False`).
+
+Disposition: **`BLOCKED_UNQUALIFIABLE`** (upstream provider payload token ceiling exceeded; no valid physical receipt or report produced).
+Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**;
+`DEBT-0058`, `DEBT-0059`, `DEBT-0060`, and `DEBT-0061` remain **OPEN**; strict sealed progress remains **12/48 complete | 36 remaining**.
+Gate B Task 5.4/5.5, Gate B closure, Gate C advancement, production dispatch, and SAKG resumption remain unauthorized.
+
