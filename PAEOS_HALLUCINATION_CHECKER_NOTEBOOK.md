@@ -3825,3 +3825,17 @@ This is local implementation evidence only. Platform-capable sandbox proof, fres
 L14/L17 evidence, and Court/L16 disposition remain required before Gate D completion credit.
 Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36
 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+
+### Entry 221 — 2026-08-31: Gate E Current Watchdog Revalidation Checkpoint
+
+At the current recovery lineage, the control-plane, watchdog CLI, and bridge-observer suites
+passed **125/125**, exit `0`. The intentional invalid-input test factories were made explicit to
+Pyright with a narrow `Any` cast; runtime code and validation guards were unchanged. Ruff and
+Pyright are clean over the Gate E scope. No provider, credential, browser, clipboard, or
+production-worker activity occurred.
+
+The constitutional review is recorded at
+`reviews/tasks/PAEOS_GATE_E_CURRENT_REVALIDATION_review.md`. This is implementation evidence only:
+fresh candidate-bound L14/L17 evidence and Court/L16 disposition remain required before Gate E
+completion credit. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48
+complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.

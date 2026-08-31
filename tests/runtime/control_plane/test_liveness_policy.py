@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, cast
+
 import pytest
 from runtime.control_plane.events import SideEffectCertainty
 from runtime.control_plane.liveness import (
@@ -24,7 +26,8 @@ def snapshot(**changes: object) -> LivenessSnapshot:
         "side_effect_certainty": SideEffectCertainty.NOT_ATTEMPTED,
     }
     values.update(changes)
-    return LivenessSnapshot(**values)
+    # The factory intentionally permits invalid values so runtime validation paths can be tested.
+    return LivenessSnapshot(**cast(Any, values))
 
 
 def test_progress_kind_is_closed_and_stream_tokens_are_not_progress() -> None:

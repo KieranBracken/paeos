@@ -378,5 +378,11 @@ no gate, Court count, debt, or SAKG status changes.
   provenance, data-policy, compiler, broker, mutation, verifier-view, evidence/profile, and
   sandbox tests passed **40/40**; Ruff and Pyright are clean on the scope. This is implementation
   evidence only. Platform-capable sandbox proof, current-candidate L14/L17, and Court/L16 remain
-  outstanding; `DEBT-0058`/`DEBT-0060` remain open and strict progress remains **12/48 complete |
-  36 remaining**.
+    outstanding; `DEBT-0058`/`DEBT-0060` remain open and strict progress remains **12/48 complete |
+    36 remaining**.
+
+- 2026-08-31 Gate E current revalidation: control-plane, watchdog CLI, and bridge-observer suites
+  passed **125/125** (exit `0`); Ruff and Pyright are clean on the Gate E scope after a narrow
+  test-factory typing correction. This is implementation evidence only. Fresh current-candidate
+  L14/L17 and Court/L16 remain outstanding; `DEBT-0058`/`DEBT-0060` remain open, Worker/Court
+  remain **0/1/0** and **0/0/0**, and strict progress remains **12/48 complete | 36 remaining**.

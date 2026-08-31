@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, cast
+
 import pytest
 from runtime.control_plane.events import SideEffectCertainty
 from runtime.control_plane.liveness import (
@@ -26,7 +28,8 @@ def snapshot(**changes: object) -> LivenessSnapshot:
         "evidence_hashes": ("c" * 64,),
     }
     values.update(changes)
-    return LivenessSnapshot(**values)
+    # The factory intentionally permits invalid values so runtime validation paths can be tested.
+    return LivenessSnapshot(**cast(Any, values))
 
 
 def decision(snapshot_value: LivenessSnapshot, *, projection_verified: bool = True):
@@ -92,7 +95,7 @@ def test_possible_side_effect_requires_reconciliation() -> None:
         {"projection_verified": False},
     ],
 )
-def test_unverified_projection_halts_shared_control_plane(kwargs: dict[str, object]) -> None:
+def test_unverified_projection_halts_shared_control_plane(kwargs: dict[str, bool]) -> None:
     result, _ = decision(snapshot(), **kwargs)
     assert result.action is RecoveryAction.HALT_SHARED_CONTROL_PLANE
     assert result.reason_code == "PROJECTION_UNVERIFIED"

@@ -722,6 +722,17 @@ This is implementation evidence only. Platform-capable sandbox proof, fresh inde
 and Court/L16 remain required; Worker/Court remain **0/1/0** and **0/0/0**, strict progress
 remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
 
+## 2026-08-31 — Gate E current watchdog revalidation
+
+The control-plane, watchdog CLI, and bridge-observer scope passed **125/125** (exit `0`). Ruff
+and Pyright are clean on the scope after a narrow typing-only correction in two test factories;
+runtime behavior and fail-closed guards were unchanged. Review:
+`reviews/tasks/PAEOS_GATE_E_CURRENT_REVALIDATION_review.md`.
+
+This is implementation evidence only. Fresh current-candidate L14/L17 and Court/L16 remain
+required; Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete |
+36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
+
 ## 2026-08-31 — Gate C current revalidation checkpoint
 
 At candidate `f546eb1`, the provider-registry and headless-supervisor suites passed **69/69**
