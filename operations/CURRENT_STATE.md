@@ -395,3 +395,11 @@ no gate, Court count, debt, or SAKG status changes.
   bootstrap, current-candidate L14/L17, and Court/L16 remain outstanding. Strict progress remains
   **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and **0/0/0**; `DEBT-0058`/
   `DEBT-0060` remain open.
+
+- 2026-08-31 Gate G current lifecycle CLI checkpoint: lifecycle evidence-matrix, Court
+  reconciliation, and read-only CLI tests passed **13/13** (exit `0`); Ruff and Pyright are clean
+  on the scope. The CLI verifies a state-root-bound SQLite chain in read-only mode and emits all
+  19 layers with exact counts, returning nonzero for unresolved evidence. This is implementation
+  evidence only; current L13/L14/L17, Court/L16, and end-to-end L01-L19 evidence remain absent.
+  Strict progress remains **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and
+  **0/0/0**; `DEBT-0058`/`DEBT-0060` remain open.

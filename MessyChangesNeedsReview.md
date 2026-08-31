@@ -735,6 +735,17 @@ current-candidate L14/L17, or Court/L16 evidence exists; Worker/Court remain **0
 **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060`
 remain open.
 
+## 2026-08-31 — Gate G current lifecycle CLI checkpoint
+
+The lifecycle evidence-matrix, Court-reconciliation, and read-only CLI tests passed **13/13**
+(exit `0`); Ruff and Pyright are clean on the scope. The CLI verifies the SQLite hash chain in
+read-only mode and emits exactly 19 ordered layer rows with exact Court counts; unresolved layers
+return a nonzero status. Review: `reviews/tasks/PAEOS_GATE_G_CURRENT_REVALIDATION_review.md`.
+
+This is implementation evidence only. Historical L01-L19 claims remain remanded; no current
+L13/L14/L17 or Court/L16 evidence exists. Worker/Court remain **0/1/0** and **0/0/0**, strict
+progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
+
 ## 2026-08-31 — Gate E current watchdog revalidation
 
 The control-plane, watchdog CLI, and bridge-observer scope passed **125/125** (exit `0`). Ruff

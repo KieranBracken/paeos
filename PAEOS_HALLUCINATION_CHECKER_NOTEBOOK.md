@@ -3856,3 +3856,18 @@ The constitutional review is recorded at
 rotation/quota-stop evidence, bootstrap disposition, fresh current-candidate L14/L17, and
 Court/L16 remain outstanding. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains
 **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+
+### Entry 223 — 2026-08-31: Gate G Current Lifecycle CLI Checkpoint
+
+The lifecycle evidence-matrix and Court-reconciliation tests plus the new read-only lifecycle CLI
+passed **13/13**, exit `0`; Ruff and Pyright are clean on the scope. The CLI opens a state-root-bound
+SQLite ledger in read-only/query-only mode, verifies the complete hash chain, emits exactly 19
+ordered layer rows, includes exact Court counts, and returns exit `2` for any unproven or remanded
+layer. No ledger/CAS/repository write, provider, credential, browser, clipboard, worker, or
+promotion activity occurred.
+
+The constitutional review is recorded at
+`reviews/tasks/PAEOS_GATE_G_CURRENT_REVALIDATION_review.md`. This remains implementation evidence:
+the historical L01-L19 claim is remanded, and current L13/L14/L17, Court/L16, and operational
+end-to-end evidence are absent. Worker/Court remain **0/1/0** and **0/0/0**; strict progress
+remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
