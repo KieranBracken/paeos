@@ -62,6 +62,12 @@ if "partial_frame" in prompt:
     sys.stdout.buffer.flush()
     time.sleep(10)
     raise SystemExit(0)
+if "unknown_event" in prompt:
+    emit(invocation_id, 0, "not_a_host_event", {})
+    raise SystemExit(0)
+if "out_of_order" in prompt:
+    emit(invocation_id, 1, "hello", {})
+    raise SystemExit(0)
 emit(invocation_id, 0, "hello", {"host": "fake"})
 emit(invocation_id, 1, "session_created", {}, session_id)
 
@@ -112,9 +118,12 @@ if "success" in prompt:
         session_id,
     )
     read_frame()
-emit(invocation_id, 8, "terminal", {"result": {"status": "ok"}}, session_id)
+terminal_sequence = 8 if "success" in prompt else 5
+emit(invocation_id, terminal_sequence, "terminal", {"result": {"status": "ok"}}, session_id)
 if "post_terminal" in prompt:
-    emit(invocation_id, 9, "hello", {"host": "fake"})
+    emit(invocation_id, terminal_sequence + 1, "hello", {"host": "fake"})
+if "nonzero_exit" in prompt:
+    raise SystemExit(7)
 """
 
 
@@ -283,3 +292,33 @@ def test_post_terminal_frame_is_rejected(tmp_path: Path) -> None:
     result = dispatch_once(request_path, prompt_path, config)
     assert isinstance(result, WorkerDispatchFailure)
     assert result.failure.kind is TransportFailureKind.PROTOCOL_VIOLATION
+
+
+def test_request_path_escape_is_rejected(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "success")
+    escaped_request = tmp_path / "request-outside.json"
+    escaped_request.write_bytes(request_path.read_bytes())
+    result = dispatch_once(escaped_request, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.PATH_ESCAPE
+
+
+def test_unknown_event_is_rejected(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "unknown_event")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.PROTOCOL_VIOLATION
+
+
+def test_out_of_order_event_is_rejected(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "out_of_order")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.PROTOCOL_VIOLATION
+
+
+def test_nonzero_worker_exit_is_not_success(tmp_path: Path) -> None:
+    request_path, prompt_path, config = _dispatch_fixture(tmp_path, "nonzero_exit")
+    result = dispatch_once(request_path, prompt_path, config)
+    assert isinstance(result, WorkerDispatchFailure)
+    assert result.failure.kind is TransportFailureKind.PROCESS_FAILED

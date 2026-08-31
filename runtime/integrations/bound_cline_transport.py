@@ -602,6 +602,15 @@ def _failure(
     )
 
 
+def _validation_failure_kind(message: str) -> TransportFailureKind:
+    lowered = message.lower()
+    if any(token in lowered for token in ("path", "symlink", "worktree", "state_root", "prompt")):
+        return TransportFailureKind.PATH_ESCAPE
+    if any(token in lowered for token in ("provider", "model", "family", "session")):
+        return TransportFailureKind.MODEL_MISMATCH
+    return TransportFailureKind.REQUEST_BINDING
+
+
 def _fsync_directory(path: Path) -> None:
     descriptor = os.open(path, os.O_RDONLY)
     try:
@@ -1050,4 +1059,10 @@ def dispatch_once(
                 payload_hash="0" * 64,
                 allowed_dispositions=(Disposition.HALT,),
             )
-        return _failure(request, TransportFailureKind.REQUEST_BINDING, str(exc), b"", b"")
+        return _failure(
+            request,
+            _validation_failure_kind(str(exc)),
+            str(exc),
+            b"",
+            b"",
+        )
