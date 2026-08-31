@@ -14,6 +14,7 @@ import re
 import time
 import uuid
 from dataclasses import dataclass, replace
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -60,6 +61,23 @@ _COURT_COUNTS_RE = re.compile(
 
 class AuditorReceiptError(ValueError):
     """Raised when an auditor receipt cannot be proven and must fail closed."""
+
+
+class AuditorReportStatus(StrEnum):
+    """The substantive disposition stated by one validated auditor report."""
+
+    PASS = "PASS"
+    REMAND_WITH_AMENDMENTS = "REMAND_WITH_AMENDMENTS"
+    BLOCKED_UNQUALIFIABLE = "BLOCKED_UNQUALIFIABLE"
+
+
+@dataclass(frozen=True, slots=True)
+class AuditorArtifactAdjudication:
+    """Conjunctive result for a substantive report and its physical receipt."""
+
+    report_status: AuditorReportStatus
+    a08_verdict: str
+    qualified: bool
 
 
 class _RouterLike(Protocol):
@@ -450,7 +468,10 @@ def capture_auditor_receipt(
     return capture_auditor_interaction(router, contract, request).receipt
 
 
-def validate_auditor_report(content: str, contract: AuditorReceiptContract) -> None:
+def validate_auditor_report(
+    content: str,
+    contract: AuditorReceiptContract,
+) -> AuditorReportStatus:
     """Reject an unbound or vacuous L14 report before it becomes evidence."""
 
     _validate_contract(contract)
@@ -463,7 +484,8 @@ def validate_auditor_report(content: str, contract: AuditorReceiptContract) -> N
     statuses = _L14_STATUS_RE.findall(content)
     if len(statuses) != 1:
         raise AuditorReceiptError("audit report must contain exactly one L14_STATUS")
-    if statuses[0] == "REMAND_WITH_AMENDMENTS":
+    status = AuditorReportStatus(statuses[0])
+    if status is AuditorReportStatus.REMAND_WITH_AMENDMENTS:
         if _L14_INVARIANT_RE.search(content) is None:
             raise AuditorReceiptError("remand report must name an INVARIANT")
         if _L14_REPRODUCTION_RE.search(content) is None:
@@ -480,6 +502,7 @@ def validate_auditor_report(content: str, contract: AuditorReceiptContract) -> N
         observed = tuple(int(value) for value in matches[0])
         if observed != expected:
             raise AuditorReceiptError(f"{label} accounting mismatch")
+    return status
 
 
 def bind_auditor_report(
@@ -492,13 +515,13 @@ def bind_auditor_report(
     return replace(receipt, report_sha256=_sha256(content.encode("utf-8")))
 
 
-def validate_auditor_artifact_pair(
+def _validate_auditor_artifact_pair(
     receipt_path: Path,
     report_path: Path,
     contract: AuditorReceiptContract,
     catalog: ModelCatalog,
-) -> A08EnforcementResult:
-    """Validate one persisted receipt and the exact report bytes it claims to capture."""
+) -> tuple[AuditorReportStatus, A08EnforcementResult]:
+    """Load and validate one artifact pair without a second report read."""
 
     receipt = load_auditor_receipt(receipt_path)
     if not report_path.is_absolute() or report_path.is_symlink() or not report_path.is_file():
@@ -507,13 +530,47 @@ def validate_auditor_artifact_pair(
         content = report_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as error:
         raise AuditorReceiptError("audit report is unreadable") from error
-    validate_auditor_report(content, contract)
+    report_status = validate_auditor_report(content, contract)
     if receipt.report_sha256 is None:
         raise AuditorReceiptError("report binding is missing")
     if receipt.report_sha256 != _sha256(content.encode("utf-8")):
         raise AuditorReceiptError("report digest mismatch")
-    return validate_auditor_receipt(
+    a08_result = validate_auditor_receipt(
         receipt, contract, catalog, require_report_binding=True
+    )
+    return report_status, a08_result
+
+
+def validate_auditor_artifact_pair(
+    receipt_path: Path,
+    report_path: Path,
+    contract: AuditorReceiptContract,
+    catalog: ModelCatalog,
+) -> A08EnforcementResult:
+    """Validate one persisted receipt and the exact report bytes it claims to capture."""
+
+    _, a08_result = _validate_auditor_artifact_pair(
+        receipt_path, report_path, contract, catalog
+    )
+    return a08_result
+
+
+def adjudicate_auditor_artifact_pair(
+    receipt_path: Path,
+    report_path: Path,
+    contract: AuditorReceiptContract,
+    catalog: ModelCatalog,
+) -> AuditorArtifactAdjudication:
+    """Qualify a pair only when both substantive status and physical A-08 pass."""
+
+    report_status, a08_result = _validate_auditor_artifact_pair(
+        receipt_path, report_path, contract, catalog
+    )
+    a08_verdict = a08_result.verdict.value
+    return AuditorArtifactAdjudication(
+        report_status=report_status,
+        a08_verdict=a08_verdict,
+        qualified=(report_status is AuditorReportStatus.PASS and a08_result.passed),
     )
 
 

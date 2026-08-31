@@ -190,7 +190,7 @@ Commit message: `feat(audit): define substantive review prompt`
 - Produces: `adjudicate_auditor_artifact_pair(receipt_path, report_path, contract, catalog) ->
   AuditorArtifactAdjudication`.
 
-- [ ] **Step 1: Write failing conjunctive behavior tests**
+- [x] **Step 1: Write failing conjunctive behavior tests**
 
 ```python
 def _bound_report(contract, status):
@@ -241,19 +241,19 @@ def test_substantive_pass_and_valid_a08_pair_qualify(tmp_path):
     assert result.qualified is True
 ```
 
-- [ ] **Step 2: Run RED tests**
+- [x] **Step 2: Run RED tests**
 
 Run the two exact pytest node IDs and confirm missing-symbol failures.
 
-- [ ] **Step 3: Implement minimal status parsing and adjudication**
+- [x] **Step 3: Implement minimal status parsing and adjudication**
 
 Reuse existing report/pair validators. Do not add Court, seal, promotion, or mutation methods.
 
-- [ ] **Step 4: Run GREEN plus receipt mutation tests**
+- [x] **Step 4: Run GREEN plus receipt mutation tests**
 
 Run the full auditor-receipt test module and confirm tampered pairs still fail closed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Commit message: `feat(audit): combine report and physical receipt`
 

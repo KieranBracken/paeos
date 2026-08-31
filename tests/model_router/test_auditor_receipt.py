@@ -119,6 +119,16 @@ def _response(request: TaskRequest, **changes: object) -> RouterResponse:
     return result
 
 
+def _bound_report(contract: AuditorReceiptContract, status: str) -> str:
+    return (
+        f"Candidate SHA: {contract.candidate_sha256}\n"
+        f"Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}\n"
+        "Worker: Admitted: 0 | Rejected: 1 | Remediated: 0\n"
+        "Court: Sealed: 0 | Remanded: 0 | Remediated: 0\n"
+        f"L14_STATUS: {status}\n"
+    )
+
+
 def test_request_fingerprint_binds_retry_and_fallback_policy() -> None:
     request = _request()
 
@@ -394,6 +404,62 @@ Evidence Bundle SHA-256: {contract.evidence_bundle_sha256}
     persist_auditor_report(report + "\n# swapped bytes\n", report_path)
     with pytest.raises(AuditorReceiptError, match="report digest"):
         validate_auditor_artifact_pair(receipt_path, report_path, contract, _catalog())
+
+
+def test_valid_receipt_does_not_upgrade_blocked_report(tmp_path) -> None:
+    from paeos.model_router.auditor_receipt import (
+        AuditorReportStatus,
+        adjudicate_auditor_artifact_pair,
+    )
+
+    request = _request()
+    contract = _contract(
+        request,
+        expected_worker_counts=(0, 1, 0),
+        expected_court_counts=(0, 0, 0),
+    )
+    report = _bound_report(contract, "BLOCKED_UNQUALIFIABLE")
+    receipt = capture_auditor_receipt(
+        FakeRouter(_response(request), _catalog()), contract, request
+    )
+    report_path = persist_auditor_report(report, tmp_path / "report.md")
+    receipt_path = persist_auditor_receipt(
+        bind_auditor_report(receipt, report), tmp_path / "receipt.json"
+    )
+
+    result = adjudicate_auditor_artifact_pair(
+        receipt_path, report_path, contract, _catalog()
+    )
+
+    assert result.report_status is AuditorReportStatus.BLOCKED_UNQUALIFIABLE
+    assert result.a08_verdict == "PASS"
+    assert result.qualified is False
+
+
+def test_substantive_pass_and_valid_a08_pair_qualify(tmp_path) -> None:
+    from paeos.model_router.auditor_receipt import (
+        AuditorReportStatus,
+        adjudicate_auditor_artifact_pair,
+    )
+
+    request = _request()
+    contract = _contract(request)
+    report = _bound_report(contract, "PASS")
+    receipt = capture_auditor_receipt(
+        FakeRouter(_response(request), _catalog()), contract, request
+    )
+    report_path = persist_auditor_report(report, tmp_path / "report.md")
+    receipt_path = persist_auditor_receipt(
+        bind_auditor_report(receipt, report), tmp_path / "receipt.json"
+    )
+
+    result = adjudicate_auditor_artifact_pair(
+        receipt_path, report_path, contract, _catalog()
+    )
+
+    assert result.report_status is AuditorReportStatus.PASS
+    assert result.a08_verdict == "PASS"
+    assert result.qualified is True
 
 
 @pytest.mark.parametrize(

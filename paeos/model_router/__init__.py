@@ -8,10 +8,13 @@ from paeos.model_router.audit_prompt import (
 )
 from paeos.model_router.auditor_receipt import (
     AUDITOR_RECEIPT_SCHEMA,
+    AuditorArtifactAdjudication,
     AuditorCaptureResult,
     AuditorReceiptContract,
     AuditorReceiptError,
+    AuditorReportStatus,
     PhysicalAuditorReceipt,
+    adjudicate_auditor_artifact_pair,
     capture_auditor_receipt,
     load_auditor_receipt,
     persist_auditor_receipt,
@@ -55,10 +58,12 @@ from paeos.model_router.types import (
 
 __all__ = [
     "AUDITOR_RECEIPT_SCHEMA",
+    "AuditorArtifactAdjudication",
     "AuditorCaptureResult",
     "AuditorPromptError",
     "AuditorReceiptContract",
     "AuditorReceiptError",
+    "AuditorReportStatus",
     "ClineEnvelopeTransport",
     "CredentialStore",
     "DataClass",
@@ -83,6 +88,7 @@ __all__ = [
     "RouterStateDB",
     "TaskClass",
     "TaskRequest",
+    "adjudicate_auditor_artifact_pair",
     "build_builtin_transport_registry",
     "build_substantive_audit_prompt",
     "capture_auditor_receipt",
