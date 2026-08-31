@@ -3687,3 +3687,23 @@ create a Court row, seal a gate, ratify promotion, or resume SAKG. Current focus
 progress **12/48 complete | 36 remaining**. `DEBT-0058` and `DEBT-0060` remain open; prior
 negative/truncated provider attempts remain preserved and are not erased. Next work is the
 committed L17 record plus fresh L13/Court reconciliation before any gate advancement.
+
+### Entry 213 — 2026-08-31: Independent L13 Reproduction Passed at Current Candidate
+
+An independent mechanical verifier ran the complete repository test tree in detached worktree
+`/private/tmp/paeos-l13-9e0c2bd` at candidate
+`9e0c2bdfd6a80523bf176bc719843c611430b218`, excluding only
+`tests/model_router/test_gateway_server.py` because restricted loopback binding is denied. The
+exact command collected and passed **1,058 tests**, exit code `0`, elapsed `49.61s`.
+
+Raw stdout/stderr is preserved at `/private/tmp/l13-9e0c2bd-nongateway-rerun.log` (120,791 bytes,
+SHA-256 `31a0e724159c5f6f74f06ad308efe4ecebda0ce4885a1276fe6d6e34855e8482`) and the exit record
+at `/private/tmp/l13-9e0c2bd-nongateway-rerun.exit` (contents `0`, SHA-256
+`9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`). An earlier one-failure
+timing run and the isolated passing parameter are retained as negative/diagnostic evidence.
+
+This establishes current-candidate L13 mechanical reproduction only. It does not establish live
+worker admission, create Court rows, seal a gate, or resume SAKG. Together with Entry 212, it makes
+the L13/L14 evidence pair available for explicit Court/L16 reconciliation. Worker/Court counts
+remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and
+`DEBT-0058`/`DEBT-0060` remain open.

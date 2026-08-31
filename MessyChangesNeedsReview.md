@@ -647,5 +647,18 @@ Founder ratification, gate closure, or SAKG resumption. Worker/Court remain **0/
 **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060`
 remain open. Next is fresh L13 reproduction and explicit Court/L16 reconciliation.
 
+## 2026-08-31 — Independent L13 reproduction passed at candidate `9e0c2bd`
+
+The detached verifier worktree `/private/tmp/paeos-l13-9e0c2bd` ran the complete non-gateway suite
+against candidate `9e0c2bdfd6a80523bf176bc719843c611430b218`: **1,058 passed, 0 failed**, exit `0`.
+Raw log SHA-256: `31a0e724159c5f6f74f06ad308efe4ecebda0ce4885a1276fe6d6e34855e8482`; exit record
+contents `0`, SHA-256 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`.
+The gateway-server fixture remains explicitly excluded for restricted-loopback reasons. An earlier
+timing-sensitive SDK failure is preserved as negative evidence, not erased.
+
+This is L13 mechanical reproduction only. It does not create a Court row, seal a gate, or authorize
+SAKG. Combined with the qualified source-focused L14/A-08 evidence, it is ready for explicit
+Court/L16 reconciliation. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains
+**12/48 complete | 36 remaining**; `DEBT-0058`/`DEBT-0060` remain open.
 
 

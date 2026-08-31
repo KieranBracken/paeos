@@ -306,3 +306,18 @@ seal or Founder ratification. Current focused reproduction is **272 passed, 0 fa
 accounting remains Worker **0/1/0**, Court **0/0/0**, strict progress **12/48 complete | 36
 remaining**. `DEBT-0058` and `DEBT-0060` remain open; SAKG remains held pending fresh L13/L17/Court
 reconciliation.
+
+## 2026-08-31 — Current-candidate independent L13 reproduction
+
+Detached verifier worktree `/private/tmp/paeos-l13-9e0c2bd` ran
+`pytest tests --ignore=tests/model_router/test_gateway_server.py -rA` against candidate
+`9e0c2bdfd6a80523bf176bc719843c611430b218`. The complete non-gateway tree passed **1,058/1,058**
+with exit code `0` in `49.61s`. Raw log SHA-256 is
+`31a0e724159c5f6f74f06ad308efe4ecebda0ce4885a1276fe6d6e34855e8482`; exit record is `0` with
+SHA-256 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`.
+
+The gateway-server exclusion is explicit and remains an environment limitation, not a pass. The
+result is L13 mechanical reproduction only. With the qualified L14/A-08 pair now recorded, the
+next step is explicit Court/L16 reconciliation; no seal or SAKG resumption is implied. Worker/Court
+remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and
+`DEBT-0058`/`DEBT-0060` remain open.
