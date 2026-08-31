@@ -3326,3 +3326,24 @@ terminal-paste, retry, fallback, or promotion activity occurred. This recheck do
 provider-adapter migration or any gate: L14/L17 remain outstanding, worker/Court counts remain
 **0/1/0** and **0/0/0**, all four debts remain **OPEN**, and strict progress remains
 **12/48 complete | 36 remaining**.
+
+### Entry 194 — 2026-08-31: Embedded-Audit Delimiter Repair and Bundle Preparation
+
+The local bundle builder exposed a validator false rejection: required phase and delimiter strings
+quoted inside embedded governance/source evidence were counted as prompt controls. The repair in
+`paeos/model_router/audit_prompt.py` parses the outer block with the first begin and last end
+delimiter, counts control markers only outside the evidence, and rejects delimiter text outside
+that block. A regression now covers evidence quoting both phase and delimiter markers.
+
+Verification: prompt suite **9/9**, auditor/CLI/routing suites **38/38**, and the complete
+non-gateway suite **1,024/1,024** all passed; changed Ruff/Pyright were clean. A self-contained
+current candidate bundle was generated locally with secret scanning and credential-shaped fixture
+redaction: candidate `cf541f8168876b09ce4d2a4c4d1698622f2b8894`, bundle SHA-256
+`1df57b07878df23caa9a6a8cb5d7d9a29c9c0e36d0a151211cbb6ce75cbb8216`, prompt SHA-256
+`e94664cfa5d4ce6193aa35c0e37d8e37ed58ea33778e3bd08a7e5d9a2888a34b`. The bundle is prepared
+only; it has not been sent to any provider.
+
+This remains implementation evidence only. No external activity occurred; the prior Gemini audit
+remains `BLOCKED_UNQUALIFIABLE`, worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**,
+Court counts remain **Sealed: 0 | Remanded: 0 | Remediated: 0**, all four debts remain **OPEN**,
+and strict progress remains **12/48 complete | 36 remaining**.

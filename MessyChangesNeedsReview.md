@@ -501,6 +501,19 @@ control-plane/bridge/ledger verification passed **137/137**. No source mutation 
 external/provider activity occurred. This is implementation evidence only: L14/L17, Gate B seal,
 debt closure, and strict **12/48** progress are unchanged.
 
+## 2026-08-31 — Embedded-audit delimiter repair and local bundle preparation
+
+The self-contained audit prompt validator was repaired after a local bundle exposed false duplicate
+marker rejection when governance/source evidence quoted protocol delimiter strings. The outer block
+now uses first-begin/last-end parsing, control markers are counted only outside evidence, and
+delimiter text outside evidence is rejected. Focused prompt tests passed **9/9**, auditor/CLI/
+routing tests **38/38**, and the complete non-gateway suite **1,024/1,024**; changed Ruff/Pyright
+were clean. A current bundle was generated and secret-scanned locally (candidate
+`cf541f8168876b09ce4d2a4c4d1698622f2b8894`, evidence SHA
+`1df57b07878df23caa9a6a8cb5d7d9a29c9c0e36d0a151211cbb6ce75cbb8216`, prompt SHA
+`e94664cfa5d4ce6193aa35c0e37d8e37ed58ea33778e3bd08a7e5d9a2888a34b`). No external transmission
+occurred; L14/L17, gate seals, debt closure, and strict **12/48** progress are unchanged.
+
 ## 2026-08-31 — Provider registry compatibility recheck
 
 The provider-registry/catalog compatibility scope passed **16/16**. Pyright on the provider

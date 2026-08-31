@@ -170,6 +170,15 @@ pre-decided disposition of the 24 vacuous seals; treating any Freeze file as pri
   equivalent mutant because the projector repeats the invariant. All mutations were restored and
   the Gate B focused suite passed **137/137**. This is local evidence only; L14/L17, Gate B seal,
   debt closure, and strict progress remain unchanged at **12/48 complete | 36 remaining**.
+- 2026-08-31 the self-contained audit prompt validator was repaired to ignore quoted protocol and
+  delimiter markers inside embedded evidence while still rejecting controls outside the evidence
+  block. Prompt/audit suites passed **9/9** and **38/38**, and the complete non-gateway suite passed
+  **1,024/1,024** with clean changed Ruff/Pyright. A current bundle was prepared locally for
+  candidate `cf541f8168876b09ce4d2a4c4d1698622f2b8894` (evidence SHA
+  `1df57b07878df23caa9a6a8cb5d7d9a29c9c0e36d0a151211cbb6ce75cbb8216`; prompt SHA
+  `e94664cfa5d4ce6193aa35c0e37d8e37ed58ea33778e3bd08a7e5d9a2888a34b`). No provider call or
+  external transmission occurred; L14/L17, debts, worker/Court counts, and **12/48** progress are
+  unchanged.
 - 2026-08-31 provider-registry compatibility recheck passed **16/16** and Pyright reported zero
   diagnostics on the registry/types scope. Ruff retains **38 inherited findings** in legacy
   `paeos/model_router/types.py`; no clean-static claim is made. This does not close Gate C or

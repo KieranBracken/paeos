@@ -120,23 +120,29 @@ def validate_substantive_audit_prompt(
     if not content.strip():
         raise AuditorPromptError("audit prompt must not be empty")
 
+    try:
+        begin = content.index(EVIDENCE_BEGIN_MARKER)
+        end = content.rindex(EVIDENCE_END_MARKER)
+    except ValueError as exc:
+        raise AuditorPromptError("audit prompt must contain evidence delimiters") from exc
+    if end <= begin:
+        raise AuditorPromptError("embedded evidence delimiters are out of order")
+    outside_evidence = content[:begin] + content[end + len(EVIDENCE_END_MARKER) :]
     required_once = (
         AUDIT_PHASE_MARKER,
         PHYSICAL_RECEIPT_PHASE_MARKER,
         PROVENANCE_ABSENCE_MARKER,
         f"Candidate SHA: {candidate_sha}",
         f"Evidence Bundle SHA-256: {evidence_sha256}",
-        EVIDENCE_BEGIN_MARKER,
-        EVIDENCE_END_MARKER,
     )
     for marker in required_once:
-        if content.count(marker) != 1:
+        if outside_evidence.count(marker) != 1:
             raise AuditorPromptError(f"audit prompt must contain marker exactly once: {marker}")
-
-    begin = content.index(EVIDENCE_BEGIN_MARKER) + len(EVIDENCE_BEGIN_MARKER)
-    end = content.index(EVIDENCE_END_MARKER)
-    if end <= begin:
-        raise AuditorPromptError("embedded evidence delimiters are out of order")
+    if outside_evidence.count(EVIDENCE_BEGIN_MARKER) or outside_evidence.count(
+        EVIDENCE_END_MARKER
+    ):
+        raise AuditorPromptError("evidence delimiters must not appear outside the evidence block")
+    begin += len(EVIDENCE_BEGIN_MARKER)
     instructions = content[:begin]
     if _SELF_REFERENTIAL_RECEIPT_RE.search(instructions):
         raise AuditorPromptError("future receipt cannot be required in the audit request")
