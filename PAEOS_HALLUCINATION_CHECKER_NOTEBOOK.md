@@ -3857,6 +3857,21 @@ rotation/quota-stop evidence, bootstrap disposition, fresh current-candidate L14
 Court/L16 remain outstanding. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains
 **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
 
+### Entry 223 — 2026-08-31: Gate G Current Lifecycle CLI Checkpoint
+
+The lifecycle evidence-matrix and Court-reconciliation tests plus the new read-only lifecycle CLI
+passed **13/13**, exit `0`; Ruff and Pyright are clean on the scope. The CLI opens a state-root-bound
+SQLite ledger in read-only/query-only mode, verifies the complete hash chain, emits exactly 19
+ordered layer rows, includes exact Court counts, and returns exit `2` for any unproven or remanded
+layer. No ledger/CAS/repository write, provider, credential, browser, clipboard, worker, or
+promotion activity occurred.
+
+The constitutional review is recorded at
+`reviews/tasks/PAEOS_GATE_G_CURRENT_REVALIDATION_review.md`. This remains implementation evidence:
+the historical L01-L19 claim is remanded, and current L13/L14/L17, Court/L16, and operational
+end-to-end evidence are absent. Worker/Court remain **0/1/0** and **0/0/0**; strict progress
+remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+
 ### Entry 224 — 2026-08-31: Full Non-Gateway Reconciliation After Disk Recovery
 
 The first full non-gateway run stopped with four SQLite `disk I/O error` setup failures because
@@ -3872,17 +3887,17 @@ This is mechanical reproduction evidence only; it does not create a Court row or
 progress. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete |
 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
 
-### Entry 223 — 2026-08-31: Gate G Current Lifecycle CLI Checkpoint
+### Entry 225 — 2026-08-31: Historical Ledger Reality Check
 
-The lifecycle evidence-matrix and Court-reconciliation tests plus the new read-only lifecycle CLI
-passed **13/13**, exit `0`; Ruff and Pyright are clean on the scope. The CLI opens a state-root-bound
-SQLite ledger in read-only/query-only mode, verifies the complete hash chain, emits exactly 19
-ordered layer rows, includes exact Court counts, and returns exit `2` for any unproven or remanded
-layer. No ledger/CAS/repository write, provider, credential, browser, clipboard, worker, or
-promotion activity occurred.
+The new lifecycle CLI was run once against the external historical ledger
+`/private/tmp/paeos-l13-fa59117/.paeos_state_investigation/ledger.db` (verified head
+`4c1e569293e643f8db7177cecc98be5afe899cd07604d39c3c757e5909ffb8e9`). The database contains one
+`goal_created` row and no run-bound layer, artifact, L13/L14/L17, Court, or SAKG evidence. The
+report therefore returned exit `2`, exact counts `Sealed: 0 | Remanded: 0 | Remediated: 0`, and
+all 19 layers `UNPROVEN`. A second attempt against an in-worktree state root was refused before
+ledger access, as required by the external-state-root boundary. No historical completion claim is
+accepted from this data.
 
-The constitutional review is recorded at
-`reviews/tasks/PAEOS_GATE_G_CURRENT_REVALIDATION_review.md`. This remains implementation evidence:
-the historical L01-L19 claim is remanded, and current L13/L14/L17, Court/L16, and operational
-end-to-end evidence are absent. Worker/Court remain **0/1/0** and **0/0/0**; strict progress
-remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+This is read-only audit evidence; no seal, remediation credit, or strict-progress advancement is
+created. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete |
+36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
