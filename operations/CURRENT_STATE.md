@@ -404,6 +404,13 @@ no gate, Court count, debt, or SAKG status changes.
   Strict progress remains **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and
   **0/0/0**; `DEBT-0058`/`DEBT-0060` remain open.
 
+- 2026-08-31 historical ledger reality check: external ledger head
+  `4c1e569293e643f8db7177cecc98be5afe899cd07604d39c3c757e5909ffb8e9` contains only one
+  `goal_created` row and no run-bound layer evidence. The read-only lifecycle CLI returned exit `2`
+  with all 19 layers `UNPROVEN` and exact Court counts `0/0/0`; an in-worktree state root was
+  correctly refused. Historical “complete” prose is not accepted as operational proof; strict
+  progress remains **12/48 complete | 36 remaining**.
+
 - 2026-08-31 full non-gateway reconciliation: an initial run recorded four SQLite setup errors
   caused by a disk-full host condition (~77 MiB free), not test assertions. After removing only
   five disposable pytest sandboxes, the affected coordinator scope passed **7/7** and the fresh

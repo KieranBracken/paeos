@@ -735,6 +735,15 @@ current-candidate L14/L17, or Court/L16 evidence exists; Worker/Court remain **0
 **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060`
 remain open.
 
+## 2026-08-31 — Historical ledger reality check
+
+The read-only lifecycle CLI inspected the external historical ledger at
+`/private/tmp/paeos-l13-fa59117/.paeos_state_investigation/ledger.db` (head
+`4c1e569293e643f8db7177cecc98be5afe899cd07604d39c3c757e5909ffb8e9`). It contains only one
+`goal_created` row and no run-bound layer evidence, so all 19 layers are `UNPROVEN`, exit `2`,
+with Court counts `0/0/0`. The CLI also refused an in-worktree state root. Historical completion
+prose remains remanded and does not advance **12/48 complete | 36 remaining**.
+
 ## 2026-08-31 — Gate G current lifecycle CLI checkpoint
 
 The lifecycle evidence-matrix, Court-reconciliation, and read-only CLI tests passed **13/13**

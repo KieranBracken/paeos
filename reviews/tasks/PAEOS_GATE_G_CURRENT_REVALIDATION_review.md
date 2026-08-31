@@ -20,6 +20,11 @@
   row for each L01-L19 layer. Any `UNPROVEN` or `REMANDED` layer produces exit `2`.
 - No ledger/CAS/repository writes, Court append, provider, credential, browser, clipboard, or
   promotion activity occurred.
+- Read-only execution against the external historical ledger
+  `/private/tmp/paeos-l13-fa59117/.paeos_state_investigation/ledger.db` verified head
+  `4c1e569293e643f8db7177cecc98be5afe899cd07604d39c3c757e5909ffb8e9`; its sole row is a
+  `goal_created` event with no run-bound layer evidence, so the CLI returned exit `2` with all 19
+  layers `UNPROVEN`. An in-worktree ledger was refused by the external-state-root boundary.
 
 ## Checklist
 
