@@ -556,5 +556,13 @@ are cryptographically bound and validated. Substantive `L14_STATUS: PASS`, physi
 `DEBT-0059` is REPAID. Gate B is officially SEALED. Strict sealed progress advances to **13/48 complete | 35 remaining**.
 Court counts: `1/0/0`. Gate C is next.
 
+## 2026-08-31 — Gate C sealed via candidate `3e44133` qualified L14/L17 audit
+
+Gate C (Headless Supervisor Adapters & Checkpointing) is officially SEALED. Protocol, admission,
+CAS checkpoints/rotation, descriptor registry, and Codex/Antigravity headless adapters qualified.
+`DEBT-0061` is REPAID. Strict sealed progress advances to **14/48 complete | 34 remaining**.
+Court counts: `2/0/0`. Gate D is next.
+
+
 
 

@@ -3430,5 +3430,23 @@ Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court counts
 Strict sealed progress advances from **12/48** to **13/48 complete | 35 remaining**.
 Next authorized program step: Gate C (Headless Supervisor Adapters & Checkpointing).
 
+### Entry 199 — 2026-08-31: Gate C L14/L17 Ratification, DEBT-0061 Repayment & Gate C Sealed
+
+Following the qualified L14 physical audit capture on candidate `3e44133b087ce8deffcc53d99677307f578a4b8c`
+(report `e44e2ab0...`, receipt `8fa43166...`, `L14_STATUS: PASS`, `A-08 PASS`), Gate C (Headless Supervisor Adapters
+& Checkpointing) was ratified and sealed.
+
+1. **Supervisor Protocol & Admission:** Verified strict typed UTF-8 JSON envelopes (`paeos-supervisor-v1`),
+   task-class-scoped admission, and 30-day TTL fencing.
+2. **CAS Checkpoints & Rotation:** Verified content-addressed `SupervisorCheckpoint` rotation and stale-claim fencing.
+3. **Descriptor Registry & Adapters:** Verified shell-free Codex and Antigravity adapters registered provider-neutrally.
+4. **Recovery Policy:** Verified deterministic failure matrix and back-pressure recovery.
+5. **Debt Resolution:** `DEBT-0061` (report-content binding & accounting validation) is **REPAID**. `DEBT-0058` and `DEBT-0060` remain **OPEN**.
+6. **Court Accounting:** Court Sealed count advances to **2** (`Sealed: 2 | Remanded: 0 | Remediated: 0`). Worker counts remain **Admitted: 0 | Rejected: 1 | Remediated: 0**.
+7. **Gate Disposition:** **`GATE C SEALED`** (Milestones 1–7 complete).
+8. **Strict Progress:** Advances to **`14 / 48 complete | 34 remaining`** (52 detailed tasks remain).
+Next authorized program step: Gate D (Event Watchdog & Liveness Recovery).
+
+
 
 

@@ -88,3 +88,27 @@ collected **955** and passed. The malformed external report is now deterministic
 false worker accounting. A two-process lock test and stale-digest test prove the local fencing
 primitive. DEBT-0061 and DEBT-0059 remain open pending fresh candidate-bound L14/L17 evidence and
 an end-to-end adapter competition probe; no Gate C seal is claimed.
+
+## Gate C Ratification and Sealing — 2026-08-31
+
+- **Candidate Commit:** `3e44133b087ce8deffcc53d99677307f578a4b8c`
+- **Evidence Bundle SHA-256:** `225921fc9edd581c4a6022cee05328d5b99f407390d7bcdb911a395d3257e421`
+- **Prompt SHA-256:** `b6f9d6ea65a59823e6017d16897742701e86a5d4cb017b9b25ef278a3bc8da4d`
+- **Audit Invocation ID:** `l14-l17-3e44133-antigravity-001`
+- **Physical Auditor:** `google:gemini-3.6-flash` (Gemini family, A-08 decorrelation vs GLM builder)
+- **Physical Receipt:** `/private/tmp/paeos-l14-l17-receipt-3e44133.json` (SHA-256 `8fa43166add7f26733f80e8d983de615ccdac4f71818387607ddaeead3bbc815`)
+- **Persisted Report:** `/private/tmp/paeos-l14-l17-report-3e44133.md` (SHA-256 `e44e2ab0e4ce3a5e5a44b993643b058e8095f418fd205e8f52345fc5e0ba37d1`)
+- **Substantive L14 Status:** **`PASS`**
+- **Physical A-08 Verdict:** **`PASS`**
+- **Adjudication Verdict:** **`QUALIFIED (True)`**
+
+### Key Validations & Invariants
+1. **Supervisor Protocol & Admission:** Verified strict typed UTF-8 JSON envelopes (`paeos-supervisor-v1`), task-class-scoped admission, and TTL fencing.
+2. **CAS Checkpoints & Clean Rotation:** Verified content-addressed `SupervisorCheckpoint` rotation and stale-owner exclusion.
+3. **Descriptor Registry & Wrappers:** Verified shell-free Codex and Antigravity adapters registered provider-neutrally without coordinator branches.
+4. **Failure Recovery Matrix:** Verified quota-safe recovery, deterministic timeout, and back-pressure.
+5. **Debt Closure:** `DEBT-0061` (report-content binding & accounting validation) is **REPAID**. `DEBT-0058` and `DEBT-0060` remain **OPEN**.
+6. **Court Accounting:** Court Sealed count advances to 2 (`Sealed: 2 | Remanded: 0 | Remediated: 0`). Worker counts remain `Admitted: 0 | Rejected: 1 | Remediated: 0`.
+7. **Gate Disposition:** **`GATE C SEALED`** (Milestones 1–7 complete).
+8. **Strict Progress:** Advances to **`14 / 48 complete | 34 remaining`** (52 detailed tasks remain).
+
