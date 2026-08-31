@@ -414,7 +414,25 @@ no gate, Court count, debt, or SAKG status changes.
 - 2026-08-31 full non-gateway reconciliation: an initial run recorded four SQLite setup errors
   caused by a disk-full host condition (~77 MiB free), not test assertions. After removing only
   five disposable pytest sandboxes, the affected coordinator scope passed **7/7** and the fresh
-  full non-gateway suite passed **1,070/1,070** (exit `0`); collect-only reconciliation also totals
-  **1,070**. `tests/model_router/test_gateway_server.py` remains excluded by policy. No code,
-  ledger, provider, or gate state changed; strict progress remains **12/48 complete | 36 remaining**
-  and Worker/Court remain **0/1/0** and **0/0/0**.
+full non-gateway suite passed **1,070/1,070** (exit `0`); collect-only reconciliation also totals
+**1,070**. `tests/model_router/test_gateway_server.py` remains excluded by policy. No code,
+ledger, provider, or gate state changed; strict progress remains **12/48 complete | 36 remaining**
+and Worker/Court remain **0/1/0** and **0/0/0**.
+
+## 2026-08-31 — Bound Cline worker stdio recovery slice
+
+The isolated recovery branch at candidate `15ef316dfe3152959e52cdee5aafb54eb4ce8fd2` now contains
+the state-root-bound one-shot framed worker transport, immutable policy sidecar, create-only
+response/quarantine/handoff persistence, explicit CLI, and opt-in runtime adapter. Focused
+transport/policy/persistence/CLI/compatibility verification passed **35/35** (exit `0`); changed
+Ruff is clean, Pyright reports **0 diagnostics**, and the Node host passes syntax validation.
+
+The non-gateway suite collects **1,093 tests** with the gateway-server fixture excluded. A single
+full execution attempt exited `1` because the host filesystem exhausted during pytest setup
+(`OSError: [Errno 28] No space left on device`); it is not counted as test evidence and was not
+identically retried. Review: `reviews/tasks/PAEOS_BOUND_CLINE_WORKER_STDIO_review.md`.
+
+This remains implementation evidence only. The old GUI/CDP/clipboard/AppleScript bridge is not
+reactivated. Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete |
+36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open. No gate closure, lifecycle advancement, or
+SAKG resumption is authorized.

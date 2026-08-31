@@ -3901,3 +3901,25 @@ accepted from this data.
 This is read-only audit evidence; no seal, remediation credit, or strict-progress advancement is
 created. Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete |
 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open.
+
+### Entry 226 — 2026-08-31: Bound Cline Worker Stdio Recovery Slice
+
+The isolated recovery branch implemented a state-root-bound, one-shot framed Cline worker
+transport across commits `bf0882a`, `c72847d`, `b378642`, `38ba251`, `5eedb8d`, and `15ef316`.
+The focused transport/policy/persistence/CLI/compatibility suite passed **35/35**, exit `0`;
+changed-path Ruff was clean, Pyright reported **0 diagnostics**, and the existing Node host passed
+syntax validation. The implementation removes the need for GUI/CDP/clipboard/AppleScript handoff,
+enforces immutable tool policy, rejects protocol/deadline/path/attempt violations, and persists
+create-only content-free quarantine and handoff metadata.
+
+The non-gateway collection now totals **1,093 tests** with the gateway-server fixture excluded by
+policy. One full execution was attempted once but reached host `ENOSPC` during pytest setup,
+raising `OSError: [Errno 28] No space left on device` for temporary directories and CAS fixtures;
+the incomplete run is not counted as passing evidence and was not identically retried. Review and
+handoff are recorded in
+`reviews/tasks/PAEOS_BOUND_CLINE_WORKER_STDIO_review.md`.
+
+This is implementation/recovery evidence only. Worker/Court remain **0/1/0** and **0/0/0**;
+strict progress remains **12/48 complete | 36 remaining** (`54` granular tasks); `DEBT-0058`
+and `DEBT-0060` remain **OPEN**; L14/L17 and Court/L16 remain outstanding; no gate seal or SAKG
+resumption is authorized.

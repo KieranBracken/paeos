@@ -789,3 +789,11 @@ clean claim is made. The mandatory review is
 This is implementation evidence only. No current-candidate L14/L17 receipt or Court/L16 row
 exists, so Gate C remains unsealed; Worker/Court remain **0/1/0** and **0/0/0**, strict progress
 remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open.
+
+- 2026-08-31 the isolated recovery branch implemented the bound Cline worker stdio transport
+  (candidate `15ef316dfe3152959e52cdee5aafb54eb4ce8fd2`). Focused transport/policy/persistence/
+  CLI/compatibility checks passed **35/35**; Ruff and Pyright are clean and Node syntax checks
+  pass. A full non-gateway attempt collected **1,093** tests but exited `1` when pytest setup hit
+  host `ENOSPC`; this is not counted as passing evidence and was not identically retried. The
+  transport is opt-in, no GUI/clipboard/AppleScript path was reactivated, and no gate/debt/Court/
+  SAKG state changed. Review/handoff: `reviews/tasks/PAEOS_BOUND_CLINE_WORKER_STDIO_review.md`.
