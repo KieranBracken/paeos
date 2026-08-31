@@ -94,11 +94,14 @@ caller later proves an exact report-bound A-08 receipt from a family different f
 Return exactly one substantive status from PASS, REMAND_WITH_AMENDMENTS, or
 BLOCKED_UNQUALIFIABLE. Include these machine-readable lines with factual explanations:
 
+Candidate SHA: <candidate-sha-from-header>
+Evidence Bundle SHA-256: <evidence-bundle-sha256-from-header>
 L14_STATUS: <status>
 INVARIANT: <finding>
 REPRODUCTION: <finding>
 {_accounting_line("Worker", worker_counts)}
 {_accounting_line("Court", court_counts)}
+
 
 {EVIDENCE_BEGIN_MARKER}
 {evidence}
