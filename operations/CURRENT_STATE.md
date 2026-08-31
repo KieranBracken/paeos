@@ -355,3 +355,13 @@ no gate, Court count, debt, or SAKG status changes.
   recovery transaction still needs independent reproduction and Court admission. No provider,
   credential, browser, clipboard, ledger, gate, or SAKG state changed. Strict progress remains
   **12/48 complete | 36 remaining**; Worker/Court remain **0/1/0** and **0/0/0**.
+
+- 2026-08-31 detached verifier `/private/tmp/paeos-l13-fa59117` independently reproduced the
+  bridge-retirement candidate `fa59117` with **1,060/1,060** non-gateway tests passing (exit `0`).
+  Raw log SHA-256 is `bbdcfafbf3fbec3e4686c37ffecf614031941853012be3dfe1602ea4aa2d1fc7`; exit
+  record SHA-256 is `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`.
+  A compact L14/L17 package was prepared locally, but dispatch was stopped before provider contact:
+  the first attempt hit local router-state `OperationalError`, and the elevated attempt was denied
+  because this exact internal bundle/destination needs explicit outbound authorization. No workaround,
+  retry, or fallback occurred. L14/L17, Court/L16, `DEBT-0058`, and `DEBT-0060` remain open; no
+  gate seal or SAKG resumption is authorized.

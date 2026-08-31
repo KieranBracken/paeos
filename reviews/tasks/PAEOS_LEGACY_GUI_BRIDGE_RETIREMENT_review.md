@@ -25,6 +25,10 @@ Evidence collected in the isolated recovery worktree:
 - Direct launcher probes: all three retired entrypoints returned `2` and emitted only a
   fail-closed diagnostic. No provider, credential, browser, clipboard, or terminal activity was
   performed.
+- Detached verifier `/private/tmp/paeos-l13-fa59117` independently reproduced the post-repair
+  tree: **1,060/1,060** non-gateway tests passed, exit `0`. Raw log SHA-256 is
+  `bbdcfafbf3fbec3e4686c37ffecf614031941853012be3dfe1602ea4aa2d1fc7`; exit-record SHA-256 is
+  `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`.
 
 ## Summary of Findings
 
@@ -97,6 +101,10 @@ transaction binding and evidence contracts rather than reintroduce GUI automatio
       independently reproduced and admitted by Court.
 - [ ] Obtain a fresh candidate-bound L14/L17 audit for this post-change commit before any gate
       closure or SAKG resumption decision.
+
+The attempted audit dispatch for this candidate was stopped before provider contact because the
+execution boundary requires explicit authorization for this exact internal bundle and destination.
+No workaround, fallback, or retry was attempted.
 
 ## Disposition
 

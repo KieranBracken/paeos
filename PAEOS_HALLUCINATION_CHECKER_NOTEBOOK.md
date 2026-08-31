@@ -3777,3 +3777,22 @@ remains open until a coordinator-backed liveness/recovery transaction is indepen
 Canonical accounting remains Worker **Admitted: 0 | Rejected: 1 | Remediated: 0**; Court
 **Sealed: 0 | Remanded: 0 | Remediated: 0**; strict progress **12/48 complete | 36 remaining**.
 SAKG remains held pending fresh candidate-bound L13/L14/L16 reconciliation.
+
+### Entry 218 — 2026-08-31: Post-Repair L13 Reproduction and Audit Authorization Boundary
+
+Detached verifier `/private/tmp/paeos-l13-fa59117` independently ran the current recovery commit
+`fa59117bd457274193a91aea873df388713557c9` and passed **1,060/1,060** non-gateway tests, exit
+`0`. Raw stdout/stderr is preserved at `/private/tmp/l13-fa59117-nongateway.log` (SHA-256
+`bbdcfafbf3fbec3e4686c37ffecf614031941853012be3dfe1602ea4aa2d1fc7`); exit record SHA-256 is
+`9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. The gateway-server fixture
+remains excluded under restricted loopback policy.
+
+A compact candidate-bound L14/L17 package was prepared locally (bundle SHA-256
+`ca65dd22923f1f7861654c0ec514905669dee4180b94031cb16459f120fd472f`; prompt SHA-256
+`5e084795c9151d0b1dbe155ca8f5b0a532b6042dde758a5f4a58cd03c2ba6ffe`). The first dispatch failed
+locally with `AUDITOR_RECEIPT_FAILED:OperationalError` before provider contact because the
+sandbox could not open router state. A second attempt was rejected by the execution boundary as
+requiring explicit authorization for this exact internal bundle and Google destination. No
+provider call, fallback, retry, or workaround occurred. L14/L17 remains unqualifiable for this
+post-repair candidate; Worker/Court remain **0/1/0** and **0/0/0**, strict progress remains
+**12/48 complete | 36 remaining**, and SAKG remains held.
