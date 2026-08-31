@@ -1,6 +1,11 @@
 """
 PAEOS Model Router & Free Inference Mesh Subsystem
 """
+from paeos.model_router.audit_prompt import (
+    AuditorPromptError,
+    build_substantive_audit_prompt,
+    validate_substantive_audit_prompt,
+)
 from paeos.model_router.auditor_receipt import (
     AUDITOR_RECEIPT_SCHEMA,
     AuditorCaptureResult,
@@ -42,6 +47,7 @@ from paeos.model_router.types import (
     NormalizedErrorType,
     ProviderHealth,
     ProviderId,
+    RetryPolicy,
     RouterResponse,
     TaskClass,
     TaskRequest,
@@ -50,6 +56,7 @@ from paeos.model_router.types import (
 __all__ = [
     "AUDITOR_RECEIPT_SCHEMA",
     "AuditorCaptureResult",
+    "AuditorPromptError",
     "AuditorReceiptContract",
     "AuditorReceiptError",
     "ClineEnvelopeTransport",
@@ -71,11 +78,13 @@ __all__ = [
     "ProviderId",
     "ProviderRegistry",
     "ProviderTransportRegistry",
+    "RetryPolicy",
     "RouterResponse",
     "RouterStateDB",
     "TaskClass",
     "TaskRequest",
     "build_builtin_transport_registry",
+    "build_substantive_audit_prompt",
     "capture_auditor_receipt",
     "load_auditor_receipt",
     "normalize_provider_key",
@@ -85,4 +94,5 @@ __all__ = [
     "response_fingerprint",
     "run_gateway_server",
     "validate_auditor_receipt",
+    "validate_substantive_audit_prompt",
 ]

@@ -129,7 +129,7 @@ Commit message: `feat(router): enforce one-shot request policy`
 - Produces: `validate_substantive_audit_prompt(content, candidate_sha, evidence_sha256) -> None`.
 - Consumed by: Task 4 capture CLI integration.
 
-- [ ] **Step 1: Write failing prompt behavior tests**
+- [x] **Step 1: Write failing prompt behavior tests**
 
 ```python
 def test_builder_embeds_evidence_and_separates_post_response_provenance():
@@ -157,23 +157,23 @@ def test_validator_rejects_path_only_or_self_referential_prompt():
         )
 ```
 
-- [ ] **Step 2: Run RED tests**
+- [x] **Step 2: Run RED tests**
 
 Run: `/Users/bob/GitHub/paeos/.venv/bin/python -m pytest -q tests/model_router/test_audit_prompt.py`
 
 Expected: the tests fail inside their bodies with `ModuleNotFoundError` because the module does not
 exist; pytest still collects and reports the intended missing behavior.
 
-- [ ] **Step 3: Implement the pure builder and fail-closed validator**
+- [x] **Step 3: Implement the pure builder and fail-closed validator**
 
 Use exact phase markers, exact counts, a non-empty delimited evidence section, and the existing
 three report statuses. Do not read files, credentials, or routes in this module.
 
-- [ ] **Step 4: Run GREEN, Ruff, and Pyright**
+- [x] **Step 4: Run GREEN, Ruff, and Pyright**
 
 Run the focused pytest file, Ruff on the new module/test, and Pyright on the same paths.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Commit message: `feat(audit): define substantive review prompt`
 
