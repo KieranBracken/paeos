@@ -140,3 +140,18 @@ disposition. Gate A's Founder seal does not seal Gate B. External accounting is 
 **Admitted: 3 | Rejected: 3 | Remediated: 0**, Court **Sealed: 1 | Remanded: 0 | Remediated: 0**,
 and strict progress remains **13/48 complete | 35 remaining**.
 
+## Fresh Audit Attempt — 2026-09-01 (`4410180`)
+
+The Founder-authorized one-shot Gemini dispatch targeted candidate
+`441018026d5fb67bae4c0eb06a7db760caa0bc86` with evidence bundle SHA-256
+`66f8d5f945ffddb937667ed46c630f163cb7b34215eedaf105cde8dca52b246d`, audit ID
+`l14-l17-4410180-gemini-001`, and `max_tokens=4096`. The router made exactly one provider
+attempt and returned HTTP `429` `RATE_LIMITED` before a model turn (observation `1072`; zero
+prompt/completion tokens). No fallback or retry occurred, and no report or physical receipt was
+created. The raw transport-failure artifact is preserved at
+`/private/tmp/paeos-l14-l17-receipt-4410180.json.transport-failure.json` with SHA-256
+`0a151df88d4d72fc3bb04f4d03a52155c9d956b6665727afac347d4435972035`.
+
+Disposition remains **BLOCKED_UNQUALIFIABLE**. This attempt provides no L14/L17 evidence and does
+not change Gate B's status, debt state, Court accounting, or strict progress. A future attempt
+requires a materially distinct, quota-eligible authorization and must not reuse this request.

@@ -4333,3 +4333,17 @@ identical request was retried. Gate B Tasks 5.3–5.5 remain open and Gate B is 
 permitted action is a fresh, materially distinct candidate-bound non-GLM audit followed by a
 separate L16/Court disposition. External counts remain Worker **3/3/0**, Court **1/0/0**, and
 strict progress **13/48 complete | 35 remaining** after the Founder-sealed Gate A decision.
+
+### Entry 247 — 2026-09-01: authorized Gate B audit blocked by Gemini rate limit
+
+The Founder-authorized one-shot `l14-l17-4410180-gemini-001` targeted candidate
+`441018026d5fb67bae4c0eb06a7db760caa0bc86` and evidence SHA-256
+`66f8d5f945ffddb937667ed46c630f163cb7b34215eedaf105cde8dca52b246d` with
+`max_tokens=4096`. Google Gemini (`gemini-3.6-flash`, family `gemini`) made one provider attempt
+and returned HTTP `429` `RATE_LIMITED` before a model turn (router observation `1072`, zero
+prompt/completion tokens). No fallback or retry occurred; no report or receipt was created. The
+raw transport-failure artifact is preserved at
+`/private/tmp/paeos-l14-l17-receipt-4410180.json.transport-failure.json` (SHA-256
+`0a151df88d4d72fc3bb04f4d03a52155c9d956b6665727afac347d4435972035`). Disposition is
+**BLOCKED_UNQUALIFIABLE**. Gate B remains unsealed and progress remains **13/48 complete | 35
+remaining**; this exact request is not to be retried.

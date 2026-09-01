@@ -719,3 +719,18 @@ candidate-bound non-GLM audit pair plus a separate L16/Court disposition. Gate A
 Founder record above. External Worker/Court accounting is **3/3/0** and **1/0/0** respectively;
 strict progress is **13/48 complete | 35 remaining**. No Gate C advancement, production dispatch,
 promotion, or SAKG resumption is authorized.
+
+## 2026-09-01 — Authorized Gate B audit blocked at Gemini transport boundary
+
+The one-shot Gemini request `l14-l17-4410180-gemini-001` for candidate
+`441018026d5fb67bae4c0eb06a7db760caa0bc86` and bundle SHA-256
+`66f8d5f945ffddb937667ed46c630f163cb7b34215eedaf105cde8dca52b246d` executed once with
+`max_tokens=4096`. Router observation `1072` records provider `google`, model
+`gemini-3.6-flash`, family `gemini`, HTTP `429` `RATE_LIMITED`, and zero tokens. No fallback or
+retry occurred; no report or receipt was produced. The raw failure artifact is preserved at
+`/private/tmp/paeos-l14-l17-receipt-4410180.json.transport-failure.json` (SHA-256
+`0a151df88d4d72fc3bb04f4d03a52155c9d956b6665727afac347d4435972035`).
+
+Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
+remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**. The
+failed request is retired; any later attempt must be materially distinct and separately authorized.

@@ -975,3 +975,11 @@ candidate-bound audit and disposition.
   Tasks 5.3–5.5 remain open and Gate B is unsealed pending a fresh materially distinct non-GLM
   audit pair and its own L16/Court disposition. External counts remain Worker **3/3/0**, Court
   **1/0/0**, strict progress **13/48 complete | 35 remaining**.
+
+- 2026-09-01 the Founder-authorized one-shot Gemini dispatch `l14-l17-4410180-gemini-001`
+  (candidate `441018026d5fb67bae4c0eb06a7db760caa0bc86`, bundle SHA
+  `66f8d5f945ffddb937667ed46c630f163cb7b34215eedaf105cde8dca52b246d`) was blocked by HTTP 429
+  `RATE_LIMITED` before a model turn (router observation `1072`, zero tokens). No fallback or
+  retry occurred and no report/receipt was created. Raw failure artifact SHA is
+  `0a151df88d4d72fc3bb04f4d03a52155c9d956b6665727afac347d4435972035`; Gate B remains unsealed,
+  with progress **13/48 complete | 35 remaining**. The exact request is retired.
