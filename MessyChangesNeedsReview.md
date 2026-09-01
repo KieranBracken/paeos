@@ -992,6 +992,19 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 the verifier prepared the external Gate C Z0 catalog proposal `CANARY-0003` through
+  `CANARY-0009` (catalog digest
+  `581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`; summary SHA-256
+  `cf30d731383e57c744d0ea7e327c411fe953e28a7b4252d17723e33bcb2686f2`). The ordered ladder
+  recorded **7/7 PASS** install/reach/kill results and one deliberate healthy **REMAND** control;
+  this is synthetic evidence preparation only. Proposal artifacts are external under
+  `/private/tmp/paeos-gate-c-z0-proposal-20260901/`, and no `constitution/canaries/` file was
+  changed. The final Court request is
+  `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md` (SHA-256
+  `349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`). Gate C remains
+  unsealed pending Founder ratification and L16/Court disposition; `DEBT-0060` remains OPEN and
+  strict progress is **14/48 complete | 34 remaining**.
+
 - 2026-09-01 current Gate C candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` received a
   qualified one-shot Gemini L14/L17 audit against bundle SHA-256
   `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. Report SHA-256 is

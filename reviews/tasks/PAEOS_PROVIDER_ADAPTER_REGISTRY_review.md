@@ -103,3 +103,19 @@ ratified Z0 canary set.
 
 Gate C remains **NOT GATE-SEALED** pending the Z0 canary boundary, L17 reconciliation, and a
 separate Founder/Court disposition. No later gate or SAKG work is authorized.
+
+## Gate C Z0 canary catalog proposal — 2026-09-01
+
+The verifier prepared an external proposal catalog for `CANARY-0003` through `CANARY-0009`,
+covering instruction fidelity, architecture escape, raw-evidence separation, restart, privacy,
+self-ratification, and prompt injection. The catalog digest is
+`581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`; catalog summary SHA-256 is
+`cf30d731383e57c744d0ea7e327c411fe953e28a7b4252d17723e33bcb2686f2`. The external proposal root
+is `/private/tmp/paeos-gate-c-z0-proposal-20260901/`; the ratified constitution was not changed.
+
+The ladder passed **7/7** ordered install/reach/kill checks and retained one healthy control
+`REMAND` (exit `2`, no kill). These are synthetic verifier-owned preparation artifacts and do
+not constitute Z0 ratification or a Gate C seal. The final Court request is
+`/private/tmp/paeos-gate-c-court-disposition-request-20260901.md`, SHA-256
+`349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`. Gate C remains unsealed
+until Founder ratification of the exact catalog and a separate L16/Court disposition.

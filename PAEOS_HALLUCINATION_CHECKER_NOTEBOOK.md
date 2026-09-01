@@ -4462,3 +4462,32 @@ SHA-256 is `bb6936cd5e8c0bf7a5ee11727b78bd709ecbd74c7badd9f241cbbe23ebb1c108`, a
 metadata SHA-256 is `56d7039d18de7e4920f7b821a3e99c4cfe36ee71178348b3c78cd4cedd300b29`. No retry or
 fallback occurred. The later compact attempt is the separately authorized qualified pair recorded
 in Entry 253.
+
+### Entry 255 — 2026-09-01: Gate C Z0 catalog proposed and canary ladder completed
+
+The verifier prepared an external, non-ratified Gate C Z0 proposal catalog for `CANARY-0003`
+through `CANARY-0009`. The seven entries cover instruction fidelity, architecture escape,
+raw-evidence separation, restart, privacy, self-ratification, and prompt injection. The ordered
+catalog digest is `581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`; the catalog
+summary SHA-256 is `cf30d731383e57c744d0ea7e327c411fe953e28a7b4252d17723e33bcb2686f2`. The exact
+proposal files and verifier-owned runtime artifacts are under
+`/private/tmp/paeos-gate-c-z0-proposal-20260901/`; no file under `constitution/canaries/` was
+created or changed.
+
+The canary ladder ran once per entry: all seven entries recorded `installed=true`, `reached=true`,
+and `killed=true` with runner exit `0`. The intentionally healthy control
+`GATE-C-Z0-CONTROL-REMAND` recorded `killed=false`, verdict `REMAND`, and runner exit `2`; this
+remand is preserved as evidence that the harness does not optimize for zero remands. The ladder
+is synthetic verifier-owned preparation evidence, not an end-to-end Court verdict. Its task
+package hash is `83aeaec9004e40ef076a9d1a88e7bd2eb88c67f3a51b2a803008a59a7579bc12`, installer hash
+is `e5caf57e99f915ef4c7ab428d3b1e9be920de93443d31cc820608edb950019d4`, and stdout summary hash
+is `5529cb29bc50639021d903c53d2a66f5c5dc09e30a71d6525bab421328e92a8a`.
+
+The final external Court request is
+`/private/tmp/paeos-gate-c-court-disposition-request-20260901.md` (SHA-256
+`349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`). It binds the qualified
+candidate evidence, the Gemini L14/L17 report and receipt, the Z0 catalog proposal, and exact
+Worker/Court counts. Gate C remains **AUTHORIZED, NOT SEALED**: the Z0 files require Founder
+ratification before installation, followed by the separate candidate-bound L16/Court
+disposition. `DEBT-0060` remains OPEN; strict progress remains **14/48 complete | 34 remaining**.
+No source change, promotion, or SAKG resumption is implied.

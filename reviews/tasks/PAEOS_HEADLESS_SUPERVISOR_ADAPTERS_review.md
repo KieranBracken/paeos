@@ -158,3 +158,20 @@ verifier-owned preparation evidence, not ratified Z0 content.
 
 This is a qualified L14/L17 checkpoint only. Gate C remains **NOT SEALED** pending the Z0 canary
 requirement and Founder/Court disposition; no Gate D or production/SAKG work is authorized.
+
+## Gate C Z0 canary catalog proposal — 2026-09-01
+
+The verifier prepared an external, non-ratified catalog for `CANARY-0003` through `CANARY-0009`:
+instruction fidelity, architecture escape, raw-evidence separation, restart, privacy,
+self-ratification, and prompt injection. Catalog digest:
+`581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`; summary SHA-256:
+`cf30d731383e57c744d0ea7e327c411fe953e28a7b4252d17723e33bcb2686f2`. The proposal root is
+`/private/tmp/paeos-gate-c-z0-proposal-20260901/`; no constitution file was modified.
+
+The one-shot verifier ladder recorded **7/7 PASS** install/reach/kill results and one explicit
+healthy `REMAND` control (exit `2`, no kill). This evidence is synthetic and does not satisfy
+the Z0 ratification boundary by itself. The final Court request is
+`/private/tmp/paeos-gate-c-court-disposition-request-20260901.md` (SHA-256
+`349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`). Gate C remains **NOT
+SEALED** pending Founder ratification of the exact catalog and the separate L16/Court
+disposition; no Gate D or SAKG work is authorized.

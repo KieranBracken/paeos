@@ -761,6 +761,30 @@ occurred; raw rejected artifacts remain preserved.
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.
 
+## 2026-09-01 — Gate C Z0 catalog proposal and canary ladder
+
+The verifier prepared an external Gate C Z0 proposal catalog `CANARY-0003` through `CANARY-0009`
+for instruction fidelity, architecture escape, raw-evidence separation, restart, privacy,
+self-ratification, and prompt injection. Catalog digest:
+`581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`; catalog summary SHA-256:
+`cf30d731383e57c744d0ea7e327c411fe953e28a7b4252d17723e33bcb2686f2`. Proposal and ladder
+artifacts are external under `/private/tmp/paeos-gate-c-z0-proposal-20260901/`; the ratified
+`constitution/canaries/` directory was not modified.
+
+The one-shot ladder produced **7/7 PASS** results (`installed=true`, `reached=true`, `killed=true`,
+exit `0`). Its healthy control `GATE-C-Z0-CONTROL-REMAND` deliberately produced **REMAND**
+(`killed=false`, exit `2`) and is retained. This is synthetic verifier-owned evidence, not a
+Court verdict or Z0 ratification. Task package SHA-256 is
+`83aeaec9004e40ef076a9d1a88e7bd2eb88c67f3a51b2a803008a59a7579bc12`; stdout summary SHA-256 is
+`5529cb29bc50639021d903c53d2a66f5c5dc09e30a71d6525bab421328e92a8a`.
+
+The final Court request is `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md`,
+SHA-256 `349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`. Gate C remains
+**AUTHORIZED, NOT SEALED** pending Founder ratification of the exact catalog and a separate L16
+Court disposition. External counts remain Worker **3/3/0**, Court **2/0/0**; strict progress
+remains **14/48 complete | 34 remaining**; `DEBT-0060` remains OPEN. No promotion, merge, or
+SAKG resumption is authorized.
+
 ## 2026-09-01 — Gate C fresh verification checkpoint
 
 Following the Founder-sealed Gate B disposition, current HEAD `8706917` was checked in the
