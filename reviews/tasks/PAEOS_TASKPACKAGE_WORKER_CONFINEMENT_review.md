@@ -65,3 +65,14 @@ This is qualified L14/L17 evidence, not a Court seal. Worker/Court request-local
 `0/1/0` and `0/0/0`; `DEBT-0060` remains OPEN. A separate Founder/Court disposition is required
 before Gate E can be counted or Gate F can begin. No promotion, merge, main/trunk mutation,
 production dispatch, or SAKG resumption is implied.
+
+## Founder/Court seal — 2026-09-01
+
+The Founder supplied the candidate-bound `COURT_SEALED` disposition for Gate E candidate
+`dd4345bc84c3d7b260eb77e5f82362600113ca82`, binding the qualified Gemini report
+`9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, canonical receipt
+`eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`, and evidence bundle
+`19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`. Gate E is therefore
+**SEALED**. `DEBT-0060` remains OPEN and is carried forward. Strict sealed progress is now
+**17/48 complete | 31 remaining** and Gate F progression is authorized. The full
+candidate-bound record is `reviews/tasks/PAEOS_GATE_E_FOUNDER_COURT_DISPOSITION_DD4345B.md`.

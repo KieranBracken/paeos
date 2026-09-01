@@ -4587,3 +4587,27 @@ one attempt, no fallback. The report binds the candidate and bundle, contains co
 and ends with `AUDIT_COMPLETE: true`. This is L14/L17 evidence only: no Gate E Court seal is
 inferred. Worker/Court request-local accounting remains `0/1/0` and `0/0/0`; `DEBT-0060` remains
 OPEN. Separate Founder/Court disposition is required before Gate E progression.
+
+### Entry 261 — 2026-09-01: Founder/Court sealed Gate E and authorized Gate F
+
+The Founder supplied the candidate-bound `COURT_SEALED` disposition for Gate E (TaskPackage
+Worker Confinement & Sandbox Hardening), candidate
+`dd4345bc84c3d7b260eb77e5f82362600113ca82`. The disposition binds the qualified compact Gemini
+L14/L17 report SHA-256
+`9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, canonical receipt SHA-256
+`eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`, receipt-file SHA-256
+`b17346ecae61a5283e5ce5aac83c45304e059c11042efe0764d1b19c350bef5e`, and evidence bundle
+SHA-256 `19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`.
+
+Physical provenance is Google `gemini-3.6-flash` / Gemini family versus the GLM builder, with
+one provider attempt, no fallback, and A-08 `PASS`. The evidence basis is 33/33 focused
+confinement tests, 1,140/1,140 non-gateway tests, clean changed-path Ruff/Pyright, and clean
+`git diff --check`. The gateway-server fixture remains an explicitly excluded restricted
+environment check, not a pass. The candidate-bound external L16 record is
+`reviews/tasks/PAEOS_GATE_E_FOUNDER_COURT_DISPOSITION_DD4345B.md`.
+
+Gate E is now **SEALED** and progression to Gate F is authorized. `DEBT-0060` remains OPEN and
+is carried forward. External Worker accounting remains `Admitted: 3 | Rejected: 3 | Remediated:
+0`; Court accounting advances to `Sealed: 5 | Remanded: 0 | Remediated: 0`; strict progress
+advances to **17/48 complete | 31 remaining**. No promotion, merge, main/trunk mutation,
+production dispatch, or SAKG resumption is authorized by this disposition.

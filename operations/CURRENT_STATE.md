@@ -979,3 +979,23 @@ disposition. Request-local Worker/Court accounting is `0/1/0` and `0/0/0`; `DEBT
 OPEN. Strict sealed progress remains **16/48 complete | 32 remaining** until the disposition is
 recorded. Gate F, promotion, merge, main/trunk mutation, production dispatch, and SAKG resumption
 remain unauthorized.
+
+## 2026-09-01 — Founder/Court sealed Gate E; Gate F authorized
+
+The Founder supplied the candidate-bound disposition `COURT_SEALED` for Gate E, candidate
+`dd4345bc84c3d7b260eb77e5f82362600113ca82`, referencing bundle SHA-256
+`19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`, report SHA-256
+`9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, and canonical receipt
+SHA-256 `eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`. The receipt is
+physically captured from Google `gemini-3.6-flash` (Gemini family) versus the GLM builder; A-08
+passed with one attempt and no fallback.
+
+The sealed evidence basis is 33/33 focused confinement tests, 1,140/1,140 non-gateway tests,
+clean changed-path Ruff/Pyright, and clean `git diff --check`. `DEBT-0060` remains OPEN and is
+carried forward. The external candidate-bound L16 record is
+`reviews/tasks/PAEOS_GATE_E_FOUNDER_COURT_DISPOSITION_DD4345B.md`.
+
+Gate E is **SEALED**; Gate F progression is authorized on the isolated recovery branch. External
+Worker/Court accounting is now **3/3/0** and **5/0/0**; strict progress is **17/48 complete |
+31 remaining**. No promotion, merge, main/trunk mutation, production dispatch, or SAKG
+resumption is authorized.
