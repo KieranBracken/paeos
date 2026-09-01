@@ -302,7 +302,9 @@ async function main() {
     resolveTerminal = resolve;
   });
   const unsubscribe = core.subscribe((event) => {
-    if (["session_ended", "session_failed"].includes(event?.type)) resolveTerminal(event);
+    if (["ended", "session_ended", "session_failed"].includes(event?.type)) {
+      resolveTerminal(event);
+    }
   });
   const capabilities = {
     requestToolApproval: forwardTool,
@@ -403,16 +405,26 @@ async function main() {
   });
 
   const ended = await terminalEvent;
+  const endedReason =
+    typeof ended?.reason === "string"
+      ? ended.reason
+      : typeof ended?.payload?.reason === "string"
+        ? ended.payload.reason
+        : "";
+  const normalizedReason = endedReason.trim().toLowerCase();
+  const endedFailed =
+    ended.type === "session_failed" ||
+    (ended.type === "ended" && !/^(?:completed|complete|success|succeeded|done)$/.test(normalizedReason));
   emit("session_snapshot", {
     event_type: ended.type,
     manifest_path: result.manifestPath,
     messages_path: result.messagesPath,
   });
-  const terminalPayload = { result: ended.result ?? {}, status: ended.type };
+  const terminalPayload = { result: ended.result ?? result.result ?? {}, status: ended.type };
   if (["AUTH_FAILED", "RATE_LIMITED", "QUOTA_EXHAUSTED"].includes(ended.normalizedError)) {
     terminalPayload.normalized_error = ended.normalizedError;
   }
-  emit(ended.type === "session_failed" ? "failure" : "terminal", terminalPayload);
+  emit(endedFailed ? "failure" : "terminal", terminalPayload);
   unsubscribe();
   await core.stop(sessionId);
 }

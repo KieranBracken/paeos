@@ -295,6 +295,49 @@ def test_node_host_binds_session_before_early_provider_attempt(tmp_path: Path) -
         process.wait(timeout=5)
 
 
+def test_node_host_consumes_real_sdk_ended_event(tmp_path: Path) -> None:
+    env = os.environ.copy()
+    env["CLINE_DATA_DIR"] = str(tmp_path / "cline")
+    process = subprocess.Popen(
+        ["node", str(HOST)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    message = _start_message()
+    message["payload"]["prompt"] = "PAEOS_SDK_PROBE:" + json.dumps(
+        {
+            "artifact_path": "/sandbox/artifact.txt",
+            "expected_text": "admitted-worker\n",
+            "initial_text": "baseline-worker\n",
+            "probe_id": "probe-ended-event",
+            "verification_command": "python3 verify_probe.py",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    try:
+        _write(process, message)
+        events: list[dict[str, object]] = []
+        for _ in range(8):
+            event = _read(process)
+            events.append(event)
+            if event["type"] in {"terminal", "failure", "cancelled"}:
+                break
+        assert [event["type"] for event in events] == [
+            "hello",
+            "session_created",
+            "capability_snapshot",
+            "session_snapshot",
+            "terminal",
+        ]
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
+
+
 def test_node_host_normalizes_known_auth_start_failure(tmp_path: Path) -> None:
     env = os.environ.copy()
     env["CLINE_DATA_DIR"] = str(tmp_path / "cline")

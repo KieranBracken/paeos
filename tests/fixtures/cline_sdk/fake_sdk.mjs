@@ -93,6 +93,18 @@ export class ClineCore {
       });
       return { sessionId, manifestPath, messagesPath };
     }
+    if (probe?.probe_id === "probe-ended-event") {
+      this.emit({
+        type: "ended",
+        payload: { sessionId, reason: "completed", ts: Date.now() },
+      });
+      return {
+        sessionId,
+        manifestPath,
+        messagesPath,
+        result: { model: { id: input.config.modelId, provider: input.config.providerId } },
+      };
+    }
     setTimeout(async () => {
       try {
         if (probe?.probe_id === "probe-timeout-unfinished") {
