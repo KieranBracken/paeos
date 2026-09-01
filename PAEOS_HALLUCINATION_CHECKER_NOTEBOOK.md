@@ -4069,3 +4069,18 @@ remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. The next authorized action
 Cline reauthentication for this profile, followed by authentication epoch increment from `1` to
 `2`; no login automation, token handling, fallback, retry, gate seal, promotion, or SAKG
 resumption is permitted before that evidence exists.
+
+### Entry 235 — 2026-09-01: Auth-epoch confirmation did not refresh the worker provider
+
+The operator reported authentication epoch `2`, but read-only verification shows that the
+standard `cline` provider record was refreshed while the worker route `cline-pass` remains on its
+expired non-secret expiry (`1787604656000` ms). The two provider records are distinct; no token
+values were read, printed, copied, or modified. The installed CLI still exits `139` with
+`SecItemCopyMatching failed -50`, so the target route is not ready for dispatch. This is an
+external authentication-state mismatch, not a new transport failure, and no live probe was run.
+
+The supported remediation is to authenticate the ClinePass provider explicitly in the dedicated
+profile (`cline auth cline-pass` with `CLINE_DATA_DIR=/Users/bob/.cline/data`), then treat the
+resulting non-secret authentication epoch as `2`. A new probe remains gated on a refreshed
+`cline-pass` expiry/readiness observation; no credential copying, fallback to standard `cline`,
+retry, or provider substitution is allowed.

@@ -531,3 +531,12 @@ edited. The live GLM route therefore remains blocked before provider execution. 
 reauthentication is required, then auth epoch `1 -> 2`; no additional probe is authorized until
 that external condition is confirmed. Worker/Court remain **0/3/0** and **0/0/0**, strict
 progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain OPEN.
+
+## 2026-09-01 — Auth epoch confirmation mismatch
+
+The reported auth epoch `2` refreshed the standard `cline` provider record, but the worker route
+`cline-pass` still has expired non-secret auth metadata (`1787604656000` ms). The records are
+distinct; no credential values were read or modified. `cline --version` continues to fail with
+Keychain `SecItemCopyMatching -50` (exit `139`). No live probe was attempted. Reauthenticate the
+target provider explicitly with `CLINE_DATA_DIR=/Users/bob/.cline/data /opt/homebrew/bin/cline auth
+cline-pass`, then confirm epoch `2`; only then may a fresh one-shot GLM probe be dispatched.

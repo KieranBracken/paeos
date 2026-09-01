@@ -859,3 +859,10 @@ until this shutdown remediation is reviewed.
   36 remaining**. Reauthentication through Cline's supported UI/flow and auth epoch `2` are the
   only next prerequisites for a fresh one-shot admission probe; no automated login or token
   handling is permitted.
+
+- 2026-09-01 the reported auth epoch `2` refreshed standard `cline`, not the worker's
+  `cline-pass` route. Read-only metadata still shows `cline-pass` expired at
+  `1787604656000` ms; `cline --version` remains a Keychain `SecItemCopyMatching -50` / exit `139`.
+  No credentials were printed or changed and no live probe was attempted. The supported next
+  action is `CLINE_DATA_DIR=/Users/bob/.cline/data /opt/homebrew/bin/cline auth cline-pass`,
+  followed by epoch-2 readiness confirmation.
