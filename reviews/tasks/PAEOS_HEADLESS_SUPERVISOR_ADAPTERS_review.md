@@ -172,6 +172,6 @@ The one-shot verifier ladder recorded **7/7 PASS** install/reach/kill results an
 healthy `REMAND` control (exit `2`, no kill). This evidence is synthetic and does not satisfy
 the Z0 ratification boundary by itself. The final Court request is
 `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md` (SHA-256
-`349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`). Gate C remains **NOT
+`32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`). Gate C remains **NOT
 SEALED** pending Founder ratification of the exact catalog and the separate L16/Court
 disposition; no Gate D or SAKG work is authorized.

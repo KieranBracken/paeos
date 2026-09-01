@@ -779,7 +779,7 @@ Court verdict or Z0 ratification. Task package SHA-256 is
 `5529cb29bc50639021d903c53d2a66f5c5dc09e30a71d6525bab421328e92a8a`.
 
 The final Court request is `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md`,
-SHA-256 `349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`. Gate C remains
+SHA-256 `32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`. Gate C remains
 **AUTHORIZED, NOT SEALED** pending Founder ratification of the exact catalog and a separate L16
 Court disposition. External counts remain Worker **3/3/0**, Court **2/0/0**; strict progress
 remains **14/48 complete | 34 remaining**; `DEBT-0060` remains OPEN. No promotion, merge, or

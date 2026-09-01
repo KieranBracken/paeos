@@ -117,5 +117,5 @@ The ladder passed **7/7** ordered install/reach/kill checks and retained one hea
 `REMAND` (exit `2`, no kill). These are synthetic verifier-owned preparation artifacts and do
 not constitute Z0 ratification or a Gate C seal. The final Court request is
 `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md`, SHA-256
-`349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`. Gate C remains unsealed
+`32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`. Gate C remains unsealed
 until Founder ratification of the exact catalog and a separate L16/Court disposition.

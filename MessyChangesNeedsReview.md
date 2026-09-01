@@ -1001,7 +1001,7 @@ candidate-bound audit and disposition.
   `/private/tmp/paeos-gate-c-z0-proposal-20260901/`, and no `constitution/canaries/` file was
   changed. The final Court request is
   `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md` (SHA-256
-  `349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`). Gate C remains
+  `32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`). Gate C remains
   unsealed pending Founder ratification and L16/Court disposition; `DEBT-0060` remains OPEN and
   strict progress is **14/48 complete | 34 remaining**.
 

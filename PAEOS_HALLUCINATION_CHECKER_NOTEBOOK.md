@@ -4485,7 +4485,7 @@ is `5529cb29bc50639021d903c53d2a66f5c5dc09e30a71d6525bab421328e92a8a`.
 
 The final external Court request is
 `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md` (SHA-256
-`349bd28032a4cb81ff64899f2cadffd414497cff0122d0ecb5f37002101c3e7c`). It binds the qualified
+`32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`). It binds the qualified
 candidate evidence, the Gemini L14/L17 report and receipt, the Z0 catalog proposal, and exact
 Worker/Court counts. Gate C remains **AUTHORIZED, NOT SEALED**: the Z0 files require Founder
 ratification before installation, followed by the separate candidate-bound L16/Court
