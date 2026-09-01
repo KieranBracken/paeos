@@ -117,7 +117,7 @@ def adapter_case(tmp_path: Path) -> tuple[ClineSdkAdmissionAdapter, ProbeContrac
     return ClineSdkAdmissionAdapter(config), contract
 
 
-def test_exact_two_turn_probe_produces_admissible_raw_worker_run(
+def test_three_turn_probe_produces_admissible_raw_worker_run(
     adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
 ) -> None:
     adapter, contract = adapter_case

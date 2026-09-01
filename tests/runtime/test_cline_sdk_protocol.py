@@ -61,7 +61,7 @@ def _start_message(sequence: int = 0) -> dict[str, object]:
             "core_entrypoint": str(FAKE_SDK),
             "core_sha256": digest,
             "cwd": "/sandbox",
-            "max_declared_model_turns": 2,
+            "max_declared_model_turns": 3,
             "model_id": "cline-pass/qwen3.8-max",
             "prompt": "perform the disposable probe",
             "provider_id": "cline-pass",
@@ -334,6 +334,10 @@ def test_node_host_adapts_canonical_tool_approval_identity(tmp_path: Path) -> No
                 "type": "tool_response",
             },
         )
+        third = _read(process)
+        assert third["type"] == "provider_attempt_started"
+        third_finished = _read(process)
+        assert third_finished["type"] == "provider_attempt_finished"
         snapshot = _read(process)
         terminal = _read(process)
         assert snapshot["type"] == "session_snapshot"

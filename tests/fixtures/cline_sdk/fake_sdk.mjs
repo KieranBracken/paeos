@@ -256,6 +256,7 @@ export class ClineCore {
               },
             );
           }
+          await this.options.fetch(new Request("data:application/json,%7B%7D"));
           this.emit({
             type: "session_ended",
             sessionId,

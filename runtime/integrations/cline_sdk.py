@@ -275,7 +275,9 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                 "core_entrypoint": self._config.qualification.core_entrypoint,
                 "core_sha256": _sha_file(Path(self._config.qualification.core_entrypoint)),
                 "cwd": str(contract.sandbox),
-                "max_declared_model_turns": 2,
+                # Cline's agent loop needs a final no-tool model turn after
+                # the bounded editor and verification-command iterations.
+                "max_declared_model_turns": 3,
                 "model_id": contract.model_id,
                 "prompt": prompt,
                 "provider_id": contract.provider_id,
@@ -297,6 +299,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         decisions: list[ToolDecisionRecord] = []
         pending_approvals: dict[str, tuple[str, object]] = {}
         attempts: dict[str, int] = {}
+        tool_iterations: list[int] = []
         capability_snapshot: dict[str, object] | None = None
         manifest_path: Path | None = None
         messages_path: Path | None = None
@@ -372,6 +375,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                         raise AdmissionError("SDK execution is not bound to its approval")
                     decision = evaluate_tool_request(contract, request, tuple(decisions))
                     decisions.append(decision)
+                    tool_iterations.append(payload["iteration"])
                 if not decision.approved:
                     stderr_bytes = self._cancel_and_stop(
                         process, invocation_id, session_id, command_sequence
@@ -437,7 +441,10 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         if capability_snapshot != _CAPABILITIES:
             raise AdmissionError("SDK capability snapshot mismatch")
         assert capability_snapshot is not None
-        if attempts != {"turn-1": 1, "turn-2": 1}:
+        final_tool_iteration = max(tool_iterations, default=0)
+        expected_turns = final_tool_iteration + 1
+        expected_attempts = {f"turn-{turn}": 1 for turn in range(1, expected_turns + 1)}
+        if attempts != expected_attempts:
             raise AdmissionError("provider attempt telemetry mismatch")
         if manifest_path is None or messages_path is None or terminal_payload is None:
             raise AdmissionError("SDK evidence incomplete")
