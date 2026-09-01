@@ -3974,3 +3974,38 @@ remains excluded under restricted loopback policy. Review:
 This is reproduction evidence only; it does not create a Court/L16 row, seal a gate, close
 `DEBT-0058` or `DEBT-0060`, or advance strict progress. Worker/Court remain **0/1/0** and
 **0/0/0**; strict progress remains **12/48 complete | 36 remaining**.
+
+### Entry 230 — 2026-09-01: First live GLM SDK admission probe rejected at protocol boundary
+
+The explicitly authorized first live probe used the frozen Cline SDK tuple (provider
+`cline-pass`, model `z-ai/glm-5.3-flash`, expected family `glm`, Cline `3.0.60`, qualification
+record `bd34e644dab3bc0812b351c1f0906ce2a9279b761e87a00a27678b7e020728aa`, profile UUID
+`6f05f1b8-297d-46cf-8e4c-5af5fc0c31da`, authentication epoch `1`). The command was invoked exactly
+once with probe ID `glm-5-3-sdk-admission-01`, no fallback, and no retry. The host emitted a
+truncated framed response; Python raised `ProtocolError("truncated frame")` before the CLI could
+write `admission-result.json`. The raw command output was a Python traceback (the host frame was
+not serializable after the uncaught exception), so this attempt is not an admission result and is
+not counted as an admitted or rejected worker receipt. No gate, Court, or debt credit is taken.
+
+The probe left a profile lease marker. PID `39982` was verified absent and the OS lock was
+verified free. The marker was preserved, not deleted, by moving it to
+`/Users/bob/.local/share/paeos/runtime-v2/worker-admission/glm-5-3-sdk-admission-01/leases/`
+`6f05f1b8-297d-46cf-8e4c-5af5fc0c31da.glm-5-3-sdk-admission-01.ba5442c88eef42c9345e11641567f8bc66d1c91455627ea3fecf02b0dff73319.stale.json`.
+The preserved marker SHA-256 is
+`ba5442c88eef42c9345e11641567f8bc66d1c91455627ea3fecf02b0dff73319`.
+
+### Entry 231 — 2026-09-01: Protocol-failure handling remediation (isolated)
+
+Root cause was confirmed in the adapter/CLI boundary: `ProtocolError` from framed SDK reads was
+not converted to a typed `AdapterFailureReceipt`, and post-acquisition failures did not release
+the profile lease. Recovery commit `a49af927da6b9ef08c990640bea4a55ad7190369` now catches protocol
+violations, stops the child, emits a canonical `TRANSPORT_FAILED` rejection, persists the CLI
+result, and records/releases failure evidence for the lease. Focused regression and boundary tests
+pass **43/43** (exit `0`); Ruff is clean, Pyright reports **0 diagnostics**, and the Node host
+passes `--check`. The failed probe ID remains permanently retired; no live probe was retried.
+
+This is control-plane remediation only. Worker/Court remain **0/1/0** and **0/0/0**; strict
+progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN;
+L14/L17 and Court/L16 remain outstanding; no gate seal, promotion, or SAKG resumption is
+authorized. A new probe requires a distinct ID and a written rationale addressing this protocol
+failure.

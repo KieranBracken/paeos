@@ -821,3 +821,11 @@ resumption occurred. Review: `reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACO
   `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. This evidence excludes
   only the restricted-loopback gateway fixture and creates no Court/L16 row or gate credit.
   Review: `reviews/tasks/PAEOS_L13_02F8E87_NON_GATEWAY_REPRODUCTION.md`.
+
+- 2026-09-01 the first authorized live GLM SDK probe (`glm-5-3-sdk-admission-01`) encountered a
+  truncated host frame and raised an uncaught `ProtocolError`; no canonical admission result was
+  written and no gate/debt credit is claimed. The recorded PID was absent and the OS lock free;
+  the active marker was preserved as a uniquely named `.stale.json` artifact. Recovery commit
+  `a49af927da6b9ef08c990640bea4a55ad7190369` adds typed protocol-failure persistence and failure
+  lease release. Focused tests pass **43/43** with clean changed-path Ruff/Pyright and valid Node
+  syntax. The probe ID is retired; any new live attempt needs a distinct ID and written rationale.

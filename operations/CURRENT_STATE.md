@@ -474,3 +474,19 @@ remains excluded under the documented restricted-loopback policy. Review:
 This is L13 reproduction evidence only. Worker/Court remain **0/1/0** and **0/0/0**; strict
 progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open. A
 canonical Court/L16 reconciliation transaction is still required.
+
+## 2026-09-01 — First live GLM SDK admission probe and protocol remediation
+
+The explicitly authorized first live probe (`glm-5-3-sdk-admission-01`) used the frozen Cline SDK
+tuple and stopped at a truncated host frame. The adapter raised an uncaught `ProtocolError` before
+writing an admission result, so this attempt is not counted as a worker receipt and no admission or
+gate credit is taken. PID `39982` was absent and the OS lock was free; the active marker was
+preserved as a uniquely named `.stale.json` artifact. Recovery commit
+`a49af927da6b9ef08c990640bea4a55ad7190369` now catches protocol failures, persists a canonical
+`TRANSPORT_FAILED` result, and releases failure leases. Focused regression/boundary tests pass
+**43/43**, Ruff/Pyright are clean, and Node syntax is valid. The failed probe ID is retired; a new
+probe requires a distinct ID and written rationale.
+
+Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36
+remaining**; `DEBT-0058` and `DEBT-0060` remain open. No gate seal, promotion, or SAKG resumption
+is authorized.
