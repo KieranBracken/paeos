@@ -32,6 +32,17 @@ function normalizedStartError(error) {
   return undefined;
 }
 
+function normalizedResponseStatus(status) {
+  if (status === 401 || status === 403) return "AUTH_FAILED";
+  if (status === 402) return "QUOTA_EXHAUSTED";
+  if (status === 408 || status === 409 || status === 425 || status === 429) {
+    return "RATE_LIMITED";
+  }
+  if (status === 404) return "MODEL_UNAVAILABLE";
+  if (status >= 500 && status <= 599) return "PROVIDER_UNAVAILABLE";
+  return undefined;
+}
+
 function stableStringify(value) {
   if (value === null || typeof value === "boolean" || typeof value === "string") {
     return JSON.stringify(value);
@@ -188,6 +199,7 @@ async function main() {
   let commandSequence = 1;
   let currentTurn = 1;
   let attemptOrdinal = 0;
+  let lastNormalizedError;
   let terminal = false;
   const invocationId = start.invocation_id;
   const sessionId = config.session_id;
@@ -232,10 +244,13 @@ async function main() {
     }
     try {
       const response = await globalThis.fetch(await input, init);
+      const normalizedError = normalizedResponseStatus(response.status);
+      if (normalizedError !== undefined) lastNormalizedError = normalizedError;
       emit("provider_attempt_finished", {
         attempt_ordinal: attemptOrdinal,
         correlation_id: correlationId,
         finished_monotonic_ns: process.hrtime.bigint().toString(),
+        status_code: response.status,
         status_class: `${Math.floor(response.status / 100)}xx`,
         turn_id: turnId,
       });
@@ -427,6 +442,9 @@ async function main() {
     result: { model: { id: config.model_id, provider: config.provider_id } },
     status: ended.type,
   };
+  if (lastNormalizedError !== undefined) {
+    terminalPayload.normalized_error = lastNormalizedError;
+  }
   if (["AUTH_FAILED", "RATE_LIMITED", "QUOTA_EXHAUSTED"].includes(ended.normalizedError)) {
     terminalPayload.normalized_error = ended.normalizedError;
   }
