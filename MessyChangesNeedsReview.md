@@ -828,4 +828,12 @@ resumption occurred. Review: `reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACO
   the active marker was preserved as a uniquely named `.stale.json` artifact. Recovery commit
   `a49af927da6b9ef08c990640bea4a55ad7190369` adds typed protocol-failure persistence and failure
   lease release. Focused tests pass **43/43** with clean changed-path Ruff/Pyright and valid Node
-  syntax. The probe ID is retired; any new live attempt needs a distinct ID and written rationale.
+syntax. The probe ID is retired; any new live attempt needs a distinct ID and written rationale.
+
+- 2026-09-01 the distinct recovery probe `glm-5-3-sdk-admission-02-protocol-recovery` returned a
+  canonical `TRANSPORT_FAILED` result after another truncated host frame (result SHA-256
+  `e5b761bd676ce000ba71072d31abc00bf90418272128cefe065c150011a646d9`). Worker accounting is
+  **Admitted: 0 | Rejected: 2 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
+  Remediated: 0**. The command emitted an `Exception ignored` `BrokenPipeError` during child-stdin
+  finalization; a regression now closes stdin in the cancellation path. No third probe is authorized
+  until this shutdown remediation is reviewed.

@@ -590,6 +590,8 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait(timeout=1)
+        with suppress(BrokenPipeError, OSError):
+            process.stdin.close()
         return process.stderr.read()
 
     @staticmethod

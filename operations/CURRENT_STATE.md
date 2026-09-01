@@ -490,3 +490,16 @@ probe requires a distinct ID and written rationale.
 Worker/Court remain **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36
 remaining**; `DEBT-0058` and `DEBT-0060` remain open. No gate seal, promotion, or SAKG resumption
 is authorized.
+
+## 2026-09-01 — Recovery probe typed rejection and shutdown hygiene
+
+A distinct one-shot GLM SDK probe (`glm-5-3-sdk-admission-02-protocol-recovery`) returned exit `1`
+with a canonical `admission-result.json` reason `TRANSPORT_FAILED`; the host again emitted a
+truncated frame. Result SHA-256 is
+`e5b761bd676ce000ba71072d31abc00bf90418272128cefe065c150011a646d9`; failure-evidence SHA-256 is
+`ee0526be5eac308dee5a2ffb111ea06367af2737ed1cfd05f4bc34ea422b6072`; released-lease SHA-256 is
+`5c72b919b6d815673a842fc9c256a74effa09cce2abcddc62c26cbaafea86a80`. Worker accounting is
+**Admitted: 0 | Rejected: 2 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
+Remediated: 0**. An `Exception ignored` `BrokenPipeError` appeared during child-stdin finalization;
+the adapter now closes stdin during cancellation, with a regression assertion. No third probe is
+authorized until this shutdown remediation is reviewed.

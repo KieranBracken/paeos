@@ -351,6 +351,7 @@ def test_timeout_sends_one_cancel_and_terminates_once_without_retry(
     original_popen = subprocess.Popen
     command_frames: list[dict[str, object]] = []
     terminate_count = 0
+    close_count = 0
 
     class TrackingInput:
         def __init__(self, wrapped: object) -> None:
@@ -364,6 +365,8 @@ def test_timeout_sends_one_cancel_and_terminates_once_without_retry(
             self._wrapped.flush()  # type: ignore[union-attr]
 
         def close(self) -> None:
+            nonlocal close_count
+            close_count += 1
             self._wrapped.close()  # type: ignore[union-attr]
 
     def capture_popen(argv: list[str], **kwargs: object) -> subprocess.Popen[bytes]:
@@ -389,6 +392,7 @@ def test_timeout_sends_one_cancel_and_terminates_once_without_retry(
     assert isinstance(result, AdapterFailureReceipt)
     assert [frame["type"] for frame in command_frames].count("cancel") == 1
     assert terminate_count == 1
+    assert close_count == 1
 
 
 def test_changed_qualification_tuple_fails_before_dispatch(

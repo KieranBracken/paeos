@@ -4009,3 +4009,21 @@ progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` 
 L14/L17 and Court/L16 remain outstanding; no gate seal, promotion, or SAKG resumption is
 authorized. A new probe requires a distinct ID and a written rationale addressing this protocol
 failure.
+
+### Entry 232 — 2026-09-01: Recovery probe produced typed rejection; shutdown warning remains
+
+After commit `a49af927da6b9ef08c990640bea4a55ad7190369`, a distinct one-shot probe
+`glm-5-3-sdk-admission-02-protocol-recovery` was run against the same frozen GLM tuple. It
+returned exit `1` and a canonical `admission-result.json` with reason `TRANSPORT_FAILED`; the host
+again terminated on a truncated frame. The result file SHA-256 is
+`e5b761bd676ce000ba71072d31abc00bf90418272128cefe065c150011a646d9`; failure evidence SHA-256 is
+`ee0526be5eac308dee5a2ffb111ea06367af2737ed1cfd05f4bc34ea422b6072`; the released lease record
+SHA-256 is `5c72b919b6d815673a842fc9c256a74effa09cce2abcddc62c26cbaafea86a80`. Worker accounting
+is now **Admitted: 0 | Rejected: 2 | Remediated: 0** (the historical Qwen rejection plus this
+canonical GLM rejection); Court remains **Sealed: 0 | Remanded: 0 | Remediated: 0**.
+
+The wrapper also emitted an `Exception ignored` `BrokenPipeError` while finalizing child stdin.
+The lease was nevertheless released and no traceback escaped the command's canonical result path.
+This is a shutdown-hygiene defect, not an admission. A focused regression test now requires stdin
+closure during cancellation; the next remediation is committed separately and no third probe is
+authorized until it is reviewed.
