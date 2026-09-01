@@ -66,27 +66,35 @@ export class ClineCore {
       await writeFile(
         manifestPath,
         JSON.stringify({
-          backend_mode: input.config.backendMode ?? "local",
-          capabilities: {
-            disable_mcp_settings_tools: input.config.disableMcpSettingsTools,
-            enable_agent_teams:
-              probe.probe_id === "probe-manifest-capabilities"
-                ? true
-                : input.config.enableAgentTeams,
-            enable_spawn_agent: input.config.enableSpawnAgent,
-            enabled_tools: ["editor", "run_commands"],
-          },
-          messages_path: messagesPath,
-          model:
-            probe.probe_id === "probe-manifest-model"
-              ? "cline-pass/deepseek-v4"
-              : input.config.modelId,
+          version: 1,
+          session_id:
+            probe.probe_id === "probe-manifest-session" ? "other-session" : sessionId,
+          source: "core",
+          pid: process.pid,
+          started_at: new Date().toISOString(),
+          ended_at: new Date().toISOString(),
+          exit_code: 0,
+          status: "completed",
+          interactive: false,
           provider:
             probe.probe_id === "probe-manifest-provider"
               ? "other-provider"
               : input.config.providerId,
-          session_id:
-            probe.probe_id === "probe-manifest-session" ? "other-session" : sessionId,
+          model:
+            probe.probe_id === "probe-manifest-model"
+              ? "cline-pass/deepseek-v4"
+              : input.config.modelId,
+          cwd: input.config.cwd,
+          workspace_root: input.config.cwd,
+          enable_tools: true,
+          enable_spawn: input.config.enableSpawnAgent,
+          enable_teams:
+            probe.probe_id === "probe-manifest-capabilities"
+              ? true
+              : input.config.enableAgentTeams,
+          prompt: input.prompt,
+          metadata: {},
+          messages_path: messagesPath,
         }),
       );
       await writeFile(
@@ -206,7 +214,9 @@ export class ClineCore {
               },
             );
           }
-          await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          if (decision.approved && verification.approved) {
+            await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          }
           this.emit({
             type: "session_ended",
             sessionId,
@@ -256,7 +266,9 @@ export class ClineCore {
               },
             );
           }
-          await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          if (decision.approved && verification.approved) {
+            await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          }
           this.emit({
             type: "session_ended",
             sessionId,

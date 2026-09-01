@@ -713,29 +713,61 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         messages_path: Path,
         capabilities: dict[str, object],
     ) -> None:
-        manifest_capabilities = dict(capabilities)
-        manifest_capabilities.pop("backend_mode", None)
-        if manifest.get("backend_mode") != "local":
+        expected_manifest_keys = {
+            "version",
+            "session_id",
+            "source",
+            "pid",
+            "started_at",
+            "ended_at",
+            "exit_code",
+            "status",
+            "interactive",
+            "provider",
+            "model",
+            "cwd",
+            "workspace_root",
+            "enable_tools",
+            "enable_spawn",
+            "enable_teams",
+            "prompt",
+            "metadata",
+            "messages_path",
+        }
+        if set(manifest) != expected_manifest_keys:
+            raise AdmissionError("SDK manifest schema mismatch")
+        if manifest.get("version") != 1 or manifest.get("source") != "core":
             raise AdmissionError("SDK manifest backend mismatch")
-        if manifest.get("capabilities") != manifest_capabilities:
+        manifest_pid = manifest.get("pid")
+        if (
+            manifest.get("status") != "completed"
+            or manifest.get("exit_code") != 0
+            or manifest.get("interactive") is not False
+            or not isinstance(manifest_pid, int)
+            or isinstance(manifest_pid, bool)
+            or manifest_pid <= 0
+        ):
+            raise AdmissionError("SDK manifest completion mismatch")
+        if manifest.get("enable_tools") is not True:
+            raise AdmissionError("SDK manifest capabilities mismatch")
+        if (
+            manifest.get("enable_spawn") is not capabilities.get("enable_spawn_agent")
+            or manifest.get("enable_teams") is not capabilities.get("enable_agent_teams")
+        ):
             raise AdmissionError("SDK manifest capabilities mismatch")
         if manifest.get("messages_path") != str(messages_path):
             raise AdmissionError("SDK manifest messages path mismatch")
+        if (
+            manifest.get("cwd") != str(contract.sandbox)
+            or manifest.get("workspace_root") != str(contract.sandbox)
+        ):
+            raise AdmissionError("SDK manifest workspace mismatch")
         if manifest.get("provider") != contract.provider_id:
             raise AdmissionError("SDK manifest provider mismatch")
         if manifest.get("model") != contract.model_id:
             raise AdmissionError("SDK manifest model mismatch")
         if manifest.get("session_id") != session_id or messages.get("sessionId") != session_id:
             raise AdmissionError("SDK manifest session mismatch")
-        if set(manifest) != {
-            "backend_mode",
-            "capabilities",
-            "messages_path",
-            "model",
-            "provider",
-            "session_id",
-        }:
-            raise AdmissionError("SDK manifest schema mismatch")
 
     @staticmethod
     def _message_models(messages: dict[str, object], provider: str) -> tuple[str, ...]:
