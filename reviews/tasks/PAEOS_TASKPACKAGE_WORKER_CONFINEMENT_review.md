@@ -40,3 +40,28 @@
 receipt is bound to candidate `3e44133b`; this Gate E implementation was added after that
 candidate and is not covered by the receipt. Preserve the implementation and local tests, but
 obtain a fresh candidate-bound L14/L17 audit before counting Gate E or advancing to Gate F.
+
+## Current candidate checkpoint — 2026-09-01
+
+The recovered Gate E implementation is bound to candidate `dd4345bc84c3d7b260eb77e5f82362600113ca82`.
+The original GLM worker orchestration halted fail-closed after a recorded budget breach; its
+successful editor operations were reconstructed from preserved transcript evidence and then
+independently corrected for a replay artifact, typing, and lint quality. The implementation
+commit is `f0b134d509f6e09e2c45a07af25226a4146e09b9`; the bound implementation report is included
+in the candidate at `docs/superpowers/plans/2026-09-01-gate-e-taskpackage-worker-confinement-implementation-report.md`.
+
+Independent candidate verification is **33/33 focused** and **1,140/1,140 non-gateway** tests
+passed (exit `0`), with changed-path Ruff and Pyright clean and `git diff --check` clean. The
+qualified Gemini L14/L17 pair binds evidence bundle SHA-256
+`19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`, report SHA-256
+`9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, receipt-file SHA-256
+`b17346ecae61a5283e5ce5aac83c45304e059c11042efe0764d1b19c350bef5e`, and canonical receipt
+SHA-256 `eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`. Physical auditor
+`google/gemini-3.6-flash` is Gemini family, distinct from the GLM builder; A-08 passed with one
+attempt and no fallback. The candidate-bound checkpoint is
+`reviews/tasks/PAEOS_GATE_E_L14_L17_DD4345B_CHECKPOINT.md`.
+
+This is qualified L14/L17 evidence, not a Court seal. Worker/Court request-local accounting is
+`0/1/0` and `0/0/0`; `DEBT-0060` remains OPEN. A separate Founder/Court disposition is required
+before Gate E can be counted or Gate F can begin. No promotion, merge, main/trunk mutation,
+production dispatch, or SAKG resumption is implied.

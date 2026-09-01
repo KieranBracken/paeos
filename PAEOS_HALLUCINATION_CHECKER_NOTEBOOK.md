@@ -4557,3 +4557,33 @@ Remediated: 0`, and strict progress advances to **16/48 complete | 32 remaining*
 remains **OPEN** and is carried forward to Gate E. This disposition does not authorize merge,
 promotion, main/trunk mutation, production dispatch, or SAKG resumption. Gate E must obtain its
 own candidate-bound L13/L14/L17 evidence and Court disposition.
+
+### Entry 259 — 2026-09-01: Gate E first audit response rejected without upgrade
+
+Candidate `dd4345bc84c3d7b260eb77e5f82362600113ca82` was sent once to Google
+`gemini-3.6-flash` against the full Gate E bundle SHA-256
+`5c7a4d97dd824be329fed738f223030a4f7cdc04cf775b145c698738c7e539c3`. Physical provenance was
+Gemini versus GLM builder, A-08 `PASS`, one provider attempt, no fallback. The model response
+stopped before the required `AUDIT_COMPLETE: true` marker; the local validator returned
+`AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`. Rejected report
+SHA-256 is `bb541477681bbda95aadb70bc81d85c1fb171a19763cd59c56a4c17ecde1a70f`; rejection metadata
+SHA-256 is `2be4e9a1e521124bc1c09065d4076f5eb4042588b8f0e7bbd651c2a5168ccda9`. The canonical
+disposition remains `BLOCKED_UNQUALIFIABLE`; raw artifacts are preserved and no identical retry
+was performed.
+
+### Entry 260 — 2026-09-01: Gate E compact L14/L17 pair qualified
+
+After the truncation rejection, a materially smaller evidence package was dispatched once under
+new audit ID `l14-l17-dd4345b-gate-e-compact-002`. Candidate
+`dd4345bc84c3d7b260eb77e5f82362600113ca82` is bound to bundle SHA-256
+`19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`; prompt SHA-256 is
+`04bb9076dd54087497d4290fdd6fc139ff9e43b887d8af5ad6ed50d18fc0bd8f`. Google
+`gemini-3.6-flash` returned a complete report: report SHA-256
+`9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, receipt-file SHA-256
+`b17346ecae61a5283e5ce5aac83c45304e059c11042efe0764d1b19c350bef5e`, canonical receipt SHA-256
+`eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`. Local validation returned
+report `PASS`, A-08 `PASS`, and `qualified=true`; physical family is Gemini versus GLM builder,
+one attempt, no fallback. The report binds the candidate and bundle, contains concrete findings,
+and ends with `AUDIT_COMPLETE: true`. This is L14/L17 evidence only: no Gate E Court seal is
+inferred. Worker/Court request-local accounting remains `0/1/0` and `0/0/0`; `DEBT-0060` remains
+OPEN. Separate Founder/Court disposition is required before Gate E progression.

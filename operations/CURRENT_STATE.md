@@ -953,3 +953,29 @@ progress advances to **16/48 complete | 32 remaining**. Gate E must follow its c
 state-reconciliation/liveness plan, obtain fresh candidate-bound L13/L14/L17 evidence, and receive
 its own Court disposition. No merge, promotion, main/trunk mutation, production dispatch, or SAKG
 resumption is authorized.
+
+## 2026-09-01 — Gate E current candidate and qualified L14/L17 checkpoint
+
+Gate E TaskPackage worker-confinement implementation was reconstructed from the preserved GLM
+worker transcript after its orchestration halted fail-closed on a budget breach. The recovered
+candidate is `dd4345bc84c3d7b260eb77e5f82362600113ca82` (implementation `f0b134d`, report
+`dd4345b`) on the isolated recovery branch. Only the four authorized sandbox source/test files
+and the implementation report were included; no production, router, governance authority, or
+SAKG files were changed by the implementation commit.
+
+Independent verification passed **33/33 focused** and **1,140/1,140 non-gateway** tests, with
+changed-path Ruff/Pyright and `git diff --check` clean. The first full-bundle Gemini response was
+physically decorrelated but rejected because it was truncated; raw rejected artifacts remain
+preserved. A materially distinct compact one-shot then qualified: bundle SHA-256
+`19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`, report SHA-256
+`9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, receipt-file SHA-256
+`b17346ecae61a5283e5ce5aac83c45304e059c11042efe0764d1b19c350bef5e`, canonical receipt SHA-256
+`eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`. Gemini family differs
+from the GLM builder; A-08 passed, one provider attempt, no fallback. Checkpoint:
+`reviews/tasks/PAEOS_GATE_E_L14_L17_DD4345B_CHECKPOINT.md`.
+
+Gate E is **IMPLEMENTATION_CHECKPOINT — NOT SEALED** pending a separate Founder/Court L16
+disposition. Request-local Worker/Court accounting is `0/1/0` and `0/0/0`; `DEBT-0060` remains
+OPEN. Strict sealed progress remains **16/48 complete | 32 remaining** until the disposition is
+recorded. Gate F, promotion, merge, main/trunk mutation, production dispatch, and SAKG resumption
+remain unauthorized.

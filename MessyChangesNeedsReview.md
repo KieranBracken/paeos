@@ -1091,3 +1091,27 @@ is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Pair vali
   `192b1e8e0a084fb123897f8eac233167e33e5be8a9829a1607192f1e039842b5`; rejected report SHA is
   `6666f152790ed37419bbdd80c99e839cb113ad6ec7af1ad2695c0e913ee0ca73`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
+
+- 2026-09-01 Gate E candidate `dd4345bc84c3d7b260eb77e5f82362600113ca82` was reconstructed from
+  the preserved GLM worker transcript after a fail-closed orchestration budget breach. The four
+  authorized sandbox files were independently corrected and committed as `f0b134d`; the report
+  was committed as `dd4345b`. Fresh evidence passed 33/33 focused tests and 1,140/1,140
+  non-gateway tests, with changed Ruff/Pyright and `git diff --check` clean. No production,
+  router, main/trunk, or SAKG files were changed.
+
+- 2026-09-01 the first full Gate E Gemini dispatch reached Google once with physical A-08 PASS
+  but returned a truncated report. The local validator rejected it (`audit report must contain
+  exactly one completion marker`); rejected report SHA is
+  `bb541477681bbda95aadb70bc81d85c1fb171a19763cd59c56a4c17ecde1a70f`, rejected receipt file
+  SHA is `31f2f19bcf8fb63844615995e5ea2cbd6fed11cab910103f182315f52951287c`, and rejection
+  metadata SHA is `2be4e9a1e521124bc1c09065d4076f5eb4042588b8f0e7bbd651c2a5168ccda9`. No identical
+  retry or upgrade was performed.
+
+- 2026-09-01 a materially distinct compact Gate E Gemini dispatch qualified: bundle SHA
+  `19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0`, report SHA
+  `9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405`, receipt-file SHA
+  `b17346ecae61a5283e5ce5aac83c45304e059c11042efe0764d1b19c350bef5e`, canonical receipt SHA
+  `eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee`. Physical Gemini family
+  differs from the GLM builder; one attempt, no fallback, A-08 PASS, and local qualification is
+  true. Gate E remains an implementation checkpoint pending Founder/Court disposition; DEBT-0060
+  remains OPEN; no Gate F or SAKG progression is implied.
