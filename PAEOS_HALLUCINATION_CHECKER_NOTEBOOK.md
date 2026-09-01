@@ -4770,3 +4770,31 @@ Remanded: 0 | Remediated: 0** and strict sealed progress is **18/48 complete | 3
 promotion, merge, push, main/trunk, or SAKG state was touched. The first helper attempt failed
 before ledger creation due an isolated import-path error; its empty state root is preserved and
 not counted as an integration run.
+
+### Entry 270 — 2026-09-02: Post-bootstrap window stopped on typed authentication failure; Gate G revalidation remains unproven
+
+Following the Founder-authorized Gate F bootstrap integration, one distinct Cline SDK admission
+probe was dispatched exactly once in the external state root
+`/private/tmp/paeos-gate-f-bootstrap-state-61521f7-v2`:
+`post-bootstrap-route-001`, provider `cline-pass`, model `z-ai/glm-5.3-flash`, GLM family,
+profile UUID `6f05f1b8-297d-46cf-8e4c-5af5fc0c31da`, auth epoch 4. It returned exit `1` with
+typed `AUTH_FAILED`; no worker admission or route proof exists. The admission result SHA-256 is
+`ae6e2072ec3405e4bbc7b044039ae5d6c445ac1e16aa114a5298a7f2bb3aaded`; failure lease SHA-256 is
+`ed72f05a0403189f8e09548ffbc1b9a56845a5f2f2bd94b95e7452a237e602d8`; released lease SHA-256 is
+`28007d8fd669aa787a233ea4db7f6f5abfb952e37eac0623cf64796089b0ec68`. Raw evidence is preserved;
+no identical retry was attempted. A new authentication state is required before another probe.
+
+The read-only Gate G CLI then ran once for run ID `gate-f-bootstrap-61521f7` against the same
+ledger. It returned exit `2`, raw stdout SHA-256
+`1cf080e0578aed2acf88a4883c043794feb0be3c6dfcb1b03701a2108973d420`, empty stderr SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, and verified ledger head
+`3cab1e7bab66592399f56ef5a00fcd03ac68f02809293efe9167e4a7998687e8`. All L01–L19 rows are
+`UNPROVEN` (`NO_COMMITTED_EVIDENCE`); local Court counts are `Sealed: 0 | Remanded: 0 |
+Remediated: 0`. The auditor contract tests independently passed `13/13` (exit 0), proving only
+the machinery, not a completed lifecycle.
+
+Exact disposition: `POST_BOOTSTRAP_WINDOW: BLOCKED_UNPROVEN`; `GATE_G_STATUS: READ_ONLY
+REVALIDATION — NOT SEALED`. `DEBT-0060` and `RB-0027` remain OPEN. No promotion, ref mutation,
+credential value, merge, main/trunk, or SAKG state was touched. The next permissible step is a
+new operator-established auth epoch, then distinct admissions and the remaining coordinator,
+canary, promotion, and independent-audit evidence required by Gate F/G.

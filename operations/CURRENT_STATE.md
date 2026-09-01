@@ -1136,3 +1136,28 @@ now **Sealed: 6 | Remanded: 0 | Remediated: 0** and strict sealed progress is **
 protected ref, promotion, merge, push, main/trunk, or SAKG state was touched. Task 7 and the
 post-bootstrap evidence window remain held pending their own candidate-bound authorization and
 live prerequisites.
+
+## 2026-09-02 — Post-bootstrap window and Gate G revalidation checkpoint
+
+The authorized post-bootstrap single-flight window attempted one fresh Cline SDK admission probe
+(`post-bootstrap-route-001`) against the isolated state root
+`/private/tmp/paeos-gate-f-bootstrap-state-61521f7-v2`. The GLM worker route (`cline-pass` /
+`z-ai/glm-5.3-flash`, auth epoch 4) returned a typed `AUTH_FAILED` with exit `1`; the raw
+admission-result SHA-256 is
+`ae6e2072ec3405e4bbc7b044039ae5d6c445ac1e16aa114a5298a7f2bb3aaded`. Failure and released lease
+hashes are recorded in `reviews/tasks/PAEOS_POST_BOOTSTRAP_WINDOW_GATE_G_61521F7.md`. The attempt
+was not retried; no route admission, coordinator event, or promotion occurred.
+
+The read-only Gate G CLI ran once against the bootstrap ledger for run ID
+`gate-f-bootstrap-61521f7`. It returned exit `2` with raw stdout SHA-256
+`1cf080e0578aed2acf88a4883c043794feb0be3c6dfcb1b03701a2108973d420` and verified head
+`3cab1e7bab66592399f56ef5a00fcd03ac68f02809293efe9167e4a7998687e8`. All 19 lifecycle layers
+are `UNPROVEN` with `NO_COMMITTED_EVIDENCE`; local Court counts are `Sealed: 0 | Remanded: 0 |
+Remediated: 0`. The Gate G auditor contract suite passed **13/13**, confirming the machinery only.
+
+Exact status is `POST_BOOTSTRAP_WINDOW: BLOCKED_UNPROVEN` and
+`GATE_G_STATUS: READ_ONLY REVALIDATION — NOT SEALED`. A new operator-established authentication
+epoch is required before distinct worker admissions can continue; then coordinator-backed route,
+rotation, quota-stop, Trace-A, promotion, and independent-audit evidence must be collected.
+`DEBT-0060` and `RB-0027` remain OPEN. No promotion, merge, credential value, protected ref,
+main/trunk, or SAKG state was touched.

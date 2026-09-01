@@ -1180,3 +1180,17 @@ evidence and Founder/Court disposition are mandatory.
   quota-stop, Trace-A, or promotion evidence exists in that root. Court is now `6/0/0`, strict
   sealed progress `18/48 complete | 30 remaining`; `DEBT-0060` and `RB-0027` remain OPEN. No
   promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.
+
+- 2026-09-02 post-bootstrap single-flight evidence window: one fresh Cline SDK GLM admission
+  probe (`post-bootstrap-route-001`, auth epoch 4) ran exactly once and returned typed
+  `AUTH_FAILED` (exit `1`). Admission-result SHA-256 is
+  `ae6e2072…`; failure/released lease hashes and raw path are recorded in
+  `reviews/tasks/PAEOS_POST_BOOTSTRAP_WINDOW_GATE_G_61521F7.md`. No identical retry, route
+  admission, coordinator event, or promotion occurred.
+
+- 2026-09-02 Gate G read-only revalidation ran once against the isolated bootstrap ledger for
+  `gate-f-bootstrap-61521f7`: exit `2`, all L01–L19 `UNPROVEN` with
+  `NO_COMMITTED_EVIDENCE`, verified head `3cab1e7…`, local Court `0/0/0`. Raw stdout SHA-256 is
+  `1cf080e0…`; the auditor machinery tests passed `13/13`. This is
+  `POST_BOOTSTRAP_WINDOW: BLOCKED_UNPROVEN`, not a Gate G seal. `DEBT-0060` and `RB-0027` remain
+  open; no protected-ref/main/trunk or SAKG mutation occurred.
