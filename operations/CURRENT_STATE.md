@@ -647,3 +647,21 @@ and rejection metadata remain preserved; no identical retry occurred. Dispositio
 **BLOCKED_UNQUALIFIABLE**, Worker/Court remain **3/3/0** and **0/0/0**, and strict progress is
 still **12/48 complete | 36 remaining**. A new, materially distinct prompt must satisfy the
 per-audit contract before Gate A can advance.
+
+## 2026-09-01 — Current-candidate Gemini L14/L17 audit qualified
+
+The corrected one-shot audit `l14-l17-38b5395-gemini-epoch4-contract-001` qualified for candidate
+`38b53955c83126f2bed231640555d86ed1f3159a` and bundle
+`8594658ae9767f489093dd0473c75b8931b95c98b8b9554c7b914e581121fd1a`. Google Gemini
+(`gemini-3.6-flash`, family `gemini`) returned a complete candidate/evidence-bound report with
+`L14_STATUS: PASS`, concrete findings, per-audit Worker `0/1/0` and Court `0/0/0`, and the
+terminal marker; A-08 **PASS**, exactly one provider attempt, no fallback. Report SHA-256 is
+`b15289ab911abbe7400dd14b871868a73e363b4bbbc8b76205fb3b136a53c48a`; receipt file SHA-256 is
+`391130b37115ddf7278821182507af9c0c76ca47e4bf98b8c38fcbd6b7cf8f7b`; canonical receipt SHA is
+`f6da040bb9d7797df36783b586f6232082ab5393279c951e3650d03823ea1c77`.
+
+The report’s machine fields are `INVARIANT: None` and `REPRODUCTION: N/A`; detailed findings
+still provide concrete transport, test, and admission evidence, and the observation is recorded
+for prompt-quality hardening. This qualifies L14/L17 evidence only. Aggregate Worker/Court remain
+**3/3/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**. No Court/L16
+row, Gate A seal, debt closure, promotion, or SAKG resumption is authorized.

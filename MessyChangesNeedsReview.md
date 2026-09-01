@@ -933,3 +933,13 @@ until this shutdown remediation is reviewed.
   rejected report SHA `9219d2e1afe975d4b5d32e9e2aa46203f15db46126e6c0053d764ebf4cfe428e`. The exact
   payload was not retried; disposition remains **BLOCKED_UNQUALIFIABLE** and strict progress
   remains **12/48 complete | 36 remaining**.
+
+- 2026-09-01 corrected Gemini audit `l14-l17-38b5395-gemini-epoch4-contract-001` qualified for
+  candidate `38b5395` and bundle `8594658ae9767f489093dd0473c75b8931b95c98b8b9554c7b914e581121fd1a`.
+  Google `gemini-3.6-flash` / family `gemini` versus GLM builder passed A-08 with one attempt and
+  no fallback. Report SHA `b15289ab911abbe7400dd14b871868a73e363b4bbbc8b76205fb3b136a53c48a`;
+  receipt file SHA `391130b37115ddf7278821182507af9c0c76ca47e4bf98b8c38fcbd6b7cf8f7b`. The report
+  contains concrete findings and the terminal completion marker; machine fields are
+  `INVARIANT: None` and `REPRODUCTION: N/A`, recorded as a quality observation. This is qualified
+  L14/L17 evidence only: Court/L16 remains unrecorded, strict progress remains **12/48 complete |
+  36 remaining**, and no gate seal or SAKG resumption is implied.

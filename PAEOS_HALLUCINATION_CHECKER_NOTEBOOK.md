@@ -4257,3 +4257,24 @@ This is **BLOCKED_UNQUALIFIABLE** under the current validator; the complete repo
 evidence and is not silently upgraded to a seal. No identical payload retry occurred. A new
 prompt must use the validator’s `0/1/0` per-audit accounting while separately describing the
 aggregate `3/3/0` worker evidence. Gate A remains unsealed.
+
+### Entry 242 — 2026-09-01: Current-candidate Gemini L14/L17 audit qualified
+
+After correcting the per-audit accounting contract, the distinct one-shot audit
+`l14-l17-38b5395-gemini-epoch4-contract-001` qualified for candidate
+`38b53955c83126f2bed231640555d86ed1f3159a` and bundle
+`8594658ae9767f489093dd0473c75b8931b95c98b8b9554c7b914e581121fd1a`. Google Gemini
+(`gemini-3.6-flash`, family `gemini`) produced a complete report with `L14_STATUS: PASS`, exact
+candidate/evidence bindings, concrete findings, per-audit Worker `0/1/0` and Court `0/0/0`
+lines, and terminal `AUDIT_COMPLETE: true`. A-08 is **PASS** (`gemini` auditor versus `glm`
+builder) with exactly one provider attempt and no fallback. Report file SHA-256 is
+`b15289ab911abbe7400dd14b871868a73e363b4bbbc8b76205fb3b136a53c48a`; receipt file SHA-256 is
+`391130b37115ddf7278821182507af9c0c76ca47e4bf98b8c38fcbd6b7cf8f7b`; canonical receipt SHA is
+`f6da040bb9d7797df36783b586f6232082ab5393279c951e3650d03823ea1c77`.
+
+The report’s machine fields read `INVARIANT: None` and `REPRODUCTION: N/A`; its detailed
+findings nonetheless cite the explicit transport boundary, 130/130 focused checks, 1,107/1,107
+L13 reproduction, and epoch-4 admissions. This quality observation is preserved in the review
+record and does not expand the PASS into a Gate seal. Aggregate Worker remains **3/3/0** and
+Court remains **0/0/0**; Gate A, L16 Court reconciliation, debt closure, and SAKG resumption
+remain outstanding.
