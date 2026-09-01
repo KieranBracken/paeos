@@ -4432,3 +4432,20 @@ installed/reached/killed passes and one explicit remand control. The variants re
 worktree and no worker/provider was invoked. This is synthetic evidence preparation, not ratified
 Z0 content or a Gate C seal. Current external accounting is Worker **3/3/0**, Court **2/0/0**;
 strict progress remains **14/48 complete | 34 remaining**; `DEBT-0060` remains OPEN.
+
+### Entry 253 — 2026-09-01: current Gate C L14/L17 pair qualified
+
+Candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` received one authorized Gemini audit using
+bundle SHA-256 `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. The first
+materially distinct compact attempt qualified: report SHA-256
+`ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`, receipt file SHA-256
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`, canonical receipt SHA-256
+`b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Physical provenance is
+Google `gemini-3.6-flash`, family `gemini`, one attempt, no fallback; A-08 passed against the GLM
+builder. Local pair adjudication returned `PASS` / `PASS` / `qualified=True`; report-bound counts
+are Worker **0/1/0**, Court **0/0/0**.
+
+The report's statement that `DEBT-0058` is open is stale and is corrected by the canonical Founder
+Gate A seal (`DEBT-0058` REPAID); `DEBT-0060` remains OPEN. The report also confirms that the
+synthetic canary ladder does not satisfy ratified Z0. Gate C therefore remains unsealed, pending
+the Z0 boundary and a separate Founder/Court disposition. No Gate D or SAKG work is authorized.

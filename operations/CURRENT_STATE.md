@@ -783,6 +783,23 @@ and separate Founder/Court disposition are still required. External accounting r
 **3/3/0**, Court **2/0/0**; strict progress remains **14/48 complete | 34 remaining**. `DEBT-0060`
 remains OPEN; no Gate D, production dispatch, promotion, or SAKG resumption is authorized.
 
+## 2026-09-01 — Gate C current candidate L14/L17 qualified checkpoint
+
+Candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` was audited once by Google
+`gemini-3.6-flash` against compact bundle SHA-256
+`a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. The report SHA-256 is
+`ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`; receipt file SHA-256 is
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`; canonical receipt SHA-256
+is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Local pair adjudication
+returned `PASS` / `PASS` / `qualified=True`; A-08 is `gemini != glm`, one attempt, no fallback.
+Per-audit counts are Worker **0/1/0** and Court **0/0/0**.
+
+The report's `DEBT-0058 open` note is stale; the canonical Founder Gate A disposition repaid
+`DEBT-0058`. Only `DEBT-0060` remains OPEN. Synthetic canary evidence is explicitly not ratified
+Z0 content, so Gate C is **AUTHORIZED, NOT SEALED** pending that constitutional boundary and a
+Founder/Court disposition. No Gate D, production dispatch, promotion, or SAKG resumption is
+authorized.
+
 ## 2026-09-01 — Gate B L17 checkpoint recorded
 
 The qualified `993b6cc` Gemini pair and the Gate B L17 retrospective are recorded in the review

@@ -139,3 +139,22 @@ The Gate C candidate remains **NOT GATE-SEALED**. Current outstanding requiremen
 candidate-bound physically decorrelated Gemini L14/L17 receipt and report for `8706917`, L17
 reconciliation, and a separate Founder/Court disposition. `DEBT-0060` remains OPEN; no Gate D
 or production/SAKG work is authorized.
+
+## Current candidate L14/L17 reconciliation — 2026-09-01
+
+Candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` was audited once by Google
+`gemini-3.6-flash` against bundle `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`.
+The report SHA-256 is `ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`; the
+receipt file SHA-256 is `fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`; its
+canonical receipt SHA-256 is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`.
+Pair adjudication is `PASS` / `PASS` / `qualified=True`, with one attempt, no fallback, and
+physical `gemini` auditor family different from the GLM builder. L17 report-bound counts are
+Worker **0/1/0** and Court **0/0/0**.
+
+The report's statement that `DEBT-0058` remains open conflicts with the canonical Founder Gate A
+seal and is corrected here: `DEBT-0058` is **REPAID**; `DEBT-0060` remains **OPEN**. The report's
+synthetic-canary limitation is accepted: the seven pass controls and one healthy remand are
+verifier-owned preparation evidence, not ratified Z0 content.
+
+This is a qualified L14/L17 checkpoint only. Gate C remains **NOT SEALED** pending the Z0 canary
+requirement and Founder/Court disposition; no Gate D or production/SAKG work is authorized.

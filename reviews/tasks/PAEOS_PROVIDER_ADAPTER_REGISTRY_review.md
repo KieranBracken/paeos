@@ -79,3 +79,27 @@ This record remains an implementation/evidence checkpoint. A candidate-bound non
 receipt for the current HEAD, L17 reconciliation, and a Founder/Court disposition remain
 required before Gate C can be sealed. External progress is unchanged at **14/48 complete | 34
 remaining**; `DEBT-0060` remains OPEN.
+
+## Current candidate L14/L17 reconciliation — 2026-09-01
+
+Candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` received a fresh one-shot physical Gemini
+audit using bundle `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. The
+persisted report is `/private/tmp/paeos-gate-c-l14-l17-report-f0be9ab-compact.md` (SHA-256
+`ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`); the physical receipt is
+`/private/tmp/paeos-gate-c-l14-l17-receipt-f0be9ab-compact.json` (file SHA-256
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`, canonical receipt SHA
+`b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`).
+
+Local pair adjudication returned `report_status=PASS`, `a08_verdict=PASS`, `qualified=True`;
+the transport recorded one Google `gemini-3.6-flash` attempt, no fallback, and `gemini != glm`.
+The report-bound per-audit accounting is Worker **0/1/0** and Court **0/0/0**. L17 is therefore
+recorded as a qualified implementation checkpoint.
+
+One report finding says `DEBT-0058` is open; that is stale relative to the canonical Founder Gate A
+seal, which repaid `DEBT-0058`. The canonical current debt is `DEBT-0060` only. This is preserved
+as a reconciliation note, not silently promoted to a new debt or used to reject the otherwise
+qualified pair. The report also correctly identifies that the synthetic canary ladder is not a
+ratified Z0 canary set.
+
+Gate C remains **NOT GATE-SEALED** pending the Z0 canary boundary, L17 reconciliation, and a
+separate Founder/Court disposition. No later gate or SAKG work is authorized.

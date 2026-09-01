@@ -992,6 +992,16 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 current Gate C candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` received a
+  qualified one-shot Gemini L14/L17 audit against bundle SHA-256
+  `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. Report SHA-256 is
+  `ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`; receipt file SHA-256 is
+  `fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`; canonical receipt SHA-256
+  is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Pair validation passed,
+  A-08 `gemini != glm`, one attempt, no fallback. The report's `DEBT-0058` open note is stale
+  against the Founder Gate A repayment; only `DEBT-0060` remains OPEN. Synthetic canaries are not
+  ratified Z0, so Gate C remains unsealed pending that boundary and Founder/Court disposition.
+
 - 2026-09-01 Gate C fresh verification at current recovery HEAD `8706917`: focused provider,
   supervisor, canary, and model-router compatibility tests **156/156 passed**; model-router/runtime
   **819/819 passed** excluding the restricted gateway fixture; complete non-gateway suite
