@@ -992,6 +992,13 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 the Founder supplied `COURT_SEALED` for Gate B candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8`,
+  referencing the qualified Gemini report/receipt/bundle evidence. Disposition record SHA-256 is
+  `8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9`. Gate B is sealed and Gate C
+  progression is authorized; `DEBT-0060` remains OPEN. External counts are Worker **3/3/0**, Court
+  **2/0/0**, and strict progress is **14/48 complete | 34 remaining**. No promotion or main/trunk
+  mutation occurred.
+
 - 2026-09-01 the qualified minimal `993b6cc` Gemini pair and Gate B L17 retrospective were
   recorded. Tasks 5.3–5.5 are complete as evidence/checkpoint work; Gate B remains unsealed
   pending a separate L16/Court disposition. External counts remain Worker **3/3/0**, Court

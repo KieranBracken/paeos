@@ -40,3 +40,17 @@ seal entries are preserved as raw governance history but are not admissible clos
 Canonical counts are **Sealed: 0 | Remanded: 0 | Remediated: 0** and strict progress remains
 **12/48 complete | 36 remaining**. SAKG resumption is held until a fresh current-candidate
 L13/L14/L17 bundle independently revalidates the downstream implementation and L01–L19 operation.
+
+## Founder/Court Seal Reconciliation — 2026-09-01
+
+The historical SQLite accounting above is retained as a read-only baseline. Subsequent external
+Founder ABI dispositions sealed Gate A (candidate `38b53955c83126f2bed231640555d86ed1f3159a`) and
+Gate B (candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8`). The Gate B disposition record is
+`reviews/tasks/PAEOS_GATE_B_FOUNDER_COURT_DISPOSITION_993B6CC.md` (SHA-256
+`8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9`).
+
+Current external accounting is Court **Sealed: 2 | Remanded: 0 | Remediated: 0** and strict
+progress is **14/48 complete | 34 remaining**. Gate C is authorized to proceed under its own
+candidate-bound evidence and L16/Court disposition requirements. `DEBT-0060` remains OPEN; no
+SQLite history rewrite, merge, promotion, main/trunk mutation, production dispatch, or SAKG
+resumption is authorized by these Gate A/B records.

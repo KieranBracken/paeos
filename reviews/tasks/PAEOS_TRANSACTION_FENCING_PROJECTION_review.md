@@ -195,6 +195,20 @@ seal exists. Residual routes are:
 This retrospective is complete for the Gate B checkpoint. It recommends the L16 disposition and
 preserves the evidence; it does not legislate or self-ratify a Gate B seal.
 
+## Founder/Court Disposition — 2026-09-01
+
+The Founder supplied the candidate-bound L16 disposition `COURT_SEALED` for Gate B (Transaction
+Fencing & Projection), candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8`, with the qualified
+Gemini L14/L17 report, receipt, and bundle hashes recorded above. The external disposition record
+is `reviews/tasks/PAEOS_GATE_B_FOUNDER_COURT_DISPOSITION_993B6CC.md` with SHA-256
+`8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9`.
+
+Gate B is now **SEALED** and progression to Gate C is authorized. `DEBT-0060` remains OPEN and is
+carried forward. External accounting advances to Court **Sealed: 2 | Remanded: 0 | Remediated: 0**
+(Gate A and Gate B), while Worker remains **Admitted: 3 | Rejected: 3 | Remediated: 0**. Strict
+progress advances to **14/48 complete | 34 remaining**. Historical SQLite ledgers remain unchanged;
+no merge, promotion, main/trunk mutation, production dispatch, or SAKG resumption is authorized.
+
 ## Qualified L14/L17 Audit Evidence — 2026-09-01 (`993b6cc`)
 
 The minimal, source-inclusive one-shot audit `l14-l17-993b6cc-gemini-004` completed and passed

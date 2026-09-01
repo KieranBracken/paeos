@@ -2716,6 +2716,22 @@ Gate B Task 5 still awaits decorrelated L14/L17 verification, and Gate A's authe
 admission prerequisite remains open. No production dispatch, Gate closure, or SAKG resumption is
 authorized.
 
+### Entry 252 — 2026-09-01: Founder/Court sealed Gate B
+
+The Founder supplied the exact candidate-bound L16 disposition `COURT_SEALED` for Gate B
+(Transaction Fencing & Projection), candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8`,
+referencing the qualified Gemini report SHA-256
+`1be71fc0404d8d2f0fc9ef6a63891d90e0f91ff5e85b8e6c6add17a570b180f8`, receipt SHA-256
+`1b684a3dcbfd7c3adb10775583b4d13fd939941b2deb4291dcdcf1df863fc102`, and bundle SHA-256
+`0b14c4d6ed6f7453a1f0c91fa963a1201c038cda250b6d8b6542cadadf6b439d`. The external disposition
+record is `reviews/tasks/PAEOS_GATE_B_FOUNDER_COURT_DISPOSITION_993B6CC.md` with SHA-256
+`8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9`.
+
+Gate B is **SEALED** and Gate C progression is authorized. `DEBT-0060` remains OPEN and is
+carried forward. External Court accounting is now **2/0/0** (Gate A and Gate B), Worker remains
+**3/3/0**, and strict progress advances to **14/48 complete | 34 remaining**. No promotion, merge,
+main/trunk mutation, production dispatch, or SAKG resumption is authorized.
+
 ### Entry 167 — 2026-08-30: Gate C Transport Extraction Candidate
 
 The isolated recovery branch implemented Gate C Task 2 in local commit `343eb5b`

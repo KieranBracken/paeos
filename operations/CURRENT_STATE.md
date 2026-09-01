@@ -720,6 +720,19 @@ Founder record above. External Worker/Court accounting is **3/3/0** and **1/0/0*
 strict progress is **13/48 complete | 35 remaining**. No Gate C advancement, production dispatch,
 promotion, or SAKG resumption is authorized.
 
+## 2026-09-01 — Founder/Court sealed Gate B; Gate C authorized
+
+The Founder supplied the candidate-bound L16 disposition `COURT_SEALED` for Gate B, candidate
+`993b6cc178f7ffe2e88d8cc404bcbed429d088a8`, referencing the qualified Gemini report, receipt, and
+bundle hashes in the Gate B review. The external disposition record is
+`reviews/tasks/PAEOS_GATE_B_FOUNDER_COURT_DISPOSITION_993B6CC.md` (SHA-256
+`8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9`). Gate B is **SEALED** and
+Gate C progression is authorized. `DEBT-0060` remains OPEN and is carried forward.
+
+External Worker/Court accounting is **3/3/0** and **2/0/0**; strict progress advances to
+**14/48 complete | 34 remaining**. Historical SQLite ledgers remain unchanged. No merge,
+promotion, main/trunk mutation, production dispatch, or SAKG resumption is authorized.
+
 ## 2026-09-01 — Authorized Gate B audit blocked at Gemini transport boundary
 
 The one-shot Gemini request `l14-l17-4410180-gemini-001` for candidate
