@@ -325,6 +325,9 @@ async function main() {
         modelId: config.model_id,
         providerId: config.provider_id,
         sessionId,
+        systemPrompt:
+          "You are the PAEOS implementation worker. Execute only the bound probe task " +
+          "through approved tools; never self-ratify, audit, promote, or widen scope.",
       },
       prompt: config.prompt,
       toolPolicies: {

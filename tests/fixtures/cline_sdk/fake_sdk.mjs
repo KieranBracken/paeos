@@ -21,6 +21,9 @@ export class ClineCore {
   }
 
   async start(input) {
+    if (typeof input.config.systemPrompt !== "string" || !input.config.systemPrompt.trim()) {
+      throw new TypeError("systemPrompt is required");
+    }
     const sessionId = input.config.sessionId;
     const probe = input.prompt.startsWith("PAEOS_SDK_PROBE:")
       ? JSON.parse(input.prompt.slice("PAEOS_SDK_PROBE:".length))
