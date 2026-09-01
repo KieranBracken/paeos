@@ -94,7 +94,6 @@ def evaluate_activation(
         fingerprint = hashlib.sha256(
             json.dumps(
                 {
-                    "kind": kind,
                     "transaction_id": tx,
                     "route": payload.get("route"),
                     "evidence_hash": payload.get("evidence_hash", payload.get("evidence_ref")),
@@ -140,6 +139,12 @@ def evaluate_activation(
         "COURT_REMEDIATED" in kinds and "COURT_REMANDED" in kinds
         for kinds in court_claims.values()
     )
+    court_conflict = any(
+        "COURT_SEALED" in kinds and "COURT_REMANDED" in kinds
+        for kinds in court_claims.values()
+    )
+    if court_conflict:
+        conflicts = True
 
     counts = ActivationCounts(
         admitted_route_probes=probes,
@@ -161,19 +166,21 @@ def evaluate_activation(
         blocking.append("CRITICAL_FAILURE_PRESENT")
 
     routes_incomplete = not probes_by_route or any(len(ids) < 3 for ids in probes_by_route.values())
+    unsafe = conflicts or critical > 0
     if routes_incomplete:
         blocking.append("MINIMUM_PROBES_OUTSTANDING")
-    else:
+    elif not unsafe:
         stage = ActivationStage.ISOLATED_CANARY
 
-    if stage == ActivationStage.ISOLATED_CANARY:
+    if stage == ActivationStage.ISOLATED_CANARY and not unsafe:
         if trace_a < 3:
             blocking.append("MINIMUM_TRACE_A_CANARIES_OUTSTANDING")
         elif rotations < 1 or quota_stops < 1:
             blocking.append("MINIMUM_ROTATION_QUOTA_STOPS_OUTSTANDING")
         else:
             bootstrap = any(
-                kind == "FOUNDER_BOOTSTRAP_SEALED" for kind, _, _ in valid_events
+                kind == "FOUNDER_BOOTSTRAP_SEALED" and payload.get("authority") == "FOUNDER"
+                for kind, payload, _ in valid_events
             )
             stage = (
                 ActivationStage.BROADER_TRACE_A

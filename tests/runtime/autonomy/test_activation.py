@@ -162,3 +162,72 @@ def test_activation_critical_failure_forces_supervised_recovery() -> None:
     assert decision.counts.critical_failures == 1
     assert decision.stage == ActivationStage.SUPERVISED_RECOVERY_ONLY
     assert "CRITICAL_FAILURE_PRESENT" in decision.blocking_reason_codes
+
+
+def test_activation_does_not_progress_after_critical_escape_even_with_minimums() -> None:
+    from runtime.autonomy.activation import ActivationStage, evaluate_activation
+
+    cas = CAS(InMemoryCasStore())
+    rows: list[LedgerRow] = []
+    seq = 0
+    def add(kind: str, tx: str, **payload: object) -> None:
+        nonlocal seq
+        seq += 1
+        ref = cas.put(tx.encode())
+        rows.append(_row(seq, kind, {**payload, "transaction_id": tx, "evidence_hash": ref}))
+
+    for index in range(3):
+        add("ROUTE_PROBE_ADMITTED", f"probe-{index}", route="cline/glm")
+    for index in range(3):
+        add("TRACE_A_CANARY_PASSED", f"trace-{index}")
+    add("SUPERVISOR_ROTATED", "rotation")
+    add("QUOTA_STOP_RECOVERED", "quota")
+    add("CRITICAL_FAILURE", "escape", reason="scope escape")
+
+    decision = evaluate_activation(rows, cas)
+
+    assert decision.stage == ActivationStage.SUPERVISED_RECOVERY_ONLY
+    assert "CRITICAL_FAILURE_PRESENT" in decision.blocking_reason_codes
+
+
+def test_activation_requires_founder_authority_for_bootstrap_transition() -> None:
+    from runtime.autonomy.activation import ActivationStage, evaluate_activation
+
+    cas = CAS(InMemoryCasStore())
+    rows: list[LedgerRow] = []
+    for index in range(3):
+        ref = cas.put(f"probe-{index}".encode())
+        rows.append(
+            _row(
+                index + 1,
+                "ROUTE_PROBE_ADMITTED",
+                {"route": "cline/glm", "transaction_id": f"probe-{index}", "evidence_hash": ref},
+            )
+        )
+    for index in range(3):
+        ref = cas.put(f"trace-{index}".encode())
+        rows.append(
+            _row(
+                index + 4,
+                "TRACE_A_CANARY_PASSED",
+                {"transaction_id": f"trace-{index}", "evidence_hash": ref},
+            )
+        )
+    for seq, kind, tx in (
+        (7, "SUPERVISOR_ROTATED", "rotation"),
+        (8, "QUOTA_STOP_RECOVERED", "quota"),
+    ):
+        ref = cas.put(tx.encode())
+        rows.append(_row(seq, kind, {"transaction_id": tx, "evidence_hash": ref}))
+    bootstrap_ref = cas.put(b"bootstrap")
+    rows.append(
+        _row(
+            9,
+            "FOUNDER_BOOTSTRAP_SEALED",
+            {"transaction_id": "bootstrap", "evidence_hash": bootstrap_ref, "authority": "worker"},
+        )
+    )
+
+    decision = evaluate_activation(rows, cas)
+
+    assert decision.stage == ActivationStage.AWAITING_FOUNDER_BOOTSTRAP
