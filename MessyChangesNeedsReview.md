@@ -1132,3 +1132,11 @@ evidence and Founder/Court disposition are mandatory.
   with hashes in Notebook Entry 263. This is `BLOCKED_UNQUALIFIABLE`, not a pass; no identical
   retry/fallback occurred. A materially smaller source-excerpt package is the only permitted next
   audit attempt.
+
+- 2026-09-01 Gate F compact Gemini dispatch for candidate `6f5707b04d8bc9dc7006868832f1cce991cb4a0b`
+  and bundle `855f082fed406d3b2c1e800727f6fbfb18d56b3dc4cf24381147969a93e26297` reached Google
+  once under host-level router access (observation `1082`, 22,231 prompt / 160 completion tokens;
+  Gemini vs GLM, A-08 PASS) but stopped mid-finding and omitted `AUDIT_COMPLETE: true`. The local
+  validator rejected it; report, receipt, and rejection metadata hashes are recorded in Notebook
+  Entry 264. Disposition is `BLOCKED_UNQUALIFIABLE`; no retry/fallback, code change, promotion,
+  merge, or protected-ref mutation occurred. Gate F remains **17/48 complete | 31 remaining**.

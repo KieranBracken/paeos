@@ -4650,3 +4650,26 @@ SHA-256 is `697a0e84f3a9c3c25c9f7fc6df992d59e97e2fc094ff53add4ef3ef18a397c4d`. T
 disposition remains `BLOCKED_UNQUALIFIABLE`; raw artifacts are retained and no identical retry or
 fallback was performed. A materially smaller source-excerpt package is required for any future
 one-shot attempt.
+
+### Entry 264 — 2026-09-01: Gate F compact Gemini audit reached provider but was rejected as incomplete
+
+Following the sandbox-boundary diagnosis, the authorized host-level one-shot dispatch used the
+compact Gate F package for candidate `6f5707b04d8bc9dc7006868832f1cce991cb4a0b`, bundle
+SHA-256 `855f082fed406d3b2c1e800727f6fbfb18d56b3dc4cf24381147969a93e26297`, and audit ID
+`l14-l17-6f5707b-gate-f-ultracompact-003`. The router recorded observation `1082` with 22,231
+prompt tokens and 160 completion tokens. Google `gemini-3.6-flash` was physically captured as
+the Gemini family versus the GLM builder; A-08 is `PASS`, provider attempts `1`, and the fallback
+chain contains only the requested Google route.
+
+The local validator rejected the response because `audit report must contain exactly one completion
+marker`. The preserved report is only 393 bytes and ends mid-finding after `REPRODUCTION: Evaluated
+Gate F implementation across 28/28 focused`; it does not contain `AUDIT_COMPLETE: true`. Rejected
+report SHA-256 is `a41dc2faa9e47ab266069894ad0b4221a4a890982e18dd73e2ad0f3eaaf65c35`; rejected
+receipt-file SHA-256 is `31fd51618732ca255aa4069d2ec5bf52402c98850959d24dc92dd51e770dd165`; rejection
+metadata SHA-256 is `48f91b0793f47d242573dd3192b88bde45ca13d41fd31fd931ce1ca2fe1c75`. The canonical
+receipt payload SHA is `52096bf4452db43c3b575f59e2d7951a94410b08c38d8a9e2e34b50257943a72`.
+
+Disposition is `BLOCKED_UNQUALIFIABLE`, not a Gate F pass. No retry, fallback, code change,
+promotion, merge, protected-ref mutation, or SAKG resumption occurred. Gate F remains an
+implementation checkpoint at **17/48 complete | 31 remaining**; a further audit requires fresh
+authorization for a materially changed package.

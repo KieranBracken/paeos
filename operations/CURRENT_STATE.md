@@ -1027,3 +1027,23 @@ raw report/receipt/rejection artifacts under `/private/tmp/paeos-gate-f-l14-l17-
 receipt-file, and rejection-metadata hashes are recorded in Notebook Entry 263. No retry, fallback,
 promotion, merge, or protected-ref mutation occurred. Gate F remains an implementation checkpoint;
 a materially smaller audit package is required before any L14/L17 qualification or Court request.
+
+## 2026-09-01 — Gate F compact Gemini audit reached provider but was rejected
+
+The authorized host-level one-shot audit for current candidate
+`6f5707b04d8bc9dc7006868832f1cce991cb4a0b` used bundle SHA-256
+`855f082fed406d3b2c1e800727f6fbfb18d56b3dc4cf24381147969a93e26297` and audit ID
+`l14-l17-6f5707b-gate-f-ultracompact-003`. Physical provenance was captured as Google
+`gemini-3.6-flash` (Gemini family) versus the GLM builder; A-08 passed, with one provider
+attempt and no fallback. Router observation `1082` recorded 22,231 prompt tokens and 160
+completion tokens.
+
+The response was 393 bytes and ended mid-finding before `AUDIT_COMPLETE: true`; the local
+validator rejected it with `audit report must contain exactly one completion marker`. Rejected
+report SHA-256: `a41dc2faa9e47ab266069894ad0b4221a4a890982e18dd73e2ad0f3eaaf65c35`; rejected
+receipt-file SHA-256: `31fd51618732ca255aa4069d2ec5bf52402c98850959d24dc92dd51e770dd165`; rejection
+metadata SHA-256: `48f91b0793f47d242573dd3192b88bde45ca13d41fd31fd931ce1ca2fe1c75`; canonical receipt
+payload SHA-256: `52096bf4452db43c3b575f59e2d7951a94410b08c38d8a9e2e34b50257943a72`. This is
+`BLOCKED_UNQUALIFIABLE`, not a Gate F pass. No retry, fallback, code change, promotion, merge,
+or protected-ref mutation occurred. Gate F remains **17/48 complete | 31 remaining** and
+requires a newly authorized materially changed package for another audit attempt.
