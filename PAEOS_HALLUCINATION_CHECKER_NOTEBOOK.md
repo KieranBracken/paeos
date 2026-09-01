@@ -4189,3 +4189,32 @@ Court/L16 reconciliation remain mandatory. Aggregate worker evidence is now **Ad
 Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 | Remediated: 0**. Strict
 progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN. No
 gate seal, promotion, or SAKG resumption is implied.
+
+### Entry 239 — 2026-09-01: Epoch-4 admission set and current-candidate L13 reproduction reconciled
+
+Two additional distinct one-shot GLM SDK probes were completed after Entry 238:
+`glm-5-3-sdk-admission-22-auth-epoch-4-seeded-mutation-002` and
+`glm-5-3-sdk-admission-23-auth-epoch-4-final-admission-003`. Both returned **ADMITTED** with
+exit `0`, provider `cline-pass`, model `z-ai/glm-5.3-flash`, family `glm`, no fallback/retry,
+spawn or teams disabled, workspace confinement, successful seeded mutation/restoration, and
+clean lease release. Their bound receipt hashes are respectively
+`8c870d09d0f533feedd3dae44825b4eb6a79191fe07a48c71ef8a5d80334a7f1` and
+`3bf1c1d3784aafedbc72210e4c4232ee474be6099874a43542a32e7ce015c737`. Manifest/message hashes
+are `6461d74e1f301c5e308910cf45a568d44f9569cdfc6e8752e08a09e028aed2ee` /
+`7f4bb2bbbb9d7dd9ec318f82ccaefa863e5af12781410053232a3b9953c7a098` and
+`626049f292c13512d6460d525054348a7d98904374143dfceb8fe06026856662` /
+`097f75842a25ca5c5020d6f140171ce23bbe811ef4b585c6945672f050d0f99b`.
+
+The three-probe epoch-4 admission set (`21`, `22`, `23`) therefore reconciles to Worker
+**Admitted: 3 | Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
+Remediated: 0**. This satisfies the bounded-probe count but does not itself close Gate A.
+
+After commit `47d7e72225f26e2dda21bcbbba07841323096aa3` restored explicit legacy identity
+compatibility for the bound transport, a fresh current-candidate L13 non-gateway reproduction
+was run once with the gateway fixture excluded. It exited `0`; the preserved raw log contains
+**1,107/1,107 PASSED** entries, reaches `[100%]`, and contains no `FAILED`, `ERROR`, or skip
+markers. Raw log SHA-256 is
+`371cb17145492dddd1d3ba59eecb48a525667f070f0509ddd1f28e4288a66ede`; exit-record SHA-256 is
+`9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. This is reproduction
+evidence only: L14/L17 physical decorrelation and Court/L16 reconciliation remain outstanding.
+Gate A remains unsealed; no later-gate credit, promotion, or SAKG resumption is implied.

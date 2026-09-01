@@ -900,3 +900,17 @@ until this shutdown remediation is reviewed.
   `d81e970298b921d5f64a6e08a4de15950a7ef6b585c797937e3172bff751dc88`. This is one of three
   required admitted probes; Worker evidence is now **1/3/0**, Court **0/0/0**, and strict progress
   remains **12/48 complete | 36 remaining**. No gate seal or SAKG resumption is implied.
+
+- 2026-09-01 epoch-4 GLM admission probes `...22-auth-epoch-4-seeded-mutation-002` and
+  `...23-auth-epoch-4-final-admission-003` both completed **ADMITTED** (exit `0`) with provider
+  `cline-pass` / `z-ai/glm-5.3-flash`, no fallback/retry, spawn/teams disabled, and clean leases.
+  Receipt hashes are `8c870d09d0f533feedd3dae44825b4eb6a79191fe07a48c71ef8a5d80334a7f1` and
+  `3bf1c1d3784aafedbc72210e4c4232ee474be6099874a43542a32e7ce015c737`. Together with probe
+  `...21`, worker evidence is **3 admitted / 3 rejected / 0 remediated**; Court remains
+  **0 sealed / 0 remanded / 0 remediated**. These probes do not seal Gate A.
+
+- 2026-09-01 current-candidate L13 reproduction after `47d7e72` completed once with exit `0`:
+  **1,107/1,107 passed**, gateway fixture excluded, no failure/error/skip markers. Raw log SHA
+  `371cb17145492dddd1d3ba59eecb48a525667f070f0509ddd1f28e4288a66ede`; exit-record SHA
+  `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. L14/L17 and Court/L16
+  remain outstanding; strict progress is unchanged at **12/48 complete | 36 remaining**.

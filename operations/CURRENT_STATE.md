@@ -596,3 +596,24 @@ This is the first of three required fresh admitted probes; Gate A remains unseal
 more probes plus independent L13/L14/L17 and Court/L16 evidence. Worker evidence is now
 **1 admitted / 3 rejected / 0 remediated**; Court remains **0 sealed / 0 remanded / 0 remediated**.
 Strict progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN.
+
+## 2026-09-01 — Epoch-4 admission set and L13 reproduction complete
+
+The second and third fresh epoch-4 GLM SDK probes, `glm-5-3-sdk-admission-22-auth-epoch-4-
+seeded-mutation-002` and `glm-5-3-sdk-admission-23-auth-epoch-4-final-admission-003`, both
+completed with verdict **ADMITTED** and exit `0` through provider `cline-pass` / model
+`z-ai/glm-5.3-flash` (family `glm`). Receipt hashes are
+`8c870d09d0f533feedd3dae44825b4eb6a79191fe07a48c71ef8a5d80334a7f1` and
+`3bf1c1d3784aafedbc72210e4c4232ee474be6099874a43542a32e7ce015c737`; manifests, messages,
+seeded mutations, and lease releases are hash-bound in their canonical admission results.
+The three-probe set now provides Worker **Admitted: 3 | Rejected: 3 | Remediated: 0**. Court
+remains **Sealed: 0 | Remanded: 0 | Remediated: 0**.
+
+Current candidate `47d7e72225f26e2dda21bcbbba07841323096aa3` also has a fresh L13 non-gateway
+reproduction: **1,107/1,107 passed**, exit `0`, no failure/error/skip markers, with only the
+restricted-loopback gateway fixture excluded. Raw log SHA-256 is
+`371cb17145492dddd1d3ba59eecb48a525667f070f0509ddd1f28e4288a66ede`; exit record SHA-256 is
+`9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. Gate A is still unsealed
+pending candidate-bound non-GLM L14, L17, and Court/L16 evidence. Strict progress remains
+**12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN. No promotion or
+SAKG resumption is authorized.
