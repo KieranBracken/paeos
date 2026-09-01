@@ -202,7 +202,12 @@ def test_node_host_forwards_tool_request_and_waits_for_python_decision() -> None
             process,
             {
                 "invocation_id": "probe-004",
-                "payload": {"approved": True, "call_id": "tool-call-001", "result": {}},
+                "payload": {
+                    "approved": True,
+                    "call_id": "tool-call-001",
+                    "phase": "approval",
+                    "result": {},
+                },
                 "protocol_version": PROTOCOL_VERSION,
                 "sequence": 1,
                 "session_id": "session-004",
@@ -219,6 +224,126 @@ def test_node_host_forwards_tool_request_and_waits_for_python_decision() -> None
         if process.poll() is None:
             process.kill()
             process.wait(timeout=5)
+
+
+def test_node_host_adapts_canonical_tool_approval_identity(tmp_path: Path) -> None:
+    env = os.environ.copy()
+    env["CLINE_DATA_DIR"] = str(tmp_path / "cline")
+    process = subprocess.Popen(
+        ["node", str(HOST)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    message = _start_message()
+    message["payload"]["prompt"] = "PAEOS_SDK_PROBE:" + json.dumps(
+        {
+            "artifact_path": "/sandbox/artifact.txt",
+            "expected_text": "admitted-worker\n",
+            "initial_text": "baseline-worker\n",
+            "probe_id": "probe-canonical-approval",
+            "verification_command": "python3 verify_probe.py",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    try:
+        _write(process, message)
+        events = [_read(process) for _ in range(6)]
+        assert events[-1]["type"] == "tool_request"
+        assert events[-1]["payload"]["call_id"] == "tool-call-001"  # type: ignore[index]
+        assert events[-1]["payload"]["phase"] == "approval"  # type: ignore[index]
+        _write(
+            process,
+            {
+                "invocation_id": "probe-004",
+                "payload": {
+                    "approved": True,
+                    "call_id": "tool-call-001",
+                    "phase": "approval",
+                    "result": {},
+                },
+                "protocol_version": PROTOCOL_VERSION,
+                "sequence": 1,
+                "session_id": "session-004",
+                "type": "tool_response",
+            },
+        )
+        execution = _read(process)
+        assert execution["type"] == "tool_request"
+        assert execution["payload"]["call_id"] == "tool-call-001"  # type: ignore[index]
+        assert execution["payload"]["phase"] == "execution"  # type: ignore[index]
+        _write(
+            process,
+            {
+                "invocation_id": "probe-004",
+                "payload": {
+                    "approved": True,
+                    "call_id": "tool-call-001",
+                    "phase": "execution",
+                    "result": {},
+                },
+                "protocol_version": PROTOCOL_VERSION,
+                "sequence": 2,
+                "session_id": "session-004",
+                "type": "tool_response",
+            },
+        )
+        second = _read(process)
+        assert second["type"] == "provider_attempt_started"
+        finished = _read(process)
+        assert finished["type"] == "provider_attempt_finished"
+        second_tool = _read(process)
+        assert second_tool["type"] == "tool_request"
+        assert second_tool["payload"]["call_id"] == "tool-call-002"  # type: ignore[index]
+        assert second_tool["payload"]["phase"] == "approval"  # type: ignore[index]
+        _write(
+            process,
+            {
+                "invocation_id": "probe-004",
+                "payload": {
+                    "approved": True,
+                    "call_id": "tool-call-002",
+                    "phase": "approval",
+                    "result": {},
+                },
+                "protocol_version": PROTOCOL_VERSION,
+                "sequence": 3,
+                "session_id": "session-004",
+                "type": "tool_response",
+            },
+        )
+        second_execution = _read(process)
+        assert second_execution["type"] == "tool_request"
+        assert second_execution["payload"]["call_id"] == "tool-call-002"  # type: ignore[index]
+        assert second_execution["payload"]["phase"] == "execution"  # type: ignore[index]
+        _write(
+            process,
+            {
+                "invocation_id": "probe-004",
+                "payload": {
+                    "approved": True,
+                    "call_id": "tool-call-002",
+                    "phase": "execution",
+                    "result": {},
+                },
+                "protocol_version": PROTOCOL_VERSION,
+                "sequence": 4,
+                "session_id": "session-004",
+                "type": "tool_response",
+            },
+        )
+        snapshot = _read(process)
+        terminal = _read(process)
+        assert snapshot["type"] == "session_snapshot"
+        assert terminal["type"] == "terminal"
+        process.wait(timeout=5)
+        assert process.returncode == 0
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
 
 
 def test_node_host_emits_terminal_failure_when_core_start_raises(tmp_path: Path) -> None:

@@ -295,6 +295,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         machine = HostEventMachine(invocation_id)
         raw_stdout = bytearray()
         decisions: list[ToolDecisionRecord] = []
+        pending_approvals: dict[str, tuple[str, object]] = {}
         attempts: dict[str, int] = {}
         capability_snapshot: dict[str, object] | None = None
         manifest_path: Path | None = None
@@ -341,12 +342,36 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                     raise AdmissionError("provider attempt missing turn")
                 attempts[turn_id] = attempts.get(turn_id, 0) + 1
             elif event_type == "tool_request":
-                decision = evaluate_tool_request(
-                    contract,
-                    {"toolName": payload.get("tool_name"), "input": payload.get("input")},
-                    tuple(decisions),
-                )
-                decisions.append(decision)
+                phase = payload.get("phase")
+                call_id = payload.get("call_id")
+                tool_name = payload.get("tool_name")
+                tool_input = payload.get("input")
+                if (
+                    phase not in {"approval", "execution"}
+                    or not isinstance(call_id, str)
+                    or not isinstance(tool_name, str)
+                    or not isinstance(tool_input, dict)
+                ):
+                    raise AdmissionError("SDK tool request phase or identity malformed")
+                request = {"toolName": tool_name, "input": tool_input}
+                if phase == "approval":
+                    approval_prior = tuple(decisions) + tuple(
+                        ToolDecisionRecord(
+                            tool_name=pending_tool_name,
+                            approved=True,
+                            reason_code="",
+                        )
+                        for pending_tool_name, _pending_input in pending_approvals.values()
+                    )
+                    decision = evaluate_tool_request(contract, request, approval_prior)
+                    if decision.approved:
+                        pending_approvals[call_id] = (tool_name, tool_input)
+                else:
+                    pending = pending_approvals.pop(call_id, None)
+                    if pending != (tool_name, tool_input):
+                        raise AdmissionError("SDK execution is not bound to its approval")
+                    decision = evaluate_tool_request(contract, request, tuple(decisions))
+                    decisions.append(decision)
                 if not decision.approved:
                     stderr_bytes = self._cancel_and_stop(
                         process, invocation_id, session_id, command_sequence
@@ -363,12 +388,17 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                         bytes(raw_stdout),
                         stderr_bytes,
                     )
-                result = self._execute_tool(contract, payload, decision)
+                result = (
+                    {}
+                    if phase == "approval"
+                    else self._execute_tool(contract, payload, decision)
+                )
                 response = {
                     "invocation_id": invocation_id,
                     "payload": {
                         "approved": True,
-                        "call_id": payload["call_id"],
+                        "call_id": call_id,
+                        "phase": phase,
                         "result": result,
                     },
                     "protocol_version": PROTOCOL_VERSION,
@@ -411,6 +441,8 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             raise AdmissionError("provider attempt telemetry mismatch")
         if manifest_path is None or messages_path is None or terminal_payload is None:
             raise AdmissionError("SDK evidence incomplete")
+        if pending_approvals:
+            raise AdmissionError("SDK tool approval was not executed")
 
         manifest_path = self._profile_path(str(manifest_path))
         messages_path = self._profile_path(str(messages_path))

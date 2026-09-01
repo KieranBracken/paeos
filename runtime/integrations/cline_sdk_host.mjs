@@ -198,6 +198,7 @@ async function main() {
   let sequence = 0;
   let commandSequence = 1;
   let currentTurn = 1;
+  let lastExecutionIteration = 0;
   let attemptOrdinal = 0;
   let lastNormalizedError;
   let terminal = false;
@@ -268,15 +269,47 @@ async function main() {
   };
 
   let core;
-  const forwardTool = async (request) => {
-    const callId = request.callId;
-    if (typeof callId !== "string" || typeof request.toolName !== "string") {
+  const normalizeToolIdentity = (request, context, fallbackToolName, fallbackInput) => {
+    const source = request && typeof request === "object" ? request : {};
+    const executionContext = context && typeof context === "object" ? context : {};
+    const identity = {
+      session_id: source.sessionId ?? executionContext.sessionId,
+      agent_id: source.agentId ?? executionContext.agentId,
+      conversation_id: source.conversationId ?? executionContext.conversationId,
+      iteration: source.iteration ?? executionContext.iteration,
+      call_id: source.toolCallId ?? executionContext.toolCallId,
+      tool_name: source.toolName ?? fallbackToolName,
+      input: source.input ?? fallbackInput,
+    };
+    if (
+      identity.session_id !== sessionId ||
+      typeof identity.agent_id !== "string" ||
+      !identity.agent_id ||
+      typeof identity.conversation_id !== "string" ||
+      !identity.conversation_id ||
+      !Number.isInteger(identity.iteration) ||
+      identity.iteration <= 0 ||
+      typeof identity.call_id !== "string" ||
+      !identity.call_id ||
+      typeof identity.tool_name !== "string" ||
+      !identity.tool_name ||
+      identity.input === null ||
+      typeof identity.input !== "object" ||
+      Array.isArray(identity.input)
+    ) {
       throw new ProtocolError("tool request identity missing");
     }
+    return identity;
+  };
+  const readToolResponse = async (identity, phase) => {
     emit("tool_request", {
-      call_id: callId,
-      input: request.input ?? {},
-      tool_name: request.toolName,
+      agent_id: identity.agent_id,
+      call_id: identity.call_id,
+      conversation_id: identity.conversation_id,
+      input: identity.input,
+      iteration: identity.iteration,
+      phase,
+      tool_name: identity.tool_name,
     });
     const response = await reader.read();
     const expectedKeys = [
@@ -302,13 +335,56 @@ async function main() {
       throw new ProtocolError("cancelled");
     }
     if (response.type !== "tool_response") throw new ProtocolError("duplicate start or command");
-    exactKeys(response.payload, ["approved", "call_id", "result"], "tool response payload");
-    if (response.payload.call_id !== callId || typeof response.payload.approved !== "boolean") {
+    exactKeys(response.payload, ["approved", "call_id", "phase", "result"], "tool response payload");
+    if (
+      response.payload.call_id !== identity.call_id ||
+      response.payload.phase !== phase ||
+      typeof response.payload.approved !== "boolean"
+    ) {
       throw new ProtocolError("tool response call mismatch");
     }
-    currentTurn += 1;
-    attemptOrdinal = 0;
-    return { approved: response.payload.approved, result: response.payload.result };
+    if (phase === "execution" && identity.iteration !== lastExecutionIteration) {
+      currentTurn += 1;
+      attemptOrdinal = 0;
+      lastExecutionIteration = identity.iteration;
+    }
+    return response.payload;
+  };
+  const forwardToolApproval = async (request) => {
+    const identity = normalizeToolIdentity(request, undefined, undefined, undefined);
+    const response = await readToolResponse(identity, "approval");
+    return {
+      approved: response.approved,
+      ...(typeof response.reason === "string" ? { reason: response.reason } : {}),
+    };
+  };
+  const forwardToolExecution = async (toolName, input, context) => {
+    const identity = normalizeToolIdentity({}, context, toolName, input);
+    const response = await readToolResponse(identity, "execution");
+    if (!response.approved) {
+      throw new ProtocolError("tool execution denied");
+    }
+    if (typeof response.result === "string") return response.result;
+    return JSON.stringify(response.result ?? {});
+  };
+  const normalizeCommandInput = (command) => {
+    if (typeof command === "string") return { commands: [command] };
+    if (
+      command &&
+      typeof command === "object" &&
+      !Array.isArray(command) &&
+      typeof command.command === "string"
+    ) {
+      const args = Array.isArray(command.args) ? command.args : [];
+      return {
+        commands: [
+          [command.command, ...args]
+            .map((part) => (/[\s"]/u.test(part) ? JSON.stringify(part) : part))
+            .join(" "),
+        ],
+      };
+    }
+    throw new ProtocolError("run_commands input malformed");
   };
 
   core = await ClineCore.create({ backendMode: "local", fetch: observedFetch });
@@ -322,11 +398,11 @@ async function main() {
     }
   });
   const capabilities = {
-    requestToolApproval: forwardTool,
+    requestToolApproval: forwardToolApproval,
     toolExecutors: {
-      editor: (input) => forwardTool({ callId: randomUUID(), input, toolName: "editor" }),
-      run_commands: (input) =>
-        forwardTool({ callId: randomUUID(), input, toolName: "run_commands" }),
+      editor: (input, _cwd, context) => forwardToolExecution("editor", input, context),
+      bash: (command, _cwd, context) =>
+        forwardToolExecution("run_commands", normalizeCommandInput(command), context),
     },
   };
   const dataRoot = process.env.CLINE_DATA_DIR;
@@ -352,9 +428,29 @@ async function main() {
         modelId: config.model_id,
         providerId: config.provider_id,
         sessionId,
+        toolRoutingRules: [
+          {
+            name: "paeos-admission-probe-allowlist",
+            mode: "act",
+            enableTools: ["editor", "run_commands"],
+            disableTools: [
+              "read_files",
+              "search_codebase",
+              "fetch_web_content",
+              "apply_patch",
+              "skills",
+              "ask_question",
+              "submit_and_exit",
+            ],
+          },
+        ],
         systemPrompt:
           "You are the PAEOS implementation worker. Execute only the bound probe task " +
-          "through approved tools; never self-ratify, audit, promote, or widen scope.",
+          "through approved tools; never self-ratify, audit, promote, or widen scope. " +
+          "Use exactly two tool calls in order: editor, then run_commands. " +
+          "For run_commands, send the provided verification_command exactly byte-for-byte " +
+          "without cd, shell operators, wrappers, flags, or any other expansion. " +
+          "Do not call any other tool.",
       },
       prompt: config.prompt,
       toolPolicies: {

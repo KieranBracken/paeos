@@ -24,6 +24,26 @@ export class ClineCore {
     if (typeof input.config.systemPrompt !== "string" || !input.config.systemPrompt.trim()) {
       throw new TypeError("systemPrompt is required");
     }
+    const routingRules = input.config.toolRoutingRules;
+    if (
+      !Array.isArray(routingRules) ||
+      routingRules.length !== 1 ||
+      routingRules[0]?.name !== "paeos-admission-probe-allowlist" ||
+      routingRules[0]?.mode !== "act" ||
+      JSON.stringify(routingRules[0]?.enableTools) !== JSON.stringify(["editor", "run_commands"]) ||
+      JSON.stringify(routingRules[0]?.disableTools) !==
+        JSON.stringify([
+          "read_files",
+          "search_codebase",
+          "fetch_web_content",
+          "apply_patch",
+          "skills",
+          "ask_question",
+          "submit_and_exit",
+        ])
+    ) {
+      throw new TypeError("probe tool capability allowlist mismatch");
+    }
     const sessionId = input.config.sessionId;
     const probe = input.prompt.startsWith("PAEOS_SDK_PROBE:")
       ? JSON.parse(input.prompt.slice("PAEOS_SDK_PROBE:".length))
@@ -139,18 +159,72 @@ export class ClineCore {
         const unauthorized = probe?.probe_id.startsWith("probe-unauthorized-")
           ? probe.probe_id.slice("probe-unauthorized-".length)
           : null;
-        const decision = await input.capabilities.requestToolApproval({
-          callId: "tool-call-001",
-          toolName: unauthorized ?? "editor",
-          input: probe
-            ? {
-                path: probe.artifact_path,
-                old_text: probe.initial_text,
-                new_text: probe.expected_text,
-              }
-            : { path: "/sandbox/artifact.txt", old_text: "old", new_text: "new" },
+        const firstToolInput = probe
+          ? {
+              path: probe.artifact_path,
+              old_text: probe.initial_text,
+              new_text: probe.expected_text,
+            }
+          : { path: "/sandbox/artifact.txt", old_text: "old", new_text: "new" };
+        const approvalRequest = (toolCallId, toolName, toolInput, iteration) => ({
+          sessionId,
+          agentId: "agent-001",
+          conversationId: "conversation-001",
+          iteration,
+          toolCallId,
+          toolName,
+          input: toolInput,
+          policy: { enabled: true, autoApprove: false },
         });
-        if (probe && !unauthorized) {
+        const decision = await input.capabilities.requestToolApproval(
+          approvalRequest("tool-call-001", unauthorized ?? "editor", firstToolInput, 1),
+        );
+        if (probe?.probe_id === "probe-batched-approvals") {
+          const verificationInput = { commands: [probe.verification_command] };
+          const verification = await input.capabilities.requestToolApproval(
+            approvalRequest("tool-call-002", "run_commands", verificationInput, 1),
+          );
+          if (decision.approved) {
+            await input.capabilities.toolExecutors.editor(firstToolInput, "/sandbox", {
+              sessionId,
+              agentId: "agent-001",
+              conversationId: "conversation-001",
+              iteration: 1,
+              toolCallId: "tool-call-001",
+            });
+          }
+          if (verification.approved) {
+            await input.capabilities.toolExecutors.bash(
+              probe.verification_command,
+              "/sandbox",
+              {
+                sessionId,
+                agentId: "agent-001",
+                conversationId: "conversation-001",
+                iteration: 1,
+                toolCallId: "tool-call-002",
+              },
+            );
+          }
+          await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          this.emit({
+            type: "session_ended",
+            sessionId,
+            result: {
+              approved: decision.approved && verification.approved,
+              model: { id: input.config.modelId, provider: input.config.providerId },
+            },
+          });
+        } else if (probe && !unauthorized) {
+          if (decision.approved) {
+            await input.capabilities.toolExecutors.editor(firstToolInput, "/sandbox", {
+              sessionId,
+              agentId: "agent-001",
+              conversationId: "conversation-001",
+              iteration: 1,
+              toolCallId: "tool-call-001",
+            });
+          }
           await this.options.fetch(new Request("data:application/json,%7B%7D"));
           const expansions = {
             cd: `cd / && ${probe.verification_command}`,
@@ -163,11 +237,25 @@ export class ClineCore {
           const expansionKind = probe.probe_id.startsWith("probe-expansion-")
             ? probe.probe_id.slice("probe-expansion-".length)
             : null;
-          const verification = await input.capabilities.requestToolApproval({
-            callId: "tool-call-002",
-            toolName: "run_commands",
-            input: { commands: [expansions[expansionKind] ?? probe.verification_command] },
-          });
+          const verificationInput = {
+            commands: [expansions[expansionKind] ?? probe.verification_command],
+          };
+          const verification = await input.capabilities.requestToolApproval(
+            approvalRequest("tool-call-002", "run_commands", verificationInput, 2),
+          );
+          if (verification.approved) {
+            await input.capabilities.toolExecutors.bash(
+              probe.verification_command,
+              "/sandbox",
+              {
+                sessionId,
+                agentId: "agent-001",
+                conversationId: "conversation-001",
+                iteration: 2,
+                toolCallId: "tool-call-002",
+              },
+            );
+          }
           this.emit({
             type: "session_ended",
             sessionId,

@@ -138,6 +138,21 @@ def test_exact_two_turn_probe_produces_admissible_raw_worker_run(
     assert os.environ.get("SYNTHETIC_SECRET_FOR_TEST") is None
 
 
+def test_batched_tool_approvals_execute_in_contract_order(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+) -> None:
+    adapter, contract = adapter_case
+
+    result = adapter.run_probe(replace(contract, probe_id="probe-batched-approvals"))
+
+    assert isinstance(result, RawWorkerRun)
+    assert [decision.tool_name for decision in result.tool_decisions] == [
+        "editor",
+        "run_commands",
+    ]
+    assert result.verification.candidate_exit_code == 0
+
+
 @pytest.mark.parametrize(
     "tool_name",
     ["read", "search", "mcp", "spawn", "team", "skill", "unknown"],
