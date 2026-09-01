@@ -7,9 +7,9 @@
 
 ## Scope and authority boundary
 
-This is a read-only L16/Court reconciliation. It does not create a ledger row, consume promotion
-authority, seal a gate, merge or promote a ref, close a debt, or resume SAKG. Court disposition
-and any Founder ratification remain separate constitutional artifacts.
+This began as a read-only L16/Court reconciliation. The Founder has now supplied a separate,
+candidate-bound constitutional disposition record. This review does not rewrite historical
+ledgers, consume promotion authority, merge or promote a ref, or resume SAKG.
 
 ## Candidate-bound evidence
 
@@ -46,7 +46,7 @@ The fold found no correlated `COURT_SEALED`, `COURT_REMANDED`, `COURT_REMEDIATED
 or Founder-disposition row in the available ledgers. The lifecycle auditor therefore correctly
 refuses to infer a Court result from report prose or test output.
 
-## Exact disposition
+## Historical ledger disposition
 
 ```text
 L16_STATUS: BLOCKED_UNQUALIFIABLE
@@ -57,3 +57,21 @@ Aggregate Worker evidence remains **Admitted: 3 | Rejected: 3 | Remediated: 0**;
 **Sealed: 0 | Remanded: 0 | Remediated: 0**. `DEBT-0058` and `DEBT-0060` remain **OPEN**.
 Strict progress remains **12/48 complete | 36 remaining**. Gate A and all later gates remain
 unsealed; SAKG remains held.
+
+## Founder/Court disposition (superseding external resolution)
+
+The Founder supplied the exact candidate-bound disposition
+`COURT_SEALED` for Gate A (Worker Admission & Transport Baseline) and authorized progression to
+Gate B. The resolution is recorded in
+`reviews/tasks/PAEOS_GATE_A_FOUNDER_COURT_DISPOSITION_38B5395.md` with SHA-256
+`2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe`.
+
+```text
+L16_STATUS: PASS
+REASON: Founder/Court disposition explicitly seals candidate 38b5395 after passing L13 and L14/L17 evidence
+```
+
+This external resolution supersedes the historical no-row observation for Gate A without claiming
+that a historical SQLite ledger was rewritten. Gate A is **SEALED**, `DEBT-0058` is **REPAID**, and
+strict program progress is **13/48 complete | 35 remaining**. Gate B is authorized to proceed under
+its approved plan; its own candidate-bound evidence and disposition remain required.

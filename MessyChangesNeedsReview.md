@@ -957,3 +957,13 @@ until this shutdown remediation is reviewed.
   **UNSEALED** and `DEBT-0058` remains OPEN pending an authorized Founder/Court disposition. The
   separate L16 review remains `BLOCKED_UNQUALIFIABLE`; strict progress remains **12/48 complete |
   36 remaining**. No self-ratification or SAKG resumption is implied.
+
+- 2026-09-01 the Founder supplied the exact candidate-bound L16 disposition `COURT_SEALED` for
+  candidate `38b53955c83126f2bed231640555d86ed1f3159a` and authorized Gate A sealing plus Gate B
+  progression. The one-off disposition record is
+  `reviews/tasks/PAEOS_GATE_A_FOUNDER_COURT_DISPOSITION_38B5395.md` (SHA-256
+  `2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe`). Gate A is now SEALED and
+  `DEBT-0058` REPAID; external Court accounting is **1/0/0**, worker accounting remains **3/3/0**,
+  and strict progress is **13/48 complete | 35 remaining**. Historical SQLite ledgers were not
+  rewritten; no merge, promotion, or main/trunk mutation occurred. Gate B still requires its own
+  candidate-bound audit and disposition.

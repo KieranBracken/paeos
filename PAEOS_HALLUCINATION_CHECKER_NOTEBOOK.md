@@ -4305,3 +4305,19 @@ L13/L14/L17 evidence pass. Gate A is still **UNSEALED**, `DEBT-0058` remains **O
 progress remains **12/48 complete | 36 remaining** until an authorized Founder/Court disposition
 is produced. The independent L16 review remains `L16_STATUS: BLOCKED_UNQUALIFIABLE` for the absent
 Court transaction. No self-ratification, promotion, or SAKG resumption is implied.
+
+### Entry 245 — 2026-09-01: Founder/Court sealed Gate A for candidate `38b5395`
+
+The Founder supplied an exact candidate-bound L16 disposition: `COURT_SEALED` for Gate A
+(Worker Admission & Transport Baseline), citing the three admitted epoch-4 GLM probes, the
+candidate-bound L13 reproduction (**1,107/1,107 passed**, exit `0`), the independent Gemini
+L14/L17 `A-08 PASS`, and verified non-secret provenance and lease lifecycle. The one-off external
+resolution record is `reviews/tasks/PAEOS_GATE_A_FOUNDER_COURT_DISPOSITION_38B5395.md` with
+SHA-256 `2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe`.
+
+This is a Founder ABI decision for candidate `38b53955c83126f2bed231640555d86ed1f3159a`; no
+historical SQLite ledger was rewritten and no ref was promoted. Gate A is now **SEALED** and
+`DEBT-0058` is **REPAID**. Worker accounting remains **Admitted: 3 | Rejected: 3 | Remediated: 0**;
+the external Gate A Court disposition is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict
+progress advances to **13/48 complete | 35 remaining**. Gate B work is authorized under its
+approved plan; its own candidate-bound L14/L17 and L16 disposition remain mandatory.

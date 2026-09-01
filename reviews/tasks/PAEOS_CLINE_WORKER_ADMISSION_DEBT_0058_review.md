@@ -7,9 +7,9 @@
 
 ## Scope and authority
 
-This review adjudicates the Gate A admission evidence and its remaining closure boundary. It is
-not a Court seal, Founder ratification, promotion, merge, or SAKG authorization. Worker claims are
-not treated as constitutional authority; physical receipts and correlated ledger facts are required.
+This review adjudicates the Gate A admission evidence and, together with the separately recorded
+Founder/Court disposition, its closure. Worker claims are not treated as constitutional authority;
+physical receipts, correlated evidence, and the explicit Founder resolution are required.
 
 ## Worker admission evidence
 
@@ -23,8 +23,9 @@ Three distinct one-shot Cline SDK probes were admitted after authentication epoc
 
 All three completed with exit `0`, no fallback/retry, spawn/teams disabled, workspace confinement,
 successful seeded mutation/restoration, and clean lease release. Aggregate worker accounting is
-**Admitted: 3 | Rejected: 3 | Remediated: 0**. `DEBT-0058` is not closed until the later Court
-and L16 boundary is reconciled.
+**Admitted: 3 | Rejected: 3 | Remediated: 0**. The later Court/L16 boundary is resolved by the
+candidate-bound Founder disposition recorded in
+`reviews/tasks/PAEOS_GATE_A_FOUNDER_COURT_DISPOSITION_38B5395.md`.
 
 ## L13/L14/L17 evidence
 
@@ -53,13 +54,15 @@ found. Court accounting is therefore **Sealed: 0 | Remanded: 0 | Remediated: 0**
 ## Exact disposition
 
 ```text
-GATE_A_STATUS: GATE_A_ROUTE_ELIGIBLE_FOR_SEALING
-REASON: all three probes and candidate-bound L13/L14/L17 evidence pass; constitutional sealing remains external
+GATE_A_STATUS: COURT_SEALED
+REASON: Founder supplied an exact candidate-bound L16 disposition after all admission and audit evidence passed
 ```
 
-Under the admission plan, this disposition makes the route eligible for Gate A sealing review; it
-does not itself seal Gate A or repay `DEBT-0058`. The separate read-only L16/Court reconciliation
-is `BLOCKED_UNQUALIFIABLE` because no candidate-correlated Court transaction exists. Strict
-progress remains **12/48 complete | 36 remaining**. No Gate B+ implementation credit, promotion,
-or SAKG resumption is claimed. A Founder/Court disposition must be produced through the canonical
-PAEOS path; this review cannot create or ratify it.
+The Founder/Court disposition record is
+`reviews/tasks/PAEOS_GATE_A_FOUNDER_COURT_DISPOSITION_38B5395.md` (SHA-256
+`2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe`). Gate A is **SEALED** and
+`DEBT-0058` is **REPAID**. The historical SQLite ledgers remain unchanged; this is an external
+Founder ABI resolution, not a fabricated runtime event. Strict progress advances to
+**13/48 complete | 35 remaining**. Gate B work is now authorized under the recovery plan, while
+promotion, merge, main/trunk mutation, and SAKG resumption remain prohibited until their own
+evidence and dispositions pass.
