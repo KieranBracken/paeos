@@ -540,3 +540,24 @@ distinct; no credential values were read or modified. `cline --version` continue
 Keychain `SecItemCopyMatching -50` (exit `139`). No live probe was attempted. Reauthenticate the
 target provider explicitly with `CLINE_DATA_DIR=/Users/bob/.cline/data /opt/homebrew/bin/cline auth
 cline-pass`, then confirm epoch `2`; only then may a fresh one-shot GLM probe be dispatched.
+
+## 2026-09-01 — ClinePass overlay reconciliation and typed provider rejection
+
+Installed Cline core source confirms that `cline-pass` uses `storageProviderId:"cline"`, while
+the settings resolver overlays the alias settings (including `auth`) over the shared provider.
+The prior record wording that treated the two records as unrelated is corrected. Read-only
+metadata shows standard `cline` refreshed at `2026-09-01T15:28:55.587Z` with expiry
+`1788280135000`, but `cline-pass` remains last updated `2026-09-01T14:49:51.293525Z` with
+expiry `1788274981000`, already expired when observed. Both report the same account identifier;
+secrets were not accessed.
+
+The repaired SDK host/adapter was verified through distinct one-shot probes `...04`–`...12`.
+The latest `glm-5-3-sdk-admission-12-data-root-fix` reached the provider and produced a
+canonical typed `AUTH_FAILED` rejection (worker `0/1/0`), with its auth-epoch-2 lease released;
+no fallback or retry occurred. The interrupted `...08` lease marker remains preserved as a
+stale artifact. No admission receipt, Court/L16 row, gate seal, or task credit exists from these
+probes. The pre-existing canonical ledger remains Worker **0/3/0**, Court **0/0/0**, strict
+progress **12/48 complete | 36 remaining**, with `DEBT-0058` and `DEBT-0060` OPEN. A supported
+refresh of the actual `cline-pass` overlay and a new readiness observation are required before
+another live probe; no automated login, credential copying, fallback, retry, promotion, or SAKG
+resumption is permitted.

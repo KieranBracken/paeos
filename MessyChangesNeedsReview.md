@@ -866,3 +866,14 @@ until this shutdown remediation is reviewed.
   No credentials were printed or changed and no live probe was attempted. The supported next
   action is `CLINE_DATA_DIR=/Users/bob/.cline/data /opt/homebrew/bin/cline auth cline-pass`,
   followed by epoch-2 readiness confirmation.
+
+- 2026-09-01 installed Cline source inspection corrected the alias interpretation: `cline-pass`
+  maps to `storageProviderId:"cline"`, but its own settings overlay (including `auth`) wins
+  when resolved. Standard `cline` metadata is refreshed and future-dated, while the
+  `cline-pass` overlay remains expired; both show the same non-secret account ID. No secret
+  values were read or modified. Repaired host/adapter probes `...04`–`...12` culminated in a
+  provider-bound `AUTH_FAILED` rejection at `...12-data-root-fix` (worker `0/1/0`, released
+  lease), with no fallback or retry. Probe `...08` was interrupted and its stale marker
+  retained. Canonical progress remains **12/48 complete | 36 remaining**; Worker/Court remain
+  **0/3/0** and **0/0/0**, and `DEBT-0058`/`DEBT-0060` remain OPEN. No gate seal or SAKG
+  resumption is implied; refresh the actual target overlay before any new one-shot probe.

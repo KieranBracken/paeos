@@ -4084,3 +4084,38 @@ profile (`cline auth cline-pass` with `CLINE_DATA_DIR=/Users/bob/.cline/data`), 
 resulting non-secret authentication epoch as `2`. A new probe remains gated on a refreshed
 `cline-pass` expiry/readiness observation; no credential copying, fallback to standard `cline`,
 retry, or provider substitution is allowed.
+
+### Entry 236 — 2026-09-01: Cline provider alias and live-route rejection reconciled
+
+Source inspection of the installed Cline core proves that `cline-pass` is registered with
+`storageProviderId:"cline"`, but the provider-settings resolver overlays the `cline-pass`
+settings (including its own `auth` object) over the shared `cline` settings. The earlier
+inference that the records were unrelated was therefore incorrect and is superseded here.
+Read-only inspection of `/Users/bob/.cline/data/settings/providers.json` found the standard
+`cline` record refreshed at `2026-09-01T15:28:55.587Z` with non-secret expiry
+`1788280135000`, while the `cline-pass` overlay remained last updated at
+`2026-09-01T14:49:51.293525Z` with non-secret expiry `1788274981000` (already expired at
+the observation time). Both records report the same account identifier; no credential values
+were read, printed, copied, or modified. Auth epoch `2` is therefore not sufficient evidence
+that the worker route is ready.
+
+After commits `48b2077`, `f2ea041`, `115391d`, `c5e992e`, `d7d5aba`, `39fcb7a`, and
+`edb2bb8`, distinct one-shot GLM SDK probes `...04-auth-epoch-2` through
+`...12-data-root-fix` exercised the repaired host/adapter seams. Probes `04`–`10` remained
+transport/protocol rejections; probe `11-provider-status` and the latest probe
+`12-data-root-fix` reached the provider boundary and were classified as typed
+`AUTH_FAILED` with no fallback or retry. The latest canonical result is
+`/Users/bob/.local/share/paeos/runtime-v2/worker-admission/glm-5-3-sdk-admission-12-data-root-fix/admission-result.json`;
+its worker counts are **Admitted: 0 | Rejected: 1 | Remediated: 0**, and its auth-epoch-2
+lease was released. Probe `08-artifact-path-fix` was interrupted during a hang; its active
+marker was preserved as a uniquely named stale artifact rather than deleted. No live probe has
+produced an admission receipt, Court row, gate seal, or task credit.
+
+The current canonical state remains Worker **Admitted: 0 | Rejected: 3 | Remediated: 0** in
+the pre-existing ledger, Court **Sealed: 0 | Remanded: 0 | Remediated: 0**, and strict progress
+**12/48 complete | 36 remaining**; the newly recorded probe outcomes do not change that task
+ledger. `DEBT-0058` and `DEBT-0060` remain OPEN. The next permissible action is a supported
+reauthentication that refreshes the `cline-pass` overlay (or a documented Cline configuration
+fix by its owner), followed by a fresh non-secret readiness check and one distinct probe ID.
+No automated login, token handling, fallback, retry, gate seal, promotion, or SAKG resumption
+is authorized.
