@@ -15,23 +15,69 @@ is thereby repaid for resource/DoS protection; container isolation remains a dep
 from __future__ import annotations
 
 import contextlib
+import enum
 import resource
 import shlex
 import subprocess
-
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
 from kernel.ledger import JsonValue
 
-__all__ = ["SandboxError", "SandboxLimits", "SandboxResult", "run_sandboxed", "sandbox_runner"]
+__all__ = [
+    "FactKind",
+    "RunFact",
+    "SandboxError",
+    "SandboxLimits",
+    "SandboxResult",
+    "allowlisted_path",
+    "run_sandboxed",
+    "sandbox_runner",
+]
 
 _MB = 1024 * 1024
 
 
 class SandboxError(Exception):
     """The command could not be launched (empty/unresolvable), distinct from a nonzero exit."""
+
+
+class FactKind(enum.StrEnum):
+    """Typed run-report fact kinds (conservative reporting: mechanism-authored facts only).
+
+    Worker-emitted stdout/stderr text is opaque payload — it is never parsed as, or
+    laundered into, any of these facts.
+    """
+
+    REFUSAL = "REFUSAL"
+    CAP_FIRED = "CAP_FIRED"
+    TRUNCATION = "TRUNCATION"
+    CLEANUP_ERROR = "CLEANUP_ERROR"
+    ENFORCEMENT_FAILURE = "ENFORCEMENT_FAILURE"
+    COMPLETION = "COMPLETION"
+
+
+@dataclass(frozen=True, slots=True)
+class RunFact:
+    """A single mechanism-observed fact about a confined run.
+
+    `os_fact` carries only mechanism-observed evidence (signal name, errno class,
+    observed-vs-expected digest, observed byte count vs cap, ESRCH confirmation) —
+    never free-text interpretation of worker output.
+    """
+
+    kind: FactKind
+    dimension: str | None
+    mechanism_id: str | None
+    os_fact: str
+
+
+def allowlisted_path() -> str:
+    """The minimal PATH the sandbox permits for kernel-side executable resolution."""
+    home_cargo = str(Path.home() / ".cargo" / "bin")
+    home_local = str(Path.home() / ".local" / "bin")
+    return f"{home_cargo}:{home_local}:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +96,10 @@ class SandboxResult:
     exit_code: int
     stdout: str
     timed_out: bool
+    # Conservative-report extensions (backward compatible defaults; the legacy
+    # court reproduce seam keeps constructing three-argument results):
+    stderr: str = ""
+    facts: tuple[RunFact, ...] = ()
 
 
 def _apply_limits(limits: SandboxLimits) -> Callable[[], None]:
@@ -79,10 +129,7 @@ def run_sandboxed(
     args = shlex.split(command)
     if not args:
         raise SandboxError("empty command")
-    home_cargo = str(Path.home() / ".cargo" / "bin")
-    home_local = str(Path.home() / ".local" / "bin")
-    allowlisted_path = f"{home_cargo}:{home_local}:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-    env = {"PATH": allowlisted_path, "LC_ALL": "C"}
+    env = {"PATH": allowlisted_path(), "LC_ALL": "C"}
 
     try:
         proc = subprocess.run(

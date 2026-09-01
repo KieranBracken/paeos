@@ -40,3 +40,11 @@ def test_sandbox_runner_shape() -> None:
 def test_timeout_reported_as_nonzero_by_runner() -> None:
     run = sandbox_runner(SandboxLimits(wallclock_s=1))
     assert run("sleep 5")["exit_code"] == 124  # a timed-out run never looks like success
+
+
+def test_result_conservative_report_seam_is_backward_compatible() -> None:
+    # The court reproduce seam keeps constructing three-argument results; the
+    # conservative-report extensions (stderr, facts) default to inert values.
+    result = run_sandboxed("echo seam")
+    assert result.stderr == ""
+    assert result.facts == ()
