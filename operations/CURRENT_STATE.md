@@ -909,3 +909,25 @@ occurred; raw artifacts remain preserved.
 
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.
+
+## 2026-09-01 — CURRENT: Gate D L14/L17 checkpoint qualified
+
+Candidate 12a051e8fb2b2bb627395bd6982d25a4b26e8d13 received a host-side one-shot Google
+gemini-3.6-flash audit against bundle SHA-256
+a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc. The report
+/private/tmp/paeos-gate-d-l14-l17-report-12a051e.md has SHA-256
+bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581; the receipt file
+/private/tmp/paeos-gate-d-l14-l17-receipt-12a051e.json has SHA-256
+137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f; canonical receipt SHA-256
+eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7. Local validation returned
+report PASS, A-08 PASS, and qualified=True. Physical provenance is Gemini family versus the GLM
+builder, with exactly one provider attempt and no fallback.
+
+The qualified report confirms focused 142/142, non-gateway 1,115/1,115, standing calibration
+9/9, the 11-scenario watchdog fault matrix, and changed-path Ruff/Pyright clean. The four
+full-suite loopback bind errors remain environmental and are not counted as passes.
+
+This is an L14/L17 implementation checkpoint only. Gate D remains UNSEALED pending the separate
+L16/Court disposition; external Worker/Court accounting remains 3/3/0, strict progress remains
+15/48 complete | 33 remaining, and DEBT-0060 remains OPEN. No promotion, merge, main/trunk
+mutation, production dispatch, or SAKG resumption is authorized.

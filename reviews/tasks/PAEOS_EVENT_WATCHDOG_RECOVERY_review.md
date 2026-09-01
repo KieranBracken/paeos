@@ -44,3 +44,28 @@
 The cited candidate-bound receipt provides implementation-level audit evidence, but no Court
 `SEALED` row or Founder L16 ratification is present. Gate D is an audit-qualified checkpoint, not a
 constitutional seal; strict sealed progress remains **12/48 complete | 36 remaining**.
+
+## Current-candidate L14/L17 checkpoint — 2026-09-01
+
+The historical `3e44133` review above is superseded for current-candidate accounting by
+the candidate-bound evidence recorded in
+`reviews/tasks/PAEOS_GATE_D_L14_L17_12A051E_CHECKPOINT.md`:
+
+- Candidate: `12a051e8fb2b2bb627395bd6982d25a4b26e8d13`
+- Evidence bundle SHA-256: `a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`
+- Report SHA-256: `bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581`
+- Receipt file SHA-256: `137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f`
+- Canonical receipt SHA-256: `eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7`
+- Physical auditor: Google `gemini-3.6-flash` / Gemini family; builder:
+  `cline-pass` / `z-ai/glm-5.3-flash` / GLM family
+- A-08: `PASS`; one provider attempt; no fallback; pair qualification: `True`
+
+Fresh evidence confirms focused **142/142**, non-gateway **1,115/1,115**, standing calibration
+**9/9**, the 11-scenario watchdog fault matrix, and changed-path Ruff/Pyright clean. The four
+full-suite loopback bind errors remain environmental and are not claimed as passes.
+
+Disposition: **L14/L17 QUALIFIED — GATE D NOT SEALED**. This reconciliation does not create an
+L16/Court row or Founder seal. External accounting remains Worker **3/3/0**, Court **3/0/0**;
+strict progress remains **15/48 complete | 33 remaining**; `DEBT-0060` remains OPEN.
+Promotion, merge, main/trunk mutation, production dispatch, and SAKG resumption remain
+unauthorized.

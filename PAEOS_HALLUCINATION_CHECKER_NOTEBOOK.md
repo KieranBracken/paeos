@@ -4514,3 +4514,26 @@ is carried forward. External Worker accounting remains **Admitted: 3 | Rejected:
 0**; Court accounting advances to **Sealed: 3 | Remanded: 0 | Remediated: 0**; strict progress
 advances to **15/48 complete | 33 remaining**. No merge, promotion, main/trunk mutation,
 production dispatch, or SAKG resumption is authorized by this disposition.
+
+### Entry 257 — 2026-09-01: Gate D current-candidate L14/L17 audit qualified
+
+The host-side one-shot physical audit paeos-gate-d-l14-l17-20260901 reviewed candidate
+12a051e8fb2b2bb627395bd6982d25a4b26e8d13 against evidence bundle SHA-256
+a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc. The independently captured
+Google gemini-3.6-flash receipt is file
+/private/tmp/paeos-gate-d-l14-l17-receipt-12a051e.json (file SHA-256
+137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f; canonical receipt SHA-256
+eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7). The report is
+/private/tmp/paeos-gate-d-l14-l17-report-12a051e.md (SHA-256
+bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581). The receipt binds the
+candidate, bundle, report, transport request/response, and physical session; actual family is
+gemini, builder family is glm, A-08 is PASS, and the provider attempt count is exactly one with
+no fallback. Local artifact-pair adjudication returned PASS / PASS / qualified=True.
+
+The report independently confirms the post-commit calibration log caught CANARY-0001 through
+CANARY-0009, the non-gateway suite passed 1,115/1,115, the focused suite passed 142/142, and the
+Gate C canary detector uses invariant-bearing artifact shape rather than canary IDs. This is
+qualified L14/L17 evidence, not an L16/Court seal. External accounting remains Worker 3/3/0,
+Court 3/0/0; strict sealed progress remains 15/48 complete | 33 remaining; DEBT-0060 remains
+OPEN. A candidate-bound Gate D Court disposition request is the next step. No self-ratification,
+promotion, merge, main/trunk mutation, production dispatch, or SAKG resumption is implied.

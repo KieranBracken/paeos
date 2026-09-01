@@ -992,6 +992,17 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 CURRENT Gate D candidate `12a051e8fb2b2bb627395bd6982d25a4b26e8d13`
+  received a host-side one-shot Gemini L14/L17 audit against bundle
+  `a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`. Report SHA is
+  `bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581`; receipt file SHA is
+  `137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f`; canonical receipt
+  SHA is `eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7`. Local
+  pair validation returned `PASS` / `PASS` / `qualified=True`; A-08 is
+  `gemini != glm`, one attempt, no fallback. Gate D remains unsealed pending L16/Court
+  disposition; `DEBT-0060` remains OPEN; strict progress remains **15/48 complete | 33
+  remaining**. No promotion, merge, main/trunk mutation, production, or SAKG claim.
+
 - 2026-09-01 the verifier prepared the external Gate C Z0 catalog proposal `CANARY-0003` through
   `CANARY-0009` (catalog digest
   `581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`; summary SHA-256
