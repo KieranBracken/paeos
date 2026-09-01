@@ -3960,3 +3960,17 @@ This is qualified L14/L17 evidence only; it does not create a Court/L16 row, clo
 or `DEBT-0060`, seal a gate, or resume SAKG. Worker/Court remain **0/1/0** and **0/0/0**;
 strict progress remains **12/48 complete | 36 remaining**. Candidate-bound L13 reproduction and
 canonical Court reconciliation remain the next required transitions.
+
+### Entry 229 — 2026-09-01: Current-candidate L13 reproduction
+
+The candidate implementation was independently reproduced with one fresh non-gateway invocation:
+**1,094/1,094 passed**, exit `0`, with no failed, error, skip, or xfail markers. Raw log:
+`/private/tmp/l13-02f8e87-nongateway.log` (SHA-256
+`93c6d4282d6995e07ee76a7ffebe420cfc5cb0234a16dfb462e9a37ab36e4b22`); exit record SHA-256
+`9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. The gateway-server test
+remains excluded under restricted loopback policy. Review:
+`reviews/tasks/PAEOS_L13_02F8E87_NON_GATEWAY_REPRODUCTION.md`.
+
+This is reproduction evidence only; it does not create a Court/L16 row, seal a gate, close
+`DEBT-0058` or `DEBT-0060`, or advance strict progress. Worker/Court remain **0/1/0** and
+**0/0/0**; strict progress remains **12/48 complete | 36 remaining**.

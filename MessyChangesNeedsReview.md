@@ -813,4 +813,11 @@ remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain op
   is stored under `/private/tmp/paeos-l14-l17-*-02f8e87-ultracompact-4096.*`. A-08 is PASS,
   report status is PASS, and the provider was attempted exactly once with no fallback. This is
   evidence bookkeeping only: no Court/L16 row, gate seal, debt closure, promotion, or SAKG
-  resumption occurred. Review: `reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACOMPACT_4096_review.md`.
+resumption occurred. Review: `reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACOMPACT_4096_review.md`.
+
+- 2026-09-01 one fresh current-candidate L13 non-gateway reproduction passed **1,094/1,094**,
+  exit `0`, with no failed/error/skip/xfail markers. Raw log SHA-256 is
+  `93c6d4282d6995e07ee76a7ffebe420cfc5cb0234a16dfb462e9a37ab36e4b22`; exit record SHA-256 is
+  `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. This evidence excludes
+  only the restricted-loopback gateway fixture and creates no Court/L16 row or gate credit.
+  Review: `reviews/tasks/PAEOS_L13_02F8E87_NON_GATEWAY_REPRODUCTION.md`.

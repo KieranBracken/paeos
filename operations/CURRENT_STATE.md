@@ -461,3 +461,16 @@ This advances only L14/L17 evidence, not a Court/L16 row or gate seal. Worker/Co
 **0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**; `DEBT-0058`
 and `DEBT-0060` remain open. Candidate-bound L13 reproduction and canonical Court/L16
 reconciliation remain required before any gate advancement or SAKG resumption.
+
+## 2026-09-01 — Current-candidate L13 reproduction
+
+One fresh non-gateway test invocation against the candidate implementation passed **1,094/1,094**
+with exit `0`, no failures, errors, skips, or xfails. Raw log SHA-256 is
+`93c6d4282d6995e07ee76a7ffebe420cfc5cb0234a16dfb462e9a37ab36e4b22`; exit record SHA-256 is
+`9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. The gateway-server fixture
+remains excluded under the documented restricted-loopback policy. Review:
+`reviews/tasks/PAEOS_L13_02F8E87_NON_GATEWAY_REPRODUCTION.md`.
+
+This is L13 reproduction evidence only. Worker/Court remain **0/1/0** and **0/0/0**; strict
+progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain open. A
+canonical Court/L16 reconciliation transaction is still required.
