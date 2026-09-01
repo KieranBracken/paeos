@@ -515,3 +515,19 @@ still emitted `ProtocolError("truncated frame")`. Result SHA-256 is
 **Admitted: 0 | Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
 Remediated: 0**. `DEBT-0058` remains open and no further probe is authorized until a new recovery
 rationale addresses persistent host-frame truncation.
+
+## 2026-09-01 — SDK start-failure framing repaired; credential preflight blocks live route
+
+Commit `d8a5f80` repairs the remaining SDK host framing seam: exceptions from `core.start()` now
+produce a terminal `failure` frame with minimal session artifacts under the injected profile root,
+while non-string normalized errors are omitted safely. The new fixture and adapter/protocol tests
+are covered by a focused **85/85** pass; changed Python Ruff and runtime Pyright are clean and
+Node syntax checks pass. No provider call occurred.
+
+Read-only Cline profile preflight found the profile directory mode `0700`, but the `cline-pass`
+authentication expiry is `1787604656000` ms (current epoch `1788270752`) and `cline --version`
+fails with macOS Keychain `SecItemCopyMatching -50` (exit `139`). No credentials were printed or
+edited. The live GLM route therefore remains blocked before provider execution. A supported user
+reauthentication is required, then auth epoch `1 -> 2`; no additional probe is authorized until
+that external condition is confirmed. Worker/Court remain **0/3/0** and **0/0/0**, strict
+progress remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain OPEN.

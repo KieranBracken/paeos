@@ -4040,3 +4040,32 @@ The third distinct one-shot probe, `glm-5-3-sdk-admission-03-shutdown-fix`, ran 
 is now **Admitted: 0 | Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
 Remediated: 0**. `DEBT-0058` remains OPEN. No further probe is authorized until a new recovery
 rationale addresses the persistent host-frame truncation.
+
+### Entry 234 — 2026-09-01: SDK start-failure framing repaired; live route remains credential-blocked
+
+The persistent truncated-frame symptom was split into two control-plane defects. First, the
+adapter/CLI now converts protocol failures into a typed `TRANSPORT_FAILED` result, persists
+hash-only failure evidence, and releases the profile lease (commits `a49af927` and `0efbd33`).
+Second, the Node host previously allowed an exception from `core.start()` to escape before a
+terminal frame. Commit `d8a5f80` catches that exception, writes a minimal session manifest and
+message ledger under the injected profile data root, emits `session_created` followed by a
+terminal `failure` frame, and preserves the normalized error only when it is a string. A new
+fixture and regression coverage exercise this path.
+
+The bounded protocol/adapter/adversarial/admission suite now collects and passes **85/85**; Ruff
+is clean on changed Python paths, Pyright reports **0 diagnostics** for runtime sources, and both
+Node host files pass `node --check`. No provider call or live probe was made during this repair.
+
+Read-only profile inspection then found the remaining external blocker: the dedicated Cline
+profile is mode `0700`, but its non-secret `cline-pass` authentication expiry is
+`1787604656000` ms while current epoch is `1788270752` (expired). The `cline` executable also
+returns `ERROR: SecItemCopyMatching failed -50` and exit `139`, indicating unavailable macOS
+Keychain material. No token or secret was printed or modified. This explains why `core.start()`
+fails before a provider turn; it is not evidence of a bad GLM response.
+
+Canonical accounting remains Worker **Admitted: 0 | Rejected: 3 | Remediated: 0** and Court
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; strict progress remains **12/48 complete | 36
+remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. The next authorized action is a supported
+Cline reauthentication for this profile, followed by authentication epoch increment from `1` to
+`2`; no login automation, token handling, fallback, retry, gate seal, promotion, or SAKG
+resumption is permitted before that evidence exists.

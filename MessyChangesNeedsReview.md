@@ -845,3 +845,17 @@ until this shutdown remediation is reviewed.
   **Admitted: 0 | Rejected: 3 | Remediated: 0** and Court remains **Sealed: 0 | Remanded: 0 |
   Remediated: 0**. The route remains unadmitted and no further probe is authorized until a new
   recovery rationale addresses the persistent host-frame truncation.
+
+- 2026-09-01 control-plane recovery commit `d8a5f80` catches Cline SDK `core.start()` exceptions,
+  emits a terminal failure frame, and writes minimal session artifacts without leaking non-string
+  error data into canonical JSON. Focused protocol/adapter/adversarial/admission coverage passes
+  **85/85**; Ruff, runtime Pyright, and Node syntax checks are clean. This is an isolated code
+  remediation only; no provider call or gate state changed.
+
+- 2026-09-01 safe Cline preflight found the dedicated profile directory mode `0700`, but the
+  `cline-pass` auth expiry is in the past (`1787604656000` ms versus epoch `1788270752`) and the
+  CLI reports Keychain `SecItemCopyMatching -50` (exit `139`). No credentials were printed or
+  edited. Worker/Court remain **0/3/0** and **0/0/0**; strict progress remains **12/48 complete |
+  36 remaining**. Reauthentication through Cline's supported UI/flow and auth epoch `2` are the
+  only next prerequisites for a fresh one-shot admission probe; no automated login or token
+  handling is permitted.
