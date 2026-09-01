@@ -24,9 +24,17 @@ def _write_inputs(root: Path, *, killed: bool = True) -> tuple[Path, Path]:
         ),
         encoding="utf-8",
     )
+    bound = {
+        "canary_id": "CANARY-CLI-001",
+        "version": "1",
+        "target_hash": "a" * 64,
+        "mutation_hash": "b" * 64,
+        "installer_hash": "c" * 64,
+        "transaction_id": "tx-cli-001",
+    }
     events = [
-        {"schema_ver": 1, "kind": "CANARY_INSTALLED", "payload": {"canary_id": "CANARY-CLI-001"}},
-        {"schema_ver": 1, "kind": "CANARY_REACHED", "payload": {"canary_id": "CANARY-CLI-001"}},
+        {"schema_ver": 1, "kind": "CANARY_INSTALLED", "payload": bound},
+        {"schema_ver": 1, "kind": "CANARY_REACHED", "payload": bound},
     ]
     if killed:
         events.append(
@@ -34,7 +42,7 @@ def _write_inputs(root: Path, *, killed: bool = True) -> tuple[Path, Path]:
                 "schema_ver": 1,
                 "kind": "CANARY_KILLED",
                 "payload": {
-                    "canary_id": "CANARY-CLI-001",
+                    **bound,
                     "observed_failure_code": "FENCE_EXPIRED",
                     "evidence_ref": "evidence-cli-001",
                 },
