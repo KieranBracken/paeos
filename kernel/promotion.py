@@ -116,20 +116,19 @@ def evaluate_promotion(
         (intent.rollback_commit, "ROLLBACK_COMMIT_INVALID"),
         (intent.disposition_hash, "DISPOSITION_HASH_INVALID"),
     ):
-        if not isinstance(value, str) or not value.strip() or any(c.isspace() for c in value):
+        if not value.strip() or any(c.isspace() for c in value):
             reasons.append(name)
     for value, name in (
         (intent.expected_target_head, "EXPECTED_HEAD_INVALID"),
         (intent.reviewed_commit, "REVIEWED_COMMIT_INVALID"),
         (intent.rollback_commit, "ROLLBACK_COMMIT_INVALID"),
     ):
-        if isinstance(value, str) and not _GIT_OID.fullmatch(value):
+        if not _GIT_OID.fullmatch(value):
             reasons.append(name)
-    if not isinstance(intent.expires_seq, int) or intent.expires_seq < 0:
+    if intent.expires_seq < 0:
         reasons.append("EXPIRY_INVALID")
     if (
-        not isinstance(intent.target_ref, str)
-        or not intent.target_ref.startswith("refs/heads/")
+        not intent.target_ref.startswith("refs/heads/")
         or ".." in intent.target_ref
         or any(c.isspace() for c in intent.target_ref)
     ):

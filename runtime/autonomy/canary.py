@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from kernel.cas import is_valid_hash
@@ -83,7 +83,7 @@ def adjudicate_canary(
         "installer_hash": manifest.installer_hash,
     }
 
-    def bound_transaction(payload: dict[str, object]) -> str | None:
+    def bound_transaction(payload: Mapping[str, object]) -> str | None:
         if payload.get("canary_id") != manifest.canary_id:
             return None
         for key, expected in manifest_values.items():

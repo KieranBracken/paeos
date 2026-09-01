@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from kernel.cas import CAS, InMemoryCasStore
-from kernel.ledger import Event, LedgerRow
+from kernel.ledger import Event, JsonValue, LedgerRow
 
 
 def _evidence_cas(*names: str) -> CAS:
@@ -17,7 +19,7 @@ def _row(seq: int, kind: str, payload: dict[str, object]) -> LedgerRow:
     return LedgerRow(
         seq=seq,
         timestamp=f"2026-08-31T00:{seq:02d}:00Z",
-        event=Event(schema_ver=1, kind=kind, payload=payload),
+        event=Event(schema_ver=1, kind=kind, payload=cast(dict[str, JsonValue], payload)),
         prev_hash="0" * 64,
         row_hash=f"{seq:064x}"[-64:],
     )

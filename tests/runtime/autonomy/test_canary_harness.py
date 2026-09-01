@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from kernel.ledger import Event
+from kernel.ledger import Event, JsonValue
 
 
-def _payload(manifest, tx: str, **extra: object) -> dict[str, object]:
+def _payload(manifest, tx: str, **extra: JsonValue) -> dict[str, JsonValue]:
     payload = {
         "canary_id": manifest.canary_id,
         "version": manifest.version,
@@ -150,7 +150,7 @@ def test_canary_rejects_stale_manifest_binding() -> None:
     from runtime.autonomy.canary import CanaryManifest, adjudicate_canary
 
     manifest = CanaryManifest("CANARY-005", "2", "a" * 64, "b" * 64, "FENCE_EXPIRED", "c" * 64)
-    stale = {
+    stale: dict[str, JsonValue] = {
         "canary_id": "CANARY-005",
         "version": "1",
         "target_hash": manifest.target_hash,
