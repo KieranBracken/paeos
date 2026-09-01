@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from paeos.model_router.types import ModelFamily, NormalizedErrorType
+from runtime.integrations.cline_sdk_protocol import ProtocolError
 from runtime.worker_adapter import (
     ADAPTER_PROTOCOL_VERSION,
     AdapterFailureKind,
@@ -165,3 +166,40 @@ def test_sdk_success_has_no_court_seal_side_effect(tmp_path: Path, monkeypatch) 
         (tmp_path / "state/worker-admission/test-probe/admission-result.json").read_text()
     )
     assert payload["court_counts"] == {"sealed": 0, "remanded": 0, "remediated": 0}
+
+
+def test_protocol_error_is_persisted_as_canonical_rejection(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    class ProtocolFailureAdapter:
+        def __init__(self, config: object) -> None:
+            pass
+
+        def run_probe(self, contract: object):
+            raise ProtocolError("truncated frame")
+
+    monkeypatch.setattr(worker_admission_probe, "ClineSdkAdmissionAdapter", ProtocolFailureAdapter)
+    state_root = tmp_path / "state"
+    code = worker_admission_probe.main(
+        [
+            "--state-root",
+            str(state_root),
+            "--probe-id",
+            "test-probe",
+            "--provider",
+            "cline-pass",
+            "--model",
+            "cline-pass/qwen3.8-max",
+            "--expected-family",
+            ModelFamily.QWEN.value,
+            *_sdk_args(tmp_path),
+        ]
+    )
+
+    assert code == 1
+    payload = json.loads(
+        (state_root / "worker-admission/test-probe/admission-result.json").read_text()
+    )
+    assert payload["reason_codes"] == ["TRANSPORT_FAILED"]
+    output = capsys.readouterr()
+    assert "Traceback" not in output.out + output.err

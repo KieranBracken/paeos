@@ -23,6 +23,7 @@ from paeos.model_router.types import NormalizedErrorType
 from runtime.integrations.cline_sdk_protocol import (
     PROTOCOL_VERSION,
     HostEventMachine,
+    ProtocolError,
     encode_frame,
     read_frame,
 )
@@ -109,6 +110,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
 
     def __init__(self, config: ClineSdkAdapterConfig) -> None:
         self._config = config
+        self._active_lease: ProfileLease | None = None
 
     def run_probe(self, contract: ProbeContract) -> RawWorkerRun | AdapterFailureReceipt:
         try:
@@ -127,11 +129,17 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                 raw_stderr_sha256=empty_hash,
                 observation_sha256=_sha_bytes(empty_hash.encode() * 2),
             )
-        except AdmissionError as error:
+        except (AdmissionError, ProtocolError) as error:
             message = str(error)
             raw_stdout, raw_stderr = _FAILURE_EVIDENCE.get()
             failure_stdout = getattr(error, "raw_stdout", raw_stdout)
             failure_stderr = getattr(error, "raw_stderr", raw_stderr)
+            self._release_failed_lease(
+                contract,
+                message=message,
+                stdout=failure_stdout,
+                stderr=failure_stderr,
+            )
             failure_text = "\n".join(
                 (
                     message,
@@ -182,6 +190,36 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                 observation_sha256=_sha_bytes(stdout_hash.encode() + stderr_hash.encode()),
             )
 
+    def _release_failed_lease(
+        self,
+        contract: ProbeContract,
+        *,
+        message: str,
+        stdout: bytes,
+        stderr: bytes,
+    ) -> None:
+        lease = self._active_lease
+        if lease is None:
+            return
+        evidence = lease.lease_root / f"{contract.probe_id}.failure.json"
+        payload = _canonical_bytes(
+            {
+                "invocation_id": contract.probe_id,
+                "status": "failed",
+                "reason": message,
+                "stdout_sha256": _sha_bytes(stdout),
+                "stderr_sha256": _sha_bytes(stderr),
+            }
+        ) + b"\n"
+        descriptor = os.open(evidence, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        try:
+            os.write(descriptor, payload)
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+        lease.release(evidence)
+        self._active_lease = None
+
     def _run_probe(self, contract: ProbeContract) -> RawWorkerRun:
         _FAILURE_EVIDENCE.set((b"", b""))
         self._validate_qualification()
@@ -196,6 +234,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             process_start_token=self._config.process_start_token,
             boot_id=self._config.boot_id,
         )
+        self._active_lease = lease
         argv = [str(self._config.node_executable), str(self._config.host_module)]
         env = {
             "CLINE_DATA_DIR": str(self._config.profile.root),
@@ -262,13 +301,26 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         while not machine.terminal:
             try:
                 event = self._read_event(cast(BinaryIO, process.stdout), deadline)
-            except AdmissionError as error:
+            except (AdmissionError, ProtocolError) as error:
                 stderr_bytes = self._cancel_and_stop(
                     process, invocation_id, session_id, command_sequence
                 )
-                raise _ProbeFailure(str(error), bytes(raw_stdout), stderr_bytes) from error
+                message = (
+                    f"SDK protocol failure: {error}"
+                    if isinstance(error, ProtocolError)
+                    else str(error)
+                )
+                raise _ProbeFailure(message, bytes(raw_stdout), stderr_bytes) from error
             raw_stdout.extend(encode_frame(event))
-            machine.accept(event)
+            try:
+                machine.accept(event)
+            except ProtocolError as error:
+                stderr_bytes = self._cancel_and_stop(
+                    process, invocation_id, session_id, command_sequence
+                )
+                raise _ProbeFailure(
+                    f"SDK protocol failure: {error}", bytes(raw_stdout), stderr_bytes
+                ) from error
             event_type = event["type"]
             payload = event["payload"]
             assert isinstance(payload, dict)
@@ -416,6 +468,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         finally:
             os.close(descriptor)
         lease.release(terminal_record)
+        self._active_lease = None
         return run
 
     def _validate_qualification(self) -> None:

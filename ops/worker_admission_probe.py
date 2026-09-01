@@ -19,6 +19,7 @@ from typing import Any
 
 from paeos.model_router.types import ModelFamily
 from runtime.integrations.cline_sdk import ClineSdkAdapterConfig, ClineSdkAdmissionAdapter
+from runtime.integrations.cline_sdk_protocol import ProtocolError
 from runtime.integrations.cline_sdk_qualification import (
     AdapterQualificationRecord,
     QualifiedFile,
@@ -315,6 +316,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         reason_codes.append("CLINE_BINARY_NOT_FOUND")
     except AdmissionError:
         reason_codes.append("ADMISSION_REJECTED")
+    except ProtocolError:
+        reason_codes.append("TRANSPORT_FAILED")
     except OSError:
         reason_codes.append("TRANSPORT_IO_ERROR")
 

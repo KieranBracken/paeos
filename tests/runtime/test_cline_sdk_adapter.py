@@ -16,13 +16,17 @@ import pytest
 import runtime.integrations.cline_sdk as cline_sdk
 from paeos.model_router.types import ModelFamily, NormalizedErrorType
 from runtime.integrations.cline_sdk import ClineSdkAdapterConfig, ClineSdkAdmissionAdapter
-from runtime.integrations.cline_sdk_protocol import read_frame
+from runtime.integrations.cline_sdk_protocol import ProtocolError, read_frame
 from runtime.integrations.cline_sdk_qualification import (
     SDK_QUALIFICATION_SCHEMA,
     AdapterQualificationRecord,
     QualifiedFile,
 )
-from runtime.worker_adapter import AdapterFailureKind, AdapterFailureReceipt
+from runtime.worker_adapter import (
+    AdapterFailureKind,
+    AdapterFailureReceipt,
+    SideEffectCertainty,
+)
 from runtime.worker_admission import (
     AdmissionVerdict,
     ProbeContract,
@@ -244,6 +248,57 @@ def test_raw_auth_failure_remains_auth_failed_when_transport_message_is_generic(
     assert isinstance(result, AdapterFailureReceipt)
     assert result.adapter_failure is None
     assert result.normalized_error is NormalizedErrorType.AUTH_FAILED
+
+
+def test_protocol_truncation_is_typed_transport_rejection(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    adapter, contract = adapter_case
+
+    def fail(_contract: ProbeContract) -> RawWorkerRun:
+        raise ProtocolError("truncated frame")
+
+    monkeypatch.setattr(adapter, "_run_probe", fail)
+
+    result = adapter.run_probe(replace(contract, probe_id="probe-truncated-frame"))
+
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is AdapterFailureKind.TRANSPORT_FAILED
+    assert result.side_effect_certainty is SideEffectCertainty.UNKNOWN
+
+
+def test_rejected_probe_releases_profile_lease_with_failure_evidence(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+) -> None:
+    adapter, contract = adapter_case
+
+    result = adapter.run_probe(replace(contract, probe_id="probe-manifest-provider"))
+
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is AdapterFailureKind.MODEL_MISMATCH
+    assert not tuple(adapter._config.lease_root.glob("*.active.json"))
+    released = tuple(adapter._config.lease_root.glob("*.released.json"))
+    assert len(released) == 1
+    record = json.loads(released[0].read_text(encoding="utf-8"))
+    assert record["auth_epoch"] == adapter._config.profile.auth_epoch
+
+
+def test_protocol_failure_releases_profile_lease(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    adapter, contract = adapter_case
+
+    def fail_read(_stream: object, _deadline: float) -> dict[str, object]:
+        raise ProtocolError("truncated frame")
+
+    monkeypatch.setattr(adapter, "_read_event", fail_read)
+    result = adapter.run_probe(replace(contract, probe_id="probe-protocol-lease"))
+
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is AdapterFailureKind.TRANSPORT_FAILED
+    assert not tuple(adapter._config.lease_root.glob("*.active.json"))
 
 
 def test_unfinished_provider_attempt_times_out_with_unknown_side_effects(
