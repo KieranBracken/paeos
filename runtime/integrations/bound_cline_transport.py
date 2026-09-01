@@ -813,7 +813,10 @@ def _run_host_once(
     process.stdin.write(encode_frame(start))
     process.stdin.flush()
 
-    machine = HostEventMachine(request.request_id)
+    # This compatibility transport speaks the pre-SDK tool frame.  Keep the
+    # SDK's phase/identity schema strict while validating this legacy shape in
+    # the explicitly selected compatibility mode.
+    machine = HostEventMachine(request.request_id, strict_tool_identity=False)
     raw_stdout = bytearray()
     decisions: list[dict[str, object]] = []
     attempts: dict[str, int] = {}

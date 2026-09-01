@@ -163,6 +163,40 @@ def test_terminal_with_unfinished_provider_attempt_terminates() -> None:
         machine.accept(_host_event("terminal", 3, session_id="session-004"))
 
 
+def test_legacy_bound_transport_can_opt_into_legacy_tool_identity() -> None:
+    machine = HostEventMachine("probe-004", strict_tool_identity=False)
+    machine.accept(_host_event("hello", 0))
+    machine.accept(_host_event("session_created", 1, session_id="session-legacy"))
+    machine.accept(
+        _host_event(
+            "provider_attempt_started",
+            2,
+            session_id="session-legacy",
+            payload={"correlation_id": "attempt-legacy"},
+        )
+    )
+    machine.accept(
+        _host_event(
+            "provider_attempt_finished",
+            3,
+            session_id="session-legacy",
+            payload={"correlation_id": "attempt-legacy"},
+        )
+    )
+    machine.accept(
+        _host_event(
+            "tool_request",
+            4,
+            session_id="session-legacy",
+            payload={
+                "call_id": "call-legacy",
+                "input": {"path": "artifact.txt"},
+                "tool_name": "editor",
+            },
+        )
+    )
+
+
 def test_second_start_and_eof_before_terminal_terminate() -> None:
     machine = PythonCommandMachine("probe-004")
     machine.accept(_start_message())

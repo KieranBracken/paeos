@@ -115,6 +115,10 @@ def _base_message(
 @dataclass(slots=True)
 class HostEventMachine:
     invocation_id: str
+    # The public SDK transport uses phase-bound identity.  The older bound
+    # stdio adapter has a deliberately smaller, already-validated frame shape;
+    # it opts into that compatibility mode explicitly at its call site.
+    strict_tool_identity: bool = True
     expected_sequence: int = 0
     session_id: str | None = None
     terminal: bool = False
@@ -162,37 +166,55 @@ class HostEventMachine:
             else:
                 self._finished_attempts.add(correlation)
         if message_type == "tool_request":
-            expected_tool_keys = {
-                "agent_id",
-                "call_id",
-                "conversation_id",
-                "input",
-                "iteration",
-                "phase",
-                "tool_name",
-            }
-            if set(payload) != expected_tool_keys:
-                raise ProtocolError("tool request schema mismatch")
-            call_id = payload.get("call_id")
-            phase = payload.get("phase")
-            if (
-                not isinstance(call_id, str)
-                or not call_id
-                or not isinstance(phase, str)
-                or phase not in {"approval", "execution"}
-                or f"{phase}:{call_id}" in self._tool_calls
-            ):
-                raise ProtocolError("duplicate or missing tool call")
-            for field_name in ("agent_id", "conversation_id", "tool_name"):
-                value = payload.get(field_name)
-                if not isinstance(value, str) or not value:
-                    raise ProtocolError("tool request identity missing")
-            iteration = payload.get("iteration")
-            if not isinstance(iteration, int) or isinstance(iteration, bool) or iteration <= 0:
-                raise ProtocolError("tool request iteration invalid")
-            if not isinstance(payload.get("input"), dict):
-                raise ProtocolError("tool request input invalid")
-            self._tool_calls.add(f"{phase}:{call_id}")
+            if self.strict_tool_identity:
+                expected_tool_keys = {
+                    "agent_id",
+                    "call_id",
+                    "conversation_id",
+                    "input",
+                    "iteration",
+                    "phase",
+                    "tool_name",
+                }
+                if set(payload) != expected_tool_keys:
+                    raise ProtocolError("tool request schema mismatch")
+                call_id = payload.get("call_id")
+                phase = payload.get("phase")
+                if (
+                    not isinstance(call_id, str)
+                    or not call_id
+                    or not isinstance(phase, str)
+                    or phase not in {"approval", "execution"}
+                    or f"{phase}:{call_id}" in self._tool_calls
+                ):
+                    raise ProtocolError("duplicate or missing tool call")
+                for field_name in ("agent_id", "conversation_id", "tool_name"):
+                    value = payload.get(field_name)
+                    if not isinstance(value, str) or not value:
+                        raise ProtocolError("tool request identity missing")
+                iteration = payload.get("iteration")
+                if not isinstance(iteration, int) or isinstance(iteration, bool) or iteration <= 0:
+                    raise ProtocolError("tool request iteration invalid")
+                if not isinstance(payload.get("input"), dict):
+                    raise ProtocolError("tool request input invalid")
+                self._tool_calls.add(f"{phase}:{call_id}")
+            else:
+                expected_tool_keys = {"call_id", "input", "tool_name"}
+                if set(payload) != expected_tool_keys:
+                    raise ProtocolError("legacy tool request schema mismatch")
+                call_id = payload.get("call_id")
+                if not isinstance(call_id, str) or not call_id:
+                    raise ProtocolError("legacy tool request identity missing")
+                for field_name in ("tool_name",):
+                    value = payload.get(field_name)
+                    if not isinstance(value, str) or not value:
+                        raise ProtocolError("legacy tool request identity missing")
+                if not isinstance(payload.get("input"), dict):
+                    raise ProtocolError("legacy tool request input invalid")
+                key = f"legacy:{call_id}"
+                if key in self._tool_calls:
+                    raise ProtocolError("duplicate legacy tool call")
+                self._tool_calls.add(key)
         if message_type in TERMINAL_HOST_TYPES:
             if self._started_attempts != self._finished_attempts:
                 raise ProtocolError("terminal with unfinished provider attempt")
