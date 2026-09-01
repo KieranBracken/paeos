@@ -4119,3 +4119,47 @@ reauthentication that refreshes the `cline-pass` overlay (or a documented Cline 
 fix by its owner), followed by a fresh non-secret readiness check and one distinct probe ID.
 No automated login, token handling, fallback, retry, gate seal, promotion, or SAKG resumption
 is authorized.
+
+### Entry 237 — 2026-09-01: Epoch-3 SDK control-plane remediation and live probe outcomes
+
+Three distinct epoch-3 probe IDs were evaluated against the isolated recovery branch. Probe
+`glm-5-3-sdk-admission-18-auth-epoch-3-batched-order-001` reached the real Cline SDK but ended
+as `TRANSPORT_FAILED` because the host was still enforcing a two-turn budget while the SDK
+required a final no-tool completion turn. Its canonical result SHA-256 is
+`647ba1a73588789aa12ed0ee410edfb9f890eb8eb56d50a82bb6691e00ec77a9`; the released lease record
+SHA-256 is `7f8b8df29aeca7fc451e40695d74e08f9854771ef895c5d61cada5c07a26dccd`. Recovery commit
+`244a561eeaa8b6746c273d21f02f2fb9243792be` raises the declared turn budget to three and binds
+provider-attempt accounting to the observed tool iterations.
+
+Probe `glm-5-3-sdk-admission-19-auth-epoch-3-final-turn-001` then completed the editor,
+verification-command, and final textual SDK turns. It was rejected as `CAPABILITY_DRIFT` because
+the validator still expected a synthetic manifest schema; no gate credit was taken. Its canonical
+result SHA-256 is `463aa9823580fcd70262a682cac627911238b078f4379df10d8f6fa64460d950`; the released
+lease record SHA-256 is `ac1164f37c133225fb62312fecd346de5b3fe27961f221a2c3195b08b78c0242`. Recovery
+commit `894a0635da67a13dd962b1a96be768b1f8339b42` pins validation to the observed Cline Core
+manifest contract (version/source/status/exit code, identity, capability, workspace, and message
+path bindings).
+
+Probe `glm-5-3-sdk-admission-20-auth-epoch-3-manifest-001` was a new one-shot attempt after that
+validator remediation. The Cline profile manifest was created with the expected provider/model,
+workspace, non-interactive capability set, and profile UUID, but the provider returned
+`AUTH_FAILED` before any model turn (`0` input and output tokens); the session ended with
+`status=failed`, `exit_code=1`, and no tool side effect. The canonical result SHA-256 is
+`6db1f5203edef830a559e99d26af32ed2aff2b08c35a9b8fde3fff534306c2ec`; failure evidence hashes
+are stdout `a410c700e219416c78235b86278cf47e38a92bd8038e25059b33aa5fa2bbbc58` and stderr
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; the released lease record
+SHA-256 is `d0d72c1a4a50e3316854170d9ad681dd114e0d4656e960a607457f6a717f0076`. The profile’s
+non-secret `cline-pass` expiry is now future-dated (`2026-09-01T17:29:20Z`), but router health
+still reports provider `cline` as `EXHAUSTED`/`QUOTA_EXHAUSTED`; this is an external provider
+readiness failure, not evidence of a GLM response or a validator defect. No identical retry is
+authorized without a new provider-readiness change.
+
+Focused control-plane verification after commits `f11fe398`, `244a561`, and `894a063` passed
+`109/109` tests across the SDK protocol, adapter, adversarial, mutation, and admission-probe
+suites. Changed Python Ruff, runtime Pyright, and Node syntax checks are clean. One diagnostic
+command initially passed the JavaScript host to Ruff (which correctly reported Python-parser
+errors); the command was corrected and no source issue remained. Canonical accounting remains
+Worker **Admitted: 0 | Rejected: 3 | Remediated: 0** in the ledger and Court **Sealed: 0 |
+Remanded: 0 | Remediated: 0**; strict progress remains **12/48 complete | 36 remaining**.
+`DEBT-0058` and `DEBT-0060` remain OPEN. Gate A is not sealed, no Court/L16 row exists, and no
+later gate or SAKG resumption is authorized.

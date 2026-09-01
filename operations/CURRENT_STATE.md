@@ -561,3 +561,22 @@ progress **12/48 complete | 36 remaining**, with `DEBT-0058` and `DEBT-0060` OPE
 refresh of the actual `cline-pass` overlay and a new readiness observation are required before
 another live probe; no automated login, credential copying, fallback, retry, promotion, or SAKG
 resumption is permitted.
+
+## 2026-09-01 — Epoch-3 SDK adapter hardening and provider-bound rejection
+
+Recovery commits `f11fe398`, `244a561`, and `894a063` corrected SDK tool ordering, allowed the
+required final completion turn, and pinned validation to the real Cline Core session-manifest
+schema. The focused protocol/adapter/adversarial/mutation/admission suite passes **109/109**;
+changed Ruff, runtime Pyright, and Node syntax checks are clean.
+
+Distinct live probes `...18` and `...19` produced typed control-plane rejections and were
+remediated locally. Probe `glm-5-3-sdk-admission-20-auth-epoch-3-manifest-001` then failed at the
+external Cline provider boundary with `AUTH_FAILED` before any model turn (session `exit_code=1`,
+zero input/output tokens). The profile’s non-secret `cline-pass` expiry is future-dated, but the
+router still reports provider `cline` as `EXHAUSTED`/`QUOTA_EXHAUSTED`; no credentials were read,
+printed, copied, or modified. No identical probe retry is authorized until a new provider
+readiness observation exists.
+
+Worker/Court remain **0/3/0** and **0/0/0** in the canonical ledger; strict progress remains
+**12/48 complete | 36 remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. Gate A remains
+unsealed; no Court/L16 row, later-gate advancement, promotion, or SAKG resumption is authorized.

@@ -877,3 +877,15 @@ until this shutdown remediation is reviewed.
   retained. Canonical progress remains **12/48 complete | 36 remaining**; Worker/Court remain
   **0/3/0** and **0/0/0**, and `DEBT-0058`/`DEBT-0060` remain OPEN. No gate seal or SAKG
   resumption is implied; refresh the actual target overlay before any new one-shot probe.
+
+- 2026-09-01 epoch-3 control-plane recovery advanced the SDK adapter through three distinct
+  probes. Commit `244a561` fixed the required final completion-turn budget after probe `...18`
+  (`TRANSPORT_FAILED`); commit `894a063` pinned real Cline manifest validation after probe `...19`
+  (`CAPABILITY_DRIFT`). Probe `...20` reached the provider boundary but returned `AUTH_FAILED`
+  before a model turn; canonical result SHA-256 is
+  `6db1f5203edef830a559e99d26af32ed2aff2b08c35a9b8fde3fff534306c2ec`, with released lease
+  SHA-256 `d0d72c1a4a50e3316854170d9ad681dd114e0d4656e960a607457f6a717f0076`. The profile expiry is
+  future-dated, while router health remains `EXHAUSTED`/`QUOTA_EXHAUSTED`; this is an external
+  readiness blocker. Focused verification passes **109/109** with changed Ruff/Pyright/Node checks
+  clean. Worker/Court stay **0/3/0** and **0/0/0**; Gate A and SAKG remain paused pending a fresh
+  readiness change and a valid admission receipt.
