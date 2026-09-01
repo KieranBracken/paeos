@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import io
+import json
+import os
 import select
 import subprocess
 from pathlib import Path
@@ -210,6 +212,43 @@ def test_node_host_forwards_tool_request_and_waits_for_python_decision() -> None
         if process.poll() is None:
             process.kill()
             process.wait(timeout=5)
+
+
+def test_node_host_emits_terminal_failure_when_core_start_raises(tmp_path: Path) -> None:
+    env = os.environ.copy()
+    env["CLINE_DATA_DIR"] = str(tmp_path / "cline")
+    process = subprocess.Popen(
+        ["node", str(HOST)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    message = _start_message()
+    message["payload"]["prompt"] = "PAEOS_SDK_PROBE:" + json.dumps(
+        {
+            "artifact_path": "/sandbox/artifact.txt",
+            "expected_text": "admitted-worker\n",
+            "initial_text": "baseline-worker\n",
+            "probe_id": "probe-start-throws",
+            "verification_command": "python3 verify_probe.py",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    try:
+        _write(process, message)
+        events: list[dict[str, object]] = []
+        for _ in range(4):
+            event = _read(process)
+            events.append(event)
+            if event["type"] in {"terminal", "failure", "cancelled"}:
+                break
+        assert events[-1]["type"] == "failure"
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
 
 
 def test_attempt_events_are_matched_and_content_free() -> None:

@@ -301,6 +301,18 @@ def test_protocol_failure_releases_profile_lease(
     assert not tuple(adapter._config.lease_root.glob("*.active.json"))
 
 
+def test_sdk_start_failure_is_emitted_as_typed_rejection(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+) -> None:
+    adapter, contract = adapter_case
+
+    result = adapter.run_probe(replace(contract, probe_id="probe-start-throws"))
+
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is AdapterFailureKind.TRANSPORT_FAILED
+    assert result.raw_stdout_sha256 != hashlib.sha256(b"").hexdigest()
+
+
 def test_unfinished_provider_attempt_times_out_with_unknown_side_effects(
     adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
 ) -> None:

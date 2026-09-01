@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash, randomUUID } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { isAbsolute } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -290,24 +290,67 @@ async function main() {
         forwardTool({ callId: randomUUID(), input, toolName: "run_commands" }),
     },
   };
-  const result = await core.start({
-    capabilities,
-    config: {
-      cwd: config.cwd,
-      disableMcpSettingsTools: true,
-      enableAgentTeams: false,
-      enableSpawnAgent: false,
-      enableTools: true,
-      modelId: config.model_id,
-      providerId: config.provider_id,
-      sessionId,
-    },
-    prompt: config.prompt,
-    toolPolicies: {
-      editor: { autoApprove: false, enabled: true },
-      run_commands: { autoApprove: false, enabled: true },
-    },
-  });
+  let result;
+  try {
+    result = await core.start({
+      capabilities,
+      config: {
+        cwd: config.cwd,
+        disableMcpSettingsTools: true,
+        enableAgentTeams: false,
+        enableSpawnAgent: false,
+        enableTools: true,
+        modelId: config.model_id,
+        providerId: config.provider_id,
+        sessionId,
+      },
+      prompt: config.prompt,
+      toolPolicies: {
+        editor: { autoApprove: false, enabled: true },
+        run_commands: { autoApprove: false, enabled: true },
+      },
+    });
+  } catch (error) {
+    const dataRoot = process.env.CLINE_DATA_DIR;
+    if (typeof dataRoot !== "string" || !isAbsolute(dataRoot)) {
+      throw new ProtocolError("profile data root unavailable for start failure");
+    }
+    const sessionRoot = `${dataRoot}/sessions/${sessionId}`;
+    const manifestPath = `${sessionRoot}/manifest.json`;
+    const messagesPath = `${sessionRoot}/messages.json`;
+    await mkdir(sessionRoot, { recursive: true });
+    await writeFile(
+      manifestPath,
+      JSON.stringify({
+        backend_mode: "local",
+        capabilities: {
+          disable_mcp_settings_tools: true,
+          enable_agent_teams: false,
+          enable_spawn_agent: false,
+          enabled_tools: ["editor", "run_commands"],
+        },
+        messages_path: messagesPath,
+        model: config.model_id,
+        provider: config.provider_id,
+        session_id: sessionId,
+      }),
+    );
+    await writeFile(messagesPath, JSON.stringify({ messages: [], sessionId }));
+    emit("session_created", { manifest_path: manifestPath, messages_path: messagesPath });
+    const failurePayload = {
+      error_class: error instanceof Error ? error.name : "UnknownError",
+    };
+    if (
+      error &&
+      typeof error === "object" &&
+      "normalizedError" in error &&
+      typeof error.normalizedError === "string"
+    ) {
+      failurePayload.normalized_error = error.normalizedError;
+    }
+    emit("failure", failurePayload);
+    return;
+  }
   if (result.sessionId !== sessionId) throw new ProtocolError("session identity mismatch");
   emit("session_created", {
     manifest_path: result.manifestPath,

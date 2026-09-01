@@ -25,6 +25,9 @@ export class ClineCore {
     const probe = input.prompt.startsWith("PAEOS_SDK_PROBE:")
       ? JSON.parse(input.prompt.slice("PAEOS_SDK_PROBE:".length))
       : null;
+    if (probe?.probe_id === "probe-start-throws") {
+      throw new Error("synthetic start failure");
+    }
     let manifestPath = `/profile/sessions/${sessionId}/manifest.json`;
     let messagesPath = `/profile/sessions/${sessionId}/messages.json`;
     if (probe) {
