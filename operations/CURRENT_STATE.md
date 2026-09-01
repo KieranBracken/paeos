@@ -447,3 +447,17 @@ non-gateway suite passed **1,094/1,094** (exit `0`); changed Ruff/Pyright are cl
 remain **0/1/0** and **0/0/0**, strict progress remains **12/48 complete | 36 remaining**, and
 `DEBT-0058`/`DEBT-0060` remain open. A fresh current-candidate L14/L17 audit is required; no
 Court/L16 row, gate seal, promotion, or SAKG resumption is authorized.
+
+## 2026-09-01 — Qualified current-candidate L14/L17 audit
+
+Candidate `02f8e87951ab8602dc441845439350027359e928` received a one-shot physical audit through
+Google `gemini-3.6-flash` (family `gemini`) against evidence bundle
+`5e417b9712e798e179bccf6ba5ee234998a1a043517d0d6766a16a875af389ab`. The builder family is GLM,
+so A-08 Builder != Auditor is **PASS**; provider attempts `1`, no fallback. The report and receipt
+qualified locally with exact bindings, substantive findings, and terminal `AUDIT_COMPLETE: true`.
+Review: `reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACOMPACT_4096_review.md`.
+
+This advances only L14/L17 evidence, not a Court/L16 row or gate seal. Worker/Court remain
+**0/1/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**; `DEBT-0058`
+and `DEBT-0060` remain open. Candidate-bound L13 reproduction and canonical Court/L16
+reconciliation remain required before any gate advancement or SAKG resumption.

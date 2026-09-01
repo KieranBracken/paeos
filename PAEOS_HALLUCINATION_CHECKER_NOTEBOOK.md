@@ -3938,3 +3938,25 @@ audit/prompt suite passed **39/39**, the complete non-gateway suite passed **1,0
 was clean on changed paths, and Pyright reported **0 diagnostics**. No provider retry, Court row,
 gate seal, debt closure, promotion, or SAKG resumption occurred. A fresh candidate-bound audit is
 required for the hardened lineage.
+
+### Entry 228 — 2026-09-01: Current-candidate L14/L17 qualification after output-budget diagnosis
+
+One authorized one-shot was dispatched for candidate
+`02f8e87951ab8602dc441845439350027359e928` with evidence bundle SHA-256
+`5e417b9712e798e179bccf6ba5ee234998a1a043517d0d6766a16a875af389ab`. Google
+`gemini-3.6-flash` returned a complete report when `max_tokens=4096` was used after prior
+2,048-token calls repeatedly stopped at approximately 80 completion tokens. The exact report and
+receipt qualified locally: `L14_STATUS: PASS`, A-08 **PASS** (`gemini != glm`), provider attempts
+`1`, no fallback, exact candidate/evidence bindings, substantive findings, and final
+`AUDIT_COMPLETE: true`.
+
+Artifacts: report SHA-256
+`336f472576941f164c9ac5c5a9ba366919777fdada084f392e94adb62d01ffca`; receipt payload SHA-256
+`667a5cad070919b09b7874072b00467bab2494fb3a72cac39c5eff7d0dbdcfaa`; transcript SHA-256
+`89cf22319988d9886126dd7a2763dbe054dbea02343780d87328c1bc810414eb`. Review:
+`reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACOMPACT_4096_review.md`.
+
+This is qualified L14/L17 evidence only; it does not create a Court/L16 row, close `DEBT-0058`
+or `DEBT-0060`, seal a gate, or resume SAKG. Worker/Court remain **0/1/0** and **0/0/0**;
+strict progress remains **12/48 complete | 36 remaining**. Candidate-bound L13 reproduction and
+canonical Court reconciliation remain the next required transitions.

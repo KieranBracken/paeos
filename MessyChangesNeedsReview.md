@@ -806,3 +806,11 @@ remains **12/48 complete | 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain op
   host `ENOSPC`; this is not counted as passing evidence and was not identically retried. The
   transport is opt-in, no GUI/clipboard/AppleScript path was reactivated, and no gate/debt/Court/
   SAKG state changed. Review/handoff: `reviews/tasks/PAEOS_BOUND_CLINE_WORKER_STDIO_review.md`.
+
+- 2026-09-01 a one-shot Google Gemini audit for current candidate `02f8e87` qualified after the
+  output budget was raised to `4096` tokens. The candidate-bound evidence bundle hash is
+  `5e417b9712e798e179bccf6ba5ee234998a1a043517d0d6766a16a875af389ab`; the report/receipt pair
+  is stored under `/private/tmp/paeos-l14-l17-*-02f8e87-ultracompact-4096.*`. A-08 is PASS,
+  report status is PASS, and the provider was attempted exactly once with no fallback. This is
+  evidence bookkeeping only: no Court/L16 row, gate seal, debt closure, promotion, or SAKG
+  resumption occurred. Review: `reviews/tasks/PAEOS_L14_L17_02F8E87_GEMINI_ULTRACOMPACT_4096_review.md`.
