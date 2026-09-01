@@ -3,22 +3,26 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-01 (Founder/Court Gate C seal; Gate D authorized)
+> **Last updated:** 2026-09-01 (Founder/Court Gate D seal; Gate E authorized)
 
 ## Current canonical recovery frontier — 2026-09-01
 
 - **Branch:** `codex/control-plane-recovery-s1-clean-recovered` (isolated; no main/trunk mutation).
-- **Gate status:** Gate A **SEALED**, Gate B **SEALED**, Gate C **SEALED**; Gate D is the next
-  authorized gate under the approved recovery plan.
-- **Strict sealed progress:** **15/48 complete | 33 remaining** (the separate granular task count
+- **Gate status:** Gate A **SEALED**, Gate B **SEALED**, Gate C **SEALED**, Gate D **SEALED**; Gate E is
+  the next authorized gate under the approved recovery plan.
+- **Strict sealed progress:** **16/48 complete | 32 remaining** (the separate granular task count
   remains larger; this is the constitutional sealed-progress counter).
 - **Worker accounting:** **Admitted: 3 | Rejected: 3 | Remediated: 0**.
-- **Court accounting:** **Sealed: 3 | Remanded: 0 | Remediated: 0**.
+- **Court accounting:** **Sealed: 4 | Remanded: 0 | Remediated: 0**.
 - **Open debt:** `DEBT-0060` remains **OPEN** and is carried forward.
 - **SAKG/production:** paused; no production dispatch, merge, promotion, or main/trunk mutation is
   authorized until later gates and the final lifecycle disposition are complete.
 
-The current Gate C candidate-bound L16 record is
+The current Gate D candidate-bound L16 record is
+`reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`; its qualified L14/L17
+checkpoint is `reviews/tasks/PAEOS_GATE_D_L14_L17_12A051E_CHECKPOINT.md`.
+
+The prior Gate C candidate-bound L16 record is
 `reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`; its Z0 catalog was ratified in
 `eec55ede0ae8faf1fe4ff82df4eee5752e71f6be`.
 
@@ -931,3 +935,21 @@ This is an L14/L17 implementation checkpoint only. Gate D remains UNSEALED pendi
 L16/Court disposition; external Worker/Court accounting remains 3/3/0, strict progress remains
 15/48 complete | 33 remaining, and DEBT-0060 remains OPEN. No promotion, merge, main/trunk
 mutation, production dispatch, or SAKG resumption is authorized.
+
+## 2026-09-01 — Founder/Court sealed Gate D; Gate E authorized
+
+The Founder supplied the candidate-bound disposition `COURT_SEALED` for Gate D, candidate
+`12a051e8fb2b2bb627395bd6982d25a4b26e8d13`, referencing evidence bundle
+`a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`, report
+`bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581`, and canonical receipt
+`eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7`. The physical auditor was
+Google `gemini-3.6-flash` (Gemini family) versus the GLM builder, with one attempt and no
+fallback; A-08 passed. The external L16 record is
+`reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`.
+
+Gate D is **SEALED** and progression to Gate E is authorized. `DEBT-0060` remains **OPEN** and is
+carried forward. External Worker/Court accounting is **3/3/0** and **4/0/0**; strict sealed
+progress advances to **16/48 complete | 32 remaining**. Gate E must follow its canonical
+state-reconciliation/liveness plan, obtain fresh candidate-bound L13/L14/L17 evidence, and receive
+its own Court disposition. No merge, promotion, main/trunk mutation, production dispatch, or SAKG
+resumption is authorized.

@@ -69,3 +69,19 @@ L16/Court row or Founder seal. External accounting remains Worker **3/3/0**, Cou
 strict progress remains **15/48 complete | 33 remaining**; `DEBT-0060` remains OPEN.
 Promotion, merge, main/trunk mutation, production dispatch, and SAKG resumption remain
 unauthorized.
+
+## Founder/Court disposition — 2026-09-01
+
+The Founder supplied the candidate-bound `COURT_SEALED` disposition for candidate
+`12a051e8fb2b2bb627395bd6982d25a4b26e8d13`, with evidence bundle SHA-256
+`a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`, report SHA-256
+`bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581`, and canonical receipt
+SHA-256 `eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7`. The matching
+receipt-file SHA-256 is `137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f`.
+
+Gate D (Event Watchdog and Safe Recovery) is now **COURT_SEALED**. External Court accounting
+advances to `Sealed: 4 | Remanded: 0 | Remediated: 0`, strict progress to `16/48 complete | 32
+remaining`, and `DEBT-0060` remains OPEN and carried forward. The disposition record is
+`reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`. Gate E is authorized, but must
+obtain independent candidate-bound evidence and its own Court disposition; no downstream gate,
+promotion, or SAKG resumption is implied.

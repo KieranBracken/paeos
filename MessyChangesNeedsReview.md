@@ -992,6 +992,17 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 the Founder supplied the candidate-bound `COURT_SEALED` disposition for Gate D,
+  candidate `12a051e8fb2b2bb627395bd6982d25a4b26e8d13`, binding evidence bundle SHA-256
+  `a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`, report SHA-256
+  `bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581`, receipt-file SHA-256
+  `137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f`, and canonical receipt
+  SHA-256 `eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7`. Gate D is
+  **COURT_SEALED**; external Court accounting is `4/0/0` and strict progress is **16/48
+  complete | 32 remaining**. `DEBT-0060` remains OPEN and is carried forward. The external
+  decision record is `reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`; Gate E
+  is authorized but requires its own fresh L13/L14/L17 evidence and Court disposition.
+
 - 2026-09-01 CURRENT Gate D candidate `12a051e8fb2b2bb627395bd6982d25a4b26e8d13`
   received a host-side one-shot Gemini L14/L17 audit against bundle
   `a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`. Report SHA is

@@ -4537,3 +4537,23 @@ qualified L14/L17 evidence, not an L16/Court seal. External accounting remains W
 Court 3/0/0; strict sealed progress remains 15/48 complete | 33 remaining; DEBT-0060 remains
 OPEN. A candidate-bound Gate D Court disposition request is the next step. No self-ratification,
 promotion, merge, main/trunk mutation, production dispatch, or SAKG resumption is implied.
+
+### Entry 258 — 2026-09-01: Founder/Court sealed Gate D and authorized Gate E
+
+The Founder supplied the candidate-bound `COURT_SEALED` disposition for Gate D (Event Watchdog
+and Safe Recovery), candidate `12a051e8fb2b2bb627395bd6982d25a4b26e8d13`. The disposition binds
+the qualified Gemini L14/L17 report SHA-256
+`bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581`, canonical receipt SHA-256
+`eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7`, and evidence bundle
+SHA-256 `a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc`. The receipt-file
+SHA-256 is `137c1c4210e3a1afbc8dfc95fa88b2c1a3989ee086df71f77d70477e4970d43f`.
+
+Physical provenance is Google `gemini-3.6-flash` / Gemini family versus the GLM builder, with
+exactly one provider attempt, no fallback, and A-08 `PASS`. The candidate-bound external L16
+record is `reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`.
+
+Gate D is now **SEALED**; external Court accounting advances to `Sealed: 4 | Remanded: 0 |
+Remediated: 0`, and strict progress advances to **16/48 complete | 32 remaining**. `DEBT-0060`
+remains **OPEN** and is carried forward to Gate E. This disposition does not authorize merge,
+promotion, main/trunk mutation, production dispatch, or SAKG resumption. Gate E must obtain its
+own candidate-bound L13/L14/L17 evidence and Court disposition.
