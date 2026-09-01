@@ -1017,3 +1017,13 @@ External accounting remains Worker **3/3/0**, Court **5/0/0**, and strict sealed
 complete | 31 remaining**. Required next steps are candidate-bound L13 reproduction, Gemini
 L14/L17 audit of the prepared package, and a separate Founder/Court disposition; Task 7 and all
 promotion/merge/main/trunk/SAKG operations remain forbidden.
+
+## 2026-09-01 — Gate F L14/L17 attempt rejected as truncated
+
+The one-shot Gemini audit for candidate `3c761a47370a9a7a93c893e1397379101108947e` and bundle
+`ec740b9d3ea794a5bdbceb0f519596d20383a6387d26ad61d881c198fd7ec617` had physical A-08 PASS but
+returned a report truncated before `AUDIT_COMPLETE: true`. The validator rejected it and preserved
+raw report/receipt/rejection artifacts under `/private/tmp/paeos-gate-f-l14-l17-*3c761a4*`; report,
+receipt-file, and rejection-metadata hashes are recorded in Notebook Entry 263. No retry, fallback,
+promotion, merge, or protected-ref mutation occurred. Gate F remains an implementation checkpoint;
+a materially smaller audit package is required before any L14/L17 qualification or Court request.

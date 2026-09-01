@@ -4635,3 +4635,18 @@ This is an implementation/bootstrap checkpoint only. External Worker/Court accou
 and `RB-0027` remain open. A fresh candidate-bound L13 reproduction and physically decorrelated
 L14/L17 audit are required before any Founder bootstrap disposition. No self-ratification, merge,
 promotion, main/trunk mutation, or SAKG resumption is implied.
+
+### Entry 263 — 2026-09-01: Gate F Gemini audit truncated and preserved
+
+The one-shot physical Gemini `gemini-3.6-flash` audit for candidate
+`3c761a47370a9a7a93c893e1397379101108947e` and bundle
+`ec740b9d3ea794a5bdbceb0f519596d20383a6387d26ad61d881c198fd7ec617` completed with A-08
+`PASS` (Gemini auditor versus GLM builder, one provider attempt, no fallback). The report stopped
+mid-finding before the mandatory `AUDIT_COMPLETE: true` marker and was rejected by the local
+validator. Rejected report SHA-256 is
+`1f9e2c2fb18e5d62fdd32a2fab38b9b36099b4015526913ec2382b5d82a68e79`; rejected receipt file
+SHA-256 is `3e5265d492c700e0eb276d80191ef3006bde973d576ae5fbf1db63ec620a62ad`; rejection metadata
+SHA-256 is `697a0e84f3a9c3c25c9f7fc6df992d59e97e2fc094ff53add4ef3ef18a397c4d`. The canonical
+disposition remains `BLOCKED_UNQUALIFIABLE`; raw artifacts are retained and no identical retry or
+fallback was performed. A materially smaller source-excerpt package is required for any future
+one-shot attempt.

@@ -1123,5 +1123,12 @@ is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Pair vali
   non-gateway collection is **1,154** with a loaded-run result of **1,152 passed / 2 Cline timeout
   assertions**; isolated rerun of all five corresponding cases passes. Repository Ruff/Pyright
   remain **557 / 120** inherited findings. No live route probes, bootstrap fact, promotion, merge,
-  or protected-ref mutation occurred. `DEBT-0060` and `RB-0027` remain open; fresh L13/L14/L17
-  evidence and Founder/Court disposition are mandatory.
+or protected-ref mutation occurred. `DEBT-0060` and `RB-0027` remain open; fresh L13/L14/L17
+evidence and Founder/Court disposition are mandatory.
+
+- 2026-09-01 Gate F Gemini L14/L17 attempt for candidate `3c761a4` was physically decorrelated
+  (Gemini vs GLM, A-08 PASS, one attempt) but the response truncated before `AUDIT_COMPLETE: true`.
+  Validator rejection and raw artifacts are preserved under `/private/tmp/paeos-gate-f-l14-l17-*3c761a4*`
+  with hashes in Notebook Entry 263. This is `BLOCKED_UNQUALIFIABLE`, not a pass; no identical
+  retry/fallback occurred. A materially smaller source-excerpt package is the only permitted next
+  audit attempt.
