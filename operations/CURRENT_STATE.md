@@ -999,3 +999,21 @@ Gate E is **SEALED**; Gate F progression is authorized on the isolated recovery 
 Worker/Court accounting is now **3/3/0** and **5/0/0**; strict progress is **17/48 complete |
 31 remaining**. No promotion, merge, main/trunk mutation, production dispatch, or SAKG
 resumption is authorized.
+
+## 2026-09-01 — Gate F implementation/bootstrap checkpoint
+
+Gate F implementation is present on commits `38e91c0`, `175599b`, and `6336808`; the current
+checkpoint adds the prepared manifest/review but is not a Gate F seal. Focused tests are **28/28
+passed**, changed-path Ruff/Pyright are clean, and three distinct one-shot synthetic canaries
+passed with raw evidence under `/private/tmp/paeos-gate-f-ladder-001` through `-003`.
+
+Repository-wide non-gateway collection is **1,154**. A loaded run reached 100% with **1,152
+passed and 2 Cline timeout assertions**; all five corresponding cases pass in isolation. Ruff
+reports **557 findings** and Pyright **120 errors**, preserved as unresolved static debt. Live
+route-probe/rotation/quota evidence and a Founder bootstrap fact are absent. The dormant
+promotion controller has not touched any ref. `DEBT-0060` and `RB-0027` remain open.
+
+External accounting remains Worker **3/3/0**, Court **5/0/0**, and strict sealed progress **17/48
+complete | 31 remaining**. Required next steps are candidate-bound L13 reproduction, Gemini
+L14/L17 audit of the prepared package, and a separate Founder/Court disposition; Task 7 and all
+promotion/merge/main/trunk/SAKG operations remain forbidden.

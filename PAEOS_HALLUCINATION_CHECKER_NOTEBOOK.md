@@ -4611,3 +4611,27 @@ is carried forward. External Worker accounting remains `Admitted: 3 | Rejected: 
 0`; Court accounting advances to `Sealed: 5 | Remanded: 0 | Remediated: 0`; strict progress
 advances to **17/48 complete | 31 remaining**. No promotion, merge, main/trunk mutation,
 production dispatch, or SAKG resumption is authorized by this disposition.
+
+### Entry 262 — 2026-09-01: Gate F implementation and bootstrap evidence checkpoint
+
+Gate F implementation commits `38e91c0`, `175599b`, and `6336808` were hardened on the isolated
+recovery branch. The focused activation/canary/promotion/fault-catalog suite collected and passed
+**28/28** with zero skips; changed-path Ruff and Pyright are clean. Activation now requires
+content-addressed evidence and unique transaction IDs, quarantines provenance conflicts and
+critical failures, and requires an explicit Founder-authority bootstrap fact. Canary observations
+bind the complete verifier manifest and cannot combine stale, replayed, or cross-transaction
+stages. Promotion is dormant by default and the disposable feature-ref test proves exact
+fast-forward/rollback/update-ref plumbing without touching protected refs.
+
+The no-promotion synthetic ladder ran three distinct one-shot canaries; all three PASS with raw
+artifacts under `/private/tmp/paeos-gate-f-ladder-001` through `-003`. Repository-wide static gates
+remain open debt: Ruff **557 findings** and Pyright **120 errors**. The full non-gateway collection
+is **1,154**; the loaded run produced **1,152 passes and 2 Cline timeout assertions**, while the
+five corresponding isolated cases pass. Raw logs and hashes are recorded in
+`operations/PAEOS_AUTONOMY_BOOTSTRAP_MANIFEST.json`.
+
+This is an implementation/bootstrap checkpoint only. External Worker/Court accounting remains
+**3/3/0** and **5/0/0**; strict progress remains **17/48 complete | 31 remaining**; `DEBT-0060`
+and `RB-0027` remain open. A fresh candidate-bound L13 reproduction and physically decorrelated
+L14/L17 audit are required before any Founder bootstrap disposition. No self-ratification, merge,
+promotion, main/trunk mutation, or SAKG resumption is implied.
