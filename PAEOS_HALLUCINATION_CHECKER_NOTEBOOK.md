@@ -4238,3 +4238,22 @@ This is preserved as **BLOCKED_UNQUALIFIABLE**, not a PASS or remand. The exact 
 was not retried. A materially smaller, separately authorized bundle is required if another audit
 is attempted. Worker remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; Court remains
 **Sealed: 0 | Remanded: 0 | Remediated: 0**; Gate A and later gates remain unsealed.
+
+### Entry 241 — 2026-09-01: Gemini PASS rejected by per-audit accounting contract mismatch
+
+The next distinct one-shot audit `l14-l17-11b75a2-gemini-epoch4-small-001` targeted candidate
+`11b75a2b06155a04e807395b8d5d3068975f05e3` and bundle SHA-256
+`d688fb788f88340760754eed82d287f1c95f7e374ba33daa27fa72961d2e23f6`. Gemini physically
+returned a complete candidate/evidence-bound report with `L14_STATUS: PASS`, concrete findings,
+and `AUDIT_COMPLETE: true`; A-08 was **PASS** (`gemini` versus `glm`), one provider attempt,
+and receipt SHA-256 was `27953f052db3e835c104e6a4cd1f39556bcfc50861921188b438d45abfa9deee`.
+The validator rejected the pair as `worker accounting mismatch` because the capture CLI contract
+expects the per-audit line `Worker: Admitted: 0 | Rejected: 1 | Remediated: 0`, while this prompt
+requested the aggregate epoch-4 ledger line `3 | 3 | 0`. Rejected report SHA-256 is
+`9219d2e1afe975d4b5d32e9e2aa46203f15db46126e6c0053d764ebf4cfe428e` and rejection metadata
+SHA-256 is `b9840d51547c169dd1c6cefa52119cb41eb8d5d348a6a7c68821946d6e9d718`.
+
+This is **BLOCKED_UNQUALIFIABLE** under the current validator; the complete report remains raw
+evidence and is not silently upgraded to a seal. No identical payload retry occurred. A new
+prompt must use the validator’s `0/1/0` per-audit accounting while separately describing the
+aggregate `3/3/0` worker evidence. Gate A remains unsealed.

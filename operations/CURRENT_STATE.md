@@ -633,3 +633,17 @@ restricted-loopback gateway fixture excluded. Raw log SHA-256 is
 pending candidate-bound non-GLM L14, L17, and Court/L16 evidence. Strict progress remains
 **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN. No promotion or
 SAKG resumption is authorized.
+
+## 2026-09-01 — Gemini PASS held by per-audit accounting contract mismatch
+
+The distinct audit `l14-l17-11b75a2-gemini-epoch4-small-001` returned a complete, physically
+Gemini-backed, candidate/evidence-bound `L14_STATUS: PASS` report with A-08 **PASS** and one
+provider attempt. The local capture validator rejected it as `worker accounting mismatch`: the
+CLI contract expects `Worker: Admitted: 0 | Rejected: 1 | Remediated: 0` for the audit artifact,
+while the prompt requested the aggregate epoch-4 ledger `3/3/0`. Receipt SHA-256 is
+`27953f052db3e835c104e6a4cd1f39556bcfc50861921188b438d45abfa9deee`; rejected report SHA-256
+is `9219d2e1afe975d4b5d32e9e2aa46203f15db46126e6c0053d764ebf4cfe428e`. The complete raw report
+and rejection metadata remain preserved; no identical retry occurred. Disposition is
+**BLOCKED_UNQUALIFIABLE**, Worker/Court remain **3/3/0** and **0/0/0**, and strict progress is
+still **12/48 complete | 36 remaining**. A new, materially distinct prompt must satisfy the
+per-audit contract before Gate A can advance.

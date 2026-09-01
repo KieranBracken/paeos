@@ -925,3 +925,11 @@ until this shutdown remediation is reviewed.
   `d5c8cfc334916007fb0cc7007110e3c7ebc342f9d484b1a85f26163046c2616e`. Disposition remains
   **BLOCKED_UNQUALIFIABLE**; exact payload was not retried. Worker/Court remain **3/3/0** and
   **0/0/0**; strict progress remains **12/48 complete | 36 remaining**.
+
+- 2026-09-01 Gemini audit `l14-l17-11b75a2-gemini-epoch4-small-001` produced a complete
+  candidate/evidence-bound `L14_STATUS: PASS` report with A-08 **PASS**, but the validator
+  rejected it as `worker accounting mismatch`: CLI expected per-audit `0/1/0`, while the prompt
+  requested aggregate `3/3/0`. Receipt SHA `27953f052db3e835c104e6a4cd1f39556bcfc50861921188b438d45abfa9deee`;
+  rejected report SHA `9219d2e1afe975d4b5d32e9e2aa46203f15db46126e6c0053d764ebf4cfe428e`. The exact
+  payload was not retried; disposition remains **BLOCKED_UNQUALIFIABLE** and strict progress
+  remains **12/48 complete | 36 remaining**.
