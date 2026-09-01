@@ -503,3 +503,15 @@ truncated frame. Result SHA-256 is
 Remediated: 0**. An `Exception ignored` `BrokenPipeError` appeared during child-stdin finalization;
 the adapter now closes stdin during cancellation, with a regression assertion. No third probe is
 authorized until this shutdown remediation is reviewed.
+
+## 2026-09-01 — Shutdown-fix probe remains unadmitted
+
+The third distinct one-shot GLM SDK probe (`glm-5-3-sdk-admission-03-shutdown-fix`) returned exit
+`1` with a canonical `TRANSPORT_FAILED` result and no `BrokenPipeError` or traceback. The host
+still emitted `ProtocolError("truncated frame")`. Result SHA-256 is
+`f3da043350b5cbf5496d889ad74b84fe1cc45e9d018950d097fd48747141a294`; failure-evidence SHA-256 is
+`eeeac11a291aac423bfbd36a954e7ce815f2adb8698f0abbbe6cc5f1f12d914b`; released-lease SHA-256 is
+`235f212c9bc33fc9b95dbf9d9794967b0ab7772d41edf11beea608f37f15492d`. Worker accounting is
+**Admitted: 0 | Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
+Remediated: 0**. `DEBT-0058` remains open and no further probe is authorized until a new recovery
+rationale addresses persistent host-frame truncation.

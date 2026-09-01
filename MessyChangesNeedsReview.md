@@ -836,4 +836,12 @@ syntax. The probe ID is retired; any new live attempt needs a distinct ID and wr
   **Admitted: 0 | Rejected: 2 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
   Remediated: 0**. The command emitted an `Exception ignored` `BrokenPipeError` during child-stdin
   finalization; a regression now closes stdin in the cancellation path. No third probe is authorized
-  until this shutdown remediation is reviewed.
+until this shutdown remediation is reviewed.
+
+- 2026-09-01 the third distinct GLM SDK probe (`glm-5-3-sdk-admission-03-shutdown-fix`) returned a
+  clean canonical `TRANSPORT_FAILED` result after another truncated host frame, with no
+  `BrokenPipeError`. Result SHA-256 is
+  `f3da043350b5cbf5496d889ad74b84fe1cc45e9d018950d097fd48747141a294`; worker accounting is
+  **Admitted: 0 | Rejected: 3 | Remediated: 0** and Court remains **Sealed: 0 | Remanded: 0 |
+  Remediated: 0**. The route remains unadmitted and no further probe is authorized until a new
+  recovery rationale addresses the persistent host-frame truncation.

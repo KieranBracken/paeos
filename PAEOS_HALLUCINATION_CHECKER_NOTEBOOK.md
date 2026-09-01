@@ -4027,3 +4027,16 @@ The lease was nevertheless released and no traceback escaped the command's canon
 This is a shutdown-hygiene defect, not an admission. A focused regression test now requires stdin
 closure during cancellation; the next remediation is committed separately and no third probe is
 authorized until it is reviewed.
+
+### Entry 233 — 2026-09-01: Shutdown-fix probe cleanly rejected at host protocol boundary
+
+The third distinct one-shot probe, `glm-5-3-sdk-admission-03-shutdown-fix`, ran after commit
+`0efbd33fc6f6c80475d40307a7fc6a0211d6da51`. It returned exit `1` with a canonical
+`TRANSPORT_FAILED` admission result and no `BrokenPipeError` or traceback. The host still emitted
+`ProtocolError("truncated frame")`, so the GLM route remains unadmitted. Result SHA-256 is
+`f3da043350b5cbf5496d889ad74b84fe1cc45e9d018950d097fd48747141a294`; failure-evidence SHA-256 is
+`eeeac11a291aac423bfbd36a954e7ce815f2adb8698f0abbbe6cc5f1f12d914b`; released-lease SHA-256 is
+`235f212c9bc33fc9b95dbf9d9794967b0ab7772d41edf11beea608f37f15492d`. Canonical worker accounting
+is now **Admitted: 0 | Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 |
+Remediated: 0**. `DEBT-0058` remains OPEN. No further probe is authorized until a new recovery
+rationale addresses the persistent host-frame truncation.
