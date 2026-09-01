@@ -1047,3 +1047,25 @@ payload SHA-256: `52096bf4452db43c3b575f59e2d7951a94410b08c38d8a9e2e34b50257943a
 `BLOCKED_UNQUALIFIABLE`, not a Gate F pass. No retry, fallback, code change, promotion, merge,
 or protected-ref mutation occurred. Gate F remains **17/48 complete | 31 remaining** and
 requires a newly authorized materially changed package for another audit attempt.
+
+## 2026-09-02 — Gate F current-candidate L14/L17 audit qualified
+
+A materially smaller current-HEAD package was dispatched once under audit ID
+`l14-l17-61521f7-gate-f-micro-001`. Candidate
+`61521f7429462a4e015feb285cb20a5b39c78294` is bound to bundle SHA-256
+`d4972ac908f41807366d33a4aaaa9b18ffa006914374cd36ab1d70213f3c02ed`; prompt SHA-256
+`22f4a2ab41728264a8421b2714ca82eecf353e69cc899f69cd9c03c1124dda64`. Google
+`gemini-3.6-flash` returned a complete qualified report: report SHA-256
+`5261730a1cf4acf127d58116317dc358591bdf6197a36d951f43b93dfaeaccbb`, receipt-file SHA-256
+`03722b7fc0a4af3db971e8bab28bcd5f4dc10e512193f93f0e1418cad036ca66`, canonical receipt SHA-256
+`afe02a7540b7fd72d3f6da95c8a0c7a72069e7d89715500b48061e65d7abc3c6`. Physical Gemini family
+differs from the GLM builder; A-08 passed, one attempt, no fallback. Router observation `1083`
+recorded 9,788 prompt and 336 completion tokens.
+
+The report is candidate/evidence bound, contains concrete findings, and ends with
+`AUDIT_COMPLETE: true`; local adjudication is `qualified=true`, `L14_STATUS: PASS`. This is
+L14/L17 evidence only: Gate F remains **IMPLEMENTATION_CHECKPOINT — NOT SEALED**. Focused tests
+remain **28/28**, synthetic ladder **3/3**, loaded non-gateway result **1,152/1,154** with two
+pre-existing Cline timeout assertions (isolated cases 5/5), and repository static debt remains
+Ruff **557** / Pyright **120**. `DEBT-0060` and `RB-0027` remain OPEN. A separate Founder/Court
+L16 bootstrap disposition is required before any Gate F seal, Task 7, promotion, or SAKG work.

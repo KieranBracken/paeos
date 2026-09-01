@@ -1140,3 +1140,11 @@ evidence and Founder/Court disposition are mandatory.
   validator rejected it; report, receipt, and rejection metadata hashes are recorded in Notebook
   Entry 264. Disposition is `BLOCKED_UNQUALIFIABLE`; no retry/fallback, code change, promotion,
   merge, or protected-ref mutation occurred. Gate F remains **17/48 complete | 31 remaining**.
+
+- 2026-09-02 Gate F current-candidate micro audit qualified: candidate
+  `61521f7429462a4e015feb285cb20a5b39c78294`, bundle `d4972ac908f41807366d33a4aaaa9b18ffa006914374cd36ab1d70213f3c02ed`,
+  report `5261730a1cf4acf127d58116317dc358591bdf6197a36d951f43b93dfaeaccbb`, receipt-file
+  `03722b7fc0a4af3db971e8bab28bcd5f4dc10e512193f93f0e1418cad036ca66`, canonical receipt
+  `afe02a7540b7fd72d3f6da95c8a0c7a72069e7d89715500b48061e65d7abc3c6`. Gemini vs GLM physical
+  provenance, A-08 PASS, one attempt, no fallback; report complete and validator qualified.
+  This is L14/L17 evidence only; Gate F remains unsealed pending Founder/Court L16 bootstrap.
