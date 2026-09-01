@@ -800,6 +800,16 @@ Z0 content, so Gate C is **AUTHORIZED, NOT SEALED** pending that constitutional 
 Founder/Court disposition. No Gate D, production dispatch, promotion, or SAKG resumption is
 authorized.
 
+## 2026-09-01 — Gate C failed audit attempts preserved
+
+The initial `f0be9ab` audit dispatch was rejected locally for a noncanonical prompt before any
+provider call. A materially distinct full-bundle dispatch reached Gemini once (A-08 PASS) but
+returned a 735-byte unbound report; the validator preserved and rejected it. Rejected report SHA
+is `94454606f04189b804c2aceb5929571d8d46c0851a7d75256146c5ad378a6a14`, rejected receipt file SHA
+is `bb6936cd5e8c0bf7a5ee11727b78bd709ecbd74c7badd9f241cbbe23ebb1c108`, and rejection metadata
+SHA is `56d7039d18de7e4920f7b821a3e99c4cfe36ee71178348b3c78cd4cedd300b29`. No retry or fallback
+occurred. The compact attempt recorded separately is the only qualified current Gate C pair.
+
 ## 2026-09-01 — Gate B L17 checkpoint recorded
 
 The qualified `993b6cc` Gemini pair and the Gate B L17 retrospective are recorded in the review

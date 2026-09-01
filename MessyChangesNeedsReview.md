@@ -997,10 +997,18 @@ candidate-bound audit and disposition.
   `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. Report SHA-256 is
   `ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`; receipt file SHA-256 is
   `fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`; canonical receipt SHA-256
-  is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Pair validation passed,
+is `b2f09e29b9ddc060bc866ab3eba84a6e35ce362f0664d487ff415275384eaed6`. Pair validation passed,
   A-08 `gemini != glm`, one attempt, no fallback. The report's `DEBT-0058` open note is stale
   against the Founder Gate A repayment; only `DEBT-0060` remains OPEN. Synthetic canaries are not
   ratified Z0, so Gate C remains unsealed pending that boundary and Founder/Court disposition.
+
+- 2026-09-01 Gate C audit dispatch failures are preserved: one local `AuditorPromptError` before
+  provider contact due missing canonical prompt markers, followed by one materially distinct Gemini
+  call that returned a 735-byte unbound report. Rejected report SHA is
+  `94454606f04189b804c2aceb5929571d8d46c0851a7d75256146c5ad378a6a14`; rejected receipt SHA is
+  `bb6936cd5e8c0bf7a5ee11727b78bd709ecbd74c7badd9f241cbbe23ebb1c108`; rejection metadata SHA is
+  `56d7039d18de7e4920f7b821a3e99c4cfe36ee71178348b3c78cd4cedd300b29`. No retry/fallback occurred;
+  the later compact pair is the only qualified audit.
 
 - 2026-09-01 Gate C fresh verification at current recovery HEAD `8706917`: focused provider,
   supervisor, canary, and model-router compatibility tests **156/156 passed**; model-router/runtime

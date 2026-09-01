@@ -4449,3 +4449,16 @@ The report's statement that `DEBT-0058` is open is stale and is corrected by the
 Gate A seal (`DEBT-0058` REPAID); `DEBT-0060` remains OPEN. The report also confirms that the
 synthetic canary ladder does not satisfy ratified Z0. Gate C therefore remains unsealed, pending
 the Z0 boundary and a separate Founder/Court disposition. No Gate D or SAKG work is authorized.
+
+### Entry 254 — 2026-09-01: Gate C audit dispatch failures preserved
+
+The first prepared `f0be9ab` dispatch was rejected locally as `AuditorPromptError` because the
+generated prompt omitted the canonical phase and evidence-delimiter markers. No provider call or
+artifact was created. A materially corrected full-bundle attempt then reached Google Gemini once
+(`gemini` family, A-08 PASS) but returned a 735-byte partial report without candidate binding;
+the validator rejected it as `audit report does not bind candidate`. Rejected report SHA-256 is
+`94454606f04189b804c2aceb5929571d8d46c0851a7d75256146c5ad378a6a14`, rejected receipt file
+SHA-256 is `bb6936cd5e8c0bf7a5ee11727b78bd709ecbd74c7badd9f241cbbe23ebb1c108`, and rejection
+metadata SHA-256 is `56d7039d18de7e4920f7b821a3e99c4cfe36ee71178348b3c78cd4cedd300b29`. No retry or
+fallback occurred. The later compact attempt is the separately authorized qualified pair recorded
+in Entry 253.
