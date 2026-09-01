@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-02 (Gate F L13/L14 evidence prepared; Founder/Court L16 pending)
+> **Last updated:** 2026-09-02 (Gate F sealed; one-time isolated bootstrap integrated)
 
 ## Current canonical recovery frontier — 2026-09-02
 
 - **Branch:** `codex/control-plane-recovery-s1-clean-recovered` (isolated; no main/trunk mutation).
-- **Gate status:** Gates A–E **SEALED**; Gate F is at a qualified implementation checkpoint and
-  remains **UNSEALED** pending the Founder/Court L16 bootstrap disposition.
-- **Strict sealed progress:** **17/48 complete | 31 remaining** (the separate granular task count
+- **Gate status:** Gates A–F **SEALED** on candidate-bound dispositions; Gate F is sealed as a
+  bounded pre-bootstrap checkpoint. Post-bootstrap activation evidence is still pending.
+- **Strict sealed progress:** **18/48 complete | 30 remaining** (the separate granular task count
   remains larger; this is the constitutional sealed-progress counter).
 - **Worker accounting:** **Admitted: 3 | Rejected: 3 | Remediated: 0**.
-- **Court accounting:** **Sealed: 5 | Remanded: 0 | Remediated: 0**.
+- **Court accounting:** **Sealed: 6 | Remanded: 0 | Remediated: 0**.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain **OPEN** and are carried forward.
 - **SAKG/production:** paused; no production dispatch, merge, promotion, or main/trunk mutation is
   authorized until later gates and the final lifecycle disposition are complete.
@@ -22,8 +22,11 @@ The current Gate F implementation candidate is
 `61521f7429462a4e015feb285cb20a5b39c78294`; its qualified L14/L17 checkpoint is
 `reviews/tasks/PAEOS_GATE_F_L14_L17_61521F7_CHECKPOINT.md`, L13 reproduction is
 `reviews/tasks/PAEOS_GATE_F_L13_REPRODUCTION_61521F7.md`, and bootstrap evidence is
-`operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json`. The separate Founder/Court L16
-bootstrap disposition remains pending.
+`operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json`. The Founder/Court L16 disposition
+and one-time isolated bootstrap integration are recorded in
+`reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_61521F7.md` and
+`reviews/tasks/PAEOS_GATE_F_BOOTSTRAP_INTEGRATION_61521F7.md`. Post-bootstrap activation remains
+`SUPERVISED_RECOVERY_ONLY` with `MINIMUM_PROBES_OUTSTANDING`; no promotion authority was minted.
 
 The current Gate D candidate-bound L16 record is
 `reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`; its qualified L14/L17
@@ -1105,3 +1108,31 @@ manifest SHA-256 `24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e28283
 `DEBT-0060`/`RB-0027`, Ruff 557, Pyright 120, two loaded Cline timeout assertions, and absent
 live route/rotation/quota evidence. Status is **PENDING FOUNDER/COURT DECISION**; no bootstrap
 authority, Task 7 promotion, merge, protected-ref mutation, or SAKG resumption is authorized.
+
+## 2026-09-02 — Founder/Court sealed Gate F and isolated bootstrap integrated
+
+The Founder supplied the candidate-bound `COURT_SEALED` disposition for Gate F candidate
+`61521f7429462a4e015feb285cb20a5b39c78294`, authorizing exactly one isolated bootstrap integration
+against manifest SHA-256 `24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`.
+The disposition is recorded at
+`reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_61521F7.md` (SHA-256
+`6330ce7532a6b46bb10de0127b82b6eb303bd0d9b92f8bf3ff24d61c0dc065ab`).
+
+The one-time integration executed in the fresh private state root
+`/private/tmp/paeos-gate-f-bootstrap-state-61521f7-v2` and is documented at
+`reviews/tasks/PAEOS_GATE_F_BOOTSTRAP_INTEGRATION_61521F7.md`. CAS verification succeeded for
+the exact manifest and disposition. The ledger contains one `FOUNDER_BOOTSTRAP_SEALED` event
+(`seq=1`, authority `FOUNDER`) with verified head
+`3cab1e7bab66592399f56ef5a00fcd03ac68f02809293efe9167e4a7998687e8`; the result artifact SHA-256
+is `734d79086d149ba383026461750329260889e48370fe098303590be82cd468c4` and the ledger file
+SHA-256 is `81daace049970ea2bdd0ff203c4be5922c4ff381d80e6c5f49acecf7f9d4ab94`.
+
+Bootstrap fact verification is `true`, but derived activation remains
+`SUPERVISED_RECOVERY_ONLY` with blocker `MINIMUM_PROBES_OUTSTANDING`; the fresh state has zero
+live route probes, rotations, quota stops, Trace-A end-to-end runs, or promotions. This is an
+honest bounded result, not a failure and not an activation claim. External Court accounting is
+now **Sealed: 6 | Remanded: 0 | Remediated: 0** and strict sealed progress is **18/48 complete |
+30 remaining**; `DEBT-0060` and `RB-0027` remain OPEN. No production state, credentials,
+protected ref, promotion, merge, push, main/trunk, or SAKG state was touched. Task 7 and the
+post-bootstrap evidence window remain held pending their own candidate-bound authorization and
+live prerequisites.

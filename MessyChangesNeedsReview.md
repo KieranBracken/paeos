@@ -1167,3 +1167,16 @@ evidence and Founder/Court disposition are mandatory.
   `61521f7` and manifest SHA-256 `24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`.
   It requests only isolated bootstrap integration if explicitly sealed; Task 7/promotion and
   protected refs remain held. No disposition was self-issued.
+
+- 2026-09-02 Founder/Court supplied `COURT_SEALED` for Gate F candidate `61521f7` and authorized
+  one-time isolated bootstrap integration against manifest SHA-256
+  `24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`. The exact disposition
+  and integration review are recorded at
+  `reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_61521F7.md` and
+  `reviews/tasks/PAEOS_GATE_F_BOOTSTRAP_INTEGRATION_61521F7.md`. A fresh private state root
+  recorded one `FOUNDER_BOOTSTRAP_SEALED` ledger event with verified head
+  `3cab1e7bab66592399f56ef5a00fcd03ac68f02809293efe9167e4a7998687e8`; activation remains
+  `SUPERVISED_RECOVERY_ONLY` / `MINIMUM_PROBES_OUTSTANDING` because no live route, rotation,
+  quota-stop, Trace-A, or promotion evidence exists in that root. Court is now `6/0/0`, strict
+  sealed progress `18/48 complete | 30 remaining`; `DEBT-0060` and `RB-0027` remain OPEN. No
+  promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.

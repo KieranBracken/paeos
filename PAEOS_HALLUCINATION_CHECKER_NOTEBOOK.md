@@ -4743,3 +4743,30 @@ Disposition is `BLOCKED_UNQUALIFIABLE`, not a Gate F pass. No retry, fallback, c
 promotion, merge, protected-ref mutation, or SAKG resumption occurred. Gate F remains an
 implementation checkpoint at **17/48 complete | 31 remaining**; a further audit requires fresh
 authorization for a materially changed package.
+
+### Entry 269 — 2026-09-02: Gate F Founder/Court seal and bounded bootstrap integration
+
+The Founder supplied the candidate-bound `COURT_SEALED` disposition for Gate F candidate
+`61521f7429462a4e015feb285cb20a5b39c78294` and authorized exactly one isolated bootstrap
+integration against manifest SHA-256
+`24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`. The signed-on-disk
+disposition is `reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_61521F7.md` with SHA-256
+`6330ce7532a6b46bb10de0127b82b6eb303bd0d9b92f8bf3ff24d61c0dc065ab`.
+
+The one-time integration ran only in fresh state root
+`/private/tmp/paeos-gate-f-bootstrap-state-61521f7-v2`. CAS stored the exact manifest and
+disposition; ledger sequence 1 is `FOUNDER_BOOTSTRAP_SEALED` with authority `FOUNDER`, candidate
+`61521f7`, and verified head
+`3cab1e7bab66592399f56ef5a00fcd03ac68f02809293efe9167e4a7998687e8`. Result SHA-256 is
+`734d79086d149ba383026461750329260889e48370fe098303590be82cd468c4`; ledger file SHA-256 is
+`81daace049970ea2bdd0ff203c4be5922c4ff381d80e6c5f49acecf7f9d4ab94`.
+
+`bootstrap_fact_verified=true`, but activation correctly remains
+`SUPERVISED_RECOVERY_ONLY` with `MINIMUM_PROBES_OUTSTANDING`; the fresh root contains zero live
+route probes, rotations, quota stops, Trace-A runs, or promotions. This bounded result does not
+fabricate evidence or mint promotion authority. External Court accounting is now **Sealed: 6 |
+Remanded: 0 | Remediated: 0** and strict sealed progress is **18/48 complete | 30 remaining**.
+`DEBT-0060` and `RB-0027` remain OPEN. No production state, credentials, protected ref,
+promotion, merge, push, main/trunk, or SAKG state was touched. The first helper attempt failed
+before ledger creation due an isolated import-path error; its empty state root is preserved and
+not counted as an integration run.
