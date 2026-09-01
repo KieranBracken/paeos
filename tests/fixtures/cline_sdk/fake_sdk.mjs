@@ -82,6 +82,17 @@ export class ClineCore {
         }),
       );
     }
+    if (probe?.probe_id === "probe-early-provider-attempt") {
+      await this.options.fetch(new Request("data:application/json,%7B%7D"));
+      this.emit({
+        type: "session_ended",
+        sessionId,
+        result: {
+          model: { id: input.config.modelId, provider: input.config.providerId },
+        },
+      });
+      return { sessionId, manifestPath, messagesPath };
+    }
     setTimeout(async () => {
       try {
         if (probe?.probe_id === "probe-timeout-unfinished") {

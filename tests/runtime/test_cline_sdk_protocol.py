@@ -26,6 +26,12 @@ HOST = ROOT / "runtime/integrations/cline_sdk_host.mjs"
 FAKE_SDK = ROOT / "tests/fixtures/cline_sdk/fake_sdk.mjs"
 
 
+def _host_env() -> dict[str, str]:
+    env = os.environ.copy()
+    env["CLINE_DATA_DIR"] = "/profile"
+    return env
+
+
 def _host_event(
     event_type: str,
     sequence: int,
@@ -172,6 +178,7 @@ def test_node_host_forwards_tool_request_and_waits_for_python_decision() -> None
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env=_host_env(),
     )
     try:
         _write(process, _start_message())
@@ -251,6 +258,43 @@ def test_node_host_emits_terminal_failure_when_core_start_raises(tmp_path: Path)
         process.wait(timeout=5)
 
 
+def test_node_host_binds_session_before_early_provider_attempt(tmp_path: Path) -> None:
+    env = os.environ.copy()
+    env["CLINE_DATA_DIR"] = str(tmp_path / "cline")
+    process = subprocess.Popen(
+        ["node", str(HOST)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    message = _start_message()
+    message["payload"]["prompt"] = "PAEOS_SDK_PROBE:" + json.dumps(
+        {
+            "artifact_path": "/sandbox/artifact.txt",
+            "expected_text": "admitted-worker\n",
+            "initial_text": "baseline-worker\n",
+            "probe_id": "probe-early-provider-attempt",
+            "verification_command": "python3 verify_probe.py",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    try:
+        _write(process, message)
+        first = [_read(process) for _ in range(4)]
+        assert [event["type"] for event in first] == [
+            "hello",
+            "session_created",
+            "provider_attempt_started",
+            "provider_attempt_finished",
+        ]
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
+
+
 def test_node_host_normalizes_known_auth_start_failure(tmp_path: Path) -> None:
     env = os.environ.copy()
     env["CLINE_DATA_DIR"] = str(tmp_path / "cline")
@@ -297,6 +341,7 @@ def test_attempt_events_are_matched_and_content_free() -> None:
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env=_host_env(),
     )
     try:
         _write(process, _start_message())
@@ -320,6 +365,7 @@ def test_second_fetch_before_tool_result_is_same_turn_retry_and_fails_closed() -
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env=_host_env(),
     )
     message = _start_message()
     message["payload"]["prompt"] = "double-fetch-before-tool"  # type: ignore[index]

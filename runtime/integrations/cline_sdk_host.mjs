@@ -312,6 +312,16 @@ async function main() {
         forwardTool({ callId: randomUUID(), input, toolName: "run_commands" }),
     },
   };
+  const dataRoot = process.env.CLINE_DATA_DIR;
+  if (typeof dataRoot !== "string" || !isAbsolute(dataRoot)) {
+    throw new ProtocolError("profile data root unavailable for session binding");
+  }
+  const sessionRoot = `${dataRoot}/sessions/${sessionId}`;
+  const manifestPath = `${sessionRoot}/manifest.json`;
+  const messagesPath = `${sessionRoot}/messages.json`;
+  // ClineCore.start may begin a provider turn before its promise resolves. Bind
+  // the session before invoking it so every subsequent event has an identity.
+  emit("session_created", { manifest_path: manifestPath, messages_path: messagesPath });
   let result;
   try {
     result = await core.start({
@@ -336,13 +346,6 @@ async function main() {
       },
     });
   } catch (error) {
-    const dataRoot = process.env.CLINE_DATA_DIR;
-    if (typeof dataRoot !== "string" || !isAbsolute(dataRoot)) {
-      throw new ProtocolError("profile data root unavailable for start failure");
-    }
-    const sessionRoot = `${dataRoot}/sessions/${sessionId}`;
-    const manifestPath = `${sessionRoot}/manifest.json`;
-    const messagesPath = `${sessionRoot}/messages.json`;
     await mkdir(sessionRoot, { recursive: true });
     await writeFile(
       manifestPath,
@@ -361,7 +364,6 @@ async function main() {
       }),
     );
     await writeFile(messagesPath, JSON.stringify({ messages: [], sessionId }));
-    emit("session_created", { manifest_path: manifestPath, messages_path: messagesPath });
     const failurePayload = {
       error_class: error instanceof Error ? error.name : "UnknownError",
     };
@@ -380,11 +382,18 @@ async function main() {
     emit("failure", failurePayload);
     return;
   }
-  if (result.sessionId !== sessionId) throw new ProtocolError("session identity mismatch");
-  emit("session_created", {
-    manifest_path: result.manifestPath,
-    messages_path: result.messagesPath,
-  });
+  if (result.sessionId !== sessionId) {
+    emit("failure", { error_class: "ProtocolError" });
+    unsubscribe();
+    await core.stop(sessionId);
+    return;
+  }
+  if (result.manifestPath !== manifestPath || result.messagesPath !== messagesPath) {
+    emit("failure", { error_class: "ProtocolError" });
+    unsubscribe();
+    await core.stop(sessionId);
+    return;
+  }
   emit("capability_snapshot", {
     backend_mode: "local",
     disable_mcp_settings_tools: true,

@@ -325,8 +325,11 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             payload = event["payload"]
             assert isinstance(payload, dict)
             if event_type == "session_created":
-                manifest_path = self._profile_path(payload.get("manifest_path"))
-                messages_path = self._profile_path(payload.get("messages_path"))
+                # The SDK may publish this binding before it has persisted the
+                # artifacts; defer strict existence/symlink checks until the
+                # terminal event has arrived and the files are read.
+                manifest_path = self._profile_event_path(payload.get("manifest_path"))
+                messages_path = self._profile_event_path(payload.get("messages_path"))
             elif event_type == "capability_snapshot":
                 capability_snapshot = payload
             elif event_type == "provider_attempt_started":
@@ -405,6 +408,9 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             raise AdmissionError("provider attempt telemetry mismatch")
         if manifest_path is None or messages_path is None or terminal_payload is None:
             raise AdmissionError("SDK evidence incomplete")
+
+        manifest_path = self._profile_path(str(manifest_path))
+        messages_path = self._profile_path(str(messages_path))
 
         manifest = self._load_json_object(manifest_path)
         messages = self._load_json_object(messages_path)
@@ -634,6 +640,17 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         if path.is_symlink():
             raise AdmissionError("SDK profile evidence symlink")
         resolved = path.resolve(strict=True)
+        if not resolved.is_relative_to(self._config.profile.root.resolve(strict=True)):
+            raise AdmissionError("SDK profile evidence path escaped")
+        return resolved
+
+    def _profile_event_path(self, value: object) -> Path:
+        if not isinstance(value, str):
+            raise AdmissionError("SDK profile evidence path missing")
+        path = Path(value)
+        if path.is_symlink():
+            raise AdmissionError("SDK profile evidence symlink")
+        resolved = path.resolve(strict=False)
         if not resolved.is_relative_to(self._config.profile.root.resolve(strict=True)):
             raise AdmissionError("SDK profile evidence path escaped")
         return resolved
