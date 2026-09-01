@@ -124,4 +124,19 @@ Court `SEALED` row or Founder L16 ratification is present in canonical accountin
 an audit-qualified checkpoint, not a constitutional seal; strict sealed progress remains
 **12/48 complete | 36 remaining**.
 
+## Current Validator Reconciliation — 2026-09-01
+
+The historical `3e44133` Gemini audit pair was rechecked against the validator currently shipped
+on the recovery branch. Candidate and evidence bindings are present and the report SHA still
+matches the receipt (`e44e2ab0e4ce3a5e5a44b993643b058e8095f418fd205e8f52345fc5e0ba37d1`), but
+`validate_auditor_report()` rejects it because the report contains zero required terminal markers
+`AUDIT_COMPLETE: true` (the validator requires exactly one, as the final non-blank line). This is
+a fail-closed validation result; raw artifacts remain preserved and no identical payload is retried.
+
+The old audit-qualified checkpoint is therefore not consumable as current Gate B L14 evidence.
+Tasks 5.3–5.5 remain incomplete and Gate B remains **UNSEALED** pending a materially new,
+candidate-bound non-GLM audit pair that passes the current validator, followed by its own L16/Court
+disposition. Gate A's Founder seal does not seal Gate B. External accounting is Worker
+**Admitted: 3 | Rejected: 3 | Remediated: 0**, Court **Sealed: 1 | Remanded: 0 | Remediated: 0**,
+and strict progress remains **13/48 complete | 35 remaining**.
 

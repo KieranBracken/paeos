@@ -4321,3 +4321,15 @@ historical SQLite ledger was rewritten and no ref was promoted. Gate A is now **
 the external Gate A Court disposition is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict
 progress advances to **13/48 complete | 35 remaining**. Gate B work is authorized under its
 approved plan; its own candidate-bound L14/L17 and L16 disposition remain mandatory.
+
+### Entry 246 — 2026-09-01: stale Gate B audit pair rejected by current validator
+
+The historical Gate B `3e44133` Gemini receipt/report pair was revalidated without changing any
+artifact. Candidate and evidence bindings are present and the report SHA still matches the
+receipt, but `validate_auditor_report()` fails closed with `audit report must contain exactly one
+completion marker`: the report has zero `AUDIT_COMPLETE: true` lines. The old prose claim of a
+qualified audit is retained as historical raw evidence only and is not a current L14 pass. No
+identical request was retried. Gate B Tasks 5.3–5.5 remain open and Gate B is unsealed; its next
+permitted action is a fresh, materially distinct candidate-bound non-GLM audit followed by a
+separate L16/Court disposition. External counts remain Worker **3/3/0**, Court **1/0/0**, and
+strict progress **13/48 complete | 35 remaining** after the Founder-sealed Gate A decision.

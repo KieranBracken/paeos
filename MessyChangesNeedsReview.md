@@ -966,4 +966,12 @@ until this shutdown remediation is reviewed.
   `DEBT-0058` REPAID; external Court accounting is **1/0/0**, worker accounting remains **3/3/0**,
   and strict progress is **13/48 complete | 35 remaining**. Historical SQLite ledgers were not
   rewritten; no merge, promotion, or main/trunk mutation occurred. Gate B still requires its own
-  candidate-bound audit and disposition.
+candidate-bound audit and disposition.
+
+- 2026-09-01 current-validator reconciliation found the historical Gate B `3e44133` Gemini
+  report/receipt pair is not consumable: candidate/evidence bindings and report digest match, but
+  the report contains zero required `AUDIT_COMPLETE: true` terminal markers. The validator rejected
+  it fail-closed; raw artifacts remain preserved and no identical payload was retried. Gate B
+  Tasks 5.3–5.5 remain open and Gate B is unsealed pending a fresh materially distinct non-GLM
+  audit pair and its own L16/Court disposition. External counts remain Worker **3/3/0**, Court
+  **1/0/0**, strict progress **13/48 complete | 35 remaining**.

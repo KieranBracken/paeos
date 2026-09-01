@@ -704,3 +704,18 @@ occurred. Worker accounting is **Admitted: 3 | Rejected: 3 | Remediated: 0**; ex
 Court accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict progress advances to
 **13/48 complete | 35 remaining**. Gate B work is authorized under its approved plan, but its own
 candidate-bound audit and L16 disposition remain mandatory before Gate C or production dispatch.
+
+## 2026-09-01 — Gate B stale audit pair rejected by current validator
+
+Read-only revalidation of the historical `3e44133` Gate B Gemini report/receipt pair found the
+candidate SHA, evidence-bundle SHA, and report digest correctly bound, but the report has zero
+`AUDIT_COMPLETE: true` terminal markers. The current `validate_auditor_report()` contract requires
+exactly one marker as the final non-blank line, so the pair is **BLOCKED_UNQUALIFIABLE** for current
+use. Raw artifacts remain preserved; no identical payload was retried and no files or ledgers were
+rewritten.
+
+Gate B Tasks 5.3–5.5 remain incomplete and Gate B remains **UNSEALED** pending a fresh
+candidate-bound non-GLM audit pair plus a separate L16/Court disposition. Gate A is sealed by the
+Founder record above. External Worker/Court accounting is **3/3/0** and **1/0/0** respectively;
+strict progress is **13/48 complete | 35 remaining**. No Gate C advancement, production dispatch,
+promotion, or SAKG resumption is authorized.
