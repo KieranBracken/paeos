@@ -4706,6 +4706,21 @@ findings, two loaded Cline timeout assertions (isolated 5/5 pass), `DEBT-0060`, 
 The manifest is preparation evidence only. No promotion, merge, protected-ref mutation, or SAKG
 resumption occurred; the Founder/Court L16 disposition remains the next constitutional action.
 
+### Entry 268 — 2026-09-02: Gate F Founder/Court L16 disposition request prepared
+
+The candidate-bound request is recorded at
+`reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_REQUEST_61521F7.md`. It presents the
+bootstrap manifest `operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json` (SHA-256
+`24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`), fresh L13 28/28
+reproduction, qualified Gemini L14/L17 evidence (report `5261730a…`, canonical receipt
+`afe02a754…`), and three synthetic no-promotion canaries. It explicitly carries `DEBT-0060`,
+`RB-0027`, Ruff 557, Pyright 120, the two loaded Cline timeout assertions, and absent live
+route/rotation/quota evidence.
+
+The request asks the Founder/Court to choose a precise L16 disposition. If sealed, authorization
+is limited to one isolated bootstrap integration; Task 7 promotion, protected refs, main/trunk,
+merge/push, and SAKG remain prohibited. No disposition is implied or self-issued.
+
 ### Entry 264 — 2026-09-01: Gate F compact Gemini audit reached provider but was rejected as incomplete
 
 Following the sandbox-boundary diagnosis, the authorized host-level one-shot dispatch used the

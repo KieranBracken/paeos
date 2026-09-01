@@ -1095,3 +1095,13 @@ debt. Status is `AWAITING_FOUNDER_L16_DISPOSITION`; the manifest cannot mint aut
 route/rotation/quota evidence is absent, Ruff/Pyright remain 557/120, two loaded Cline timeout
 assertions remain (isolated 5/5 pass), and `DEBT-0060`/`RB-0027` remain OPEN. No promotion,
 merge, protected-ref mutation, or SAKG resumption occurred.
+
+## 2026-09-02 — Gate F Founder/Court L16 disposition request prepared
+
+The exact candidate-bound request is
+`reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_REQUEST_61521F7.md`. It references bootstrap
+manifest SHA-256 `24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`, fresh L13
+28/28, qualified Gemini L14/L17, and three synthetic no-promotion canaries. It carries open
+`DEBT-0060`/`RB-0027`, Ruff 557, Pyright 120, two loaded Cline timeout assertions, and absent
+live route/rotation/quota evidence. Status is **PENDING FOUNDER/COURT DECISION**; no bootstrap
+authority, Task 7 promotion, merge, protected-ref mutation, or SAKG resumption is authorized.
