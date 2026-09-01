@@ -3,7 +3,24 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-08-31 (legacy GUI bridge retirement checkpoint)
+> **Last updated:** 2026-09-01 (Founder/Court Gate C seal; Gate D authorized)
+
+## Current canonical recovery frontier — 2026-09-01
+
+- **Branch:** `codex/control-plane-recovery-s1-clean-recovered` (isolated; no main/trunk mutation).
+- **Gate status:** Gate A **SEALED**, Gate B **SEALED**, Gate C **SEALED**; Gate D is the next
+  authorized gate under the approved recovery plan.
+- **Strict sealed progress:** **15/48 complete | 33 remaining** (the separate granular task count
+  remains larger; this is the constitutional sealed-progress counter).
+- **Worker accounting:** **Admitted: 3 | Rejected: 3 | Remediated: 0**.
+- **Court accounting:** **Sealed: 3 | Remanded: 0 | Remediated: 0**.
+- **Open debt:** `DEBT-0060` remains **OPEN** and is carried forward.
+- **SAKG/production:** paused; no production dispatch, merge, promotion, or main/trunk mutation is
+  authorized until later gates and the final lifecycle disposition are complete.
+
+The current Gate C candidate-bound L16 record is
+`reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`; its Z0 catalog was ratified in
+`eec55ede0ae8faf1fe4ff82df4eee5752e71f6be`.
 
 ## 1. What just happened (session arc, condensed)
 
