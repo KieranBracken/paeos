@@ -4278,3 +4278,19 @@ L13 reproduction, and epoch-4 admissions. This quality observation is preserved 
 record and does not expand the PASS into a Gate seal. Aggregate Worker remains **3/3/0** and
 Court remains **0/0/0**; Gate A, L16 Court reconciliation, debt closure, and SAKG resumption
 remain outstanding.
+
+### Entry 243 — 2026-09-01: Gate A admission review remanded at Court/L16 boundary
+
+The mandatory Gate A review `reviews/tasks/PAEOS_CLINE_WORKER_ADMISSION_DEBT_0058_review.md`
+reconciles the three epoch-4 admitted GLM probes, current-candidate L13 reproduction, and the
+qualified Gemini L14/L17 receipt. Aggregate Worker accounting is **Admitted: 3 | Rejected: 3 |
+Remediated: 0**; the L14/L17 report is candidate-bound with A-08 **PASS**. The report’s
+`INVARIANT: None` / `REPRODUCTION: N/A` machine fields remain a recorded quality observation.
+
+Read-only lifecycle audits over the available state ledgers verify hash chains but return all 19
+layers `UNPROVEN` and no correlated `COURT_SEALED`, `COURT_REMANDED`, `COURT_REMEDIATED`,
+promotion, or Founder-disposition row. Court remains **Sealed: 0 | Remanded: 0 | Remediated: 0**.
+The exact Gate A disposition is therefore **REMANDED** at the Court/L16 boundary; `DEBT-0058`
+remains OPEN and strict progress remains **12/48 complete | 36 remaining**. No later-gate credit,
+promotion, or SAKG resumption is claimed. The next permitted transition is an authorized,
+candidate-correlated Court/L16 transaction; this review cannot create or ratify it.

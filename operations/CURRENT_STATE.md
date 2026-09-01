@@ -665,3 +665,16 @@ still provide concrete transport, test, and admission evidence, and the observat
 for prompt-quality hardening. This qualifies L14/L17 evidence only. Aggregate Worker/Court remain
 **3/3/0** and **0/0/0**; strict progress remains **12/48 complete | 36 remaining**. No Court/L16
 row, Gate A seal, debt closure, promotion, or SAKG resumption is authorized.
+
+## 2026-09-01 — Gate A admission review remanded at Court/L16 boundary
+
+The mandatory review `reviews/tasks/PAEOS_CLINE_WORKER_ADMISSION_DEBT_0058_review.md` reconciles
+the three epoch-4 admitted GLM probes, current-candidate L13 reproduction, and qualified Gemini
+L14/L17 evidence. Aggregate Worker/Court counts remain **3/3/0** and **0/0/0**. Read-only
+lifecycle audits verify available ledger chains but return all 19 layers `UNPROVEN` and no
+correlated `COURT_SEALED`, `COURT_REMANDED`, `COURT_REMEDIATED`, promotion, or Founder row.
+
+Exact disposition: **GATE_A_STATUS: REMANDED** because no canonical Court/L16 disposition exists.
+`DEBT-0058` remains **OPEN**; strict progress remains **12/48 complete | 36 remaining**. Gate B+
+credit, promotion, and SAKG resumption remain held. An authorized candidate-correlated Court/L16
+transaction is required; this review cannot create or ratify it.

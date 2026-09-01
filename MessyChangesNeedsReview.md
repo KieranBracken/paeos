@@ -943,3 +943,10 @@ until this shutdown remediation is reviewed.
   `INVARIANT: None` and `REPRODUCTION: N/A`, recorded as a quality observation. This is qualified
   L14/L17 evidence only: Court/L16 remains unrecorded, strict progress remains **12/48 complete |
   36 remaining**, and no gate seal or SAKG resumption is implied.
+
+- 2026-09-01 mandatory Gate A review `PAEOS_CLINE_WORKER_ADMISSION_DEBT_0058_review.md`
+  reconciles three admitted epoch-4 GLM probes, current L13 `1,107/1,107` reproduction, and
+  qualified Gemini L14/L17 evidence. Read-only lifecycle audits found no candidate-correlated
+  Court/L16 row and returned 19 `UNPROVEN` layers; Court remains **0/0/0**. Exact disposition is
+  **GATE_A_STATUS: REMANDED**; `DEBT-0058` stays OPEN and strict progress stays **12/48 complete |
+  36 remaining**. No later-gate credit or SAKG resumption is implied.
