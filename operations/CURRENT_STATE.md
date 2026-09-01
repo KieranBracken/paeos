@@ -437,6 +437,26 @@ reactivated. Worker/Court remain **0/1/0** and **0/0/0**, strict progress remain
 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open. No gate closure, lifecycle advancement, or
 SAKG resumption is authorized.
 
+## 2026-09-01 — Founder/Court sealed Gate C; Gate D authorized
+
+The Founder supplied `COURT_SEALED` for Gate C (Provider Adapter Registry & Headless Supervisor
+Adapters), candidate `f0be9ab1a59ac8053213aacb70d26472739b217d`. Evidence is the qualified Gemini
+L14/L17 report `ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`, receipt file
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`, and bundle
+`a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`; A-08 is `gemini != glm`,
+one attempt, no fallback.
+
+The exact Z0 catalog digest `581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`
+was Founder-ratified in commit `eec55ede0ae8faf1fe4ff82df4eee5752e71f6be`. All seven files
+match the external proposal byte-for-byte and the canonical loader accepts CANARY-0001 through
+CANARY-0009. The candidate-bound disposition record is
+`reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`.
+
+Gate C is **SEALED** and Gate D progression is authorized. External Worker/Court counts are
+**3/3/0** and **3/0/0**; strict progress is **15/48 complete | 33 remaining**. `DEBT-0060`
+remains OPEN and is carried forward. No merge, promotion, main/trunk mutation, production
+dispatch, or SAKG resumption is authorized.
+
 ## 2026-09-01 — Current-candidate Gemini L14/L17 capture rejected as truncated
 
 The explicitly authorized one-shot audit `l14-l17-46e4d26-gemini-epoch4-001` targeted candidate

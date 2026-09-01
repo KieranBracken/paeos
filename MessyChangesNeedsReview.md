@@ -1005,6 +1005,16 @@ candidate-bound audit and disposition.
   unsealed pending Founder ratification and L16/Court disposition; `DEBT-0060` remains OPEN and
   strict progress is **14/48 complete | 34 remaining**.
 
+- 2026-09-01 the Founder supplied `COURT_SEALED` for Gate C candidate `f0be9ab1a59ac8053213aacb70d26472739b217d`,
+  with qualified Gemini report SHA `ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`,
+  receipt SHA `fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`, bundle SHA
+  `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`, and ratified Z0 commit
+  `eec55ede0ae8faf1fe4ff82df4eee5752e71f6be` for catalog digest
+  `581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f`. All seven ratified files
+  match the proposal byte-for-byte. Gate C is sealed and Gate D is authorized; `DEBT-0060` stays
+  OPEN. Court advances to **3/0/0** and strict progress to **15/48 complete | 33 remaining**.
+  No promotion, merge, or main/trunk mutation occurred.
+
 - 2026-09-01 current Gate C candidate `f0be9ab1a59ac8053213aacb70d26472739b217d` received a
   qualified one-shot Gemini L14/L17 audit against bundle SHA-256
   `a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. Report SHA-256 is

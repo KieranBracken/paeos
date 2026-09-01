@@ -4491,3 +4491,26 @@ Worker/Court counts. Gate C remains **AUTHORIZED, NOT SEALED**: the Z0 files req
 ratification before installation, followed by the separate candidate-bound L16/Court
 disposition. `DEBT-0060` remains OPEN; strict progress remains **14/48 complete | 34 remaining**.
 No source change, promotion, or SAKG resumption is implied.
+
+### Entry 256 — 2026-09-01: Founder/Court sealed Gate C and authorized Gate D
+
+The Founder supplied the candidate-bound L16 disposition `COURT_SEALED` for Gate C (Provider
+Adapter Registry & Headless Supervisor Adapters), candidate
+`f0be9ab1a59ac8053213aacb70d26472739b217d`. The qualified Gemini L14/L17 report SHA-256 is
+`ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`; receipt-file SHA-256 is
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`; and audit-bundle SHA-256 is
+`a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. Physical A-08 remains
+`gemini` auditor versus `glm` builder, one attempt, no fallback.
+
+The Founder also ratified the exact Z0 catalog digest
+`581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f` in commit
+`eec55ede0ae8faf1fe4ff82df4eee5752e71f6be`; all seven committed files match the verifier
+proposal byte-for-byte and the project virtualenv loads CANARY-0001 through CANARY-0009. The
+external L16 disposition record is
+`reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`.
+
+Gate C is now **SEALED** and progression to Gate D is authorized. `DEBT-0060` remains OPEN and
+is carried forward. External Worker accounting remains **Admitted: 3 | Rejected: 3 | Remediated:
+0**; Court accounting advances to **Sealed: 3 | Remanded: 0 | Remediated: 0**; strict progress
+advances to **15/48 complete | 33 remaining**. No merge, promotion, main/trunk mutation,
+production dispatch, or SAKG resumption is authorized by this disposition.

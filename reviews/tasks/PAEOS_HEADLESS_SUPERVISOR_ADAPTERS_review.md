@@ -175,3 +175,18 @@ the Z0 ratification boundary by itself. The final Court request is
 `32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`). Gate C remains **NOT
 SEALED** pending Founder ratification of the exact catalog and the separate L16/Court
 disposition; no Gate D or SAKG work is authorized.
+
+## Founder/Court seal — 2026-09-01
+
+The Founder supplied `COURT_SEALED` for candidate `f0be9ab1a59ac8053213aacb70d26472739b217d`,
+with qualified Gemini L14/L17 report SHA-256
+`ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`, receipt file SHA-256
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`, and bundle SHA-256
+`a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. Z0 catalog digest
+`581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f` was ratified in commit
+`eec55ede0ae8faf1fe4ff82df4eee5752e71f6be`; all seven files match the proposal exactly.
+
+The candidate-bound L16 disposition is
+`reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`. Gate C is **SEALED** and
+Gate D progression is authorized. `DEBT-0060` remains OPEN and is carried forward; no Gate D
+implementation or SAKG resumption is implied until the Gate D evidence path is complete.

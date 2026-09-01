@@ -119,3 +119,19 @@ not constitute Z0 ratification or a Gate C seal. The final Court request is
 `/private/tmp/paeos-gate-c-court-disposition-request-20260901.md`, SHA-256
 `32eaa77764a2054ce62081ae3cf0d067c00e2bcb7b53274bd5e1cea071b50158`. Gate C remains unsealed
 until Founder ratification of the exact catalog and a separate L16/Court disposition.
+
+## Founder/Court seal — 2026-09-01
+
+The Founder supplied `COURT_SEALED` for candidate `f0be9ab1a59ac8053213aacb70d26472739b217d`,
+backed by the qualified Gemini report SHA-256
+`ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55`, receipt file SHA-256
+`fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4`, and bundle SHA-256
+`a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af`. The exact Z0 catalog
+digest `581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f` was ratified in
+`eec55ede0ae8faf1fe4ff82df4eee5752e71f6be`; each of CANARY-0003 through CANARY-0009 matches
+the proposal byte-for-byte.
+
+The candidate-bound L16 record is
+`reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`. Gate C is **SEALED** and
+Gate D progression is authorized. `DEBT-0060` remains OPEN; no promotion, merge, or main/trunk
+mutation is authorized.
