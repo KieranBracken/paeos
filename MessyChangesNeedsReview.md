@@ -991,3 +991,11 @@ candidate-bound audit and disposition.
   `d9a9c9fa78a9dc39282d32afc4ba046bf7f2bffb628a557812b9f1fcc7927950`; rejected report SHA is
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
+
+- 2026-09-01 the authorized source-inclusive `l14-l17-ab3dd01-gemini-003` dispatch reached
+  Gemini once (A-08 physical PASS) but returned 315 completion tokens and stopped mid-finding
+  before `AUDIT_COMPLETE: true`. Router observation `1074` reports 87,155 prompt tokens; the
+  validator rejected the pair. Receipt canonical SHA is
+  `192b1e8e0a084fb123897f8eac233167e33e5be8a9829a1607192f1e039842b5`; rejected report SHA is
+  `6666f152790ed37419bbdd80c99e839cb113ad6ec7af1ad2695c0e913ee0ca73`. No retry/fallback
+  occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.

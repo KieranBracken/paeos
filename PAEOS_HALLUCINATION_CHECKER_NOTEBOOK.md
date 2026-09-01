@@ -4360,3 +4360,17 @@ decorrelation passed with one attempt and receipt canonical SHA-256
 Rejected report SHA-256 is `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`.
 No retry or fallback occurred. This payload is retired; Gate B remains unsealed and strict
 progress remains **13/48 complete | 35 remaining**.
+
+### Entry 249 — 2026-09-01: source-inclusive Gate B audit still truncated
+
+The authorized one-shot `l14-l17-ab3dd01-gemini-003` targeted candidate
+`ab3dd01e54028614373efd5c3d8d5147d7d2bfce` and evidence SHA-256
+`a8570a16ab43ea58b7ccf07d0e291877e92b639546627e41eea9cb3e128142fe`. Gemini physical
+decorrelation passed with one provider attempt, but the response stopped after 315 completion
+tokens in the middle of an audit finding and omitted `AUDIT_COMPLETE: true`. Router observation
+`1074` records 87,155 prompt tokens and 315 completion tokens. The validator rejected the pair with
+`audit report must contain exactly one completion marker`; receipt canonical SHA-256 is
+`192b1e8e0a084fb123897f8eac233167e33e5be8a9829a1607192f1e039842b5`, and rejected report
+SHA-256 is `6666f152790ed37419bbdd80c99e839cb113ad6ec7af1ad2695c0e913ee0ca73`. No retry or
+fallback occurred. Gate B remains unsealed; strict progress remains **13/48 complete | 35
+remaining**.

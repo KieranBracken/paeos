@@ -747,3 +747,18 @@ occurred; raw rejected artifacts remain preserved.
 
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.
+
+## 2026-09-01 — Source-inclusive Gate B audit truncated before completion marker
+
+The authorized one-shot Gemini request `l14-l17-ab3dd01-gemini-003` targeted candidate
+`ab3dd01e54028614373efd5c3d8d5147d7d2bfce` and bundle SHA-256
+`a8570a16ab43ea58b7ccf07d0e291877e92b639546627e41eea9cb3e128142fe`. Transport completed once
+with physical A-08 **PASS**, but the model returned 315 completion tokens and stopped mid-finding;
+the validator rejected the response because `AUDIT_COMPLETE: true` was absent. Router observation
+`1074` records 87,155 prompt tokens and 315 completion tokens. Receipt canonical SHA-256 is
+`192b1e8e0a084fb123897f8eac233167e33e5be8a9829a1607192f1e039842b5`; rejected report SHA-256 is
+`6666f152790ed37419bbdd80c99e839cb113ad6ec7af1ad2695c0e913ee0ca73`. No retry or fallback
+occurred; raw artifacts remain preserved.
+
+Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
+remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.

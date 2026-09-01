@@ -170,3 +170,17 @@ free-tier input ceiling despite its byte-size estimate. The validator rejected t
 (`audit report does not bind candidate`); rejected report SHA-256 is
 `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry or fallback
 occurred. Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete.
+
+## Fresh Audit Attempt — 2026-09-01 (`ab3dd01`)
+
+The Founder-authorized source-inclusive one-shot Gemini dispatch targeted candidate
+`ab3dd01e54028614373efd5c3d8d5147d7d2bfce` with evidence bundle SHA-256
+`a8570a16ab43ea58b7ccf07d0e291877e92b639546627e41eea9cb3e128142fe`, audit ID
+`l14-l17-ab3dd01-gemini-003`, and `max_tokens=4096`. Physical transport completed once and
+recorded A-08 **PASS** (Gemini family versus GLM builder), but the model returned only 315
+completion tokens and stopped mid-finding before the required completion marker. The validator
+rejected the pair with `audit report must contain exactly one completion marker`. Router
+observation `1074` records 87,155 prompt tokens and 315 completion tokens. Receipt canonical SHA-256
+is `192b1e8e0a084fb123897f8eac233167e33e5be8a9829a1607192f1e039842b5`; rejected report SHA-256
+is `6666f152790ed37419bbdd80c99e839cb113ad6ec7af1ad2695c0e913ee0ca73`. No retry or fallback
+occurred. Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete.
