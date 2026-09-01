@@ -317,8 +317,8 @@ async function main() {
     throw new ProtocolError("profile data root unavailable for session binding");
   }
   const sessionRoot = `${dataRoot}/sessions/${sessionId}`;
-  const manifestPath = `${sessionRoot}/manifest.json`;
-  const messagesPath = `${sessionRoot}/messages.json`;
+  const manifestPath = `${sessionRoot}/${sessionId}.json`;
+  const messagesPath = `${sessionRoot}/${sessionId}.messages.json`;
   // ClineCore.start may begin a provider turn before its promise resolves. Bind
   // the session before invoking it so every subsequent event has an identity.
   emit("session_created", { manifest_path: manifestPath, messages_path: messagesPath });

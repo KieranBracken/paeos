@@ -36,13 +36,13 @@ export class ClineCore {
       error.name = "OAuthReauthRequiredError";
       throw error;
     }
-    let manifestPath = `/profile/sessions/${sessionId}/manifest.json`;
-    let messagesPath = `/profile/sessions/${sessionId}/messages.json`;
+    let manifestPath = `/profile/sessions/${sessionId}/${sessionId}.json`;
+    let messagesPath = `/profile/sessions/${sessionId}/${sessionId}.messages.json`;
     if (probe) {
       const sessionRoot = join(process.env.CLINE_DATA_DIR, "sessions", sessionId);
       await mkdir(sessionRoot, { recursive: true });
-      manifestPath = join(sessionRoot, "manifest.json");
-      messagesPath = join(sessionRoot, "messages.json");
+      manifestPath = join(sessionRoot, `${sessionId}.json`);
+      messagesPath = join(sessionRoot, `${sessionId}.messages.json`);
       await writeFile(
         manifestPath,
         JSON.stringify({
