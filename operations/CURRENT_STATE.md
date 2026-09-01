@@ -437,6 +437,22 @@ reactivated. Worker/Court remain **0/1/0** and **0/0/0**, strict progress remain
 36 remaining**, and `DEBT-0058`/`DEBT-0060` remain open. No gate closure, lifecycle advancement, or
 SAKG resumption is authorized.
 
+## 2026-09-01 — Current-candidate Gemini L14/L17 capture rejected as truncated
+
+The explicitly authorized one-shot audit `l14-l17-46e4d26-gemini-epoch4-001` targeted candidate
+`46e4d26d0dfbd32020f6874cd8a0c8c4a3534cb8` and bundle SHA-256
+`4150f934573b54763241480440bcbd3db55031df96dde93eb3e1563305d4874b`. Physical transport
+captured Google Gemini (`gemini-3.6-flash`, family `gemini`) against the GLM builder with A-08
+**PASS** and one provider attempt. Router observation `1069` recorded 108,775 prompt tokens and
+162 completion tokens. The 558-byte response omitted the candidate/evidence bindings and final
+completion marker; validator disposition is **BLOCKED_UNQUALIFIABLE** and raw rejection evidence
+is preserved at `/private/tmp/paeos-l14-l17-report-46e4d26.md.rejected` and
+`/private/tmp/paeos-l14-l17-receipt-46e4d26.json.rejected` (receipt SHA
+`6293a60a216455d131d39b3a69e0785a85f58114c0cbd60b63c8c9d3ea45aac4`). No retry of the exact
+payload occurred. Worker/Court remain **3/3/0** and **0/0/0**; strict progress remains
+**12/48 complete | 36 remaining**. A smaller separately authorized audit bundle is required
+before Gate A closure can be considered; no promotion or SAKG resumption is authorized.
+
 ## 2026-09-01 — L14 report completion-boundary hardening
 
 The current-candidate Gemini response for `c4f54ca` had a valid physical receipt but ended

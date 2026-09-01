@@ -914,3 +914,14 @@ until this shutdown remediation is reviewed.
   `371cb17145492dddd1d3ba59eecb48a525667f070f0509ddd1f28e4288a66ede`; exit-record SHA
   `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. L14/L17 and Court/L16
   remain outstanding; strict progress is unchanged at **12/48 complete | 36 remaining**.
+
+- 2026-09-01 the explicitly authorized one-shot Gemini audit for current candidate `46e4d26`
+  used bundle SHA `4150f934573b54763241480440bcbd3db55031df96dde93eb3e1563305d4874b` and
+  physically captured Gemini (`gemini-3.6-flash`, A-08 **PASS**, one attempt) against the GLM
+  builder. Router observation `1069` recorded 108,775 prompt and 162 completion tokens. The
+  response was truncated to 558 bytes / 6 lines and omitted required bindings; validator returned
+  `AUDITOR_RECEIPT_REJECTED:audit report does not bind candidate`. Receipt SHA
+  `6293a60a216455d131d39b3a69e0785a85f58114c0cbd60b63c8c9d3ea45aac4`; rejected report SHA
+  `d5c8cfc334916007fb0cc7007110e3c7ebc342f9d484b1a85f26163046c2616e`. Disposition remains
+  **BLOCKED_UNQUALIFIABLE**; exact payload was not retried. Worker/Court remain **3/3/0** and
+  **0/0/0**; strict progress remains **12/48 complete | 36 remaining**.

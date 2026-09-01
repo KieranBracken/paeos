@@ -4218,3 +4218,23 @@ markers. Raw log SHA-256 is
 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. This is reproduction
 evidence only: L14/L17 physical decorrelation and Court/L16 reconciliation remain outstanding.
 Gate A remains unsealed; no later-gate credit, promotion, or SAKG resumption is implied.
+
+### Entry 240 — 2026-09-01: Current-candidate Gemini L14/L17 capture rejected as truncated
+
+The explicitly authorized one-shot audit `l14-l17-46e4d26-gemini-epoch4-001` targeted candidate
+`46e4d26d0dfbd32020f6874cd8a0c8c4a3534cb8` and bundle SHA-256
+`4150f934573b54763241480440bcbd3db55031df96dde93eb3e1563305d4874b`. Transport captured a
+physical Gemini receipt with actual provider `google`, model `gemini-3.6-flash`, family `gemini`,
+builder family `glm`, A-08 **PASS**, and exactly one provider attempt. Router observation `1069`
+recorded `108,775` prompt tokens and `162` completion tokens. Receipt SHA-256 is
+`6293a60a216455d131d39b3a69e0785a85f58114c0cbd60b63c8c9d3ea45aac4`; its rejected-file SHA is
+`5112df3544e7abc3bfb8b3d0ed50b2655becee87dcbb04e5bf3836fa84b1bef9`. The raw report was only
+558 bytes / 6 lines (SHA-256 `d5c8cfc334916007fb0cc7007110e3c7ebc342f9d484b1a85f26163046c2616e`) and
+omitted the required candidate/evidence bindings and terminal marker, so the validator returned
+`AUDITOR_RECEIPT_REJECTED:audit report does not bind candidate`. Rejection metadata SHA-256 is
+`4dfb08714ce275cdad611f0ca03a85d9f4f1f30315d917a5e9186298c41a5f4f`.
+
+This is preserved as **BLOCKED_UNQUALIFIABLE**, not a PASS or remand. The exact one-shot payload
+was not retried. A materially smaller, separately authorized bundle is required if another audit
+is attempted. Worker remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; Court remains
+**Sealed: 0 | Remanded: 0 | Remediated: 0**; Gate A and later gates remain unsealed.
