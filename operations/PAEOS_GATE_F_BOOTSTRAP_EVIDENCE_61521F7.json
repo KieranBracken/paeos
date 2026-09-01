@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "manifest_kind": "PAEOS_GATE_F_BOOTSTRAP_EVIDENCE",
+  "candidate_commit": "61521f7429462a4e015feb285cb20a5b39c78294",
+  "recovery_branch": "codex/control-plane-recovery-s1-clean-recovered",
+  "implementation_commits": [
+    "38e91c0",
+    "175599b",
+    "6336808"
+  ],
+  "l13_reproduction": {
+    "status": "PASS",
+    "collected": 28,
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "focused_log": "/private/tmp/paeos-gate-f-l13-focused-61521f7.log",
+    "focused_log_sha256": "a4ba55c7ec7daeede2ecfea3dda9a793665ee142066911215af4f033a9e8412a",
+    "collection_log": "/private/tmp/paeos-gate-f-l13-collect-61521f7.log",
+    "collection_log_sha256": "ae947271d7970b7f431a07d6ee407c072d5f07d68962e24d35a89b1e9416bd8f"
+  },
+  "l14_l17_audit": {
+    "status": "PASS",
+    "audit_id": "l14-l17-61521f7-gate-f-micro-001",
+    "bundle_sha256": "d4972ac908f41807366d33a4aaaa9b18ffa006914374cd36ab1d70213f3c02ed",
+    "report_sha256": "5261730a1cf4acf127d58116317dc358591bdf6197a36d951f43b93dfaeaccbb",
+    "receipt_file_sha256": "03722b7fc0a4af3db971e8bab28bcd5f4dc10e512193f93f0e1418cad036ca66",
+    "canonical_receipt_sha256": "afe02a7540b7fd72d3f6da95c8a0c7a72069e7d89715500b48061e65d7abc3c6",
+    "actual_provider": "google",
+    "actual_model": "gemini-3.6-flash",
+    "actual_family": "gemini",
+    "builder_provider": "cline-pass",
+    "builder_model": "z-ai/glm-5.3-flash",
+    "builder_family": "glm",
+    "a08_verdict": "PASS",
+    "provider_attempts": 1,
+    "fallback": false
+  },
+  "gate_f_verification": {
+    "focused_tests": {"collected": 28, "passed": 28, "failed": 0, "skipped": 0},
+    "synthetic_canaries": {"distinct": 3, "passed": 3, "remanded": 0},
+    "non_gateway_collection": 1154,
+    "non_gateway_loaded_passed": 1152,
+    "non_gateway_loaded_failed": 2,
+    "isolated_timeout_cases_passed": 5,
+    "ruff_findings": 557,
+    "pyright_errors": 120,
+    "open_debt": ["DEBT-0060", "RB-0027"]
+  },
+  "external_accounting": {
+    "worker": {"admitted": 3, "rejected": 3, "remediated": 0},
+    "court": {"sealed": 5, "remanded": 0, "remediated": 0}
+  },
+  "protected_refs_mutated": false,
+  "promotion_executed": false,
+  "bootstrap_status": "AWAITING_FOUNDER_L16_DISPOSITION",
+  "blocking_reasons": [
+    "FOUNDER_BOOTSTRAP_FACT_REQUIRED",
+    "LIVE_ROUTE_ROTATION_QUOTA_WINDOW_NOT_RUN",
+    "REPOSITORY_STATIC_DEBT_UNRESOLVED",
+    "FULL_LOAD_CLINE_TIMEOUT_CASES_REMAIN"
+  ],
+  "mandatory_stop": "Founder/Court L16 disposition required before bootstrap integration or Task 7 promotion"
+}

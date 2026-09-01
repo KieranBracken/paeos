@@ -4691,6 +4691,21 @@ Raw focused log is `/private/tmp/paeos-gate-f-l13-focused-61521f7.log` (SHA-256
 evidence only; it does not create an L14/L17 result, Court/L16 row, Gate F seal, bootstrap
 authority, promotion, or SAKG resumption. No source or protected state changed.
 
+### Entry 267 — 2026-09-02: Gate F bootstrap evidence manifest prepared
+
+The independent L13 reproduction and qualified L14/L17 pair are consolidated in
+`operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json` (SHA-256
+`24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`). The manifest binds
+implementation candidate `61521f7429462a4e015feb285cb20a5b39c78294`, L13 focused 28/28 evidence,
+L14/L17 bundle/report/receipt hashes, physical Gemini-versus-GLM A-08 PASS, three synthetic
+no-promotion canaries, and exact static/full-suite debt. It explicitly records
+`AWAITING_FOUNDER_L16_DISPOSITION`; it does not mint bootstrap authority.
+
+Known blockers remain live route/rotation/quota window absent, repository Ruff 557/Pyright 120
+findings, two loaded Cline timeout assertions (isolated 5/5 pass), `DEBT-0060`, and `RB-0027`.
+The manifest is preparation evidence only. No promotion, merge, protected-ref mutation, or SAKG
+resumption occurred; the Founder/Court L16 disposition remains the next constitutional action.
+
 ### Entry 264 — 2026-09-01: Gate F compact Gemini audit reached provider but was rejected as incomplete
 
 Following the sandbox-boundary diagnosis, the authorized host-level one-shot dispatch used the

@@ -3,20 +3,27 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-01 (Founder/Court Gate D seal; Gate E authorized)
+> **Last updated:** 2026-09-02 (Gate F L13/L14 evidence prepared; Founder/Court L16 pending)
 
-## Current canonical recovery frontier — 2026-09-01
+## Current canonical recovery frontier — 2026-09-02
 
 - **Branch:** `codex/control-plane-recovery-s1-clean-recovered` (isolated; no main/trunk mutation).
-- **Gate status:** Gate A **SEALED**, Gate B **SEALED**, Gate C **SEALED**, Gate D **SEALED**; Gate E is
-  the next authorized gate under the approved recovery plan.
-- **Strict sealed progress:** **16/48 complete | 32 remaining** (the separate granular task count
+- **Gate status:** Gates A–E **SEALED**; Gate F is at a qualified implementation checkpoint and
+  remains **UNSEALED** pending the Founder/Court L16 bootstrap disposition.
+- **Strict sealed progress:** **17/48 complete | 31 remaining** (the separate granular task count
   remains larger; this is the constitutional sealed-progress counter).
 - **Worker accounting:** **Admitted: 3 | Rejected: 3 | Remediated: 0**.
-- **Court accounting:** **Sealed: 4 | Remanded: 0 | Remediated: 0**.
-- **Open debt:** `DEBT-0060` remains **OPEN** and is carried forward.
+- **Court accounting:** **Sealed: 5 | Remanded: 0 | Remediated: 0**.
+- **Open debt:** `DEBT-0060` and `RB-0027` remain **OPEN** and are carried forward.
 - **SAKG/production:** paused; no production dispatch, merge, promotion, or main/trunk mutation is
   authorized until later gates and the final lifecycle disposition are complete.
+
+The current Gate F implementation candidate is
+`61521f7429462a4e015feb285cb20a5b39c78294`; its qualified L14/L17 checkpoint is
+`reviews/tasks/PAEOS_GATE_F_L14_L17_61521F7_CHECKPOINT.md`, L13 reproduction is
+`reviews/tasks/PAEOS_GATE_F_L13_REPRODUCTION_61521F7.md`, and bootstrap evidence is
+`operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json`. The separate Founder/Court L16
+bootstrap disposition remains pending.
 
 The current Gate D candidate-bound L16 record is
 `reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`; its qualified L14/L17
@@ -1078,3 +1085,13 @@ Gate F focused set (`tests/runtime/autonomy`, `tests/kernel/test_promotion_polic
 failure, error, or skip markers; collection reconciled to 28 tests. Raw logs and hashes are
 recorded in `reviews/tasks/PAEOS_GATE_F_L13_REPRODUCTION_61521F7.md`. This is L13 evidence only,
 not an L14/L17 result or Gate F/Court seal. No source or protected state changed.
+## 2026-09-02 — Gate F bootstrap evidence manifest prepared
+
+`operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json` (SHA-256
+`24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`) consolidates candidate
+`61521f7429462a4e015feb285cb20a5b39c78294`, independent L13 28/28 reproduction, qualified
+L14/L17 hashes and A-08 PASS, three synthetic no-promotion canaries, and known static/full-suite
+debt. Status is `AWAITING_FOUNDER_L16_DISPOSITION`; the manifest cannot mint authority. Live
+route/rotation/quota evidence is absent, Ruff/Pyright remain 557/120, two loaded Cline timeout
+assertions remain (isolated 5/5 pass), and `DEBT-0060`/`RB-0027` remain OPEN. No promotion,
+merge, protected-ref mutation, or SAKG resumption occurred.

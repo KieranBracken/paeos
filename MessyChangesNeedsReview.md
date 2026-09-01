@@ -1154,3 +1154,10 @@ evidence and Founder/Court disposition are mandatory.
   Raw logs and SHA-256 values are recorded in `reviews/tasks/PAEOS_GATE_F_L13_REPRODUCTION_61521F7.md`.
   This is reproduction evidence only; Gate F remains unsealed pending Founder/Court L16
   bootstrap, and no source or protected state changed.
+
+- 2026-09-02 Gate F bootstrap evidence manifest prepared at
+  `operations/PAEOS_GATE_F_BOOTSTRAP_EVIDENCE_61521F7.json` (SHA-256
+  `24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328`). It binds candidate
+  `61521f7`, fresh L13 28/28, qualified Gemini L14/L17, and the no-promotion canary evidence;
+  status is `AWAITING_FOUNDER_L16_DISPOSITION`. It does not create authority; Gate F remains
+  unsealed and `DEBT-0060`/`RB-0027` remain open.
