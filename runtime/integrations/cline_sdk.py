@@ -384,8 +384,12 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                 stderr_bytes = process.stderr.read()
                 if payload.get("normalized_error") == "AUTH_FAILED":
                     raise _ProbeFailure("SDK AUTH_FAILED", bytes(raw_stdout), stderr_bytes)
+                error_class = payload.get("error_class")
+                suffix = f" ({error_class})" if isinstance(error_class, str) else ""
                 raise _ProbeFailure(
-                    f"SDK terminal failure: {event_type}", bytes(raw_stdout), stderr_bytes
+                    f"SDK terminal failure: {event_type}{suffix}",
+                    bytes(raw_stdout),
+                    stderr_bytes,
                 )
 
         process.stdin.close()

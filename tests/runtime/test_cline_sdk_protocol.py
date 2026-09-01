@@ -251,6 +251,46 @@ def test_node_host_emits_terminal_failure_when_core_start_raises(tmp_path: Path)
         process.wait(timeout=5)
 
 
+def test_node_host_normalizes_known_auth_start_failure(tmp_path: Path) -> None:
+    env = os.environ.copy()
+    env["CLINE_DATA_DIR"] = str(tmp_path / "cline")
+    process = subprocess.Popen(
+        ["node", str(HOST)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    message = _start_message()
+    message["payload"]["prompt"] = "PAEOS_SDK_PROBE:" + json.dumps(
+        {
+            "artifact_path": "/sandbox/artifact.txt",
+            "expected_text": "admitted-worker\n",
+            "initial_text": "baseline-worker\n",
+            "probe_id": "probe-start-auth-error",
+            "verification_command": "python3 verify_probe.py",
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    try:
+        _write(process, message)
+        events: list[dict[str, object]] = []
+        for _ in range(4):
+            event = _read(process)
+            events.append(event)
+            if event["type"] in {"terminal", "failure", "cancelled"}:
+                break
+        assert events[-1]["type"] == "failure"
+        payload = events[-1]["payload"]
+        assert payload["error_class"] == "OAuthReauthRequiredError"
+        assert payload["normalized_error"] == "AUTH_FAILED"
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
+
+
 def test_attempt_events_are_matched_and_content_free() -> None:
     process = subprocess.Popen(
         ["node", str(HOST)],

@@ -10,6 +10,28 @@ const MAX_FRAME_BYTES = 1_048_576;
 
 class ProtocolError extends Error {}
 
+function normalizedStartError(error) {
+  const name = error instanceof Error ? error.name : "UnknownError";
+  const message = error instanceof Error ? error.message : "";
+  const text = `${name} ${message}`.toUpperCase();
+  if (/AUTH|UNAUTH|OAUTH|CREDENTIAL|TOKEN|KEYCHAIN|SECITEM/.test(text)) {
+    return "AUTH_FAILED";
+  }
+  if (/RATE[ _-]?LIMIT|TOO MANY REQUEST|\b429\b/.test(text)) {
+    return "RATE_LIMITED";
+  }
+  if (/QUOTA|PASSLIMIT|FREE.?MODEL.?LIMIT/.test(text)) {
+    return "QUOTA_EXHAUSTED";
+  }
+  if (/MODEL.*(NOT|UNAVAILABLE)|NOT.*MODEL/.test(text)) {
+    return "MODEL_UNAVAILABLE";
+  }
+  if (/PROVIDER.*(UNAVAILABLE|NOT FOUND)|UNAVAILABLE/.test(text)) {
+    return "PROVIDER_UNAVAILABLE";
+  }
+  return undefined;
+}
+
 function stableStringify(value) {
   if (value === null || typeof value === "boolean" || typeof value === "string") {
     return JSON.stringify(value);
@@ -340,6 +362,10 @@ async function main() {
     const failurePayload = {
       error_class: error instanceof Error ? error.name : "UnknownError",
     };
+    const normalizedError = normalizedStartError(error);
+    if (normalizedError !== undefined) {
+      failurePayload.normalized_error = normalizedError;
+    }
     if (
       error &&
       typeof error === "object" &&

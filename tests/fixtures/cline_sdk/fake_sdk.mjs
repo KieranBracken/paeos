@@ -28,6 +28,11 @@ export class ClineCore {
     if (probe?.probe_id === "probe-start-throws") {
       throw new Error("synthetic start failure");
     }
+    if (probe?.probe_id === "probe-start-auth-error") {
+      const error = new Error("credentials require reauthentication");
+      error.name = "OAuthReauthRequiredError";
+      throw error;
+    }
     let manifestPath = `/profile/sessions/${sessionId}/manifest.json`;
     let messagesPath = `/profile/sessions/${sessionId}/messages.json`;
     if (probe) {

@@ -313,6 +313,18 @@ def test_sdk_start_failure_is_emitted_as_typed_rejection(
     assert result.raw_stdout_sha256 != hashlib.sha256(b"").hexdigest()
 
 
+def test_sdk_known_auth_start_failure_is_typed_auth_rejection(
+    adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
+) -> None:
+    adapter, contract = adapter_case
+
+    result = adapter.run_probe(replace(contract, probe_id="probe-start-auth-error"))
+
+    assert isinstance(result, AdapterFailureReceipt)
+    assert result.adapter_failure is None
+    assert result.normalized_error is NormalizedErrorType.AUTH_FAILED
+
+
 def test_unfinished_provider_attempt_times_out_with_unknown_side_effects(
     adapter_case: tuple[ClineSdkAdmissionAdapter, ProbeContract],
 ) -> None:
