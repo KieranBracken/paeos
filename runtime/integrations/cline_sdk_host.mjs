@@ -420,7 +420,13 @@ async function main() {
     manifest_path: result.manifestPath,
     messages_path: result.messagesPath,
   });
-  const terminalPayload = { result: ended.result ?? result.result ?? {}, status: ended.type };
+  // AgentResult is provider-specific and may contain undefined/non-JSON fields.
+  // Emit only the identity required by the admission receipt; all substantive
+  // evidence is read from the bound session artifacts below the Python boundary.
+  const terminalPayload = {
+    result: { model: { id: config.model_id, provider: config.provider_id } },
+    status: ended.type,
+  };
   if (["AUTH_FAILED", "RATE_LIMITED", "QUOTA_EXHAUSTED"].includes(ended.normalizedError)) {
     terminalPayload.normalized_error = ended.normalizedError;
   }

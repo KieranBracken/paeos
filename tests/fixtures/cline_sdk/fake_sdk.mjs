@@ -102,7 +102,10 @@ export class ClineCore {
         sessionId,
         manifestPath,
         messagesPath,
-        result: { model: { id: input.config.modelId, provider: input.config.providerId } },
+        result: {
+          model: { id: input.config.modelId, provider: input.config.providerId },
+          usage: undefined,
+        },
       };
     }
     setTimeout(async () => {
