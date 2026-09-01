@@ -53,11 +53,13 @@ found. Court accounting is therefore **Sealed: 0 | Remanded: 0 | Remediated: 0**
 ## Exact disposition
 
 ```text
-GATE_A_STATUS: REMANDED
-REASON: candidate-bound admission and L13/L14/L17 evidence exist, but no canonical Court/L16 disposition row exists
+GATE_A_STATUS: GATE_A_ROUTE_ELIGIBLE_FOR_SEALING
+REASON: all three probes and candidate-bound L13/L14/L17 evidence pass; constitutional sealing remains external
 ```
 
-Gate A is not closed; `DEBT-0058` remains **OPEN**. Strict progress remains **12/48 complete |
-36 remaining**. Gate B+ implementation/credit, promotion, and SAKG resumption remain held. The
-next valid action is an authorized, candidate-correlated Court/L16 transaction produced by the
-PAEOS runtime; this review cannot create or ratify that transaction.
+Under the admission plan, this disposition makes the route eligible for Gate A sealing review; it
+does not itself seal Gate A or repay `DEBT-0058`. The separate read-only L16/Court reconciliation
+is `BLOCKED_UNQUALIFIABLE` because no candidate-correlated Court transaction exists. Strict
+progress remains **12/48 complete | 36 remaining**. No Gate B+ implementation credit, promotion,
+or SAKG resumption is claimed. A Founder/Court disposition must be produced through the canonical
+PAEOS path; this review cannot create or ratify it.

@@ -4294,3 +4294,14 @@ The exact Gate A disposition is therefore **REMANDED** at the Court/L16 boundary
 remains OPEN and strict progress remains **12/48 complete | 36 remaining**. No later-gate credit,
 promotion, or SAKG resumption is claimed. The next permitted transition is an authorized,
 candidate-correlated Court/L16 transaction; this review cannot create or ratify it.
+
+### Entry 244 — 2026-09-01: Gate A disposition corrected to route-eligible (not sealed)
+
+The canonical admission plan distinguishes Gate A route eligibility from the later constitutional
+L16/Court transaction. Entry 243’s `REMANDED` label was too strong: absence of a Court row is a
+separate L16 stop, not a defect in the admitted route. The mandatory Gate A review is corrected to
+`GATE_A_STATUS: GATE_A_ROUTE_ELIGIBLE_FOR_SEALING` because all three probes and candidate-bound
+L13/L14/L17 evidence pass. Gate A is still **UNSEALED**, `DEBT-0058` remains **OPEN**, and strict
+progress remains **12/48 complete | 36 remaining** until an authorized Founder/Court disposition
+is produced. The independent L16 review remains `L16_STATUS: BLOCKED_UNQUALIFIABLE` for the absent
+Court transaction. No self-ratification, promotion, or SAKG resumption is implied.

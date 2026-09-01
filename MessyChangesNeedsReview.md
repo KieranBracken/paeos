@@ -949,4 +949,11 @@ until this shutdown remediation is reviewed.
   qualified Gemini L14/L17 evidence. Read-only lifecycle audits found no candidate-correlated
   Court/L16 row and returned 19 `UNPROVEN` layers; Court remains **0/0/0**. Exact disposition is
   **GATE_A_STATUS: REMANDED**; `DEBT-0058` stays OPEN and strict progress stays **12/48 complete |
-  36 remaining**. No later-gate credit or SAKG resumption is implied.
+36 remaining**. No later-gate credit or SAKG resumption is implied.
+
+- 2026-09-01 sequencing correction: the canonical admission plan distinguishes Gate A route
+  eligibility from the later L16/Court transaction. The Gate A review is corrected to
+  `GATE_A_ROUTE_ELIGIBLE_FOR_SEALING` (three probes plus L13/L14/L17 pass), while Gate A remains
+  **UNSEALED** and `DEBT-0058` remains OPEN pending an authorized Founder/Court disposition. The
+  separate L16 review remains `BLOCKED_UNQUALIFIABLE`; strict progress remains **12/48 complete |
+  36 remaining**. No self-ratification or SAKG resumption is implied.

@@ -678,3 +678,13 @@ Exact disposition: **GATE_A_STATUS: REMANDED** because no canonical Court/L16 di
 `DEBT-0058` remains **OPEN**; strict progress remains **12/48 complete | 36 remaining**. Gate B+
 credit, promotion, and SAKG resumption remain held. An authorized candidate-correlated Court/L16
 transaction is required; this review cannot create or ratify it.
+
+## 2026-09-01 — Gate A disposition corrected to route-eligible (not sealed)
+
+The canonical admission plan distinguishes Gate A route eligibility from the later constitutional
+L16/Court transaction. The Gate A review is corrected from `REMANDED` to
+`GATE_A_ROUTE_ELIGIBLE_FOR_SEALING`: all three epoch-4 probes and candidate-bound L13/L14/L17
+evidence pass. Gate A remains **UNSEALED**, `DEBT-0058` remains **OPEN**, and strict progress
+remains **12/48 complete | 36 remaining** until an authorized Founder/Court disposition exists.
+The separate L16 review remains `BLOCKED_UNQUALIFIABLE` for the absent Court transaction. No
+self-ratification, promotion, or SAKG resumption is implied.
