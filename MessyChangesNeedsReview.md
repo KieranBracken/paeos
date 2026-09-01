@@ -992,6 +992,14 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 the minimal source-inclusive `l14-l17-993b6cc-gemini-004` audit qualified for
+  candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8` and bundle SHA
+  `0b14c4d6ed6f7453a1f0c91fa963a1201c038cda250b6d8b6542cadadf6b439d`. Pair validation returned
+  `PASS` / `PASS` / `qualified=True`; A-08 passed with one Gemini attempt and no fallback. Report
+  SHA is `1be71fc0404d8d2f0fc9ef6a63891d90e0f91ff5e85b8e6c6add17a570b180f8`; receipt file SHA is
+  `1b684a3dcbfd7c3adb10775583b4d13fd939941b2deb4291dcdcf1df863fc102`. Gate B remains unsealed
+  pending L16/Court disposition, with strict progress **13/48 complete | 35 remaining**.
+
 - 2026-09-01 the authorized source-inclusive `l14-l17-ab3dd01-gemini-003` dispatch reached
   Gemini once (A-08 physical PASS) but returned 315 completion tokens and stopped mid-finding
   before `AUDIT_COMPLETE: true`. Router observation `1074` reports 87,155 prompt tokens; the

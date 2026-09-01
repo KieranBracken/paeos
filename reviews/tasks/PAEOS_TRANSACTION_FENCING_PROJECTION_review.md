@@ -171,6 +171,25 @@ free-tier input ceiling despite its byte-size estimate. The validator rejected t
 `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry or fallback
 occurred. Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete.
 
+## Qualified L14/L17 Audit Evidence — 2026-09-01 (`993b6cc`)
+
+The minimal, source-inclusive one-shot audit `l14-l17-993b6cc-gemini-004` completed and passed
+the current artifact-pair validator. Candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8` is
+bound to evidence bundle SHA-256 `0b14c4d6ed6f7453a1f0c91fa963a1201c038cda250b6d8b6542cadadf6b439d`.
+The persisted report SHA-256 is `1be71fc0404d8d2f0fc9ef6a63891d90e0f91ff5e85b8e6c6add17a570b180f8`;
+the receipt file SHA-256 is `1b684a3dcbfd7c3adb10775583b4d13fd939941b2deb4291dcdcf1df863fc102`,
+and its canonical receipt SHA-256 is `4058d494e340e8c481ff8528fef251487ef65cf056604831e21eab1c49db6a4f`.
+
+`validate_auditor_artifact_pair()` returned `report_status=PASS`, `a08_verdict=PASS`,
+`qualified=True`; provider attempt count was exactly one, with no fallback. The report contains
+the required candidate/evidence bindings, per-audit Worker `0/1/0` and Court `0/0/0` accounting,
+one concrete finding, and the final `AUDIT_COMPLETE: true` marker. Its `INVARIANT: None` and
+`REPRODUCTION: N/A` fields are retained as a quality observation, not upgraded into extra proof.
+
+This closes the current L14/L17 evidence requirement for the Gate B candidate but does not create
+an L16/Court disposition. Gate B Tasks 5.4/5.5 and constitutional sealing remain pending an
+independent Gate B disposition; no Gate C advancement or production dispatch is authorized.
+
 ## Fresh Audit Attempt — 2026-09-01 (`ab3dd01`)
 
 The Founder-authorized source-inclusive one-shot Gemini dispatch targeted candidate

@@ -748,6 +748,21 @@ occurred; raw rejected artifacts remain preserved.
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.
 
+## 2026-09-01 — Gate B L14/L17 audit qualified
+
+The minimal source-inclusive audit `l14-l17-993b6cc-gemini-004` passed artifact-pair validation for
+candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8` and evidence SHA-256
+`0b14c4d6ed6f7453a1f0c91fa963a1201c038cda250b6d8b6542cadadf6b439d`. Report SHA-256 is
+`1be71fc0404d8d2f0fc9ef6a63891d90e0f91ff5e85b8e6c6add17a570b180f8`; receipt file SHA-256 is
+`1b684a3dcbfd7c3adb10775583b4d13fd939941b2deb4291dcdcf1df863fc102`; canonical receipt SHA-256
+is `4058d494e340e8c481ff8528fef251487ef65cf056604831e21eab1c49db6a4f`. The validator returned
+`PASS` / `PASS` / `qualified=True`; one Gemini attempt, no fallback, and A-08 `gemini != glm`.
+
+Gate B's L14/L17 evidence requirement is satisfied, but no L16/Court disposition has been issued.
+Gate B remains **UNSEALED** and Tasks 5.4/5.5 remain pending. Worker/Court external counts remain
+**3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**. No Gate C,
+production, promotion, or SAKG resumption is authorized.
+
 ## 2026-09-01 — Source-inclusive Gate B audit truncated before completion marker
 
 The authorized one-shot Gemini request `l14-l17-ab3dd01-gemini-003` targeted candidate
