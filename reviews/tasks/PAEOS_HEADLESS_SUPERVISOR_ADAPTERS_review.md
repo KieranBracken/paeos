@@ -117,3 +117,25 @@ an end-to-end adapter competition probe; no Gate C seal is claimed.
 The candidate-bound Gemini receipt supports implementation review for this candidate, but no Court
 `SEALED` row or Founder L16 ratification is present. Gate C is an audit-qualified checkpoint, not a
 constitutional seal; strict sealed progress remains **12/48 complete | 36 remaining**.
+
+## Fresh Gate C verification evidence — 2026-09-01
+
+At current recovery HEAD `8706917`, the focused supervisor/provider/canary set passed **156/156**;
+the model-router/runtime set passed **819/819** with the restricted gateway fixture excluded;
+and the complete non-gateway repository suite passed **1107/1107**. Changed-path Ruff and
+Pyright are clean (0 findings/diagnostics). Raw suite logs are preserved under
+`/private/tmp/gate-c-current-suite-20260901/`.
+
+A verifier-owned external canary ladder is preserved under
+`/private/tmp/gate-c-canary-evidence-20260901/` with summary SHA-256
+`39d73ee06875c9134f58b08340d66f816f1284c55339a0e3a9f8e2fd43afd293`. Seven rotating variants
+recorded ordered `installed=true`, `reached=true`, `killed=true` results; one deliberately
+incomplete control produced an explicit `REMAND` (exit `2`). The manifests and observations are
+outside the worktree and were not exposed to a worker. This is synthetic verifier-owned runner
+evidence; it is **not** a ratified Z0 canary set and therefore does not by itself close plan Step
+7.2. The Z0/CANARY-0002 ratification boundary remains explicit.
+
+The Gate C candidate remains **NOT GATE-SEALED**. Current outstanding requirements are a
+candidate-bound physically decorrelated Gemini L14/L17 receipt and report for `8706917`, L17
+reconciliation, and a separate Founder/Court disposition. `DEBT-0060` remains OPEN; no Gate D
+or production/SAKG work is authorized.

@@ -52,3 +52,30 @@ quality blockers. No Gate B/C closure, production dispatch, or SAKG resumption i
 - Strict sealed progress: **12/48 complete | 36 remaining**.
 - Required next evidence: preserve standalone RED baselines, obtain physical decorrelated audit
   receipt, disposition repository static debt, and reconcile restricted gateway test failures.
+
+## Fresh Gate C revalidation — 2026-09-01
+
+Current recovery HEAD `8706917` was revalidated without source or test edits. The focused
+provider-registry, transport, descriptor-policy, architecture, A-08, decorrelation, and state
+compatibility set passed **156/156** (exit `0`). The broader model-router/runtime set passed
+**819/819** with the restricted loopback gateway fixture excluded. The complete non-gateway
+repository suite passed **1107/1107** (exit `0`). Changed-path Ruff reported **0 findings** and
+changed-path Pyright reported **0 errors, 0 warnings, 0 informations**. Full-repository static
+debt and the restricted gateway environment remain separate unresolved quality findings.
+
+The discriminative synthetic-provider proof is preserved at
+`/private/tmp/gate-c-registry-discriminative-20260901.json` (SHA-256
+`2e82a7077d3bc4c4ebdc7e7d125630aa95fe1c4b2900108414509ce5bb87a759`): the pre-registry parent
+`764ae085` fails closed with `ModuleNotFoundError`, while current HEAD registers and resolves a
+provider without core enum/table edits (exit `0`). This is a compatibility-boundary proof, not a
+live-provider admission.
+
+The intermittent manifest-classification symptom was stress-tested in nine independent focused
+runs plus two complete-suite seeds; all completed runs passed. Raw logs remain under
+`/private/tmp/gate-c-manifest-stress/` and `/private/tmp/gate-c-flake-stress/`. No reproducible
+source defect was established, so no speculative fix was applied.
+
+This record remains an implementation/evidence checkpoint. A candidate-bound non-GLM L14/L17
+receipt for the current HEAD, L17 reconciliation, and a Founder/Court disposition remain
+required before Gate C can be sealed. External progress is unchanged at **14/48 complete | 34
+remaining**; `DEBT-0060` remains OPEN.

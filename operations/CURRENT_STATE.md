@@ -761,6 +761,28 @@ occurred; raw rejected artifacts remain preserved.
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.
 
+## 2026-09-01 — Gate C fresh verification checkpoint
+
+Following the Founder-sealed Gate B disposition, current HEAD `8706917` was checked in the
+isolated recovery worktree. The focused Gate C provider/supervisor/canary tests passed **156/156**;
+the model-router/runtime set passed **819/819** with the restricted gateway fixture excluded; and
+the complete non-gateway suite passed **1107/1107**. Changed-path Ruff and Pyright are clean.
+Raw logs are under `/private/tmp/gate-c-current-suite-20260901/`.
+
+The parent-versus-candidate synthetic provider proof is preserved in
+`/private/tmp/gate-c-registry-discriminative-20260901.json` (SHA-256
+`2e82a7077d3bc4c4ebdc7e7d125630aa95fe1c4b2900108414509ce5bb87a759`): parent import fails, current
+candidate registration/resolution passes. The external canary ladder summary
+`/private/tmp/gate-c-canary-evidence-20260901/ladder-summary.json` has SHA-256
+`39d73ee06875c9134f58b08340d66f816f1284c55339a0e3a9f8e2fd43afd293`; it contains seven ordered
+pass results and one explicit healthy remand. Because the variants are synthetic and not ratified
+Z0 content, this is evidence preparation only, not a Gate C seal.
+
+Gate C remains **AUTHORIZED, NOT SEALED**. A current-HEAD candidate-bound non-GLM L14/L17 audit
+and separate Founder/Court disposition are still required. External accounting remains Worker
+**3/3/0**, Court **2/0/0**; strict progress remains **14/48 complete | 34 remaining**. `DEBT-0060`
+remains OPEN; no Gate D, production dispatch, promotion, or SAKG resumption is authorized.
+
 ## 2026-09-01 — Gate B L17 checkpoint recorded
 
 The qualified `993b6cc` Gemini pair and the Gate B L17 retrospective are recorded in the review

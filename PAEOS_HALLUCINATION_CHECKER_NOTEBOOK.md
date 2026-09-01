@@ -4415,3 +4415,20 @@ the remaining routes (`DEBT-0060`, L18 knowledge capture, and L16/Court disposit
 Tasks 5.3–5.5 are complete as evidence/checkpoint work, but Gate B remains **UNSEALED** and
 strict progress remains **13/48 complete | 35 remaining**. No Gate C or production dispatch is
 authorized.
+
+### Entry 252 — 2026-09-01: Gate C fresh verification and canary evidence preparation
+
+Current recovery HEAD `8706917` was revalidated read-only. Focused Gate C tests passed **156/156**;
+the model-router/runtime set passed **819/819** with the restricted gateway fixture excluded; the
+complete non-gateway suite passed **1107/1107**; changed-path Ruff and Pyright reported zero
+findings. A nine-run manifest stress probe and two complete-suite seeds did not reproduce the
+earlier intermittent `SIDE_EFFECT_UNCERTAIN` classification, so no unproven source change was
+made. Parent-versus-candidate synthetic provider registration evidence is preserved with SHA
+`2e82a7077d3bc4c4ebdc7e7d125630aa95fe1c4b2900108414509ce5bb87a759`.
+
+The verifier-owned external canary ladder summary has SHA
+`39d73ee06875c9134f58b08340d66f816f1284c55339a0e3a9f8e2fd43afd293`: seven ordered
+installed/reached/killed passes and one explicit remand control. The variants remain outside the
+worktree and no worker/provider was invoked. This is synthetic evidence preparation, not ratified
+Z0 content or a Gate C seal. Current external accounting is Worker **3/3/0**, Court **2/0/0**;
+strict progress remains **14/48 complete | 34 remaining**; `DEBT-0060` remains OPEN.

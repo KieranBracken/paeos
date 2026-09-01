@@ -992,6 +992,15 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 Gate C fresh verification at current recovery HEAD `8706917`: focused provider,
+  supervisor, canary, and model-router compatibility tests **156/156 passed**; model-router/runtime
+  **819/819 passed** excluding the restricted gateway fixture; complete non-gateway suite
+  **1107/1107 passed**; changed-path Ruff/Pyright clean. Parent-versus-candidate synthetic
+  provider proof and verifier-owned canary ladder are preserved under `/private/tmp` with hashes
+  recorded in the Gate C reviews. Seven canaries passed ordered install/reach/kill and one control
+  correctly remanded. Evidence is synthetic and not ratified Z0; Gate C remains unsealed pending
+  current-HEAD L14/L17 and Founder/Court disposition. `DEBT-0060` remains OPEN.
+
 - 2026-09-01 the Founder supplied `COURT_SEALED` for Gate B candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8`,
   referencing the qualified Gemini report/receipt/bundle evidence. Disposition record SHA-256 is
   `8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9`. Gate B is sealed and Gate C
