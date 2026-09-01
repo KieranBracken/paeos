@@ -889,3 +889,14 @@ until this shutdown remediation is reviewed.
   readiness blocker. Focused verification passes **109/109** with changed Ruff/Pyright/Node checks
   clean. Worker/Court stay **0/3/0** and **0/0/0**; Gate A and SAKG remain paused pending a fresh
   readiness change and a valid admission receipt.
+
+- 2026-09-01 epoch-4 readiness probe `glm-5-3-sdk-admission-21-auth-epoch-4-readiness-001`
+  succeeded through the repaired Cline SDK adapter: verdict **ADMITTED**, exit `0`, provider
+  `cline-pass`, model `z-ai/glm-5.3-flash`, family `glm`, receipt hash
+  `102fe131f694aabd840ea49cc024060db2258d4a93ce4ac04694ba6d355739c1`, and canonical result
+  SHA-256 `064ea5ba130130f769cfe59d890183d874945c30114d7cec851ffcdc72772818`. The completed
+  manifest/message hashes are `b2311241de6dd4f65f9f81e2bcc598bdd97c5c74f83b2125e979f3ed412b7b47` /
+  `c6603da5e3b16b5b9e52f840c9076357fb783748a2fb0fae49776eaee9da835b`; lease release hash is
+  `d81e970298b921d5f64a6e08a4de15950a7ef6b585c797937e3172bff751dc88`. This is one of three
+  required admitted probes; Worker evidence is now **1/3/0**, Court **0/0/0**, and strict progress
+  remains **12/48 complete | 36 remaining**. No gate seal or SAKG resumption is implied.

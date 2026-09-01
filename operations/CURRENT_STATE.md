@@ -580,3 +580,19 @@ readiness observation exists.
 Worker/Court remain **0/3/0** and **0/0/0** in the canonical ledger; strict progress remains
 **12/48 complete | 36 remaining**. `DEBT-0058` and `DEBT-0060` remain OPEN. Gate A remains
 unsealed; no Court/L16 row, later-gate advancement, promotion, or SAKG resumption is authorized.
+
+## 2026-09-01 — First valid epoch-4 GLM worker admission
+
+Fresh probe `glm-5-3-sdk-admission-21-auth-epoch-4-readiness-001` completed through the pinned
+Cline SDK adapter with verdict **ADMITTED**, exit `0`, provider `cline-pass`, model
+`z-ai/glm-5.3-flash`, and family `glm`. Canonical result SHA-256 is
+`064ea5ba130130f769cfe59d890183d874945c30114d7cec851ffcdc72772818`; bound receipt hash is
+`102fe131f694aabd840ea49cc024060db2258d4a93ce4ac04694ba6d355739c1`. The completed session
+manifest and message ledger are hash-bound (`b2311241de6dd4f65f9f81e2bcc598bdd97c5c74f83b2125e979f3ed412b7b47` and
+`c6603da5e3b16b5b9e52f840c9076357fb783748a2fb0fae49776eaee9da835b`), with spawn/teams disabled,
+workspace confinement, and a clean lease release. No fallback or retry occurred.
+
+This is the first of three required fresh admitted probes; Gate A remains unsealed pending two
+more probes plus independent L13/L14/L17 and Court/L16 evidence. Worker evidence is now
+**1 admitted / 3 rejected / 0 remediated**; Court remains **0 sealed / 0 remanded / 0 remediated**.
+Strict progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN.

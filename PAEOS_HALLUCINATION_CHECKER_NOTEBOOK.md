@@ -4163,3 +4163,29 @@ Worker **Admitted: 0 | Rejected: 3 | Remediated: 0** in the ledger and Court **S
 Remanded: 0 | Remediated: 0**; strict progress remains **12/48 complete | 36 remaining**.
 `DEBT-0058` and `DEBT-0060` remain OPEN. Gate A is not sealed, no Court/L16 row exists, and no
 later gate or SAKG resumption is authorized.
+
+### Entry 238 — 2026-09-01: Epoch-4 GLM worker admission succeeded
+
+After the operator reported ClinePass authentication epoch `4`, one fresh one-shot probe
+`glm-5-3-sdk-admission-21-auth-epoch-4-readiness-001` was dispatched through the pinned public
+Cline SDK adapter with provider `cline-pass`, model `z-ai/glm-5.3-flash`, and family `glm`.
+It completed with exit `0` and verdict **`ADMITTED`**; no fallback or retry occurred. The
+canonical result file is
+`/Users/bob/.local/share/paeos/runtime-v2/worker-admission/glm-5-3-sdk-admission-21-auth-epoch-4-readiness-001/admission-result.json`
+with SHA-256 `064ea5ba130130f769cfe59d890183d874945c30114d7cec851ffcdc72772818`. The bound
+receipt hash is `102fe131f694aabd840ea49cc024060db2258d4a93ce4ac04694ba6d355739c1`.
+
+The machine-captured Cline session manifest is completed/non-interactive with `exit_code=0`,
+provider/model `cline-pass`/`z-ai/glm-5.3-flash`, spawn and teams disabled, and both `cwd` and
+`workspace_root` bound to the disposable evidence sandbox. Manifest SHA-256 is
+`b2311241de6dd4f65f9f81e2bcc598bdd97c5c74f83b2125e979f3ed412b7b47`; message-ledger SHA-256 is
+`c6603da5e3b16b5b9e52f840c9076357fb783748a2fb0fae49776eaee9da835b`. The seeded artifact
+mutation ended at the expected `admitted-worker` bytes and the lease-release record has SHA-256
+`d81e970298b921d5f64a6e08a4de15950a7ef6b585c797937e3172bff751dc88`.
+
+This is one admitted probe, not Gate A closure. Two further fresh-session admitted probes, then
+independent L13 reproduction, a physically decorrelated L14 audit, L17 review, and a canonical
+Court/L16 reconciliation remain mandatory. Aggregate worker evidence is now **Admitted: 1 |
+Rejected: 3 | Remediated: 0**; Court remains **Sealed: 0 | Remanded: 0 | Remediated: 0**. Strict
+progress remains **12/48 complete | 36 remaining**; `DEBT-0058` and `DEBT-0060` remain OPEN. No
+gate seal, promotion, or SAKG resumption is implied.
