@@ -1069,3 +1069,12 @@ remain **28/28**, synthetic ladder **3/3**, loaded non-gateway result **1,152/1,
 pre-existing Cline timeout assertions (isolated cases 5/5), and repository static debt remains
 Ruff **557** / Pyright **120**. `DEBT-0060` and `RB-0027` remain OPEN. A separate Founder/Court
 L16 bootstrap disposition is required before any Gate F seal, Task 7, promotion, or SAKG work.
+
+## 2026-09-02 — Gate F candidate L13 focused reproduction
+
+The isolated candidate `61521f7429462a4e015feb285cb20a5b39c78294` was reproduced once with the
+Gate F focused set (`tests/runtime/autonomy`, `tests/kernel/test_promotion_policy.py`, and
+`tests/ops/test_run_autonomy_canary.py`). It exited `0` with **28/28** progress dots and no
+failure, error, or skip markers; collection reconciled to 28 tests. Raw logs and hashes are
+recorded in `reviews/tasks/PAEOS_GATE_F_L13_REPRODUCTION_61521F7.md`. This is L13 evidence only,
+not an L14/L17 result or Gate F/Court seal. No source or protected state changed.

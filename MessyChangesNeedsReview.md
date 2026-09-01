@@ -1148,3 +1148,9 @@ evidence and Founder/Court disposition are mandatory.
   `afe02a7540b7fd72d3f6da95c8a0c7a72069e7d89715500b48061e65d7abc3c6`. Gemini vs GLM physical
   provenance, A-08 PASS, one attempt, no fallback; report complete and validator qualified.
   This is L14/L17 evidence only; Gate F remains unsealed pending Founder/Court L16 bootstrap.
+
+- 2026-09-02 fresh Gate F candidate L13 reproduction: focused autonomy/promotion/canary tests
+  executed once and passed **28/28** (exit 0; zero skips/errors); collection reconciled to 28.
+  Raw logs and SHA-256 values are recorded in `reviews/tasks/PAEOS_GATE_F_L13_REPRODUCTION_61521F7.md`.
+  This is reproduction evidence only; Gate F remains unsealed pending Founder/Court L16
+  bootstrap, and no source or protected state changed.

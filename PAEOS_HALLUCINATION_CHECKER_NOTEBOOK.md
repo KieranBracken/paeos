@@ -4675,6 +4675,22 @@ and repository static debt remains Ruff **557** / Pyright **120**. External acco
 Worker **3/3/0**, Court **5/0/0**; `DEBT-0060` and `RB-0027` remain OPEN. A separate Founder/Court
 L16 bootstrap disposition is required before any Gate F seal or Task 7/promotion operation.
 
+### Entry 266 — 2026-09-02: Gate F candidate L13 focused reproduction
+
+The Gate F focused test set for implementation candidate
+`61521f7429462a4e015feb285cb20a5b39c78294` was executed once in the isolated recovery worktree:
+`tests/runtime/autonomy`, `tests/kernel/test_promotion_policy.py`, and
+`tests/ops/test_run_autonomy_canary.py`. The run exited `0` with **28/28** progress dots and no
+failure, error, or skip markers. A separate collection run reconciled the count as
+`4 + 5 + 7 + 6 + 2 + 4 = 28` and exited `0`.
+
+Raw focused log is `/private/tmp/paeos-gate-f-l13-focused-61521f7.log` (SHA-256
+`a4ba55c7ec7daeede2ecfea3dda9a793665ee142066911215af4f033a9e8412a`); raw collection log is
+`/private/tmp/paeos-gate-f-l13-collect-61521f7.log` (SHA-256
+`ae947271d7970b7f431a07d6ee407c072d5f07d68962e24d35a89b1e9416bd8f`). This is L13 reproduction
+evidence only; it does not create an L14/L17 result, Court/L16 row, Gate F seal, bootstrap
+authority, promotion, or SAKG resumption. No source or protected state changed.
+
 ### Entry 264 — 2026-09-01: Gate F compact Gemini audit reached provider but was rejected as incomplete
 
 Following the sandbox-boundary diagnosis, the authorized host-level one-shot dispatch used the
