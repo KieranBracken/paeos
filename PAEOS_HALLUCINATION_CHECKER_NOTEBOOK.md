@@ -4389,3 +4389,13 @@ per-audit Worker `0/1/0`, Court `0/0/0`, one concrete finding, and terminal mark
 `INVARIANT: None` / `REPRODUCTION: N/A` values remain a quality observation. Gate B remains
 unsealed pending its separate L16/Court disposition; strict progress remains **13/48 complete |
 35 remaining**.
+
+### Entry 251 — 2026-09-01: Gate B L17 checkpoint recorded; L16 remains outstanding
+
+The qualified `993b6cc` Gemini pair and the L17 retrospective are now recorded in the Gate B
+review. The retrospective preserves the exact external counts (Worker **3/3/0**, Court **1/0/0**),
+per-audit counts (Worker **0/1/0**, Court **0/0/0**), the oversized-prompt/truncation lesson, and
+the remaining routes (`DEBT-0060`, L18 knowledge capture, and L16/Court disposition). Gate B
+Tasks 5.3–5.5 are complete as evidence/checkpoint work, but Gate B remains **UNSEALED** and
+strict progress remains **13/48 complete | 35 remaining**. No Gate C or production dispatch is
+authorized.

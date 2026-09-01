@@ -376,17 +376,17 @@ adding `UNCERTAIN` to retryable certainty was killed by the fail-closed retry ma
 a consumed terminal record to quarantine was killed by an isolated terminal-state probe. Every
 mutation was restored before the next; the restored Gate B suite passed **137/137** with exit `0`.
 
-- [ ] **Step 5.3: Obtain physically decorrelated L14 audit**
+- [x] **Step 5.3: Obtain physically decorrelated L14 audit**
 
 Give the auditor only the sealed candidate/evidence bundle. Prove its physical family differs
 from every builder receipt. Missing provenance is REMANDED.
 
-- [ ] **Step 5.4: Record L17 and stop at Gate B**
+- [x] **Step 5.4: Record L17 and stop at Gate B**
 
 Record exact Sealed/Remanded/Remediated counts, residual risks, and all L18/L19/debt routes. This
 plan does not authorize a live production dispatch.
 
-- [ ] **Step 5.5: Commit review records**
+- [x] **Step 5.5: Commit review records**
 
 ```bash
 git add PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md MessyChangesNeedsReview.md \

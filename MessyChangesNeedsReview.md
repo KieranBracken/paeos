@@ -992,6 +992,11 @@ candidate-bound audit and disposition.
   `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
   occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
 
+- 2026-09-01 the qualified minimal `993b6cc` Gemini pair and Gate B L17 retrospective were
+  recorded. Tasks 5.3–5.5 are complete as evidence/checkpoint work; Gate B remains unsealed
+  pending a separate L16/Court disposition. External counts remain Worker **3/3/0**, Court
+  **1/0/0**; `DEBT-0060` remains OPEN; strict progress remains **13/48 complete | 35 remaining**.
+
 - 2026-09-01 the minimal source-inclusive `l14-l17-993b6cc-gemini-004` audit qualified for
   candidate `993b6cc178f7ffe2e88d8cc404bcbed429d088a8` and bundle SHA
   `0b14c4d6ed6f7453a1f0c91fa963a1201c038cda250b6d8b6542cadadf6b439d`. Pair validation returned

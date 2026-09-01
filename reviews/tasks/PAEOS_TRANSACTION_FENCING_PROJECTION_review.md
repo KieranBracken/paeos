@@ -171,6 +171,30 @@ free-tier input ceiling despite its byte-size estimate. The validator rejected t
 `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry or fallback
 occurred. Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete.
 
+## L17 Retrospective and Constitutional Review — 2026-09-01
+
+The Gate B evidence cycle exposed three operational lessons. First, byte-count estimates are not
+token-count guarantees: the larger bundle measured ~76k tokens by a four-bytes heuristic but was
+observed at 264,436 provider tokens and produced a truncated response. Second, a complete physical
+Gemini receipt is not sufficient by itself; the substantive report must be candidate-bound,
+evidence-bound, concise, and terminated with the validator's exact completion marker. Third, the
+fail-closed validator and quarantine artifacts correctly prevented every incomplete response from
+being promoted into evidence.
+
+Exact accounting at this checkpoint is external Worker **Admitted: 3 | Rejected: 3 | Remediated: 0**
+and external Court **Sealed: 1 | Remanded: 0 | Remediated: 0** (the single seal is Gate A).
+The Gate B audit invocation itself records Worker **0/1/0** and Court **0/0/0**. No Gate B Court
+seal exists. Residual routes are:
+
+- **L16/Court:** Gate B requires a separate Founder/Court disposition; this review cannot create it.
+- **L18/knowledge:** retain the compact, bounded-output audit prompt pattern and token-budget
+  measurement as reusable workflow knowledge; no kernel policy amendment is inferred here.
+- **L19/debt:** `DEBT-0060` (bridge/idempotency recovery) remains OPEN; no production dispatch,
+  promotion, or SAKG resumption is authorized until its route and later-gate evidence are closed.
+
+This retrospective is complete for the Gate B checkpoint. It recommends the L16 disposition and
+preserves the evidence; it does not legislate or self-ratify a Gate B seal.
+
 ## Qualified L14/L17 Audit Evidence — 2026-09-01 (`993b6cc`)
 
 The minimal, source-inclusive one-shot audit `l14-l17-993b6cc-gemini-004` completed and passed

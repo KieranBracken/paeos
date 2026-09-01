@@ -748,6 +748,15 @@ occurred; raw rejected artifacts remain preserved.
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.
 
+## 2026-09-01 — Gate B L17 checkpoint recorded
+
+The qualified `993b6cc` Gemini pair and the Gate B L17 retrospective are recorded in the review
+ledger. Tasks 5.3–5.5 are complete as evidence/checkpoint work. Exact external counts remain
+Worker **3/3/0** and Court **1/0/0**; the Gate B audit itself is Worker **0/1/0**, Court **0/0/0**.
+Gate B is still **UNSEALED** pending a separate L16/Court disposition; strict progress remains
+**13/48 complete | 35 remaining**. `DEBT-0060` remains OPEN, and no Gate C, production dispatch,
+promotion, or SAKG resumption is authorized.
+
 ## 2026-09-01 — Gate B L14/L17 audit qualified
 
 The minimal source-inclusive audit `l14-l17-993b6cc-gemini-004` passed artifact-pair validation for
