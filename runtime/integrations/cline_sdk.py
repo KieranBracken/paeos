@@ -237,7 +237,10 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         self._active_lease = lease
         argv = [str(self._config.node_executable), str(self._config.host_module)]
         env = {
-            "CLINE_DATA_DIR": str(self._config.profile.root),
+            # Cline keeps provider OAuth settings and session storage in the
+            # profile's data directory; the parent profile root remains the
+            # leased/private boundary.
+            "CLINE_DATA_DIR": str(self._config.profile.root / "data"),
             "LANG": "C.UTF-8",
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin",
         }

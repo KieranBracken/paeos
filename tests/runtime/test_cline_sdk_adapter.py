@@ -359,7 +359,7 @@ def test_child_environment_is_exact_allowlist_without_parent_secret(
 
     assert isinstance(result, RawWorkerRun)
     assert node_env == {
-        "CLINE_DATA_DIR": str(adapter._config.profile.root),
+        "CLINE_DATA_DIR": str(adapter._config.profile.root / "data"),
         "LANG": "C.UTF-8",
         "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin",
     }
