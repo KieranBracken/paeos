@@ -734,3 +734,16 @@ retry occurred; no report or receipt was produced. The raw failure artifact is p
 Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
 remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**. The
 failed request is retired; any later attempt must be materially distinct and separately authorized.
+
+## 2026-09-01 — Gate B audit response truncated on oversized bundle
+
+The authorized Gemini request `l14-l17-c7f4380-gemini-002` reached the provider once and passed
+physical A-08 decorrelation, but its 164-token response omitted the candidate binding and was
+rejected by the validator. Router observation `1073` records 264,436 input tokens, exceeding the
+Google free-tier input ceiling. Receipt canonical SHA-256 is
+`d9a9c9fa78a9dc39282d32afc4ba046bf7f2bffb628a557812b9f1fcc7927950`; rejected report SHA-256 is
+`8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry or fallback
+occurred; raw rejected artifacts remain preserved.
+
+Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete. External Worker/Court counts
+remain **3/3/0** and **1/0/0**; strict progress remains **13/48 complete | 35 remaining**.

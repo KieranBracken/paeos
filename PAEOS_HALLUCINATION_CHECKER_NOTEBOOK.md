@@ -4347,3 +4347,16 @@ raw transport-failure artifact is preserved at
 `0a151df88d4d72fc3bb04f4d03a52155c9d956b6665727afac347d4435972035`). Disposition is
 **BLOCKED_UNQUALIFIABLE**. Gate B remains unsealed and progress remains **13/48 complete | 35
 remaining**; this exact request is not to be retried.
+
+### Entry 248 — 2026-09-01: Gate B audit response truncated on oversized prompt
+
+The authorized one-shot `l14-l17-c7f4380-gemini-002` targeted candidate
+`c7f4380d5933b54d7d4b2b28711cae255ff78db5` and evidence SHA-256
+`dfd6b4b2ad1ad0c95508c7b7b26b27ff892707b08c68f78fc5302257ac405c9d`. Gemini physical
+decorrelation passed with one attempt and receipt canonical SHA-256
+`d9a9c9fa78a9dc39282d32afc4ba046bf7f2bffb628a557812b9f1fcc7927950`, but the model returned only
+164 completion tokens and omitted the candidate binding. Router observation `1073` captured
+264,436 prompt tokens; the validator rejected the pair as `audit report does not bind candidate`.
+Rejected report SHA-256 is `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`.
+No retry or fallback occurred. This payload is retired; Gate B remains unsealed and strict
+progress remains **13/48 complete | 35 remaining**.

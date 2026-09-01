@@ -155,3 +155,18 @@ created. The raw transport-failure artifact is preserved at
 Disposition remains **BLOCKED_UNQUALIFIABLE**. This attempt provides no L14/L17 evidence and does
 not change Gate B's status, debt state, Court accounting, or strict progress. A future attempt
 requires a materially distinct, quota-eligible authorization and must not reuse this request.
+
+## Fresh Audit Attempt — 2026-09-01 (`c7f4380`)
+
+The Founder-authorized one-shot Gemini dispatch targeted candidate
+`c7f4380d5933b54d7d4b2b28711cae255ff78db5` with evidence bundle SHA-256
+`dfd6b4b2ad1ad0c95508c7b7b26b27ff892707b08c68f78fc5302257ac405c9d`, audit ID
+`l14-l17-c7f4380-gemini-002`, and `max_tokens=4096`. Physical transport completed once with
+Gemini-family decorrelation **PASS** (receipt canonical SHA-256
+`d9a9c9fa78a9dc39282d32afc4ba046bf7f2bffb628a557812b9f1fcc7927950`), but the response was
+truncated after 164 completion tokens and omitted the required candidate binding. Router
+observation `1073` records 264,436 prompt tokens, confirming that the bundle exceeded Google's
+free-tier input ceiling despite its byte-size estimate. The validator rejected the pair
+(`audit report does not bind candidate`); rejected report SHA-256 is
+`8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry or fallback
+occurred. Gate B remains **UNSEALED** and Tasks 5.3–5.5 remain incomplete.

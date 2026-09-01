@@ -983,3 +983,11 @@ candidate-bound audit and disposition.
   retry occurred and no report/receipt was created. Raw failure artifact SHA is
   `0a151df88d4d72fc3bb04f4d03a52155c9d956b6665727afac347d4435972035`; Gate B remains unsealed,
   with progress **13/48 complete | 35 remaining**. The exact request is retired.
+
+- 2026-09-01 the authorized `l14-l17-c7f4380-gemini-002` dispatch reached Gemini once (A-08
+  physical PASS) but returned only 164 completion tokens and omitted the candidate binding.
+  Router observation `1073` reports 264,436 input tokens; the validator rejected the pair and raw
+  artifacts were preserved. Receipt canonical SHA is
+  `d9a9c9fa78a9dc39282d32afc4ba046bf7f2bffb628a557812b9f1fcc7927950`; rejected report SHA is
+  `8bda1f31a07087ba10b0a9da899c4cb639b19f74e261fe81aea091114d483c8c`. No retry/fallback
+  occurred. Gate B remains unsealed, with strict progress **13/48 complete | 35 remaining**.
