@@ -1,4 +1,5 @@
 """Well-formedness checks for golden tradeoff precedent fixtures."""
+
 from __future__ import annotations
 
 import json
@@ -24,13 +25,22 @@ def _errors(fixture: object) -> list[str]:
     if fixture.get("schema_version") != "paeos.sakg.tradeoff-fixture/v1":
         errors.append("schema-version")
     source = fixture.get("source")
-    if not isinstance(source, dict) or not source.get("path") or not re.fullmatch(r"[0-9a-f]{64}", str(source.get("sha256"))):
+    if (
+        not isinstance(source, dict)
+        or not source.get("path")
+        or not re.fullmatch(r"[0-9a-f]{64}", str(source.get("sha256")))
+    ):
         errors.append("source")
     query = fixture.get("query")
     if not isinstance(query, dict) or query.get("method") != "tradeoff_precedents":
         errors.append("query-method")
     axes = query.get("axes") if isinstance(query, dict) else None
-    if not isinstance(axes, list) or len(axes) < 2 or len(axes) != len(set(axes)) or not all(isinstance(axis, str) and AXIS.fullmatch(axis) for axis in axes):
+    if (
+        not isinstance(axes, list)
+        or len(axes) < 2
+        or len(axes) != len(set(axes))
+        or not all(isinstance(axis, str) and AXIS.fullmatch(axis) for axis in axes)
+    ):
         errors.append("axes")
     expected = fixture.get("expected")
     results = expected.get("results") if isinstance(expected, dict) else None
@@ -48,12 +58,21 @@ def _errors(fixture: object) -> list[str]:
         else:
             scores.append(float(score))
         why = result.get("why")
-        if not isinstance(why, list) or len(why) < 3 or not all(isinstance(step, str) and step for step in why):
+        if (
+            not isinstance(why, list)
+            or len(why) < 3
+            or not all(isinstance(step, str) and step for step in why)
+        ):
             errors.append("why-path")
         elif "TradeOff" not in why[0] or "Decision" not in why[1] or "Outcome" not in why[-1]:
             errors.append("why-join")
         outcome = result.get("outcome")
-        if not isinstance(outcome, dict) or set(outcome) != {"id", "status", "summary"} or outcome.get("status") != "realized" or not outcome.get("summary"):
+        if (
+            not isinstance(outcome, dict)
+            or set(outcome) != {"id", "status", "summary"}
+            or outcome.get("status") != "realized"
+            or not outcome.get("summary")
+        ):
             errors.append("outcome")
     if scores != sorted(scores, reverse=True):
         errors.append("ranking")
@@ -68,7 +87,11 @@ def test_tradeoff_fixture_catalog_is_well_formed_and_ranked() -> None:
     validator = Draft202012Validator(schema)
     fixtures = [json.loads(path.read_text()) for path in files]
     assert all(not list(validator.iter_errors(item)) for item in fixtures)
-    assert all(not _errors(item) for item in fixtures), [(path.name, _errors(item)) for path, item in zip(files, fixtures) if _errors(item)]
+    assert all(not _errors(item) for item in fixtures), [
+        (path.name, _errors(item))
+        for path, item in zip(files, fixtures, strict=True)
+        if _errors(item)
+    ]
     assert {item["case"] for item in fixtures} == {path.stem for path in files}
 
 

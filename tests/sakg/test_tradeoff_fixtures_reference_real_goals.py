@@ -1,4 +1,5 @@
 """Ensure tradeoff fixtures bind to the archaeological corpus and real sealed goals."""
+
 from __future__ import annotations
 
 import hashlib
@@ -25,7 +26,15 @@ def test_axis_catalog_binds_to_ast_inventory_and_source_anchors() -> None:
     entries = _entries()
     assert len(catalog["axes"]) >= 10
     axes = {item["axis"] for item in catalog["axes"]}
-    assert {"latency", "accuracy", "cost", "reliability", "complexity", "security", "safety"} <= axes
+    assert {
+        "latency",
+        "accuracy",
+        "cost",
+        "reliability",
+        "complexity",
+        "security",
+        "safety",
+    } <= axes
     for item in catalog["axes"]:
         entry = entries[item["source_path"]]
         assert entry["sha256"] == item["source_sha256"]
@@ -45,11 +54,17 @@ def test_fixtures_reference_catalog_axes_and_sealed_goal_decisions() -> None:
         assert all(axis in axis_map for axis in fixture["query"]["axes"])
         source = fixture["source"]
         assert source["inventory_sha256"] == catalog["ast_inventory_sha256"]
-        assert all(any(item["source_path"] == source["path"] for item in axis_map[axis]) for axis in fixture["query"]["axes"])
+        assert all(
+            any(item["source_path"] == source["path"] for item in axis_map[axis])
+            for axis in fixture["query"]["axes"]
+        )
         goal = goals[fixture["query"]["goal_id"]]
         bundle_path = ROOT / goal["bundle_path"]
         assert hashlib.sha256(bundle_path.read_bytes()).hexdigest() == goal["bundle_sha256"]
         bundle = json.loads(bundle_path.read_text())
         decision_ids = {node["id"] for node in bundle["nodes"] if node["type"] == "Decision"}
         assert goal["decision_id"] in decision_ids
-        assert all(result["decision_id"] == goal["decision_id"] for result in fixture["expected"]["results"])
+        assert all(
+            result["decision_id"] == goal["decision_id"]
+            for result in fixture["expected"]["results"]
+        )
