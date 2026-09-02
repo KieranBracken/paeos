@@ -2,7 +2,7 @@
 
 - **Program:** PAEOS (Proactive Autonomous Engineering Operating System)
 - **Scope:** 48 Milestones (Gates A–F [1–18], SAKG Tasks 1–20 [19–38], Intakes M40–M48 [39–48])
-- **Final Candidate Commit:** `02236a8`
+- **Final Candidate Commit:** `c3c8c93`
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor
 
