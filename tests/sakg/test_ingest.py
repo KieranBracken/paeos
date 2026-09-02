@@ -26,7 +26,14 @@ def node() -> dict[str, object]:
             "ingested_at": "2026-09-02T12:00:00Z",
             "source_hash": sha256(b"source").hexdigest(),
         },
-        "evidence": [{"hash": EVIDENCE, "uri": "cas://evidence", "kind": "test", "reverification": "rerun ingest"}],
+        "evidence": [
+            {
+                "hash": EVIDENCE,
+                "uri": "cas://evidence",
+                "kind": "test",
+                "reverification": "rerun ingest",
+            }
+        ],
         "status": "candidate",
         "confidence": 0.5,
         "valid_from": "2026-09-02T12:00:00Z",
@@ -42,8 +49,17 @@ def fixture(tmp_path):
     bundle_hash = cas.put(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode())
     outbox = PostSealOutbox(tmp_path / "outbox.jsonl")
     outbox.write_after_seal(
-        {"bundle_id": "bundle-i-ingest", "goal_id": "g-i-ingest", "namespace": "demo", "artifact_bundle_hash": bundle_hash, "evidence_refs": [EVIDENCE]},
-        goal_state="integrated", seal_sequence=4, l16_sequence=5, emitted_at="2026-09-02T12:00:00Z",
+        {
+            "bundle_id": "bundle-i-ingest",
+            "goal_id": "g-i-ingest",
+            "namespace": "demo",
+            "artifact_bundle_hash": bundle_hash,
+            "evidence_refs": [EVIDENCE],
+        },
+        goal_state="integrated",
+        seal_sequence=4,
+        l16_sequence=5,
+        emitted_at="2026-09-02T12:00:00Z",
     )
     return cas, outbox
 
@@ -52,7 +68,14 @@ def test_pull_ingest_lands_a_candidate_in_the_producing_namespace(tmp_path) -> N
     cas, outbox = fixture(tmp_path)
     with GraphStore(tmp_path / "graph.sqlite3", "demo") as store:
         report = ingest_outbox(outbox, store, cas)
-        assert report.to_dict() == {"records_seen": 1, "bundles_read": 1, "nodes_appended": 1, "nodes_replayed": 0, "nodes_total": 1, "promoted": 0}
+        assert report.to_dict() == {
+            "records_seen": 1,
+            "bundles_read": 1,
+            "nodes_appended": 1,
+            "nodes_replayed": 0,
+            "nodes_total": 1,
+            "promoted": 0,
+        }
         assert store.get_node(NODE_ID)["status"] == "candidate"
         assert store.get_node(NODE_ID)["namespace"] == "demo"
 

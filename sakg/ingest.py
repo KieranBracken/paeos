@@ -5,6 +5,7 @@ outbox namespace, is required to carry evidence bound to the outbox references, 
 lands in the graph store as ``candidate``.  Re-reading an unchanged outbox is a no-op
 at the storage layer; no frequency or replay count can promote a node.
 """
+
 from __future__ import annotations
 
 import json
@@ -207,9 +208,7 @@ def is_promotion_eligible(node: Mapping[str, object], evidence_hashes: Sequence[
         return False
     allowed = set(evidence_hashes)
     return all(
-        isinstance(item, Mapping)
-        and isinstance(item.get("hash"), str)
-        and item["hash"] in allowed
+        isinstance(item, Mapping) and isinstance(item.get("hash"), str) and item["hash"] in allowed
         for item in evidence
     )
 

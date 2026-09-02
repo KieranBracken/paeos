@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from sakg.ingest import ingest_outbox
 from sakg.store import GraphStore
-
-from tests.sakg.test_ingest import fixture, NODE_ID
+from tests.sakg.test_ingest import NODE_ID, fixture
 
 
 def test_re_reading_the_same_outbox_is_idempotent(tmp_path) -> None:
