@@ -1,0 +1,64 @@
+{
+  "candidates": [
+    {
+      "estimated_tokens": 120,
+      "id": "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F01",
+      "node_summary": {
+        "id": "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F01",
+        "label": "Budget candidate 1",
+        "namespace": "sakg-budget-fixtures",
+        "status": "candidate",
+        "summary": "Complete projection result for Budget candidate 1; it must be dropped as a whole.",
+        "type": "Option"
+      },
+      "score": 0.99,
+      "why": "budget fixture traversal path 1: complete why evidence remains intact; oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker oversized-result-marker"
+    },
+    {
+      "estimated_tokens": 40,
+      "id": "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F02",
+      "node_summary": {
+        "id": "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F02",
+        "label": "Budget candidate 2",
+        "namespace": "sakg-budget-fixtures",
+        "status": "candidate",
+        "summary": "Complete projection result for Budget candidate 2; it must be dropped as a whole.",
+        "type": "Option"
+      },
+      "score": 0.8,
+      "why": "budget fixture traversal path 2: complete why evidence remains intact"
+    },
+    {
+      "estimated_tokens": 40,
+      "id": "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F03",
+      "node_summary": {
+        "id": "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F03",
+        "label": "Budget candidate 3",
+        "namespace": "sakg-budget-fixtures",
+        "status": "candidate",
+        "summary": "Complete projection result for Budget candidate 3; it must be dropped as a whole.",
+        "type": "Option"
+      },
+      "score": 0.7,
+      "why": "budget fixture traversal path 3: complete why evidence remains intact"
+    }
+  ],
+  "case": "skip-oversized-then-fit",
+  "expected": {
+    "omitted": 1,
+    "retained_ids": [
+      "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F02",
+      "sakg://sakg-budget-fixtures/Option/01ARZ3NDEKTSV4RRFFQ69G5F03"
+    ],
+    "retained_tokens": 80,
+    "truncated": true
+  },
+  "request": {
+    "budget": {
+      "max_nodes": 3,
+      "max_tokens": 80,
+      "tier": "SUMMARY"
+    }
+  },
+  "schema_version": "paeos.sakg.budget-fixture/v1"
+}
