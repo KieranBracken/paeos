@@ -1204,3 +1204,21 @@ evidence and Founder/Court disposition are mandatory.
   post-bootstrap probe was `AUTH_FAILED` and Gate G reports all L01–L19 unproven, the effective
   envelope is inactive and the formal recommendation is `HALT_FOR_FOUNDER`. No canary, automatic
   dispatch, promotion, merge, push, protected-ref, main/trunk, production, or SAKG mutation occurred.
+
+- 2026-09-02 epoch-6 Step 2/3 checkpoint: the preserved auth-epoch-6 worker probe is
+  `REJECTED / AUTH_FAILED` (exit `1`; admission-result SHA-256
+  `be0da8beab1afd4e4621981cf6f51170acfb49b520c222a27f19dbe0fd9ccc36`) and was not retried. One
+  host-Python 3.9 canary invocation failed before loading (exit `1`); the repository venv then
+  executed three distinct synthetic no-provider Trace-A canaries, all `PASS` / exit `0`, with
+  result SHAs `46c72b930c7c8225641491867f7f424b595c14aad648fd5894a5bf8e3785fadd`,
+  `06b13a9c635ca30bcf0a2c0d262807b511d0a7aed326db743e150fda55c9eb2b`, and
+  `1750ec869ae45f777b592044de901168d6518cd48876996b19afc03b9044d3db`. The synthetic runner
+  does not append ledger events and no supervisor-rotation or quota-stop facts were fabricated.
+  Read-only lifecycle revalidation ran once against the epoch-6 ledger path, exited `2`, and
+  reported `ERROR: ledger must be an existing regular file` (stderr SHA-256
+  `201e784f38f5cc2d1608b860acc6c22ed7dd8b8dd7c1562d0209ff6f0e9bd455`; empty stdout SHA-256
+  `e3b0c44298fc1c149afbf4c899fb92427ae41e4649b934ca495991b7852b855`). Full report is
+  `/private/tmp/paeos-gate-g-epoch6/revalidation/epoch6-step2-step3-report.json`, SHA-256
+  `0ab44eb766a0716f04bf6ee5a5511dc042c924f90b93b434dbfea2a9454348e2`. Disposition remains
+  `BLOCKED_UNPROVEN`; strict progress is unchanged at `18/48 complete | 30 remaining`, and no
+  SAKG contract or lifecycle seal was created.

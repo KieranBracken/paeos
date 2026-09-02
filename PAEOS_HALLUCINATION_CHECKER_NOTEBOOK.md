@@ -4832,3 +4832,37 @@ non-gateway Cline timeout assertions remain visible quality/reconciliation debt.
 auth epoch, successful admission, new coordinator/Trace-A evidence, independent L13/L14/L17
 evidence, and a new frozen SAKG contract with applicable L16 disposition are required before any
 resumption decision. No production, protected-ref, merge, push, main/trunk, or SAKG state changed.
+
+### Entry 272 — 2026-09-02: Epoch-6 synthetic canary ladder and read-only revalidation remain unproven
+
+The Founder-authorized epoch-6 recovery root is `/private/tmp/paeos-gate-g-epoch6`. The live
+worker admission barrier is preserved exactly once as `REJECTED / AUTH_FAILED` at auth epoch 6;
+no live retry was attempted. The host `python3` invocation of the canary runner exited `1` before
+the runner loaded because the host interpreter is Python 3.9 and cannot parse the repository's
+Python 3.12+ type-alias syntax. Using the repository venv (`Python 3.13.5`) as an environment
+correction, three distinct one-shot synthetic, no-provider Trace-A canaries ran and each exited
+`0` with `PASS`: `CANARY-TRACE-A-001` result SHA-256
+`46c72b930c7c8225641491867f7f424b595c14aad648fd5894a5bf8e3785fadd`,
+`CANARY-TRACE-A-002` result SHA-256
+`06b13a9c635ca30bcf0a2c0d262807b511d0a7aed326db743e150fda55c9eb2b`, and
+`CANARY-TRACE-A-003` result SHA-256
+`1750ec869ae45f777b592044de901168d6518cd48876996b19afc03b9044d3db`. Their manifest and
+observation hashes are retained in `/private/tmp/paeos-gate-g-epoch6/revalidation/` and the
+canary evidence directories. Each proves only the ordered synthetic installed/reached/killed
+contract; worker and Court counts are `0/0/0`, and the runner has no ledger-append seam.
+
+No authorized operational command exists to produce verifier-owned `SUPERVISOR_ROTATED` or
+`QUOTA_STOP_RECOVERED` ledger facts in this root. Test helpers and the checkpoint library were
+not used to mint those events. The read-only lifecycle revalidator was run exactly once with the
+epoch-6 ledger path and exited `2`: `ERROR: ledger must be an existing regular file`. Empty
+stdout SHA-256 is `e3b0c44298fc1c149afbf4c899fb92427ae41e4649b934ca495991b7852b855`; stderr
+SHA-256 is `201e784f38f5cc2d1608b860acc6c22ed7dd8b8dd7c1562d0209ff6f0e9bd455`. The machine
+report is `/private/tmp/paeos-gate-g-epoch6/revalidation/epoch6-step2-step3-report.json`,
+SHA-256 `0ab44eb766a0716f04bf6ee5a5511dc042c924f90b93b434dbfea2a9454348e2`.
+
+Disposition is `BLOCKED_UNPROVEN`, not a Gate G seal: no epoch-6 ledger exists, no L01–L19
+layer can be proven, no supervisor/quota recovery evidence was recorded, and no frozen SAKG
+Mission 0 contract was created. Canonical strict progress is unchanged at **18/48 complete | 30
+remaining**; external Court remains **Sealed: 6 | Remanded: 0 | Remediated: 0** and this local
+epoch-6 root has no Court events. No retry, fallback, promotion, merge, protected-ref, main/trunk,
+credential, or SAKG mutation occurred.

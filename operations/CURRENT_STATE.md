@@ -1191,3 +1191,32 @@ and the loaded-run timeout assertions remain visible. A fresh auth epoch, succes
 new lifecycle evidence, and a new frozen SAKG contract with applicable L16 disposition are
 required before resumption; no production, protected-ref, merge, push, main/trunk, or SAKG state
 changed.
+
+## 2026-09-02 — Epoch-6 synthetic canary ladder and Gate G revalidation checkpoint
+
+The fresh external root `/private/tmp/paeos-gate-g-epoch6` preserves the single auth-epoch-6
+admission result (`REJECTED / AUTH_FAILED`, exit `1`; admission-result SHA-256
+`be0da8beab1afd4e4621981cf6f51170acfb49b520c222a27f19dbe0fd9ccc36`). No live retry was
+authorized or attempted. The requested host `python3` canary invocation exited `1` before
+execution because host Python 3.9 cannot parse the repository's type-alias syntax; the established
+venv Python 3.13.5 then ran three distinct one-shot synthetic canaries successfully (exit `0` each):
+`CANARY-TRACE-A-001` result `46c72b930c7c8225641491867f7f424b595c14aad648fd5894a5bf8e3785fadd`,
+`CANARY-TRACE-A-002` result `06b13a9c635ca30bcf0a2c0d262807b511d0a7aed326db743e150fda55c9eb2b`,
+and `CANARY-TRACE-A-003` result `1750ec869ae45f777b592044de901168d6518cd48876996b19afc03b9044d3db`. These
+are synthetic harness proofs only: no provider, worker, ledger append, rotation, or quota recovery
+was involved; each reports Worker `0/0/0` and Court `0/0/0`.
+
+No production seam exists for recording verifier-owned `SUPERVISOR_ROTATED` or
+`QUOTA_STOP_RECOVERED` in this new root; no such rows were fabricated. The read-only lifecycle
+revalidator ran once against the requested epoch-6 ledger path and exited `2` with
+`ERROR: ledger must be an existing regular file`. Empty stdout SHA-256 is
+`e3b0c44298fc1c149afbf4c899fb92427ae41e4649b934ca495991b7852b855`; stderr SHA-256 is
+`201e784f38f5cc2d1608b860acc6c22ed7dd8b8dd7c1562d0209ff6f0e9bd455`. Full external report:
+`/private/tmp/paeos-gate-g-epoch6/revalidation/epoch6-step2-step3-report.json` (SHA-256
+`0ab44eb766a0716f04bf6ee5a5511dc042c924f90b93b434dbfea2a9454348e2`).
+
+Disposition: `GATE_G_STATUS: BLOCKED_UNPROVEN` / read-only revalidation not sealed. Epoch-6 adds
+zero 48-milestone completions; strict progress remains **18/48 complete | 30 remaining**. All
+L01–L19 remain unproven for this root, and no frozen SAKG Mission 0 Trace-A contract is created
+while the operating envelope is `INACTIVE_BLOCKED`. `DEBT-0060` and `RB-0027` remain open. No
+retry, fallback, promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.
