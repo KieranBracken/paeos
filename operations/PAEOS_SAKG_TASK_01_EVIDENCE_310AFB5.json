@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "310afb58c699a56f6d1aaafd2530c11d0003599f",
+  "l13_reproduction": {
+    "collected": 11,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-01-l13-focused-310afb5.log",
+    "focused_log_sha256": "a31010bcd775fc73170de6067d0bacebd890340f5aee13da76962b3b13834067",
+    "passed": 11,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_01_EVIDENCE",
+  "program_candidate_commit": "0399ae5424a8155217071999299f81ae05919258",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 01 \u2014 Pure SQLite Storage Engine & Append-Only Invariants"
+}

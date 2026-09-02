@@ -1,43 +1,36 @@
-# SAKG TASK 01 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
+# PAEOS SAKG Task 01 L14/L17 Checkpoint — Candidate 310afb5
 
-- **Candidate Commit:** `310afb5`
-- **Program Candidate Commit:** `b0a3823`
+Date: 2026-09-02  
+Branch: `codex/control-plane-recovery-s1-clean-recovered`  
+Candidate: `310afb58c699a56f6d1aaafd2530c11d0003599f`  
+Program Candidate: `0399ae5424a8155217071999299f81ae05919258`
 
-- **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
-- **Task:** Task 01 — Pure SQLite Storage Engine & Append-Only Invariants
-- **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)
-- **Status:** **QUALIFIED / VERIFIED**
+## Bound evidence
 
----
+- Evidence bundle SHA-256: `0f937a9494b4052398a9467c966d7687e703ea7eb1845c390df8cc189dc69ec8`
+- Prompt SHA-256: `840e9d1db9af1f2341973a7064584c4117a7b0870c922003a9b6a25d3fe4baca`
+- Report: `/private/tmp/paeos-sakg-task-01-l14-l17-report-310afb5.md`
+- Report SHA-256: `1858d6e0f57ee54fe44966317d505a5c5c64cc409eed8e7530c040845c3ab47d`
+- Receipt: `/private/tmp/paeos-sakg-task-01-l14-l17-receipt-310afb5.json`
+- Receipt file SHA-256: `1ba5a7cb92dd971c0c316c2b1ec05f51eb980b33a9c3d6f1ea8196efc28e8afb`
+- Canonical receipt SHA-256: `adb840ea5ba7347156967e23b5754c3e2270c8ffea422793949b0108ac853a3f`
+- Physical auditor: Google `gemini-3.6-flash`, Gemini family
+- Builder: `cline-pass` / `z-ai/glm-5.3-flash`, GLM family
+- A-08: `PASS` (Gemini family differs from GLM family)
+- Provider attempts: `1`; fallback chain: `google:gemini-3.6-flash` only
 
-## 1. Scope & Source Invariants
+## Validation
 
-* **Production Module:** `sakg/store.py` (SHA-256: `b37a239015cb79ec3efb5d49b812cc19dd13a6a23c5b2e82ceba94ea23af01e4`)
-* **Test Modules:**
-  * `tests/sakg/test_store.py` (SHA-256: `a2fb5c5c5954edae4814d73020c3a77a709ba52b3d8fb3c8f9f532dc511112e5`)
-  * `tests/sakg/test_store_append_only.py` (SHA-256: `b166cf970639f76bb98340bb90dfa0d5a55f24752ac6ea2f033dff4d958d362a`)
-  * `tests/sakg/test_store_namespace_isolation.py` (SHA-256: `062ef2595836be1cfdc000d726f6cd0a9df7cec490f689108475bb0394c7e85d`)
+The local artifact-pair validator returned report `PASS`, A-08 `PASS`, and `qualified=true`. The
+report binds the exact candidate and evidence bundle, contains concrete findings, and ends with
+`AUDIT_COMPLETE: true`.
 
----
+Implementation evidence remains:
+- SAKG Task 01 focused tests: **11/11 passed**, zero skipped.
+- Static analysis: Ruff clean (0 findings), Pyright clean (0 errors).
+- AST scan: 0 swallowed exceptions (`pytest.raises` enforced).
 
-## 2. Empirical Verification Evidence (L13 Deterministic Reproduction)
+## Disposition
 
-* **Command Executed:**
-  `uv run pytest tests/sakg/test_store.py tests/sakg/test_store_append_only.py tests/sakg/test_store_namespace_isolation.py -v`
-* **Test Execution Summary:** `11/11 passed in 0.23s (Exit Code: 0)`.
-* **Static Analysis:** `uv run ruff check` -> `0 findings (Clean)`.
-* **AST Anti-Pattern Scan:** `0 swallowed exceptions (pytest.raises enforced)`.
-
----
-
-## 3. Remand Remediation Verification
-
-* **Root Cause Remand:** Earlier Codex review noted two `try/except pass` blocks in `tests/sakg/test_store.py` and 6 import/line-length Ruff findings.
-* **Remediation:** Replaced all swallowed exceptions with strict `pytest.raises(EnvelopeValidationError)` and `pytest.raises(NamespaceViolation)`, reformatted imports, and wrapped lines.
-* **Outcome:** Clean AST scan, non-vacuous mutation proof, 100% green pass.
-
----
-
-## 4. Auditor Recommendation
-
-**RECOMMENDATION:** **SEAL SAKG TASK 01** into the canonical ledger at commit `310afb5`.
+`L14/L17_STATUS: QUALIFIED`  
+`SAKG_TASK_01_STATUS: IMPLEMENTATION_CHECKPOINT — QUALIFIED`
