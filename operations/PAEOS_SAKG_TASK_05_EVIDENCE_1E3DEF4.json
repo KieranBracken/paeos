@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "1e3def4ea9496fd545e343e2f47d10e59e8e2400",
+  "l13_reproduction": {
+    "collected": 15,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-05-l13-focused-1e3def4.log",
+    "focused_log_sha256": "8559781d9145a06576e5bfd1f6217bebdcf595e477c1d36da170897a2218d395",
+    "passed": 15,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_05_EVIDENCE",
+  "program_candidate_commit": "dbe41261d2d3e33f382a3928233ee97e20ec4272",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 05 \u2014 Context Projection Engine, Token Budgets & Trust Invariants"
+}
