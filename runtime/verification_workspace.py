@@ -51,9 +51,7 @@ def create_verification_views(
         "verifier_bundle_type": verifier_bundle.type,
         "verifier_bundle_hash": str(verifier_bundle.hash),
     }
-    encoded = json.dumps(
-        manifest_payload, sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
+    encoded = json.dumps(manifest_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     verifier_manifest_hash = hashlib.sha256(encoded).hexdigest()
 
     return VerificationViews(

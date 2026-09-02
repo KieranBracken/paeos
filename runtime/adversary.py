@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, List
+from typing import Any
 
 
 class AdversaryVerdict(Enum):
@@ -20,11 +20,11 @@ class AdversaryVerdict(Enum):
 @dataclass(frozen=True)
 class AdversaryReviewReport:
     verdict: AdversaryVerdict
-    findings: List[str]
-    dissent_reasons: List[str]
+    findings: list[str]
+    dissent_reasons: list[str]
     summary: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "verdict": self.verdict.name,
             "findings": self.findings,
@@ -36,9 +36,9 @@ class AdversaryReviewReport:
 class AdversarialReviewEngine:
     """Evaluates design-time artifacts for adversarial flaws and binds verdicts."""
 
-    def evaluate_review(self, design_artifact: Dict[str, Any]) -> AdversaryReviewReport:
-        dissent_reasons: List[str] = []
-        findings: List[str] = []
+    def evaluate_review(self, design_artifact: dict[str, Any]) -> AdversaryReviewReport:
+        dissent_reasons: list[str] = []
+        findings: list[str] = []
 
         # Audit design for security boundary or invariant flaws
         has_critical_flaw = design_artifact.get("has_security_flaw", False)

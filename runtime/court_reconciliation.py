@@ -76,8 +76,6 @@ def verify_builder_auditor_receipts(
     ):
         raise DecorrelationError("missing Builder/Auditor physical identity")
     if builder_family == auditor_family:
-        raise DecorrelationError(
-            f"Builder and Auditor share the same family ({builder_family})"
-        )
+        raise DecorrelationError(f"Builder and Auditor share the same family ({builder_family})")
 
     return (builder_family, auditor_family)

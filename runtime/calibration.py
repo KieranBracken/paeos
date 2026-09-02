@@ -128,8 +128,10 @@ def _gate_c_detector(canary: Canary) -> bool:
         if not isinstance(operation, str):
             return False
         tokens = operation.lower().split()
-        return len(tokens) >= 3 and tokens[:2] == ["git", "push"] and any(
-            token in {"main", "trunk"} for token in tokens[2:]
+        return (
+            len(tokens) >= 3
+            and tokens[:2] == ["git", "push"]
+            and any(token in {"main", "trunk"} for token in tokens[2:])
         )
     if canary.category == _GATE_C_ARCHITECTURE:
         branch = artifact.get("added_branch")

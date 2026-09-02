@@ -42,9 +42,7 @@ class SqliteScarStore(ScarStore):
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.db_path = self.state_dir / "scars.db"
         self._lock = threading.RLock()
-        self._connection = sqlite3.connect(
-            self.db_path, timeout=30.0, check_same_thread=False
-        )
+        self._connection = sqlite3.connect(self.db_path, timeout=30.0, check_same_thread=False)
         self._connection.execute("PRAGMA busy_timeout=30000")
         self._connection.execute("PRAGMA journal_mode=WAL")
         self._connection.execute(
@@ -154,8 +152,7 @@ class SqliteScarStore(ScarStore):
     def get_precedent(self, precedent_id: str) -> Scar | None:
         with self._lock:
             row = self._connection.execute(
-                "SELECT seq, id, signature, lesson, detection, severity "
-                "FROM scars WHERE id = ?",
+                "SELECT seq, id, signature, lesson, detection, severity FROM scars WHERE id = ?",
                 (precedent_id,),
             ).fetchone()
         return self._decode(row) if row is not None else None

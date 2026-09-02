@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, List
+from typing import Any
 
 
 class AuditStatus(Enum):
@@ -27,10 +27,10 @@ class VulnerabilityFinding:
 @dataclass(frozen=True)
 class AuditReport:
     status: AuditStatus
-    findings: List[VulnerabilityFinding]
+    findings: list[VulnerabilityFinding]
     summary: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "status": self.status.name,
             "summary": self.summary,
@@ -49,8 +49,8 @@ class AuditReport:
 class IndependentAuditEngine:
     """Performs heterogeneous model code audits and static security vulnerability scanning."""
 
-    def perform_audit(self, target_files: Dict[str, str]) -> AuditReport:
-        findings: List[VulnerabilityFinding] = []
+    def perform_audit(self, target_files: dict[str, str]) -> AuditReport:
+        findings: list[VulnerabilityFinding] = []
 
         # Audit files for known anti-patterns or security flaws
         for path, code in target_files.items():

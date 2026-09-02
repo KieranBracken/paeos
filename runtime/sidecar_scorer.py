@@ -9,12 +9,12 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from kernel.types import Role, StageId
+from kernel.types import StageId
 
 logger = logging.getLogger(__name__)
 
@@ -100,8 +100,18 @@ class SidecarStageScorer:
             # Deterministic baseline scoring heuristic for active runtime evaluation
             content_len = len(artifact_content)
             c_score = 95 if content_len > 100 else 80
-            r_score = 95 if "objective" in artifact_content.lower() or "claim" in artifact_content.lower() else 85
-            v_score = 95 if "test" in artifact_content.lower() or "assert" in artifact_content.lower() or "pytest" in artifact_content.lower() else 90
+            r_score = (
+                95
+                if "objective" in artifact_content.lower() or "claim" in artifact_content.lower()
+                else 85
+            )
+            v_score = (
+                95
+                if "test" in artifact_content.lower()
+                or "assert" in artifact_content.lower()
+                or "pytest" in artifact_content.lower()
+                else 90
+            )
 
         overall = (c_score + r_score + v_score) // 3
         suggestions: list[str] = []
@@ -129,5 +139,11 @@ class SidecarStageScorer:
         )
 
         self._persist(run_id, stage, score_obj.to_dict())
-        logger.info("Sidecar scored stage %s for run %s: %d/100 (%s)", stage.name, run_id, overall, verdict.value)
+        logger.info(
+            "Sidecar scored stage %s for run %s: %d/100 (%s)",
+            stage.name,
+            run_id,
+            overall,
+            verdict.value,
+        )
         return score_obj

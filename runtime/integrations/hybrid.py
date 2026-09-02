@@ -12,8 +12,14 @@ from collections.abc import Callable
 from pathlib import Path
 
 from kernel.types import Hash, Role, StageId
+
 from runtime.claude_code import AgentRuntime, RunOutput
-from runtime.integrations import ClaudeCodeRuntime, CliInvoker, SessionResult, SessionSpec, claude_cli_invoker
+from runtime.integrations import (
+    ClaudeCodeRuntime,
+    CliInvoker,
+    SessionResult,
+    SessionSpec,
+)
 from runtime.task_package import TaskPackage
 
 logger = logging.getLogger(__name__)
@@ -98,8 +104,12 @@ def codex_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = No
         except subprocess.TimeoutExpired as e:
             # Fail-loud (CRITICAL-002): a timeout previously returned a transcript that the
             # runtime recorded as a zero-cost COMPLETE success.
-            stdout_str = e.stdout.decode("utf-8") if isinstance(e.stdout, bytes) else (e.stdout or "")
-            stderr_str = e.stderr.decode("utf-8") if isinstance(e.stderr, bytes) else (e.stderr or "")
+            stdout_str = (
+                e.stdout.decode("utf-8") if isinstance(e.stdout, bytes) else (e.stdout or "")
+            )
+            stderr_str = (
+                e.stderr.decode("utf-8") if isinstance(e.stderr, bytes) else (e.stderr or "")
+            )
             raise RuntimeError(
                 f"{binary} CLI session timed out after {effective_timeout}s "
                 f"(stdout tail: {stdout_str[-500:]!r}, stderr tail: {stderr_str[-500:]!r})"
@@ -263,20 +273,29 @@ def glm_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = None
         #     and design flaws propagate downstream — quality is the product. → high
         #   * The adversarial audit keeps high — rigor is the product (unchanged).
         if package.role is Role.ADVERSARY or package.stage in (
-            StageId.ADVERSARIAL_REVIEW, StageId.DESIGN, StageId.PLAN, StageId.CRITIQUE,
+            StageId.ADVERSARIAL_REVIEW,
+            StageId.DESIGN,
+            StageId.PLAN,
+            StageId.CRITIQUE,
         ):
             thinking = "high"
         else:
             thinking = "medium"
         cmd = [
             CLINE_BINARY,
-            "-P", CLINE_PROVIDER,
-            "-m", CLINE_MODEL,
+            "-P",
+            CLINE_PROVIDER,
+            "-m",
+            CLINE_MODEL,
             "--json",
-            "--auto-approve", "true",
-            "--thinking", thinking,
-            "-t", str(effective_timeout),
-            "-c", str(spec.workspace),
+            "--auto-approve",
+            "true",
+            "--thinking",
+            thinking,
+            "-t",
+            str(effective_timeout),
+            "-c",
+            str(spec.workspace),
             prompt,
         ]
         try:
@@ -292,8 +311,12 @@ def glm_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = None
         except subprocess.TimeoutExpired as e:
             # Fail-loud (CRITICAL-002): a timeout previously returned a transcript that the
             # runtime recorded as a zero-cost COMPLETE success.
-            stdout_str = e.stdout.decode("utf-8") if isinstance(e.stdout, bytes) else (e.stdout or "")
-            stderr_str = e.stderr.decode("utf-8") if isinstance(e.stderr, bytes) else (e.stderr or "")
+            stdout_str = (
+                e.stdout.decode("utf-8") if isinstance(e.stdout, bytes) else (e.stdout or "")
+            )
+            stderr_str = (
+                e.stderr.decode("utf-8") if isinstance(e.stderr, bytes) else (e.stderr or "")
+            )
             raise RuntimeError(
                 f"{CLINE_BINARY} CLI session timed out after {effective_timeout}s "
                 f"(stdout tail: {stdout_str[-500:]!r}, stderr tail: {stderr_str[-500:]!r})"
@@ -345,7 +368,11 @@ class CodexRuntime(ClaudeCodeRuntime):
 
     def run(self, package: TaskPackage) -> RunOutput:
         mcp_cfg = self._mcp_config_path if package.role in (Role.BUILDER, Role.ADVERSARY) else None
-        invoker = self._invoker if self._invoker is not None else codex_cli_invoker(package, mcp_config_path=mcp_cfg)
+        invoker = (
+            self._invoker
+            if self._invoker is not None
+            else codex_cli_invoker(package, mcp_config_path=mcp_cfg)
+        )
         return self._run_with_invoker(package, invoker)
 
 
@@ -354,7 +381,11 @@ class GlmRuntime(ClaudeCodeRuntime):
 
     def run(self, package: TaskPackage) -> RunOutput:
         mcp_cfg = self._mcp_config_path if package.role in (Role.BUILDER, Role.ADVERSARY) else None
-        invoker = self._invoker if self._invoker is not None else glm_cli_invoker(package, mcp_config_path=mcp_cfg)
+        invoker = (
+            self._invoker
+            if self._invoker is not None
+            else glm_cli_invoker(package, mcp_config_path=mcp_cfg)
+        )
         return self._run_with_invoker(package, invoker)
 
 
@@ -391,5 +422,7 @@ class HybridRuntime:
             return self._glm.run(package)
 
         # Route Main Construction Chain (RE_DERIVE, IDEATE, DESIGN, PLAN, IMPLEMENT, etc.) to Codex / GPT-5.6 Sol
-        logger.info("Routing stage %s to Codex / GPT-5.6 Sol (Main Construction Chain)", package.stage)
+        logger.info(
+            "Routing stage %s to Codex / GPT-5.6 Sol (Main Construction Chain)", package.stage
+        )
         return self._codex.run(package)

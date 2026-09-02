@@ -125,16 +125,14 @@ def check_layer_dag(repo_root: Path) -> list[ArchitectureViolation]:
             if visited.get(neighbor, 0) == 1:
                 cycle_nodes.extend(path[path.index(neighbor) :])
                 return True
-            if visited.get(neighbor, 0) == 0:
-                if dfs(neighbor, path):
-                    return True
+            if visited.get(neighbor, 0) == 0 and dfs(neighbor, path):
+                return True
         path.pop()
         visited[node] = 2
         return False
 
     for node in list(graph.adj.keys()):
-        if visited.get(node, 0) == 0:
-            if dfs(node, []):
+        if visited.get(node, 0) == 0 and dfs(node, []):
                 cycle_str = " -> ".join(cycle_nodes)
                 violations.append(
                     ArchitectureViolation(

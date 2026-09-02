@@ -72,7 +72,6 @@ class ProductionTaskCompiler:
             expires_seq=current_seq + 100,
         )
 
-
         permissions = Permissions(
             write_scopes=contract.allowed_paths,
             read_scopes=contract.allowed_paths,
@@ -97,6 +96,3 @@ class ProductionTaskCompiler:
             budget=budget,
             execution_binding=binding,
         )
-
-
-

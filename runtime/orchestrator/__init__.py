@@ -22,7 +22,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, replace
 from enum import Enum
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, cast
 
 from kernel.capability import CapabilityBroker
 from kernel.cas import CAS
@@ -719,11 +719,14 @@ class SoftLoop:
                 Event(
                     1,
                     LAYER_DISCHARGED,
-                    {
-                        "run_id": run_id,
-                        "goal_id": goal_id,
-                        "discharge": stub.to_record(),
-                    },
+                    cast(
+                        dict[str, JsonValue],
+                        {
+                            "run_id": run_id,
+                            "goal_id": goal_id,
+                            "discharge": stub.to_record(),
+                        },
+                    ),
                 )
             )
 

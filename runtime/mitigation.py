@@ -4,8 +4,8 @@ Binds safeguards, kill-switches, fallback behaviors, and accepted-risk records t
 hazards identified during L06 Trade-off Analysis.
 """
 
-from dataclasses import dataclass, field
-from typing import Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -42,7 +42,9 @@ class MitigationCatalogue:
         high_hazards = {h.id for h in self.hazards if h.severity.upper() == "HIGH"}
         if not high_hazards:
             return True
-        covered = {s.hazard_id for s in self.safeguards} | {r.hazard_id for r in self.accepted_risks}
+        covered = {s.hazard_id for s in self.safeguards} | {
+            r.hazard_id for r in self.accepted_risks
+        }
         return high_hazards.issubset(covered)
 
 

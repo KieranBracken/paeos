@@ -74,9 +74,9 @@ def compute_contract_hash(
         "context_manifest_hash": context_manifest_hash,
         "derivation_register_hash": derivation_register_hash,
     }
-    encoded = json.dumps(
-        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
-    ).encode("utf-8")
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode(
+        "utf-8"
+    )
     return hashlib.sha256(encoded).hexdigest()
 
 
@@ -115,7 +115,6 @@ def validate_implementation_contract(contract: FrozenImplementationContract) -> 
             raise ContractValidationError(
                 f"path traversal or absolute path forbidden in allowed_paths: {path_str}"
             )
-
 
     expected_hash = compute_contract_hash(
         goal_id=contract.goal_id,

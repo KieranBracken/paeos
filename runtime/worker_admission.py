@@ -410,17 +410,13 @@ def assess_worker_run(
     ).hexdigest()
     if verification.argv_hash != expected_argv_hash:
         reasons.append("verification argv hash mismatch")
-    if verification.baseline_artifact_hash != hashlib.sha256(
-        contract.initial_bytes
-    ).hexdigest():
+    if verification.baseline_artifact_hash != hashlib.sha256(contract.initial_bytes).hexdigest():
         reasons.append("verification baseline artifact mismatch")
     if verification.candidate_artifact_hash != expected_hash:
         reasons.append("verification candidate artifact mismatch")
     if verification.artifact_restored_hash != expected_hash:
         reasons.append("verification restoration artifact mismatch")
-    if verification.mutation_hash != hashlib.sha256(
-        b"seeded-mutation\n"
-    ).hexdigest():
+    if verification.mutation_hash != hashlib.sha256(b"seeded-mutation\n").hexdigest():
         reasons.append("verification mutation hash mismatch")
     if verification.baseline_exit_code == 0:
         reasons.append("baseline verification did not fail")
@@ -446,9 +442,7 @@ def assess_worker_run(
             reasons.append(f"invalid verification hash: {name}")
 
     if reasons:
-        return AdmissionResult(
-            verdict=AdmissionVerdict.REJECTED, reasons=tuple(reasons)
-        )
+        return AdmissionResult(verdict=AdmissionVerdict.REJECTED, reasons=tuple(reasons))
 
     return AdmissionResult(verdict=AdmissionVerdict.ADMITTED, reasons=())
 
@@ -510,9 +504,7 @@ class WorkerBinding:
         return self.run.receipt.receipt_hash
 
 
-def admitted_worker_binding(
-    contract: ProbeContract, run: RawWorkerRun
-) -> WorkerBinding:
+def admitted_worker_binding(contract: ProbeContract, run: RawWorkerRun) -> WorkerBinding:
     """Return the validated binding for an admitted worker run.
 
     Delegates to the WorkerBinding evidence constructor, which re-assesses

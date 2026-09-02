@@ -31,9 +31,7 @@ class CanaryResult:
     evidence_refs: tuple[str, ...]
 
 
-def adjudicate_canary(
-    manifest: CanaryManifest, observations: Sequence[Event]
-) -> CanaryResult:
+def adjudicate_canary(manifest: CanaryManifest, observations: Sequence[Event]) -> CanaryResult:
     """Adjudicate one immutable canary transaction.
 
     Every observation must bind the complete verifier-owned manifest and one stable
@@ -61,8 +59,10 @@ def adjudicate_canary(
         manifest.installer_hash,
     )
     if (
-        any(not isinstance(value, str) or not value.strip() or any(c.isspace() for c in value)
-            for value in manifest_tokens)
+        any(
+            not isinstance(value, str) or not value.strip() or any(c.isspace() for c in value)
+            for value in manifest_tokens
+        )
         or not is_valid_hash(manifest.target_hash)
         or not is_valid_hash(manifest.mutation_hash)
         or not is_valid_hash(manifest.installer_hash)

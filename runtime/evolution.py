@@ -96,9 +96,7 @@ class EvolutionLayer:
             self._append_event(
                 "EVOLVE", outcome, run_id=run_id, summary="no failure; no scar or proposal"
             )
-            self._append_event(
-                "MEMORY_UPDATE", outcome, run_id=run_id, summary="no scar written"
-            )
+            self._append_event("MEMORY_UPDATE", outcome, run_id=run_id, summary="no scar written")
             self._append_event(
                 "IMPROVE_RUNTIME", outcome, run_id=run_id, summary="no runtime proposal"
             )

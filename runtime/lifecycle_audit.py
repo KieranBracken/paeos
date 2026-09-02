@@ -132,8 +132,11 @@ def audit_run(
             reason = "CAS_UNAVAILABLE"
         elif seqs and cas is not None and any(not cas.has(value) for value in arts):
             reason = "CAS_ARTIFACT_MISSING"
-        elif seqs and i in (13, 17) and cas is not None and any(
-            not cas.has(value) for value in evidences
+        elif (
+            seqs
+            and i in (13, 17)
+            and cas is not None
+            and any(not cas.has(value) for value in evidences)
         ):
             reason = "CAS_EVIDENCE_MISSING"
         elif seqs:

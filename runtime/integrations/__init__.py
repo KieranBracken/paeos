@@ -209,9 +209,7 @@ class ClaudeCodeRuntime:
         self._default_model = default_model
 
     def run(self, package: TaskPackage) -> RunOutput:
-        mcp_cfg = (
-            self._mcp_config_path if package.role in (Role.BUILDER, Role.ADVERSARY) else None
-        )
+        mcp_cfg = self._mcp_config_path if package.role in (Role.BUILDER, Role.ADVERSARY) else None
         invoker = (
             self._invoker
             if self._invoker is not None
@@ -298,8 +296,15 @@ def _seed_workspace(workspace: Path, source: Path, write_scopes: tuple[str, ...]
                 src,
                 workspace / scope,
                 ignore=shutil.ignore_patterns(
-                    ".git", ".venv", "state_*", ".pytest_cache", "__pycache__", ".claude",
-                    "*.pyc", "*.pyo", ".paeos_state",
+                    ".git",
+                    ".venv",
+                    "state_*",
+                    ".pytest_cache",
+                    "__pycache__",
+                    ".claude",
+                    "*.pyc",
+                    "*.pyo",
+                    ".paeos_state",
                 ),
                 dirs_exist_ok=True,
             )
@@ -323,8 +328,8 @@ def _is_junk_artifact(rel: str, *, size: int) -> bool:
     """OS/workspace droppings and empty files are never authored work (notebook Entry 141,
     Finding K).
 
-    24 of 25 historical seals certified junk as their artifact — 15 × a macOS `.DS_Store`
-    Finder-metadata blob and 9 × a 0-byte file — because `_collect_writes` harvested whatever
+    24 of 25 historical seals certified junk as their artifact — 15 x a macOS `.DS_Store`
+    Finder-metadata blob and 9 x a 0-byte file — because `_collect_writes` harvested whatever
     happened to sit in the workspace. A junk or empty file must never become
     `build.artifacts[0]`, the artifact the adversary reviews and the seal certifies.
     """

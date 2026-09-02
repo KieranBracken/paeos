@@ -1,4 +1,5 @@
 """Golden drop-and-count semantics over complete candidate structures."""
+
 from __future__ import annotations
 
 import json

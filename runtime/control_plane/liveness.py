@@ -219,8 +219,7 @@ def assess_liveness(
             meaningful_age=meaningful_age,
         )
     if heartbeat is None or (
-        heartbeat_age is not None
-        and heartbeat_age >= selected_policy.heartbeat_seconds
+        heartbeat_age is not None and heartbeat_age >= selected_policy.heartbeat_seconds
     ):
         return _assessment(
             snapshot,
@@ -312,9 +311,7 @@ def assess_liveness(
                 else LivenessStatus.SIDE_EFFECT_UNCERTAIN
             ),
             reason=(
-                "PRE_SIDE_EFFECT_HARD_STALL"
-                if safe
-                else "HARD_STALL_AFTER_POSSIBLE_SIDE_EFFECT"
+                "PRE_SIDE_EFFECT_HARD_STALL" if safe else "HARD_STALL_AFTER_POSSIBLE_SIDE_EFFECT"
             ),
             heartbeat_age=heartbeat_age,
             meaningful_age=meaningful_age,

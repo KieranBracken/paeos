@@ -254,9 +254,9 @@ class PostSealOutbox:
         emitted = _text(
             emitted_at
             if emitted_at is not None
-            else _datetime.datetime.now(_datetime.__dict__["UTC"]).isoformat().replace(
-                "+00:00", "Z"
-            ),
+            else _datetime.datetime.now(_datetime.__dict__["UTC"])
+            .isoformat()
+            .replace("+00:00", "Z"),
             "emitted_at",
         )
         candidate = OutboxRecord(
@@ -297,9 +297,7 @@ class PostSealOutbox:
                     emitted_at=candidate.emitted_at,
                 )
                 handle.seek(0, os.SEEK_END)
-                encoded = json.dumps(
-                    record.to_dict(), sort_keys=True, separators=(",", ":")
-                )
+                encoded = json.dumps(record.to_dict(), sort_keys=True, separators=(",", ":"))
                 handle.write(encoded + "\n")
                 handle.flush()
                 os.fsync(handle.fileno())

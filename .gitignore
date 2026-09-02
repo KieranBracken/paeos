@@ -30,3 +30,8 @@ state_sakg/
 # --- patch artifacts ---
 *.rej
 *.orig
+ops/chatgpt_bridge/.*
+ops/chatgpt_bridge/*.out
+ops/chatgpt_bridge/*.err
+*.out
+*.err

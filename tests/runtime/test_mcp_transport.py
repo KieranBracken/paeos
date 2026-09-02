@@ -29,8 +29,12 @@ _BUDGETS = {
     WeightClass.KERNEL_TOUCHING: Budget(600_000, 10800, 5),
 }
 _ARGS = {
-    "run_id": "r-1", "claim_id": "builds", "command": "echo built",
-    "artifact_hash": "0" * 64, "exit_code": 0, "stdout": "built\n",
+    "run_id": "r-1",
+    "claim_id": "builds",
+    "command": "echo built",
+    "artifact_hash": "0" * 64,
+    "exit_code": 0,
+    "stdout": "built\n",
 }
 
 
@@ -76,13 +80,18 @@ def test_soft_loop_seals_on_mcp_submitted_evidence(tmp_path: Path) -> None:
     asyncio.run(server.call_tool("submit_evidence", dict(_ARGS)))  # evidence arrives over MCP
     transport = McpWorkerTransport(pool_dir)
     loop = SoftLoop(
-        ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
-        cas=CAS(InMemoryCasStore()), agent_runtime=_Runtime(), budget_by_class=_BUDGETS,
+        ledger=Ledger(InMemoryLedgerStore()),
+        signing_key=SigningKey.generate(),
+        cas=CAS(InMemoryCasStore()),
+        agent_runtime=_Runtime(),
+        budget_by_class=_BUDGETS,
         sidecar_scorer=SidecarStageScorer(None),  # DEBT-0057: explicitly non-persistent
     )
     outcome = loop.run(
-        objective="x", changed_paths=("runtime/f.py",),
-        plan_write_scopes=("runtime/feature.py",), builder_evidence=(),
+        objective="x",
+        changed_paths=("runtime/f.py",),
+        plan_write_scopes=("runtime/feature.py",),
+        builder_evidence=(),
         evidence_source=transport,
     )
     assert outcome.status is RunStatus.SEALED  # sealed on evidence the worker submitted over MCP

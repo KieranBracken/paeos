@@ -13,9 +13,7 @@ from runtime.integrations.bridge_protocol import TransactionEvent
 
 CONTROL_PLANE_EVENT_SCHEMA = 1
 CONTROL_PLANE_TRANSACTION = "CONTROL_PLANE_TRANSACTION"
-INITIAL_TRANSACTION_DIGEST = hashlib.sha256(
-    b"PAEOS-CONTROL-PLANE-EMPTY/v1"
-).hexdigest()
+INITIAL_TRANSACTION_DIGEST = hashlib.sha256(b"PAEOS-CONTROL-PLANE-EMPTY/v1").hexdigest()
 
 
 class SideEffectCertainty(StrEnum):
@@ -57,8 +55,7 @@ class DispatchEvidence:
             ("response_bytes_hash", self.response_bytes_hash),
         ):
             if value is not None and (
-                len(value) != 64
-                or any(character not in "0123456789abcdef" for character in value)
+                len(value) != 64 or any(character not in "0123456789abcdef" for character in value)
             ):
                 raise ValueError(f"{field_name} must be a lowercase 64-character hex digest")
         if self.request_bytes_persisted != (self.request_bytes_hash is not None):
@@ -134,9 +131,7 @@ def transaction_event(command: TransactionCommand) -> Event:
         or any(character not in "0123456789abcdef" for character in command.idempotency_key)
     ):
         raise ValueError("idempotency_key must be a lowercase 64-character hex digest")
-    if isinstance(command.fencing_token, bool) or not isinstance(
-        command.fencing_token, int
-    ):
+    if isinstance(command.fencing_token, bool) or not isinstance(command.fencing_token, int):
         raise TypeError("command.fencing_token must be an integer")
     payload: dict[str, JsonValue] = {
         "request_id": command.request_id,

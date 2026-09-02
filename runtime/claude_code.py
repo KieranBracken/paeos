@@ -152,18 +152,30 @@ class AgentDispatcher:
     ) -> TaskResult:
         now = self._now()
         token = self._broker.mint(
-            goal_id=goal_id, run_id=run_id, stage=stage, role=role, session=session,
-            operations=self._operations(mcp_servers), issued_seq=now, expires_seq=now + ttl,
+            goal_id=goal_id,
+            run_id=run_id,
+            stage=stage,
+            role=role,
+            session=session,
+            operations=self._operations(mcp_servers),
+            issued_seq=now,
+            expires_seq=now + ttl,
         )
         compiled = self._compiler.compile(
             objective=objective, context_refs=context_refs, scars=scars
         )
         package = TaskPackage(
             task_id="t-" + uuid.uuid4().hex[:12],
-            goal_id=goal_id, run_id=run_id, stage=stage, role=role,
-            objective=compiled.objective, capability=token,
+            goal_id=goal_id,
+            run_id=run_id,
+            stage=stage,
+            role=role,
+            objective=compiled.objective,
+            capability=token,
             permissions=Permissions(write_scopes, read_scopes, mcp_servers),
-            required_evidence=required_evidence, context_refs=compiled.context_refs, budget=budget,
+            required_evidence=required_evidence,
+            context_refs=compiled.context_refs,
+            budget=budget,
         )
 
         output = self._runtime.run(package)  # the scoped, DEBT-0002-validated spawn

@@ -41,9 +41,7 @@ class ActivationDecision:
     evidence_head: str
 
 
-def evaluate_activation(
-    rows: Sequence[LedgerRow], cas: object = None
-) -> ActivationDecision:
+def evaluate_activation(rows: Sequence[LedgerRow], cas: object = None) -> ActivationDecision:
     """Derive the activation frontier from durable, content-addressed facts only.
 
     Event prose is deliberately ignored.  A countable fact must carry a unique
@@ -136,12 +134,10 @@ def evaluate_activation(
     sealed = sum("COURT_SEALED" in kinds for kinds in court_claims.values())
     remanded = sum("COURT_REMANDED" in kinds for kinds in court_claims.values())
     remediated = sum(
-        "COURT_REMEDIATED" in kinds and "COURT_REMANDED" in kinds
-        for kinds in court_claims.values()
+        "COURT_REMEDIATED" in kinds and "COURT_REMANDED" in kinds for kinds in court_claims.values()
     )
     court_conflict = any(
-        "COURT_SEALED" in kinds and "COURT_REMANDED" in kinds
-        for kinds in court_claims.values()
+        "COURT_SEALED" in kinds and "COURT_REMANDED" in kinds for kinds in court_claims.values()
     )
     if court_conflict:
         conflicts = True

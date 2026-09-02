@@ -62,10 +62,8 @@ def compile_egress_manifest(
             )
         if entry.data_class == DataClass.INTERNAL and not policy.allows_internal:
             raise EgressPolicyViolationError(
-                f"Provider {policy.provider} does not allow INTERNAL data "
-                f"(entry {entry.ref.type})"
+                f"Provider {policy.provider} does not allow INTERNAL data (entry {entry.ref.type})"
             )
-
 
         # Approximate content byte length or use hash length
         byte_len = len(entry.source_hash.encode("utf-8"))

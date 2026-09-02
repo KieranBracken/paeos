@@ -1,4 +1,5 @@
 """Machine-readable, lossless SAKG bundle round-trip reporting."""
+
 from __future__ import annotations
 
 import argparse

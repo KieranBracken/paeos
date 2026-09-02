@@ -58,8 +58,14 @@ def _broker() -> CapabilityBroker:
 
 def _token(broker: CapabilityBroker, ops: tuple[str, ...]) -> CapabilityToken:
     return broker.mint(
-        goal_id="g", run_id="r", stage=StageId.IMPLEMENT, role=Role.BUILDER, session="s",
-        operations=ops, issued_seq=10, expires_seq=40,
+        goal_id="g",
+        run_id="r",
+        stage=StageId.IMPLEMENT,
+        role=Role.BUILDER,
+        session="s",
+        operations=ops,
+        issued_seq=10,
+        expires_seq=40,
     )
 
 
@@ -149,10 +155,16 @@ def test_court_submit_and_verdict_gated() -> None:
     broker = _broker()
     server = CourtServer(_StubCourt(), broker, _clock)
     ev = Evidence(
-        hash="e" * 64, kind=EvidenceKind.TEST, claim_id="c", artifact_hash="a" * 64,
-        environment_hash="v" * 64, reproducible_command="echo ok",
+        hash="e" * 64,
+        kind=EvidenceKind.TEST,
+        claim_id="c",
+        artifact_hash="a" * 64,
+        environment_hash="v" * 64,
+        reproducible_command="echo ok",
         producer=EvidenceProducer(role=Role.BUILDER, session="s"),
-        determinism=Determinism.DETERMINISTIC, result={"exit_code": 0}, attestation="sig",
+        determinism=Determinism.DETERMINISTIC,
+        result={"exit_code": 0},
+        attestation="sig",
     )
     writer = _token(broker, ("mcp:court:write",))
     assert server.submit_evidence(writer, ev) == {"submitted": ev.hash}

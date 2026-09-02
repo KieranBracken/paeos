@@ -17,8 +17,6 @@ import time
 import uuid
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
-
 from kernel.types import StageId
 from nacl.signing import SigningKey
 
@@ -27,6 +25,8 @@ from runtime.claude_code import AgentDispatcher
 from runtime.orchestrator import CapabilityBroker
 from runtime.selfhost import Intake, _parse_intake
 from runtime.task_package import Budget
+
+logger = logging.getLogger(__name__)
 
 
 def _build_canonical_audit_context(repo_root: Path) -> str:

@@ -37,7 +37,10 @@ class PaeosAstLinter(ast.NodeVisitor):
             and isinstance(node.body[0], ast.Return)
             and (
                 node.body[0].value is None
-                or (isinstance(node.body[0].value, ast.Constant) and node.body[0].value.value is None)
+                or (
+                    isinstance(node.body[0].value, ast.Constant)
+                    and node.body[0].value.value is None
+                )
             )
         ):
             self.violations.append(

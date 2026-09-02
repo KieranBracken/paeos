@@ -68,11 +68,27 @@ def test_schema_is_draft_2020_12_and_freezes_request_response_shapes() -> None:
     assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
     assert schema["oneOf"] == [{"$ref": "#/$defs/request"}, {"$ref": "#/$defs/response"}]
     defs = schema["$defs"]
-    assert set(defs["request"]["required"]) == {"method", "subject", "namespace", "budget", "filters"}
-    assert set(defs["response"]["required"]) == {"results", "provenance", "truncated", "omitted", "trust", "tier"}
+    assert set(defs["request"]["required"]) == {
+        "method",
+        "subject",
+        "namespace",
+        "budget",
+        "filters",
+    }
+    assert set(defs["response"]["required"]) == {
+        "results",
+        "provenance",
+        "truncated",
+        "omitted",
+        "trust",
+        "tier",
+    }
     assert defs["method"]["enum"] == [
-        "query_architectures", "dependency_impact", "tradeoff_precedents",
-        "pattern_retrieval", "memory_augment",
+        "query_architectures",
+        "dependency_impact",
+        "tradeoff_precedents",
+        "pattern_retrieval",
+        "memory_augment",
     ]
 
 

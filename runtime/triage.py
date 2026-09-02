@@ -100,13 +100,9 @@ class GoalBudget:
         new_tokens = self._spent_tokens + cost.tokens
         new_wallclock = self._spent_wallclock + cost.wallclock_s
         if new_tokens > self._budget.tokens:
-            raise BudgetExceeded(
-                f"tokens {new_tokens} > budget {self._budget.tokens}"
-            )
+            raise BudgetExceeded(f"tokens {new_tokens} > budget {self._budget.tokens}")
         if new_wallclock > self._budget.wallclock_s:
-            raise BudgetExceeded(
-                f"wallclock {new_wallclock}s > budget {self._budget.wallclock_s}s"
-            )
+            raise BudgetExceeded(f"wallclock {new_wallclock}s > budget {self._budget.wallclock_s}s")
         self._spent_tokens = new_tokens
         self._spent_wallclock = new_wallclock
 

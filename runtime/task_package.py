@@ -39,7 +39,7 @@ __all__ = [
 @dataclass(frozen=True, slots=True)
 class ExecutionContext:
     """L1 Ephemeral Execution Context (IP-0004).
-    
+
     Scoped strictly to the active run_id. Holds transient operational retry state.
     Destroyed when the execution scope terminates. NEVER written to institutional memory.
     """
@@ -103,7 +103,6 @@ class TaskPackage:
     forbidden: tuple[str, ...] = ()  # documentation of intent; enforcement is by capability (T1)
     ephemeral_context: ExecutionContext = field(default_factory=ExecutionContext)
     execution_binding: object | None = None
-
 
 
 class TaskStatus(Enum):

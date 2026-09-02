@@ -507,9 +507,7 @@ def bind_request_to_admitted_worker(
         )
 
     unbound_hash = content_hash(worker_evidence_manifest(request))
-    bound_manifest = worker_evidence_manifest(
-        request, worker_receipt_hash=binding.receipt_hash
-    )
+    bound_manifest = worker_evidence_manifest(request, worker_receipt_hash=binding.receipt_hash)
     # Serialize, parse, and reserialize the canonical snapshot so the returned
     # bytes are exactly the canonical evidence. No trailing newline is added.
     snapshot = canonical_json(bound_manifest)
@@ -525,9 +523,7 @@ def bind_request_to_admitted_worker(
             raise ProtocolViolation(
                 "bound evidence manifest conflicts with the existing transaction binding"
             )
-        return AdmittedWorkerRequest(
-            request=request, evidence_manifest_bytes=manifest_bytes
-        )
+        return AdmittedWorkerRequest(request=request, evidence_manifest_bytes=manifest_bytes)
     if request.evidence_manifest_hash != unbound_hash:
         raise ProtocolViolation(
             "existing evidence_manifest_hash conflicts with the canonical manifest"
@@ -667,12 +663,8 @@ def _validate_record(record: TransactionRecord) -> None:
         TransactionState.CLAIMED,
         TransactionState.RESPONDED,
         TransactionState.CONSUMED,
-    } and (
-        record.lease_owner is None or record.lease_expires_at is None
-    ):
-        raise _protocol_error(
-            f"{record.state.value} requires an active lease"
-        )
+    } and (record.lease_owner is None or record.lease_expires_at is None):
+        raise _protocol_error(f"{record.state.value} requires an active lease")
 
     if record.lease_owner is None:
         if record.lease_expires_at is not None:
@@ -1176,12 +1168,8 @@ class TransactionStore:
             raw = target.read_bytes()
             actual_prior_digest = hashlib.sha256(raw).hexdigest()
             if actual_prior_digest != expected_prior_digest:
-                raise _protocol_error(
-                    "transaction changed concurrently; reconciliation required"
-                )
-            existing = _record_from_mapping(
-                _json_object_from_bytes(raw, source=str(target))
-            )
+                raise _protocol_error("transaction changed concurrently; reconciliation required")
+            existing = _record_from_mapping(_json_object_from_bytes(raw, source=str(target)))
             if (
                 len(record.transitions) != len(existing.transitions) + 1
                 or record.transitions[:-1] != existing.transitions
@@ -1190,14 +1178,10 @@ class TransactionStore:
 
             transition = record.transitions[-1]
             claim_lease_owner = (
-                record.lease_owner
-                if transition.event is TransactionEvent.CLAIM
-                else None
+                record.lease_owner if transition.event is TransactionEvent.CLAIM else None
             )
             claim_lease_expires_at = (
-                record.lease_expires_at
-                if transition.event is TransactionEvent.CLAIM
-                else None
+                record.lease_expires_at if transition.event is TransactionEvent.CLAIM else None
             )
             changed_side_effect = (
                 record.last_side_effect
@@ -1214,9 +1198,7 @@ class TransactionStore:
                 last_side_effect=changed_side_effect,
             )
             if expected != record:
-                raise _protocol_error(
-                    "save record does not match the pure reducer result"
-                )
+                raise _protocol_error("save record does not match the pure reducer result")
 
             payload = (canonical_json(record) + "\n").encode("utf-8")
             fd, temp_name = tempfile.mkstemp(

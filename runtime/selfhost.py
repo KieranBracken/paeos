@@ -226,6 +226,7 @@ def run_backlog(
                 record_friction(friction, repo_root)
             if friction.high_leverage_intake is not None:
                 from dataclasses import replace
+
                 outcome = replace(outcome, high_leverage_intake=friction.high_leverage_intake)
                 queue.appendleft(friction.high_leverage_intake)
         outcomes.append(outcome)

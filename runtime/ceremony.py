@@ -1,8 +1,8 @@
 """Canonical L02 ceremony contract + Trace-A discharge evidence stubs.
 
 Implements the **existing canonical law** — no legislation. Source: Engineering Lifecycle
-(operations/ENGINEERING_LIFECYCLE.md v1.3, L18–30) and its derived machine-executable form
-(operations/WORKFLOW_STATE_MACHINE.yaml, ``ceremony_depth`` L56–72). Doctrine extraction with
+(operations/ENGINEERING_LIFECYCLE.md v1.3, L18-30) and its derived machine-executable form
+(operations/WORKFLOW_STATE_MACHINE.yaml, ``ceremony_depth`` L56-72). Doctrine extraction with
 citations: ``backlog/research/PAEOS_RESEARCH_BACKLOGS_CEREMONY_TDD_v0.1/
 PAEOS_CEREMONY_DEPTH_DOCTRINE_EXTRACTION_v1.md`` (RB-CEREMONY-DEPTH-001 D1).
 
@@ -10,34 +10,34 @@ What this module gives the runtime (the R4 gap labelled "L02 PARTIAL — depth a
 ceremony contract absent" in the Two-Axis Conformance Map):
 
   1. **CeremonyContract** — the per-run obligation graph derived from L02's ceremony-depth
-     decision: for every canonical layer L01–L19, EXECUTE or lawful DISCHARGE.
+     decision: for every canonical layer L01-L19, EXECUTE or lawful DISCHARGE.
   2. **DischargeStub** — the mandatory K1 evidence for a discharged layer, in the canonical
-     WSM format ``{result: auto_pass, reason: trace_a, by: runtime}`` (WSM L70–72; EL L29–30:
+     WSM format ``{result: auto_pass, reason: trace_a, by: runtime}`` (WSM L70-72; EL L29-30:
      "auto-discharge is not skip — it emits the evidence stub that keeps every transition valid").
   3. **Obligation plan** — the ordered ceremony-resolved path a run must follow
      (the input to the runtime obligation-graph execution, approved sequence step 4).
 
-Canonical sets encoded here (EL L24–28 / WSM L60–68):
+Canonical sets encoded here (EL L24-28 / WSM L60-68):
 
   * Trace-A: executes L01, L02, L12, L13, L14, L15, L16 (and L19 if triggered) **in full**;
-    auto-discharges L03–L11 and L17–L18.
+    auto-discharges L03-L11 and L17-L18.
   * Trace-B: all 19 layers execute in full, founder decisions at the gates.
 """
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
 
 __all__ = [
+    "TRACE_A_DISCHARGE",
+    "TRACE_A_EXECUTE_FULL",
+    "TRACE_B_EXECUTE_FULL",
     "CeremonyContract",
     "DischargeStub",
     "Layer",
     "Obligation",
-    "TRACE_A_DISCHARGE",
-    "TRACE_A_EXECUTE_FULL",
-    "TRACE_B_EXECUTE_FULL",
     "ceremony_for",
     "discharged_layers_for",
 ]
@@ -68,7 +68,7 @@ class Layer(Enum):
 
 
 class Obligation(Enum):
-    """What the contract demands of a layer for this run (EL L24–28)."""
+    """What the contract demands of a layer for this run (EL L24-28)."""
 
     EXECUTE = "EXECUTE"  # substantive execution (or L01/L02/TRIAGE/... never dischargeable)
     DISCHARGE = "DISCHARGE"  # lawful auto-discharge with a mandatory evidence stub
@@ -97,7 +97,7 @@ CANONICAL_ORDER: tuple[Layer, ...] = (
     Layer.L19,
 )
 
-# Trace-A auto-discharge set: L03–L11 and L17–L18 (EL L24–25; WSM L62).
+# Trace-A auto-discharge set: L03-L11 and L17-L18 (EL L24-25; WSM L62).
 TRACE_A_DISCHARGE: frozenset[Layer] = frozenset(
     {
         Layer.L03,
@@ -125,10 +125,10 @@ TRACE_A_EXECUTE_FULL: frozenset[Layer] = frozenset(
         # L19 executes only if triggered (EL L26); it is never dischargeable.
     }
 )
-# Trace-B: all 19 in full (EL L27–28).
+# Trace-B: all 19 in full (EL L27-28).
 TRACE_B_EXECUTE_FULL: frozenset[Layer] = frozenset(CANONICAL_ORDER)
 
-# Layers that may NEVER be auto-discharged on any trace (EL L24–26; D1 §6).
+# Layers that may NEVER be auto-discharged on any trace (EL L24-26; D1 §6).
 NEVER_DISCHARGEABLE: frozenset[Layer] = TRACE_A_EXECUTE_FULL | frozenset({Layer.L19})
 
 
@@ -136,7 +136,7 @@ NEVER_DISCHARGEABLE: frozenset[Layer] = TRACE_A_EXECUTE_FULL | frozenset({Layer.
 class DischargeStub:
     """A lawful-discharge evidence stub (K1) for one auto-discharged layer.
 
-    Structured exactly per WSM L70–72 / EL L29–30, so every discharged transition still carries
+    Structured exactly per WSM L70-72 / EL L29-30, so every discharged transition still carries
     evidence. `result`/`reason`/`by` are fixed for a Trace-A auto-discharge; a Trace-B run never
     produces stubs (nothing is discharged).
     """
@@ -227,9 +227,7 @@ def ceremony_for(trace: str | None) -> CeremonyContract:
     obligations: dict[Layer, Obligation] = {}
     for layer in CANONICAL_ORDER:
         if layer in execute or layer in discharge:
-            obligations[layer] = (
-                Obligation.EXECUTE if layer in execute else Obligation.DISCHARGE
-            )
+            obligations[layer] = Obligation.EXECUTE if layer in execute else Obligation.DISCHARGE
         else:
             # L01/L02/L12..L16/L19 execute-if-triggered are never dischargeable.
             obligations[layer] = Obligation.EXECUTE

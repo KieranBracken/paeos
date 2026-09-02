@@ -50,9 +50,7 @@ class TransactionCoordinator:
         self._ledger = ledger
         self._projection = projection
         self._commit_lock = threading.Lock()
-        self._process_lock_path = projection.path.with_name(
-            f".{projection.path.name}.commit.lock"
-        )
+        self._process_lock_path = projection.path.with_name(f".{projection.path.name}.commit.lock")
 
     def prepare(
         self,

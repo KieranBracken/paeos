@@ -107,9 +107,7 @@ def score_leverage(
     """
     blast_radius = classify_paths(changed_paths)
 
-    is_substrate = any(
-        _normalize_top(p) in _SUBSTRATE_PREFIXES for p in changed_paths
-    )
+    is_substrate = any(_normalize_top(p) in _SUBSTRATE_PREFIXES for p in changed_paths)
 
     score = 1.0
     if is_substrate:
@@ -218,18 +216,28 @@ class FrictionRecord:
 # Each rule is (substring to match in RunOutcome.detail, category, title template).
 # Order matters: first match wins. More specific patterns come first.
 _CLASSIFICATION_RULES: tuple[tuple[str, FrictionCategory, str], ...] = (
-    ("builder produced no artifact", FrictionCategory.DEBT,
-     "Builder Produced No Artifact — Write-Scope or Agent Failure"),
-    ("no evidence submitted", FrictionCategory.DEBT,
-     "No Evidence Submitted to Court MCP"),
-    ("non-probative (vacuous) evidence", FrictionCategory.DEBT,
-     "Non-Probative Evidence — Test Does Not Exercise Change"),
-    ("court remanded", FrictionCategory.DEBT,
-     "Court Remand — Unmet Evidence Claims"),
-    ("adversary blocked the seal", FrictionCategory.RESEARCH,
-     "Adversary Blocked Seal — Design Disagreement Requires Investigation"),
-    ("budget breach", FrictionCategory.RESEARCH,
-     "Budget Breach — Possible Budget Model Miscalibration"),
+    (
+        "builder produced no artifact",
+        FrictionCategory.DEBT,
+        "Builder Produced No Artifact — Write-Scope or Agent Failure",
+    ),
+    ("no evidence submitted", FrictionCategory.DEBT, "No Evidence Submitted to Court MCP"),
+    (
+        "non-probative (vacuous) evidence",
+        FrictionCategory.DEBT,
+        "Non-Probative Evidence — Test Does Not Exercise Change",
+    ),
+    ("court remanded", FrictionCategory.DEBT, "Court Remand — Unmet Evidence Claims"),
+    (
+        "adversary blocked the seal",
+        FrictionCategory.RESEARCH,
+        "Adversary Blocked Seal — Design Disagreement Requires Investigation",
+    ),
+    (
+        "budget breach",
+        FrictionCategory.RESEARCH,
+        "Budget Breach — Possible Budget Model Miscalibration",
+    ),
 )
 
 

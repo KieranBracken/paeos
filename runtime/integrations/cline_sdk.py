@@ -202,15 +202,18 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
         if lease is None:
             return
         evidence = lease.lease_root / f"{contract.probe_id}.failure.json"
-        payload = _canonical_bytes(
-            {
-                "invocation_id": contract.probe_id,
-                "status": "failed",
-                "reason": message,
-                "stdout_sha256": _sha_bytes(stdout),
-                "stderr_sha256": _sha_bytes(stderr),
-            }
-        ) + b"\n"
+        payload = (
+            _canonical_bytes(
+                {
+                    "invocation_id": contract.probe_id,
+                    "status": "failed",
+                    "reason": message,
+                    "stdout_sha256": _sha_bytes(stdout),
+                    "stderr_sha256": _sha_bytes(stderr),
+                }
+            )
+            + b"\n"
+        )
         descriptor = os.open(evidence, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         try:
             os.write(descriptor, payload)
@@ -393,9 +396,7 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
                         stderr_bytes,
                     )
                 result = (
-                    {}
-                    if phase == "approval"
-                    else self._execute_tool(contract, payload, decision)
+                    {} if phase == "approval" else self._execute_tool(contract, payload, decision)
                 )
                 response = {
                     "invocation_id": invocation_id,
@@ -750,16 +751,14 @@ class ClineSdkAdmissionAdapter(AdmissionProbeTransport):
             raise AdmissionError("SDK manifest completion mismatch")
         if manifest.get("enable_tools") is not True:
             raise AdmissionError("SDK manifest capabilities mismatch")
-        if (
-            manifest.get("enable_spawn") is not capabilities.get("enable_spawn_agent")
-            or manifest.get("enable_teams") is not capabilities.get("enable_agent_teams")
-        ):
+        if manifest.get("enable_spawn") is not capabilities.get(
+            "enable_spawn_agent"
+        ) or manifest.get("enable_teams") is not capabilities.get("enable_agent_teams"):
             raise AdmissionError("SDK manifest capabilities mismatch")
         if manifest.get("messages_path") != str(messages_path):
             raise AdmissionError("SDK manifest messages path mismatch")
-        if (
-            manifest.get("cwd") != str(contract.sandbox)
-            or manifest.get("workspace_root") != str(contract.sandbox)
+        if manifest.get("cwd") != str(contract.sandbox) or manifest.get("workspace_root") != str(
+            contract.sandbox
         ):
             raise AdmissionError("SDK manifest workspace mismatch")
         if manifest.get("provider") != contract.provider_id:

@@ -158,10 +158,15 @@ def decide_recovery(
         last_checkpoint_monotonic=last_checkpoint_monotonic,
     )
     status = assessment.status
-    if storage_observation is not None and decide_storage(
-        storage_observation,
-        StoragePolicy() if storage_policy is None else storage_policy,
-    ) is StorageDisposition.BACKPRESSURE and status is LivenessStatus.HEALTHY:
+    if (
+        storage_observation is not None
+        and decide_storage(
+            storage_observation,
+            StoragePolicy() if storage_policy is None else storage_policy,
+        )
+        is StorageDisposition.BACKPRESSURE
+        and status is LivenessStatus.HEALTHY
+    ):
         return _decision(
             snapshot,
             action=RecoveryAction.DIAGNOSE,

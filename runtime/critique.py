@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, List
+from typing import Any
 
 
 class CritiqueStance(Enum):
@@ -33,11 +33,11 @@ class StanceEvaluation:
 
 @dataclass(frozen=True)
 class CritiqueReport:
-    evaluations: List[StanceEvaluation]
+    evaluations: list[StanceEvaluation]
     passed_all: bool
     summary: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "passed_all": self.passed_all,
             "summary": self.summary,
@@ -56,14 +56,14 @@ class CritiqueReport:
 class MultiPerspectiveCritiqueEngine:
     """Evaluates proposed architecture changes against the 8 canonical stances."""
 
-    def __init__(self, required_stances: List[CritiqueStance] | None = None) -> None:
+    def __init__(self, required_stances: list[CritiqueStance] | None = None) -> None:
         if required_stances is None:
             self._stances = list(CritiqueStance)
         else:
             self._stances = required_stances
 
-    def evaluate(self, proposal: Dict[str, Any]) -> CritiqueReport:
-        evaluations: List[StanceEvaluation] = []
+    def evaluate(self, proposal: dict[str, Any]) -> CritiqueReport:
+        evaluations: list[StanceEvaluation] = []
         all_passed = True
 
         for stance in self._stances:

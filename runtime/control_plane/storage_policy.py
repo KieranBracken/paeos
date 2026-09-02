@@ -38,12 +38,7 @@ class StorageObservation:
 
     @property
     def total_bytes(self) -> int:
-        return (
-            self.cas_bytes
-            + self.trace_bytes
-            + self.projection_bytes
-            + self.quarantine_bytes
-        )
+        return self.cas_bytes + self.trace_bytes + self.projection_bytes + self.quarantine_bytes
 
 
 @dataclass(frozen=True, slots=True)

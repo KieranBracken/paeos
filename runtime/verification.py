@@ -76,7 +76,9 @@ def vacuous_commands(
 
     for rel_path, artifact_hash in written_paths:
         target = baseline / rel_path
-        is_test_file = rel_path.startswith("tests/") or "test_" in rel_path or rel_path.endswith("_test.py")
+        is_test_file = (
+            rel_path.startswith("tests/") or "test_" in rel_path or rel_path.endswith("_test.py")
+        )
         if is_test_file:
             # Apply new test file to baseline workspace so the test executes against baseline code
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -86,13 +88,14 @@ def vacuous_commands(
             # so Python imports from baseline (failing missing symbols) rather than falling back to repo_root via editable .pth
             if rel_path.endswith(".py"):
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text("# baseline stub: implementation removed for non-vacuity check\n", encoding="utf-8")
+                target.write_text(
+                    "# baseline stub: implementation removed for non-vacuity check\n",
+                    encoding="utf-8",
+                )
             elif target.is_file():
                 target.unlink()
             elif target.is_dir():
                 shutil.rmtree(target, ignore_errors=True)
-
-
 
     try:
         run_with, run_without = workspace_runner(with_change), workspace_runner(baseline)
@@ -102,16 +105,14 @@ def vacuous_commands(
             res_without = run_without(c)
             is_test_cmd = "pytest" in c or "test" in c
             # Vacuous if identical output in both environments, or if a test passes in baseline without implementation
-            if res_with == res_without:
-                vacuous.append(c)
-            elif is_test_cmd and res_with.get("exit_code") == 0 and res_without.get("exit_code") == 0:
+            if res_with == res_without or (
+                is_test_cmd and res_with.get("exit_code") == 0 and res_without.get("exit_code") == 0
+            ):
                 vacuous.append(c)
         return tuple(vacuous)
     finally:
         shutil.rmtree(with_change, ignore_errors=True)
         shutil.rmtree(baseline, ignore_errors=True)
-
-
 
 
 def workspace_runner(workspace: Path) -> Callable[[str], dict[str, JsonValue]]:
@@ -141,4 +142,3 @@ def check_ast(
         for v in file_violations:
             violations.append(f"{rel_path}: {v}")
     return tuple(violations)
-

@@ -98,9 +98,7 @@ class InformationBarrierManager:
 
     def adversary_context(self, bundle: SealedBundle) -> tuple[ArtifactRef, ...]:
         """The adversary's `context_refs`: bundle artifacts + evidence-as-refs, nothing else."""
-        evidence_as_refs = tuple(
-            ArtifactRef(hash=h, type="evidence") for h in bundle.evidence_refs
-        )
+        evidence_as_refs = tuple(ArtifactRef(hash=h, type="evidence") for h in bundle.evidence_refs)
         return bundle.artifact_refs + evidence_as_refs
 
     def verify_isolation(
