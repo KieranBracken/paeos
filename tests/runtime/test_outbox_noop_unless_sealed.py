@@ -1,11 +1,9 @@
 """Fail-closed lifecycle state and reference validation."""
 
-import pytest
-
-from runtime.emission.outbox import OutboxOrderingError, OutboxValidationError, OutboxWriter
-
-
 from hashlib import sha256
+
+import pytest
+from runtime.emission.outbox import OutboxOrderingError, OutboxValidationError, OutboxWriter
 
 
 def bundle(bundle_id: str = "bundle-1") -> dict[str, object]:
@@ -18,13 +16,17 @@ def bundle(bundle_id: str = "bundle-1") -> dict[str, object]:
     }
 
 
-
 def test_non_integrated_goal_is_a_true_noop(tmp_path) -> None:
     path = tmp_path / "outbox.jsonl"
     writer = OutboxWriter(path)
     malformed = {"inline_evidence": {"secret": "must never be persisted"}}
     for state in ("declared", "planned", "executed", "sealed", "remanded"):
-        assert writer.write_after_seal(malformed, goal_state=state, seal_sequence=None, l16_sequence=None) is None
+        assert (
+            writer.write_after_seal(
+                malformed, goal_state=state, seal_sequence=None, l16_sequence=None
+            )
+            is None
+        )
     assert not path.exists()
 
 
@@ -48,5 +50,7 @@ def test_integrated_goal_requires_nonempty_valid_cas_references(tmp_path) -> Non
 def test_integrated_goal_requires_explicit_seal_boundary(tmp_path) -> None:
     writer = OutboxWriter(tmp_path / "outbox.jsonl")
     with pytest.raises(OutboxOrderingError):
-        writer.write_after_seal(bundle(), goal_state="integrated", seal_sequence=None, l16_sequence=2)
+        writer.write_after_seal(
+            bundle(), goal_state="integrated", seal_sequence=None, l16_sequence=2
+        )
     assert not writer.path.exists()
