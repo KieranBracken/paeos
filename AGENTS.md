@@ -32,4 +32,10 @@
      3. *Heterogeneous Audit:* Reviewer family must differ from builder family (`Builder != Auditor`).
      4. *Economy of Reasoning:* Match task criticality to model capability; preserve scarce high-reasoning quotas.
 
-
+4. **Hypervisor Visual Screen-Audit Protocol (Every 20 Cron Check-ins)**:
+   * Every 20 cron check-ins (e.g. Iterations 20, 40, 60, 80, 100, 120, etc.), the hypervisor must perform a visual screen inspection / forensic capture of the ChatGPT Codex window.
+   * **Forensic Visual Invariants to Verify**:
+     1. *Hash Matching:* Prompt SHA-256 and evidence bundle SHA-256 match exactly between the terminal relay, candidate commit, and ChatGPT input prompt.
+     2. *Queue Congestion & Staggered Messages:* Detect if multiple prompts or authorizations were queued/staggered in the UI without execution.
+     3. *Truncation & UI Halts:* Check for truncated responses, stalled spinners, stuck tools, or modal authorization prompts.
+     4. *Anti-Hallucination Integrity:* Confirm the model is not outputting fabricated claims, self-ratifying without Court disposition, or bypassing safety machinery.

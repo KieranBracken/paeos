@@ -65,9 +65,13 @@ Why is this worth exploring? What problem does it solve?
 - **[`RB-0008-autonomous-technical-leadership.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0008-autonomous-technical-leadership.md)** — **Autonomous Technical Leadership & Self-Improvement Loop**:
   establishes the operational blueprint and success metrics for long-running autonomous runs where PAEOS builds external systems, identifies its own structural gaps, files research/proposals/debt, calculates ROI, and self-corrects without founder intervention.
   Status: **Critical (Phase 4 Mission Target)**.
-- **[`RB-0009-organisational-cognition-and-dynamic-capability-discovery.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0009-organisational-cognition-and-dynamic-capability-discovery.md)** — **Organisational Cognition & Dynamic Capability Discovery**:
-  master research domain unifying Organizational Cognition, Pre-implementation Capability Discovery, Capability Requests (voice without authority), Capability Broker, Local vs Global Incentive Optimization, Dynamic Specialists & Councils, Engineering Friction, Capability Demand Analytics, and Safe Self-Improvement.
-  Status: **High Priority (Foundational Research)**.
+- **[`PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/README.md)** — **PAEOS Reliability, Error Intelligence & Learning Backlog**:
+  * **[`PAEOS-RQ-REL-001`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-001-reliability-error-intelligence-model.md)**: Reliability & Error Intelligence Model (P0)
+  * **[`PAEOS-RQ-REL-002`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-002-verification-coverage-false-passes-seal-escape.md)**: Verification Coverage, False Passes & Seal-Escape Measurement (P0/P1)
+  * **[`PAEOS-RQ-REL-003`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-003-confidence-calibration-disagreement-audit-yield.md)**: Confidence Calibration, Disagreement & Audit Yield (P1)
+  * **[`PAEOS-RQ-REL-004`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-004-economy-of-reasoning-recovery-efficiency.md)**: Economy of Reasoning, Recovery & Engineering Efficiency (P1)
+  * **[`PAEOS-RQ-REL-005`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-005-learning-effectiveness-adaptive-routing.md)**: Learning Effectiveness & Adaptive Reliability Routing (P2)
+
 
 
 
