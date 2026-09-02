@@ -11,7 +11,8 @@ import json
 from collections.abc import Iterable, Mapping
 from typing import Any, cast
 
-from mcp.server import MCPServer
+from mcp.server import MCPServer  # pyright: ignore[reportMissingImports]
+
 
 from sakg.methods.tradeoff_precedents import TradeoffPrecedentError, tradeoff_precedents
 
