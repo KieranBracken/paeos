@@ -5015,3 +5015,21 @@ receipt/report creation with exit code `2`, `AUDITOR_RECEIPT_FAILED:OperationalE
 retry, provider substitution, code change, or promotion occurred. Canonical strict progress remains
 **18/48 complete | 30 remaining**. Task 12 implementation is not yet dispatched from this turn.
 
+### Entry 279 — 2026-09-02: Task 12 SoftLoop run remanded; no seal
+
+One host-level isolated SoftLoop run for `[F-BUDGET-FIX]` used Cline/ClinePass GLM in
+`/private/tmp/paeos-fbudget-run-host` (run `r-06906dc3`, goal `g-11d19028534e`). The worker made no
+repository changes and submitted real claims for the budget fixture catalog (**2/2 passed**) and
+the projection-budget check (**3/3 passed**). The Verification Court could not reproduce the bound
+claims and returned `REMANDED`; `ops/autonomous_run.py` exited `2` with zero seals. The state-root
+ledger verifies to head
+`6d0aa748f3147d704f3a2f28f4f9a0ee7400086d10fbfdc8e4e68e0354f89b91`; raw Court JSONL
+`/private/tmp/paeos-fbudget-run-host/court/r-06906dc3.jsonl` has SHA-256
+`78824b6e6e4f050e43b53651528eb18192be7d80655ba45a57309eeba39c738f`.
+
+RB-0008 filed `DEBT-0063` (SHA-256
+`ed66d55e5955346f2ec74018464198762c65d64c5e1156708b076051f3dd9f57`) for the reproduction
+friction. The existing implementation commit `2c987988221da134a636f181720ba9200b8bd32e` is an
+ancestor and its local fixture test is green, but no candidate-bound Task 12 L14/L17 pair exists;
+therefore no Task 12 seal or progress increment is admitted. Exact canonical progress remains
+**18/48 complete | 30 remaining**.

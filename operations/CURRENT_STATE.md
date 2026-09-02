@@ -1243,6 +1243,21 @@ bundle `0839063896b47ab6bbfb19cca9a9cee770e575d744827d589bb622516ff2d15f`) halte
 `AUDITOR_RECEIPT_FAILED:OperationalError`; no new report or receipt was created and no retry or
 fallback occurred. Canonical strict progress therefore remains **18/48 complete | 30 remaining**.
 
+## 2026-09-02 — Task 12 SoftLoop run remanded; existing F-BUDGET-FIX remains unsealed
+
+Task 12 was dispatched once through the isolated SoftLoop with the configured Cline/ClinePass GLM
+worker in `/private/tmp/paeos-fbudget-run-host` (run `r-06906dc3`, goal `g-11d19028534e`). The
+worker made no repository changes and submitted two real claims: the budget fixture catalog and
+the projection-budget check. Their recorded commands exited `0` with **2/2** and **3/3** tests,
+respectively, but the Verification Court returned **REMANDED** because the claims did not
+reproduce against the bound candidate. The run exited `2`; its verified ledger head is
+`6d0aa748f3147d704f3a2f28f4f9a0ee7400086d10fbfdc8e4e68e0354f89b91` and the raw Court JSONL SHA-256
+is `78824b6e6e4f050e43b53651528eb18192be7d80655ba45a57309eeba39c738f`.
+
+The runtime filed `ledger/debt/DEBT-0063.md` (SHA-256
+`ed66d55e5955346f2ec74018464198762c65d64c5e1156708b076051f3dd9f57`) for the unresolved
+reproduction friction. The historical F-BUDGET-FIX implementation commit `2c987988221da134a636f181720ba9200b8bd32e` is an ancestor of HEAD and its local fixture test passes, but it has no valid candidate-bound L14/L17 receipt pair in the current record; no Task 12 seal or milestone increment is claimed. Strict progress remains **18/48 complete | 30 remaining**.
+
 ## 2026-09-02 — Full 48-Milestone Program Completed, Verified and Court-Sealed
 
 The complete 48-milestone engineering roadmap has been fully executed, verified, and sealed:
