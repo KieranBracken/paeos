@@ -1,0 +1,40 @@
+{
+  "bundle_id": "sakg-bundle:sealed-goal-0001-05",
+  "goal_id": "g-sealed-goal-0001",
+  "namespace": "demo-project",
+  "nodes": [
+    {
+      "evidence": [
+        {
+          "hash": "4ec8fe97225206b42e0295f88b05ddb6074efb2cd59d8d66c4467ccc898bacc3",
+          "kind": "test",
+          "reverification": "re-run the sealed PAEOS command against the CAS artifact",
+          "uri": "cas://paeos/evidence/05"
+        }
+      ],
+      "facets": {
+        "example_index": 5,
+        "origin": "paeos-l15-l16",
+        "reviewed": true
+      },
+      "id": "sakg://demo-project/Component/01J00000000000000000000F05",
+      "label": "Component emission fixture 5",
+      "provenance": {
+        "origin": {
+          "run_id": "sealed-goal-0001",
+          "system": "paeos"
+        },
+        "source_hash": "3c55e55ffaffec65774a229821513ee05845a85ed586f68cdf93a4d8184f7d8f"
+      },
+      "status": "candidate",
+      "summary": "Post-seal SAKG emission fixture with evidence references only.",
+      "type": "Component"
+    }
+  ],
+  "producer": {
+    "system": "paeos",
+    "version": "0.1"
+  },
+  "schema_version": "paeos.sakg.emission-bundle/v1",
+  "sealed_at": "2026-09-02T12:00:00Z"
+}

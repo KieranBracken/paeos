@@ -1,0 +1,182 @@
+{
+  "$id": "https://paeos.local/sakg/schema/bundle.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Append-only post-seal L15/L16 outbox; only EvidenceRef hashes cross the boundary.",
+  "properties": {
+    "bundle_id": {
+      "pattern": "^sakg-bundle:[a-z0-9-]+$",
+      "type": "string"
+    },
+    "goal_id": {
+      "pattern": "^g-[a-z0-9-]+$",
+      "type": "string"
+    },
+    "namespace": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "type": "string"
+    },
+    "nodes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "hash": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "artifact",
+                    "test",
+                    "report",
+                    "observation",
+                    "decision",
+                    "source"
+                  ],
+                  "type": "string"
+                },
+                "reverification": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "uri": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "hash",
+                "uri",
+                "kind",
+                "reverification"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "facets": {
+            "additionalProperties": {},
+            "propertyNames": {
+              "pattern": "^(?!.*(?:payload|evidence|content)).+$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "id": {
+            "pattern": "^sakg://[^/]+/(?:Decision|TradeOff|Option|Constraint|Component|Scar|EvidenceRef)/[0-9A-HJKMNP-TV-Z]{26}$",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "provenance": {
+            "additionalProperties": false,
+            "properties": {
+              "origin": {
+                "additionalProperties": false,
+                "properties": {
+                  "run_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "system": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "system",
+                  "run_id"
+                ],
+                "type": "object"
+              },
+              "source_hash": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "origin",
+              "source_hash"
+            ],
+            "type": "object"
+          },
+          "status": {
+            "const": "candidate"
+          },
+          "summary": {
+            "maxLength": 280,
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "Decision",
+              "TradeOff",
+              "Option",
+              "Constraint",
+              "Component",
+              "Scar",
+              "EvidenceRef"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "label",
+          "summary",
+          "facets",
+          "evidence",
+          "provenance"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "producer": {
+      "additionalProperties": false,
+      "properties": {
+        "system": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "system",
+        "version"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "paeos.sakg.emission-bundle/v1"
+    },
+    "sealed_at": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "bundle_id",
+    "schema_version",
+    "goal_id",
+    "sealed_at",
+    "namespace",
+    "producer",
+    "nodes"
+  ],
+  "title": "SAKG Emission Bundle",
+  "type": "object"
+}
