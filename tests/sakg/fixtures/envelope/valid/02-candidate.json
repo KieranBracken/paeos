@@ -1,0 +1,36 @@
+{
+  "confidence": 0.75,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 2
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Problem/01J00000000000000000000002",
+  "label": "Example Problem 2",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "ingest",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-02",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "ada987408d4654e36fc691a5d4383af83cdaf396c088eb6370a5a18235786882"
+  },
+  "status": "candidate",
+  "summary": "A deterministic problem fixture exercising the universal envelope.",
+  "type": "Problem",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

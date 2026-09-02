@@ -1,0 +1,43 @@
+{
+  "confidence": 0.65,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "b9f35749d145af689a5a342650f2ae39af921deb1acdc1496fb96422a3d63063",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/09"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 9
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Component/01J00000000000000000000009",
+  "label": "Example Component 9",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-09",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "6f8452267bf1fcc65c7892ad7b611834a8c26495152539f8ba8e366ae17ee2ef"
+  },
+  "status": "superseded",
+  "summary": "A deterministic component fixture exercising the universal envelope.",
+  "type": "Component",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

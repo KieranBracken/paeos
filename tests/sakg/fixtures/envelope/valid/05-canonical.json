@@ -1,0 +1,43 @@
+{
+  "confidence": 0.65,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "237e9fee742dd844d231df29595848fe5308b9b86035e9e39027c2ae9e482c05",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/05"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 5
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Objective/01J00000000000000000000005",
+  "label": "Example Objective 5",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-05",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "2c4b303cdbaf0dd7def127756797668bb1d6140eda7b690b39a8bf0bf0102e02"
+  },
+  "status": "canonical",
+  "summary": "A deterministic objective fixture exercising the universal envelope.",
+  "type": "Objective",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

@@ -1,0 +1,43 @@
+{
+  "confidence": 0.85,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "c3e26e5dbcd4820b9e9c5ba9bbb9628c3f792677d8233bb8d720cdca82050a8e",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/07"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 7
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Mechanism/01J00000000000000000000007",
+  "label": "Example Mechanism 7",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-07",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "4a81437dc8650b7bd98859d7fe5c797b03cf8aabfbcd5b94b8d21bc4ef993491"
+  },
+  "status": "superseded",
+  "summary": "A deterministic mechanism fixture exercising the universal envelope.",
+  "type": "Mechanism",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

@@ -1,0 +1,43 @@
+{
+  "confidence": 0.85,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "2b02e7a70e43f8555cff941bd24a34f475460b135b33df3d1bd04041a46491bb",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/11"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 11
+    }
+  },
+  "falsifier": "A bound contradictory observation",
+  "id": "sakg://demo-project/Scar/01J00000000000000000000011",
+  "label": "Example Scar 11",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-11",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "eeae8fe6fd43ad316fc38ee51bf7c34366748af9745bccffac6ec03a8700321e"
+  },
+  "status": "refuted",
+  "summary": "A deterministic scar fixture exercising the universal envelope.",
+  "type": "Scar",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}
