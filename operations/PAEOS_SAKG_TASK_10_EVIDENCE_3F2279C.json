@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "3f2279cd2f2a547eab5fb64ab9f87846d2b49a80",
+  "l13_reproduction": {
+    "collected": 12,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-10-l13-focused-3f2279c.log",
+    "focused_log_sha256": "3d4896047cff93d16cd218e107055cb7ecd08e8f06ac2b0d31759f86f3119c8d",
+    "passed": 12,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_10_EVIDENCE",
+  "program_candidate_commit": "d4f7424177b633474e110adb5c22718efbae8db1",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1 / Schema & Property Engine",
+  "task": "Task 10 \u2014 Universal Envelope Schema, Bundle Validation & Roundtrip Property Tests"
+}
