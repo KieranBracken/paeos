@@ -1,6 +1,7 @@
 # SAKG TASK 02 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `d1c51cc`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
 - **Task:** Task 02 — AST Node & Tradeoff Extractor with Explicit Gaps
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

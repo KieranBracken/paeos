@@ -1,6 +1,7 @@
 # SAKG TASK 09 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `01076b8`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 / MCP Protocol Adapter
 - **Task:** Task 09 — MCP Server, Read-Only Enforcement & Graceful Degradation
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

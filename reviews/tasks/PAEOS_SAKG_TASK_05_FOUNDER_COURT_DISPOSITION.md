@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 05 (Context Projection Engine, Token Budgets & Trust Invariants)
 - **Candidate Commit:** `1e3def4`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

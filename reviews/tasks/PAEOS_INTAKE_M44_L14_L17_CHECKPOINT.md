@@ -1,5 +1,6 @@
 # INTAKE M44 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `7adf7d8`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** Runtime / Verification Engine
 - **Task:** M44 — Verification Engine Upgrades (`[L06]`)
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

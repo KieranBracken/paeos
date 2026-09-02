@@ -1,5 +1,6 @@
 # INTAKE M47 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `02236a8`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** Runtime / AST Anti-Pattern Linter
 - **Task:** M47 — AST Anti-Pattern Linter & Swallowed Exception Enforcement (`[RB-0015]`)
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

@@ -133,16 +133,16 @@ def check_layer_dag(repo_root: Path) -> list[ArchitectureViolation]:
 
     for node in list(graph.adj.keys()):
         if visited.get(node, 0) == 0 and dfs(node, []):
-                cycle_str = " -> ".join(cycle_nodes)
-                violations.append(
-                    ArchitectureViolation(
-                        source_path=cycle_nodes[0] if cycle_nodes else node,
-                        imported_target=cycle_nodes[-1] if cycle_nodes else node,
-                        rule_id="ARCH-INVARIANT-03",
-                        description=f"Circular dependency cycle detected: {cycle_str}",
-                    )
+            cycle_str = " -> ".join(cycle_nodes)
+            violations.append(
+                ArchitectureViolation(
+                    source_path=cycle_nodes[0] if cycle_nodes else node,
+                    imported_target=cycle_nodes[-1] if cycle_nodes else node,
+                    rule_id="ARCH-INVARIANT-03",
+                    description=f"Circular dependency cycle detected: {cycle_str}",
                 )
-                break
+            )
+            break
 
     return violations
 

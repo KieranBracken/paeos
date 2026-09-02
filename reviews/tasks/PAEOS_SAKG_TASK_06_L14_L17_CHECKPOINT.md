@@ -1,6 +1,7 @@
 # SAKG TASK 06 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `f45df32`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
 - **Task:** Task 06 — Edge Families, Non-Authority Boundaries & No-Mutating Egress
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

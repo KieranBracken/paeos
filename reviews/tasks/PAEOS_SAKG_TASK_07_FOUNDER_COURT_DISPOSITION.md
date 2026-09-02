@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 07 (Tradeoff Precedents, Outcome Joins & Ranked Precedents)
 - **Candidate Commit:** `10d7187`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

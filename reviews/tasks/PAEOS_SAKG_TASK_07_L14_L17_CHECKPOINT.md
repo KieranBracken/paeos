@@ -1,6 +1,7 @@
 # SAKG TASK 07 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `10d7187`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
 - **Task:** Task 07 — Tradeoff Precedents, Outcome Joins & Ranked Precedents
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

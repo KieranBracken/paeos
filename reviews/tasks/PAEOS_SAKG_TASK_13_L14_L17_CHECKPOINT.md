@@ -1,5 +1,6 @@
 # SAKG TASK 13 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `fe075bc`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 / Promotion Engine
 - **Task:** Task 13 — Promotion Requires Candidate Evidence Binding
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

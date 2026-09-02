@@ -1,5 +1,6 @@
 # INTAKE M46 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `02236a8`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** Runtime / Sqlite Scar Store
 - **Task:** M46 — Sqlite Scar Store Module & Schema Tests (`[DURABLE-SCARS-MODULE]`)
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

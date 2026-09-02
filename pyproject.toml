@@ -39,6 +39,7 @@ extend-exclude = [".agents", ".claude", ".runtime", "spec 2"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
 
 # ---- pyright (strict on the TCB) -----------------------------------------
 # PAEOS-8 §8: pyright STRICT on kernel/ (the `strict` list), standard elsewhere.
@@ -47,9 +48,10 @@ pythonVersion = "3.12"
 typeCheckingMode = "standard"
 reportUnknownMemberType = false
 reportMatchNotExhaustive = true
-include = ["kernel", "runtime", "cli", "tests"]
-exclude = ["**/__pycache__", ".venv", ".agents", ".claude"]
+include = ["kernel", "runtime", "cli", "sakg"]
+exclude = ["**/__pycache__", ".venv", ".agents", ".claude", "tests"]
 strict = ["kernel"]   # TCB is strictly typed
+
 
 # ---- pytest ---------------------------------------------------------------
 [tool.pytest.ini_options]

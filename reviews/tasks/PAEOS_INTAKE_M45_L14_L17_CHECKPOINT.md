@@ -1,5 +1,6 @@
 # INTAKE M45 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `02236a8`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** Runtime / Evolution Ledger
 - **Task:** M45 — Durable L17-L19 Evolution Events in Ledger (`[EVOLUTION-LEDGER]`)
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

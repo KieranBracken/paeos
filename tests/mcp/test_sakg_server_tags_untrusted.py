@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import pytest
 
 from sakg.mcp_server import build_sakg_mcp_server
 
@@ -18,9 +19,6 @@ def test_every_response_is_untrusted_sakg_advisory_data() -> None:
 
 
 def test_full_tier_cannot_be_configured() -> None:
-    try:
+    with pytest.raises(ValueError, match="tier"):
         build_sakg_mcp_server(nodes=(), edges=(), tier="FULL")
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("FULL tier must be rejected")
+

@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 03 (Ingestion Pipeline, Idempotency & Candidate-Only Landing)
 - **Candidate Commit:** `34e2080`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

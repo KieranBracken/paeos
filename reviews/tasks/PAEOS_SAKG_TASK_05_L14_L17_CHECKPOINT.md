@@ -1,6 +1,7 @@
 # SAKG TASK 05 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `1e3def4`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
 - **Task:** Task 05 — Context Projection Engine, Token Budgets & Trust Invariants
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

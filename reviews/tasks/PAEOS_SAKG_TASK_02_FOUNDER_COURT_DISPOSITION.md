@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 02 (AST Node & Tradeoff Extractor with Explicit Gaps)
 - **Candidate Commit:** `d1c51cc`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

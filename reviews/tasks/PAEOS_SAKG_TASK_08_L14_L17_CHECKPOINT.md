@@ -1,6 +1,7 @@
 # SAKG TASK 08 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `d78101b`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 / Runtime Outbox
 - **Task:** Task 08 — Outbox Event Fencing, Append-Only Durability & Post-Seal Ordering
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

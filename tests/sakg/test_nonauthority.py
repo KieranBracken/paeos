@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import pytest
 
 from sakg.mcp_server import build_sakg_mcp_server
 
@@ -24,9 +25,5 @@ def test_consumer_surface_is_query_only_and_advisory() -> None:
 
 
 def test_full_tier_is_not_an_admissible_consumer_contract() -> None:
-    try:
+    with pytest.raises(ValueError, match="tier"):
         build_sakg_mcp_server(nodes=(), edges=(), tier="FULL")
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("FULL tier must be rejected")

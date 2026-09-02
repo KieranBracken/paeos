@@ -1,5 +1,6 @@
 # SAKG TASK 16 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `24bffc3`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 / Backfill Pipeline
 - **Task:** Task 16 — Historical Backfill & Hand-Attributed Metadata
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

@@ -1,5 +1,6 @@
 # SAKG TASK 12 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 - **Candidate Commit:** `fe075bc`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 / Promotion Rules
 - **Task:** Task 12 — Frequency Never Promotes Invariant
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)

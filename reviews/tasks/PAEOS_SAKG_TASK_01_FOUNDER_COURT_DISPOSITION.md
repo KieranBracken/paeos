@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 01 (Pure SQLite Storage & Append-Only Invariants)
 - **Candidate Commit:** `310afb5`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 10 (Universal Envelope Schema, Bundle Validation & Roundtrip Property Tests)
 - **Candidate Commit:** `3f2279c`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

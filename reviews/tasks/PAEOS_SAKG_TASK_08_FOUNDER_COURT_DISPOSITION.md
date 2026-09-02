@@ -2,6 +2,7 @@
 
 - **Task:** SAKG Task 08 (Outbox Event Fencing, Append-Only Durability & Post-Seal Ordering)
 - **Candidate Commit:** `d78101b`
+- **Program Candidate Commit:** `fe7b257`
 - **Disposition:** **COURT_SEALED**
 - **Date:** 2026-09-02
 - **Court Panel:** Founder / Overseer & Heterogeneous Auditor

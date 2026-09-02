@@ -1,6 +1,7 @@
 # SAKG TASK 10 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
 
 - **Candidate Commit:** `3f2279c`
+- **Program Candidate Commit:** `fe7b257`
 - **Subsystem:** SAKG-1 / Schema & Property Engine
 - **Task:** Task 10 — Universal Envelope Schema, Bundle Validation & Roundtrip Property Tests
 - **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)
