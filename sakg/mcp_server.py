@@ -13,7 +13,6 @@ from typing import Any, cast
 
 from mcp.server import MCPServer  # pyright: ignore[reportMissingImports]
 
-
 from sakg.methods.tradeoff_precedents import TradeoffPrecedentError, tradeoff_precedents
 
 __all__ = ["build_sakg_mcp_server", "build_server", "main"]
