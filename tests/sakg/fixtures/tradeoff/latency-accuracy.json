@@ -1,0 +1,38 @@
+{
+  "case": "latency-accuracy",
+  "expected": {
+    "results": [
+      {
+        "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F01",
+        "outcome": {
+          "id": "sakg://paeos-recovery/Outcome/01J00000000000000000000F11",
+          "status": "realized",
+          "summary": "Gate A admission transport was sealed with typed evidence."
+        },
+        "score": 0.94,
+        "why": [
+          "TradeOff axes matched: latency,accuracy",
+          "TradeOff resolves_to Decision",
+          "Decision realized_as Outcome"
+        ]
+      }
+    ]
+  },
+  "query": {
+    "axes": [
+      "latency",
+      "accuracy"
+    ],
+    "goal_id": "g-extract-gate-a",
+    "method": "tradeoff_precedents",
+    "subject": "latency versus accuracy in admission verification"
+  },
+  "schema_version": "paeos.sakg.tradeoff-fixture/v1",
+  "source": {
+    "excerpt": "Latency; Accuracy; Cost; Maintainability; Reliability; Scalability",
+    "heading": "Dimension 3 \u2014 Objectives",
+    "inventory_sha256": "798d592065fcb75996e5fbe55e662b210062f8148f43fe55ab57a88ecb81c9fc",
+    "path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+    "sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+  }
+}

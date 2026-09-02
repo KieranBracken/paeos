@@ -1,0 +1,38 @@
+{
+  "case": "scalability-memory",
+  "expected": {
+    "results": [
+      {
+        "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F01",
+        "outcome": {
+          "id": "sakg://paeos-recovery/Outcome/01J00000000000000000000F14",
+          "status": "realized",
+          "summary": "The sealed Gate A decision remains a candidate precedent for resource-bounded retrieval."
+        },
+        "score": 0.87,
+        "why": [
+          "TradeOff axes matched: scalability,memory",
+          "TradeOff resolves_to Decision",
+          "Decision realized_as Outcome"
+        ]
+      }
+    ]
+  },
+  "query": {
+    "axes": [
+      "scalability",
+      "memory"
+    ],
+    "goal_id": "g-extract-gate-a",
+    "method": "tradeoff_precedents",
+    "subject": "scalability versus memory in graph projection"
+  },
+  "schema_version": "paeos.sakg.tradeoff-fixture/v1",
+  "source": {
+    "excerpt": "Performance; Complexity; Scalability; Maintainability; Reliability; Security; Safety; Cost; Latency; Memory; Implementation Difficulty",
+    "heading": "Layer 6 \u2014 Trade-off Analysis",
+    "inventory_sha256": "798d592065fcb75996e5fbe55e662b210062f8148f43fe55ab57a88ecb81c9fc",
+    "path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+    "sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+  }
+}

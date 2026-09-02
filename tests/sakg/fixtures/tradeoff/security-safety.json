@@ -1,0 +1,38 @@
+{
+  "case": "security-safety",
+  "expected": {
+    "results": [
+      {
+        "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F02",
+        "outcome": {
+          "id": "sakg://paeos-recovery/Outcome/01J00000000000000000000F15",
+          "status": "realized",
+          "summary": "The sealed Gate B decision preserves fail-closed safety while carrying debt explicitly."
+        },
+        "score": 0.85,
+        "why": [
+          "TradeOff axes matched: security,safety",
+          "TradeOff resolves_to Decision",
+          "Decision realized_as Outcome"
+        ]
+      }
+    ]
+  },
+  "query": {
+    "axes": [
+      "security",
+      "safety"
+    ],
+    "goal_id": "g-extract-gate-b",
+    "method": "tradeoff_precedents",
+    "subject": "security versus safety in transaction controls"
+  },
+  "schema_version": "paeos.sakg.tradeoff-fixture/v1",
+  "source": {
+    "excerpt": "Performance; Complexity; Scalability; Maintainability; Reliability; Security; Safety; Cost; Latency; Memory; Implementation Difficulty",
+    "heading": "Layer 6 \u2014 Trade-off Analysis",
+    "inventory_sha256": "798d592065fcb75996e5fbe55e662b210062f8148f43fe55ab57a88ecb81c9fc",
+    "path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+    "sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+  }
+}
