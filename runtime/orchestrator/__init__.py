@@ -43,6 +43,7 @@ from runtime.review import (
     ReviewHarness,
     read_adversary_verdict,
 )
+from runtime.scar_store import SqliteScarStore
 from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, ExecutionContext, TaskResult
 from runtime.triage import BudgetExceeded, GoalBudget, TriageDecision, triage
@@ -64,6 +65,13 @@ __all__ = [
 ]
 
 GOAL_CREATED = "goal_created"
+
+
+def durable_scar_store(state_dir: Path) -> ScarStore:
+    """Construct the state-directory-owned scar store used by autonomous composition roots."""
+    return SqliteScarStore(state_dir)
+
+
 LAYER_DISCHARGED = "layer_discharged"
 
 
@@ -265,10 +273,15 @@ class SoftLoop:
         # accounting exact rather than charging the weight-class ceiling for every run.
         budget = GoalBudget(decision.budget)
         outcome = self._run_body(
-            budget=budget, decision=decision, objective=objective,
-            changed_paths=changed_paths, plan_write_scopes=plan_write_scopes,
-            builder_evidence=builder_evidence, goal_signature=goal_signature,
-            run_id=run_id, evidence_source=evidence_source,
+            budget=budget,
+            decision=decision,
+            objective=objective,
+            changed_paths=changed_paths,
+            plan_write_scopes=plan_write_scopes,
+            builder_evidence=builder_evidence,
+            goal_signature=goal_signature,
+            run_id=run_id,
+            evidence_source=evidence_source,
         )
         return replace(
             outcome,
@@ -292,9 +305,10 @@ class SoftLoop:
         goal_id = "g-" + uuid.uuid4().hex[:12]
         self._ledger.append(
             Event(
-                1, GOAL_CREATED,
+                1,
+                GOAL_CREATED,
                 {"goal_id": goal_id, "weight_class": decision.weight_class.value},
-                        )
+            )
         )
 
         # Step 4 — lawful Trace-A discharge evidence (K1): emit one canonical LAYER_DISCHARGED row
@@ -321,10 +335,19 @@ class SoftLoop:
                 if decision.ceremony.obligation_for(layer) is Obligation.DISCHARGE:
                     continue
                 scars = self._scar_refs(goal_signature, stage)
-                session_name = "adversary" if stage is StageId.ADVERSARIAL_REVIEW else ("critic" if stage is StageId.CRITIQUE else "planner")
+                session_name = (
+                    "adversary"
+                    if stage is StageId.ADVERSARIAL_REVIEW
+                    else ("critic" if stage is StageId.CRITIQUE else "planner")
+                )
                 result = self._playbook.run_stage(
-                    goal_id=goal_id, run_id=run_id, stage=stage, session=session_name,
-                    budget=decision.budget, scars=scars, context_refs=tuple(planner_artifacts),
+                    goal_id=goal_id,
+                    run_id=run_id,
+                    stage=stage,
+                    session=session_name,
+                    budget=decision.budget,
+                    scars=scars,
+                    context_refs=tuple(planner_artifacts),
                     detail=goal_detail,
                 )
                 budget.charge(result.cost)
@@ -347,9 +370,14 @@ class SoftLoop:
 
             # --- Builder: IMPLEMENT on the plan scopes, with design + plan as context (B2.J) ---
             build = self._playbook.run_stage(
-                goal_id=goal_id, run_id=run_id, stage=StageId.IMPLEMENT, session="builder",
-                budget=decision.budget, write_scopes=plan_write_scopes,
-                context_refs=tuple(planner_artifacts), detail=goal_detail,
+                goal_id=goal_id,
+                run_id=run_id,
+                stage=StageId.IMPLEMENT,
+                session="builder",
+                budget=decision.budget,
+                write_scopes=plan_write_scopes,
+                context_refs=tuple(planner_artifacts),
+                detail=goal_detail,
             )
             budget.charge(build.cost)
             self._record_stage(run_id, goal_id, StageId.IMPLEMENT, "builder", build)
@@ -411,8 +439,11 @@ class SoftLoop:
                 diagnostics=(f"court remanded {goal_id}: unmet {verdict.unmet_claims}",),
             )
             return RunOutcome(
-                RunStatus.REMANDED, goal_id, "court remanded",
-                verdict=verdict, ephemeral_context=context,
+                RunStatus.REMANDED,
+                goal_id,
+                "court remanded",
+                verdict=verdict,
+                ephemeral_context=context,
             )
 
         # --- Probative-evidence gate (B2.O / CANARY-0002): even a reproducing command must
@@ -425,13 +456,18 @@ class SoftLoop:
             vacuous = vacuous_commands(self._repo_root, build.written_paths, self._cas, commands)
             if vacuous:
                 context = ExecutionContext(
-                    retry_hints=("evidence must exercise the change — a command with the same "
-                                 "result with and without it proves nothing; supply a real test",),
+                    retry_hints=(
+                        "evidence must exercise the change — a command with the same "
+                        "result with and without it proves nothing; supply a real test",
+                    ),
                     diagnostics=(f"non-probative (vacuous) evidence: {vacuous}",),
                 )
                 return RunOutcome(
-                    RunStatus.REMANDED, goal_id, "non-probative (vacuous) evidence",
-                    verdict=verdict, ephemeral_context=context,
+                    RunStatus.REMANDED,
+                    goal_id,
+                    "non-probative (vacuous) evidence",
+                    verdict=verdict,
+                    ephemeral_context=context,
                 )
 
         # --- Isolated Adversary over the sealed bundle (B1.D / FR-3) ---
@@ -442,7 +478,10 @@ class SoftLoop:
         bundle = self._ibm.seal(artifact_refs=(artifact,), evidence_refs=evidence_refs)
         try:
             adversary = self._review.review(
-                goal_id=goal_id, run_id=run_id, session="adversary", bundle=bundle,
+                goal_id=goal_id,
+                run_id=run_id,
+                session="adversary",
+                bundle=bundle,
                 budget=decision.budget,
             )
             budget.charge(adversary.cost)
@@ -463,15 +502,21 @@ class SoftLoop:
                 diagnostics=(f"adversary BLOCK on goal {goal_id} at ADVERSARIAL_REVIEW",),
             )
             return RunOutcome(
-                RunStatus.REMANDED, goal_id, "adversary blocked the seal",
-                verdict=verdict, ephemeral_context=context,
+                RunStatus.REMANDED,
+                goal_id,
+                "adversary blocked the seal",
+                verdict=verdict,
+                ephemeral_context=context,
             )
 
         # --- Seal (B0.9): idempotent, over the bundle + verdict + adversary + ledger head ---
         verdict_ref = self._cas.put(_canonical(verdict).encode("ascii"))
         seal = self._seal.seal(
-            goal_id=goal_id, run_id=run_id, artifact_bundle=bundle.bundle_hash,
-            verdict_ref=verdict_ref, adversary_ref=adversary.trace_ref,
+            goal_id=goal_id,
+            run_id=run_id,
+            artifact_bundle=bundle.bundle_hash,
+            verdict_ref=verdict_ref,
+            adversary_ref=adversary.trace_ref,
         )
 
         # --- Post-Seal Evolution Stages (EL L17-L18 / Trace-B): Retrospect & Memory Update ---
@@ -479,8 +524,12 @@ class SoftLoop:
             for stage, layer in POST_SEAL_EVOLUTION_STAGES:
                 if decision.ceremony.obligation_for(layer) is Obligation.EXECUTE:
                     evo_res = self._playbook.run_stage(
-                        goal_id=goal_id, run_id=run_id, stage=stage, session="evolution",
-                        budget=decision.budget, context_refs=(ArtifactRef(hash=seal.seal_hash, type="seal"),),
+                        goal_id=goal_id,
+                        run_id=run_id,
+                        stage=stage,
+                        session="evolution",
+                        budget=decision.budget,
+                        context_refs=(ArtifactRef(hash=seal.seal_hash, type="seal"),),
                         detail=goal_detail,
                     )
                     budget.charge(evo_res.cost)
@@ -490,7 +539,9 @@ class SoftLoop:
                         stage=stage,
                         primary_model=evo_res.cost.model_ver,
                         artifact_content=(
-                            self._cas.get(evo_res.artifacts[0].hash).decode("utf-8", errors="replace")
+                            self._cas.get(evo_res.artifacts[0].hash).decode(
+                                "utf-8", errors="replace"
+                            )
                             if evo_res.artifacts
                             else goal_detail
                         ),
@@ -499,8 +550,12 @@ class SoftLoop:
             # --- L19 (EVOLVE): Constitutional Evolution (Triggered for KERNEL_TOUCHING) ---
             if decision.weight_class is WeightClass.KERNEL_TOUCHING:
                 evolve_res = self._playbook.run_stage(
-                    goal_id=goal_id, run_id=run_id, stage=StageId.EVOLVE, session="ratifier",
-                    budget=decision.budget, context_refs=(ArtifactRef(hash=seal.seal_hash, type="seal"),),
+                    goal_id=goal_id,
+                    run_id=run_id,
+                    stage=StageId.EVOLVE,
+                    session="ratifier",
+                    budget=decision.budget,
+                    context_refs=(ArtifactRef(hash=seal.seal_hash, type="seal"),),
                     detail=goal_detail,
                 )
                 budget.charge(evolve_res.cost)
@@ -510,13 +565,21 @@ class SoftLoop:
                     stage=StageId.EVOLVE,
                     primary_model=evolve_res.cost.model_ver,
                     artifact_content=(
-                        self._cas.get(evolve_res.artifacts[0].hash).decode("utf-8", errors="replace")
+                        self._cas.get(evolve_res.artifacts[0].hash).decode(
+                            "utf-8", errors="replace"
+                        )
                         if evolve_res.artifacts
                         else goal_detail
                     ),
                 )
         except BudgetExceeded as exc:
-            return RunOutcome(RunStatus.HALTED, goal_id, f"budget breach at evolution: {exc}", seal=seal, verdict=verdict)
+            return RunOutcome(
+                RunStatus.HALTED,
+                goal_id,
+                f"budget breach at evolution: {exc}",
+                seal=seal,
+                verdict=verdict,
+            )
 
         return RunOutcome(RunStatus.SEALED, goal_id, "sealed", seal=seal, verdict=verdict)
 
@@ -545,9 +608,7 @@ class SoftLoop:
             )
         )
 
-    def _record_discharges(
-        self, run_id: str, goal_id: str, ceremony: CeremonyContract
-    ) -> None:
+    def _record_discharges(self, run_id: str, goal_id: str, ceremony: CeremonyContract) -> None:
         """Emit the K1 evidence stubs for every layer the ceremony contract discharges.
 
         Auto-discharge is NOT a skip (EL L29-30 / WSM L70-72): each discharged layer appends one

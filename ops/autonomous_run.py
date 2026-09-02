@@ -33,7 +33,13 @@ from runtime.evolution import EvolutionLayer
 from runtime.friction import FrictionCategory, classify_friction, record_friction
 from runtime.integrations import ClaudeCodeRuntime
 from runtime.integrations.hybrid import CodexRuntime, HybridRuntime
-from runtime.orchestrator import Intake, RunOutcome, RunStatus, SoftLoop
+from runtime.orchestrator import (
+    Intake,
+    RunOutcome,
+    RunStatus,
+    SoftLoop,
+    durable_scar_store,
+)
 from runtime.scheduler import (
     ConcurrentScheduler,
     ContinuousScheduler,
@@ -108,12 +114,14 @@ def build_scheduler(
         )
     ledger = Ledger(SqliteLedgerStore(state_dir / "ledger.db"))
     signing_key = load_or_create_signing_key(state_dir / "seal.key")
+    scar_store = durable_scar_store(state_dir)
     loop = SoftLoop(
         ledger=ledger,
         signing_key=signing_key,
         cas=cas,
         agent_runtime=runtime,
         budget_by_class=DEFAULT_BUDGETS,
+        scar_store=scar_store,
         repo_root=repo_root,  # B2.N: the court verifies each command in a workspace WITH the change
         # DEBT-0057: persistence is explicit — state-dir-owned, never repository-relative.
         sidecar_scorer=SidecarStageScorer(state_dir.resolve() / "evaluations"),
