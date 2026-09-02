@@ -1,5 +1,10 @@
 # Founder/Court Disposition — SAKG Task 12
 
+> **RECONCILIATION STATUS (2026-09-02): SUPERSEDED / NOT A CURRENT DISPOSITION.** This historical
+> record labels the older “Frequency Never Promotes” invariant as Task 12 and binds Task 11's
+> candidate `fe075bc`. It is not a disposition for the `[F-BUDGET-FIX]` intake. The current
+> F-BUDGET-FIX SoftLoop run was Court-REMANDED, so no Task 12 seal is in force.
+
 - **Disposition:** `COURT_SEALED`
 - **Candidate:** `fe075bc1c6845466b28aca5cefb7a49d32aae206`
 - **Program Candidate:** `0ce64355991f99dd144040dc2b547158ff0e00ed`

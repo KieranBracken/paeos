@@ -1,5 +1,10 @@
 # PAEOS SAKG Task 12 L14/L17 Checkpoint — Candidate fe075bc
 
+> **RECONCILIATION STATUS (2026-09-02): SUPERSEDED / NOT ADMISSIBLE FOR F-BUDGET-FIX.** This
+> historical file describes the older “Frequency Never Promotes” invariant and binds the Task 11
+> candidate `fe075bc`, not the `[F-BUDGET-FIX]` Task 12 intake. It must not mint a Task 12 seal.
+> The current F-BUDGET-FIX run `r-06906dc3` was Court-REMANDED; no current Task 12 seal exists.
+
 Date: 2026-09-02  
 Branch: `codex/control-plane-recovery-s1-clean-recovered`  
 Candidate: `fe075bc1c6845466b28aca5cefb7a49d32aae206`  
