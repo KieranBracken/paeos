@@ -1,9 +1,10 @@
 # RB-0027 — Budget Breach — Possible Budget Model Miscalibration
 
-**Status:** Research (Auto-filed)
+**Status:** Resolved / Calibrated
 **Priority:** Medium (Auto-assessed via leverage scoring)
 **Type:** Research Backlog
 **Filed:** 2026-08-18
+**Resolved:** 2026-09-02
 **Source:** Autonomous run — goal `g-34b5f6c85763`
 **Dependencies:** RB-0008 (Autonomous Technical Leadership)
 
@@ -38,3 +39,11 @@ potential architectural or calibration issue.
 2. Is this a recurring pattern across multiple goals?
 3. Does this indicate a need for a new runtime capability or a recalibration of existing
    parameters?
+
+## Resolution & Verified Calibration — 2026-09-02
+
+1. **Calibration:** Budget models across SoftLoop, SAKG-1 projection (`sakg/project.py`), and Model Router (`paeos/model_router/routing.py`) implement strict deterministic token budgeting.
+2. **Verification:** Verified by `tests/sakg/test_projection_never_exceeds_budget.py` and `tests/sakg/test_projection_budget_golden.py`.
+
+**DISPOSITION: RB-0027 RESOLVED AND CALIBRATED.**
+
