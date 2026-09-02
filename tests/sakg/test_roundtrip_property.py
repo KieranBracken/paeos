@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
 from sakg.report import canonical_roundtrip
 
-
-json_scalar = st.one_of(st.none(), st.booleans(), st.integers(-100000, 100000), st.text(max_size=30))
+json_scalar = st.one_of(
+    st.none(), st.booleans(), st.integers(-100000, 100000), st.text(max_size=30)
+)
 json_value = st.recursive(
     json_scalar,
     lambda children: st.one_of(

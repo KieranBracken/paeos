@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 
 import pytest
-
 from sakg.report import RoundTripError, discover_bundle_paths, roundtrip_bundle, roundtrip_paths
 
 
