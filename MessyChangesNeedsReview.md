@@ -1222,6 +1222,14 @@ evidence and Founder/Court disposition are mandatory.
   `0ab44eb766a0716f04bf6ee5a5511dc042c924f90b93b434dbfea2a9454348e2`. Disposition remains
   `BLOCKED_UNPROVEN`; strict progress is unchanged at `18/48 complete | 30 remaining`, and no
   SAKG contract or lifecycle seal was created.
+
+- 2026-09-02 Mission 0 inventory binding checkpoint: recovery commit `e69f705` adds
+  `ops/sakg/SAKG_SOURCE_INVENTORY.md` (SHA-256
+  `cc15de2e32fdb837f39dcf4ba5fa5239d4f918861492da599dba1b0c4f996f6e`). No AST extractor or
+  canonical `SAKG_AST_INVENTORY.json` exists yet. Because epoch-6 worker admission remains
+  `AUTH_FAILED` and the former GUI bridge is retired, no bound SoftLoop worker was available;
+  direct Architect-side extraction and Court submission were not attempted. Mission 0 remains
+  `BLOCKED_UNPROVEN`, with no artifact/Court hash and no change to `18/48 complete | 30 remaining`.
 - 2026-09-02 Founder Mission 0 authorization: conditional Trace-A envelope was ratified, but
    activation remains `INACTIVE_BLOCKED` because epoch-6 admission is `AUTH_FAILED`; no live retry
    was allowed. The referenced `ops/sakg/SAKG_SOURCE_INVENTORY.md` exists only as an untracked

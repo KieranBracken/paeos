@@ -1221,6 +1221,20 @@ L01–L19 remain unproven for this root, and no frozen SAKG Mission 0 Trace-A co
 while the operating envelope is `INACTIVE_BLOCKED`. `DEBT-0060` and `RB-0027` remain open. No
 retry, fallback, promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.
 
+## 2026-09-02 — Mission 0 source inventory bound; AST extraction held
+
+Recovery commit `e69f705d79c51c00bae0c319b2cd6e3368b99016` binds
+`ops/sakg/SAKG_SOURCE_INVENTORY.md` (SHA-256
+`cc15de2e32fdb837f39dcf4ba5fa5239d4f918861492da599dba1b0c4f996f6e`). The branch contains no
+canonical `ops/sakg/SAKG_AST_INVENTORY.json` or extractor. Mission 0 remains a research-backlog
+execution that must run through an admitted Trace-A worker and active SoftLoop/chat-bridge sandbox;
+epoch-6 admission is still `AUTH_FAILED`, and the old GUI bridge is retired.
+
+Disposition: `MISSION_0: BLOCKED_UNPROVEN`. No AST artifact or Court evidence was generated, and
+strict progress remains **18/48 complete | 30 remaining**. No direct Architect-side generation was
+performed because it would bypass the worker/Court boundary. A fresh successful admission and
+candidate-bound lifecycle evidence are required before Mission 0 can advance.
+
 ## 2026-09-02 — Mission 0 dispatch held at inactive-envelope and bridge boundary
 
 Founder ratification of the conditional Trace-A envelope does not bypass successful worker

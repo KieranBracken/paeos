@@ -4867,6 +4867,29 @@ remaining**; external Court remains **Sealed: 6 | Remanded: 0 | Remediated: 0** 
 epoch-6 root has no Court events. No retry, fallback, promotion, merge, protected-ref, main/trunk,
 credential, or SAKG mutation occurred.
 
+### Entry 274 — 2026-09-02: Mission 0 source inventory bound; AST extraction still held
+
+Founder supplied recovery commit `e69f705d79c51c00bae0c319b2cd6e3368b99016`, which binds
+`ops/sakg/SAKG_SOURCE_INVENTORY.md` in the isolated recovery branch. The inventory file's
+SHA-256 is `cc15de2e32fdb837f39dcf4ba5fa5239d4f918861492da599dba1b0c4f996f6e` (5,053 bytes,
+80 lines, 29 top-level entries). Read-only validation confirms the listed local corpus roots are
+present; no canonical `ops/sakg/SAKG_AST_INVENTORY.json` or extraction implementation is present.
+
+The requested Mission 0 operation remains a research-backlog execution and must be routed through
+an admitted Trace-A worker and active SoftLoop/chat-bridge sandbox. The epoch-6 Cline admission is
+still the preserved typed `AUTH_FAILED` barrier; no new authentication epoch or retry was supplied.
+The recovery branch's former GUI bridge is retired and has no active bound prompt/worker. The
+historical Mission 0 SAEOS-1 artifacts are superseded and cannot serve as candidate evidence.
+Accordingly, direct AST generation, Court submission, and canonical-file creation were not
+attempted from the Architect session.
+
+Disposition: `MISSION_0: BLOCKED_UNPROVEN`. No artifact SHA, Court evidence, ledger event, or
+48-milestone increment exists for AST extraction. Strict progress remains **18/48 complete | 30
+remaining**; `DEBT-0060` and `RB-0027` remain open. Required next step is a fresh successful typed
+worker admission followed by a bound SoftLoop Mission 0 run that creates the inventory and its
+candidate-bound L13/L14/L17 evidence. No promotion, merge, protected-ref, main/trunk, credential,
+or SAKG mutation occurred.
+
 ### Entry 273 — 2026-09-02: Founder Mission 0 dispatch held at inactive-envelope and bridge boundary
 
 The Founder ratified the conditional Trace-A operating envelope (serial concurrency `1`,
