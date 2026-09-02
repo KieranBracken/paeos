@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from hypothesis import given, strategies as st
 
+from hypothesis import given
+from hypothesis import strategies as st
 from kernel.cas import CAS, FilesystemCasStore
 
 

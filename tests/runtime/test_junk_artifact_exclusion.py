@@ -1,6 +1,6 @@
 """Junk-artifact exclusion in `_collect_writes` (notebook Entry 141, Finding K).
 
-24 of 25 historical seals certified junk — 15 × a macOS `.DS_Store`, 9 × a 0-byte file —
+24 of 25 historical seals certified junk - 15 x a macOS `.DS_Store`, 9 x a 0-byte file -
 because workspace harvesting collected OS droppings and empty files as authored work.
 These must never be collected as writes/artifacts.
 """

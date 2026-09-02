@@ -1,7 +1,7 @@
 """L02 ceremony contract + Trace-A discharge evidence stubs (K1).
 
-Implements canonical law from `operations/ENGINEERING_LIFECYCLE.md` (v1.3 L18–30) and its derived
-machine form `operations/WORKFLOW_STATE_MACHINE.yaml` (ceremony_depth L56–72). Doctrine extraction:
+Implements canonical law from `operations/ENGINEERING_LIFECYCLE.md` (v1.3 L18-30) and its derived
+machine form `operations/WORKFLOW_STATE_MACHINE.yaml` (ceremony_depth L56-72). Doctrine extraction:
 RB-CEREMONY-DEPTH-001 D1 (PAEOS_CEREMONY_DEPTH_DOCTRINE_EXTRACTION_v1.md).
 
 Negative coverage (RB-CEREMONY-DEPTH-001 §16 matrix, G "model misclassification ⇒ deterministic
@@ -12,12 +12,11 @@ silent fast-path; a never-dischargeable layer must refuse discharge.
 from __future__ import annotations
 
 import pytest
-
 from kernel.types import WeightClass
 from runtime.ceremony import (
-    Layer,
     NEVER_DISCHARGEABLE,
     TRACE_A_DISCHARGE,
+    Layer,
     Obligation,
     ceremony_for,
     discharged_layers_for,
@@ -43,9 +42,9 @@ _TRACE_A_EXECUTE_LAYERS = {
 
 def test_trace_a_discharge_and_execute_sets_match_doctrine() -> None:
     c = ceremony_for("trace_a")
-    # EL L24–25 / WSM L62: auto-discharge L03–L11 and L17–L18.
+    # EL L24-25 / WSM L62: auto-discharge L03-L11 and L17-L18.
     assert c.dischargeable == _TRACE_A_DISCHARGE_LAYERS
-    # EL L26: execute L01, L02, L12–L16 in full (L19 if triggered, never dischargeable).
+    # EL L26: execute L01, L02, L12-L16 in full (L19 if triggered, never dischargeable).
     assert c.execute_full == _TRACE_A_EXECUTE_LAYERS
     assert c.dischargeable == TRACE_A_DISCHARGE
     # Covenant: the union of execute/full and discharge is exactly the 19 canonical layers,
@@ -98,7 +97,7 @@ def test_unknown_or_missing_depth_defaults_to_full_ceremony() -> None:
 
 
 def test_never_dischargeable_invariant() -> None:
-    # L01/L02/L12..L16/L19 can never be auto-discharged on any trace (EL L24–26; D1 §6).
+    # L01/L02/L12..L16/L19 can never be auto-discharged on any trace (EL L24-26; D1 §6).
     non_dischargeable = {Layer.L01, Layer.L02, Layer.L13, Layer.L19}
     assert non_dischargeable <= NEVER_DISCHARGEABLE
     for layer in non_dischargeable:

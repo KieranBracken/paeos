@@ -10,15 +10,11 @@ from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProduce
 from kernel.ledger import InMemoryLedgerStore, Ledger
 from kernel.types import Role, StageId, WeightClass
 from nacl.signing import SigningKey
-
 from runtime.claude_code import AgentWrite, RunOutput
-from runtime.ceremony import Layer
-from runtime.court import VerdictOutcome
 from runtime.memory import ScarStore
-from runtime.orchestrator import RunStatus, SoftLoop
+from runtime.orchestrator import SoftLoop
 from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.task_package import Budget, Cost, TaskPackage, TaskStatus
-
 
 # === TEST FIXTURES ===
 _CODE = b"def feature() -> int:\n    return 42\n"

@@ -5,9 +5,18 @@ from pathlib import Path
 
 from paeos.model_router.a08_enforcer import A08Enforcer, A08Verdict
 from paeos.model_router.catalog import ModelCatalog
-from paeos.model_router.providers import ProviderDescriptor, ProviderRegistry, build_builtin_provider_registry
-from paeos.model_router.types import CostTier, LogicalModel, ModelCatalogEntry, ModelFamily, TaskClass
-
+from paeos.model_router.providers import (
+    ProviderDescriptor,
+    ProviderRegistry,
+    build_builtin_provider_registry,
+)
+from paeos.model_router.types import (
+    CostTier,
+    LogicalModel,
+    ModelCatalogEntry,
+    ModelFamily,
+    TaskClass,
+)
 
 ROOT = Path(__file__).parents[2]
 
@@ -35,25 +44,7 @@ def test_core_modules_do_not_branch_on_provider_enum_or_builtin_names() -> None:
 
 def test_synthetic_provider_uses_family_inequality_not_provider_identity() -> None:
     registry = ProviderRegistry(
-        list(build_builtin_provider_registry().snapshot())
-        + [
-            ProviderDescriptor(
-                key="future-provider",
-                credential_env="FUTURE_PROVIDER_KEY",
-                transport_adapter_id="future-adapter",
-                trains_on_inputs=False,
-                retains_prompts=False,
-                allows_internal=True,
-                allows_confidential=True,
-                max_rpm=5,
-                max_tpm=5_000,
-                max_rpd=50,
-                preference_rank={model: 1 for model in LogicalModel},
-                task_fit={TaskClass.AUDIT: 1.0},
-                quality_bias=0.5,
-                latency_bias=0.5,
-            )
-        ]
+        [*list(build_builtin_provider_registry().snapshot()), ProviderDescriptor(key="future-provider", credential_env="FUTURE_PROVIDER_KEY", transport_adapter_id="future-adapter", trains_on_inputs=False, retains_prompts=False, allows_internal=True, allows_confidential=True, max_rpm=5, max_tpm=5000, max_rpd=50, preference_rank={model: 1 for model in LogicalModel}, task_fit={TaskClass.AUDIT: 1.0}, quality_bias=0.5, latency_bias=0.5)]
     )
     catalog = ModelCatalog(
         entries=[

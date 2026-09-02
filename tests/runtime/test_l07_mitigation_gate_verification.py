@@ -1,12 +1,9 @@
 """Tests for canonical layer L07 Trade-off Mitigation (StageId.MITIGATION)."""
 
-import pytest
-from kernel.lifecycle import StageId, is_legal, WeightClass
+from kernel.lifecycle import StageId, WeightClass, is_legal
 from runtime.mitigation import (
     MitigationCatalogue,
     TradeoffHazard,
-    Safeguard,
-    AcceptedRisk,
     mitigate_tradeoffs,
 )
 

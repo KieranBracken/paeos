@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import pytest
 
+import pytest
 from sakg.mcp_server import build_sakg_mcp_server
 
 

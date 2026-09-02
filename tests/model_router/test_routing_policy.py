@@ -4,18 +4,14 @@ Adversarial Unit Tests: Routing Policy Engine & Heterogeneous Audit
 from pathlib import Path
 
 import pytest
-
-from paeos.model_router.aimd import AIMDController
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
-from paeos.model_router.policy import RoutingPolicyEngine
 from paeos.model_router.router import ModelRouter
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.transport import LiteLLMTransport
 from paeos.model_router.types import (
     DataClass,
     LogicalModel,
-    ModelCatalogEntry,
     ModelFamily,
     NormalizedError,
     NormalizedErrorType,
@@ -91,7 +87,7 @@ def mock_router(tmp_path: Path):
 
 def test_logical_model_paeos_strong(mock_router):
     """paeos-strong prefers Gemini 3.7 Flash -> NVIDIA Llama."""
-    router, transport = mock_router
+    router, _transport = mock_router
     req = TaskRequest(
         messages=[{"role": "user", "content": "Analyze architecture"}],
         logical_model=LogicalModel.PAEOS_STRONG,
@@ -128,7 +124,7 @@ def test_task_request_preserves_legacy_positional_metadata() -> None:
 
 def test_explicit_physical_model_selection(mock_router):
     """Requesting an explicit physical model strictly selects that model."""
-    router, transport = mock_router
+    router, _transport = mock_router
     req = TaskRequest(
         messages=[{"role": "user", "content": "Specific task"}],
         explicit_model="meta/llama-3.1-8b-instruct",
@@ -141,7 +137,7 @@ def test_explicit_physical_model_selection(mock_router):
 
 def test_availability_gate_fails_closed(mock_router):
     """Requesting an unavailable model strictly fails closed and raises MODEL_UNAVAILABLE."""
-    router, transport = mock_router
+    router, _transport = mock_router
     req = TaskRequest(
         messages=[{"role": "user", "content": "Test"}],
         explicit_model="z-ai/glm-5.2",  # available=False
@@ -154,7 +150,7 @@ def test_availability_gate_fails_closed(mock_router):
 
 def test_heterogeneous_audit_builder_not_auditor(mock_router):
     """Invariant V: Builder family != Auditor family."""
-    router, transport = mock_router
+    router, _transport = mock_router
 
     # DeepSeek builder -> Gemini or Llama auditor
     req1 = TaskRequest(

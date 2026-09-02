@@ -15,10 +15,10 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
-
 from kernel.types import StageId
 from runtime.integrations import SessionSpec, _parse_cost
 from runtime.integrations.hybrid import CLINE_MODEL, _court_pool_dir, glm_cli_invoker
+
 from tests.runtime.test_hybrid_runtime import _make_package
 
 

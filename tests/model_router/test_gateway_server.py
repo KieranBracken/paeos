@@ -4,22 +4,16 @@ Adversarial Unit Tests: Local Unified Gateway HTTP Server (127.0.0.1:4000)
 import json
 import threading
 import time
-from pathlib import Path
-import urllib.request
 import urllib.error
+import urllib.request
+from pathlib import Path
 
 import pytest
-
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.router import ModelRouter
 from paeos.model_router.server import run_gateway_server
 from paeos.model_router.state import RouterStateDB
-from paeos.model_router.types import (
-    ModelFamily,
-    ProviderId,
-    RouterResponse,
-)
 from tests.model_router.test_routing_policy import MockTransport
 
 
@@ -62,7 +56,7 @@ def running_server(tmp_path: Path):
 
 def test_gateway_bearer_auth_rejection(running_server):
     """Requests without valid Bearer token return 401 Unauthorized."""
-    base_url, router, transport = running_server
+    base_url, _router, _transport = running_server
 
     # Request without Authorization header
     req = urllib.request.Request(f"{base_url}/v1/models")
@@ -79,7 +73,7 @@ def test_gateway_bearer_auth_rejection(running_server):
 
 def test_gateway_get_models_authenticated(running_server):
     """GET /v1/models with valid Bearer token returns registered models."""
-    base_url, router, transport = running_server
+    base_url, _router, _transport = running_server
 
     req = urllib.request.Request(
         f"{base_url}/v1/models",
@@ -96,7 +90,7 @@ def test_gateway_get_models_authenticated(running_server):
 
 def test_gateway_post_chat_completions_explicit_model(running_server):
     """POST /v1/chat/completions with explicit physical model guarantees exact dispatch."""
-    base_url, router, transport = running_server
+    base_url, _router, _transport = running_server
 
     payload = {
         "model": "meta/llama-3.1-8b-instruct",
@@ -122,7 +116,7 @@ def test_gateway_post_chat_completions_explicit_model(running_server):
 
 def test_gateway_availability_fail_closed(running_server):
     """Requesting an unavailable model returns error (fails closed)."""
-    base_url, router, transport = running_server
+    base_url, _router, _transport = running_server
 
     payload = {
         "model": "z-ai/glm-5.2",  # available=False

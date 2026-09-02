@@ -10,7 +10,6 @@ from pathlib import Path
 from runtime.arch_verifier import (
     check_kernel_isolation,
     extract_imports,
-    verify_architectural_conformance,
 )
 
 

@@ -7,28 +7,28 @@ the physical model that actually executed, not just catalog/alias metadata.
 Tests use real router/transport plumbing with mocked provider boundaries.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from paeos.model_router.router import ModelRouter
-from paeos.model_router.transport import LiteLLMTransport
-from paeos.model_router.catalog import ModelCatalog
-from paeos.model_router.credentials import CredentialStore
+import pytest
 from paeos.model_router.a08_enforcer import (
     A08Enforcer,
     A08Verdict,
     derive_family_from_actual_model,
 )
+from paeos.model_router.catalog import ModelCatalog
+from paeos.model_router.credentials import CredentialStore
+from paeos.model_router.router import ModelRouter
+from paeos.model_router.transport import LiteLLMTransport
 from paeos.model_router.types import (
     CostTier,
+    DataClass,
+    LogicalModel,
     ModelCatalogEntry,
     ModelFamily,
     ProviderId,
     RouterResponse,
-    TaskRequest,
     TaskClass,
-    DataClass,
-    LogicalModel,
+    TaskRequest,
 )
 
 
@@ -265,7 +265,7 @@ def test_transport_captures_actual_model_from_response(catalog):
     
     This tests the real LiteLLMTransport path with mocked litellm.
     """
-    transport = LiteLLMTransport(CredentialStore(), catalog)
+    LiteLLMTransport(CredentialStore(), catalog)
     
     # Create a mock litellm response
     mock_response = MagicMock()
@@ -279,10 +279,10 @@ def test_transport_captures_actual_model_from_response(catalog):
     mock_response.model = "google/gemini-2.0-flash"  # Actual model from provider
     
     # Patch litellm.acompletion
-    model_entry = catalog.get("gemini-3.6-flash")
+    catalog.get("gemini-3.6-flash")
     
     with patch('paeos.model_router.transport.litellm.acompletion', return_value=mock_response):
-        request = TaskRequest(
+        TaskRequest(
             messages=["test"],
             task_class=TaskClass.ROUTINE,
             data_class=DataClass.INTERNAL,

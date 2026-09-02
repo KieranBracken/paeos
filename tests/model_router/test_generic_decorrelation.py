@@ -15,12 +15,9 @@ Tests prove that the A-08 heterogeneous independence enforcement works correctly
 """
 
 import pytest
-
 from paeos.model_router.a08_enforcer import (
     A08Enforcer,
-    A08EnforcementResult,
     A08Verdict,
-    Provenance,
     resolve_logical_model_family,
 )
 from paeos.model_router.catalog import ModelCatalog
@@ -443,7 +440,7 @@ def test_select_auditor_for_deepseek_builder(enforcer):
     result = enforcer.select_auditor(ModelFamily.DEEPSEEK)
     
     assert result is not None
-    model, family = result
+    _model, family = result
     assert family != ModelFamily.DEEPSEEK
     assert family != ModelFamily.UNKNOWN
 
@@ -453,7 +450,7 @@ def test_select_auditor_for_gemini_builder(enforcer):
     result = enforcer.select_auditor(ModelFamily.GEMINI)
     
     assert result is not None
-    model, family = result
+    _model, family = result
     assert family != ModelFamily.GEMINI
     assert family != ModelFamily.UNKNOWN
 
@@ -463,7 +460,7 @@ def test_select_auditor_for_llama_builder(enforcer):
     result = enforcer.select_auditor(ModelFamily.LLAMA)
     
     assert result is not None
-    model, family = result
+    _model, family = result
     assert family != ModelFamily.LLAMA
     assert family != ModelFamily.UNKNOWN
 
@@ -476,7 +473,7 @@ def test_select_auditor_filters_by_provider(enforcer):
     result = enforcer.select_auditor(ModelFamily.GEMINI, providers)
     
     assert result is not None
-    model, family = result
+    model, _family = result
     assert model.provider_id == ProviderId.NVIDIA
 
 

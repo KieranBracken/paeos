@@ -4,12 +4,15 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.observability import ObservabilityDiagnostics
 from paeos.model_router.probe_harness import run_all_probes
-from paeos.model_router.providers import ProviderDescriptor, ProviderRegistry, build_builtin_provider_registry
+from paeos.model_router.providers import (
+    ProviderDescriptor,
+    ProviderRegistry,
+    build_builtin_provider_registry,
+)
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import (
     LogicalModel,

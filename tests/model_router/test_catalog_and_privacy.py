@@ -2,8 +2,8 @@
 Adversarial Unit Tests: Catalog, Free-Only Invariant, and Privacy Gating
 """
 import pytest
-from paeos.model_router.catalog import ModelCatalog, INITIAL_MODEL_CATALOG
-from paeos.model_router.credentials import CredentialStore, mask_secret
+from paeos.model_router.catalog import ModelCatalog
+from paeos.model_router.credentials import mask_secret
 from paeos.model_router.privacy import evaluate_privacy_eligibility
 from paeos.model_router.types import (
     DataClass,

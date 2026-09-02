@@ -8,18 +8,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 from kernel.cas import CAS, InMemoryCasStore, content_hash
 from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
-from kernel.ledger import InMemoryLedgerStore, Ledger
 from kernel.sandbox import run_sandboxed
-from kernel.types import Role, StageId, WeightClass
-from nacl.signing import SigningKey
-from runtime.claude_code import AgentWrite, RunOutput
+from kernel.types import Role, WeightClass
 from runtime.court import VerdictOutcome
-from runtime.orchestrator import SoftLoop
 from runtime.review import AdversaryOutcome, read_adversary_verdict
-from runtime.task_package import Budget, TaskPackage, TaskStatus
+from runtime.task_package import Budget
 from runtime.verification import vacuous_commands
 
 _BUDGETS = {
@@ -33,7 +28,7 @@ def test_sandbox_path_has_no_literal_tilde() -> None:
     """Item 3: Verify sandbox PATH uses expanded absolute paths and contains no literal '~'."""
     res = run_sandboxed("env")
     assert res.exit_code == 0
-    path_line = [line for line in res.stdout.splitlines() if line.startswith("PATH=")][0]
+    path_line = next(line for line in res.stdout.splitlines() if line.startswith("PATH="))
     assert "~" not in path_line, f"PATH contains unexpanded literal tilde: {path_line}"
     assert "/Users/" in path_line or "/home/" in path_line or "/usr/bin" in path_line
 
