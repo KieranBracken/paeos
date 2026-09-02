@@ -1,4 +1,5 @@
 """Evidence-boundary tests: bundles may carry references, never inline evidence."""
+
 from __future__ import annotations
 
 import json
@@ -14,10 +15,12 @@ def _keys(value: object) -> set[str]:
     found: set[str] = set()
     if isinstance(value, dict):
         for key, child in value.items():
-            if key.lower() in FORBIDDEN: found.add(key)
+            if key.lower() in FORBIDDEN:
+                found.add(key)
             found |= _keys(child)
     elif isinstance(value, list):
-        for child in value: found |= _keys(child)
+        for child in value:
+            found |= _keys(child)
     return found
 
 

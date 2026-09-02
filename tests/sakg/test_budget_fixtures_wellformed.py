@@ -1,4 +1,5 @@
 """Structural validation for golden drop-and-count budget fixtures."""
+
 from __future__ import annotations
 
 import json
@@ -62,7 +63,11 @@ def _errors(value: object) -> list[str]:
             errors.append("candidate-id")
         else:
             ids.append(candidate_id)
-        if not isinstance(candidate.get("score"), Real) or isinstance(candidate.get("score"), bool) or not 0 <= candidate["score"] <= 1:
+        if (
+            not isinstance(candidate.get("score"), Real)
+            or isinstance(candidate.get("score"), bool)
+            or not 0 <= candidate["score"] <= 1
+        ):
             errors.append("score")
         if not isinstance(candidate.get("why"), str) or not candidate["why"]:
             errors.append("why")
@@ -87,13 +92,27 @@ def _errors(value: object) -> list[str]:
         errors.append("retained-tokens")
     elif expected.get("retained_tokens") != sum(costs.get(item, 0) for item in retained):
         errors.append("retained-token-sum")
-    if not isinstance(expected.get("omitted"), int) or isinstance(expected.get("omitted"), bool) or expected["omitted"] != len(ids) - len(retained):
+    if (
+        not isinstance(expected.get("omitted"), int)
+        or isinstance(expected.get("omitted"), bool)
+        or expected["omitted"] != len(ids) - len(retained)
+    ):
         errors.append("omitted-count")
-    if not isinstance(expected.get("truncated"), bool) or expected["truncated"] != (expected.get("omitted") != 0):
+    if not isinstance(expected.get("truncated"), bool) or expected["truncated"] != (
+        expected.get("omitted") != 0
+    ):
         errors.append("truncated-flag")
-    if isinstance(budget, dict) and _positive_int(budget.get("max_nodes")) and len(retained) > budget["max_nodes"]:
+    if (
+        isinstance(budget, dict)
+        and _positive_int(budget.get("max_nodes"))
+        and len(retained) > budget["max_nodes"]
+    ):
         errors.append("max-nodes")
-    if isinstance(budget, dict) and _positive_int(budget.get("max_tokens")) and expected.get("retained_tokens", 0) > budget["max_tokens"]:
+    if (
+        isinstance(budget, dict)
+        and _positive_int(budget.get("max_tokens"))
+        and expected.get("retained_tokens", 0) > budget["max_tokens"]
+    ):
         errors.append("max-tokens")
     return errors
 
@@ -106,7 +125,11 @@ def test_budget_fixture_catalog_is_complete_and_well_formed() -> None:
     cases = [json.loads(path.read_text()) for path in files]
     validator = Draft202012Validator(schema)
     assert all(not list(validator.iter_errors(case)) for case in cases)
-    assert all(not _errors(case) for case in cases), [(path.name, _errors(case)) for path, case in zip(files, cases) if _errors(case)]
+    assert all(not _errors(case) for case in cases), [
+        (path.name, _errors(case))
+        for path, case in zip(files, cases, strict=True)
+        if _errors(case)
+    ]
     assert {case["case"] for case in cases} == {path.stem for path in files}
     assert {case["case"] for case in cases} >= {
         "max-nodes-overflow",
@@ -128,6 +151,14 @@ def test_budget_fixtures_prove_drop_and_count_without_truncation() -> None:
         else:
             assert expected["truncated"] is False
     pathological = by_case["single-result-too-large"]
-    assert pathological["expected"] == {"retained_ids": [], "retained_tokens": 0, "omitted": 1, "truncated": True}
+    assert pathological["expected"] == {
+        "retained_ids": [],
+        "retained_tokens": 0,
+        "omitted": 1,
+        "truncated": True,
+    }
     skip = by_case["skip-oversized-then-fit"]
-    assert skip["expected"]["retained_ids"] == [skip["candidates"][1]["id"], skip["candidates"][2]["id"]]
+    assert skip["expected"]["retained_ids"] == [
+        skip["candidates"][1]["id"],
+        skip["candidates"][2]["id"],
+    ]

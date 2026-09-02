@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from sakg.ingest import ingest_outbox, promotion_eligible
 from sakg.store import GraphStore
-
-from tests.sakg.test_ingest import fixture, NODE_ID, node
+from tests.sakg.test_ingest import NODE_ID, fixture
 
 
 def test_frequency_does_not_promote_a_candidate(tmp_path) -> None:
