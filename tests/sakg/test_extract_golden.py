@@ -19,4 +19,7 @@ def test_tradeoff_extraction_has_stable_golden_bytes() -> None:
     assert first == second
     assert first is not None
     assert canonical_json(first) == canonical_json(second)
-    assert hashlib.sha256(canonical_json(first)).hexdigest() == "f7151e50d7e18311dc39135a8795780cfc21329e0dd5396f2a22e6f804e7a876"
+    assert (
+        hashlib.sha256(canonical_json(first)).hexdigest()
+        == "f7151e50d7e18311dc39135a8795780cfc21329e0dd5396f2a22e6f804e7a876"
+    )

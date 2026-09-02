@@ -4,7 +4,10 @@ from sakg.extract import extract_tradeoff
 
 
 def test_unextractable_fields_are_explicit_gaps_not_silently_dropped() -> None:
-    result = extract_tradeoff({"kind": "l06", "axes": {"cost": ["low", "high"]}, "unmapped": {"secret": True}}, namespace="demo")
+    result = extract_tradeoff(
+        {"kind": "l06", "axes": {"cost": ["low", "high"]}, "unmapped": {"secret": True}},
+        namespace="demo",
+    )
     paths = {gap.path for gap in result.gaps}
     assert "source.unmapped" in paths
     assert "label" in paths

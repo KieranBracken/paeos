@@ -3,7 +3,6 @@ from __future__ import annotations
 from hashlib import sha256
 
 import pytest
-
 from sakg.extract import extract_artifact, extract_evidence_ref, extract_nodes
 from sakg.store import validate_node_envelope
 
@@ -12,10 +11,26 @@ EVIDENCE = sha256(b"extract-evidence").hexdigest()
 
 @pytest.mark.parametrize(
     ("kind", "node_type"),
-    (("l06", "TradeOff"), ("l04", "Option"), ("l08", "Component"), ("l11", "Constraint"), ("decision-graph", "Decision"), ("scar-graph", "Scar")),
+    (
+        ("l06", "TradeOff"),
+        ("l04", "Option"),
+        ("l08", "Component"),
+        ("l11", "Constraint"),
+        ("decision-graph", "Decision"),
+        ("scar-graph", "Scar"),
+    ),
 )
 def test_layer_artifacts_extract_to_universal_typed_nodes(kind: str, node_type: str) -> None:
-    result = extract_artifact({"kind": kind, "name": "Example", "summary": "A stable extraction.", "evidence": [EVIDENCE]}, namespace="demo", evidence_hashes=(EVIDENCE,))
+    result = extract_artifact(
+        {
+            "kind": kind,
+            "name": "Example",
+            "summary": "A stable extraction.",
+            "evidence": [EVIDENCE],
+        },
+        namespace="demo",
+        evidence_hashes=(EVIDENCE,),
+    )
     assert result.node is not None
     assert result.node["type"] == node_type
     assert result.node["status"] == "candidate"
