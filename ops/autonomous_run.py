@@ -126,7 +126,9 @@ def build_scheduler(
         # DEBT-0057: persistence is explicit — state-dir-owned, never repository-relative.
         sidecar_scorer=SidecarStageScorer(state_dir.resolve() / "evaluations"),
     )
-    evolution = EvolutionLayer(scar_store=loop.scar_store)  # sole L3 author (Stage 17)
+    evolution = EvolutionLayer(
+        scar_store=loop.scar_store, ledger=ledger
+    )  # sole L3 author (Stage 17)
     evolution_lock = threading.Lock()  # IP-0005: serialize L3 authoring under parallel execution
 
     def run_one(intake: Intake) -> RunOutcome:
@@ -144,7 +146,10 @@ def build_scheduler(
         )
         with evolution_lock:  # single-committer L3 authoring stays serial under parallel execution
             evolution.run(
-                outcome, goal_signature=intake.goal_signature, changed_paths=intake.changed_paths
+                outcome,
+                goal_signature=intake.goal_signature,
+                changed_paths=intake.changed_paths,
+                run_id=run_id,
             )
         # RB-0008: autonomous friction detection — classify and record structural gaps.
         sig = intake.goal_signature

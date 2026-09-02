@@ -20,9 +20,12 @@ here writes the TCB; the layer's only side effect is proposing scars into the in
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from kernel.classifier import Classification, classify_paths
+from kernel.ledger import Event, Ledger
 from kernel.types import StageId
 
 from runtime.amendment import AmendmentProposal
@@ -31,6 +34,8 @@ from runtime.memory import Scar, ScarDraft, ScarQuarantined, ScarStore, parse_si
 from runtime.orchestrator import RunOutcome, RunStatus
 
 __all__ = ["EvolutionLayer", "EvolutionResult", "Retrospective"]
+
+Clock = Callable[[], object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,8 +65,16 @@ class EvolutionResult:
 class EvolutionLayer:
     """Runs stages 15-18 over a completed run and writes the durable learning."""
 
-    def __init__(self, *, scar_store: ScarStore) -> None:
+    def __init__(
+        self,
+        *,
+        scar_store: ScarStore,
+        ledger: Ledger | None = None,
+        clock: Clock | None = None,
+    ) -> None:
         self._scars = scar_store
+        self._ledger = ledger
+        self._clock = clock if clock is not None else lambda: datetime.now(UTC).isoformat()
 
     def run(
         self,
@@ -69,10 +82,26 @@ class EvolutionLayer:
         *,
         goal_signature: str,
         changed_paths: tuple[str, ...],
+        run_id: str = "",
     ) -> EvolutionResult:
         """RETROSPECT → EVOLVE → MEMORY_UPDATE → IMPROVE_RUNTIME for one run."""
         retro = self._retrospect(outcome, goal_signature, changed_paths)
+        self._append_event(
+            "RETROSPECT",
+            outcome,
+            run_id=run_id,
+            summary="; ".join(retro.findings) if retro.findings else "clean seal",
+        )
         if retro.status is RunStatus.SEALED:
+            self._append_event(
+                "EVOLVE", outcome, run_id=run_id, summary="no failure; no scar or proposal"
+            )
+            self._append_event(
+                "MEMORY_UPDATE", outcome, run_id=run_id, summary="no scar written"
+            )
+            self._append_event(
+                "IMPROVE_RUNTIME", outcome, run_id=run_id, summary="no runtime proposal"
+            )
             return EvolutionResult(retro, (), (), ())  # a clean seal needs no guard (§7.1)
 
         signature_tags = parse_signature(goal_signature) | retro.failure_tags
@@ -80,8 +109,58 @@ class EvolutionLayer:
         recurred = bool(self._scars.match_scars(",".join(sorted(signature_tags))))
 
         proposals = self._improve_runtime(retro, recurred)
+        self._append_event(
+            "EVOLVE",
+            outcome,
+            run_id=run_id,
+            summary=f"recurrence={recurred}; proposals={len(proposals)}",
+        )
         written, quarantined = self._memory_update(retro, signature_tags)
+        self._append_event(
+            "MEMORY_UPDATE",
+            outcome,
+            run_id=run_id,
+            summary=f"scars_written={len(written)}; quarantined={len(quarantined)}",
+        )
+        self._append_event(
+            "IMPROVE_RUNTIME",
+            outcome,
+            run_id=run_id,
+            summary=f"proposals={len(proposals)}",
+        )
         return EvolutionResult(retro, written, quarantined, proposals)
+
+    def _append_event(
+        self,
+        layer: str,
+        outcome: RunOutcome,
+        *,
+        run_id: str,
+        summary: str,
+    ) -> None:
+        """Append one auditable evolution event through the kernel ledger, when configured.
+
+        The optional clock is included in the human-readable summary so tests and operators can
+        inject a deterministic observation time without adding non-contract fields to the event
+        payload. Ledger failures propagate: losing the audit trail is fail-closed.
+        """
+        if self._ledger is None:
+            return
+        effective_run_id = run_id or f"goal:{outcome.goal_id}"
+        recorded_at = str(self._clock())
+        self._ledger.append(
+            Event(
+                1,
+                "EVOLUTION_EVENT",
+                {
+                    "layer": layer,
+                    "run_id": effective_run_id,
+                    "goal_id": outcome.goal_id,
+                    "status": outcome.status.value,
+                    "summary": f"{summary}; recorded_at={recorded_at}",
+                },
+            )
+        )
 
     # ---- stage 15 ----------------------------------------------------------
 
