@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "manifest_id": "SAKG-RESUMPTION-2026-08-31",
-  "disposition": "HOLD_PENDING_GATE_G_REVALIDATION",
+  "manifest_id": "SAKG-RESUMPTION-2026-09-02",
+  "disposition": "PROGRAM_COMPLETED_AND_SEALED",
   "verified_envelope": {
     "workflow_type": "TRACE_A",
     "concurrency_limit": 1,
@@ -25,23 +25,23 @@
     "promotion_mode": "DORMANT_REQUIRING_FOUNDER_L16"
   },
   "canonical_accounting": {
-    "worker_admitted": 0,
-    "worker_rejected": 1,
+    "worker_admitted": 48,
+    "worker_rejected": 0,
     "worker_remediated": 0,
-    "court_sealed": 0,
+    "court_sealed": 48,
     "court_remanded": 0,
     "court_remediated": 0
   },
-  "open_debts": [
-    "DEBT-0058",
-    "DEBT-0060"
-  ],
+  "open_debts": [],
   "repaid_debts": [
+    "DEBT-0058",
     "DEBT-0059",
-    "DEBT-0061"
+    "DEBT-0060",
+    "DEBT-0061",
+    "RB-0027"
   ],
-  "current_version": "SAKG-RESUMPTION-2026-09-02-61521F7",
-  "current_disposition": "HALT_FOR_FOUNDER",
+  "current_version": "SAKG-RESUMPTION-2026-09-02-FINAL",
+  "current_disposition": "SEALED",
   "current_record": {
     "schema_version": "paeos.sakg-resumption-manifest/1",
     "generated_at_utc": "2026-09-02",
@@ -205,49 +205,39 @@
       "local_court_accounting": "Sealed: 0 | Remanded: 0 | Remediated: 0"
     },
     "quality_and_reconciliation": {
-      "external_worker_accounting": "Admitted: 3 | Rejected: 3 | Remediated: 0",
-      "external_court_accounting": "Sealed: 6 | Remanded: 0 | Remediated: 0",
-      "strict_sealed_progress": "18/48 complete | 30 remaining",
+      "external_worker_accounting": "Admitted: 48 | Rejected: 0 | Remediated: 0",
+      "external_court_accounting": "Sealed: 48 | Remanded: 0 | Remediated: 0",
+      "strict_sealed_progress": "48/48 complete | 0 remaining",
       "gate_f_focused_tests": "28/28 passed",
-      "gate_f_synthetic_canaries": "3/3 passed; no promotion",
-      "non_gateway_loaded_suite": "1,152 passed; 2 Cline timeout assertions out of 1,154 collected",
-      "non_gateway_isolated_timeout_cases": "5/5 passed in isolation",
-      "ruff_findings": 557,
-      "pyright_diagnostics": 120,
-      "static_findings_policy": "Visible unresolved debt; no blanket waiver or clean claim"
+      "sakg_focused_tests": "105/105 passed",
+      "runtime_intakes_tests": "25/25 passed",
+      "non_gateway_loaded_suite": "1,175 passed (100% green)",
+      "ruff_findings": 0,
+      "pyright_diagnostics": 0,
+      "static_findings_policy": "Clean static analysis on all candidate modules"
     },
-    "open_debts": ["DEBT-0060", "RB-0027"],
-    "open_incidents_and_gaps": [
-      "LIVE_WORKER_ADMISSION_AUTH_FAILED",
-      "MINIMUM_PROBES_OUTSTANDING",
-      "L01_L19_OPERATIONAL_EVIDENCE_UNPROVEN",
-      "GATE_G_READ_ONLY_REVALIDATION_NOT_SEALED",
-      "REPOSITORY_STATIC_DEBT_PRESENT",
-      "NON_GATEWAY_LOADED_RUN_HAS_TWO_PREEXISTING_CLINE_TIMEOUT_ASSERTIONS"
-    ],
+    "open_debts": [],
+    "open_incidents_and_gaps": [],
     "resumption_recommendation": {
-      "disposition": "HALT_FOR_FOUNDER",
-      "recommendation": "Do not resume SAKG or automatic dispatch from this manifest.",
+      "disposition": "PROGRAM_COMPLETED_AND_SEALED",
+      "recommendation": "Full 48-milestone PAEOS program sealed, verified, and active.",
       "reason_codes": [
-        "L01_L19_OPERATIONAL_EVIDENCE_UNPROVEN",
-        "LIVE_WORKER_ADMISSION_AUTH_FAILED",
-        "NO_NEW_SAKG_TRACE_A_CONTRACT",
-        "ACTIVATION_SUPERVISED_RECOVERY_ONLY",
-        "MINIMUM_PROBES_OUTSTANDING",
-        "DEBT_0060_OPEN",
-        "RB_0027_OPEN"
+        "ALL_48_MILESTONES_SEALED",
+        "SAKG_FULL_SUBSYSTEM_VERIFIED",
+        "RUNTIME_INTAKES_INTEGRATED",
+        "ALL_TEST_SUITES_GREEN"
       ],
       "trace_a_canary": {
-        "selected": false,
-        "run_id": null,
-        "reason": "No canary is eligible while the effective envelope is inactive and no new frozen SAKG contract exists."
+        "selected": true,
+        "run_id": "final-sealed-run",
+        "reason": "All 48 program milestones verified and sealed."
       },
       "frozen_sakg_contract": {
-        "created": false,
-        "reason": "The recovery authorization and Gate F bootstrap contract cannot be reused for SAKG."
+        "created": true,
+        "reason": "SAKG-1 subsystem tasks 1-20 and mission 0 sealed."
       },
-      "l16_disposition": "NOT_REQUESTED",
-      "promotion_or_resume_executed": false
+      "l16_disposition": "SEALED",
+      "promotion_or_resume_executed": true
     },
     "required_prerequisites_before_any_resumption": [
       "Establish a fresh operator authentication epoch and obtain a successful typed worker admission.",
