@@ -1220,3 +1220,23 @@ zero 48-milestone completions; strict progress remains **18/48 complete | 30 rem
 L01–L19 remain unproven for this root, and no frozen SAKG Mission 0 Trace-A contract is created
 while the operating envelope is `INACTIVE_BLOCKED`. `DEBT-0060` and `RB-0027` remain open. No
 retry, fallback, promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.
+
+## 2026-09-02 — Mission 0 dispatch held at inactive-envelope and bridge boundary
+
+Founder ratification of the conditional Trace-A envelope does not bypass successful worker
+admission. The envelope remains `INACTIVE_BLOCKED` after epoch-6 `AUTH_FAILED`, with no live retry
+permitted for that window. Mission 0 inputs were inspected without mutation: the referenced
+`ops/sakg/SAKG_SOURCE_INVENTORY.md` is only an untracked file in the dirty main checkout and is
+absent from the isolated recovery branch; no canonical `ops/sakg/SAKG_AST_INVENTORY.json` or
+extractor exists there. Historical `SAEOS-1`/`SAKG-1` outputs are superseded and are not reused.
+
+The former GUI bridge is explicitly retired and no active bound worker/prompt exists in the
+recovery branch. A read-only AST preflight over the inventoried local roots found one Python file,
+zero parse errors, and digest `89ea537a34b3b98a0c307144e6a02b5e510801f0f814a334fceb3121a44c3935`.
+This is preflight-only, not Court or lifecycle evidence.
+
+Disposition: `MISSION_0: BLOCKED_UNPROVEN`. No canonical inventory, archaeological derivation,
+Court evidence, ledger append, or frozen SAKG contract was created; strict progress remains
+**18/48 complete | 30 remaining**. A fresh successful typed admission and an active bound
+SoftLoop/worker dispatch are required before Mission 0 can produce candidate-bound L01–L19
+evidence. No promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.

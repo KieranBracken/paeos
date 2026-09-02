@@ -1222,3 +1222,12 @@ evidence and Founder/Court disposition are mandatory.
   `0ab44eb766a0716f04bf6ee5a5511dc042c924f90b93b434dbfea2a9454348e2`. Disposition remains
   `BLOCKED_UNPROVEN`; strict progress is unchanged at `18/48 complete | 30 remaining`, and no
   SAKG contract or lifecycle seal was created.
+- 2026-09-02 Founder Mission 0 authorization: conditional Trace-A envelope was ratified, but
+   activation remains `INACTIVE_BLOCKED` because epoch-6 admission is `AUTH_FAILED`; no live retry
+   was allowed. The referenced `ops/sakg/SAKG_SOURCE_INVENTORY.md` exists only as an untracked
+   main-checkout file; the isolated recovery branch has no `ops/sakg` directory, canonical AST
+   inventory, or extractor. Historical SAEOS-1 outputs are superseded. The old GUI bridge is
+   retired and no bound worker/prompt is active. A read-only AST preflight found one Python file,
+   zero parse errors, digest `89ea537a34b3b98a0c307144e6a02b5e510801f0f814a334fceb3121a44c3935`.
+   Mission 0 is `BLOCKED_UNPROVEN`; no canonical artifact, Court evidence, ledger row, milestone,
+   or SAKG contract was created. Strict progress remains `18/48 complete | 30 remaining`.

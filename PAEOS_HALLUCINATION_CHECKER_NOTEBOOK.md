@@ -4866,3 +4866,34 @@ Mission 0 contract was created. Canonical strict progress is unchanged at **18/4
 remaining**; external Court remains **Sealed: 6 | Remanded: 0 | Remediated: 0** and this local
 epoch-6 root has no Court events. No retry, fallback, promotion, merge, protected-ref, main/trunk,
 credential, or SAKG mutation occurred.
+
+### Entry 273 — 2026-09-02: Founder Mission 0 dispatch held at inactive-envelope and bridge boundary
+
+The Founder ratified the conditional Trace-A operating envelope (serial concurrency `1`,
+`INTERNAL` data, typed capability broker, immutable CAS, and physical A-08 heterogeneity) and
+requested Mission 0 archaeological discovery. That ratification does not waive the required
+successful worker admission or create a ledger fact: the current operating envelope remains
+`INACTIVE_BLOCKED` after the epoch-6 `AUTH_FAILED` probe, and no live retry is permitted for that
+window.
+
+Mission 0 inputs were inspected read-only. The referenced `ops/sakg/SAKG_SOURCE_INVENTORY.md`
+exists only as an untracked file in the dirty main checkout; it is absent from the isolated
+recovery branch. No `ops/sakg/SAKG_AST_INVENTORY.json` or canonical extractor exists in the
+recovery branch. The historical Mission 0 worktree contains superseded `SAEOS-1` architecture
+and `SAKG-1` backlog commits, not a candidate-bound AST inventory. The repository's former GUI
+bridge is explicitly retired; no active bound prompt/worker exists in the isolated branch, and
+the stale main-checkout bridge files are not admissible evidence.
+
+A read-only AST preflight over the inventoried local roots found one Python source file,
+`/Users/bob/GitHub/SAKG/Engineering-Intelligence/build_docs.py`, with zero parse errors and
+preflight digest `89ea537a34b3b98a0c307144e6a02b5e510801f0f814a334fceb3121a44c3935`. This is a
+preflight observation only; it is not the canonical inventory, an L13 result, a Court artifact,
+or proof of SAKG architecture.
+
+Disposition: `MISSION_0: BLOCKED_UNPROVEN`. No canonical AST inventory, archaeological derivation,
+Court evidence, ledger append, lifecycle milestone, or frozen SAKG contract was created. Strict
+progress remains **18/48 complete | 30 remaining**; external Court accounting remains
+**Sealed: 6 | Remanded: 0 | Remediated: 0**. Required next prerequisites are a fresh successful
+typed worker admission, a bound Mission 0 intake through an active SoftLoop/worker seam, and
+candidate-bound independent L13/L14/L17 evidence. No promotion, merge, protected-ref, main/trunk,
+credential, or SAKG mutation occurred.
