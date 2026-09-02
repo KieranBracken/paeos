@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "10d71877354e9f7c8d25b787602067014aa2351a",
+  "l13_reproduction": {
+    "collected": 10,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-07-l13-focused-10d7187.log",
+    "focused_log_sha256": "6c8827eadbafa83bf2b4e71e39e442d3b199b31c8bbda96a44bc07884698cd77",
+    "passed": 10,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_07_EVIDENCE",
+  "program_candidate_commit": "d694d2572bcf8198f3b65aca2aecb0f9958eb29c",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 07 \u2014 Tradeoff Precedents, Outcome Joins & Ranked Precedents"
+}

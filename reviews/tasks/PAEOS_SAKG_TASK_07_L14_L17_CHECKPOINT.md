@@ -1,36 +1,36 @@
-# SAKG TASK 07 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
+# PAEOS SAKG Task 07 L14/L17 Checkpoint — Candidate 10d7187
 
-- **Candidate Commit:** `10d7187`
-- **Program Candidate Commit:** `fe7b257`
-- **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
-- **Task:** Task 07 — Tradeoff Precedents, Outcome Joins & Ranked Precedents
-- **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)
-- **Status:** **QUALIFIED / VERIFIED**
+Date: 2026-09-02  
+Branch: `codex/control-plane-recovery-s1-clean-recovered`  
+Candidate: `10d71877354e9f7c8d25b787602067014aa2351a`  
+Program Candidate: `d694d2572bcf8198f3b65aca2aecb0f9958eb29c`
 
----
+## Bound evidence
 
-## 1. Scope & Source Invariants
+- Evidence bundle SHA-256: `ba34d19eee298b657ce6164be9322212ae261aac932b6ec83b15fd0d14e5ccb2`
+- Prompt SHA-256: `8528347968b6b97b5ef3e8e62e7713ca87c02cf6b1d56bede05101fbaefca51d`
+- Report: `/private/tmp/paeos-sakg-task-07-l14-l17-report-10d7187.md`
+- Report SHA-256: `3389d41438ee69f0100525421d4fbdf06ebd50aaa9e18031d365dde48ab08c13`
+- Receipt: `/private/tmp/paeos-sakg-task-07-l14-l17-receipt-10d7187.json`
+- Receipt file SHA-256: `24df1c8332df73157dd08b66e7821d64f82416a54172510cea5c2ea5e88a9eeb`
+- Canonical receipt SHA-256: `33c17846c6c8e299535ad451c55bfcc767074825ce794e39a9163e5f949e5241`
+- Physical auditor: Google `gemini-3.6-flash`, Gemini family
+- Builder: `cline-pass` / `z-ai/glm-5.3-flash`, GLM family
+- A-08: `PASS` (Gemini family differs from GLM family)
+- Provider attempts: `1`; fallback chain: `google:gemini-3.6-flash` only
 
-* **Production Module:** `sakg/methods/tradeoff_precedents.py` (SHA-256: `6966e85136f322362d409fa2a0099c810f4f200d441ab5218944b50f70f24d2d`)
-* **Test Modules:**
-  * `tests/sakg/test_tradeoff_fixtures_reference_real_goals.py` (SHA-256: `6c004a5ef4a72bd1af8b80e260e12928f6e089a32601c6bad1ada03a8c09c2f7`)
-  * `tests/sakg/test_tradeoff_fixtures_wellformed.py` (SHA-256: `196befc79b9f55da775aa03e1e06ac338dbada2d016d688464351b644350ed19`)
-  * `tests/sakg/test_tradeoff_golden.py` (SHA-256: `6aeb23f2cc9a2a1ea20a5770cd5f9437d3ebfa8868b6ebeb8d47fa13ce16e553`)
-  * `tests/sakg/test_tradeoff_joins_outcome.py` (SHA-256: `7f27fd7ea401e1405c386df78ca4ce8ece719c7bb0e11673ce61a1f66aba6740`)
-  * `tests/sakg/test_tradeoff_precedents.py` (SHA-256: `280fde7600bc45913c90127021db41b1f11bd8f32138d902fe64db6e42b89703`)
+## Validation
 
----
+The local artifact-pair validator returned report `PASS`, A-08 `PASS`, and `qualified=true`. The
+report binds the exact candidate and evidence bundle, contains concrete findings, and ends with
+`AUDIT_COMPLETE: true`.
 
-## 2. Empirical Verification Evidence (L13 Deterministic Reproduction)
+Implementation evidence remains:
+- SAKG Task 07 focused tests: **10/10 passed**, zero skipped.
+- Static analysis: Ruff clean (0 findings), Pyright clean (0 errors).
+- AST scan: 0 swallowed exceptions (tradeoff precedents and outcome joins verified).
 
-* **Command Executed:**
-  `uv run pytest tests/sakg/test_tradeoff*.py -v`
-* **Test Execution Summary:** `10/10 passed in 0.24s (Exit Code: 0)`.
-* **Static Analysis:** `uv run ruff check` -> `0 findings (Clean)`.
-* **AST Anti-Pattern Scan:** `0 swallowed exceptions`. Invariant verified: every tradeoff result maintains an explicit decision-to-outcome path and joins verified real goals.
+## Disposition
 
----
-
-## 3. Auditor Recommendation
-
-**RECOMMENDATION:** **SEAL SAKG TASK 07** into the canonical ledger at commit `10d7187`.
+`L14/L17_STATUS: QUALIFIED`  
+`SAKG_TASK_07_STATUS: IMPLEMENTATION_CHECKPOINT — QUALIFIED`
