@@ -1,11 +1,7 @@
-"""Storage-boundary namespace isolation tests for I-STORE."""
+from hashlib import sha256
 
 import pytest
-
 from sakg.store import GraphStore, NamespaceViolation
-
-
-from hashlib import sha256
 
 
 def node(namespace: str = "demo-project", suffix: str = "1") -> dict[str, object]:

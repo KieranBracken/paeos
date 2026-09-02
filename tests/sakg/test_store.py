@@ -1,9 +1,7 @@
-"""Focused persistence and §4.2 envelope tests for I-STORE."""
-
-from sakg.store import Edge, EnvelopeValidationError, GraphStore, NamespaceViolation
-
-
 from hashlib import sha256
+
+import pytest
+from sakg.store import EnvelopeValidationError, GraphStore, NamespaceViolation
 
 
 def node(namespace: str = "demo-project", suffix: str = "1") -> dict[str, object]:
@@ -67,19 +65,11 @@ def test_envelope_validation_rejects_missing_or_cross_namespace_fields(tmp_path)
     with GraphStore(tmp_path / "graph.sqlite3", "demo-project") as store:
         malformed = dict(original)
         malformed.pop("confidence")
-        try:
+        with pytest.raises(EnvelopeValidationError):
             store.append_node(malformed)
-        except EnvelopeValidationError:
-            pass
-        else:
-            raise AssertionError("missing §4.2 field was accepted")
         foreign = node("other-project", "2")
-        try:
+        with pytest.raises(NamespaceViolation):
             store.append_node(foreign)
-        except NamespaceViolation:
-            pass
-        else:
-            raise AssertionError("cross-namespace node was accepted")
 
 
 def test_edge_round_trip_preserves_edge_object_properties(tmp_path) -> None:

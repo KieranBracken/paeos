@@ -1,13 +1,8 @@
-"""Append-only and supersession invariants for I-STORE."""
-
 import sqlite3
+from hashlib import sha256
 
 import pytest
-
 from sakg.store import AppendOnlyViolation, DuplicateIdentity, GraphStore
-
-
-from hashlib import sha256
 
 
 def node(namespace: str = "demo-project", suffix: str = "1") -> dict[str, object]:
@@ -72,7 +67,8 @@ def test_supersession_appends_new_version_without_mutating_old(tmp_path) -> None
         store.append_node(original)
         store.supersede_node(replacement, original["id"])
         assert store.get_node(original["id"]) == original
-        assert store.get_node(replacement["id"])["facets"]["supersedes"] == {"node_id": original["id"]}
+        supersedes_dict = {"node_id": original["id"]}
+        assert store.get_node(replacement["id"])["facets"]["supersedes"] == supersedes_dict
         assert len(store.nodes()) == 2
 
 
@@ -92,6 +88,9 @@ def test_sqlite_triggers_reject_direct_update_and_delete(tmp_path) -> None:
     with GraphStore(db, "demo-project") as store:
         store.append_node(original)
         with pytest.raises(sqlite3.IntegrityError):
-            store._db.execute("UPDATE nodes SET payload = payload WHERE node_id = ?", (original["id"],))
+            store._db.execute(
+                "UPDATE nodes SET payload = payload WHERE node_id = ?",
+                (original["id"],),
+            )
         with pytest.raises(sqlite3.IntegrityError):
             store._db.execute("DELETE FROM nodes WHERE node_id = ?", (original["id"],))
