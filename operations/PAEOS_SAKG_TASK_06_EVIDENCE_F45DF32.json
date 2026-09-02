@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "f45df32057aae9cbe4aba6c9fb3687e42ac28784",
+  "l13_reproduction": {
+    "collected": 9,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-06-l13-focused-f45df32.log",
+    "focused_log_sha256": "fa156f66a756fe5a8bc6e8a12a968edd815022a8d552016290dae14cdd8a4ce2",
+    "passed": 9,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_06_EVIDENCE",
+  "program_candidate_commit": "22082da17fa06935bcf8e02d8495a683286c476e",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 06 \u2014 Edge Families, Non-Authority Boundaries & No-Mutating Egress"
+}
