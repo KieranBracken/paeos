@@ -1,0 +1,42 @@
+{
+  "bundle_id": "sakg-bundle:extract-adversarial-missing-l06",
+  "goal_id": "g-extract-adversarial-missing-l06",
+  "namespace": "paeos-recovery",
+  "nodes": [
+    {
+      "evidence": [
+        {
+          "hash": "c38d23095a8cfba2905a2fc1f041fcb27eed1e820955955b8dc9c36facba5bf4",
+          "kind": "source",
+          "reverification": "re-read the bound input artifact and compare its SHA-256",
+          "uri": "repo://reviews/tasks/adversarial-missing-l06"
+        }
+      ],
+      "facets": {
+        "emission_policy": "candidate-only",
+        "extraction_case": "adversarial-missing-l06",
+        "l06_matrix": "absent",
+        "lossless_claim": false,
+        "source_disposition": "COURT_SEALED"
+      },
+      "id": "sakg://paeos-recovery/Constraint/01J00000000000000000000F05",
+      "label": "Extraction fixture adversarial-missing-l06",
+      "provenance": {
+        "origin": {
+          "run_id": "extract-adversarial-missing-l06",
+          "system": "paeos-extraction-fixture"
+        },
+        "source_hash": "c38d23095a8cfba2905a2fc1f041fcb27eed1e820955955b8dc9c36facba5bf4"
+      },
+      "status": "candidate",
+      "summary": "Expected candidate projection preserves source provenance and does not infer absent fields.",
+      "type": "Constraint"
+    }
+  ],
+  "producer": {
+    "system": "paeos",
+    "version": "0.1"
+  },
+  "schema_version": "paeos.sakg.emission-bundle/v1",
+  "sealed_at": "2026-09-02T12:00:00Z"
+}
