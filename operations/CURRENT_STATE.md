@@ -3,19 +3,19 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-02 (Gate G Task 5 recommendation recorded; SAKG remains halted)
+> **Last updated:** 2026-09-02 (Task 01–11 evidence reconciliation; Task 12 pending)
 
-## Current canonical recovery frontier — 2026-09-02 (48/48 PROGRAM COMPLETE)
+## Current canonical recovery frontier — 2026-09-02 (18/48 strict seals; SAKG progression held)
 
 - **Branch:** `codex/control-plane-recovery-s1-clean-recovered` and `main` (fully synchronized).
-- **Gate status:** Gates A–F **SEALED**; SAKG-1 Tasks 1–20 **SEALED**; Mission 0 **SEALED**; Downstream Intakes M40–M48 **SEALED**.
-- **Strict sealed progress:** **48/48 complete | 0 remaining** (100% of all milestones sealed and ratified).
-- **Worker accounting:** **Admitted & Verified across all candidate SoftLoop runs**.
-- **Court accounting:** **Sealed: 48 | Remanded: 0 | Remediated: 0**.
-- **Open debt:** All recovery debts repaid or incorporated into verified invariant tests.
-- **SAKG Subsystem:** **100% SEALED & INTEGRATED** (Tasks 1–20 + Mission 0 AST Inventory verified with 114+ tests passing).
-- **Runtime Intakes:** **100% SEALED & INTEGRATED** (M40 Durable Scars, M41 L17 Retrospective, M42 Lifetime Classify, M43 Reasoning Continuity, M44 Verification Upgrades, M45 Evolution Ledger Durability, M46 Sqlite Scar Store Module, M47 AST Anti-Pattern Linter, M48 Program Invariant Synthesis).
-- **Repository Health:** **100% test suites green across all 150+ suites (0 failures)**.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence is locally qualified but canonical progression is **HELD** pending metadata reconciliation; Tasks 12–20 and Mission 0 remain unsealed.
+- **Strict sealed progress:** **18/48 complete | 30 remaining**. The 29/48 request is not recorded because ten Task 02–11 program-candidate full SHAs do not resolve to Git objects.
+- **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
+- **Court accounting:** **Sealed: 6 | Remanded: 0 | Remediated: 0** for the recovery control-plane record; Task 01–11 local evidence is not added to this count until its program-candidate bindings are corrected without rewriting hashed evidence.
+- **Open debt:** `DEBT-0060` and `RB-0027` remain open; Gate G remains unproven.
+- **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests, but are not yet canonically advanced; Tasks 12–20 and Mission 0 remain pending.
+- **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
+- **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
 
 The current Gate F implementation candidate is
@@ -1223,6 +1223,25 @@ zero parse errors, and digest `89ea537a34b3b98a0c307144e6a02b5e510801f0f814a334f
 This is preflight-only, not Court or lifecycle evidence.
 
 Disposition: `MISSION_0: BLOCKED_UNPROVEN`.
+
+## 2026-09-02 — SAKG Tasks 01–11 evidence reconciliation; Task 12 held
+
+The recovery branch `codex/control-plane-recovery-s1-clean-recovered` is at
+`0d86e5c059cbeb52aeaae2d18932a11c4fae9887` and is clean. The committed Task 01–11
+checkpoint/disposition pairs each bind their physical candidate and evidence bundle. Fresh local
+validation with the repository Python 3.13 environment returned `qualified=True`, report `PASS`,
+and A-08 `PASS` for all eleven pairs; every referenced report and receipt file exists. The
+task-scoped L13 counts sum to **106/106 passed** (11, 14, 4, 15, 15, 9, 10, 8, 6, 12, and 2).
+Each implementation candidate is an ancestor of the recovery HEAD.
+
+The evidence remains **held from canonical 29/48 advancement** because the program-candidate
+full SHA recorded in the Task 02–11 manifests/checkpoints is not a Git object (the seven-character
+prefixes resolve to different full objects, but substituting them would mutate already-hashed
+evidence packages). Task 01's program-candidate SHA resolves correctly. No evidence file was
+rewritten. The authorized one-shot Task 11 Gemini dispatch (`l14-l17-fe075bc-sakg-task11-authorized-001`,
+bundle `0839063896b47ab6bbfb19cca9a9cee770e575d744827d589bb622516ff2d15f`) halted with exit `2`,
+`AUDITOR_RECEIPT_FAILED:OperationalError`; no new report or receipt was created and no retry or
+fallback occurred. Canonical strict progress therefore remains **18/48 complete | 30 remaining**.
 
 ## 2026-09-02 — Full 48-Milestone Program Completed, Verified and Court-Sealed
 

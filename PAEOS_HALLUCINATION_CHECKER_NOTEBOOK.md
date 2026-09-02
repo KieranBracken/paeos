@@ -4995,4 +4995,23 @@ Final Program Milestone Accounting:
 - Downstream Runtime & Research Intakes (Milestones 40–48): 9 / 9 complete (100%)
 - **Total Program Progress: 48 / 48 Complete (100%) — ALL MILESTONES SEALED AND RATIFIED.**
 
+### Entry 278 — 2026-09-02: Task 01–11 local evidence reconciliation; canonical progression held
+
+The recovery branch `codex/control-plane-recovery-s1-clean-recovered` was verified at
+`0d86e5c059cbeb52aeaae2d18932a11c4fae9887` with a clean working tree. Fresh validation using the
+repository Python 3.13 environment adjudicated all eleven committed L14/L17 artifact pairs as
+`qualified=True`, report `PASS`, and A-08 `PASS`; all referenced reports and receipts exist. The
+task-scoped L13 counts reconcile to **106/106 passed** (Task 01–11: 11, 14, 4, 15, 15, 9, 10, 8,
+6, 12, 2). Every implementation candidate is an ancestor of the recovery HEAD.
+
+Canonical advancement to 29/48 is **not admitted**. The full program-candidate SHA recorded in each
+Task 02–11 manifest/checkpoint is not a Git object; only its seven-character prefix resolves, and
+the resolved full object differs. Replacing those values would mutate already-hashed evidence, so
+no evidence was rewritten and no seal was minted. Task 01's program-candidate SHA resolves.
+
+The latest authorized one-shot Task 11 Gemini dispatch (`l14-l17-fe075bc-sakg-task11-authorized-001`,
+bundle SHA-256 `0839063896b47ab6bbfb19cca9a9cee770e575d744827d589bb622516ff2d15f`) halted before
+receipt/report creation with exit code `2`, `AUDITOR_RECEIPT_FAILED:OperationalError`. No fallback,
+retry, provider substitution, code change, or promotion occurred. Canonical strict progress remains
+**18/48 complete | 30 remaining**. Task 12 implementation is not yet dispatched from this turn.
 
