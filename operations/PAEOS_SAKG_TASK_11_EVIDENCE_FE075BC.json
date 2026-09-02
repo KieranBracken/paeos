@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "fe075bc1c6845466b28aca5cefb7a49d32aae206",
+  "l13_reproduction": {
+    "collected": 2,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-11-l13-focused-fe075bc.log",
+    "focused_log_sha256": "8d8a4ccb2c76bec2ef8c713414513df6234b0bddef900c7e0ecdb0e63fac9899",
+    "passed": 2,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_11_EVIDENCE",
+  "program_candidate_commit": "c377c7a525f2425d487ffdc07b727c47ae2c980a",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1 / Defense Engine",
+  "task": "Task 11 \u2014 Poisoned Corpus Defense & Untrusted Knowledge Fencing"
+}
