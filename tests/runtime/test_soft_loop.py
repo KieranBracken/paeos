@@ -77,7 +77,7 @@ def _writes(impl_path: str = "runtime/feature.py") -> dict[StageId, tuple[AgentW
         StageId.ADVERSARIAL_REVIEW: (
             AgentWrite("review/adversary_report.md", b"no dissent\nVERDICT: PASS\n"),
         ),
-        StageId.RETROSPECT: (AgentWrite("retrospect/retro.md", b"retrospect"),),
+        StageId.RETROSPECT: (AgentWrite("retrospective/retro.md", b"retrospect"),),
         StageId.MEMORY_UPDATE: (AgentWrite("memory/scar.md", b"scar"),),
     }
 
