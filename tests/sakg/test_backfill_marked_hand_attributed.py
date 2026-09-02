@@ -1,4 +1,5 @@
 """Hand-attribution safeguards for historical outcomes."""
+
 from __future__ import annotations
 
 from pathlib import Path
