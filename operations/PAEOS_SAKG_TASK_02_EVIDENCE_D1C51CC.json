@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "d1c51ccff26a2a27b70cf7f3b65aca2aecb0f995",
+  "l13_reproduction": {
+    "collected": 14,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-02-l13-focused-d1c51cc.log",
+    "focused_log_sha256": "c0b3beb4f65e0f07e73a0089470e679f45dab536006639f7e2ecc696804c0764",
+    "passed": 14,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_02_EVIDENCE",
+  "program_candidate_commit": "bd90fdc3e98032b8429dc288a91cfeb08eb29c48",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 02 \u2014 AST Node & Tradeoff Extractor with Explicit Gaps"
+}
