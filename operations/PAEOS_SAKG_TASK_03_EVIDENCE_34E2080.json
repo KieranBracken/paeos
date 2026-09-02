@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "34e2080332206ed08b0955fc88c092d3821b8647",
+  "l13_reproduction": {
+    "collected": 4,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-03-l13-focused-34e2080.log",
+    "focused_log_sha256": "733599856940acf5c1728bf7c61afcdccb7a0f0514719394a968b454a21ca95b",
+    "passed": 4,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_03_EVIDENCE",
+  "program_candidate_commit": "9a5f232dbf98d4d7732a3928233ee97e20ec4272",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 03 \u2014 Ingestion Pipeline, Idempotency & Candidate-Only Landing"
+}
