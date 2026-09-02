@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "01076b89a2a89c6de250dc84a552b4451bb42ae2",
+  "l13_reproduction": {
+    "collected": 6,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-09-l13-focused-01076b8.log",
+    "focused_log_sha256": "c139fb1203bd00d3f67f5518e0e7762d444cdd44d663f9ef5b950d7c3c7a71ac",
+    "passed": 6,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_09_EVIDENCE",
+  "program_candidate_commit": "c7a74fd48b898144b5218944b50f70f24d2d41ab",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1 / MCP Protocol Adapter",
+  "task": "Task 09 \u2014 MCP Server, Read-Only Enforcement & Graceful Degradation"
+}
