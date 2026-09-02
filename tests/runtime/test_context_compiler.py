@@ -26,9 +26,7 @@ def test_scars_are_always_on_the_path() -> None:
 def test_dedup_and_deterministic_order() -> None:
     c = ContextCompiler()
     compiled = c.compile(objective="X", context_refs=(_PLAN, _PLAN), scars=(_SCAR,))
-    assert compiled.context_refs == tuple(
-        sorted((_PLAN, _SCAR), key=lambda r: (r.type, r.hash))
-    )
+    assert compiled.context_refs == tuple(sorted((_PLAN, _SCAR), key=lambda r: (r.type, r.hash)))
 
 
 def test_different_objective_changes_hash() -> None:

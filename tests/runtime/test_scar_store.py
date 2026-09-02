@@ -73,7 +73,7 @@ def test_matching_and_all_scars_are_deterministic(tmp_path: Path) -> None:
     first = store.record_scar(_draft("domain:sakg", "failure:timeout"))
     second = store.record_scar(_draft("domain:sakg", "failure:quota"))
     assert [scar.id for scar in store.all_scars()] == [first.id, second.id]
-    assert [scar.id for scar in store.match_scars("domain:sakg,failure:quota,extra")]==[second.id]
+    assert [scar.id for scar in store.match_scars("domain:sakg,failure:quota,extra")] == [second.id]
     store.close()
 
 
