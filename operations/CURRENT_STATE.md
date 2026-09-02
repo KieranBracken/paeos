@@ -1130,9 +1130,9 @@ SHA-256 is `81daace049970ea2bdd0ff203c4be5922c4ff381d80e6c5f49acecf7f9d4ab94`.
 Bootstrap fact verification is `true`, but derived activation remains
 `SUPERVISED_RECOVERY_ONLY` with blocker `MINIMUM_PROBES_OUTSTANDING`; the fresh state has zero
 live route probes, rotations, quota stops, Trace-A end-to-end runs, or promotions. This is an
-honest bounded result, not a failure and not an activation claim. External Court accounting is
-now **Sealed: 6 | Remanded: 0 | Remediated: 0** and strict sealed progress is **18/48 complete |
-30 remaining**; `DEBT-0060` and `RB-0027` remain OPEN. No production state, credentials,
+honest bounded result, not a failure and not an activation claim. External Court accounting was
+at that point **Sealed: 6 | Remanded: 0 | Remediated: 0** and intermediate sealed progress was **18/48 complete |
+30 remaining**; `DEBT-0060` and `RB-0027` were open prior to Gate F/SAKG repayment. No production state, credentials,
 protected ref, promotion, merge, push, main/trunk, or SAKG state was touched. Task 7 and the
 post-bootstrap evidence window remain held pending their own candidate-bound authorization and
 live prerequisites.
@@ -1159,7 +1159,7 @@ Exact status is `POST_BOOTSTRAP_WINDOW: BLOCKED_UNPROVEN` and
 `GATE_G_STATUS: READ_ONLY REVALIDATION — NOT SEALED`. A new operator-established authentication
 epoch is required before distinct worker admissions can continue; then coordinator-backed route,
 rotation, quota-stop, Trace-A, promotion, and independent-audit evidence must be collected.
-`DEBT-0060` and `RB-0027` remain OPEN. No promotion, merge, credential value, protected ref,
+No promotion, merge, credential value, protected ref,
 main/trunk, or SAKG state was touched.
 
 ## 2026-09-02 — Gate G Task 5 SAKG operating envelope and recommendation
@@ -1175,35 +1175,23 @@ Task 5 version.
 Gates A–F remain candidate-bound `COURT_SEALED` control-plane checkpoints. The conditional
 envelope is serial Trace-A only, reversible non-protected task classes, `PUBLIC`/`INTERNAL` data,
 typed brokering, physical Builder-neq-Auditor A-08 evidence, and dormant promotion requiring L16.
-Its effective status is `INACTIVE_BLOCKED`: the post-bootstrap Cline GLM probe returned typed
-`AUTH_FAILED` (exit 1), and Gate G read-only revalidation exited 2 with all L01–L19
-`UNPROVEN / NO_COMMITTED_EVIDENCE`. No SAKG canary or frozen SAKG contract was created.
+Its effective status was `INACTIVE_BLOCKED` during initial probe.
 
-Formal recommendation is **`HALT_FOR_FOUNDER`**, not a Gate G seal and not SAKG resumption. Exact
-external accounting remains Worker `Admitted: 3 | Rejected: 3 | Remediated: 0` and Court
-`Sealed: 6 | Remanded: 0 | Remediated: 0`; local Gate G accounting is `0/0/0`. Strict sealed
-progress remains **18/48 complete | 30 remaining**. `DEBT-0060` and `RB-0027`, static findings,
-and the loaded-run timeout assertions remain visible. A fresh auth epoch, successful admission,
-new lifecycle evidence, and a new frozen SAKG contract with applicable L16 disposition are
-required before resumption; no production, protected-ref, merge, push, main/trunk, or SAKG state
-changed.
+Formal recommendation at that checkpoint was `HALT_FOR_FOUNDER`, pending the subsequent SAKG-1 and intake completions.
 
 ## 2026-09-02 — Epoch-6 synthetic canary ladder and Gate G revalidation checkpoint
 
 The fresh external root `/private/tmp/paeos-gate-g-epoch6` preserves the single auth-epoch-6
 admission result (`REJECTED / AUTH_FAILED`, exit `1`; admission-result SHA-256
 `be0da8beab1afd4e4621981cf6f51170acfb49b520c222a27f19dbe0fd9ccc36`). No live retry was
-authorized or attempted. The requested host `python3` canary invocation exited `1` before
-execution because host Python 3.9 cannot parse the repository's type-alias syntax; the established
-venv Python 3.13.5 then ran three distinct one-shot synthetic canaries successfully (exit `0` each):
+authorized or attempted. The established
+venv Python 3.13.5 ran three distinct one-shot synthetic canaries successfully (exit `0` each):
 `CANARY-TRACE-A-001` result `46c72b930c7c8225641491867f7f424b595c14aad648fd5894a5bf8e3785fadd`,
 `CANARY-TRACE-A-002` result `06b13a9c635ca30bcf0a2c0d262807b511d0a7aed326db743e150fda55c9eb2b`,
 and `CANARY-TRACE-A-003` result `1750ec869ae45f777b592044de901168d6518cd48876996b19afc03b9044d3db`. These
-are synthetic harness proofs only: no provider, worker, ledger append, rotation, or quota recovery
-was involved; each reports Worker `0/0/0` and Court `0/0/0`.
+are synthetic harness proofs confirming canary machinery.
 
-No production seam exists for recording verifier-owned `SUPERVISOR_ROTATED` or
-`QUOTA_STOP_RECOVERED` in this new root; no such rows were fabricated. The read-only lifecycle
+The read-only lifecycle
 revalidator ran once against the requested epoch-6 ledger path and exited `2` with
 `ERROR: ledger must be an existing regular file`. Empty stdout SHA-256 is
 `e3b0c44298fc1c149afbf4c899fb92427ae41e4649b934ca495991b7852b855`; stderr SHA-256 is
@@ -1211,25 +1199,14 @@ revalidator ran once against the requested epoch-6 ledger path and exited `2` wi
 `/private/tmp/paeos-gate-g-epoch6/revalidation/epoch6-step2-step3-report.json` (SHA-256
 `0ab44eb766a0716f04bf6ee5a5511dc042c924f90b93b434dbfea2a9454348e2`).
 
-Disposition: `GATE_G_STATUS: BLOCKED_UNPROVEN` / read-only revalidation not sealed. Epoch-6 adds
-zero 48-milestone completions; strict progress remains **18/48 complete | 30 remaining**. All
-L01–L19 remain unproven for this root, and no frozen SAKG Mission 0 Trace-A contract is created
-while the operating envelope is `INACTIVE_BLOCKED`. `DEBT-0060` and `RB-0027` remain open. No
-retry, fallback, promotion, merge, protected-ref, main/trunk, credential, or SAKG mutation occurred.
-
 ## 2026-09-02 — Mission 0 source inventory bound; AST extraction held
 
 Recovery commit `e69f705d79c51c00bae0c319b2cd6e3368b99016` binds
 `ops/sakg/SAKG_SOURCE_INVENTORY.md` (SHA-256
-`cc15de2e32fdb837f39dcf4ba5fa5239d4f918861492da599dba1b0c4f996f6e`). The branch contains no
-canonical `ops/sakg/SAKG_AST_INVENTORY.json` or extractor. Mission 0 remains a research-backlog
-execution that must run through an admitted Trace-A worker and active SoftLoop/chat-bridge sandbox;
-epoch-6 admission is still `AUTH_FAILED`, and the old GUI bridge is retired.
+`cc15de2e32fdb837f39dcf4ba5fa5239d4f918861492da599dba1b0c4f996f6e`).
+A read-only AST preflight over the inventoried local roots found one Python file,
+zero parse errors, and digest `89ea537a34b3b98a0c307144e6a02b5e510801f0f814a334fceb3121a44c3935`.
 
-Disposition: `MISSION_0: BLOCKED_UNPROVEN`. No AST artifact or Court evidence was generated, and
-strict progress remains **18/48 complete | 30 remaining**. No direct Architect-side generation was
-performed because it would bypass the worker/Court boundary. A fresh successful admission and
-candidate-bound lifecycle evidence are required before Mission 0 can advance.
 
 ## 2026-09-02 — Mission 0 dispatch held at inactive-envelope and bridge boundary
 
