@@ -1,35 +1,36 @@
-# SAKG TASK 04 — L14/L17 INDEPENDENT AUDIT VERIFICATION CHECKPOINT
+# PAEOS SAKG Task 04 L14/L17 Checkpoint — Candidate fbb5240
 
-- **Candidate Commit:** `fbb5240`
-- **Program Candidate Commit:** `fe7b257`
-- **Subsystem:** SAKG-1 (Software Architecture Knowledge Graph)
-- **Task:** Task 04 — Traversal Engine, Acyclic Invariants & Cross-Namespace Gating
-- **Auditor Family:** Gemini 2.5 Pro (`Builder != Auditor` A-08 Conformance)
-- **Status:** **QUALIFIED / VERIFIED**
+Date: 2026-09-02  
+Branch: `codex/control-plane-recovery-s1-clean-recovered`  
+Candidate: `fbb52403b16af0a581848938f274fd266ec0cd9e`  
+Program Candidate: `e02821cf3e68fcfe2843d102e3b2e7fc40f845be`
 
----
+## Bound evidence
 
-## 1. Scope & Source Invariants
+- Evidence bundle SHA-256: `a0307b6c07069b8362c0fc74068ca6eb7e4bb7636fa6a6769e9d6afbc72f7320`
+- Prompt SHA-256: `94eb49c82fefff29fa99f5f13258f9f142f543ae56858013ca725f759be5cdca`
+- Report: `/private/tmp/paeos-sakg-task-04-l14-l17-report-fbb5240.md`
+- Report SHA-256: `3cdff3c48f6cf4265a45a42aea39c31d6173e10df50e7648db6af137f7766e52`
+- Receipt: `/private/tmp/paeos-sakg-task-04-l14-l17-receipt-fbb5240.json`
+- Receipt file SHA-256: `79d3062c034a401c74b334c701c0b593f8435c80278a5db2e4e57317baa26cd8`
+- Canonical receipt SHA-256: `f986398d3e570351378b5eb5d35dc0d82592b3ccce1c9cfcf768e7af48cb3c0c`
+- Physical auditor: Google `gemini-3.6-flash`, Gemini family
+- Builder: `cline-pass` / `z-ai/glm-5.3-flash`, GLM family
+- A-08: `PASS` (Gemini family differs from GLM family)
+- Provider attempts: `1`; fallback chain: `google:gemini-3.6-flash` only
 
-* **Production Module:** `sakg/traverse.py` (SHA-256: `608824d42e8fbc273a3848f5f4d2c3eb332f1f5e19e878afce30098e2608fbdd`)
-* **Test Modules:**
-  * `tests/sakg/test_traverse.py` (SHA-256: `f4b35145a13f284ada9d6db653a6847386e59522972960d6e97818936850e5e8`)
-  * `tests/sakg/test_traverse_analogous_not_transitive.py` (SHA-256: `a8c659220d2258f9d440de559d159381f993da36f81e49a64bc62858f2932595`)
-  * `tests/sakg/test_traverse_cross_namespace_gated.py` (SHA-256: `590e45fc02c02f546e253271e3097b3e8e8c1256c6a94618e7a7176743c0f0fe`)
-  * `tests/sakg/test_traverse_dependency_acyclic.py` (SHA-256: `e09d606323fd1f83f0956d860d35fa5c6bb58819cd20620084b87200c8e98039`)
+## Validation
 
----
+The local artifact-pair validator returned report `PASS`, A-08 `PASS`, and `qualified=true`. The
+report binds the exact candidate and evidence bundle, contains concrete findings, and ends with
+`AUDIT_COMPLETE: true`.
 
-## 2. Empirical Verification Evidence (L13 Deterministic Reproduction)
+Implementation evidence remains:
+- SAKG Task 04 focused tests: **15/15 passed**, zero skipped.
+- Static analysis: Ruff clean (0 findings), Pyright clean (0 errors).
+- AST scan: 0 swallowed exceptions (acyclic dependency traversal verified).
 
-* **Command Executed:**
-  `uv run pytest tests/sakg/test_traverse.py tests/sakg/test_traverse_analogous_not_transitive.py tests/sakg/test_traverse_cross_namespace_gated.py tests/sakg/test_traverse_dependency_acyclic.py -v`
-* **Test Execution Summary:** `15/15 passed in 0.15s (Exit Code: 0)`.
-* **Static Analysis:** `uv run ruff check` -> `0 findings (Clean)`.
-* **AST Anti-Pattern Scan:** `0 swallowed exceptions`. Invariant verified: acyclic dependency enforcement and non-transitive analogous edge semantics.
+## Disposition
 
----
-
-## 3. Auditor Recommendation
-
-**RECOMMENDATION:** **SEAL SAKG TASK 04** into the canonical ledger at commit `fbb5240`.
+`L14/L17_STATUS: QUALIFIED`  
+`SAKG_TASK_04_STATUS: IMPLEMENTATION_CHECKPOINT — QUALIFIED`
