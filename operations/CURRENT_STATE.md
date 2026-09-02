@@ -3,7 +3,7 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-02 (Gate F sealed; one-time isolated bootstrap integrated)
+> **Last updated:** 2026-09-02 (Gate G Task 5 recommendation recorded; SAKG remains halted)
 
 ## Current canonical recovery frontier — 2026-09-02
 
@@ -17,6 +17,10 @@
 - **Open debt:** `DEBT-0060` and `RB-0027` remain **OPEN** and are carried forward.
 - **SAKG/production:** paused; no production dispatch, merge, promotion, or main/trunk mutation is
   authorized until later gates and the final lifecycle disposition are complete.
+- **Gate G Task 5:** current recommendation is `HALT_FOR_FOUNDER`; the effective envelope is
+  `INACTIVE_BLOCKED` because post-bootstrap admission failed and L01–L19 remain unproven. See
+  `operations/SAKG_RESUMPTION_MANIFEST.json` and
+  `reviews/tasks/SAKG_RESUMPTION_DISPOSITION_review.md`.
 
 The current Gate F implementation candidate is
 `61521f7429462a4e015feb285cb20a5b39c78294`; its qualified L14/L17 checkpoint is
@@ -1161,3 +1165,29 @@ epoch is required before distinct worker admissions can continue; then coordinat
 rotation, quota-stop, Trace-A, promotion, and independent-audit evidence must be collected.
 `DEBT-0060` and `RB-0027` remain OPEN. No promotion, merge, credential value, protected ref,
 main/trunk, or SAKG state was touched.
+
+## 2026-09-02 — Gate G Task 5 SAKG operating envelope and recommendation
+
+Task 5 records the current machine-readable envelope in
+`operations/SAKG_RESUMPTION_MANIFEST.json` (SHA-256
+`d8e6576d7162c866e56fb36c03fb59c243e294dc13f92b7fe13f1514ecd775f1`) and the formal review in
+`reviews/tasks/SAKG_RESUMPTION_DISPOSITION_review.md` (SHA-256
+`03426bb2e138036c909a2ead4ac76d9e467e9de0b5a427ddb858738d327b46b8`). The historical manifest
+and review contents are preserved; the manifest's `current_record` is the authoritative current
+Task 5 version.
+
+Gates A–F remain candidate-bound `COURT_SEALED` control-plane checkpoints. The conditional
+envelope is serial Trace-A only, reversible non-protected task classes, `PUBLIC`/`INTERNAL` data,
+typed brokering, physical Builder-neq-Auditor A-08 evidence, and dormant promotion requiring L16.
+Its effective status is `INACTIVE_BLOCKED`: the post-bootstrap Cline GLM probe returned typed
+`AUTH_FAILED` (exit 1), and Gate G read-only revalidation exited 2 with all L01–L19
+`UNPROVEN / NO_COMMITTED_EVIDENCE`. No SAKG canary or frozen SAKG contract was created.
+
+Formal recommendation is **`HALT_FOR_FOUNDER`**, not a Gate G seal and not SAKG resumption. Exact
+external accounting remains Worker `Admitted: 3 | Rejected: 3 | Remediated: 0` and Court
+`Sealed: 6 | Remanded: 0 | Remediated: 0`; local Gate G accounting is `0/0/0`. Strict sealed
+progress remains **18/48 complete | 30 remaining**. `DEBT-0060` and `RB-0027`, static findings,
+and the loaded-run timeout assertions remain visible. A fresh auth epoch, successful admission,
+new lifecycle evidence, and a new frozen SAKG contract with applicable L16 disposition are
+required before resumption; no production, protected-ref, merge, push, main/trunk, or SAKG state
+changed.

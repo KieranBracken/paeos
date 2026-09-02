@@ -4798,3 +4798,37 @@ REVALIDATION — NOT SEALED`. `DEBT-0060` and `RB-0027` remain OPEN. No promotio
 credential value, merge, main/trunk, or SAKG state was touched. The next permissible step is a
 new operator-established auth epoch, then distinct admissions and the remaining coordinator,
 canary, promotion, and independent-audit evidence required by Gate F/G.
+
+### Entry 271 — 2026-09-02: Gate G Task 5 operating envelope and SAKG resumption recommendation
+
+Gate G Task 5 computed the operating envelope from the six candidate-bound recovery seals and the
+post-bootstrap evidence window. The current machine-readable record is
+`operations/SAKG_RESUMPTION_MANIFEST.json`, whose SHA-256 is
+`d8e6576d7162c866e56fb36c03fb59c243e294dc13f92b7fe13f1514ecd775f1`; the formal review is
+`reviews/tasks/SAKG_RESUMPTION_DISPOSITION_review.md`, SHA-256
+`03426bb2e138036c909a2ead4ac76d9e467e9de0b5a427ddb858738d327b46b8`.
+
+The six recovery checkpoints A–F are recorded as `COURT_SEALED` in their candidate-bound
+disposition files. They prove gate-level control-plane checkpoints, not a new end-to-end L01–L19
+execution. The conditional envelope is intentionally limited to serial Trace-A work, reversible
+non-protected task classes, `PUBLIC`/`INTERNAL` data, typed worker brokering, physical
+Builder-neq-Auditor A-08 evidence, and dormant promotion requiring L16. Its effective status is
+`INACTIVE_BLOCKED` because the sole post-bootstrap Cline GLM probe (`post-bootstrap-route-001`,
+auth epoch 4) returned typed `AUTH_FAILED` (exit 1; admission-result SHA-256
+`ae6e2072ec3405e4bbc7b044039ae5d6c445ac1e16aa114a5298a7f2bb3aaded`). No retry, fallback,
+admission, coordinator event, or promotion occurred.
+
+The read-only Gate G run `gate-f-bootstrap-61521f7` exited 2 with stdout SHA-256
+`1cf080e0578aed2acf88a4883c043794feb0be3c6dfcb1b03701a2108973d420`; all L01–L19 rows are
+`UNPROVEN / NO_COMMITTED_EVIDENCE`. Its 13/13 tests validate only the auditor machinery. No new
+SAKG Trace-A contract was created and no canary was selected or run. Exact external accounting is
+Worker **Admitted: 3 | Rejected: 3 | Remediated: 0** and Court **Sealed: 6 | Remanded: 0 |
+Remediated: 0**; the local Gate G ledger is **Sealed: 0 | Remanded: 0 | Remediated: 0**. Strict
+sealed progress remains **18/48 complete | 30 remaining**.
+
+Formal recommendation: **`HALT_FOR_FOUNDER`**. This is not a Court seal and does not authorize
+SAKG resumption. `DEBT-0060` and `RB-0027` remain OPEN; Ruff 557, Pyright 120, and the two loaded
+non-gateway Cline timeout assertions remain visible quality/reconciliation debt. A fresh operator
+auth epoch, successful admission, new coordinator/Trace-A evidence, independent L13/L14/L17
+evidence, and a new frozen SAKG contract with applicable L16 disposition are required before any
+resumption decision. No production, protected-ref, merge, push, main/trunk, or SAKG state changed.

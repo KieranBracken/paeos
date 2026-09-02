@@ -1194,3 +1194,13 @@ evidence and Founder/Court disposition are mandatory.
   `1cf080e0…`; the auditor machinery tests passed `13/13`. This is
   `POST_BOOTSTRAP_WINDOW: BLOCKED_UNPROVEN`, not a Gate G seal. `DEBT-0060` and `RB-0027` remain
   open; no protected-ref/main/trunk or SAKG mutation occurred.
+
+- 2026-09-02 Gate G Task 5 computed and recorded the current SAKG operating envelope in
+  `operations/SAKG_RESUMPTION_MANIFEST.json` (SHA-256
+  `d8e6576d7162c866e56fb36c03fb59c243e294dc13f92b7fe13f1514ecd775f1`) and the formal review in
+  `reviews/tasks/SAKG_RESUMPTION_DISPOSITION_review.md` (SHA-256
+  `03426bb2e138036c909a2ead4ac76d9e467e9de0b5a427ddb858738d327b46b8`). The update preserves the
+  historical manifest/review record and appends a versioned current record. Because the fresh
+  post-bootstrap probe was `AUTH_FAILED` and Gate G reports all L01–L19 unproven, the effective
+  envelope is inactive and the formal recommendation is `HALT_FOR_FOUNDER`. No canary, automatic
+  dispatch, promotion, merge, push, protected-ref, main/trunk, production, or SAKG mutation occurred.
