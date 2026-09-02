@@ -27,9 +27,18 @@ from typing import Protocol
 from kernel.capability import CapabilityBroker
 from kernel.cas import CAS
 from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
+from kernel.gates import Gate
 from kernel.ledger import Event, JsonValue, Ledger
 from kernel.seal import SealAuthority, SealRecord
-from kernel.types import ArtifactRef, Claim, Role, StageId, WeightClass
+from kernel.types import (
+    ArtifactRef,
+    Claim,
+    Role,
+    StageId,
+    TransitionRequest,
+    ValidationClaim,
+    WeightClass,
+)
 from nacl.signing import SigningKey
 
 from runtime.agents import StagePlaybook
@@ -37,6 +46,7 @@ from runtime.ceremony import CeremonyContract, Layer, Obligation
 from runtime.claude_code import AgentDispatcher, AgentRuntime
 from runtime.court import Court, Verdict, VerdictOutcome
 from runtime.memory import ScarStore
+from runtime.retrospective import RetrospectiveEngine, RetrospectiveTransitionRejected
 from runtime.review import (
     AdversaryOutcome,
     InformationBarrierManager,
@@ -230,6 +240,9 @@ class SoftLoop:
         # builder's change applied (B2.N) — so probative evidence can pass. None ⇒ injected court.
         self._repo_root = repo_root
         broker = CapabilityBroker(signing_key)
+        self._broker = broker
+        self._transition_evidence: dict[str, Evidence] = {}
+        self._gate = Gate(broker, self._transition_evidence.__getitem__)
         dispatcher = AgentDispatcher(broker, cas, agent_runtime, clock=self._now)
         self._playbook = StagePlaybook(dispatcher)
         self._court = court if court is not None else Court()
@@ -518,6 +531,91 @@ class SoftLoop:
             verdict_ref=verdict_ref,
             adversary_ref=adversary.trace_ref,
         )
+
+        # --- Gate-routed L17 retrospective (EL L17): report is CAS-bound before stage execution.
+        # The frozen kernel requires the canonical SEAL -> RETROSPECT -> EVOLVE -> MEMORY_UPDATE
+        # chain; this request exercises only the first edge and does not bypass Gate.propose_transition.
+        try:
+            if decision.ceremony.obligation_for(Layer.L17) is Obligation.EXECUTE:
+                retrospective = RetrospectiveEngine(self._cas)
+                retro_report = retrospective.build_report(
+                    RunOutcome(RunStatus.SEALED, goal_id, "sealed", seal=seal, verdict=verdict),
+                    run_id=run_id,
+                    objective=objective,
+                    goal_signature=goal_signature,
+                    changed_paths=changed_paths,
+                )
+                retro_hash = retrospective.emit_report(retro_report)
+                evidence_hash = hashlib.sha256(("l17-evidence:" + retro_hash).encode()).hexdigest()
+                self._transition_evidence[evidence_hash] = Evidence(
+                    hash=evidence_hash,
+                    kind=EvidenceKind.PROOF,
+                    claim_id="l17_retrospective",
+                    artifact_hash=retro_hash,
+                    environment_hash=hashlib.sha256(b"paeos-l17-retrospective").hexdigest(),
+                    reproducible_command=None,
+                    producer=EvidenceProducer(role=Role.DOC, session="retrospective-" + run_id),
+                    determinism=Determinism.NONDETERMINISTIC,
+                    result={"status": "report-emitted", "artifact_hash": retro_hash},
+                    attestation="l17-runtime",
+                )
+                head = self._ledger.head()
+                current_seq = head.seq if head is not None else 0
+                token = self._broker.mint(
+                    goal_id=goal_id,
+                    run_id=run_id,
+                    stage=StageId.SEAL,
+                    role=Role.DOC,
+                    session="retrospective-" + run_id,
+                    operations=("propose_transition",),
+                    issued_seq=current_seq,
+                    expires_seq=current_seq + 1800,
+                )
+                request = TransitionRequest(
+                    authority=token,
+                    goal_id=goal_id,
+                    run_id=run_id,
+                    from_state=StageId.SEAL,
+                    to_state=StageId.RETROSPECT,
+                    evidence=(evidence_hash,),
+                    validation=ValidationClaim(
+                        gate_id="G-L17-RETROSPECT",
+                        claims=(
+                            Claim("l17_retrospective", "CAS report emitted", (evidence_hash,)),
+                        ),
+                        producer=Role.DOC,
+                        produced_against=retro_hash,
+                    ),
+                )
+                _ = retrospective.route_transition(
+                    self._gate,
+                    request,
+                    weight_class=decision.weight_class,
+                    current_seq=current_seq,
+                    artifact_hash=retro_hash,
+                )
+                self._ledger.append(
+                    Event(
+                        1,
+                        "RETROSPECTIVE_TRANSITION",
+                        {  # type: ignore[arg-type]
+                            "run_id": run_id,
+                            "goal_id": goal_id,
+                            "from": StageId.SEAL.name,
+                            "to": StageId.RETROSPECT.name,
+                            "outcome": "COMMITTED",
+                            "report_hash": retro_hash,
+                        },
+                    )
+                )
+        except RetrospectiveTransitionRejected as exc:
+            return RunOutcome(
+                RunStatus.REMANDED,
+                goal_id,
+                f"L17 retrospective gate rejected: {exc}",
+                seal=seal,
+                verdict=verdict,
+            )
 
         # --- Post-Seal Evolution Stages (EL L17-L18 / Trace-B): Retrospect & Memory Update ---
         try:

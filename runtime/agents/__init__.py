@@ -110,7 +110,15 @@ _DESIGN = RoleSpec(
     role=Role.PLANNER,
     objective="Produce the system design (component graph, interfaces, data flow, state machines).",
     write_scopes=("design/",),
-    read_scopes=("constitution/", "spec/", "derive/", "ideate/", "tradeoff/", "mitigation/", "design/"),
+    read_scopes=(
+        "constitution/",
+        "spec/",
+        "derive/",
+        "ideate/",
+        "tradeoff/",
+        "mitigation/",
+        "design/",
+    ),
     mcp_servers=("constitution", "memory:read", "artifacts"),
     required_evidence=(
         EvidenceObligation(
@@ -169,7 +177,9 @@ _IMPLEMENT = RoleSpec(
     read_scopes=("constitution/", "design/", "plan/"),
     mcp_servers=("constitution", "artifacts", "court", "memory:read"),
     required_evidence=(
-        EvidenceObligation(claim_id="builds", kind=EvidenceKind.TEST, acceptance="exit 0, probative test"),
+        EvidenceObligation(
+            claim_id="builds", kind=EvidenceKind.TEST, acceptance="exit 0, probative test"
+        ),
         EvidenceObligation(
             claim_id="unit", kind=EvidenceKind.TEST, acceptance="probative unit test green"
         ),
@@ -177,12 +187,12 @@ _IMPLEMENT = RoleSpec(
     skills=(SkillRef("testing", "2.1"),),
 )
 
-_RETROSPECT = RoleSpec(
+_RETROSPECTIVE_AUDITOR = RoleSpec(
     stage=StageId.RETROSPECT,
-    role=Role.PLANNER,
-    objective="Extract execution friction, cost efficiency, and operational lessons from run execution.",
-    write_scopes=("retrospect/",),
-    read_scopes=("constitution/", "design/", "plan/", "review/"),
+    role=Role.DOC,
+    objective="Perform the six-question CER retrospective and record attributable operational lessons.",
+    write_scopes=("retrospective/",),
+    read_scopes=("constitution/", "design/", "plan/", "review/", "retrospective/"),
     mcp_servers=("constitution", "memory:read", "artifacts"),
     required_evidence=(),
     skills=(SkillRef("retrospective", "1.0"),),
@@ -221,7 +231,7 @@ ROLE_SPECS: dict[StageId, RoleSpec] = {
     StageId.ADVERSARIAL_REVIEW: _ADVERSARIAL_REVIEW,
     StageId.PLAN: _PLAN,
     StageId.IMPLEMENT: _IMPLEMENT,
-    StageId.RETROSPECT: _RETROSPECT,
+    StageId.RETROSPECT: _RETROSPECTIVE_AUDITOR,
     StageId.MEMORY_UPDATE: _MEMORY_UPDATE,
     StageId.EVOLVE: _EVOLVE,
 }
