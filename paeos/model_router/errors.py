@@ -3,14 +3,15 @@ PAEOS Model Router — Normalized Error Handling Engine
 """
 from __future__ import annotations
 
+import contextlib
 import json
 import re
-from typing import Any, Dict, Optional
+from typing import Any
 
 from paeos.model_router.types import NormalizedError, NormalizedErrorType, ProviderId
 
 
-def parse_retry_after(headers: Optional[Dict[str, Any]], body_str: str = "") -> Optional[float]:
+def parse_retry_after(headers: dict[str, Any] | None, body_str: str = "") -> float | None:
     """Extract Retry-After from HTTP headers or body text (e.g. 'Try again in 1h 29m' or 'retry after 15s')."""
     if headers:
         for k, v in headers.items():
@@ -40,28 +41,26 @@ def parse_retry_after(headers: Optional[Dict[str, Any]], body_str: str = "") -> 
 
 
 def normalize_error(
-    http_status: Optional[int],
-    body: Optional[Any],
-    headers: Optional[Dict[str, Any]] = None,
-    provider_id: Optional[ProviderId] = None,
-    model_id: Optional[str] = None,
+    http_status: int | None,
+    body: Any | None,
+    headers: dict[str, Any] | None = None,
+    provider_id: ProviderId | None = None,
+    model_id: str | None = None,
 ) -> NormalizedError:
     """
     Parses HTTP status + provider-specific error body into canonical NormalizedError.
     Never relies solely on raw HTTP status code.
     """
     raw_str = ""
-    body_data: Dict[str, Any] = {}
+    body_data: dict[str, Any] = {}
 
     if isinstance(body, dict):
         body_data = body
         raw_str = json.dumps(body)
     elif isinstance(body, str):
         raw_str = body
-        try:
+        with contextlib.suppress(Exception):
             body_data = json.loads(body)
-        except Exception:
-            pass
     elif body is not None:
         raw_str = str(body)
 

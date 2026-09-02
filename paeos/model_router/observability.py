@@ -4,9 +4,9 @@ Zero-Secret Leakage Guarantee
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import time
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
@@ -15,7 +15,7 @@ from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import ProviderId, ProviderKey
 
 # Canonical Free Tier Quota Limits (RPD: Requests Per Day)
-FREE_TIER_DAILY_LIMITS: Dict[ProviderId, Optional[int]] = {
+FREE_TIER_DAILY_LIMITS: dict[ProviderId, int | None] = {
     ProviderId.GOOGLE: 1500,       # Google AI Studio Free Tier: 1500 RPD
     ProviderId.CLINE: None,        # Cline API zero-cost routes (e.g. minimax-m2.5): Unmetered / non-negative balance
     ProviderId.NVIDIA: 1000,       # NVIDIA NIM developer tier: ~1000 RPD
@@ -26,7 +26,7 @@ FREE_TIER_DAILY_LIMITS: Dict[ProviderId, Optional[int]] = {
 
 def time_to_next_utc_midnight() -> tuple[int, str]:
     """Calculates remaining seconds and human-formatted time until 00:00:00 UTC daily quota reset."""
-    now_utc = datetime.now(timezone.utc)
+    now_utc = datetime.now(UTC)
     # Target next 00:00:00 UTC
     seconds_since_midnight = now_utc.hour * 3600 + now_utc.minute * 60 + now_utc.second
     seconds_remaining = 86400 - seconds_since_midnight
@@ -48,7 +48,7 @@ class ObservabilityDiagnostics:
         self.credentials = credentials
         self.provider_registry = provider_registry or catalog.provider_registry or build_builtin_provider_registry()
 
-    def get_mesh_status(self) -> Dict[str, Any]:
+    def get_mesh_status(self) -> dict[str, Any]:
         """Produces comprehensive structured telemetry dictionary with quota tracking & reset times."""
         now = time.time()
         seconds_to_reset, reset_countdown = time_to_next_utc_midnight()
@@ -57,7 +57,7 @@ class ObservabilityDiagnostics:
         for descriptor in self.provider_registry.snapshot():
             provider_key: ProviderKey = descriptor.key
             st = self.state_db.get_provider_state(provider_key)
-            rpm, tpm, rpd, tpd = self.state_db.get_window_usage(provider_key)
+            rpm, tpm, rpd, _tpd = self.state_db.get_window_usage(provider_key)
             metrics = self.state_db.get_recent_metrics(provider_key, window_seconds=300.0)
             has_key = self.credentials.has_key(provider_key)
             models = [
@@ -157,7 +157,7 @@ class ObservabilityDiagnostics:
         div = "─" * 84
         out = [
             f"\n\033[1;36m╔{border}╗\033[0m",
-            f"\033[1;36m║\033[0m \033[1;37mPAEOS INFERENCE MESH — REAL-TIME QUOTA & HEALTH MONITOR\033[0m               \033[1;36m║\033[0m",
+            "\033[1;36m║\033[0m \033[1;37mPAEOS INFERENCE MESH — REAL-TIME QUOTA & HEALTH MONITOR\033[0m               \033[1;36m║\033[0m",
             f"\033[1;36m║\033[0m \033[2mDaily Free Tier Reset: \033[1;33m{reset_time}\033[0m\033[2m until 00:00 UTC\033[0m                                 \033[1;36m║\033[0m",
             f"\033[1;36m╠{border}╣\033[0m",
             f"\033[1;36m║\033[0m \033[1;37m{'PROVIDER':<12} {'HEALTH':<12} {'RPD / LIMIT':<14} {'% USED':<12} {'CONC':<8} {'LIVE MODELS':<21}\033[0m\033[1;36m║\033[0m",

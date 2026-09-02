@@ -5,7 +5,7 @@ Safely tests active provider endpoints with minimal token overhead.
 from __future__ import annotations
 
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
@@ -31,7 +31,7 @@ def probe_single_model(
     credentials: CredentialStore,
     transport: LiteLLMTransport,
     timeout: float = 20.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Runs a minimal live inference probe on a single candidate model."""
     req = TaskRequest(
         messages=[{"role": "user", "content": "Say hello!"}],
@@ -94,9 +94,9 @@ def probe_single_model(
 
 
 def run_all_probes(
-    credentials: Optional[CredentialStore] = None,
-    catalog: Optional[ModelCatalog] = None,
-) -> List[Dict[str, Any]]:
+    credentials: CredentialStore | None = None,
+    catalog: ModelCatalog | None = None,
+) -> list[dict[str, Any]]:
     """Runs probes across primary model candidates for each configured provider."""
     creds = credentials or CredentialStore()
     cat = catalog or ModelCatalog()

@@ -6,17 +6,15 @@ Enforces local bearer token authentication, tool calling, SSE streaming, and har
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
-from typing import Any, Dict, Optional
+from typing import Any
 
-from paeos.model_router.catalog import ModelCatalog
-from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.observability import ObservabilityDiagnostics
 from paeos.model_router.router import ModelRouter
-from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import (
     DataClass,
     LogicalModel,
@@ -30,7 +28,7 @@ from paeos.model_router.types import (
 class GatewayHandler(BaseHTTPRequestHandler):
     router: ModelRouter
     diagnostics: ObservabilityDiagnostics
-    api_key: Optional[str] = None
+    api_key: str | None = None
 
     def _check_auth(self) -> bool:
         """Validates incoming Authorization: Bearer <token> if api_key is configured."""
@@ -46,7 +44,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
             return False
         return True
 
-    def _send_json(self, status: int, data: Dict[str, Any]) -> None:
+    def _send_json(self, status: int, data: dict[str, Any]) -> None:
         raw = json.dumps(data).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
@@ -141,7 +139,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
             return
 
         requested_model = body.get("model", LogicalModel.PAEOS_AUTO.value)
-        logical_model: Optional[LogicalModel] = None
+        logical_model: LogicalModel | None = None
         for lm in LogicalModel:
             if lm.value == requested_model:
                 logical_model = lm
@@ -160,12 +158,10 @@ class GatewayHandler(BaseHTTPRequestHandler):
             task_class = TaskClass.ROUTINE
 
         builder_family_str = body.get("builder_family", self.headers.get("X-PAEOS-Builder-Family"))
-        builder_family: Optional[ModelFamily] = None
+        builder_family: ModelFamily | None = None
         if builder_family_str:
-            try:
+            with contextlib.suppress(ValueError):
                 builder_family = ModelFamily(builder_family_str.lower())
-            except ValueError:
-                pass
 
         stream = bool(body.get("stream", False))
         tools = body.get("tools")
@@ -202,7 +198,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
                 self.close_connection = True
 
                 # Chunk 1: Role & Content / Tool Calls
-                delta_payload: Dict[str, Any] = {"role": "assistant"}
+                delta_payload: dict[str, Any] = {"role": "assistant"}
                 if resp.content:
                     delta_payload["content"] = resp.content
                 if resp.tool_calls:
@@ -222,7 +218,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
                         }
                     ],
                 }
-                self.wfile.write(f"data: {json.dumps(chunk_1)}\n\n".encode("utf-8"))
+                self.wfile.write(f"data: {json.dumps(chunk_1)}\n\n".encode())
                 self.wfile.flush()
 
                 # Chunk 2: Finish Reason
@@ -244,13 +240,13 @@ class GatewayHandler(BaseHTTPRequestHandler):
                         "total_tokens": resp.total_tokens,
                     },
                 }
-                self.wfile.write(f"data: {json.dumps(chunk_2)}\n\n".encode("utf-8"))
+                self.wfile.write(f"data: {json.dumps(chunk_2)}\n\n".encode())
                 self.wfile.write(b"data: [DONE]\n\n")
                 self.wfile.flush()
 
             else:
                 # Non-streaming standard JSON response
-                msg_payload: Dict[str, Any] = {
+                msg_payload: dict[str, Any] = {
                     "role": "assistant",
                     "content": resp.content,
                 }
@@ -301,22 +297,24 @@ class GatewayHandler(BaseHTTPRequestHandler):
 def run_gateway_server(
     host: str = "127.0.0.1",
     port: int = 4000,
-    router: Optional[ModelRouter] = None,
-    api_key: Optional[str] = None,
+    router: ModelRouter | None = None,
+    api_key: str | None = None,
 ) -> HTTPServer:
     """Instantiates and starts the local loopback gateway server."""
     if host not in ("127.0.0.1", "localhost"):
         raise ValueError(f"SECURITY VIOLATION: Gateway server must strictly bind to loopback (127.0.0.1), got '{host}'.")
 
     r = router or ModelRouter()
-    diagnostics = ObservabilityDiagnostics(r.state_db, r.catalog, r.credentials)
     configured_key = api_key or os.environ.get("PAEOS_GATEWAY_KEY")
     if not configured_key and r.credentials.env_file.exists():
         for line in r.credentials.env_file.read_text(encoding="utf-8").splitlines():
             if line.strip().startswith("PAEOS_GATEWAY_KEY="):
-                configured_key = line.split("=", 1)[1].strip().strip("\"'\''")
+                configured_key = line.split("=", 1)[1].strip().strip('"\'')
+
+    diagnostics = ObservabilityDiagnostics(r.state_db, r.catalog, r.credentials)
 
     class CustomHandler(GatewayHandler):
+
         pass
 
     CustomHandler.router = r

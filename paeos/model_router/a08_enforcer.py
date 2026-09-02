@@ -15,10 +15,9 @@ Required Semantics:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
-from collections.abc import Sequence
-from typing import List, Optional, Tuple
 
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.providers import normalize_provider_key
@@ -50,8 +49,8 @@ class Provenance:
 class A08EnforcementResult:
     """Result of A-08 heterogeneous independence verification."""
     verdict: A08Verdict
-    builder_provenance: Optional[Provenance]
-    auditor_provenance: Optional[Provenance]
+    builder_provenance: Provenance | None
+    auditor_provenance: Provenance | None
     reason: str
     
     @property
@@ -181,8 +180,8 @@ class A08Enforcer:
     def select_auditor(
         self,
         builder_family: ModelFamily,
-        available_providers: Optional[Sequence[str | ProviderId]] = None,
-    ) -> Optional[Tuple[ModelCatalogEntry, ModelFamily]]:
+        available_providers: Sequence[str | ProviderId] | None = None,
+    ) -> tuple[ModelCatalogEntry, ModelFamily] | None:
         """
         Select a heterogeneous auditor for a given builder family.
         
@@ -241,7 +240,7 @@ class A08Enforcer:
     def verify_fallback_chain(
         self,
         builder_family: ModelFamily,
-        fallback_chain: List[Tuple[str, str, ModelFamily]],
+        fallback_chain: list[tuple[str, str, ModelFamily]],
     ) -> A08EnforcementResult:
         """
         Verify that the FINAL fallback candidate maintains heterogeneous independence.
@@ -289,7 +288,7 @@ class A08Enforcer:
                 verdict=A08Verdict.FAIL_UNKNOWN_AUDITOR,
                 builder_provenance=builder_prov,
                 auditor_provenance=auditor_prov,
-                reason=f"Final fallback has unknown family - heterogeneous independence unverified. FAIL CLOSED.",
+                reason="Final fallback has unknown family - heterogeneous independence unverified. FAIL CLOSED.",
             )
         
         if family == builder_family:
@@ -312,7 +311,7 @@ class A08Enforcer:
 def resolve_logical_model_family(
     logical_model: str,
     catalog: ModelCatalog,
-    resolved_physical_model: Optional[ModelCatalogEntry] = None,
+    resolved_physical_model: ModelCatalogEntry | None = None,
 ) -> ModelFamily:
     """
     Resolve a logical model alias to its physical model family.

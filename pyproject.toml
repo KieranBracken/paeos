@@ -35,7 +35,8 @@ target-version = "py312"
 line-length = 100
 src = ["kernel", "runtime", "cli", "tests"]
 # Vendored/tooling dirs are not PAEOS source and are not linted.
-extend-exclude = [".agents", ".claude", ".runtime", "spec 2"]
+extend-exclude = [".agents", ".claude", ".runtime", "spec 2", "misc", "ops"]
+
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

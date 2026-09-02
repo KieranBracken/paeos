@@ -5,6 +5,7 @@ Usage: uv run python -m paeos.model_router.status
 from __future__ import annotations
 
 import sys
+
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.observability import ObservabilityDiagnostics

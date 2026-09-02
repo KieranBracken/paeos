@@ -3,7 +3,7 @@ PAEOS Model Router — First-Class Data Privacy Eligibility Gating
 """
 from __future__ import annotations
 
-from paeos.model_router.types import DataClass, ProviderDataPolicy, ProviderId
+from paeos.model_router.types import DataClass, ProviderDataPolicy
 
 
 def evaluate_privacy_eligibility(
@@ -24,21 +24,14 @@ def evaluate_privacy_eligibility(
     if data_class == DataClass.CONFIDENTIAL:
         if not provider_policy.allows_confidential:
             return False
-        if provider_policy.trains_on_inputs:
-            return False
-        return True
+        return not provider_policy.trains_on_inputs
 
     # INTERNAL allows standard project code on zero-retention / non-training routes
     if data_class == DataClass.INTERNAL:
         if not provider_policy.allows_internal:
             return False
-        if provider_policy.trains_on_inputs:
-            # Block training routes (e.g. Kilo Auto Free) from ingesting internal codebase
-            return False
-        return True
+        return not provider_policy.trains_on_inputs
+
 
     # PUBLIC allows all active routes
-    if data_class == DataClass.PUBLIC:
-        return True
-
-    return False
+    return data_class == DataClass.PUBLIC

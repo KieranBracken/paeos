@@ -6,11 +6,10 @@ It is integrated with paeos.model_router.a08_enforcer for fail-closed verificati
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections.abc import Sequence
-from typing import Optional
+from dataclasses import dataclass
 
-from paeos.model_router.a08_enforcer import A08Enforcer, A08EnforcementResult
+from paeos.model_router.a08_enforcer import A08EnforcementResult, A08Enforcer
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.types import ModelCatalogEntry, ModelFamily
 
@@ -20,17 +19,17 @@ class AuditRouteResult:
     """Result of heterogeneous auditor routing with A-08 enforcement."""
     builder_family: ModelFamily
     auditor_family: ModelFamily
-    auditor_model: Optional[ModelCatalogEntry]
+    auditor_model: ModelCatalogEntry | None
     eligible: bool
-    a08_result: Optional[A08EnforcementResult] = None
-    rejection_reason: Optional[str] = None
+    a08_result: A08EnforcementResult | None = None
+    rejection_reason: str | None = None
 
 
 def select_heterogeneous_auditor(
     builder_family: ModelFamily,
     catalog: ModelCatalog,
     available_providers: Sequence[str] | None = None,
-) -> Optional[ModelCatalogEntry]:
+) -> ModelCatalogEntry | None:
     """
     Selects an auditor from a strictly distinct model family from the builder.
     Uses A-08 enforcer for fail-closed semantics.

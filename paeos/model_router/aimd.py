@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import math
 import time
-from typing import Dict, Optional, Tuple
 
 from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.state import RouterStateDB
@@ -17,7 +16,7 @@ from paeos.model_router.types import (
 )
 
 # Configurable safety ceilings (fallback defaults, not immutable provider limits)
-DEFAULT_PUBLISHED_LIMITS: Dict[ProviderId, Dict[str, int]] = {
+DEFAULT_PUBLISHED_LIMITS: dict[ProviderId, dict[str, int]] = {
     ProviderId.GOOGLE: {
         "max_rpm": 12,       # Conservative 80% default for standard tier
         "max_tpm": 800_000,
@@ -35,14 +34,14 @@ class AIMDController:
     def __init__(
         self,
         state_db: RouterStateDB,
-        custom_limits: Optional[Dict[ProviderId, Dict[str, int]]] = None,
+        custom_limits: dict[ProviderId, dict[str, int]] | None = None,
         provider_registry: ProviderRegistry | None = None,
     ):
         self.state_db = state_db
         self.provider_registry = provider_registry or build_builtin_provider_registry()
         self.limits = custom_limits or DEFAULT_PUBLISHED_LIMITS
 
-    def limits_for(self, provider_id: ProviderId) -> Dict[str, int]:
+    def limits_for(self, provider_id: ProviderId) -> dict[str, int]:
         """Resolve rate ceilings from descriptor facts with legacy fallback."""
 
         configured = self.limits.get(provider_id)
@@ -63,7 +62,7 @@ class AIMDController:
         self,
         provider_id: ProviderId,
         estimated_tokens: int = 2000,
-    ) -> Tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """
         Multidimensional admission check: (Concurrency) AND (RPM < Target) AND (TPM < Target) AND (RPD < Target)
         """

@@ -3,21 +3,23 @@ PAEOS Model Router — Concurrent SQLite WAL State Engine
 """
 from __future__ import annotations
 
-import os
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
+from paeos.model_router.providers import (
+    ProviderRegistry,
+    build_builtin_provider_registry,
+    normalize_provider_key,
+)
 from paeos.model_router.types import (
     ModelFamily,
     NormalizedErrorType,
     ProviderHealth,
-    ProviderKey,
     ProviderId,
+    ProviderKey,
 )
-from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry, normalize_provider_key
-
 
 DEFAULT_DB_PATH = Path.home() / ".local" / "share" / "paeos" / "model-router" / "state.sqlite3"
 
@@ -25,8 +27,8 @@ DEFAULT_DB_PATH = Path.home() / ".local" / "share" / "paeos" / "model-router" / 
 class RouterStateDB:
     def __init__(
         self,
-        db_path: Optional[Path] = None,
-        provider_registry: Optional[ProviderRegistry] = None,
+        db_path: Path | None = None,
+        provider_registry: ProviderRegistry | None = None,
     ):
         self.db_path = db_path or DEFAULT_DB_PATH
         self.provider_registry = provider_registry or build_builtin_provider_registry()
@@ -123,7 +125,7 @@ class RouterStateDB:
                 ) VALUES (?, 'HEALTHY', 2, 10, 1, 0, ?)
                 """, (descriptor.key, time.time()))
 
-    def get_provider_state(self, provider_id: ProviderId | ProviderKey) -> Dict[str, Any]:
+    def get_provider_state(self, provider_id: ProviderId | ProviderKey) -> dict[str, Any]:
         provider_key = self._provider_key(provider_id)
         with self._get_connection() as conn:
             row = conn.execute("SELECT * FROM providers WHERE provider_id = ?", (provider_key,)).fetchone()
@@ -148,8 +150,8 @@ class RouterStateDB:
         self,
         provider_id: ProviderId | ProviderKey,
         health: ProviderHealth,
-        error_type: Optional[NormalizedErrorType] = None,
-        cooldown_seconds: Optional[float] = None,
+        error_type: NormalizedErrorType | None = None,
+        cooldown_seconds: float | None = None,
     ) -> None:
         provider_key = self._provider_key(provider_id)
         now = time.time()
@@ -266,7 +268,7 @@ class RouterStateDB:
                 token_count = token_count + ?
             """, (provider_key, day_window, total_tokens, total_tokens))
 
-    def get_window_usage(self, provider_id: ProviderId | ProviderKey) -> Tuple[int, int, int, int]:
+    def get_window_usage(self, provider_id: ProviderId | ProviderKey) -> tuple[int, int, int, int]:
         provider_key = self._provider_key(provider_id)
         now = time.time()
         min_window = (now // 60) * 60
@@ -292,7 +294,7 @@ class RouterStateDB:
     def log_observation(
         self,
         task_class: str,
-        logical_model: Optional[str],
+        logical_model: str | None,
         model_id: str,
         provider_id: ProviderId | ProviderKey,
         family: ModelFamily,
@@ -300,7 +302,7 @@ class RouterStateDB:
         prompt_tokens: int,
         completion_tokens: int,
         success: bool,
-        normalized_error: Optional[str] = None,
+        normalized_error: str | None = None,
     ) -> None:
         provider_key = self._provider_key(provider_id)
         with self._get_connection() as conn:
@@ -323,7 +325,7 @@ class RouterStateDB:
                 normalized_error,
             ))
 
-    def get_recent_metrics(self, provider_id: ProviderId | ProviderKey, window_seconds: float = 300.0) -> Dict[str, Any]:
+    def get_recent_metrics(self, provider_id: ProviderId | ProviderKey, window_seconds: float = 300.0) -> dict[str, Any]:
         provider_key = self._provider_key(provider_id)
         cutoff = time.time() - window_seconds
         with self._get_connection() as conn:

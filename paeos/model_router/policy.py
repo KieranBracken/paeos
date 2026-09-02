@@ -3,8 +3,6 @@ PAEOS Model Router — Multi-Stage Constraint Pipeline & Economy of Reasoning Po
 """
 from __future__ import annotations
 
-from typing import List, Optional
-
 from paeos.model_router.aimd import AIMDController
 from paeos.model_router.audit import select_heterogeneous_auditor
 from paeos.model_router.catalog import ModelCatalog
@@ -12,7 +10,6 @@ from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.privacy import evaluate_privacy_eligibility
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import (
-    DataClass,
     LogicalModel,
     ModelCatalogEntry,
     ModelFamily,
@@ -35,7 +32,7 @@ class RoutingPolicyEngine:
         self.credentials = credentials
         self.aimd = aimd
 
-    def resolve_candidate_chain(self, request: TaskRequest) -> List[ModelCatalogEntry]:
+    def resolve_candidate_chain(self, request: TaskRequest) -> list[ModelCatalogEntry]:
         """
         Executes the ordered multi-stage constraint pipeline:
         1. Privacy Eligibility (Data Class vs Provider Policy)
@@ -124,9 +121,9 @@ class RoutingPolicyEngine:
 
     def _filter_quota_reservations(
         self,
-        candidates: List[ModelCatalogEntry],
+        candidates: list[ModelCatalogEntry],
         request: TaskRequest,
-    ) -> List[ModelCatalogEntry]:
+    ) -> list[ModelCatalogEntry]:
         filtered = []
         for m in candidates:
             descriptor = self.catalog.provider_registry.resolve(m.provider_id)
@@ -143,7 +140,7 @@ class RoutingPolicyEngine:
             filtered.append(m)
         return filtered
 
-    def _order_strong_tier(self, candidates: List[ModelCatalogEntry]) -> List[ModelCatalogEntry]:
+    def _order_strong_tier(self, candidates: list[ModelCatalogEntry]) -> list[ModelCatalogEntry]:
         return sorted(
             candidates,
             key=lambda m: (
@@ -154,7 +151,7 @@ class RoutingPolicyEngine:
             ),
         )
 
-    def _order_code_tier(self, candidates: List[ModelCatalogEntry]) -> List[ModelCatalogEntry]:
+    def _order_code_tier(self, candidates: list[ModelCatalogEntry]) -> list[ModelCatalogEntry]:
         return sorted(
             candidates,
             key=lambda m: (
@@ -165,7 +162,7 @@ class RoutingPolicyEngine:
             ),
         )
 
-    def _order_cheap_tier(self, candidates: List[ModelCatalogEntry]) -> List[ModelCatalogEntry]:
+    def _order_cheap_tier(self, candidates: list[ModelCatalogEntry]) -> list[ModelCatalogEntry]:
         return sorted(
             candidates,
             key=lambda m: self.catalog.provider_registry.resolve(m.provider_id).preference_rank.get(
@@ -175,9 +172,9 @@ class RoutingPolicyEngine:
 
     def _score_and_rank(
         self,
-        candidates: List[ModelCatalogEntry],
+        candidates: list[ModelCatalogEntry],
         request: TaskRequest,
-    ) -> List[ModelCatalogEntry]:
+    ) -> list[ModelCatalogEntry]:
         def calculate_score(m: ModelCatalogEntry) -> float:
             st = self.state_db.get_provider_state(m.provider_id)
             health_mult = 1.0 if st["health_status"] == ProviderHealth.HEALTHY.value else 0.4

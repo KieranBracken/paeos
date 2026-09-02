@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import random
 import time
-from typing import Any, Dict, List, Optional
 
 from paeos.model_router.aimd import AIMDController
 from paeos.model_router.auditor_receipt import response_fingerprint
@@ -32,10 +31,10 @@ from paeos.model_router.types import (
 class ModelRouter:
     def __init__(
         self,
-        credentials: Optional[CredentialStore] = None,
-        catalog: Optional[ModelCatalog] = None,
-        state_db: Optional[RouterStateDB] = None,
-        transport: Optional[LiteLLMTransport] = None,
+        credentials: CredentialStore | None = None,
+        catalog: ModelCatalog | None = None,
+        state_db: RouterStateDB | None = None,
+        transport: LiteLLMTransport | None = None,
     ):
         self.credentials = credentials or CredentialStore()
         self.catalog = catalog or ModelCatalog()
@@ -58,13 +57,13 @@ class ModelRouter:
         if not request.allow_fallback:
             candidates = candidates[:1]
 
-        attempted_chain: List[str] = []
-        last_error: Optional[NormalizedError] = None
+        attempted_chain: list[str] = []
+        last_error: NormalizedError | None = None
 
         for candidate in candidates:
             attempted_chain.append(f"{candidate.provider_id.value}:{candidate.model_id}")
 
-            admitted, reason = self.aimd.check_admission(candidate.provider_id)
+            admitted, _reason = self.aimd.check_admission(candidate.provider_id)
             if not admitted:
                 continue
 
@@ -116,7 +115,7 @@ class ModelRouter:
 
         except NormalizedError as e:
             if e.error_type == NormalizedErrorType.RATE_LIMITED:
-                cooldown = self.aimd.on_rate_limit(candidate.provider_id, e)
+                self.aimd.on_rate_limit(candidate.provider_id, e)
                 # If short retry-after (< 3s), perform ONE bounded retry with jitter
                 if (
                     request.retry_policy is RetryPolicy.SINGLE_RATE_LIMIT
@@ -174,12 +173,12 @@ class ModelRouter:
     def generate(
         self,
         prompt: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         task_class: TaskClass = TaskClass.ROUTINE,
         data_class: DataClass = DataClass.INTERNAL,
-        logical_model: Optional[LogicalModel] = None,
-        builder_family: Optional[ModelFamily] = None,
-        max_tokens: Optional[int] = None,
+        logical_model: LogicalModel | None = None,
+        builder_family: ModelFamily | None = None,
+        max_tokens: int | None = None,
         temperature: float = 0.7,
     ) -> RouterResponse:
         messages = []

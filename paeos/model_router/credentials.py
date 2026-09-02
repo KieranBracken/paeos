@@ -5,9 +5,9 @@ Canonical Precedence: ~/.config/paeos/model-router.env takes precedence over amb
 """
 from __future__ import annotations
 
+import contextlib
 import os
 from pathlib import Path
-from typing import Dict, Optional
 
 from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.types import ProviderId
@@ -23,7 +23,7 @@ PROVIDER_ENV_MAPPING = {
 }
 
 
-def mask_secret(secret: Optional[str]) -> str:
+def mask_secret(secret: str | None) -> str:
     """Safely mask secret for logging/diagnostics without leaking ANY characters."""
     if not secret or len(secret.strip()) == 0:
         return "<UNSET>"
@@ -33,12 +33,12 @@ def mask_secret(secret: Optional[str]) -> str:
 class CredentialStore:
     def __init__(
         self,
-        env_file: Optional[Path] = None,
-        provider_registry: Optional[ProviderRegistry] = None,
+        env_file: Path | None = None,
+        provider_registry: ProviderRegistry | None = None,
     ):
         self.env_file = env_file or DEFAULT_CONFIG_PATH
         self.provider_registry = provider_registry or build_builtin_provider_registry()
-        self._keys: Dict[str, str] = {}
+        self._keys: dict[str, str] = {}
         self.reload()
 
     def reload(self) -> None:
@@ -60,10 +60,8 @@ class CredentialStore:
             try:
                 mode = self.env_file.stat().st_mode
                 if mode & 0o077 and os.name == "posix":
-                    try:
+                    with contextlib.suppress(Exception):
                         os.chmod(self.env_file, 0o600)
-                    except Exception:
-                        pass
 
                 lines = self.env_file.read_text(encoding="utf-8").splitlines()
                 for line in lines:
@@ -74,16 +72,14 @@ class CredentialStore:
                         k, v = line.split("=", 1)
                         k = k.strip()
                         v = v.strip()
-                        if v.startswith('"') and v.endswith('"'):
-                            v = v[1:-1]
-                        elif v.startswith("'") and v.endswith("'"):
+                        if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
                             v = v[1:-1]
                         if v:
                             self._keys[k] = v
             except Exception:
                 pass
 
-    def get_key(self, provider_id: ProviderId | str) -> Optional[str]:
+    def get_key(self, provider_id: ProviderId | str) -> str | None:
         try:
             env_var = self.provider_registry.resolve(provider_id).credential_env
         except (KeyError, ValueError):
@@ -99,7 +95,7 @@ class CredentialStore:
         key = self.get_key(provider_id)
         return bool(key and len(key.strip()) > 0)
 
-    def get_status_matrix(self) -> Dict[str, bool]:
+    def get_status_matrix(self) -> dict[str, bool]:
         return {
             p.value: self.has_key(p) for p in ProviderId
         }

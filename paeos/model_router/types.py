@@ -4,18 +4,18 @@ PAEOS Model Router & Free Inference Mesh — Type Definitions
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum, StrEnum
-from typing import Any, Dict, List, Optional
+from enum import StrEnum
+from typing import Any
 
 
-class DataClass(str, Enum):
+class DataClass(StrEnum):
     PUBLIC = "PUBLIC"
     INTERNAL = "INTERNAL"
     CONFIDENTIAL = "CONFIDENTIAL"
     SECRET = "SECRET"
 
 
-class TaskClass(str, Enum):
+class TaskClass(StrEnum):
     ARCHITECTURE = "ARCHITECTURE"
     IMPLEMENTATION = "IMPLEMENTATION"
     CODE_REVIEW = "CODE_REVIEW"
@@ -24,7 +24,7 @@ class TaskClass(str, Enum):
     AUDIT = "AUDIT"
 
 
-class LogicalModel(str, Enum):
+class LogicalModel(StrEnum):
     PAEOS_AUTO = "paeos-auto"
     PAEOS_STRONG = "paeos-strong"
     PAEOS_CODE = "paeos-code"
@@ -32,7 +32,7 @@ class LogicalModel(str, Enum):
     PAEOS_AUDIT = "paeos-audit"
 
 
-class ProviderId(str, Enum):
+class ProviderId(StrEnum):
     GOOGLE = "google"
     CLINE = "cline"
     NVIDIA = "nvidia"
@@ -45,13 +45,13 @@ class ProviderId(str, Enum):
 ProviderKey = str
 
 
-class CostTier(str, Enum):
+class CostTier(StrEnum):
     FREE = "FREE"                                    # Zero monetary entitlement required
     SUBSCRIPTION_INCLUDED = "SUBSCRIPTION_INCLUDED"  # Already-paid subscription ($0 marginal inference cost)
     PAID_USAGE = "PAID_USAGE"                        # Consumes pay-as-you-go monetary credits
 
 
-class ModelFamily(str, Enum):
+class ModelFamily(StrEnum):
     GEMINI = "gemini"
     GLM = "glm"
     LLAMA = "llama"
@@ -65,7 +65,7 @@ class ModelFamily(str, Enum):
     UNKNOWN = "unknown"
 
 
-class NormalizedErrorType(str, Enum):
+class NormalizedErrorType(StrEnum):
     CONTEXT_EXCEEDED = "CONTEXT_EXCEEDED"
     RATE_LIMITED = "RATE_LIMITED"
     QUOTA_EXHAUSTED = "QUOTA_EXHAUSTED"
@@ -83,7 +83,7 @@ class RetryPolicy(StrEnum):
     SINGLE_RATE_LIMIT = "single-rate-limit"
 
 
-class ProviderHealth(str, Enum):
+class ProviderHealth(StrEnum):
     HEALTHY = "HEALTHY"
     THROTTLED = "THROTTLED"
     COOLDOWN = "COOLDOWN"
@@ -116,25 +116,25 @@ class ModelCatalogEntry:
     supports_json: bool = True
     verified_at: float = 0.0
     base_quality_score: float = 0.5
-    entitlement_notes: Optional[str] = None
+    entitlement_notes: str | None = None
 
 
 @dataclass
 class TaskRequest:
-    messages: List[Dict[str, Any]]
+    messages: list[dict[str, Any]]
     task_class: TaskClass = TaskClass.ROUTINE
     data_class: DataClass = DataClass.INTERNAL
-    logical_model: Optional[LogicalModel] = None
-    explicit_model: Optional[str] = None
-    builder_family: Optional[ModelFamily] = None
+    logical_model: LogicalModel | None = None
+    explicit_model: str | None = None
+    builder_family: ModelFamily | None = None
     require_tools: bool = False
     require_json: bool = False
-    tools: Optional[List[Dict[str, Any]]] = None
-    tool_choice: Optional[Any] = None
+    tools: list[dict[str, Any]] | None = None
+    tool_choice: Any | None = None
     stream: bool = False
-    max_tokens: Optional[int] = None
+    max_tokens: int | None = None
     temperature: float = 0.7
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     retry_policy: RetryPolicy = RetryPolicy.SINGLE_RATE_LIMIT
     allow_fallback: bool = True
 
@@ -143,11 +143,11 @@ class TaskRequest:
 class NormalizedError(Exception):
     error_type: NormalizedErrorType
     message: str
-    provider_id: Optional[ProviderId] = None
-    model_id: Optional[str] = None
-    http_status: Optional[int] = None
-    retry_after: Optional[float] = None
-    raw_response: Optional[str] = None
+    provider_id: ProviderId | None = None
+    model_id: str | None = None
+    http_status: int | None = None
+    retry_after: float | None = None
+    raw_response: str | None = None
 
     def __str__(self) -> str:
         return f"[{self.error_type.value}] Provider={self.provider_id} HTTP={self.http_status} RetryAfter={self.retry_after}: {self.message}"
@@ -159,18 +159,18 @@ class RouterResponse:
     model_id: str                          # Catalog/model_id used for routing
     provider_id: ProviderId
     family: ModelFamily                    # Family from catalog entry
-    actual_model: Optional[str] = None      # Actual upstream model returned by provider (for dynamic routes)
-    actual_family: Optional[ModelFamily] = None  # Actual family derived from actual_model
+    actual_model: str | None = None      # Actual upstream model returned by provider (for dynamic routes)
+    actual_family: ModelFamily | None = None  # Actual family derived from actual_model
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
     latency_ms: float = 0.0
     attempts: int = 1
-    fallback_chain: List[str] = field(default_factory=list)
-    tool_calls: Optional[List[Dict[str, Any]]] = None
+    fallback_chain: list[str] = field(default_factory=list)
+    tool_calls: list[dict[str, Any]] | None = None
     finish_reason: str = "stop"
     raw_response: Any = None
     # Content-free hashes captured at the transport boundary.  These are optional for
     # backwards-compatible diagnostic responses, but required by Task 9A physical receipts.
-    transport_request_sha256: Optional[str] = None
-    transport_response_sha256: Optional[str] = None
+    transport_request_sha256: str | None = None
+    transport_response_sha256: str | None = None

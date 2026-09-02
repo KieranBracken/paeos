@@ -3,8 +3,6 @@ PAEOS Model Router — Validated Model Catalog & Free-Only Registry
 """
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
 from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.types import (
     CostTier,
@@ -14,7 +12,7 @@ from paeos.model_router.types import (
     ProviderId,
 )
 
-PROVIDER_DATA_POLICIES: Dict[ProviderId, ProviderDataPolicy] = {
+PROVIDER_DATA_POLICIES: dict[ProviderId, ProviderDataPolicy] = {
     ProviderId.GOOGLE: ProviderDataPolicy(
         provider_id=ProviderId.GOOGLE,
         trains_on_inputs=False,
@@ -53,7 +51,7 @@ PROVIDER_DATA_POLICIES: Dict[ProviderId, ProviderDataPolicy] = {
 }
 
 
-INITIAL_MODEL_CATALOG: List[ModelCatalogEntry] = [
+INITIAL_MODEL_CATALOG: list[ModelCatalogEntry] = [
     # Google AI Studio (Live verified zero-cost Free Tier)
     ModelCatalogEntry(
         model_id="gemini-3.6-flash",
@@ -203,10 +201,10 @@ INITIAL_MODEL_CATALOG: List[ModelCatalogEntry] = [
 class ModelCatalog:
     def __init__(
         self,
-        entries: Optional[List[ModelCatalogEntry]] = None,
+        entries: list[ModelCatalogEntry] | None = None,
         provider_registry: ProviderRegistry | None = None,
     ):
-        self._catalog: Dict[str, ModelCatalogEntry] = {}
+        self._catalog: dict[str, ModelCatalogEntry] = {}
         self.provider_registry = provider_registry or build_builtin_provider_registry()
         entries = entries if entries is not None else INITIAL_MODEL_CATALOG
         for e in entries:
@@ -228,14 +226,14 @@ class ModelCatalog:
 
         self._catalog[entry.model_id] = entry
 
-    def get(self, model_id: str) -> Optional[ModelCatalogEntry]:
+    def get(self, model_id: str) -> ModelCatalogEntry | None:
         return self._catalog.get(model_id)
 
     def list_models(
         self,
-        provider_id: Optional[ProviderId] = None,
+        provider_id: ProviderId | None = None,
         available_only: bool = False,
-    ) -> List[ModelCatalogEntry]:
+    ) -> list[ModelCatalogEntry]:
         models = list(self._catalog.values())
         if provider_id:
             models = [m for m in models if m.provider_id == provider_id]
