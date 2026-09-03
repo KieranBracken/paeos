@@ -5311,3 +5311,25 @@ only. Because no authorized Gemini 3.6 receipt exists, physical A-08 remains **N
 strict progress remains **20/48 complete | 28 remaining**. No retry, fallback, source change,
 promotion, or protected-ref mutation occurred. Any future provider request requires a fresh,
 materially distinct audit ID and explicit exact authorization.
+
+### Entry 291 — 2026-09-03: Task 15 physical Gemini 3.7 pair qualified; Founder seal recorded; Task 16 opened
+
+The supplied physical receipt/report pair for Task 15 `[I-TRAVERSE]` was mechanically verified
+against candidate `fbb52403b16af0a581848938f274fd266ec0cd9e` and bundle
+`eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8d`. The captured prompt path
+hash is `1d60c40937dad6798175069b12ff1d06f4c8df6ff41f7088ff999566ae000607`; report SHA-256 is
+`8d54670ad476fd8574e1d51d11b0a172c0c1c165533753f8a55d57f492c9aeae`.
+
+The raw receipt file SHA-256 is `85ed9a5fba647790e4e6376b756e5020659267595ed0fe73d7a76e2489041d4c`;
+the canonical receipt SHA-256 is `3c94be2f29f18958da0a8e4ece7019b57a2e3c8f66b8f33cf7b17f94d0dc9df9`.
+It records Google `gemini-3.7-flash` / Gemini as auditor against `cline-pass` /
+`z-ai/glm-5.3-flash` / GLM builder, one provider attempt, and A-08 `PASS`. Artifact-pair
+adjudication returned `report_status=PASS`, `a08_verdict=PASS`, `qualified=True`; the report
+contains `AUDIT_COMPLETE: true`.
+
+The Founder-provided `COURT_SEALED` disposition is recorded in the Task 15 physical checkpoint
+and disposition files. Local reproduction returned 15/15 focused tests and Pyright with exit `0`.
+Task 15 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**; strict physical
+progress advances from **20/48** to **21/48 complete | 27 remaining**. Canonical Task 16
+`[I-PROJ]` is opened and queued; stale historical Task 15/16 labels remain preserved. No
+promotion, merge, or protected-ref mutation occurred.

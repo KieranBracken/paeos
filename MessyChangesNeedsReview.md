@@ -1376,3 +1376,13 @@ evidence and Founder/Court disposition are mandatory.
   SHA-256 `3c94be2f29f18958da0a8e4ece7019b57a2e3c8f66b8f33cf7b17f94d0dc9df9`. It is not counted
   under the Gemini 3.6 authorization. Strict progress remains **20/48 complete | 28 remaining**;
   physical A-08 is not started and no retry/fallback/promotion occurred.
+
+- 2026-09-03 Task 15 `[I-TRAVERSE]` physical Gemini 3.7 pair was verified and qualified for
+  candidate `fbb52403b16af0a581848938f274fd266ec0cd9e`, bundle
+  `eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8d`, report SHA-256
+  `8d54670ad476fd8574e1d51d11b0a172c0c1c165533753f8a55d57f492c9aeae`, raw receipt SHA-256
+  `85ed9a5fba647790e4e6376b756e5020659267595ed0fe73d7a76e2489041d4c`, and canonical receipt
+  SHA-256 `3c94be2f29f18958da0a8e4ece7019b57a2e3c8f66b8f33cf7b17f94d0dc9df9`. A-08 was `PASS`
+  (Gemini auditor versus GLM builder), with `qualified=True` and report `PASS`. Founder-provided
+  `COURT_SEALED` is recorded; strict progress advances to **21/48 complete | 27 remaining** and
+  canonical Task 16 `[I-PROJ]` is opened. No promotion, merge, or protected-ref mutation occurred.
