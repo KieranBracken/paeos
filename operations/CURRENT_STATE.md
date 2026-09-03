@@ -1362,3 +1362,28 @@ there is no candidate-bound physical non-GLM receipt, this is not an A-08 L14/L1
 not advance the strict physical counter. Canonical progress remains **18/48 complete | 30
 remaining**; Task 14 remains held. The full bounded record is in
 `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_LOCAL_COURT_SEAL.md`.
+
+## 2026-09-03 — Physical Task 13 Gemini attempts rejected for truncation
+
+Two separately authorized, single-attempt Gemini captures used candidate
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa` and bundle
+`5840389120a94a95b9eb8d3bc0f06dd5e17bfa4f96b3267e6cffe32d55156f74`. Both recorded physical
+`google/gemini-3.6-flash` provenance with A-08 `PASS` against the GLM builder, but the substantive
+report stopped before `AUDIT_COMPLETE: true`; the validator returned exit `2` with
+`AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`.
+
+Attempt `l14-l17-b2ef99c-gemini-physical-001` preserved report SHA-256
+`369e33897b98fe972e74175be50ed28918be0ab9a6a1788e3222085f49b2c5a2`, rejected receipt file
+SHA-256 `8661fe00fc49a97926eb9d6e26175b0bf5b65de67faaece98d3a36d98f9a3838`, and rejection
+metadata SHA-256 `494ac45a523b6564588141c45e82ca3011e616af0fefcacac9904b6ebaee70d7`. Its report
+ended mid-command at `test_tradeoff_precedents...`.
+
+The explicitly authorized second attempt `l14-l17-b2ef99c-gemini-physical-002` preserved report
+SHA-256 `5593004941957071e26f95ad2776feeb5e61f2cebe9d486a9726c9b6990cbeb2`, rejected receipt
+file SHA-256 `dd3a7c9669abd770b07170d3f36d9c6e45dbef2f7731d2eae3a964947a322e89`, and rejection
+metadata SHA-256 `f32bce519162e3ed43d270b52def87872a6c548f11543f0102dde9c04b5af332`. Its report
+ended at `REPRODUCTION: Scoped suite passes 16/`.
+
+No fallback or in-process retry occurred in either capture. These are physical A-08 provenance
+records but **not qualified audit receipts**. Strict program progress remains **18/48 complete |
+30 remaining**; Task 14 remains held pending a materially compact, complete candidate-bound audit.

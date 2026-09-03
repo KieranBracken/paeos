@@ -1286,3 +1286,19 @@ evidence and Founder/Court disposition are mandatory.
   not established. No candidate-bound heterogeneous Gemini L14/L17 receipt exists. Strict
   physical progress therefore remains **18/48 complete | 30 remaining** and Task 14 is held.
   See `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_LOCAL_COURT_SEAL.md` for the bounded record.
+
+- 2026-09-03 two separately authorized physical Gemini captures for Task 13 candidate
+  `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa` and bundle
+  `5840389120a94a95b9eb8d3bc0f06dd5e17bfa4f96b3267e6cffe32d55156f74` recorded
+  `google/gemini-3.6-flash` provenance and A-08 PASS against the GLM builder, but both reports
+  were truncated before `AUDIT_COMPLETE: true`. The validator rejected both with exit `2`.
+  Attempt 001 report/receipt/rejection hashes are
+  `369e33897b98fe972e74175be50ed28918be0ab9a6a1788e3222085f49b2c5a2`,
+  `8661fe00fc49a97926eb9d6e26175b0bf5b65de67faaece98d3a36d98f9a3838`, and
+  `494ac45a523b6564588141c45e82ca3011e616af0fefcacac9904b6ebaee70d7`.
+  Explicitly authorized attempt 002 hashes are
+  `5593004941957071e26f95ad2776feeb5e61f2cebe9d486a9726c9b6990cbeb2`,
+  `dd3a7c9669abd770b07170d3f36d9c6e45dbef2f7731d2eae3a964947a322e89`, and
+  `f32bce519162e3ed43d270b52def87872a6c548f11543f0102dde9c04b5af332`.
+  No fallback or in-process retry occurred. Physical provenance is preserved, but no qualified
+  receipt exists; strict progress remains **18/48 complete | 30 remaining** and Task 14 is held.

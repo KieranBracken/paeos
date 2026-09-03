@@ -5129,3 +5129,29 @@ heterogeneous Gemini L14/L17 receipt exists for `b2ef99c`. The strict physical p
 therefore remains **18/48 complete | 30 remaining** and Task 14 remains held. The bounded local
 record is `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_LOCAL_COURT_SEAL.md`; no self-ratification,
 main/trunk promotion, or protected-ref mutation occurred.
+
+### Entry 283 — 2026-09-03: Task 13 physical Gemini captures had A-08 provenance but truncated reports
+
+Two separately authorized single-attempt captures targeted candidate
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa` with bundle
+`5840389120a94a95b9eb8d3bc0f06dd5e17bfa4f96b3267e6cffe32d55156f74`. Both physically observed
+`google/gemini-3.6-flash` (Gemini family) against the GLM builder and recorded A-08 `PASS`, but
+the substantive reports were truncated before the required completion marker. The validator
+correctly rejected both with exit `2` and reason
+`AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`.
+
+Attempt `l14-l17-b2ef99c-gemini-physical-001`: rejected report SHA-256
+`369e33897b98fe972e74175be50ed28918be0ab9a6a1788e3222085f49b2c5a2`, receipt-file SHA-256
+`8661fe00fc49a97926eb9d6e26175b0bf5b65de67faaece98d3a36d98f9a3838`, rejection metadata
+SHA-256 `494ac45a523b6564588141c45e82ca3011e616af0fefcacac9904b6ebaee70d7`; report stopped
+mid-command at `test_tradeoff_precedents...`.
+
+Attempt `l14-l17-b2ef99c-gemini-physical-002` (explicitly authorized rerun): rejected report
+SHA-256 `5593004941957071e26f95ad2776feeb5e61f2cebe9d486a9726c9b6990cbeb2`, receipt-file
+SHA-256 `dd3a7c9669abd770b07170d3f36d9c6e45dbef2f7731d2eae3a964947a322e89`, rejection metadata
+SHA-256 `f32bce519162e3ed43d270b52def87872a6c548f11543f0102dde9c04b5af332`; report stopped at
+`REPRODUCTION: Scoped suite passes 16/`.
+
+No fallback or in-process retry was used. These are physical provenance artifacts, not qualified
+L14/L17 receipts. Strict progress remains **18/48 complete | 30 remaining** and Task 14 remains
+held. The exact raw files are preserved under `/private/tmp/paeos-task13-l14-l17-*b2ef99c*`.
