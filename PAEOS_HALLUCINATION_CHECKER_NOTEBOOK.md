@@ -5155,3 +5155,8 @@ SHA-256 `f32bce519162e3ed43d270b52def87872a6c548f11543f0102dde9c04b5af332`; repo
 No fallback or in-process retry was used. These are physical provenance artifacts, not qualified
 L14/L17 receipts. Strict progress remains **18/48 complete | 30 remaining** and Task 14 remains
 held. The exact raw files are preserved under `/private/tmp/paeos-task13-l14-l17-*b2ef99c*`.
+
+The requested next-task label has a separate canonical drift: `ops/backlogs/sakg-1-intakes.json`
+identifies item 14 as `[I-BACKFILL]`, while stale `PAEOS_SAKG_TASK_14_*` review files describe
+“Bundle Golden Bytes & Inline Evidence.” Neither interpretation was dispatched; the intake label
+must be reconciled before Task 14 starts.

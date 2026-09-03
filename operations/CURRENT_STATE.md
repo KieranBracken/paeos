@@ -1387,3 +1387,8 @@ ended at `REPRODUCTION: Scoped suite passes 16/`.
 No fallback or in-process retry occurred in either capture. These are physical A-08 provenance
 records but **not qualified audit receipts**. Strict program progress remains **18/48 complete |
 30 remaining**; Task 14 remains held pending a materially compact, complete candidate-bound audit.
+
+The requested next-task label also has a canonical drift: `ops/backlogs/sakg-1-intakes.json`
+currently identifies item 14 as `[I-BACKFILL]`, while stale review files
+`PAEOS_SAKG_TASK_14_*` describe “Bundle Golden Bytes & Inline Evidence.” Neither label was
+dispatched; the canonical intake must be reconciled before Task 14 starts.
