@@ -1366,3 +1366,13 @@ evidence and Founder/Court disposition are mandatory.
   launch by the execution approval gate because exact bundle/destination authorization was not
   explicit. No provider request or retry occurred; physical A-08 is not started and strict
   progress remains **20/48 complete | 28 remaining**.
+
+- 2026-09-03 Task 15 Gemini 3.6 one-shot `l14-l17-sakg-task15-gemini36-001` failed before
+  provider dispatch with `AUDITOR_RECEIPT_FAILED:AuditorPromptError` (exit `2`); no external
+  request or artifacts were produced. A separate process reused the paths for an unauthorized
+  Gemini 3.7 pair (`l14-l17-fbb5240-gemini37-001`) with report SHA-256
+  `8d54670ad476fd8574e1d51d11b0a172c0c1c165533753f8a55d57f492c9aeae`, raw receipt SHA-256
+  `85ed9a5fba647790e4e6376b756e5020659267595ed0fe73d7a76e2489041d4c`, and canonical receipt
+  SHA-256 `3c94be2f29f18958da0a8e4ece7019b57a2e3c8f66b8f33cf7b17f94d0dc9df9`. It is not counted
+  under the Gemini 3.6 authorization. Strict progress remains **20/48 complete | 28 remaining**;
+  physical A-08 is not started and no retry/fallback/promotion occurred.

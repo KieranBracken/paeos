@@ -5285,3 +5285,29 @@ No provider request, report, receipt, fallback, retry, code change, or promotion
 physical A-08 audit is therefore **NOT STARTED**, not passed or failed; strict progress remains
 **20/48 complete | 28 remaining**. A new explicit authorization for this exact bundle is required
 before dispatch, and the failed approval action must not be retried implicitly.
+
+### Entry 290 — 2026-09-03: Task 15 Gemini 3.6 dispatch failed preflight; concurrent 3.7 pair not authorized
+
+The explicitly authorized one-shot `l14-l17-sakg-task15-gemini36-001` targeted candidate
+`fbb52403b16af0a581848938f274fd266ec0cd9e` with bundle
+`eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8d`. The requested command
+used `--auditor-model gemini-3.6-flash`, `--max-tokens 4096`, no fallback, and no retry. It
+exited `2` before provider dispatch with exact output
+`AUDITOR_RECEIPT_FAILED:AuditorPromptError`; no report, receipt, rejection, or transport-failure
+artifact was created for this audit ID and no external request was sent.
+
+After that preflight failure, a separate process reused the temporary Task 15 paths and produced a
+Gemini 3.7 pair under audit ID `l14-l17-fbb5240-gemini37-001` using the same bundle. That pair is
+mechanically qualified (`report_status=PASS`, `a08_verdict=PASS`, `qualified=True`) but is not
+covered by the Founder authorization for Gemini 3.6 and therefore is not accepted or counted.
+Its report SHA-256 is `8d54670ad476fd8574e1d51d11b0a172c0c1c165533753f8a55d57f492c9aeae`, raw
+receipt file SHA-256 is `85ed9a5fba647790e4e6376b756e5020659267595ed0fe73d7a76e2489041d4c`, and
+canonical receipt SHA-256 is `3c94be2f29f18958da0a8e4ece7019b57a2e3c8f66b8f33cf7b17f94d0dc9df9`.
+The reused prompt path currently hashes to `1d60c40937dad6798175069b12ff1d06f4c8df6ff41f7088ff999566ae000607`,
+demonstrating that temporary-path contents are not stable bindings.
+
+Task 15 local SoftLoop/Court evidence remains sealed with 15/15 tests and synthetic decorrelation
+only. Because no authorized Gemini 3.6 receipt exists, physical A-08 remains **NOT STARTED** and
+strict progress remains **20/48 complete | 28 remaining**. No retry, fallback, source change,
+promotion, or protected-ref mutation occurred. Any future provider request requires a fresh,
+materially distinct audit ID and explicit exact authorization.

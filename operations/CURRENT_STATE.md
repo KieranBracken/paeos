@@ -1514,3 +1514,23 @@ The requested Gemini 3.7 dispatch was rejected by the execution approval gate be
 because exact bundle/destination authorization was not explicit. No provider request, receipt,
 report, retry, fallback, or source mutation occurred. Physical A-08 status is **NOT STARTED**;
 Task 15 remains held and strict physical progress remains **20/48 complete | 28 remaining**.
+
+## 2026-09-03 — Task 15 Gemini 3.6 dispatch failed preflight; 3.7 artifact not authorized
+
+The explicitly authorized one-shot `l14-l17-sakg-task15-gemini36-001` targeted candidate
+`fbb52403b16af0a581848938f274fd266ec0cd9e` and bundle
+`eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8d`, with Gemini 3.6 and no
+fallback/retry. It exited `2` before provider dispatch with
+`AUDITOR_RECEIPT_FAILED:AuditorPromptError`; no artifact or external request was produced.
+
+A separate process then reused the Task 15 temporary paths for a Gemini 3.7 pair
+(`l14-l17-fbb5240-gemini37-001`). That pair mechanically qualifies but is outside the explicit
+Gemini 3.6 authorization and is not counted. Report SHA-256:
+`8d54670ad476fd8574e1d51d11b0a172c0c1c165533753f8a55d57f492c9aeae`; raw receipt SHA-256:
+`85ed9a5fba647790e4e6376b756e5020659267595ed0fe73d7a76e2489041d4c`; canonical receipt
+SHA-256: `3c94be2f29f18958da0a8e4ece7019b57a2e3c8f66b8f33cf7b17f94d0dc9df9`. The current reused
+prompt path hash is `1d60c40937dad6798175069b12ff1d06f4c8df6ff41f7088ff999566ae000607`.
+
+Task 15 remains held: physical A-08 is **NOT STARTED** and strict progress remains
+**20/48 complete | 28 remaining**. The local synthetic Court seal and 15/15 test result remain
+valid. No retry, fallback, source change, promotion, or protected-ref mutation occurred.
