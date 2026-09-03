@@ -5619,3 +5619,28 @@ Mechanical validation against the authorized Gemini 3.6 contract returned
 physical A-08. It is preserved as rejected evidence; no retry, fallback, workaround, source
 change, promotion, merge, or protected-ref mutation occurred. Strict physical progress remains
 **25/48 complete | 23 remaining**.
+
+### Entry 305 — 2026-09-03: Task 20 `[T-BASELINE]` Gemini 3.7 qualified; Founder/Court sealed
+
+The Founder authorized one one-shot transmission of bundle
+`e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82` to Google
+`gemini-3.7-flash`, with no fallback or retry. The supplied artifacts identify audit ID
+`l14-l17-08aaae9-gemini37-001`, candidate
+`08aaae95ff687db1f1c2337557a37aee126b517e`, and the exact authorized bundle. Report SHA-256 is
+`871f0ca5a126c6a34c3426c91e800e1e232576d74073f70c8de4a40f6aca8e9c`; receipt file SHA-256 is
+`7d5f874a1e33d07629ec54ea0ce8fc5b65cabe37d5ef78d280fe2ad0fc43caf7`; canonical receipt SHA-256
+is `00d0d9b6cc06da78886eb2586d9813e27ae8894da3a7c21a0b53c6535d473ce4`.
+
+Mechanical artifact adjudication with review scope
+`ad68ddfeb6234eec413f0d94e6ac3e9b66a1b72ae0b02ff40ebc704bcfa60776` returned
+`report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. A-08 is satisfied by Gemini
+auditor versus GLM builder; provider attempts were exactly `1` with no fallback. Local Task 20
+SoftLoop evidence remains sealed: RED exit `2` as expected, GREEN 4-test Court exit `0`, CLI
+exit `0`, Ruff exit `0`, and Pyright exit `0`; local seal is
+`e1847bed784a1f4d52704d33e636e1e20ca3fb8b29d5b80a425e3c8da58409ee` and local bundle is
+`2a93b08c21b61f2d121500887a51a036d9c270dfd6fe42f05bdcf292c63d58eb`.
+
+Task 20 is `COURT_SEALED` with window accounting `Sealed: 1 | Remanded: 0 | Remediated: 0`.
+Strict physical progress advances from **25/48** to **26/48 complete | 22 remaining**. The
+earlier Gemini 3.6 identity-mismatch attempt remains preserved as rejected evidence and is not
+counted. No retry, fallback, source change, promotion, merge, or protected-ref mutation occurred.

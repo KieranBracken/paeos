@@ -1512,3 +1512,15 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   is `00d0d9b6cc06da78886eb2586d9813e27ae8894da3a7c21a0b53c6535d473ce4`. Mechanical validation
   rejected the pair with `AuditorReceiptError:audit identity mismatch`; no retry, fallback,
   workaround, source change, promotion, merge, or protected-ref mutation occurred.
+
+- 2026-09-03 Task 20 `[T-BASELINE]` Founder/Court disposition sealed the qualified Gemini 3.7
+  pair `l14-l17-08aaae9-gemini37-001` for candidate `08aaae95ff687db1f1c2337557a37aee126b517e`
+  and bundle `e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82`. Mechanical
+  adjudication returned `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`; report
+  SHA-256 `871f0ca5a126c6a34c3426c91e800e1e232576d74073f70c8de4a40f6aca8e9c`, receipt file
+  SHA-256 `7d5f874a1e33d07629ec54ea0ce8fc5b65cabe37d5ef78d280fe2ad0fc43caf7`, canonical receipt
+  SHA-256 `00d0d9b6cc06da78886eb2586d9813e27ae8894da3a7c21a0b53c6535d473ce4`. Task-window
+  accounting is `Sealed: 1 | Remanded: 0 | Remediated: 0`; strict physical progress advances
+  to `26/48 complete | 22 remaining`. Earlier Gemini 3.6 identity-mismatch artifacts remain
+  preserved as rejected evidence. No retry, fallback, source change, promotion, merge, or
+  protected-ref mutation occurred.
