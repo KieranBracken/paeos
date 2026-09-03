@@ -5203,3 +5203,17 @@ program progress advances from **18/48** to **19/48 complete | 29 remaining**. E
 truncated reports, and the provider-503 transport failure remain preserved as historical evidence.
 Canonical item 14 from `ops/backlogs/sakg-1-intakes.json` is now opened as `[I-BACKFILL]` in
 `reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_INTAKE.md`; implementation is queued, not started.
+
+### Entry 286 — 2026-09-03: Temporary audit-path reuse detected after Task 13 seal
+
+After Entry 285 was validated and committed, a concurrent process replaced the addressed report
+and receipt paths with a new pair for `gemini-3.7-flash` (`l14-l17-b2ef99c-gemini37-001`). The
+replacement report SHA-256 is
+`85191188638f638bdfcd27b0bba75cfd58d17790200af180521437b041168c5d`; raw receipt SHA-256 is
+`195722580f5188b997fd2a2ec204ce09eb57baccc620c7c7dbb8ec57f0dd3ada`; canonical receipt SHA-256
+is `8d9fdc5d6236645d77172004b7b828b67638aae3d165525ff62fd49d46efbab6`. That pair also reports
+A-08 PASS against the GLM builder, but it is not substituted for the explicitly authorized
+`gemini-3.6-flash` evidence in Entry 285, and no additional milestone is counted. The original
+validated hashes remain the authoritative Task 13 record; reuse of the same temporary paths is
+an artifact-integrity anomaly. The concurrent provider/model source edits are unstaged and
+require reconciliation before later audits rely on these paths.

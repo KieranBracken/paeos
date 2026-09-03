@@ -54,3 +54,15 @@ back-pressure, not silently converted into passes.
 - Strict physical program progression: **19/48 complete | 29 remaining**.
 - No main/trunk promotion, merge, or protected-ref mutation was performed.
 
+## Post-adjudication artifact-path drift
+
+After the pair above was validated and this checkpoint was committed, a concurrent process
+replaced the files at the same `/private/tmp` paths with a different pair targeting
+`gemini-3.7-flash` (audit ID `l14-l17-b2ef99c-gemini37-001`). The replacement pair is mechanically
+qualified when validated against its own receipt scope, but it is **not substituted** for the
+user-authorized `gemini-3.6-flash` pair recorded above. Current replacement hashes are report
+`85191188638f638bdfcd27b0bba75cfd58d17790200af180521437b041168c5d`, raw receipt
+`195722580f5188b997fd2a2ec204ce09eb57baccc620c7c7dbb8ec57f0dd3ada`, and canonical receipt
+`8d9fdc5d6236645d77172004b7b828b67638aae3d165525ff62fd49d46efbab6`. The original validated
+hashes remain the authoritative Task 13 record above; the path replacement is logged as an
+artifact-integrity anomaly and must be reconciled before any later audit relies on those paths.

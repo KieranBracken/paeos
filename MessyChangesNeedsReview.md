@@ -1322,3 +1322,12 @@ evidence and Founder/Court disposition are mandatory.
   remaining`. Canonical Task 14 `[I-BACKFILL]` is opened and queued in
   `reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_INTAKE.md`; stale Bundle Golden Bytes Task 14 files
   are preserved and not dispatched.
+
+- 2026-09-03 post-seal artifact drift: after the authorized Task 13 `gemini-3.6-flash` pair was
+  verified, the same temporary report/receipt paths were replaced by a `gemini-3.7-flash` pair.
+  Replacement report SHA-256 is `85191188638f638bdfcd27b0bba75cfd58d17790200af180521437b041168c5d`,
+  raw receipt SHA-256 `195722580f5188b997fd2a2ec204ce09eb57baccc620c7c7dbb8ec57f0dd3ada`, canonical
+  receipt SHA-256 `8d9fdc5d6236645d77172004b7b828b67638aae3d165525ff62fd49d46efbab6`. It is not
+  substituted for the user-authorized 3.6 evidence and does not alter the 19/48 count. The
+  original hashes are preserved in the committed checkpoint; temporary-path reuse and concurrent
+  provider/model source edits are recorded for reconciliation before future audits.

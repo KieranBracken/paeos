@@ -1437,3 +1437,17 @@ Canonical Task 14 is now opened as `[I-BACKFILL]`, per item 14 in
 `ops/backlogs/sakg-1-intakes.json`, in `reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_INTAKE.md`.
 The stale Task 14 “Bundle Golden Bytes” review files remain unchanged and are explicitly
 superseded for dispatch by the canonical intake label. No Task 14 implementation has started.
+
+## 2026-09-03 — Post-seal temporary-artifact path drift recorded
+
+After the Task 13 `gemini-3.6-flash` pair was verified and recorded, a concurrent process replaced
+the same `/private/tmp/paeos-sakg-task-13-l14-l17-report-b2ef99c.md` and
+`...receipt-b2ef99c.json` paths with a different `gemini-3.7-flash` pair (audit ID
+`l14-l17-b2ef99c-gemini37-001`). The replacement report hashes to
+`85191188638f638bdfcd27b0bba75cfd58d17790200af180521437b041168c5d`; replacement receipt raw
+file hash is `195722580f5188b997fd2a2ec204ce09eb57baccc620c7c7dbb8ec57f0dd3ada`, canonical hash
+`8d9fdc5d6236645d77172004b7b828b67638aae3d165525ff62fd49d46efbab6`. It also mechanically
+qualifies against its own receipt scope, but it is not substituted for the user-authorized
+3.6 pair and no new program milestone is counted. This path reuse is an artifact-integrity
+anomaly; the original Task 13 hashes remain authoritative in the committed checkpoint, and the
+new provider/model source edits remain unstaged pending explicit reconciliation.
