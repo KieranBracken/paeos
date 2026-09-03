@@ -1502,3 +1502,13 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   did not explicitly name that new hash; the provider command was not executed. No retry,
   workaround, fallback, source change, promotion, merge, or protected-ref mutation occurred.
   Strict physical progress remains `25/48 complete | 23 remaining`.
+
+- 2026-09-03 Task 20 `[T-BASELINE]` returned an artifact pair that did not match the authorized
+  model identity. The Founder authorized Gemini 3.6 for bundle
+  `e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82`, but the receipt identifies
+  Gemini 3.7 / audit ID `l14-l17-08aaae9-gemini37-001`. Report SHA-256 is
+  `871f0ca5a126c6a34c3426c91e800e1e232576d74073f70c8de4a40f6aca8e9c`; receipt file SHA-256 is
+  `7d5f874a1e33d07629ec54ea0ce8fc5b65cabe37d5ef78d280fe2ad0fc43caf7`; canonical receipt SHA-256
+  is `00d0d9b6cc06da78886eb2586d9813e27ae8894da3a7c21a0b53c6535d473ce4`. Mechanical validation
+  rejected the pair with `AuditorReceiptError:audit identity mismatch`; no retry, fallback,
+  workaround, source change, promotion, merge, or protected-ref mutation occurred.

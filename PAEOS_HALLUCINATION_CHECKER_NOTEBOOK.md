@@ -5603,3 +5603,19 @@ layer rejected the escalation because the preceding authorization did not explic
 new bundle hash; the provider command was not executed. No retry, fallback, workaround, source
 change, promotion, merge, or protected-ref mutation occurred. Strict physical progress remains
 **25/48 complete | 23 remaining**.
+
+### Entry 304 — 2026-09-03: Task 20 `[T-BASELINE]` Gemini artifact rejected for unauthorized model identity
+
+The Founder authorized one Gemini 3.6 transmission of bundle
+`e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82` with no fallback or retry.
+The returned artifacts instead identify audit ID `l14-l17-08aaae9-gemini37-001` and Google
+`gemini-3.7-flash`. Returned report SHA-256 is
+`871f0ca5a126c6a34c3426c91e800e1e232576d74073f70c8de4a40f6aca8e9c`; returned receipt file
+SHA-256 is `7d5f874a1e33d07629ec54ea0ce8fc5b65cabe37d5ef78d280fe2ad0fc43caf7`; canonical receipt
+SHA-256 is `00d0d9b6cc06da78886eb2586d9813e27ae8894da3a7c21a0b53c6535d473ce4`.
+
+Mechanical validation against the authorized Gemini 3.6 contract returned
+`AuditorReceiptError:audit identity mismatch`. The pair is not qualified and cannot establish
+physical A-08. It is preserved as rejected evidence; no retry, fallback, workaround, source
+change, promotion, merge, or protected-ref mutation occurred. Strict physical progress remains
+**25/48 complete | 23 remaining**.
