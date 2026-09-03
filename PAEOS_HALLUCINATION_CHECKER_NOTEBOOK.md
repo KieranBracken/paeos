@@ -5736,3 +5736,41 @@ remains an integrity follow-up. At Founder direction the window is sealed:
 **`29/48 complete | 19 remaining`**. M42 `[I-LIFETIME-CONFORMANCE]` is opened in
 `reviews/tasks/PAEOS_MILESTONE_42_I_LIFETIME_CONFORMANCE_INTAKE.md`. No retry, fallback,
 promotion, merge, or protected-ref mutation occurred.
+
+### Entry 309 — 2026-09-03: Milestone 42 `[I-LIFETIME-CONFORMANCE]` Court seal; M43 opened
+
+The supplied physical receipt/report pair for candidate
+`8e92bae07e48bf98b39d436cd5af0464917a2f65` was mechanically revalidated as
+`report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. Audit ID is
+`m42-r4lifetime-8e92bae-nvidia-001`; actual auditor is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`) and the receipt records builder
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`). A-08 is `PASS` (`llama != glm`), with one
+provider attempt and no fallback. Bundle SHA-256 is
+`f22702e1698f9fc8836de9840089d215823e1d163413e1bbf8070c4ad566f050`; report SHA-256 is
+`262afcbf88e8c94d9de32498f64a122942ac47853f36fc0a7a2fb36d6c02674d`; receipt file SHA-256 is
+`6f3a62421ff6addcfe118c90066a320461d1a2ca224e1733557f490acedd0a6f`; canonical receipt SHA-256
+is `87595e177a044480f024bb5397e20294803983860f3c77670214a9be191a6016`.
+
+The local hermetic SoftLoop run `i-r4lifetime-trace-a-003` under
+`/private/tmp/paeos-r4lifetime-run` was sealed with Court exit `0`, seal hash
+`72ccf5e8a9c68ecf50b31ad2736bfdf19daa62a924f01fa2957b173963a6d229`, and ledger-chain digest
+`1a46ac0227ae0e5fd4c5901de254b8af433da561ebe36568605d67baf726c93f`. Local reproduction is
+3/3 focused tests, API probe exit `0`, full runtime pytest exit `0`, Ruff exit `0`, Pyright
+exit `0`, and no AST anti-pattern violations. The report's KeyError suggestion is preserved
+but is non-blocking because the intake and test require meaningful fail-closed `KeyError` behavior
+for an unregistered artifact type.
+
+The earlier authorized Google Gemini dispatch was rejected for `worker accounting mismatch`; raw
+`.rejected`, `.rejection.json`, and report artifacts remain preserved. Candidate-manifest metadata
+declares a GPT builder and `llama != gpt`, while the physical receipt records GLM; the current
+prompt digest is `c03beabb04f63b506e60f461dcab044b431604dee261797174b1153a22a8141e`, while the
+manifest stores `c16fe6ac4c6bdf44c7c8da4c31220a8f054e4ced5b5d4370286cab2d6761ca14`. These
+provenance/metadata discrepancies are carried forward; exact candidate/bundle/report/receipt
+bindings remain intact.
+
+Window accounting is `Sealed: 1 | Remanded: 0 | Remediated: 0`; strict physical progress advances
+from **`29/48` to `30/48 complete | 18 remaining`**. Milestone 43 `[I-CER-BASELINE]` / L02-C1
+Ceremony Enforcement Realization is opened in
+`reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_INTAKE.md`. No source change, retry, fallback,
+promotion, merge, or protected-ref mutation occurred. Existing unrelated host modifications remain
+untouched.

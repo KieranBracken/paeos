@@ -1563,3 +1563,19 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   discrepancies remain explicitly recorded. Strict progress advances to `29/48 complete | 19
   remaining`; M42 `[I-LIFETIME-CONFORMANCE]` is opened. No retry, fallback, promotion, merge,
   or protected-ref mutation occurred.
+
+- 2026-09-03 Milestone 42 `[I-LIFETIME-CONFORMANCE]` was Court-sealed for candidate
+  `8e92bae07e48bf98b39d436cd5af0464917a2f65` after mechanical revalidation of the qualified
+  NVIDIA/Llama physical pair (`m42-r4lifetime-8e92bae-nvidia-001`, A-08 `PASS`, `llama != glm`,
+  one provider attempt, no fallback). Bundle SHA-256 is
+  `f22702e1698f9fc8836de9840089d215823e1d163413e1bbf8070c4ad566f050`; report SHA-256 is
+  `262afcbf88e8c94d9de32498f64a122942ac47853f36fc0a7a2fb36d6c02674d`; receipt file SHA-256 is
+  `6f3a62421ff6addcfe118c90066a320461d1a2ca224e1733557f490acedd0a6f`; canonical receipt
+  SHA-256 is `87595e177a044480f024bb5397e20294803983860f3c77670214a9be191a6016`. Local
+  SoftLoop run `i-r4lifetime-trace-a-003` was sealed with 3/3 focused tests, full runtime exit
+  `0`, Ruff/Pyright/AST clean. The earlier Google dispatch was rejected for worker-accounting
+  mismatch and remains preserved; receipt/manifests also contain explicit builder/prompt-digest
+  metadata drift. Window accounting is `Sealed: 1 | Remanded: 0 | Remediated: 0`; strict
+  progress advances to `30/48 complete | 18 remaining`, and Milestone 43
+  `[I-CER-BASELINE]` is opened. Existing unrelated modifications remain untouched:
+  `ops/auditor_receipt_capture.py`, `paeos/model_router/catalog.py`, and `ops/nudge_codex.py`.
