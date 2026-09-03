@@ -5172,3 +5172,8 @@ failure artifact is
 `/private/tmp/paeos-sakg-task-13-l14-l17-receipt-b2ef99c.json.transport-failure.json`, SHA-256
 `fec7596974c047e66705620146bdea806f88f925014028dc154bcccce4c54026`. Strict progress remains
 **18/48 complete | 30 remaining**; Task 14 remains held.
+
+The dispatched prompt file was `/private/tmp/paeos-sakg-task-13-l14-l17-prompt-b2ef99c.md`,
+SHA-256 `1b76ec20dc0dc19e6163b3861c3ef1f099a0f341bd855102b0eaed08d8a665d6`. Its embedded
+manifest text contains a duplicate `local_court` JSON key and Worker/Court lines of `0 | 1 | 0`
+and `0 | 0 | 0`; the raw prompt was preserved without normalization.
