@@ -7,7 +7,7 @@
 
 ## Current canonical recovery frontier — 2026-09-03 (18/48 physical program seals; Task 13 local seal, physical A-08 pending)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `ae77bac063013491d8138a80894d523c0af44356`; the Task 13 implementation is at `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`; `main` remains at `0d86e5c` (recovery is ahead; no promotion performed).
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD`; the Task 13 implementation is at `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`; `main` remains at `0d86e5c` (recovery is ahead; no promotion performed).
 - **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence remains **HELD** pending metadata reconciliation; Task 12 `[F-BUDGET-FIX]` is locally Court **SEALED**; Task 13 `[F-TRADEOFF-FIX]` is locally Court **SEALED** after the strong CAS implementation was integrated and P1–P5 probes passed; Task 14 remains held pending physical A-08 qualification.
 - **Strict sealed progress:** **18/48 physical program seals complete | 30 remaining**. Tasks 12 and 13 each have local Court seals, but neither has an independent candidate-bound physical L14/L17 A-08 receipt yet, so the physical-program counter is not advanced.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
