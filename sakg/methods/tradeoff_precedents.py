@@ -2,8 +2,10 @@
 
 The method is deliberately read-only: it matches every requested axis on TradeOff nodes,
 follows an explicit ``resolves_to`` edge to a Decision, then joins only a realized Outcome
-through a ``realized_as`` edge.  Missing or malformed links are skipped fail-closed, and the
-returned ``why`` path makes the three-hop evidence chain visible to callers.
+through a ``realized_as`` edge.  The join is fail-closed by construction: malformed or
+negated links, untypeable nodes, namespace mismatches, unknown decisions, and candidate
+outcomes are all skipped, and the returned ``why`` path makes the three-hop evidence chain
+visible to callers.
 """
 
 from __future__ import annotations
@@ -183,16 +185,49 @@ def _family(edge: Mapping[str, object]) -> str:
     return value.strip().lower() if isinstance(value, str) else ""
 
 
+_NEGATION_TOKENS = frozenset(
+    {
+        "un",
+        "unresolved",
+        "unrealized",
+        "not",
+        "non",
+        "never",
+        "no",
+        "pending",
+        "partial",
+        "candidate",
+        "blocked",
+        "rejected",
+        "failed",
+    }
+)
+
+
+def _affirmative(relation: str) -> bool:
+    """Return True only for an explicit, non-negated relation label.
+
+    Substring matching alone would let a negated edge label such as
+    ``unresolved_decision`` or ``unrealized_as_outcome`` masquerade as a resolving
+    or realization link; such malformed links must stay fail-closed.
+    """
+    if not relation:
+        return False
+    return not any(token in _NEGATION_TOKENS for token in relation.split("_"))
+
+
 def _is_resolving(edge: Mapping[str, object]) -> bool:
     relation = _relation(edge)
-    return "resolv" in relation and (
+    return _affirmative(relation) and "resolv" in relation and (
         "decision" in relation or relation in {"resolves_to", "resolves_to_decision"}
     )
 
 
 def _is_realization(edge: Mapping[str, object]) -> bool:
     relation = _relation(edge)
-    return "realized_as" in relation or ("realiz" in relation and "outcome" in relation)
+    return _affirmative(relation) and (
+        "realized_as" in relation or ("realiz" in relation and "outcome" in relation)
+    )
 
 
 def _query_axes(axes: Sequence[str]) -> tuple[str, ...]:
@@ -219,8 +254,10 @@ def tradeoff_precedents(
 ) -> tuple[dict[str, object], ...]:
     """Return ranked TradeOff -> Decision -> realized Outcome precedent records.
 
-    All links are directed and explicit.  A malformed node, a missing hop, a non-realized
-    outcome, or a namespace mismatch simply cannot become a result; no inference is invented.
+    All links are directed and explicit, and every hop must carry an explicit node
+    type (a ``type`` field or a ``sakg://`` URI that yields one).  A malformed or
+    negated link, a missing hop, an untypeable node, a non-realized outcome, or a
+    namespace mismatch simply cannot become a result; no inference is invented.
     """
     query_axes = _query_axes(axes)
     if (
@@ -236,17 +273,17 @@ def tradeoff_precedents(
     decision_by_id = {
         node_id: node
         for node in decision_nodes
-        if (node_id := _id(node)) is not None and (_type(node) in {None, "Decision"})
+        if (node_id := _id(node)) is not None and _type(node) == "Decision"
     }
     outcome_by_id = {
         node_id: node
         for node in outcome_nodes
-        if (node_id := _id(node)) is not None and (_type(node) in {None, "Outcome"})
+        if (node_id := _id(node)) is not None and _type(node) == "Outcome"
     }
     results: dict[tuple[str, str], dict[str, object]] = {}
     for tradeoff in tradeoff_nodes:
         tradeoff_id = _id(tradeoff)
-        if tradeoff_id is None or _type(tradeoff) not in {None, "TradeOff"}:
+        if tradeoff_id is None or _type(tradeoff) != "TradeOff":
             continue
         if namespace is not None and _namespace(tradeoff) != namespace:
             continue
@@ -324,18 +361,43 @@ def tradeoff_precedents(
 
 
 def execute(request: Mapping[str, object], nodes: object, edges: object) -> dict[str, object]:
-    """Execute a request-shaped query and return an advisory, untrusted response."""
+    """Execute a request-shaped query and return an advisory, untrusted response.
+
+    The join stays fail-closed end to end: untypeable nodes never enter a hop,
+    malformed or negated links cannot join, unknown decisions are skipped, candidate
+    outcomes are excluded, and a requested ``namespace`` gates every hop.  A malformed
+    ``namespace`` or ``min_confidence`` in the request raises rather than being
+    silently ignored.
+    """
+    if not isinstance(request, Mapping):
+        raise TradeoffPrecedentError("request must be an object")
     if request.get("method") != "tradeoff_precedents":
         raise TradeoffPrecedentError("method must be tradeoff_precedents")
     raw_axes = request.get("axes")
     if not isinstance(raw_axes, Sequence) or isinstance(raw_axes, (str, bytes, bytearray)):
         raise TradeoffPrecedentError("request.axes must be an array")
+    namespace = request.get("namespace")
+    if namespace is not None and (not isinstance(namespace, str) or not namespace.strip()):
+        raise TradeoffPrecedentError("request.namespace must be a non-empty string")
+    raw_min_confidence = request.get("min_confidence", 0.0)
+    if (
+        isinstance(raw_min_confidence, bool)
+        or not isinstance(raw_min_confidence, (int, float))
+        or not 0 <= raw_min_confidence <= 1
+    ):
+        raise TradeoffPrecedentError("request.min_confidence must be between 0 and 1")
     records = _records(nodes, "nodes")
-    tradeoffs = tuple(node for node in records if _type(node) in {None, "TradeOff"})
-    decisions = tuple(node for node in records if _type(node) in {None, "Decision"})
-    outcomes = tuple(node for node in records if _type(node) in {None, "Outcome"})
+    tradeoffs = tuple(node for node in records if _type(node) == "TradeOff")
+    decisions = tuple(node for node in records if _type(node) == "Decision")
+    outcomes = tuple(node for node in records if _type(node) == "Outcome")
     result = tradeoff_precedents(
-        tradeoffs, decisions, outcomes, edges, cast(Sequence[str], raw_axes)
+        tradeoffs,
+        decisions,
+        outcomes,
+        edges,
+        cast(Sequence[str], raw_axes),
+        min_confidence=float(raw_min_confidence),
+        namespace=namespace,
     )
     return {"results": [dict(item) for item in result], "trust": "untrusted", "tier": "SUMMARY"}
 
