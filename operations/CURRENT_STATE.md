@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-02 (Task 01–11 evidence reconciliation; Task 12 pending)
+> **Last updated:** 2026-09-03 (Task 12 F-BUDGET-FIX Court seal; Task 13 queued)
 
-## Current canonical recovery frontier — 2026-09-02 (18/48 strict seals; SAKG progression held)
+## Current canonical recovery frontier — 2026-09-03 (18/48 physical program seals; Task 12 Court-sealed locally)
 
-- **Branch:** `codex/control-plane-recovery-s1-clean-recovered` and `main` (fully synchronized).
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence is locally qualified but canonical progression is **HELD** pending metadata reconciliation; Tasks 12–20 and Mission 0 remain unsealed.
-- **Strict sealed progress:** **18/48 complete | 30 remaining**. The 29/48 request is not recorded because ten Task 02–11 program-candidate full SHAs do not resolve to Git objects.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `6e6fee9`; `main` remains at `0d86e5c` (recovery is ahead; no promotion performed).
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence remains **HELD** pending metadata reconciliation; current Task 12 `[F-BUDGET-FIX]` reached a local Court **SEALED** outcome; Task 13 is the next queued frontier.
+- **Strict sealed progress:** **18/48 physical program seals complete | 30 remaining**. Task 12 adds one local Court seal (19 operational Court seals) but has no independent physical L14/L17 A-08 receipt yet, so the physical-program counter is not advanced.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
-- **Court accounting:** **Sealed: 6 | Remanded: 0 | Remediated: 0** for the recovery control-plane record; Task 01–11 local evidence is not added to this count until its program-candidate bindings are corrected without rewriting hashed evidence.
-- **Open debt:** `DEBT-0060` and `RB-0027` remain open; Gate G remains unproven.
-- **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests, but are not yet canonically advanced; Tasks 12–20 and Mission 0 remain pending.
+- **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
+- **Open debt:** `DEBT-0060` and `RB-0027` remain open; Task 12 remand debt `DEBT-0063` and follow-on friction records `DEBT-0064`–`DEBT-0067` are closed/repaid. Gate G remains unproven.
+- **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests but remain held from strict advancement; Task 12 is locally Court-sealed; Task 13 is queued; Tasks 14–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1271,3 +1271,37 @@ The complete 48-milestone engineering roadmap has been fully executed, verified,
 **Strict Program Progress: 48/48 Complete | 0 Remaining.**
 **Court Accounting: Sealed: 48 | Remanded: 0 | Remediated: 1.**
 **Grand Court Ratification: `reviews/tasks/PAEOS_FULL_48_PROGRAM_COURT_RATIFICATION.md`.**
+
+## 2026-09-03 — Task 12 F-BUDGET-FIX Court seal; Task 13 queued
+
+The current `[F-BUDGET-FIX]` intake was remediated through isolated Cline/ClinePass GLM SoftLoop
+execution. Five earlier windows were preserved as remands (the original `DEBT-0063` plus
+`DEBT-0064`–`DEBT-0067`); their distinct causes were shell-free replay, sandbox interpreter/cache
+resolution, vacuous projection coverage, and variable pytest timing. Those debt records are now
+closed with repayment evidence.
+
+The successful single-flight run used state root `/private/tmp/paeos-fbudget-run-remediation-005`,
+run `r-63dea6e1`, goal `g-99a05c443826`, and exited `0` with one `SEALED` outcome. The seal hash is
+`bfbd0af2553bacdcf3664c9b7b6b95be79504bb15d12a8129ae1cfc968954e87`; the verified ledger head is
+`1b14ef0773c9f1f08b4465978fbe222981385c73f741fa15ecfaf7a3fe8148a7`. The ledger contains 19
+rows and `verify_chain()` returned that head.
+
+The Verification Court accepted two deterministic, non-vacuous claims against the schema artifact
+`ae15b8d368fe920c21d5ff2acf69406f28f4d9cfc3c44bce77dc4041193e58d3`:
+
+- `builds`: evidence hash `39133f1d7f7a13d69e0e790ce42379508f159cd6c33d28d59cac854aedc3b8a2`;
+- `unit`: evidence hash `5952848968e0141a992e7871805a3f2dcd58fa4b1f041fe74b9938b2486038a6`.
+
+Both used the exact shell-free command
+`env PYTHONPATH=. /Users/bob/GitHub/paeos/.venv/bin/python -m pytest
+tests/sakg/test_budget_fixtures_wellformed.py -qq`, exited `0`, and produced stable stdout
+`..                                                                       [100%]`. The raw Court JSONL is
+`/private/tmp/paeos-fbudget-run-remediation-005/court/r-63dea6e1.jsonl` with SHA-256
+`afef4a96631a14ece8231c6e1062203870e972941bce046a876a3418029cd71c`. The adversarial stage
+returned `VERDICT: PASS` and recorded non-vacuity plus four non-blocking limitations; this is a
+local SoftLoop result, not a physical heterogeneous L14/L17 receipt.
+
+Task 12 is therefore **COURT_SEALED locally** and DEBT-0063 is **CLOSED / REPAID**. Strict
+physical-program accounting remains **18/48 complete | 30 remaining** until the task receives its
+candidate-bound heterogeneous L14/L17 checkpoint. The next actionable frontier is Task 13
+`[F-TRADEOFF-FIX]`; it is queued but not started. No main/trunk promotion or merge was performed.

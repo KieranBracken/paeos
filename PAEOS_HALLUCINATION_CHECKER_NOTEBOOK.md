@@ -5033,3 +5033,36 @@ friction. The existing implementation commit `2c987988221da134a636f181720ba9200b
 ancestor and its local fixture test is green, but no candidate-bound Task 12 L14/L17 pair exists;
 therefore no Task 12 seal or progress increment is admitted. Exact canonical progress remains
 **18/48 complete | 30 remaining**.
+
+### Entry 280 — 2026-09-03: Task 12 F-BUDGET-FIX remediated and locally Court-sealed
+
+The current `[F-BUDGET-FIX]` intake was run through isolated Cline/ClinePass GLM SoftLoop
+windows. The original remand (`DEBT-0063`) and four subsequent diagnostic remands
+(`DEBT-0064`–`DEBT-0067`) were preserved as raw evidence and are now closed/repaid. Their
+causes were identified as shell-free Court replay incompatibility, sandbox interpreter/cache
+resolution, a projection-golden claim that did not exercise the schema, and nondeterministic
+pytest timing in worker output.
+
+The corrected single-flight run used state root `/private/tmp/paeos-fbudget-run-remediation-005`,
+run `r-63dea6e1`, goal `g-99a05c443826`, and exited `0` with one `SEALED` outcome. Seal hash:
+`bfbd0af2553bacdcf3664c9b7b6b95be79504bb15d12a8129ae1cfc968954e87`. The 19-row SQLite ledger
+verified to head `1b14ef0773c9f1f08b4465978fbe222981385c73f741fa15ecfaf7a3fe8148a7`.
+
+Court evidence was two deterministic claims against schema artifact
+`ae15b8d368fe920c21d5ff2acf69406f28f4d9cfc3c44bce77dc4041193e58d3`:
+
+- `builds` evidence `39133f1d7f7a13d69e0e790ce42379508f159cd6c33d28d59cac854aedc3b8a2`;
+- `unit` evidence `5952848968e0141a992e7871805a3f2dcd58fa4b1f041fe74b9938b2486038a6`.
+
+Both used `env PYTHONPATH=. /Users/bob/GitHub/paeos/.venv/bin/python -m pytest
+tests/sakg/test_budget_fixtures_wellformed.py -qq`, exited `0`, and produced stable stdout
+`..                                                                       [100%]`. Raw Court JSONL:
+`/private/tmp/paeos-fbudget-run-remediation-005/court/r-63dea6e1.jsonl`, SHA-256
+`afef4a96631a14ece8231c6e1062203870e972941bce046a876a3418029cd71c`. The adversarial stage
+returned `VERDICT: PASS` and independently recorded the fixture semantics as non-vacuous.
+
+Disposition: **Task 12 COURT_SEALED locally; physical A-08 L14/L17 checkpoint still pending**.
+The control-plane physical count remains **18/48 complete | 30 remaining**; local Task 12 Court
+accounting for this window is **Sealed: 1 | Remanded: 5 | Remediated: 5**. Task 13
+`[F-TRADEOFF-FIX]` is the next queued frontier and has not been started. No promotion, merge,
+main/trunk mutation, or external audit claim was made.

@@ -1239,3 +1239,14 @@ evidence and Founder/Court disposition are mandatory.
    zero parse errors, digest `89ea537a34b3b98a0c307144e6a02b5e510801f0f814a334fceb3121a44c3935`.
    Mission 0 is `BLOCKED_UNPROVEN`; no canonical artifact, Court evidence, ledger row, milestone,
    or SAKG contract was created. Strict progress remains `18/48 complete | 30 remaining`.
+- 2026-09-03 Task 12 F-BUDGET-FIX remediation: five isolated SoftLoop windows were preserved.
+  The original `DEBT-0063` remand and follow-on `DEBT-0064`–`DEBT-0067` friction records are
+  closed/repaid after the corrected run `r-63dea6e1` in `/private/tmp/paeos-fbudget-run-remediation-005`.
+  The run exited `0` with `SEALED` outcome, seal hash
+  `bfbd0af2553bacdcf3664c9b7b6b95be79504bb15d12a8129ae1cfc968954e87`, and ledger head
+  `1b14ef0773c9f1f08b4465978fbe222981385c73f741fa15ecfaf7a3fe8148a7`. Court JSONL
+  `/private/tmp/paeos-fbudget-run-remediation-005/court/r-63dea6e1.jsonl` hashes to
+  `afef4a96631a14ece8231c6e1062203870e972941bce046a876a3418029cd71c`. Both claims used the
+  shell-free absolute-venv `pytest -qq` command and were independently reproduced as
+  non-vacuous. Task 12 is locally Court-sealed; physical heterogeneous L14/L17 qualification
+  remains pending. No promotion, merge, or main/trunk mutation occurred.
