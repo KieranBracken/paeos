@@ -1355,3 +1355,14 @@ evidence and Founder/Court disposition are mandatory.
   checkpoint/disposition files. Strict progress advances to **20/48 complete | 28 remaining**;
   Task 15 `[I-TRAVERSE]` is opened and queued in its canonical intake file. No promotion, merge,
   or protected-ref mutation occurred.
+
+- 2026-09-03 Task 15 `[I-TRAVERSE]` local SoftLoop/Court window `i-traverse-trace-a-006` sealed
+  with seal `87015d9d5929a535c021eb9aa8f3403cadc5b077474fa270bb8c8112a7660b68`, artifact bundle
+  `5ffc551e5a8a0869e402f27988e134df86a7b6a3416e1aef20f0f481570ccfa8`, and ledger head
+  `a2cdc8b84a0d43b377b8f72ce1548f6df88c0cff16150549fae69d2cfd063b9b`; the 15 focused tests
+  passed in the hermetic Court ladder. A fresh physical bundle is
+  `eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8d` (candidate
+  `fbb52403b16af0a581848938f274fd266ec0cd9e`). The Gemini 3.7 dispatch was rejected before
+  launch by the execution approval gate because exact bundle/destination authorization was not
+  explicit. No provider request or retry occurred; physical A-08 is not started and strict
+  progress remains **20/48 complete | 28 remaining**.

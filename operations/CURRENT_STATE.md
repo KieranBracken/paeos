@@ -1493,3 +1493,24 @@ Task 14 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict
 progress advances to **20/48 complete | 28 remaining**. Canonical Task 15 `[I-TRAVERSE]` is
 opened and queued in `reviews/tasks/PAEOS_SAKG_TASK_15_I_TRAVERSE_INTAKE.md`; stale historical
 Task 14/15 labels remain unchanged. No promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 15 local Court seal complete; physical audit not started
+
+The isolated `[I-TRAVERSE]` SoftLoop window `i-traverse-trace-a-006` returned `SEALED` with seal
+hash `87015d9d5929a535c021eb9aa8f3403cadc5b077474fa270bb8c8112a7660b68`, artifact bundle
+`5ffc551e5a8a0869e402f27988e134df86a7b6a3416e1aef20f0f481570ccfa8`, verdict reference
+`8a12964af935bac6d0ee5a0e361b36252bfca7968a45b13718a5f258bb25b733`, adversary reference
+`24ca1656f624d86677918ab3d0bf3ba86089902f4653f35ebf1950f54246e1f3`, and verified ledger head
+`a2cdc8b84a0d43b377b8f72ce1548f6df88c0cff16150549fae69d2cfd063b9b`. The hermetic Court ladder
+reproduced the four Task 15 suites (15 tests) with exit code `0`; the local runtime is synthetic,
+so it does not establish Builder != Auditor.
+
+The exact candidate bundle for the physical audit is
+`/private/tmp/paeos-sakg-task-15-l14-l17-bundle-fbb5240.json`, SHA-256
+`eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8d`, with prompt SHA-256
+`b7f037529b0d94c1d892770b1d2484feacf782f9ed9e45cbfb8c4bdca5cf7ccd`.
+
+The requested Gemini 3.7 dispatch was rejected by the execution approval gate before launch
+because exact bundle/destination authorization was not explicit. No provider request, receipt,
+report, retry, fallback, or source mutation occurred. Physical A-08 status is **NOT STARTED**;
+Task 15 remains held and strict physical progress remains **20/48 complete | 28 remaining**.

@@ -5260,3 +5260,28 @@ Pyright with exit `0`. Task 14 window accounting is **Sealed: 1 | Remanded: 0 | 
 strict physical progress advances from **19/48** to **20/48 complete | 28 remaining**. Canonical
 Task 15 `[I-TRAVERSE]` is opened and queued; its stale historical review files are preserved.
 No main/trunk promotion or protected-ref mutation occurred.
+
+### Entry 289 — 2026-09-03: Task 15 local Court seal complete; physical dispatch approval missing
+
+The isolated `[I-TRAVERSE]` SoftLoop window `i-traverse-trace-a-006` completed with status
+`SEALED`, seal hash `87015d9d5929a535c021eb9aa8f3403cadc5b077474fa270bb8c8112a7660b68`, artifact
+bundle `5ffc551e5a8a0869e402f27988e134df86a7b6a3416e1aef20f0f481570ccfa8`, verdict reference
+`8a12964af935bac6d0ee5a0e361b36252bfca7968a45b13718a5f258bb25b733`, adversary reference
+`24ca1656f624d86677918ab3d0bf3ba86089902f4653f35ebf1950f54246e1f3`, and ledger head
+`a2cdc8b84a0d43b377b8f72ce1548f6df88c0cff16150549fae69d2cfd063b9b`. The hermetic Court
+ladder reproduced 15/15 focused tests with exit `0`; the red-phase control failed as expected
+because `sakg/traverse.py` was absent. The local runtime is synthetic and does not establish
+Builder != Auditor.
+
+A fresh candidate bundle was built from the exact bytes at source candidate
+`fbb52403b16af0a581848938f274fd266ec0cd9e`: `/private/tmp/paeos-sakg-task-15-l14-l17-bundle-fbb5240.json`,
+SHA-256 `eb0a7e4763f8c1815fda0509b077708904068c161fe963bab50db5dca38eef8`; its audit prompt is
+`/private/tmp/paeos-sakg-task-15-l14-l17-prompt-fbb5240.md`, SHA-256
+`b7f037529b0d94c1d892770b1d2484feacf782f9ed9e45cbfb8c4bdca5cf7ccd`.
+
+The requested one-shot Gemini 3.7 dispatch was rejected by the execution approval gate before
+launch because the exact bundle hash and destination payload had not been explicitly approved.
+No provider request, report, receipt, fallback, retry, code change, or promotion occurred. The
+physical A-08 audit is therefore **NOT STARTED**, not passed or failed; strict progress remains
+**20/48 complete | 28 remaining**. A new explicit authorization for this exact bundle is required
+before dispatch, and the failed approval action must not be retried implicitly.
