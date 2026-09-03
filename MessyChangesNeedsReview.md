@@ -1422,3 +1422,11 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   evidence had 16/16 tests, method-count `1`, and Pyright exit `0`. Strict physical progress is
   now `23/48 complete | 25 remaining`; canonical Task 18 `[I-MCP]` is opened. No promotion,
   merge, retry, fallback, source change, or protected-ref mutation occurred.
+
+- 2026-09-03 Task 18 `[I-MCP]` local SoftLoop run `i-mcp-trace-a-actual-013` sealed after the
+  expected RED import failure (exit `2`) and GREEN Court verification of 5 MCP tests (exit `0`),
+  with Pyright and Ruff clean. Local seal is
+  `3b3d36cf0b36eede208d5d7b8941e76d9f5a3867b7abd0a69e2453bf1f0a5d03`; candidate-bound physical
+  bundle `840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9` is prepared for an
+  explicit one-shot heterogeneous audit. Physical A-08 remains unproven and strict progress
+  remains `23/48 complete | 25 remaining`; no provider request or promotion occurred.

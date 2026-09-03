@@ -5454,3 +5454,24 @@ checkpoint and disposition files. Task 17 window accounting is **Sealed: 1 | Rem
 Remediated: 0**; strict physical progress advances from **22/48** to **23/48 complete | 25
 remaining**. Canonical Task 18 `[I-MCP]` is opened. No retry, fallback, source change, promotion,
 merge, or protected-ref mutation occurred.
+
+### Entry 297 — 2026-09-03: Task 18 `[I-MCP]` local SoftLoop sealed; physical A-08 pending
+
+The actual MCP implementation and tests were exercised in fresh isolated state root
+`/private/tmp/paeos-imcp-actual-run-013`. The expected RED phase failed with
+`ModuleNotFoundError: sakg.mcp_server` (exit `2`); the GREEN Court phase passed all 5 MCP tests
+with exit `0`. Pyright over `sakg/` and Ruff over `sakg/ tests/mcp/` both exited `0` with no
+findings. Local SoftLoop status is `SEALED` with seal
+`3b3d36cf0b36eede208d5d7b8941e76d9f5a3867b7abd0a69e2453bf1f0a5d03`, artifact bundle
+`b9372589c95738a7e1d4327b473287cf3f42ff95e8d159928a5a5e6cf75b2eab`, verdict reference
+`c3857f06869efd6af1202b237cb7a3c4728d0fa89860c2393d829b781270e287`, adversary reference
+`77d1ae2f9a8b195e21ef20222e1e96b6e9082a12f82f08c9a9bbaaeeb031a885`, and ledger head
+`54efe60e8e8d4a9fb83480b383513710828315aff36eb8e9efe85448449361d1`.
+
+A candidate-bound bundle is ready at
+`/private/tmp/paeos-sakg-task-18-l14-l17-bundle-88cb88f.json` with SHA-256
+`840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9`; its prompt SHA-256 is
+`aa6600ef2a14671c9c187ef5d33656de2ba244c43597a792de8407dc2bc5e161`. The scripted local runtime
+does not establish Builder != Auditor, so physical A-08 remains **UNPROVEN** and strict progress
+remains **23/48 complete | 25 remaining**. No external provider request, retry, fallback, source
+mutation, promotion, merge, or protected-ref mutation occurred.
