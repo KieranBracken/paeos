@@ -5676,3 +5676,31 @@ now `OPEN/QUEUED` from `ops/backlogs/intake-rb0026-durable-scars.json` (SHA-256
 `e8b867d6814fbce12ad9d7f160df156220a91111c36b6d4a2af5f7609eef7cfc`). Earlier blocked Gemini
 dispatch attempts remain preserved; no retry, fallback, promotion, merge, or protected-ref
 mutation occurred.
+
+### Entry 307 — 2026-09-03: Milestone 40 `[I-DURABLE-SCARS]` Court sealed; Milestone 41 opened
+
+The Founder supplied `COURT_SEALED` for candidate
+`a2e3d49bc8cb8a199bf620c9d8ce4ec0f5fe5aac` after mechanical adjudication of the physical
+NVIDIA/Llama artifact pair. Audit ID is `m40-scarstore-a2e3d49-nvidia-003`; the actual auditor
+is NVIDIA `meta/llama-3.2-11b-vision-instruct` (family `llama`) and the builder is
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`). A-08 is `PASS` (`llama != glm`), with one
+provider attempt and no fallback. The candidate-bound bundle SHA-256 is
+`a46d3ff05599bcd7526845c2040b2f7a97551482bcb20eb11aee8f44d210a135`; report SHA-256 is
+`c32cd6db9866c6362350d246eb7aa8ca3e2521ce665c63eae813be038dce562e`; receipt file SHA-256
+is `c9d5558d461100eadc3528ec597cfcdbb22108a962bfff7ca6a515552df04d9e`; canonical receipt
+SHA-256 is `9614961d706a4c8b492701ea7579673df1813f23586280c3752e238ad9157df5`. Mechanical
+adjudication returned `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`.
+
+The hermetic SoftLoop run `rb0026-scar-store-trace-a-002` sealed with Court exit `0`, local
+seal hash `16d7478df01ba8ad02e93725d96c0586d0cae26e9d44900c33e578dce8ed3086`, local bundle
+`bf5fd2ee0bc0a7c93a1122d712f3346af09a8c69d834ef4948d92be0a6845637`, and 5/5 focused tests.
+The physical report's finding that corrupted or missing SQLite databases are not handled is
+retained as an open integrity risk. The candidate manifest's stored prompt digest differs
+from the current prompt file; this metadata discrepancy is preserved for follow-up, while
+the candidate/evidence/review-scope/report bindings remain qualified.
+
+Window accounting is `Sealed: 1 | Remanded: 0 | Remediated: 0`; strict physical progress
+advances from `27/48` to **`28/48 complete | 20 remaining`**. Milestone 41
+`[I-CEREMONY-WALK]` is opened at
+`reviews/tasks/PAEOS_MILESTONE_41_I_CEREMONY_WALK_INTAKE.md`. Unrelated pre-existing changes
+remain untouched; no retry, fallback, promotion, merge, or protected-ref mutation occurred.

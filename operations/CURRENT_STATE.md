@@ -3,18 +3,18 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (L17 Retrospective Court-sealed; Milestone 40 `[I-DURABLE-SCARS]` opened)
+> **Last updated:** 2026-09-03 (Milestone 40 `[I-DURABLE-SCARS]` Court-sealed; Milestone 41 `[I-CEREMONY-WALK]` opened)
 
-## Current canonical recovery frontier — 2026-09-03 (27/48 physical program seals; L17 Retrospective sealed)
+## Current canonical recovery frontier — 2026-09-03 (28/48 physical program seals; M40 sealed)
 
 - **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); L17 Retrospective candidate is `fd17d209b6dbf0aead8ff5137f213439b13e580a`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–20 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, and Task 20 `[T-BASELINE]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective is now **COURT_SEALED**; Milestone 40 `[I-DURABLE-SCARS]` is **OPEN/QUEUED**.
-- **Strict sealed progress:** **27/48 physical program seals complete | 21 remaining**. Task 20 and L17 Retrospective evidence are recorded; stale historical labels are preserved and superseded by canonical intake names.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–20 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, and Task 20 `[T-BASELINE]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective and Milestone 40 `[I-DURABLE-SCARS]` are **COURT_SEALED**; Milestone 41 `[I-CEREMONY-WALK]` is **OPEN/QUEUED**.
+- **Strict sealed progress:** **28/48 physical program seals complete | 20 remaining**. Task 20, L17 Retrospective, and M40 evidence are recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
 - **SAKG Subsystem:** Tasks 14–20 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`, `[T-NONAUTH]`, `[T-BASELINE]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; Task 19 has a local seal with 8 focused tests, clean import-boundary verification, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair; Task 20 has a local seal with 4 focused tests, baseline CLI, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair. Earlier failed and alternate audit attempts remain preserved as separate evidence. Mission 0 remains pending.
-- **Runtime Intakes:** Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is open for isolated execution; it is not sealed.
+- **Runtime Intakes:** Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is **COURT_SEALED**. Milestone 41 `[I-CEREMONY-WALK]` is open for isolated execution; it is not sealed.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
 
@@ -1762,6 +1762,35 @@ opened in `reviews/tasks/PAEOS_SAKG_TASK_20_T_BASELINE_INTAKE.md` for isolated S
 The earlier Gemini 3.7 OperationalError and Gemini 3.6 qualified pair remain preserved as
 separate evidence. No source change, retry, fallback, promotion, merge, or protected-ref mutation
 occurred.
+
+## 2026-09-03 — Milestone 40 Durable Scars Court seal; Milestone 41 opened
+
+The isolated SoftLoop run `rb0026-scar-store-trace-a-002` under
+`/private/tmp/paeos-scarstore-run` sealed with Court exit `0`, seal hash
+`16d7478df01ba8ad02e93725d96c0586d0cae26e9d44900c33e578dce8ed3086`, and local bundle
+`bf5fd2ee0bc0a7c93a1122d712f3346af09a8c69d834ef4948d92be0a6845637`. The focused
+`SqliteScarStore` suite passed `5/5`; focused Ruff/Pyright and full Ruff exited `0`. The
+isolated full-Pyright exit `1` and the host's pre-existing `mcp.server` diagnostic are
+disclosed in the disposition rather than presented as clean full-repository typing.
+
+The candidate-bound physical pair for candidate `a2e3d49bc8cb8a199bf620c9d8ce4ec0f5fe5aac`
+and evidence bundle `a46d3ff05599bcd7526845c2040b2f7a97551482bcb20eb11aee8f44d210a135` is
+mechanically qualified: audit ID `m40-scarstore-a2e3d49-nvidia-003`, `report_status=PASS`,
+`a08_verdict=PASS`, and `qualified=True`. Actual auditor provenance is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`) versus builder `cline-pass` /
+`z-ai/glm-5.3-flash` (family `glm`); provider attempts were exactly one with no fallback.
+Report SHA-256 is `c32cd6db9866c6362350d246eb7aa8ca3e2521ce665c63eae813be038dce562e`, receipt
+file SHA-256 is `c9d5558d461100eadc3528ec597cfcdbb22108a962bfff7ca6a515552df04d9e`, and
+canonical receipt SHA-256 is `9614961d706a4c8b492701ea7579673df1813f23586280c3752e238ad9157df5`.
+
+Founder/Court disposition is `COURT_SEALED`; window accounting is
+`Sealed: 1 | Remanded: 0 | Remediated: 0`, advancing strict physical progress from
+`27/48` to **`28/48 complete | 20 remaining`**. The physical report's finding that corrupted
+or missing SQLite databases are not handled is retained as an open integrity risk. A stale
+candidate-manifest prompt digest is also recorded in the disposition as metadata debt; the
+candidate/evidence/report bindings remain qualified. Milestone 41 `[I-CEREMONY-WALK]` is
+opened in `reviews/tasks/PAEOS_MILESTONE_41_I_CEREMONY_WALK_INTAKE.md`. No retry, fallback,
+promotion, merge, or protected-ref mutation occurred.
 
 ## 2026-09-03 — Task 20 `[T-BASELINE]` local seal; physical dispatch held by authorization gate
 

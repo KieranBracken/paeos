@@ -1456,6 +1456,20 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   rejection remains preserved. No retry, fallback, source change, promotion, merge, or
   protected-ref mutation occurred.
 
+- 2026-09-03 Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 was Court-sealed for candidate
+  `a2e3d49bc8cb8a199bf620c9d8ce4ec0f5fe5aac`. The qualified NVIDIA/Llama audit pair is bound
+  to bundle `a46d3ff05599bcd7526845c2040b2f7a97551482bcb20eb11aee8f44d210a135`, report
+  `c32cd6db9866c6362350d246eb7aa8ca3e2521ce665c63eae813be038dce562e`, receipt file
+  `c9d5558d461100eadc3528ec597cfcdbb22108a962bfff7ca6a515552df04d9e`, and canonical receipt
+  `9614961d706a4c8b492701ea7579673df1813f23586280c3752e238ad9157df5`. A-08 is PASS
+  (`llama != glm`), report status PASS, and qualification true. The local SoftLoop run
+  `rb0026-scar-store-trace-a-002` sealed with 5/5 focused tests and Court exit 0. The report's
+  corrupted/missing SQLite handling finding remains an open risk. Candidate-manifest prompt
+  digest drift is recorded as metadata debt. Strict progress advances to `28/48 complete |
+  20 remaining`; Milestone 41 `[I-CEREMONY-WALK]` is opened. Unrelated pre-existing files
+  (`ops/auditor_receipt_capture.py`, `paeos/model_router/catalog.py`, `ops/nudge_codex.py`)
+  remain untouched.
+
 - 2026-09-03 Task 19 `[T-NONAUTH]` fresh Gemini 3.6 physical audit
   `l14-l17-sakg-task19-21616d1-gemini36-002` completed once with exit `0`,
   `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. Candidate
