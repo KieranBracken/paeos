@@ -5217,3 +5217,24 @@ A-08 PASS against the GLM builder, but it is not substituted for the explicitly 
 validated hashes remain the authoritative Task 13 record; reuse of the same temporary paths is
 an artifact-integrity anomaly. The concurrent provider/model source edits are unstaged and
 require reconciliation before later audits rely on these paths.
+
+### Entry 287 — 2026-09-03: Task 14 Gemini 3.6 one-shot returned empty response
+
+The explicitly authorized one-shot `l14-l17-sakg-task14-gemini36-001` targeted candidate
+`542ebba88467629d3d68c335cb2720dbf8025cb2` with evidence bundle
+`5e4d85030484cf9350c97f89753a3baafc574d45cbae9634996c92c017ea0fa9` and prompt SHA-256
+`449ad06bebae2a07d48feb597343edadeefe80382baef84fd01243ba0194cadc`. The command used
+`google/gemini-3.6-flash`, `--max-tokens 4096`, no fallback, and no retry. The provider returned
+an empty response; the process exited `2` with exact validator error
+`AUDITOR_RECEIPT_REJECTED:audit response is empty`. No report, receipt, or rejection artifact
+was created on disk, and no qualified physical A-08 audit exists for Task 14. Raw failure state
+is preserved by this entry; an identical command must not be autonomously repeated.
+
+The local Task 14 `[I-BACKFILL]` SoftLoop/Court run remains independently sealed (state root
+`/private/tmp/paeos-ibackfill-run-004`, seal hash
+`2c3452ba256bd1bad3d742cc6d765fa886911d7afe4ba3e8a7ce3cc1749f46cf`, artifact bundle
+`485660d49964393452e73bdfc6e7850f483ee930eb325bbb59743b453c73e1d5`) and its six focused
+acceptance tests pass. Because the heterogeneous physical audit is unqualified, Task 14 is
+held and strict physical progress remains **19/48 complete | 29 remaining**. Worker/Court
+window accounting is unchanged at **Sealed: 1 | Remanded: 4 | Remediated: 0**; no promotion,
+merge, or protected-ref mutation occurred.

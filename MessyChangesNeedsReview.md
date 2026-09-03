@@ -1331,3 +1331,15 @@ evidence and Founder/Court disposition are mandatory.
   substituted for the user-authorized 3.6 evidence and does not alter the 19/48 count. The
   original hashes are preserved in the committed checkpoint; temporary-path reuse and concurrent
   provider/model source edits are recorded for reconciliation before future audits.
+
+- 2026-09-03 Task 14 `[I-BACKFILL]` physical audit attempt
+  `l14-l17-sakg-task14-gemini36-001` was explicitly authorized for candidate
+  `542ebba88467629d3d68c335cb2720dbf8025cb2`, bundle
+  `5e4d85030484cf9350c97f89753a3baafc574d45cbae9634996c92c017ea0fa9`, and prompt SHA-256
+  `449ad06bebae2a07d48feb597343edadeefe80382baef84fd01243ba0194cadc`. It reached
+  `google/gemini-3.6-flash` once with `max_tokens=4096`, no fallback/retry, then returned an
+  empty response. The receipt capture exited `2` with
+  `AUDITOR_RECEIPT_REJECTED:audit response is empty`; no report, receipt, or rejection artifact
+  was created. No qualified physical A-08 receipt exists, so Task 14 remains held and strict
+  progress remains **19/48 complete | 29 remaining**. The local Task 14 Court seal and six
+  focused tests remain valid; no promotion, merge, or protected-ref mutation occurred.

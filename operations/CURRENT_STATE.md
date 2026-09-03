@@ -1451,3 +1451,22 @@ qualifies against its own receipt scope, but it is not substituted for the user-
 3.6 pair and no new program milestone is counted. This path reuse is an artifact-integrity
 anomaly; the original Task 13 hashes remain authoritative in the committed checkpoint, and the
 new provider/model source edits remain unstaged pending explicit reconciliation.
+
+## 2026-09-03 — Task 14 Gemini 3.6 physical audit returned empty response
+
+The explicitly authorized one-shot `l14-l17-sakg-task14-gemini36-001` targeted candidate
+`542ebba88467629d3d68c335cb2720dbf8025cb2` with bundle
+`5e4d85030484cf9350c97f89753a3baafc574d45cbae9634996c92c017ea0fa9` and prompt SHA-256
+`449ad06bebae2a07d48feb597343edadeefe80382baef84fd01243ba0194cadc`. It used
+`google/gemini-3.6-flash`, `--max-tokens 4096`, no fallback, and no retry. The provider returned
+an empty response; `ops.auditor_receipt_capture` exited `2` with
+`AUDITOR_RECEIPT_REJECTED:audit response is empty`. No report, receipt, or rejection artifact
+was created, so no qualified A-08 evidence is available. This failure is preserved and the
+identical command is not retried.
+
+Task 14's local `[I-BACKFILL]` SoftLoop/Court run remains sealed with seal hash
+`2c3452ba256bd1bad3d742cc6d765fa886911d7afe4ba3e8a7ce3cc1749f46cf`, verified artifact bundle
+`485660d49964393452e73bdfc6e7850f483ee930eb325bbb59743b453c73e1d5`, and six focused tests
+passing. The missing heterogeneous audit keeps Task 14 held: strict physical progress is
+**19/48 complete | 29 remaining**. Window accounting remains **Sealed: 1 | Remanded: 4 |
+Remediated: 0**. No promotion, merge, or protected-ref mutation occurred.
