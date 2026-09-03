@@ -1442,3 +1442,16 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   covered by the authorization and is excluded. No retry, fallback, source change, promotion,
   merge, or protected-ref mutation occurred; Task 18 remains physically unqualified at
   `23/48 complete | 25 remaining`.
+
+- 2026-09-03 Task 18 `[I-MCP]` Gemini 3.7 physical pair was mechanically verified and accepted
+  under audit ID `l14-l17-88cb88f-gemini37-001` for candidate
+  `88cb88f84b056dfe7fc3dccb2f47cae8a0a09f1a` and bundle
+  `840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9`. Report SHA-256 is
+  `b78a2e40c765f0b4890b8d4a036683ec2d3494cd52162828d95ae5df888f3292`; raw receipt SHA-256 is
+  `283724ebbcdc06204f91d136e50aab8c39d41d521601fb439ef23ff832f3a89e`; canonical receipt
+  SHA-256 is `05d4ba79a2a444664e15772671bbff4e59bc90cb49733695293417c19d9497c2`. Gemini 3.7
+  audited the GLM builder with A-08 `PASS`, one provider attempt, and a final `AUDIT_COMPLETE:
+  true` marker. Founder/Court `COURT_SEALED` was recorded; strict progress advances to
+  `24/48 complete | 24 remaining`, and Task 19 `[T-NONAUTH]` is opened. The prior Gemini 3.6
+  rejection remains preserved. No retry, fallback, source change, promotion, merge, or
+  protected-ref mutation occurred.
