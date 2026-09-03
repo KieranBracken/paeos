@@ -1,4 +1,4 @@
-# SAKG Task 20 — `[T-BASELINE]` Canonical Intake (Prepared)
+# SAKG Task 20 — `[T-BASELINE]` Canonical Intake
 
 Source: item 19 of `ops/backlogs/sakg-1-intakes.json`.
 
@@ -20,5 +20,5 @@ is unreachable.
 - JSON report contains `research_spawns_delta`, `remands_delta`, and `tokens_delta`
 - `uv run pyright sakg/`
 
-Execution is held pending Founder/Court sealing of Task 19. No Task 20 implementation or seal is
-claimed by this prepared intake.
+Task 19 is now Court-sealed. Task 20 is open for isolated SoftLoop execution; no Task 20
+implementation or seal is claimed by this intake.

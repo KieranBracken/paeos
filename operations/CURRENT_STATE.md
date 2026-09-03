@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 19 `[T-NONAUTH]` physical audit qualified; Founder/Court seal pending)
+> **Last updated:** 2026-09-03 (Task 19 `[T-NONAUTH]` Court-sealed; Task 20 `[T-BASELINE]` opened)
 
-## Current canonical recovery frontier — 2026-09-03 (24/48 physical program seals; Task 19 qualified, seal pending)
+## Current canonical recovery frontier — 2026-09-03 (25/48 physical program seals; Task 19 sealed, Task 20 opened)
 
 - **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–17 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, and Task 18 `[I-MCP]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 19 `[T-NONAUTH]` has a qualified physical checkpoint awaiting Founder/Court seal.
-- **Strict sealed progress:** **24/48 physical program seals complete | 24 remaining**. Task 18 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–18 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, and Task 19 `[T-NONAUTH]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 20 `[T-BASELINE]` is open.
+- **Strict sealed progress:** **25/48 physical program seals complete | 23 remaining**. Task 19 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
-- **SAKG Subsystem:** Tasks 14–18 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; the earlier Gemini 3.6 rejection remains preserved as non-qualified evidence. Task 19 `[T-NONAUTH]` has a qualified Gemini 3.6 A-08 pair and awaits Founder/Court seal; Task 20 and Mission 0 remain pending.
+- **SAKG Subsystem:** Tasks 14–19 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`, `[T-NONAUTH]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; Task 19 has a local seal with 8 focused tests, clean import-boundary verification, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair. Earlier failed and alternate audit attempts remain preserved as separate evidence. Task 20 `[T-BASELINE]` is open; Mission 0 remains pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1713,3 +1713,22 @@ The disposition request is recorded in
 Task 20 intake is held and does not claim implementation or seal. The earlier Gemini 3.7
 OperationalError remains preserved as non-qualified evidence. No code change, retry, fallback,
 promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 19 `[T-NONAUTH]` Founder/Court seal; Task 20 opened
+
+The Founder supplied `COURT_SEALED` for Task 19 candidate
+`21616d1ee845eedf093f80c658758ce8d29c20b1`, based on the qualified Gemini 3.7 physical pair
+`l14-l17-21616d1-gemini37-001`. The evidence bundle SHA-256 is
+`4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`; report SHA-256 is
+`ea3893ebd2f7ef978fa7575ba3d4ffc743d9e488e63f12611f4b907a8d376723`; receipt file SHA-256 is
+`4db4820c83cf1413f4d736a84acf4c44a675ce2de5c7be0afbab4e7d50d515be`; and canonical receipt
+SHA-256 is `216f9ce4657e53af8e1daaf159d2c0b20b37d3def22a2c56c82a51a4e110c29e`. Mechanical
+adjudication returned `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`; Gemini
+audited the GLM builder with one provider attempt and no fallback.
+
+Task 19 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical
+progress advances to **25/48 complete | 23 remaining**. Canonical Task 20 `[T-BASELINE]` is
+opened in `reviews/tasks/PAEOS_SAKG_TASK_20_T_BASELINE_INTAKE.md` for isolated SoftLoop execution.
+The earlier Gemini 3.7 OperationalError and Gemini 3.6 qualified pair remain preserved as
+separate evidence. No source change, retry, fallback, promotion, merge, or protected-ref mutation
+occurred.

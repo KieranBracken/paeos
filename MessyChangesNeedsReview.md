@@ -1479,3 +1479,15 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   `AUDITOR_RECEIPT_FAILED:OperationalError`; no report/receipt was created. Physical A-08 is
   **NOT QUALIFIED**, strict progress remains `24/48 complete | 24 remaining`, and Task 20 is not
   opened. No retry, fallback, source change, promotion, merge, or protected-ref mutation occurred.
+
+- 2026-09-03 Task 19 `[T-NONAUTH]` Founder/Court disposition was supplied for the qualified
+  Gemini 3.7 pair `l14-l17-21616d1-gemini37-001`. Candidate
+  `21616d1ee845eedf093f80c658758ce8d29c20b1` and bundle
+  `4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2` are bound to report
+  SHA-256 `ea3893ebd2f7ef978fa7575ba3d4ffc743d9e488e63f12611f4b907a8d376723`, receipt file
+  SHA-256 `4db4820c83cf1413f4d736a84acf4c44a675ce2de5c7be0afbab4e7d50d515be`, and canonical
+  receipt SHA-256 `216f9ce4657e53af8e1daaf159d2c0b20b37d3def22a2c56c82a51a4e110c29e`. Mechanical
+  adjudication is `report_status=PASS`, `a08_verdict=PASS`, `qualified=True`; A-08 is Gemini
+  versus GLM with one provider attempt and no fallback. Task 19 is `COURT_SEALED`; strict
+  progress advances to `25/48 complete | 23 remaining`, and Task 20 `[T-BASELINE]` is opened.
+  No retry, source change, promotion, merge, or protected-ref mutation occurred.

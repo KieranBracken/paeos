@@ -1,7 +1,8 @@
 # Founder/Court Disposition Request — SAKG Task 19 `[T-NONAUTH]`
 
-The candidate-bound Gemini 3.6 physical audit for Task 19 is qualified and ready for Founder/Court
-disposition.
+This request is superseded by the explicit Founder/Court disposition recorded in
+`PAEOS_SAKG_TASK_19_T_NONAUTH_FOUNDER_COURT_DISPOSITION.md`. It is retained as the original
+request record.
 
 - Candidate: `21616d1ee845eedf093f80c658758ce8d29c20b1`
 - Evidence bundle SHA-256: `4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`

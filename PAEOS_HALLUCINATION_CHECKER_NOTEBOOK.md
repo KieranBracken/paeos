@@ -5568,3 +5568,21 @@ This is a qualified physical checkpoint, not a Founder/Court seal. Strict physic
 therefore remains **24/48 complete | 24 remaining**; Task 20 is prepared but not opened. The
 earlier Gemini 3.7 OperationalError attempt remains preserved. No retry, fallback, source change,
 promotion, merge, or protected-ref mutation occurred.
+
+### Entry 302 — 2026-09-03: Task 19 `[T-NONAUTH]` Founder/Court sealed; Task 20 opened
+
+The Founder supplied `COURT_SEALED` for Task 19 candidate
+`21616d1ee845eedf093f80c658758ce8d29c20b1`, using the qualified Gemini 3.7 pair
+`l14-l17-21616d1-gemini37-001`. Bundle SHA-256 is
+`4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`; report SHA-256 is
+`ea3893ebd2f7ef978fa7575ba3d4ffc743d9e488e63f12611f4b907a8d376723`; receipt file SHA-256 is
+`4db4820c83cf1413f4d736a84acf4c44a675ce2de5c7be0afbab4e7d50d515be`; canonical receipt SHA-256
+is `216f9ce4657e53af8e1daaf159d2c0b20b37d3def22a2c56c82a51a4e110c29e`. Mechanical adjudication
+returned `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`; A-08 is Gemini != GLM,
+with one provider attempt and no fallback used.
+
+Task 19 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical
+progress advances from **24/48** to **25/48 complete | 23 remaining**. Canonical Task 20
+`[T-BASELINE]` is opened. The earlier failed and alternate audit attempts remain preserved as
+separate evidence. No retry, fallback, source change, promotion, merge, or protected-ref mutation
+occurred.
