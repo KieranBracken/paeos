@@ -1844,3 +1844,34 @@ progress advances from **25/48** to **26/48 complete | 22 remaining**. The earli
 identity-mismatch pair remains preserved as rejected evidence and is not counted. No retry,
 fallback, source change, promotion, merge, or protected-ref mutation occurred; no subsequent
 milestone intake is opened by this seal.
+
+## 2026-09-03 — Milestone 41 `[I-CEREMONY-WALK]` Court seal; Milestone 42 opened
+
+The Founder supplied `COURT_SEALED` for candidate
+`fba0a21a664b9e5f8d7f76dfc04e53bcc24a42cd`. The isolated SoftLoop run
+`i-ceremony-walk-trace-a-001` under `/private/tmp/paeos-ceremony-walk-run` returned `SEALED`,
+Court exit `0`, seal hash
+`28ec7e92650a19c94026ec6d0bb8c120a0aabae14846795b42633831dd7d099b`, and ledger head
+`9005b5fc253a7826ee6b90fa6e5258875aa7e2fce9b609e757f96238444f1f62`. The canonical
+`ceremony_walk` event records `L01` through `L19` in order; Trace-A has eleven lawful K1
+discharge stubs and Trace-B has none. Local reproduction is 3/3 focused tests and 32/32
+ceremony/SoftLoop regressions, with full `tests/runtime` exit `0`; Ruff is clean and focused
+Pyright is clean. Full runtime Pyright retains the inherited unresolved `mcp.server` diagnostic.
+
+The candidate-bound physical pair is mechanically qualified (`report_status=PASS`,
+`a08_verdict=PASS`, `qualified=True`) under audit ID `m41-ceremony-walk-fba0a21-nvidia-001`.
+Bundle SHA-256 is
+`03ade6736c3789fbbe1fb4b9769d5bb11e0c217b715479156f7f4e29ae861905`; report SHA-256 is
+`6a3b99a57abb74e95238983b445dce3a82f7ce4aecd9933537b67d3f5f22566f`; receipt file SHA-256 is
+`ebb766938818621222e6fa513487c9e71b6461d7fce7a35944233d9698e76f7c`; canonical receipt
+SHA-256 is `495574fec06bd14a067e5e70214b70e0f570633aa53b4d2eb18a7ef2da94ea8c`. The receipt
+identifies NVIDIA Llama versus a GLM builder (`A-08 PASS`, one attempt, no fallback). The
+earlier requested Google Gemini dispatch returned `FileExistsError` while this NVIDIA pair
+appeared; that authorization/provider divergence and the report's 9/9 claim versus local 3/3
+reproduction are preserved explicitly in the disposition, not hidden or retried.
+
+Window accounting is **`Sealed: 1 | Remanded: 0 | Remediated: 0`**; strict physical progress
+advances from `28/48` to **`29/48 complete | 19 remaining`**. Milestone 42
+`[I-LIFETIME-CONFORMANCE]` is opened in
+`reviews/tasks/PAEOS_MILESTONE_42_I_LIFETIME_CONFORMANCE_INTAKE.md`. No host source change,
+merge, promotion, fallback, retry, or protected-ref mutation occurred.

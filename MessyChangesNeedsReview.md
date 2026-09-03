@@ -1549,3 +1549,17 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   validation finding remains an explicit carried-forward risk. Strict physical progress is
   `27/48 complete | 21 remaining`; Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is opened and
   queued, not sealed. Unrelated pre-existing modifications remain untouched.
+
+- 2026-09-03 Milestone 41 `[I-CEREMONY-WALK]` was Court-sealed at Founder's direction for
+  candidate `fba0a21a664b9e5f8d7f76dfc04e53bcc24a42cd`. The isolated SoftLoop run
+  `i-ceremony-walk-trace-a-001` sealed with Court exit `0`; local evidence is 3/3 focused,
+  32/32 regression, and full runtime pytest exit `0`. Bundle
+  `03ade6736c3789fbbe1fb4b9769d5bb11e0c217b715479156f7f4e29ae861905` is bound to a qualified
+  NVIDIA/Llama physical pair (report `6a3b99a57abb74e95238983b445dce3a82f7ce4aecd9933537b67d3f5f22566f`,
+  receipt file `ebb766938818621222e6fa513487c9e71b6461d7fce7a35944233d9698e76f7c`, canonical
+  receipt `495574fec06bd14a067e5e70214b70e0f570633aa53b4d2eb18a7ef2da94ea8c`, A-08 PASS).
+  The earlier authorization named Google Gemini but the persisted artifact identifies NVIDIA;
+  the wrapper returned `FileExistsError` and the report claims 9/9 versus local 3/3. Both
+  discrepancies remain explicitly recorded. Strict progress advances to `29/48 complete | 19
+  remaining`; M42 `[I-LIFETIME-CONFORMANCE]` is opened. No retry, fallback, promotion, merge,
+  or protected-ref mutation occurred.

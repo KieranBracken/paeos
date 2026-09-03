@@ -5704,3 +5704,35 @@ advances from `27/48` to **`28/48 complete | 20 remaining`**. Milestone 41
 `[I-CEREMONY-WALK]` is opened at
 `reviews/tasks/PAEOS_MILESTONE_41_I_CEREMONY_WALK_INTAKE.md`. Unrelated pre-existing changes
 remain untouched; no retry, fallback, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 308 — 2026-09-03: Milestone 41 `[I-CEREMONY-WALK]` Court seal; M42 opened
+
+The Founder supplied `COURT_SEALED` for candidate
+`fba0a21a664b9e5f8d7f76dfc04e53bcc24a42cd`. Hermetic SoftLoop run
+`i-ceremony-walk-trace-a-001` returned `SEALED` with Court exit `0`, local seal hash
+`28ec7e92650a19c94026ec6d0bb8c120a0aabae14846795b42633831dd7d099b`, and ledger head
+`9005b5fc253a7826ee6b90fa6e5258875aa7e2fce9b609e757f96238444f1f62`. Its ceremony event
+contains all nineteen layers in canonical order; Trace-A emits exactly eleven K1 discharge
+stubs and Trace-B emits none. Local evidence is 3/3 focused tests, 32/32 regressions, and full
+runtime pytest exit `0`; Ruff and focused Pyright are clean. Full runtime Pyright retains the
+inherited `mcp.server` import diagnostic.
+
+The supplied physical artifact pair is mechanically qualified: audit ID
+`m41-ceremony-walk-fba0a21-nvidia-001`, report `PASS`, A-08 `PASS`, and `qualified=True`.
+Bundle SHA-256 is
+`03ade6736c3789fbbe1fb4b9769d5bb11e0c217b715479156f7f4e29ae861905`; report SHA-256 is
+`6a3b99a57abb74e95238983b445dce3a82f7ce4aecd9933537b67d3f5f22566f`; receipt file SHA-256 is
+`ebb766938818621222e6fa513487c9e71b6461d7fce7a35944233d9698e76f7c`; canonical receipt SHA-256
+is `495574fec06bd14a067e5e70214b70e0f570633aa53b4d2eb18a7ef2da94ea8c`. Actual auditor is
+NVIDIA Llama and the receipt records a GLM builder, giving `llama != glm` with one attempt and
+no fallback.
+
+The earlier dispatch authorization named Google Gemini, while the persisted pair identifies
+NVIDIA Llama and the wrapper reported `FileExistsError`; this provider/authorization divergence
+is preserved as an execution anomaly. The external report claims 9/9 tests, whereas the local
+M41 test file has 3/3; both facts are recorded. The report's concrete event-validation finding
+remains an integrity follow-up. At Founder direction the window is sealed:
+`Sealed: 1 | Remanded: 0 | Remediated: 0`, advancing strict physical progress to
+**`29/48 complete | 19 remaining`**. M42 `[I-LIFETIME-CONFORMANCE]` is opened in
+`reviews/tasks/PAEOS_MILESTONE_42_I_LIFETIME_CONFORMANCE_INTAKE.md`. No retry, fallback,
+promotion, merge, or protected-ref mutation occurred.

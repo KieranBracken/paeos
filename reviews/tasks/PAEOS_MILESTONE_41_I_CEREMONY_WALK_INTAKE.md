@@ -1,6 +1,6 @@
 # PAEOS Milestone 41 Intake — `[I-CEREMONY-WALK]` L02/K1 Ceremony Walk
 
-**Status:** `OPEN/QUEUED`  
+**Status:** `CLOSED/SEALED`
 **Opened:** 2026-09-03  
 **Predecessor:** Milestone 40 `[I-DURABLE-SCARS]`, candidate `a2e3d49bc8cb8a199bf620c9d8ce4ec0f5fe5aac`  
 **Canonical references:** `operations/ENGINEERING_LIFECYCLE.md` (L02, K1 evidence rule),
