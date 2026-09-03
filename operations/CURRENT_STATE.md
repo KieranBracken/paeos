@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 18 `[I-MCP]` physically sealed; Task 19 `[T-NONAUTH]` opened)
+> **Last updated:** 2026-09-03 (Task 19 `[T-NONAUTH]` physical audit qualified; Founder/Court seal pending)
 
-## Current canonical recovery frontier — 2026-09-03 (24/48 physical program seals; Task 18 sealed, Task 19 opened)
+## Current canonical recovery frontier — 2026-09-03 (24/48 physical program seals; Task 19 qualified, seal pending)
 
 - **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–17 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, and Task 18 `[I-MCP]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 19 `[T-NONAUTH]` is queued.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–17 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, and Task 18 `[I-MCP]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 19 `[T-NONAUTH]` has a qualified physical checkpoint awaiting Founder/Court seal.
 - **Strict sealed progress:** **24/48 physical program seals complete | 24 remaining**. Task 18 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
-- **SAKG Subsystem:** Tasks 14–18 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; the earlier Gemini 3.6 rejection remains preserved as non-qualified evidence. Task 19 `[T-NONAUTH]`, Task 20, and Mission 0 remain pending.
+- **SAKG Subsystem:** Tasks 14–18 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; the earlier Gemini 3.6 rejection remains preserved as non-qualified evidence. Task 19 `[T-NONAUTH]` has a qualified Gemini 3.6 A-08 pair and awaits Founder/Court seal; Task 20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1690,3 +1690,26 @@ provider dispatch with `AUDITOR_RECEIPT_FAILED:OperationalError`; no report or r
 created. Physical A-08 is **NOT QUALIFIED**, so strict physical progress remains
 **24/48 complete | 24 remaining** and Task 20 is not opened. The identical command is not retried;
 no fallback, source change, promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 19 `[T-NONAUTH]` physical audit qualified; Founder/Court seal requested
+
+The fresh one-shot Gemini 3.6 audit `l14-l17-sakg-task19-21616d1-gemini36-002` completed with exit
+`0`, `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. The auditor was Google
+`gemini-3.6-flash` / Gemini and the builder was `cline-pass` / `z-ai/glm-5.3-flash` / GLM; A-08
+decorrelation passed with one provider attempt and no fallback used.
+
+Candidate `21616d1ee845eedf093f80c658758ce8d29c20b1` is bound to evidence bundle
+`4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`. The report SHA-256 is
+`b7928de945ce44e3c7511023375cb66c14ce57334e7bef8dbc6acaf409739019`; receipt file SHA-256 is
+`5d9f09e655b4c3de6dfaee3c3e8693ed5d638706a303936366328a9173d9f68f`; and canonical receipt
+SHA-256 is `c1c4ae05662c046be10e0ed99f040d61f2f4b5684a464896e322c011e8e162ce`. The report ends
+with `AUDIT_COMPLETE: true` and records Worker `Admitted: 3 | Rejected: 3 | Remediated: 0` and
+Court `Sealed: 1 | Remanded: 0 | Remediated: 0`.
+
+Task 19 is physically qualified, but no Founder/Court seal is inferred from a transmission
+authorization. Strict physical progress therefore remains **24/48 complete | 24 remaining**.
+The disposition request is recorded in
+`reviews/tasks/PAEOS_SAKG_TASK_19_T_NONAUTH_FOUNDER_COURT_DISPOSITION_REQUEST.md`; the prepared
+Task 20 intake is held and does not claim implementation or seal. The earlier Gemini 3.7
+OperationalError remains preserved as non-qualified evidence. No code change, retry, fallback,
+promotion, merge, or protected-ref mutation occurred.

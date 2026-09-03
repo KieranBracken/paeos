@@ -5546,3 +5546,25 @@ provider dispatch with `AUDITOR_RECEIPT_FAILED:OperationalError`; no report, rec
 response artifact was created. The identical command is not retried. Physical A-08 is **NOT
 QUALIFIED** and strict physical progress remains **24/48 complete | 24 remaining**. No fallback,
 source change, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 301 — 2026-09-03: Task 19 `[T-NONAUTH]` Gemini 3.6 physical audit qualified; seal requested
+
+The newly authorized one-shot audit `l14-l17-sakg-task19-21616d1-gemini36-002` completed with
+exit `0`, `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. Google
+`gemini-3.6-flash` / Gemini audited the `cline-pass` / `z-ai/glm-5.3-flash` / GLM builder;
+A-08 passed with one provider attempt and no fallback used. Candidate
+`21616d1ee845eedf093f80c658758ce8d29c20b1` is bound to bundle
+`4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`.
+
+Report SHA-256 is `b7928de945ce44e3c7511023375cb66c14ce57334e7bef8dbc6acaf409739019`; receipt
+file SHA-256 is `5d9f09e655b4c3de6dfaee3c3e8693ed5d638706a303936366328a9173d9f68f`; canonical
+receipt SHA-256 is `c1c4ae05662c046be10e0ed99f040d61f2f4b5684a464896e322c011e8e162ce`.
+The report contains `AUDIT_COMPLETE: true`, Worker `Admitted: 3 | Rejected: 3 | Remediated: 0`,
+and Court `Sealed: 1 | Remanded: 0 | Remediated: 0`. Local Task 19 evidence remains separately
+sealed and non-vacuous with 8/8 focused tests, clean import-boundary verification, Ruff, and
+Pyright.
+
+This is a qualified physical checkpoint, not a Founder/Court seal. Strict physical progress
+therefore remains **24/48 complete | 24 remaining**; Task 20 is prepared but not opened. The
+earlier Gemini 3.7 OperationalError attempt remains preserved. No retry, fallback, source change,
+promotion, merge, or protected-ref mutation occurred.

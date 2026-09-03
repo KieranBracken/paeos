@@ -1456,6 +1456,18 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   rejection remains preserved. No retry, fallback, source change, promotion, merge, or
   protected-ref mutation occurred.
 
+- 2026-09-03 Task 19 `[T-NONAUTH]` fresh Gemini 3.6 physical audit
+  `l14-l17-sakg-task19-21616d1-gemini36-002` completed once with exit `0`,
+  `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. Candidate
+  `21616d1ee845eedf093f80c658758ce8d29c20b1` is bound to bundle
+  `4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`; report SHA-256 is
+  `b7928de945ce44e3c7511023375cb66c14ce57334e7bef8dbc6acaf409739019`, receipt file SHA-256 is
+  `5d9f09e655b4c3de6dfaee3c3e8693ed5d638706a303936366328a9173d9f68f`, and canonical receipt
+  SHA-256 is `c1c4ae05662c046be10e0ed99f040d61f2f4b5684a464896e322c011e8e162ce`. Gemini audited
+  the GLM builder with A-08 `PASS`; no fallback was used. The checkpoint is qualified but awaits
+  Founder/Court sealing, so strict progress remains `24/48 complete | 24 remaining`; Task 20 is
+  prepared but not opened. No retry, source change, promotion, merge, or protected-ref mutation occurred.
+
 - 2026-09-03 Task 19 `[T-NONAUTH]` local SoftLoop run `t-nonauth-trace-a-actual-014` sealed in
   `/private/tmp/paeos-tnonauth-actual-run-014`: expected RED exit `2`, GREEN Court exit `0` with
   8 focused tests, import-boundary exit `0`, Pyright exit `0`, and Ruff exit `0`. Local seal is
