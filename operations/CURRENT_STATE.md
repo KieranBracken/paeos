@@ -3,11 +3,11 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 18 `[I-MCP]` locally sealed; physical A-08 audit pending)
+> **Last updated:** 2026-09-03 (Task 18 `[I-MCP]` locally sealed; authorized Gemini 3.6 audit rejected)
 
-## Current canonical recovery frontier — 2026-09-03 (23/48 physical program seals; Task 18 local seal, physical audit pending)
+## Current canonical recovery frontier — 2026-09-03 (23/48 physical program seals; Task 18 local seal, physical audit rejected)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `HEAD c897a85`; Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `HEAD 54322c4`; Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
 - **Gate status:** Gates A–F **SEALED**; SAKG Task 01–16 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, and Task 17 `[I-TRADEOFF]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 18 `[I-MCP]` is queued.
 - **Strict sealed progress:** **23/48 physical program seals complete | 25 remaining**. Task 17 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
