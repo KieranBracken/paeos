@@ -12,7 +12,7 @@
 - **Strict sealed progress:** **18/48 physical program seals complete | 30 remaining**. Tasks 12 and 13 each have local Court seals, but neither has an independent candidate-bound physical L14/L17 A-08 receipt yet, so the physical-program counter is not advanced.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
-- **Open debt:** `DEBT-0060` and `RB-0027` remain open; Task 12 remand debt `DEBT-0063` and follow-on friction records `DEBT-0064`–`DEBT-0067` are closed/repaid. Gate G remains unproven.
+- **Open debt:** `DEBT-0060`, `RB-0027`, and `DEBT-0068` remain open; Task 12 remand debt `DEBT-0063` and follow-on friction records `DEBT-0064`–`DEBT-0067` are closed/repaid. Gate G remains unproven.
 - **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests but remain held from strict advancement; Task 12 is locally Court-sealed; Task 13 is locally Court-sealed with 16/16 scoped tests and 115/115 SAKG tests green, but has no physical A-08 receipt; Tasks 14–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
