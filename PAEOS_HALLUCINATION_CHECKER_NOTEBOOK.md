@@ -5099,3 +5099,33 @@ Disposition: **Task 13 REMANDED / NOT SEALED**. Strict program progress remains
 mutation occurred. Required next step is an authorized integration seam that lands the strong
 implementation in the recovery candidate, adds discriminating negative/namespace/confidence/type
 fixtures, and obtains a fresh Court plus heterogeneous L14/L17 review.
+
+### Entry 282 — 2026-09-03: Task 13 remediation locally Court-sealed; physical A-08 remains pending
+
+The authorized recovery-only integration landed the verified strong CAS implementation in commit
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`. The committed
+`sakg/methods/tradeoff_precedents.py` SHA-256 is
+`551344f9deba9a67a8a9435b4412de7fdb542c9400189f8a98917f032bb37b75`, exactly matching the
+requested CAS artifact. Discriminating P1–P5 probes plus malformed-threshold coverage were added
+at `tests/sakg/test_tradeoff_precedents_adversarial.py`.
+
+Post-integration verification is **16/16 Task 13 tests passed**, **115/115 `tests/sakg` tests
+passed**, Ruff clean, Pyright clean, and `check_ast()` clean. A single live GLM attempt failed
+before Court execution with exit `1` (`SecItemCopyMatching failed -50`); no retry, fallback,
+credential change, or provider substitution occurred.
+
+The corrected hermetic final SoftLoop window used state root
+`/private/tmp/paeos-ftradeoff-run-final-scripted-002`, run `r-final-scripted-002`, goal
+`g-4c1eb3ade75c`, and synthetic worker `scripted-final-worker-002`. Court reproduction returned
+`SEALED`, exit `0`, with seal hash
+`8270dedaecf61e7deb45c660abe2e49a1ec5ac974b7f5f312a8abbb8549c9289`, verified ledger head
+`5c7e95958dc72c2e6027ff4388cf6eea6343b0960b8a381641debfa5c1efb3d9`, and SealCommitted artifact
+bundle `8da642ce2ccc6103c15f8e1ee141eb1db58ab5c703c252306c4a97e0a447ecfb`. The final local
+window is **Sealed: 1 | Remanded: 0 | Remediated: 0**; the four earlier windows remain
+**Sealed: 0 | Remanded: 4 | Remediated: 0**.
+
+This successful worker was scripted, so Builder != Auditor is not established and no physical
+heterogeneous Gemini L14/L17 receipt exists for `b2ef99c`. The strict physical program counter
+therefore remains **18/48 complete | 30 remaining** and Task 14 remains held. The bounded local
+record is `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_LOCAL_COURT_SEAL.md`; no self-ratification,
+main/trunk promotion, or protected-ref mutation occurred.

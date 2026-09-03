@@ -1261,4 +1261,28 @@ evidence and Founder/Court disposition are mandatory.
   method fails closed-link, namespace, confidence, and typing invariants. Exact window accounting:
   **Sealed: 0 | Remanded: 4 | Remediated: 0**. Task 13 is not sealed; Task 14 is held; strict
   program progress remains **18/48 complete | 30 remaining**. See
-  `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_REMAND.md` for the full evidence binding.
+`reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_REMAND.md` for the full evidence binding.
+
+- 2026-09-03 Task 13 remediation landed on the recovery branch in commit
+  `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`. The committed
+  `sakg/methods/tradeoff_precedents.py` SHA-256 is
+  `551344f9deba9a67a8a9435b4412de7fdb542c9400189f8a98917f032bb37b75`, matching the authorized
+  strong CAS artifact. New P1–P5 probes plus malformed-threshold coverage are committed in
+  `tests/sakg/test_tradeoff_precedents_adversarial.py`.
+
+- Post-integration checks were **16/16 Task 13 tests**, **115/115 tests/sakg tests**, Ruff,
+  Pyright, and AST clean. The one live GLM attempt failed before Court execution with exit `1`
+  (`SecItemCopyMatching failed -50`); no retry or fallback occurred.
+
+- A corrected hermetic SoftLoop run (`r-final-scripted-002`, goal `g-4c1eb3ade75c`, state root
+  `/private/tmp/paeos-ftradeoff-run-final-scripted-002`) reproduced exactly and returned local
+  `SEALED`, exit `0`; seal hash `8270dedaecf61e7deb45c660abe2e49a1ec5ac974b7f5f312a8abbb8549c9289`,
+  verified ledger head `5c7e95958dc72c2e6027ff4388cf6eea6343b0960b8a381641debfa5c1efb3d9`, and
+  artifact bundle `8da642ce2ccc6103c15f8e1ee141eb1db58ab5c703c252306c4a97e0a447ecfb`. Local
+  window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**; the four earlier windows
+  remain **0 | 4 | 0**.
+
+- This was a scripted worker run, not a physical provider invocation, so Builder != Auditor is
+  not established. No candidate-bound heterogeneous Gemini L14/L17 receipt exists. Strict
+  physical progress therefore remains **18/48 complete | 30 remaining** and Task 14 is held.
+  See `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_LOCAL_COURT_SEAL.md` for the bounded record.

@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 13 F-TRADEOFF-FIX remanded; Task 14 held)
+> **Last updated:** 2026-09-03 (Task 13 locally Court-sealed after remediation; physical A-08 pending; Task 14 held)
 
-## Current canonical recovery frontier — 2026-09-03 (18/48 physical program seals; Task 13 remanded)
+## Current canonical recovery frontier — 2026-09-03 (18/48 physical program seals; Task 13 local seal, physical A-08 pending)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `af601ffe1386735c5e0c76bc332dfa2ce0b81d0a`; `main` remains at `0d86e5c` (recovery is ahead; no promotion performed).
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence remains **HELD** pending metadata reconciliation; Task 12 `[F-BUDGET-FIX]` reached a local Court **SEALED** outcome; Task 13 `[F-TRADEOFF-FIX]` has four remanded windows and is not sealed; Task 14 is held.
-- **Strict sealed progress:** **18/48 physical program seals complete | 30 remaining**. Task 12 adds one local Court seal (19 operational Court seals) but has no independent physical L14/L17 A-08 receipt yet, so the physical-program counter is not advanced.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`; `main` remains at `0d86e5c` (recovery is ahead; no promotion performed).
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence remains **HELD** pending metadata reconciliation; Task 12 `[F-BUDGET-FIX]` is locally Court **SEALED**; Task 13 `[F-TRADEOFF-FIX]` is locally Court **SEALED** after the strong CAS implementation was integrated and P1–P5 probes passed; Task 14 remains held pending physical A-08 qualification.
+- **Strict sealed progress:** **18/48 physical program seals complete | 30 remaining**. Tasks 12 and 13 each have local Court seals, but neither has an independent candidate-bound physical L14/L17 A-08 receipt yet, so the physical-program counter is not advanced.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; Task 12 remand debt `DEBT-0063` and follow-on friction records `DEBT-0064`–`DEBT-0067` are closed/repaid. Gate G remains unproven.
-- **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests but remain held from strict advancement; Task 12 is locally Court-sealed; Task 13 has 10/10 local tests but no admissible Court seal; Tasks 14–20 and Mission 0 remain pending.
+- **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests but remain held from strict advancement; Task 12 is locally Court-sealed; Task 13 is locally Court-sealed with 16/16 scoped tests and 115/115 SAKG tests green, but has no physical A-08 receipt; Tasks 14–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1333,3 +1333,32 @@ Task 13 accounting for this window is **Sealed: 0 | Remanded: 4 | Remediated: 0*
 strict program count remains **18/48 complete | 30 remaining**; no Task 13 seal or Task 14 dispatch
 is admitted. The raw findings and required remediation are recorded in
 `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_REMAND.md` and debts `DEBT-0068`, `RB-0027`–`RB-0029`.
+
+## 2026-09-03 — Task 13 F-TRADEOFF-FIX remediation locally Court-sealed
+
+The authorized recovery integration landed the strong CAS implementation in commit
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`. The committed
+`sakg/methods/tradeoff_precedents.py` has SHA-256
+`551344f9deba9a67a8a9435b4412de7fdb542c9400189f8a98917f032bb37b75`, exactly matching the
+requested CAS artifact. The discriminating P1–P5 adversarial probes (plus malformed-threshold
+coverage) are in `tests/sakg/test_tradeoff_precedents_adversarial.py` and cover negated links,
+namespace, confidence, and strict node typing.
+
+Fresh verification after integration returned **16/16 Task 13 tests passed**, **115/115 tests/sakg
+tests passed**, Ruff clean, Pyright clean, and no `check_ast()` anti-pattern violations. A live
+GLM worker attempt was made once and failed before Court execution with exit `1` due to
+`SecItemCopyMatching failed -50`; no retry or fallback occurred.
+
+The corrected hermetic SoftLoop window at
+`/private/tmp/paeos-ftradeoff-run-final-scripted-002` (`r-final-scripted-002`, goal
+`g-4c1eb3ade75c`) reproduced exactly and returned a local `SEALED` outcome (exit `0`). Seal hash
+is `8270dedaecf61e7deb45c660abe2e49a1ec5ac974b7f5f312a8abbb8549c9289`; verified ledger head is
+`5c7e95958dc72c2e6027ff4388cf6eea6343b0960b8a381641debfa5c1efb3d9`; the SealCommitted artifact
+bundle is `8da642ce2ccc6103c15f8e1ee141eb1db58ab5c703c252306c4a97e0a447ecfb`.
+
+Task 13 local-window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0** after four
+earlier preserved remands (**0 | 4 | 0**). Because the successful worker identity is scripted and
+there is no candidate-bound physical non-GLM receipt, this is not an A-08 L14/L17 seal and does
+not advance the strict physical counter. Canonical progress remains **18/48 complete | 30
+remaining**; Task 14 remains held. The full bounded record is in
+`reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_LOCAL_COURT_SEAL.md`.
