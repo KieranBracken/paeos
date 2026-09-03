@@ -1250,3 +1250,15 @@ evidence and Founder/Court disposition are mandatory.
   shell-free absolute-venv `pytest -qq` command and were independently reproduced as
   non-vacuous. Task 12 is locally Court-sealed; physical heterogeneous L14/L17 qualification
   remains pending. No promotion, merge, or main/trunk mutation occurred.
+
+- 2026-09-03 Task 13 `[F-TRADEOFF-FIX]`: local scoped suites passed **10/10** and static checks
+  were clean, but four distinct SoftLoop windows were remanded (Court JSONL SHA-256 values:
+  `83f6194306337f65d2a88de12931adf796494c2625ee189bfe5e956e5869374e`,
+  `3f5660ed1cf490fee585cb757deaf8923b7e9b2fe401fd0dd15e1b3dab174ae9`,
+  `996a6efb27a2f0003e8baf252746ff615c91c32818d4f3a479e55ddb5da43747`,
+  `6173020693c1e52d38b1212736f4c0f97f1eab381866e75d39a4a3f92c4871e7`). The latest adversary
+  found the strong worker artifact was only in CAS, not the committed tree, and the committed
+  method fails closed-link, namespace, confidence, and typing invariants. Exact window accounting:
+  **Sealed: 0 | Remanded: 4 | Remediated: 0**. Task 13 is not sealed; Task 14 is held; strict
+  program progress remains **18/48 complete | 30 remaining**. See
+  `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_REMAND.md` for the full evidence binding.

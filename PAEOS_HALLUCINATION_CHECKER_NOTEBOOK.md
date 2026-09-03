@@ -5066,3 +5066,36 @@ The control-plane physical count remains **18/48 complete | 30 remaining**; loca
 accounting for this window is **Sealed: 1 | Remanded: 5 | Remediated: 5**. Task 13
 `[F-TRADEOFF-FIX]` is the next queued frontier and has not been started. No promotion, merge,
 main/trunk mutation, or external audit claim was made.
+
+### Entry 281 — 2026-09-03: Task 13 F-TRADEOFF-FIX remanded after substantive adversarial findings
+
+The five Task 13 tradeoff fixture/precedent suites were independently run once against the
+recovery checkout with the repository Python 3.13 environment: **10/10 passed**, exit `0`; Ruff
+and Pyright over `sakg/ tests/sakg/` were clean. This local result is not a Court seal and does not
+establish Builder != Auditor.
+
+Four distinct SoftLoop windows were dispatched with no fallback or identical rerun. Their exact
+Court JSONL SHA-256 values are:
+
+* `r-5d109410`: `83f6194306337f65d2a88de12931adf796494c2625ee189bfe5e956e5869374e`
+* `r-c265642d`: `3f5660ed1cf490fee585cb757deaf8923b7e9b2fe401fd0dd15e1b3dab174ae9`
+* `r-456aa82b`: `996a6efb27a2f0003e8baf252746ff615c91c32818d4f3a479e55ddb5da43747`
+* `r-ab48d6e2`: `6173020693c1e52d38b1212736f4c0f97f1eab381866e75d39a4a3f92c4871e7`
+
+All four exited `2` with `REMANDED`; exact Task 13 window accounting is **Sealed: 0 | Remanded:
+4 | Remediated: 0**. The latest state-root ledger verifies to head
+`b640986594ba8e38a77556e0608e31e1cb244eec079b4867f634be3f07a6574f`.
+
+The latest adversary report (CAS
+`cas/9f/bd51416c6a2a64cebcac0aa840de82ba6dc10b64e315bbc9409886c68aad5b`) is preserved as raw
+evidence. It proves the strong artifact hash
+`551344f9deba9a67a8a9435b4412de7fdb542c9400189f8a98917f032bb37b75` was never committed; the
+live method hash is `6966e85136f322362d409fa2a0099c810f4f200d441ab5218944b50f70f24d2d` and fails
+closed-link, namespace, min-confidence, and strict-typing probes. The `builds` claim reproduces
+only against the uncommitted CAS bytes and the `unit` claim is non-discriminating.
+
+Disposition: **Task 13 REMANDED / NOT SEALED**. Strict program progress remains
+**18/48 complete | 30 remaining** and Task 14 is held. No code, promotion, merge, or main/trunk
+mutation occurred. Required next step is an authorized integration seam that lands the strong
+implementation in the recovery candidate, adds discriminating negative/namespace/confidence/type
+fixtures, and obtains a fresh Court plus heterogeneous L14/L17 review.
