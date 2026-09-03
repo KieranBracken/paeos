@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 13 locally Court-sealed after remediation; physical A-08 pending; Task 14 held)
+> **Last updated:** 2026-09-03 (Task 14 `[I-BACKFILL]` physically qualified and Court-sealed; Task 15 `[I-TRAVERSE]` queued)
 
-## Current canonical recovery frontier — 2026-09-03 (18/48 physical program seals; Task 13 local seal, physical A-08 pending)
+## Current canonical recovery frontier — 2026-09-03 (20/48 physical program seals; Task 15 queued)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD`; the Task 13 implementation is at `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`; `main` remains at `0d86e5c` (recovery is ahead; no promotion performed).
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–11 evidence remains **HELD** pending metadata reconciliation; Task 12 `[F-BUDGET-FIX]` is locally Court **SEALED**; Task 13 `[F-TRADEOFF-FIX]` is locally Court **SEALED** after the strong CAS implementation was integrated and P1–P5 probes passed; Task 14 remains held pending physical A-08 qualification.
-- **Strict sealed progress:** **18/48 physical program seals complete | 30 remaining**. Tasks 12 and 13 each have local Court seals, but neither has an independent candidate-bound physical L14/L17 A-08 receipt yet, so the physical-program counter is not advanced.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD`; Task 14 candidate is `542ebba88467629d3d68c335cb2720dbf8025cb2`; no promotion to `main` or protected-ref mutation occurred.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–13 records remain governed by their candidate-bound checkpoints; Task 14 `[I-BACKFILL]` is **COURT_SEALED** with qualified Gemini 3.7 A-08 evidence; Task 15 `[I-TRAVERSE]` is queued.
+- **Strict sealed progress:** **20/48 physical program seals complete | 28 remaining**. Task 14 local and physical evidence are both recorded; the stale historical Task 14/15 labels are preserved and superseded by the canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
-- **Open debt:** `DEBT-0060`, `RB-0027`, and `DEBT-0068` remain open; Task 12 remand debt `DEBT-0063` and follow-on friction records `DEBT-0064`–`DEBT-0067` are closed/repaid. Gate G remains unproven.
-- **SAKG Subsystem:** Tasks 01–11 have qualified local L14/L17 pairs and 106 focused tests but remain held from strict advancement; Task 12 is locally Court-sealed; Task 13 is locally Court-sealed with 16/16 scoped tests and 115/115 SAKG tests green, but has no physical A-08 receipt; Tasks 14–20 and Mission 0 remain pending.
+- **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
+- **SAKG Subsystem:** Task 14 `[I-BACKFILL]` is physically qualified and Court-sealed with six focused tests; Task 15 `[I-TRAVERSE]` is the next canonical queued intake; Tasks 16–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1470,3 +1470,26 @@ Task 14's local `[I-BACKFILL]` SoftLoop/Court run remains sealed with seal hash
 passing. The missing heterogeneous audit keeps Task 14 held: strict physical progress is
 **19/48 complete | 29 remaining**. Window accounting remains **Sealed: 1 | Remanded: 4 |
 Remediated: 0**. No promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 14 `[I-BACKFILL]` physical Gemini 3.7 audit qualified and sealed
+
+The candidate-bound physical pair for Task 14 is now present and mechanically verified. Candidate
+`542ebba88467629d3d68c335cb2720dbf8025cb2`, evidence bundle
+`5e4d85030484cf9350c97f89753a3baafc574d45cbae9634996c92c017ea0fa9`, and prompt SHA-256
+`449ad06bebae2a07d48feb597343edadeefe80382baef84fd01243ba0194cadc` all match the receipt
+contract. The report SHA-256 is `6b5cc4cb8223f0e70d42a04d8d2ed93f47331c05646158a0feee783c76e6aae6`.
+
+The physical receipt file SHA-256 is `32db4d7f796dad4ff95fd16572ddbca7122bfc23d2b90bb6cc5fefa54c19e552`;
+its canonical schema SHA-256 is `194dce44c75f162eecf7ca9e93167f6dd32e20ae053df9b62def2f9736f97768`.
+It records Google `gemini-3.7-flash` (Gemini family) as auditor versus the recorded
+`cline-pass` / `z-ai/glm-5.3-flash` (GLM family) builder, one provider attempt, and A-08 `PASS`.
+The artifact-pair validator returned `report_status=PASS`, `a08_verdict=PASS`, and
+`qualified=True`; the report ends with `AUDIT_COMPLETE: true`.
+
+The Founder-provided `COURT_SEALED` disposition is recorded in
+`reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_FOUNDER_COURT_DISPOSITION.md`, with the physical
+checkpoint in `reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_PHYSICAL_L14_L17_CHECKPOINT.md`.
+Task 14 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical
+progress advances to **20/48 complete | 28 remaining**. Canonical Task 15 `[I-TRAVERSE]` is
+opened and queued in `reviews/tasks/PAEOS_SAKG_TASK_15_I_TRAVERSE_INTAKE.md`; stale historical
+Task 14/15 labels remain unchanged. No promotion, merge, or protected-ref mutation occurred.

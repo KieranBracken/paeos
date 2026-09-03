@@ -5238,3 +5238,25 @@ acceptance tests pass. Because the heterogeneous physical audit is unqualified, 
 held and strict physical progress remains **19/48 complete | 29 remaining**. Worker/Court
 window accounting is unchanged at **Sealed: 1 | Remanded: 4 | Remediated: 0**; no promotion,
 merge, or protected-ref mutation occurred.
+
+### Entry 288 — 2026-09-03: Task 14 physical Gemini 3.7 audit qualified; Task 15 opened
+
+The candidate-bound physical pair for Task 14 `[I-BACKFILL]` was mechanically verified. Candidate
+`542ebba88467629d3d68c335cb2720dbf8025cb2`, evidence bundle
+`5e4d85030484cf9350c97f89753a3baafc574d45cbae9634996c92c017ea0fa9`, and prompt SHA-256
+`449ad06bebae2a07d48feb597343edadeefe80382baef84fd01243ba0194cadc` match the receipt contract.
+The report SHA-256 is `6b5cc4cb8223f0e70d42a04d8d2ed93f47331c05646158a0feee783c76e6aae6`.
+
+The raw receipt file SHA-256 is `32db4d7f796dad4ff95fd16572ddbca7122bfc23d2b90bb6cc5fefa54c19e552`;
+the canonical receipt SHA-256 is `194dce44c75f162eecf7ca9e93167f6dd32e20ae053df9b62def2f9736f97768`.
+The receipt records Google `gemini-3.7-flash` / Gemini as auditor against `cline-pass` /
+`z-ai/glm-5.3-flash` / GLM builder, one attempt, and A-08 `PASS`. The artifact-pair validator
+returned `report_status=PASS`, `a08_verdict=PASS`, `qualified=True`; the report contains
+`AUDIT_COMPLETE: true`.
+
+The Founder-provided `COURT_SEALED` disposition is recorded in the new Task 14 checkpoint and
+disposition files. Local reproduction independently returned six focused tests, Ruff, and
+Pyright with exit `0`. Task 14 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**;
+strict physical progress advances from **19/48** to **20/48 complete | 28 remaining**. Canonical
+Task 15 `[I-TRAVERSE]` is opened and queued; its stale historical review files are preserved.
+No main/trunk promotion or protected-ref mutation occurred.
