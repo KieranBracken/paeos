@@ -1671,3 +1671,22 @@ progress advances to **24/48 complete | 24 remaining**. Task 19 `[T-NONAUTH]` is
 
 The earlier authorized Gemini 3.6 rejection remains preserved as non-qualified evidence. No
 retry, fallback, source mutation, promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 19 `[T-NONAUTH]` local seal; physical Gemini 3.7 audit blocked
+
+The isolated local SoftLoop run `t-nonauth-trace-a-actual-014` sealed under
+`/private/tmp/paeos-tnonauth-actual-run-014`. The expected RED phase exited `2` without
+`sakg/mcp_server.py`; the GREEN Court phase passed all 8 focused non-authority tests with exit `0`.
+The PAEOS import-boundary check, Pyright over `sakg/`, and Ruff over `sakg/` plus the focused tests
+each exited `0`. Local seal is
+`d9e2c19ccc9f15fad293e62e9ee3ddecd5fca0ae1721ac62adb2d942af73f7cc`; local artifact bundle is
+`a911ec40b0df67f88b025ea09807ab98493fc1059c74434da732d31d2a67c18b`; local ledger head is
+`a13a0c67c540e3352eb343b1f776a31de97d9c3a3544096eaf8b5e31dfe3db8a`.
+
+Candidate-bound physical bundle `4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`
+targets candidate `21616d1ee845eedf093f80c658758ce8d29c20b1`. The requested one-shot audit
+`l14-l17-sakg-task19-21616d1-gemini37-001` for Google `gemini-3.7-flash` exited `2` before
+provider dispatch with `AUDITOR_RECEIPT_FAILED:OperationalError`; no report or receipt artifact was
+created. Physical A-08 is **NOT QUALIFIED**, so strict physical progress remains
+**24/48 complete | 24 remaining** and Task 20 is not opened. The identical command is not retried;
+no fallback, source change, promotion, merge, or protected-ref mutation occurred.

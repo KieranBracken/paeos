@@ -1455,3 +1455,15 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   `24/48 complete | 24 remaining`, and Task 19 `[T-NONAUTH]` is opened. The prior Gemini 3.6
   rejection remains preserved. No retry, fallback, source change, promotion, merge, or
   protected-ref mutation occurred.
+
+- 2026-09-03 Task 19 `[T-NONAUTH]` local SoftLoop run `t-nonauth-trace-a-actual-014` sealed in
+  `/private/tmp/paeos-tnonauth-actual-run-014`: expected RED exit `2`, GREEN Court exit `0` with
+  8 focused tests, import-boundary exit `0`, Pyright exit `0`, and Ruff exit `0`. Local seal is
+  `d9e2c19ccc9f15fad293e62e9ee3ddecd5fca0ae1721ac62adb2d942af73f7cc`; local artifact bundle is
+  `a911ec40b0df67f88b025ea09807ab98493fc1059c74434da732d31d2a67c18b`.
+  Candidate-bound audit bundle `4f23267a73f4c13a13608596f9c1a169c47f58217a5c22cf9a7bc7f2862b0dd2`
+  targeted candidate `21616d1ee845eedf093f80c658758ce8d29c20b1`. Gemini 3.7 audit
+  `l14-l17-sakg-task19-21616d1-gemini37-001` exited `2` before provider dispatch with
+  `AUDITOR_RECEIPT_FAILED:OperationalError`; no report/receipt was created. Physical A-08 is
+  **NOT QUALIFIED**, strict progress remains `24/48 complete | 24 remaining`, and Task 20 is not
+  opened. No retry, fallback, source change, promotion, merge, or protected-ref mutation occurred.
