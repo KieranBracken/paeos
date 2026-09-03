@@ -1409,4 +1409,16 @@ evidence and Founder/Court disposition are mandatory.
   report/receipt/metadata artifacts and hashes are recorded in Notebook Entry 295. A separate
   Gemini 3.7 artifact appeared under an unauthorized audit ID and is excluded. No retry,
   fallback, source change, promotion, merge, or protected-ref mutation occurred; Task 17 remains
-  physically unqualified and strict progress remains `22/48 complete | 26 remaining`.
+physically unqualified and strict progress remains `22/48 complete | 26 remaining`.
+
+- 2026-09-03 Task 17 `[I-TRADEOFF]` Founder/Court disposition is `COURT_SEALED` after mechanical
+  verification of the authorized Gemini 3.7 pair for candidate
+  `d612230d90773d2eca7221a2553038b064e36f8b` and bundle
+  `8b721a72e7f003a910ecbc6d6d8b4afd40108b11c1c9022380b919e4ccd2b6d4`. Audit ID
+  `l14-l17-d612230-gemini37-002` returned report status `PASS`, A-08 `PASS`, and `qualified=True`
+  with one provider attempt. Report SHA-256 is
+  `3de39fcee90c39a9e3c0bd96525d1328390f43a8789f5b24b283260fa5631df5`; canonical receipt SHA-256
+  is `c0dff9978e1bc840371f7f1fb2c071b5eae1a208e3abff63e320300903da960e`. The local SoftLoop
+  evidence had 16/16 tests, method-count `1`, and Pyright exit `0`. Strict physical progress is
+  now `23/48 complete | 25 remaining`; canonical Task 18 `[I-MCP]` is opened. No promotion,
+  merge, retry, fallback, source change, or protected-ref mutation occurred.

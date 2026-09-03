@@ -5432,3 +5432,25 @@ covered by the 3.6 authorization and is explicitly excluded from accounting. Tas
 physically unqualified; local SoftLoop evidence remains `SEALED` with 16/16 tests, and strict
 physical progress remains **22/48 complete | 26 remaining**. No retry, fallback, source change,
 promotion, merge, or protected-ref mutation occurred.
+
+### Entry 296 — 2026-09-03: Task 17 Gemini 3.7 physical pair qualified; Founder seal recorded; Task 18 opened
+
+The Founder authorized the candidate-bound Task 17 physical audit bundle
+`8b721a72e7f003a910ecbc6d6d8b4afd40108b11c1c9022380b919e4ccd2b6d4` for Google
+`gemini-3.7-flash` and accepted audit ID `l14-l17-d612230-gemini37-002`. Mechanical artifact-pair
+adjudication verified candidate `d612230d90773d2eca7221a2553038b064e36f8b`, report status `PASS`,
+A-08 `PASS` (Gemini family auditor versus GLM family builder), and `qualified=True`.
+
+The report SHA-256 is `3de39fcee90c39a9e3c0bd96525d1328390f43a8789f5b24b283260fa5631df5`; the
+raw receipt file SHA-256 is `528154aada2c322ea7cbc96ff9b453e50e0ab60ad853ce58449af903084b9f78`; and
+the canonical receipt SHA-256 is `c0dff9978e1bc840371f7f1fb2c071b5eae1a208e3abff63e320300903da960e`.
+The report contains exactly one final `AUDIT_COMPLETE: true` marker and binds the bundle and
+candidate. The earlier authorized Gemini 3.6 attempt remains preserved as a rejection and is not
+substituted.
+
+The local actual SoftLoop was already `SEALED` with 16/16 tradeoff tests, method-count `1`, and
+Pyright exit `0`. The Founder/Court `COURT_SEALED` disposition is recorded in the Task 17 physical
+checkpoint and disposition files. Task 17 window accounting is **Sealed: 1 | Remanded: 0 |
+Remediated: 0**; strict physical progress advances from **22/48** to **23/48 complete | 25
+remaining**. Canonical Task 18 `[I-MCP]` is opened. No retry, fallback, source change, promotion,
+merge, or protected-ref mutation occurred.

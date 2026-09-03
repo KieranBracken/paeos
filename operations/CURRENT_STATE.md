@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 16 `[I-PROJ]` physically qualified and Court-sealed; Task 17 queued)
+> **Last updated:** 2026-09-03 (Task 17 `[I-TRADEOFF]` physically qualified and Court-sealed; Task 18 queued)
 
-## Current canonical recovery frontier — 2026-09-03 (21/48 physical program seals; Task 16 queued)
+## Current canonical recovery frontier — 2026-09-03 (23/48 physical program seals; Task 18 queued)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD`; Task 15 candidate is `fbb52403b16af0a581848938f274fd266ec0cd9e`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–14 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]` and Task 16 `[I-PROJ]` are **COURT_SEALED** with qualified Gemini 3.7 A-08 evidence; Task 17 `[I-TRADEOFF]` is queued.
-- **Strict sealed progress:** **21/48 physical program seals complete | 27 remaining**. Task 15 local and physical evidence are both recorded; stale historical Task 15/16 labels are preserved and superseded by the canonical intake names.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `HEAD d612230d90773d2eca7221a2553038b064e36f8b`; Task 17 candidate is this commit; no promotion to `main` or protected-ref mutation occurred.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–16 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, and Task 17 `[I-TRADEOFF]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 18 `[I-MCP]` is queued.
+- **Strict sealed progress:** **23/48 physical program seals complete | 25 remaining**. Task 17 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
-- **SAKG Subsystem:** Task 14 `[I-BACKFILL]`, Task 15 `[I-TRAVERSE]`, and Task 16 `[I-PROJ]` are physically qualified and Court-sealed; Task 16 has 15 actual projection tests plus clean Ruff/Pyright. Task 17 `[I-TRADEOFF]` is the next canonical queued intake; Tasks 18–20 and Mission 0 remain pending.
+- **SAKG Subsystem:** Task 14 `[I-BACKFILL]`, Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, and Task 17 `[I-TRADEOFF]` are physically qualified and Court-sealed. Task 17 has 16 tradeoff tests, exactly one method module, and clean Pyright/Ruff. Task 18 `[I-MCP]` is the next canonical queued intake; Tasks 19–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
