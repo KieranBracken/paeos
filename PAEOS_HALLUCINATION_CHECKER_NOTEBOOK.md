@@ -5333,3 +5333,73 @@ Task 15 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**; strict
 progress advances from **20/48** to **21/48 complete | 27 remaining**. Canonical Task 16
 `[I-PROJ]` is opened and queued; stale historical Task 15/16 labels remain preserved. No
 promotion, merge, or protected-ref mutation occurred.
+
+### Entry 292 — 2026-09-03: Task 16 `[I-PROJ]` local Court seal; physical A-08 hold
+
+The actual repository implementation and test files for the canonical projection intake were
+exercised in a fresh isolated SoftLoop window at `/private/tmp/paeos-iproj-actual-run-008`.
+The red phase exited `2` with `ModuleNotFoundError: sakg.project`, as expected before the
+implementation was present. The hermetic Court evidence phase exited `0` with 15 projection
+tests passing. Local SoftLoop status is `SEALED`; seal hash
+`2645db5e6e23b1f76726a555ef5ee9d44a4835d7b12a7328c37eeb6054ce1a5b`, artifact bundle
+`31f658d7c00169139c87d4a3ef4f509845a19e635b3dec0df89878b755a03bb2`, verdict reference
+`5bc8d2b8d3bd0fcb7233390b942ce4508d3ef0fa46d0ff98477f8f2e9a2bc977`, adversary reference
+`db9ab3d16d3de1b175f1b54aad56bd081aa8bdd8d0c6dcc8bcdd6ca124d794d8`, and ledger head
+`6fb6b833b6bffd716677621af520f856e725660f0fb608f3f39daafd3de315dc`.
+
+Actual repository checks independently returned 15 projection tests, `pyright sakg/` with zero
+errors/warnings/informations, and `ruff check sakg/ tests/sakg/` clean, all exit `0`. The
+candidate-bound evidence bundle is
+`/private/tmp/paeos-sakg-task-16-l14-l17-bundle-2cedea8.json`, SHA-256
+`227e5f2e6528e16c70b92e86734c2ea187864da2c9019201ee5edc16e057e117`; its audit prompt is
+`/private/tmp/paeos-sakg-task-16-l14-l17-prompt-2cedea8.md`, SHA-256
+`bf03d1e9c67a278f3897fae8ed413c1ba7e7c093a27f30fb6d536b32c8d299bc`, bound to candidate
+`2cedea82da2d775a878055a6d8eb3dd05c929883`.
+
+The bundle records a material canonical filename drift: the intake requires
+`tests/sakg/test_projection.py`, which is absent; `tests/sakg/test_sakg_projection.py` is the
+present functional equivalent. This is not silently normalized. The scripted local runtime does
+not establish Builder != Auditor, so physical A-08 remains `UNPROVEN`; no milestone increment is
+claimed. Strict physical progress remains **21/48 complete | 27 remaining**, and Task 16 is held
+pending a qualified Gemini 3.7 physical receipt. No provider request, retry, fallback, source
+mutation, promotion, or protected-ref mutation occurred.
+
+### Entry 293 — 2026-09-03: Task 16 authorized Gemini 3.6 dispatch halted by local OperationalError
+
+The exact one-shot authorization for bundle
+`227e5f2e6528e16c70b92e86734c2ea187864da2c9019201ee5edc16e057e117` was executed once under
+audit ID `l14-l17-sakg-task16-2cedea8-gemini36-001`, candidate
+`2cedea82da2d775a878055a6d8eb3dd05c929883`, model `gemini-3.6-flash`, and max tokens 4096 with
+fallback/retry disabled. The command exited `2` with exact output
+`AUDITOR_RECEIPT_FAILED:OperationalError`; no provider report or receipt was created. The
+requested output paths are absent. A separate read-only router-state query could not open the
+SQLite state database (`unable to open database file (14)`), identifying a local control-plane
+storage failure before provider adjudication. The identical command is not retried and no
+provider result is inferred.
+
+Task 16 therefore remains physically unqualified; the local SoftLoop seal and 15-test/Ruff/
+Pyright results remain valid but do not establish A-08. Strict physical progress remains
+**21/48 complete | 27 remaining**. No source, provider configuration, promotion, merge, or
+protected-ref mutation occurred.
+
+### Entry 294 — 2026-09-03: Task 16 `[I-PROJ]` Gemini 3.7 physical audit qualified and Court-sealed
+
+The supplied physical artifact pair for audit ID `l14-l17-2cedea8-gemini37-001` was mechanically
+verified against candidate `2cedea82da2d775a878055a6d8eb3dd05c929883` and evidence bundle
+`227e5f2e6528e16c70b92e86734c2ea187864da2c9019201ee5edc16e057e117`. The report SHA-256 is
+`2d25328ed69a3e37ee0080582016310f0e47307f5a4961f3c9e34e7c234a7ca5`; receipt file SHA-256 is
+`911fda16c4bb35f7654a3cbea31e87b114d878492f19fd21705459192b3c8baf`; canonical receipt
+SHA-256 is `8a9d0bf0b4a61c3b14960f8a755fad98c1d4a5a1ae64cdb63cc2bdea1b601489`.
+
+The receipt records Google `gemini-3.7-flash` / Gemini as auditor versus `cline-pass` /
+`z-ai/glm-5.3-flash` / GLM builder, one provider attempt, and A-08 `PASS`. Artifact-pair
+adjudication returned `report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`; the
+report binds candidate and bundle and ends with `AUDIT_COMPLETE: true`. Local verification
+remains 15 projection tests, Ruff clean, and Pyright clean.
+
+The Founder/Court `COURT_SEALED` disposition is recorded in the Task 16 physical checkpoint and
+disposition files. Task 16 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**;
+strict physical progress advances from **21/48** to **22/48 complete | 26 remaining**. Canonical
+Task 17 `[I-TRADEOFF]` is opened in `reviews/tasks/PAEOS_SAKG_TASK_17_I_TRADEOFF_INTAKE.md`.
+The earlier Gemini 3.6 OperationalError and filename drift remain preserved; no retries,
+fallbacks, source changes, promotion, or protected-ref mutation occurred.

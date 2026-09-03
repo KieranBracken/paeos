@@ -1386,3 +1386,15 @@ evidence and Founder/Court disposition are mandatory.
   (Gemini auditor versus GLM builder), with `qualified=True` and report `PASS`. Founder-provided
   `COURT_SEALED` is recorded; strict progress advances to **21/48 complete | 27 remaining** and
   canonical Task 16 `[I-PROJ]` is opened. No promotion, merge, or protected-ref mutation occurred.
+
+- 2026-09-03 Task 16 `[I-PROJ]` local Court evidence and physical-audit hold: actual repository
+  source/tests were exercised in `/private/tmp/paeos-iproj-actual-run-008`. Red phase exited `2`
+  as expected without `sakg/project.py`; Court evidence exited `0` with 15 tests. Local seal
+  `2645db5e6e23b1f76726a555ef5ee9d44a4835d7b12a7328c37eeb6054ce1a5b`, artifact bundle
+  `31f658d7c00169139c87d4a3ef4f509845a19e635b3dec0df89878b755a03bb2`, and ledger head
+  `6fb6b833b6bffd716677621af520f856e725660f0fb608f3f39daafd3de315dc` are recorded in the
+  checkpoint. Candidate bundle `227e5f2e6528e16c70b92e86734c2ea187864da2c9019201ee5edc16e057e117`
+  is ready for an explicitly authorized Gemini 3.7 one-shot. The required intake filename
+  `tests/sakg/test_projection.py` is absent; present equivalent is
+  `tests/sakg/test_sakg_projection.py`; this drift remains an audit finding. No source or
+  protected-ref mutation occurred and strict progress remains 21/48.

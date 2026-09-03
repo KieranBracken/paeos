@@ -3,17 +3,17 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 15 `[I-TRAVERSE]` physically qualified and Court-sealed; Task 16 `[I-PROJ]` queued)
+> **Last updated:** 2026-09-03 (Task 16 `[I-PROJ]` physically qualified and Court-sealed; Task 17 queued)
 
 ## Current canonical recovery frontier — 2026-09-03 (21/48 physical program seals; Task 16 queued)
 
 - **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD`; Task 15 candidate is `fbb52403b16af0a581848938f274fd266ec0cd9e`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–14 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]` is **COURT_SEALED** with qualified Gemini 3.7 A-08 evidence; Task 16 `[I-PROJ]` is queued.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–14 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]` and Task 16 `[I-PROJ]` are **COURT_SEALED** with qualified Gemini 3.7 A-08 evidence; Task 17 `[I-TRADEOFF]` is queued.
 - **Strict sealed progress:** **21/48 physical program seals complete | 27 remaining**. Task 15 local and physical evidence are both recorded; stale historical Task 15/16 labels are preserved and superseded by the canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
-- **SAKG Subsystem:** Task 14 `[I-BACKFILL]` is physically qualified and Court-sealed; Task 15 `[I-TRAVERSE]` is physically qualified and Court-sealed with 15 focused tests; Task 16 `[I-PROJ]` is the next canonical queued intake; Tasks 17–20 and Mission 0 remain pending.
+- **SAKG Subsystem:** Task 14 `[I-BACKFILL]`, Task 15 `[I-TRAVERSE]`, and Task 16 `[I-PROJ]` are physically qualified and Court-sealed; Task 16 has 15 actual projection tests plus clean Ruff/Pyright. Task 17 `[I-TRADEOFF]` is the next canonical queued intake; Tasks 18–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1557,3 +1557,57 @@ Task 15 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict
 progress advances to **21/48 complete | 27 remaining**. Canonical Task 16 `[I-PROJ]` is opened
 and queued in `reviews/tasks/PAEOS_SAKG_TASK_16_I_PROJ_INTAKE.md`; stale historical Task 15/16
 labels remain unchanged. No promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 16 `[I-PROJ]` local Court seal and physical-audit hold
+
+The actual repository projection implementation and test files were copied into a fresh isolated
+candidate under `/private/tmp/paeos-iproj-actual-run-008`. The expected red phase exited `2` because
+`sakg/project.py` was absent; the Court evidence phase then exited `0` with 15 projection tests
+passing. The local scripted SoftLoop sealed with seal hash
+`2645db5e6e23b1f76726a555ef5ee9d44a4835d7b12a7328c37eeb6054ce1a5b`, artifact bundle
+`31f658d7c00169139c87d4a3ef4f509845a19e635b3dec0df89878b755a03bb2`, verdict reference
+`5bc8d2b8d3bd0fcb7233390b942ce4508d3ef0fa46d0ff98477f8f2e9a2bc977`, adversary reference
+`db9ab3d16d3de1b175f1b54aad56bd081aa8bdd8d0c6dcc8bcdd6ca124d794d8`, and ledger head
+`6fb6b833b6bffd716677621af520f856e725660f0fb608f3f39daafd3de315dc`.
+
+Actual repository verification returned 15 projection tests, Ruff clean, and Pyright clean, all
+with exit code `0`. A candidate-bound bundle was built at
+`/private/tmp/paeos-sakg-task-16-l14-l17-bundle-2cedea8.json` with SHA-256
+`227e5f2e6528e16c70b92e86734c2ea187864da2c9019201ee5edc16e057e117`; its prompt is
+`/private/tmp/paeos-sakg-task-16-l14-l17-prompt-2cedea8.md` with SHA-256
+`bf03d1e9c67a278f3897fae8ed413c1ba7e7c093a27f30fb6d536b32c8d299bc`.
+
+The bundle explicitly records canonical filename drift: the intake names
+`tests/sakg/test_projection.py`, which is absent; `tests/sakg/test_sakg_projection.py` is present.
+The local scripted runtime cannot prove Builder != Auditor. No physical Gemini request has been
+made because exact bundle/destination authorization is not yet present. Strict progress remains
+**21/48 complete | 27 remaining** and Task 16 is held pending qualified Gemini 3.7 A-08 evidence.
+
+The explicitly authorized Gemini 3.6 physical dispatch
+`l14-l17-sakg-task16-2cedea8-gemini36-001` then exited `2` with
+`AUDITOR_RECEIPT_FAILED:OperationalError`. No report or receipt was created, and a read-only
+router-state query could not open the local SQLite database (`unable to open database file (14)`).
+This is preserved as a local control-plane failure before provider adjudication; the identical
+command is not retried. Physical A-08 remains **NOT QUALIFIED** and strict progress remains
+**21/48 complete | 27 remaining**.
+
+## 2026-09-03 — Task 16 `[I-PROJ]` physical Gemini 3.7 qualification and Court seal
+
+The supplied artifact pair for audit ID `l14-l17-2cedea8-gemini37-001` was verified against
+candidate `2cedea82da2d775a878055a6d8eb3dd05c929883` and bundle
+`227e5f2e6528e16c70b92e86734c2ea187864da2c9019201ee5edc16e057e117`.
+
+Report SHA-256 is `2d25328ed69a3e37ee0080582016310f0e47307f5a4961f3c9e34e7c234a7ca5`; canonical
+receipt SHA-256 is `8a9d0bf0b4a61c3b14960f8a755fad98c1d4a5a1ae64cdb63cc2bdea1b601489`; receipt file
+SHA-256 is `911fda16c4bb35f7654a3cbea31e87b114d878492f19fd21705459192b3c8baf`. The pair returned
+`report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`, with Gemini 3.7 (Gemini family)
+auditing the GLM-family builder after one provider attempt. The report binds the candidate and
+bundle and ends with `AUDIT_COMPLETE: true`.
+
+Founder/Court `COURT_SEALED` disposition is recorded in
+`reviews/tasks/PAEOS_SAKG_TASK_16_I_PROJ_FOUNDER_COURT_DISPOSITION.md`; the physical checkpoint
+is `reviews/tasks/PAEOS_SAKG_TASK_16_I_PROJ_PHYSICAL_L14_L17_CHECKPOINT.md`. Task 16 window
+accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical progress advances
+from **21/48** to **22/48 complete | 26 remaining**. Canonical Task 17 `[I-TRADEOFF]` is opened
+in `reviews/tasks/PAEOS_SAKG_TASK_17_I_TRADEOFF_INTAKE.md`. No promotion, merge, or protected-ref
+mutation occurred.
