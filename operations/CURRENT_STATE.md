@@ -1651,3 +1651,23 @@ Task 18 remains locally sealed (5 MCP tests, Ruff, and Pyright clean) but physic
 strict physical progress remains **23/48 complete | 25 remaining**. A separate Gemini 3.7 pair
 under another audit ID is outside the explicit authorization and is excluded. No retry, fallback,
 source mutation, promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Task 18 `[I-MCP]` Gemini 3.7 physical audit qualified and Court-sealed
+
+The supplied candidate-bound artifact pair `l14-l17-88cb88f-gemini37-001` was mechanically
+verified against candidate `88cb88f84b056dfe7fc3dccb2f47cae8a0a09f1a` and evidence bundle
+`840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9`. It returned
+`report_status=PASS`, `a08_verdict=PASS`, and `qualified=True` with Google
+`gemini-3.7-flash` / Gemini auditing the `cline-pass` / `z-ai/glm-5.3-flash` / GLM builder,
+one provider attempt, and a final `AUDIT_COMPLETE: true` marker.
+
+Report SHA-256 is `b78a2e40c765f0b4890b8d4a036683ec2d3494cd52162828d95ae5df888f3292`; raw receipt
+file SHA-256 is `283724ebbcdc06204f91d136e50aab8c39d41d521601fb439ef23ff832f3a89e`; canonical
+receipt SHA-256 is `05d4ba79a2a444664e15772671bbff4e59bc90cb49733695293417c19d9497c2`. The
+Founder/Court disposition and physical checkpoint are recorded in the canonical Task 18 review
+files. Task 18 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**; strict physical
+progress advances to **24/48 complete | 24 remaining**. Task 19 `[T-NONAUTH]` is opened in
+`reviews/tasks/PAEOS_SAKG_TASK_19_T_NONAUTH_INTAKE.md`.
+
+The earlier authorized Gemini 3.6 rejection remains preserved as non-qualified evidence. No
+retry, fallback, source mutation, promotion, merge, or protected-ref mutation occurred.
