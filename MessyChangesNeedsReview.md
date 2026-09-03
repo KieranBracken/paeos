@@ -1524,3 +1524,14 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   to `26/48 complete | 22 remaining`. Earlier Gemini 3.6 identity-mismatch artifacts remain
   preserved as rejected evidence. No retry, fallback, source change, promotion, merge, or
   protected-ref mutation occurred.
+
+- 2026-09-03 L17 Retrospective `[RETROSPECT]` was sealed from candidate `fd17d20` after
+  mechanical qualification of the supplied NVIDIA/Llama physical receipt (`llama != glm`,
+  A-08 PASS). Candidate-bound bundle is `77dc016d8f9c9bbdd5a0696d1242c8b01cfa484dd4fb58fa07da925dfe96ddb4`;
+  report SHA-256 `433533a60368b64c7475559f571bb636925fbdb74ef40485b803825cb4c3ea22`; receipt file
+  SHA-256 `40f383e8673576a34c5a607ff99a78e2f950c23d5c727af296cbb88c6bdba1b4`; canonical receipt
+  SHA-256 `43485923a5d2787967ad80a6737b6a7b7f371a2ca8f9587e9b4bf024c2fce2ab`. Local SoftLoop
+  run `l17-retrospective-softloop-004` sealed with 5/5 focused tests. The auditor's CAS report
+  validation finding remains an explicit carried-forward risk. Strict physical progress is
+  `27/48 complete | 21 remaining`; Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is opened and
+  queued, not sealed. Unrelated pre-existing modifications remain untouched.

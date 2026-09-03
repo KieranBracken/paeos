@@ -3,18 +3,18 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Task 20 `[T-BASELINE]` Court-sealed; next milestone not opened)
+> **Last updated:** 2026-09-03 (L17 Retrospective Court-sealed; Milestone 40 `[I-DURABLE-SCARS]` opened)
 
-## Current canonical recovery frontier — 2026-09-03 (26/48 physical program seals; Task 20 sealed)
+## Current canonical recovery frontier — 2026-09-03 (27/48 physical program seals; L17 Retrospective sealed)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–19 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, and Task 20 `[T-BASELINE]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence. No subsequent intake is opened.
-- **Strict sealed progress:** **26/48 physical program seals complete | 22 remaining**. Task 20 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); L17 Retrospective candidate is `fd17d209b6dbf0aead8ff5137f213439b13e580a`; no promotion to `main` or protected-ref mutation occurred.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–20 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, and Task 20 `[T-BASELINE]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective is now **COURT_SEALED**; Milestone 40 `[I-DURABLE-SCARS]` is **OPEN/QUEUED**.
+- **Strict sealed progress:** **27/48 physical program seals complete | 21 remaining**. Task 20 and L17 Retrospective evidence are recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
 - **SAKG Subsystem:** Tasks 14–20 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`, `[T-NONAUTH]`, `[T-BASELINE]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; Task 19 has a local seal with 8 focused tests, clean import-boundary verification, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair; Task 20 has a local seal with 4 focused tests, baseline CLI, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair. Earlier failed and alternate audit attempts remain preserved as separate evidence. Mission 0 remains pending.
-- **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
+- **Runtime Intakes:** Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is open for isolated execution; it is not sealed.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
 
@@ -31,6 +31,36 @@ and one-time isolated bootstrap integration are recorded in
 The current Gate D candidate-bound L16 record is
 `reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md`; its qualified L14/L17
 checkpoint is `reviews/tasks/PAEOS_GATE_D_L14_L17_12A051E_CHECKPOINT.md`.
+
+## 2026-09-03 — L17 Retrospective Court seal; Milestone 40 opened
+
+The isolated hermetic SoftLoop run `l17-retrospective-softloop-004` completed with status
+`SEALED` and verdict `PASS` under state root `/private/tmp/paeos-l17retro-run-004`. Its seal
+hash is `3a7cde59fbc582d2d3ee5fd2726db9236e9eaf558a63d334402bc2e4447e9d97`; the ledger result
+bundle is `801a8dd5026dbd0ef3867668ae64e6688fbd0b4f185fd9396a735ccebaf547ae`; focused
+retrospective tests were 5/5 with exit 0, and focused Ruff/Pyright were clean. Full runtime
+Ruff was clean; full runtime Pyright retains the pre-existing unresolved `mcp.server` import
+at `runtime/transports/mcp/court_server.py:21` (exit 1), which is disclosed rather than hidden.
+
+The candidate-bound physical audit pair supplied for candidate
+`fd17d209b6dbf0aead8ff5137f213439b13e580a` and bundle
+`77dc016d8f9c9bbdd5a0696d1242c8b01cfa484dd4fb58fa07da925dfe96ddb4` is mechanically qualified:
+audit ID `l14-l17-fd17d20-nvidia-001`, `report_status=PASS`, `a08_verdict=PASS`, and
+`qualified=True`. Actual auditor provenance is NVIDIA `meta/llama-3.2-11b-vision-instruct`
+(family `llama`), versus builder `cline-pass` / `z-ai/glm-5.3-flash` (family `glm`), with one
+provider attempt and no fallback. Report SHA-256 is
+`433533a60368b64c7475559f571bb636925fbdb74ef40485b803825cb4c3ea22`; receipt file SHA-256 is
+`40f383e8673576a34c5a607ff99a78e2f950c23d5c727af296cbb88c6bdba1b4`; canonical receipt SHA-256
+is `43485923a5d2787967ad80a6737b6a7b7f371a2ca8f9587e9b4bf024c2fce2ab`; review scope is
+`8519fc423fafd0af17b5185e142584c4eb10d8730f6fc54c09da241075a7a49e`.
+
+L17 window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical
+progress advances from **26/48** to **27/48 complete | 21 remaining**. The substantive audit
+finding that retrospective reports are not validated before CAS storage is carried forward as
+an open risk; no claim is made that it is fixed by this seal. Milestone 40 `[I-DURABLE-SCARS]`
+is opened from `ops/backlogs/intake-rb0026-durable-scars.json` (SHA-256
+`e8b867d6814fbce12ad9d7f160df156220a91111c36b6d4a2af5f7609eef7cfc`) for the next isolated
+SoftLoop run. No promotion, merge, retry, fallback, or protected-ref mutation occurred.
 
 The prior Gate C candidate-bound L16 record is
 `reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md`; its Z0 catalog was ratified in

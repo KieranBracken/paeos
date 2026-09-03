@@ -5644,3 +5644,35 @@ Task 20 is `COURT_SEALED` with window accounting `Sealed: 1 | Remanded: 0 | Reme
 Strict physical progress advances from **25/48** to **26/48 complete | 22 remaining**. The
 earlier Gemini 3.6 identity-mismatch attempt remains preserved as rejected evidence and is not
 counted. No retry, fallback, source change, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 306 — 2026-09-03: L17 Retrospective qualified audit and Court seal; M40 opened
+
+The supplied candidate-bound physical artifacts for the L17 Retrospective are mechanically
+qualified: audit ID `l14-l17-fd17d20-nvidia-001`, candidate
+`fd17d209b6dbf0aead8ff5137f213439b13e580a`, bundle
+`77dc016d8f9c9bbdd5a0696d1242c8b01cfa484dd4fb58fa07da925dfe96ddb4`, report status `PASS`,
+A-08 `PASS`, and `qualified=True`. The actual auditor is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`), while the builder is
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`); this is the provenance recorded by the
+receipt, not Gemini. Provider attempts were exactly one with no fallback. Receipt file SHA-256
+is `40f383e8673576a34c5a607ff99a78e2f950c23d5c727af296cbb88c6bdba1b4`; canonical receipt
+SHA-256 is `43485923a5d2787967ad80a6737b6a7b7f371a2ca8f9587e9b4bf024c2fce2ab`; report SHA-256
+is `433533a60368b64c7475559f571bb636925fbdb74ef40485b803825cb4c3ea22`; review scope is
+`8519fc423fafd0af17b5185e142584c4eb10d8730f6fc54c09da241075a7a49e`.
+
+The hermetic SoftLoop run `l17-retrospective-softloop-004` under
+`/private/tmp/paeos-l17retro-run-004` sealed with hash
+`3a7cde59fbc582d2d3ee5fd2726db9236e9eaf558a63d334402bc2e4447e9d97`; local result bundle is
+`801a8dd5026dbd0ef3867668ae64e6688fbd0b4f185fd9396a735ccebaf547ae`; focused tests were 5/5.
+The report's concrete finding is preserved: retrospective reports are not validated before CAS
+storage, leaving a carried-forward integrity risk. Full runtime Ruff was clean; full runtime
+Pyright remains an inherited exit-1 due unresolved `mcp.server` at
+`runtime/transports/mcp/court_server.py:21`, disclosed in the disposition.
+
+Founder/Court disposition is `COURT_SEALED` for L17. Window accounting is
+**Sealed: 1 | Remanded: 0 | Remediated: 0** and strict physical progress advances from
+**26/48** to **27/48 complete | 21 remaining**. Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is
+now `OPEN/QUEUED` from `ops/backlogs/intake-rb0026-durable-scars.json` (SHA-256
+`e8b867d6814fbce12ad9d7f160df156220a91111c36b6d4a2af5f7609eef7cfc`). Earlier blocked Gemini
+dispatch attempts remain preserved; no retry, fallback, promotion, merge, or protected-ref
+mutation occurred.
