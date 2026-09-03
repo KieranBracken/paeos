@@ -5177,3 +5177,29 @@ The dispatched prompt file was `/private/tmp/paeos-sakg-task-13-l14-l17-prompt-b
 SHA-256 `1b76ec20dc0dc19e6163b3861c3ef1f099a0f341bd855102b0eaed08d8a665d6`. Its embedded
 manifest text contains a duplicate `local_court` JSON key and Worker/Court lines of `0 | 1 | 0`
 and `0 | 0 | 0`; the raw prompt was preserved without normalization.
+
+### Entry 285 — 2026-09-03: Task 13 physical Gemini audit qualified; Founder seal recorded; Task 14 opened
+
+The physical Task 13 artifact pair for candidate
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa` is now present and was mechanically verified. Bundle
+SHA-256: `ea3cb850b98a6519afab7cd9df453a31a13a9795fb9139f0469537e1305b850f`. Prompt SHA-256:
+`1b76ec20dc0dc19e6163b3861c3ef1f099a0f341bd855102b0eaed08d8a665d6`.
+
+Report SHA-256: `1ba70ff96f3daedfe9ff9083da36ee1c656946b09eaefac160b001db35368175`. Receipt raw-file
+SHA-256: `97a2bad513f530f7b6315cc17e36081a36d68a2e73f83a2ecca7b4217f10202f`; canonical receipt
+SHA-256: `dfa25a2a14f69c1c8bcb178625c5e200c379886fe56aeec7491f07642e4aaa0e`. The local
+`adjudicate_auditor_artifact_pair()` check returned `report_status=PASS`, `a08_verdict=PASS`,
+`qualified=True`. Physical provenance is Google `gemini-3.6-flash` / Gemini family as auditor
+against the recorded ClinePass GLM builder, with exactly one attempt and no fallback.
+
+The report binds the exact candidate and bundle, contains substantive findings, and ends with the
+required completion marker. A fresh focused Task 13 command returned `16 passed in 0.15s`, exit
+`0`. The Founder-provided disposition `COURT_SEALED` is recorded without self-ratification in
+`reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_FOUNDER_COURT_DISPOSITION.md` and the checkpoint in
+`reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_PHYSICAL_L14_L17_CHECKPOINT.md`.
+
+Task 13 window accounting is **Sealed: 1 | Remanded: 4 | Remediated: 0**. Strict physical
+program progress advances from **18/48** to **19/48 complete | 29 remaining**. Earlier remands,
+truncated reports, and the provider-503 transport failure remain preserved as historical evidence.
+Canonical item 14 from `ops/backlogs/sakg-1-intakes.json` is now opened as `[I-BACKFILL]` in
+`reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_INTAKE.md`; implementation is queued, not started.

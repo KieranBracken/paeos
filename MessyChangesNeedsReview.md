@@ -1309,3 +1309,16 @@ evidence and Founder/Court disposition are mandatory.
   The provider returned HTTP `503 PROVIDER_UNAVAILABLE` (`Retry-After: 30`); the command exited
   `2`, emitted no report or receipt, and made no retry/fallback. The normalized failure artifact
   SHA-256 is `fec7596974c047e66705620146bdea806f88f925014028dc154bcccce4c54026`.
+
+- 2026-09-03 Task 13 physical Gemini artifact pair was ingested after exact verification. Candidate
+  `b2ef99c0ca484b919ed89b52287d746f6b4ac8aa`, bundle
+  `ea3cb850b98a6519afab7cd9df453a31a13a9795fb9139f0469537e1305b850f`, report
+  `1ba70ff96f3daedfe9ff9083da36ee1c656946b09eaefac160b001db35368175`, and canonical receipt
+  `dfa25a2a14f69c1c8bcb178625c5e200c379886fe56aeec7491f07642e4aaa0e` all match. The local
+  artifact-pair validator returned `qualified=True`, report `PASS`, A-08 `PASS` (Gemini auditor
+  versus GLM builder), and a fresh focused run returned `16/16` with exit `0`. Founder-provided
+  `COURT_SEALED` is recorded in the new physical checkpoint/disposition files. Task-window
+  accounting is `Sealed: 1 | Remanded: 4 | Remediated: 0`; strict progress is now `19/48 | 29
+  remaining`. Canonical Task 14 `[I-BACKFILL]` is opened and queued in
+  `reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_INTAKE.md`; stale Bundle Golden Bytes Task 14 files
+  are preserved and not dispatched.

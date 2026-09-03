@@ -1405,3 +1405,35 @@ The dispatched prompt file was `/private/tmp/paeos-sakg-task-13-l14-l17-prompt-b
 SHA-256 `1b76ec20dc0dc19e6163b3861c3ef1f099a0f341bd855102b0eaed08d8a665d6`. Its embedded
 manifest text contains a duplicate `local_court` JSON key and Worker/Court lines of `0 | 1 | 0`
 and `0 | 0 | 0`; this raw prompt was not rewritten or silently normalized.
+
+## 2026-09-03 — Task 13 physical Gemini audit qualified and sealed; Task 14 [I-BACKFILL] opened
+
+The newly appeared physical artifact pair for candidate
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa` was verified before ingestion. The evidence bundle
+`/private/tmp/paeos-sakg-task-13-l14-l17-bundle-b2ef99c.json` hashes to
+`ea3cb850b98a6519afab7cd9df453a31a13a9795fb9139f0469537e1305b850f`, and the prompt hashes to
+`1b76ec20dc0dc19e6163b3861c3ef1f099a0f341bd855102b0eaed08d8a665d6`.
+
+The report `/private/tmp/paeos-sakg-task-13-l14-l17-report-b2ef99c.md` hashes to
+`1ba70ff96f3daedfe9ff9083da36ee1c656946b09eaefac160b001db35368175`. The persisted receipt's
+raw file hash is `97a2bad513f530f7b6315cc17e36081a36d68a2e73f83a2ecca7b4217f10202f`; its canonical
+schema hash, verified by `load_auditor_receipt()`, is
+`dfa25a2a14f69c1c8bcb178625c5e200c379886fe56aeec7491f07642e4aaa0e`.
+
+The repository artifact-pair validator returned `report_status=PASS`, `a08_verdict=PASS`, and
+`qualified=True`. The receipt records Google `gemini-3.6-flash` (Gemini family) as auditor and
+`cline-pass` / `z-ai/glm-5.3-flash` (GLM family) as builder, one provider attempt, and no fallback.
+The report binds the exact candidate and bundle and ends with `AUDIT_COMPLETE: true`. A fresh
+scoped Task 13 run returned `16 passed in 0.15s`, exit `0`.
+
+The Founder-provided `COURT_SEALED` disposition is recorded in
+`reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_FOUNDER_COURT_DISPOSITION.md`; the physical checkpoint
+is `reviews/tasks/PAEOS_SAKG_TASK_13_FTRADEOFF_PHYSICAL_L14_L17_CHECKPOINT.md`. Task-window
+accounting is **Sealed: 1 | Remanded: 4 | Remediated: 0**, and strict physical program progress
+advances to **19/48 complete | 29 remaining**. Historical truncated reports and the prior
+provider-503 failure remain preserved; they were not reclassified as passes.
+
+Canonical Task 14 is now opened as `[I-BACKFILL]`, per item 14 in
+`ops/backlogs/sakg-1-intakes.json`, in `reviews/tasks/PAEOS_SAKG_TASK_14_I_BACKFILL_INTAKE.md`.
+The stale Task 14 “Bundle Golden Bytes” review files remain unchanged and are explicitly
+superseded for dispatch by the canonical intake label. No Task 14 implementation has started.
