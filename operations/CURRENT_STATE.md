@@ -1611,3 +1611,24 @@ accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical progr
 from **21/48** to **22/48 complete | 26 remaining**. Canonical Task 17 `[I-TRADEOFF]` is opened
 in `reviews/tasks/PAEOS_SAKG_TASK_17_I_TRADEOFF_INTAKE.md`. No promotion, merge, or protected-ref
 mutation occurred.
+
+## 2026-09-03 — Task 17 Gemini 3.6 physical audit rejected; A-08 not qualified
+
+The explicitly authorized one-shot audit `l14-l17-sakg-task17-d612230-gemini36-001` targeted
+candidate `d612230d90773d2eca7221a2553038b064e36f8b` and bundle
+`8b721a72e7f003a910ecbc6d6d8b4afd40108b11c1c9022380b919e4ccd2b6d4`, using Google
+`gemini-3.6-flash`, `max_tokens=4096`, no fallback, and no retry. It exited `2` with
+`AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`.
+The rejected report and receipt were preserved under `/private/tmp` (report file SHA-256
+`584ad5f88571616d78ab65edfe80f01effc9c8096df6184a3290d1a065aa1b2f`; receipt file SHA-256
+`e97440cfbe380bebca624f41a787d863a7bee718fece89e7ac9390ad3860f7f7`; rejection metadata SHA-256
+`de6faf6df2a9e1369b941eed87c0f209612dea65f85ef2b7b98e7b056f98b48a`). The physical receipt
+recorded Gemini versus the GLM builder with one provider attempt, but the missing completion
+marker makes the pair unqualified; A-08 and Task 17 physical seal are **not established**.
+
+A separate Gemini 3.7 artifact under audit ID `l14-l17-d612230-gemini37-002` is outside the
+explicit 3.6 authorization and is not counted. Task 17 local SoftLoop remains `SEALED` (16/16
+tests, method-count and Pyright exit `0`), while strict physical progress remains
+**22/48 complete | 26 remaining**. No retry, fallback, source mutation, promotion, merge, or
+protected-ref mutation occurred. A future physical request requires a fresh audit ID and explicit
+authorization for its exact bundle and destination.

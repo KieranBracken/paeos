@@ -1398,3 +1398,15 @@ evidence and Founder/Court disposition are mandatory.
   `tests/sakg/test_projection.py` is absent; present equivalent is
   `tests/sakg/test_sakg_projection.py`; this drift remains an audit finding. No source or
   protected-ref mutation occurred and strict progress remains 21/48.
+
+- 2026-09-03 Task 17 `[I-TRADEOFF]` authorized Gemini 3.6 one-shot reached the provider once but
+  was rejected by the local receipt validator because the returned report omitted the required
+  single `AUDIT_COMPLETE: true` marker. Audit ID was
+  `l14-l17-sakg-task17-d612230-gemini36-001`, candidate
+  `d612230d90773d2eca7221a2553038b064e36f8b`, and bundle
+  `8b721a72e7f003a910ecbc6d6d8b4afd40108b11c1c9022380b919e4ccd2b6d4`. Exact exit was `2` with
+  `AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`. Rejected
+  report/receipt/metadata artifacts and hashes are recorded in Notebook Entry 295. A separate
+  Gemini 3.7 artifact appeared under an unauthorized audit ID and is excluded. No retry,
+  fallback, source change, promotion, merge, or protected-ref mutation occurred; Task 17 remains
+  physically unqualified and strict progress remains `22/48 complete | 26 remaining`.

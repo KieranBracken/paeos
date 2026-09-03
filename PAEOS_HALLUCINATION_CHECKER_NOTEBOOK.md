@@ -5403,3 +5403,32 @@ strict physical progress advances from **21/48** to **22/48 complete | 26 remain
 Task 17 `[I-TRADEOFF]` is opened in `reviews/tasks/PAEOS_SAKG_TASK_17_I_TRADEOFF_INTAKE.md`.
 The earlier Gemini 3.6 OperationalError and filename drift remain preserved; no retries,
 fallbacks, source changes, promotion, or protected-ref mutation occurred.
+
+### Entry 295 — 2026-09-03: Task 17 authorized Gemini 3.6 audit rejected by completion-marker validation
+
+The exact one-shot authorization for Task 17 candidate
+`d612230d90773d2eca7221a2553038b064e36f8b` and bundle
+`8b721a72e7f003a910ecbc6d6d8b4afd40108b11c1c9022380b919e4ccd2b6d4` was executed once under
+audit ID `l14-l17-sakg-task17-d612230-gemini36-001`, configured for Google
+`gemini-3.6-flash`, `max_tokens=4096`, with no fallback or retry. The transport returned a
+candidate-bound report stating `L14_STATUS: PASS` but omitted the required single
+`AUDIT_COMPLETE: true` marker. The capture command exited `2` with exact
+`AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`.
+
+Raw rejection artifacts were preserved:
+
+- rejected report `/private/tmp/paeos-sakg-task-17-l14-l17-report-d612230-gemini36.md.rejected`,
+  file SHA-256 `584ad5f88571616d78ab65edfe80f01effc9c8096df6184a3290d1a065aa1b2f`;
+- rejected receipt `/private/tmp/paeos-sakg-task-17-l14-l17-receipt-d612230-gemini36.json.rejected`,
+  file SHA-256 `e97440cfbe380bebca624f41a787d863a7bee718fece89e7ac9390ad3860f7f7`,
+  payload receipt SHA-256 `8d355b59f30d62e296bed00bb4a77b48bc7a0ffec9d2305f2c0fb250ae873a20`;
+- rejection metadata `/private/tmp/paeos-sakg-task-17-l14-l17-receipt-d612230-gemini36.json.rejection.json`,
+  file SHA-256 `de6faf6df2a9e1369b941eed87c0f209612dea65f85ef2b7b98e7b056f98b48a`.
+
+The receipt's physical family was Gemini versus the GLM-family builder and provider attempt count
+was one, but the invalid report means the pair is **not qualified** and A-08 cannot be counted.
+A separate Gemini 3.7 pair appeared under audit ID `l14-l17-d612230-gemini37-002`; it was not
+covered by the 3.6 authorization and is explicitly excluded from accounting. Task 17 remains
+physically unqualified; local SoftLoop evidence remains `SEALED` with 16/16 tests, and strict
+physical progress remains **22/48 complete | 26 remaining**. No retry, fallback, source change,
+promotion, merge, or protected-ref mutation occurred.
