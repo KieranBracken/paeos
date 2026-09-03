@@ -66,3 +66,14 @@ program counter remains **18/48 complete | 30 remaining**. A candidate-bound het
 L14/L17 audit must qualify this exact commit and bundle before Task 13 can advance the strict
 counter or Task 14 can be dispatched. No main/trunk promotion, merge, or self-ratification was
 performed.
+
+## Physical audit attempts
+
+Two authorized one-shot Google Gemini captures were made against this candidate and bundle
+`5840389120a94a95b9eb8d3bc0f06dd5e17bfa4f96b3267e6cffe32d55156f74`. Both captured
+`google/gemini-3.6-flash` (Gemini family) against the GLM builder with A-08 `PASS` and one
+provider attempt, but both substantive reports were truncated before `AUDIT_COMPLETE: true` and
+were rejected with exit `2` (`audit report must contain exactly one completion marker`). Raw
+report, receipt, and rejection metadata artifacts are preserved under
+`/private/tmp/paeos-task13-l14-l17-*b2ef99c*`; their hashes are recorded in Notebook Entry 283
+and `operations/CURRENT_STATE.md`. Physical qualification and Task 14 dispatch remain blocked.
