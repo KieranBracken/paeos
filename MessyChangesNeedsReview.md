@@ -1302,3 +1302,10 @@ evidence and Founder/Court disposition are mandatory.
   `f32bce519162e3ed43d270b52def87872a6c548f11543f0102dde9c04b5af332`.
   No fallback or in-process retry occurred. Physical provenance is preserved, but no qualified
   receipt exists; strict progress remains **18/48 complete | 30 remaining** and Task 14 is held.
+
+- 2026-09-03 the newly authorized compact manifest capture
+  `l14-l17-b2ef99c-gemini-manifest-001` used bundle
+  `ea3cb850b98a6519afab7cd9df453a31a13a9795fb9139f0469537e1305b850f` and reached Google once.
+  The provider returned HTTP `503 PROVIDER_UNAVAILABLE` (`Retry-After: 30`); the command exited
+  `2`, emitted no report or receipt, and made no retry/fallback. The normalized failure artifact
+  SHA-256 is `fec7596974c047e66705620146bdea806f88f925014028dc154bcccce4c54026`.

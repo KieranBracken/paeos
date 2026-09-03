@@ -1392,3 +1392,11 @@ The requested next-task label also has a canonical drift: `ops/backlogs/sakg-1-i
 currently identifies item 14 as `[I-BACKFILL]`, while stale review files
 `PAEOS_SAKG_TASK_14_*` describe “Bundle Golden Bytes & Inline Evidence.” Neither label was
 dispatched; the canonical intake must be reconciled before Task 14 starts.
+
+The newly authorized compact manifest capture `l14-l17-b2ef99c-gemini-manifest-001` used bundle
+`ea3cb850b98a6519afab7cd9df453a31a13a9795fb9139f0469537e1305b850f` and stopped at the provider
+boundary with HTTP `503 PROVIDER_UNAVAILABLE` (`Retry-After: 30`). Exit code was `2`; no report or
+receipt was created, no retry/fallback was made, and the normalized failure artifact
+`/private/tmp/paeos-sakg-task-13-l14-l17-receipt-b2ef99c.json.transport-failure.json` has SHA-256
+`fec7596974c047e66705620146bdea806f88f925014028dc154bcccce4c54026`. Strict progress remains
+**18/48 complete | 30 remaining**.

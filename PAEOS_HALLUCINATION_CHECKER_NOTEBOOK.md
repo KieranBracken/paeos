@@ -5160,3 +5160,15 @@ The requested next-task label has a separate canonical drift: `ops/backlogs/sakg
 identifies item 14 as `[I-BACKFILL]`, while stale `PAEOS_SAKG_TASK_14_*` review files describe
 “Bundle Golden Bytes & Inline Evidence.” Neither interpretation was dispatched; the intake label
 must be reconciled before Task 14 starts.
+
+### Entry 284 — 2026-09-03: Compact Task 13 Gemini dispatch stopped at provider boundary
+
+The newly authorized one-shot `l14-l17-b2ef99c-gemini-manifest-001` used candidate
+`b2ef99c0ca484b919ed89b52287d746f6b4ac8aa` and bundle
+`ea3cb850b98a6519afab7cd9df453a31a13a9795fb9139f0469537e1305b850f`. The router reached the
+Google provider, which returned HTTP `503 PROVIDER_UNAVAILABLE` with `Retry-After: 30`. Exit code
+was `2`; no report or physical receipt was created and no retry/fallback occurred. The normalized
+failure artifact is
+`/private/tmp/paeos-sakg-task-13-l14-l17-receipt-b2ef99c.json.transport-failure.json`, SHA-256
+`fec7596974c047e66705620146bdea806f88f925014028dc154bcccce4c54026`. Strict progress remains
+**18/48 complete | 30 remaining**; Task 14 remains held.
