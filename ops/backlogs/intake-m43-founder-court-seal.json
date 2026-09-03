@@ -1,0 +1,36 @@
+[
+  {
+    "objective": "Record the Founder-directed COURT_SEALED disposition for Milestone 43 [I-CER-BASELINE] / L02-C1 and open Milestone 44 [I-L15-SIZING] / L15 Dynamic Context Sizing. This is a documentation and canonical-state transition only: no runtime source change, audit retry/fallback, provider transmission, candidate promotion, merge, or main/trunk mutation is authorized.\n\nCreate reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_FOUNDER_COURT_DISPOSITION.md. Bind candidate e761351faeb8f4bf6fb25218ae7e97eb413f190b, evidence bundle 12dbc843b14cbb6c4e8aca608bc109faf84cc590a37e3c966e8354bea32a24b2, audit ID m43-cer-baseline-e761351-nvidia-001, NVIDIA meta/llama-3.2-11b-vision-instruct auditor, receipt-recorded GLM builder, exactly one provider attempt, no fallback, report_status=PASS, a08_verdict=PASS, qualified=True, and Worker 0/0/0 plus Court 1/0/0. Distinguish the physical receipt file SHA-256 a3990a99436037dcb00782d2d4c506370376b4ec55112b9c23d4c2c0ac2729cb from the canonical receipt SHA-256 cceeeb13f062130a6d64f9d38b7846acaaff5c9c73d2cf741b0338098c6ea777. Record report SHA-256 e4c317558f6e96cba4537cf71e561f28608c4e7ab1b2326d809776ebd4bec411, review scope 06187ec929f5e898c4a62eef08dae63efdaf23125f89ed214d8db15f2ee3b2a8, local SoftLoop run i-cer-baseline-trace-a-004, seal 11043daf9c35e76a7a45b8419b12ca16b87a55120b29c7f8158cc910041c784e, ledger head 5f4eabd3d5a1bf006d4cad459780389ca72ed81755e828cb851a643cc3877b42, 14/14 focused tests, 9/9 contract tests, Ruff exit 0, and focused Pyright exit 0. Preserve the provenance discrepancy that the candidate manifest declares a GPT builder while the physical receipt records GLM; qualify A-08 from the receipt as llama != glm and do not normalize the discrepancy away. Preserve the report's findings without overstating them.\n\nAppend a matching dated state entry to operations/CURRENT_STATE.md and Entry 310 to PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md. Advance strict physical progress exactly from 30/48 to 31/48 complete | 17 remaining with window accounting Sealed: 1 | Remanded: 0 | Remediated: 0.\n\nCreate reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md with Status OPEN/QUEUED, predecessor Milestone 43 candidate e761351faeb8f4bf6fb25218ae7e97eb413f190b, title [I-L15-SIZING] / L15 Dynamic Context Sizing, canonical references to operations/ENGINEERING_LIFECYCLE.md L15, operations/WORKFLOW_STATE_MACHINE.yaml L15, runtime/context_compiler.py, runtime/task_package.py, and docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md context-size eligibility. State that L15 sizing must be deterministic, evidence-bearing, model-context-aware, fail closed rather than silently truncate, preserve required constitutional/evidence inputs, and remain policy-owned by PAEOS rather than provider transport. Require an isolated SoftLoop implementation, discriminating tests, L13 evidence, and heterogeneous L14/L17 before any Founder/Court seal. Note explicitly that legacy reviews/tasks/PAEOS_INTAKE_M44_* records refer to an older Verification Engine Upgrades sequence and are not this milestone; do not overwrite them.",
+    "accept": [
+      "The M43 disposition says COURT_SEALED and binds the exact candidate, bundle, report, receipt file hash, canonical receipt hash, review scope, A-08 result, one-attempt/no-fallback provenance, local SoftLoop evidence, and exact Worker/Court accounting",
+      "CURRENT_STATE and the audit notebook advance only from 30/48 to 31/48 complete with 17 remaining and open the unambiguous M44 I-L15-SIZING intake",
+      "The new M44 intake is OPEN/QUEUED, names its predecessor and canonical references, defines fail-closed PAEOS-owned dynamic sizing constraints, and does not overwrite legacy PAEOS_INTAKE_M44 records",
+      "No file outside the four declared documentation paths changes"
+    ],
+    "changed_paths": [
+      "reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_FOUNDER_COURT_DISPOSITION.md",
+      "operations/CURRENT_STATE.md",
+      "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md"
+    ],
+    "plan_write_scopes": [
+      "reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_FOUNDER_COURT_DISPOSITION.md",
+      "operations/CURRENT_STATE.md",
+      "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md"
+    ],
+    "goal_signature": "domain:runtime,task:m43_founder_court_seal_open_m44_l15_sizing",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": [
+      {
+        "claim_id": "builds",
+        "kind": "TEST",
+        "command": "test -f reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_FOUNDER_COURT_DISPOSITION.md",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": ""
+      }
+    ]
+  }
+]

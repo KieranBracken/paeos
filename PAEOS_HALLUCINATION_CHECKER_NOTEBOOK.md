@@ -5774,3 +5774,61 @@ Ceremony Enforcement Realization is opened in
 `reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_INTAKE.md`. No source change, retry, fallback,
 promotion, merge, or protected-ref mutation occurred. Existing unrelated host modifications remain
 untouched.
+
+### Entry 310 — 2026-09-03: Milestone 43 `[I-CER-BASELINE]` Court seal; M44 opened
+
+The supplied physical receipt/report pair for candidate
+`e761351faeb8f4bf6fb25218ae7e97eb413f190b` was mechanically revalidated as
+`report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. Audit ID is
+`m43-cer-baseline-e761351-nvidia-001`; actual auditor is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`), and the receipt records builder
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`). A-08 is `PASS` (`llama != glm`), with exactly
+one provider attempt and a single-route NVIDIA fallback chain. Candidate and bundle bindings are
+`e761351faeb8f4bf6fb25218ae7e97eb413f190b` and
+`12dbc843b14cbb6c4e8aca608bc109faf84cc590a37e3c966e8354bea32a24b2`; report SHA-256 is
+`e4c317558f6e96cba4537cf71e561f28608c4e7ab1b2326d809776ebd4bec411`; review scope is
+`06187ec929f5e898c4a62eef08dae63efdaf23125f89ed214d8db15f2ee3b2a8`.
+
+The receipt's canonical self-hash is
+`cceeeb13f062130a6d64f9d38b7846acaaff5c9c73d2cf741b0338098c6ea777`, while the physical
+receipt file SHA-256 is the distinct value
+`a3990a99436037dcb00782d2d4c506370376b4ec55112b9c23d4c2c0ac2729cb`. Both are retained to
+avoid falsely labeling the canonical hash as the file digest.
+
+The hermetic SoftLoop run `i-cer-baseline-trace-a-004` sealed with Court exit `0`, seal hash
+`11043daf9c35e76a7a45b8419b12ca16b87a55120b29c7f8158cc910041c784e`, and ledger head
+`5f4eabd3d5a1bf006d4cad459780389ca72ed81755e828cb851a643cc3877b42`. Local reproduction is
+14/14 focused ceremony tests, 9/9 contract tests, Ruff exit `0`, and focused Pyright exit `0`.
+The report's findings support the ceremony-contract and fail-closed walk claims in the embedded
+evidence but are not promoted into a claim that the remote auditor executed tools.
+
+The candidate manifest records a GPT/Codex builder while the physical receipt records a GLM
+builder. This provenance discrepancy is preserved; the qualified physical contract establishes
+`llama != glm`. Founder/Court disposition is `COURT_SEALED`, with window accounting
+`Sealed: 1 | Remanded: 0 | Remediated: 0`. Strict physical progress advances from **`30/48` to
+`31/48 complete | 17 remaining`**. Milestone 44 `[I-L15-SIZING]` / L15 Dynamic Context Sizing is
+opened at `reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md`; legacy
+`PAEOS_INTAKE_M44_*` records are a separate older sequence and remain untouched. No provider
+transmission, source change, retry, fallback, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 311 — 2026-09-03: M43 documentation-ingestion remand remediated and locally sealed
+
+The first documentation-ingestion SoftLoop run `r-97d0204d` correctly remanded because declared
+claim `builds` did not reproduce; its ledger head is
+`ca7c77081f589847118930cd4637c27e6f6125937794b336285c626c73b2332b`. RB-0008 recorded the
+event as `ledger/debt/DEBT-0069.md`. No candidate documentation was admitted by that run.
+
+The evidence command was narrowed to a candidate-discriminating disposition-existence check. A
+fresh isolated run `r-c1fe583c` passed the Court and adversarial gate and sealed with hash
+`44a719fd0013eca370d8350f2b5100098b75e4d50e2886ed8d3da313adf59462`; its ledger head is
+`edf715769fd2fe95196d4a615ed26ebcbe3cd4c4d62f95cdc3c2d1359828a068`. The four host records
+were then compared to the accepted CAS artifacts and matched byte-for-byte. Documentation-
+ingestion window accounting is **Sealed: 1 | Remanded: 1 | Remediated: 1**. This auxiliary
+accounting does not alter M43's physical audit window accounting or the programme's
+`31/48 complete | 17 remaining` state.
+
+The local adversary recorded a non-blocking runtime limitation: the sealed review bundle exposed
+the primary artifact rather than every member of the four-file documentation write set. Explicit
+host-side digest comparison therefore covered all four accepted artifacts before commit. Debt
+`DEBT-0069` is resolved; the original remand remains preserved. No provider transmission, runtime
+source change, fallback, retry, promotion, merge, or protected-ref mutation occurred.

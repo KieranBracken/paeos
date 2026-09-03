@@ -1913,3 +1913,35 @@ Founder/Court disposition is `COURT_SEALED`; window accounting is
 Enforcement Realization is opened in
 `reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_INTAKE.md`. No host source change, retry,
 fallback, promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-03 — Milestone 43 `[I-CER-BASELINE]` Court seal; Milestone 44 opened
+
+The supplied NVIDIA physical audit pair for candidate
+`e761351faeb8f4bf6fb25218ae7e97eb413f190b` was mechanically revalidated as
+`report_status=PASS`, `a08_verdict=PASS`, and `qualified=True`. Audit ID is
+`m43-cer-baseline-e761351-nvidia-001`; actual auditor is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`), and the receipt records builder
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`). A-08 is `PASS` (`llama != glm`), with exactly
+one provider attempt and no fallback. The pair binds bundle
+`12dbc843b14cbb6c4e8aca608bc109faf84cc590a37e3c966e8354bea32a24b2`, report
+`e4c317558f6e96cba4537cf71e561f28608c4e7ab1b2326d809776ebd4bec411`, and review scope
+`06187ec929f5e898c4a62eef08dae63efdaf23125f89ed214d8db15f2ee3b2a8`.
+
+The physical receipt file SHA-256 is
+`a3990a99436037dcb00782d2d4c506370376b4ec55112b9c23d4c2c0ac2729cb`; its distinct canonical
+self-hash is `cceeeb13f062130a6d64f9d38b7846acaaff5c9c73d2cf741b0338098c6ea777`.
+The local hermetic run `i-cer-baseline-trace-a-004` sealed with hash
+`11043daf9c35e76a7a45b8419b12ca16b87a55120b29c7f8158cc910041c784e` and ledger head
+`5f4eabd3d5a1bf006d4cad459780389ca72ed81755e828cb851a643cc3877b42`. Reproduction is 14/14
+focused tests and 9/9 contract tests, with clean candidate-scope Ruff and focused Pyright.
+
+The candidate manifest's GPT builder identity differs from the receipt's GLM builder identity;
+that provenance discrepancy is preserved rather than normalized. The external findings are an
+assessment of embedded evidence and are not represented as an independent remote tool execution.
+
+Founder/Court disposition is `COURT_SEALED`; window accounting is
+`Sealed: 1 | Remanded: 0 | Remediated: 0`, advancing strict physical progress from `30/48` to
+**`31/48 complete | 17 remaining`**. Milestone 44 `[I-L15-SIZING]` / L15 Dynamic Context Sizing
+is `OPEN/QUEUED` in `reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md`. Legacy
+`PAEOS_INTAKE_M44_*` files belong to an older sequence and remain unchanged. No host source change,
+provider transmission, retry, fallback, promotion, merge, or protected-ref mutation occurred.

@@ -1579,3 +1579,19 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   progress advances to `30/48 complete | 18 remaining`, and Milestone 43
   `[I-CER-BASELINE]` is opened. Existing unrelated modifications remain untouched:
   `ops/auditor_receipt_capture.py`, `paeos/model_router/catalog.py`, and `ops/nudge_codex.py`.
+
+- 2026-09-03 Milestone 43 `[I-CER-BASELINE]` Founder/Court disposition was recorded from the
+  mechanically qualified NVIDIA/Llama physical pair for candidate
+  `e761351faeb8f4bf6fb25218ae7e97eb413f190b` and bundle
+  `12dbc843b14cbb6c4e8aca608bc109faf84cc590a37e3c966e8354bea32a24b2`. Added
+  `reviews/tasks/PAEOS_MILESTONE_43_I_CER_BASELINE_FOUNDER_COURT_DISPOSITION.md` and
+  `reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md`; updated
+  `operations/CURRENT_STATE.md` and `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`; added the bounded
+  orchestration intake `ops/backlogs/intake-m43-founder-court-seal.json`. The first documentation
+  ingestion run remanded on nonreproducing evidence and was preserved as `DEBT-0069`; the fresh
+  remediation run sealed. Documentation-ingestion accounting is `Sealed: 1 | Remanded: 1 |
+  Remediated: 1`. Physical programme progress is `31/48 complete | 17 remaining`; M44
+  `[I-L15-SIZING]` is open. No provider transmission, runtime source change, fallback, retry,
+  promotion, merge, or protected-ref mutation occurred. Unrelated pre-existing modifications
+  remain untouched: `ops/auditor_receipt_capture.py`, `paeos/model_router/catalog.py`, and
+  `ops/nudge_codex.py`.
