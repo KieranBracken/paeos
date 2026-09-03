@@ -5586,3 +5586,20 @@ progress advances from **24/48** to **25/48 complete | 23 remaining**. Canonical
 `[T-BASELINE]` is opened. The earlier failed and alternate audit attempts remain preserved as
 separate evidence. No retry, fallback, source change, promotion, merge, or protected-ref mutation
 occurred.
+
+### Entry 303 — 2026-09-03: Task 20 `[T-BASELINE]` local seal; physical dispatch held by authorization gate
+
+The fresh isolated SoftLoop run `t-baseline-trace-a-actual-016` sealed under
+`/private/tmp/paeos-tbaseline-actual-run-016`: expected RED exit `2`, GREEN Court exit `0` with
+4 focused tests, baseline CLI exit `0`, Ruff exit `0`, and Pyright exit `0`. Local seal is
+`e1847bed784a1f4d52704d33e636e1e20ca3fb8b29d5b80a425e3c8da58409ee`; local artifact bundle is
+`2a93b08c21b61f2d121500887a51a036d9c270dfd6fe42f05bdcf292c63d58eb`; local ledger head is
+`a923339f1369e7b636688b17b55580a266554f20e8b809fe5ab175b7d485da29`.
+
+Candidate-bound physical bundle `e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82`
+and prompt `63703afb78fb40102440ec4f3ebd89e1ce5be26c064d7f8727d90716ce7586d4` were prepared for
+Google `gemini-3.7-flash`, audit ID `l14-l17-sakg-task20-08aaae9-gemini37-001`. The host approval
+layer rejected the escalation because the preceding authorization did not explicitly name this
+new bundle hash; the provider command was not executed. No retry, fallback, workaround, source
+change, promotion, merge, or protected-ref mutation occurred. Strict physical progress remains
+**25/48 complete | 23 remaining**.

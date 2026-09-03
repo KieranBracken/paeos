@@ -1491,3 +1491,14 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   versus GLM with one provider attempt and no fallback. Task 19 is `COURT_SEALED`; strict
   progress advances to `25/48 complete | 23 remaining`, and Task 20 `[T-BASELINE]` is opened.
   No retry, source change, promotion, merge, or protected-ref mutation occurred.
+
+- 2026-09-03 Task 20 `[T-BASELINE]` local SoftLoop run `t-baseline-trace-a-actual-016` sealed in
+  `/private/tmp/paeos-tbaseline-actual-run-016` with expected RED exit `2`, GREEN Court exit `0`
+  (4 focused tests), baseline CLI exit `0`, Ruff exit `0`, and Pyright exit `0`. Local seal is
+  `e1847bed784a1f4d52704d33e636e1e20ca3fb8b29d5b80a425e3c8da58409ee`; local artifact bundle is
+  `2a93b08c21b61f2d121500887a51a036d9c270dfd6fe42f05bdcf292c63d58eb`. Candidate-bound physical
+  bundle `e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82` was prepared for
+  Gemini 3.7, but the host approval layer rejected escalation because the preceding authorization
+  did not explicitly name that new hash; the provider command was not executed. No retry,
+  workaround, fallback, source change, promotion, merge, or protected-ref mutation occurred.
+  Strict physical progress remains `25/48 complete | 23 remaining`.

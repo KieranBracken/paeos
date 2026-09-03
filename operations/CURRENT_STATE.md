@@ -1732,3 +1732,23 @@ opened in `reviews/tasks/PAEOS_SAKG_TASK_20_T_BASELINE_INTAKE.md` for isolated S
 The earlier Gemini 3.7 OperationalError and Gemini 3.6 qualified pair remain preserved as
 separate evidence. No source change, retry, fallback, promotion, merge, or protected-ref mutation
 occurred.
+
+## 2026-09-03 — Task 20 `[T-BASELINE]` local seal; physical dispatch held by authorization gate
+
+The fresh isolated SoftLoop run `t-baseline-trace-a-actual-016` sealed under
+`/private/tmp/paeos-tbaseline-actual-run-016` with 4 focused tests passing, expected RED exit `2`,
+baseline CLI exit `0`, Ruff exit `0`, and Pyright exit `0`. Local seal is
+`e1847bed784a1f4d52704d33e636e1e20ca3fb8b29d5b80a425e3c8da58409ee`; local artifact bundle is
+`2a93b08c21b61f2d121500887a51a036d9c270dfd6fe42f05bdcf292c63d58eb`; local ledger head is
+`a923339f1369e7b636688b17b55580a266554f20e8b809fe5ab175b7d485da29`.
+
+Candidate-bound physical bundle `e5e44d4fa6b018452e9c734f52ea8364d40333707dad10d0d516f28de8942e82`
+and prompt `63703afb78fb40102440ec4f3ebd89e1ce5be26c064d7f8727d90716ce7586d4` are prepared for
+Google `gemini-3.7-flash`, audit ID `l14-l17-sakg-task20-08aaae9-gemini37-001`. The host approval
+layer rejected the external-dispatch escalation because the preceding authorization did not name
+this new bundle hash; the provider command was **not executed**. No retry, workaround, fallback,
+source change, promotion, merge, or protected-ref mutation occurred.
+
+Task 20 remains locally sealed but physically unqualified; strict progress remains
+**25/48 complete | 23 remaining**. Explicit authorization naming the exact bundle hash and
+destination is required for the one-shot A-08 audit.
