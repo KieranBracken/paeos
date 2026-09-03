@@ -41,6 +41,10 @@ reproduced exactly by the Court:
 * Verdict reference: `af09be2aaa68da4a3547345986d30cbee0593afd6e87574bd7b109d0f8459a5b`
 * Adversary reference: `a55732c8ae472c9ab6cbebda2f8b6ef83a1a472351a50395b4247835e69ae55b`
 
+The scripted harness used an in-process Court, so no Court JSONL file was emitted; the verified
+SQLite ledger is the sole durable record for this local window. This limitation is preserved
+explicitly and does not weaken the physical A-08 requirement below.
+
 The local final-window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. The four
 earlier Task 13 windows remain preserved as **Sealed: 0 | Remanded: 4 | Remediated: 0**; their
 raw JSONL hashes and findings are recorded in
