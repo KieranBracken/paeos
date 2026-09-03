@@ -1,6 +1,6 @@
 # SAKG Task 18 [I-MCP] — Local Court Checkpoint
 
-**Disposition:** `LOCAL_SEALED_PHYSICAL_AUDIT_PENDING`
+**Disposition:** `LOCAL_SEALED_PHYSICAL_AUDIT_REJECTED`
 
 ## Candidate and local evidence
 
@@ -28,7 +28,13 @@
 - Bundle SHA-256: `840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9`
 - Prompt: `/private/tmp/paeos-sakg-task-18-l14-l17-prompt-88cb88f.md`
 - Prompt SHA-256: `aa6600ef2a14671c9c187ef5d33656de2ba244c43597a792de8407dc2bc5e161`
-- Physical A-08: **UNPROVEN** pending authorized heterogeneous audit
+- Physical A-08: **NOT QUALIFIED** after the authorized Gemini 3.6 response was rejected by the
+  local validator for omitting the required single `AUDIT_COMPLETE: true` marker.
+- Authorized audit ID: `l14-l17-sakg-task18-88cb88f-gemini36-001`
+- Exit code: `2`
+- Rejected report SHA-256: `43456ceb22993f2792a406acf0cd161685be67eaf52128ddb08584d9bf0b50be`
+- Rejected receipt SHA-256: `df855622b0f35c5dddcd7d57923967d0f3bf2efc77e58338a15641143dd5a4f9`
+- Rejection metadata SHA-256: `e536fc3666f0678028b16f6ad315a09c4da1319df1c1e24205dc250daa21a29a`
 - Strict physical progress: **23/48 complete | 25 remaining**
 
 No source, promotion, merge, or protected-ref mutation occurred.

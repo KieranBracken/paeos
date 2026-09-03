@@ -1430,3 +1430,15 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   bundle `840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9` is prepared for an
   explicit one-shot heterogeneous audit. Physical A-08 remains unproven and strict progress
   remains `23/48 complete | 25 remaining`; no provider request or promotion occurred.
+
+- 2026-09-03 Task 18 `[I-MCP]` authorized Gemini 3.6 one-shot
+  `l14-l17-sakg-task18-88cb88f-gemini36-001` reached Google `gemini-3.6-flash` once and exited
+  `2` with `AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`.
+  The raw rejected report SHA-256 is `43456ceb22993f2792a406acf0cd161685be67eaf52128ddb08584d9bf0b50be`,
+  rejected receipt SHA-256 is `df855622b0f35c5dddcd7d57923967d0f3bf2efc77e58338a15641143dd5a4f9`,
+  and rejection metadata SHA-256 is `e536fc3666f0678028b16f6ad315a09c4da1319df1c1e24205dc250daa21a29a`.
+  The response bound candidate/bundle and reported `L14_STATUS: PASS` but omitted the required
+  `AUDIT_COMPLETE: true` marker, so the pair is unqualified. A separate Gemini 3.7 pair was not
+  covered by the authorization and is excluded. No retry, fallback, source change, promotion,
+  merge, or protected-ref mutation occurred; Task 18 remains physically unqualified at
+  `23/48 complete | 25 remaining`.

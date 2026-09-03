@@ -7,13 +7,13 @@
 
 ## Current canonical recovery frontier — 2026-09-03 (23/48 physical program seals; Task 18 local seal, physical audit pending)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `HEAD d77117d`; Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at `HEAD c897a85`; Task 17 candidate is `d612230d90773d2eca7221a2553038b064e36f8b`; no promotion to `main` or protected-ref mutation occurred.
 - **Gate status:** Gates A–F **SEALED**; SAKG Task 01–16 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, and Task 17 `[I-TRADEOFF]` are **COURT_SEALED** with qualified heterogeneous Gemini A-08 evidence; Task 18 `[I-MCP]` is queued.
 - **Strict sealed progress:** **23/48 physical program seals complete | 25 remaining**. Task 17 local and physical evidence are both recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
-- **SAKG Subsystem:** Task 14 `[I-BACKFILL]`, Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, and Task 17 `[I-TRADEOFF]` are physically qualified and Court-sealed. Task 18 `[I-MCP]` has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a candidate-bound bundle; physical A-08 is pending exact-bundle authorization. Tasks 19–20 and Mission 0 remain pending.
+- **SAKG Subsystem:** Task 14 `[I-BACKFILL]`, Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, and Task 17 `[I-TRADEOFF]` are physically qualified and Court-sealed. Task 18 `[I-MCP]` has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a candidate-bound bundle; the authorized Gemini 3.6 physical audit was rejected for a missing completion marker, so A-08 is not qualified. Tasks 19–20 and Mission 0 remain pending.
 - **Runtime Intakes:** No new runtime intake was sealed in this reconciliation.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
@@ -1632,3 +1632,22 @@ tests, method-count and Pyright exit `0`), while strict physical progress remain
 **22/48 complete | 26 remaining**. No retry, fallback, source mutation, promotion, merge, or
 protected-ref mutation occurred. A future physical request requires a fresh audit ID and explicit
 authorization for its exact bundle and destination.
+
+## 2026-09-03 — Task 18 `[I-MCP]` Gemini 3.6 physical audit rejected
+
+The explicitly authorized one-shot `l14-l17-sakg-task18-88cb88f-gemini36-001` targeted candidate
+`88cb88f84b056dfe7fc3dccb2f47cae8a0a09f1a` and bundle
+`840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9`, using Google
+`gemini-3.6-flash`, `max_tokens=4096`, no fallback, and no retry. It reached the provider once
+and exited `2` with `AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion
+marker`. The local validator preserved the rejected report (SHA-256
+`43456ceb22993f2792a406acf0cd161685be67eaf52128ddb08584d9bf0b50be`), rejected receipt
+(SHA-256 `df855622b0f35c5dddcd7d57923967d0f3bf2efc77e58338a15641143dd5a4f9`), and rejection
+metadata (SHA-256 `e536fc3666f0678028b16f6ad315a09c4da1319df1c1e24205dc250daa21a29a`) under
+`/private/tmp/paeos-sakg-task-18-l14-l17-*`. The report omitted `AUDIT_COMPLETE: true`, so the
+pair is not qualified and cannot establish physical A-08.
+
+Task 18 remains locally sealed (5 MCP tests, Ruff, and Pyright clean) but physically unqualified;
+strict physical progress remains **23/48 complete | 25 remaining**. A separate Gemini 3.7 pair
+under another audit ID is outside the explicit authorization and is excluded. No retry, fallback,
+source mutation, promotion, merge, or protected-ref mutation occurred.

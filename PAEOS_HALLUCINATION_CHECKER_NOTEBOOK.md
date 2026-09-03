@@ -5475,3 +5475,31 @@ A candidate-bound bundle is ready at
 does not establish Builder != Auditor, so physical A-08 remains **UNPROVEN** and strict progress
 remains **23/48 complete | 25 remaining**. No external provider request, retry, fallback, source
 mutation, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 298 — 2026-09-03: Task 18 `[I-MCP]` authorized Gemini 3.6 audit rejected by completion-marker validation
+
+The Founder authorized exactly one Gemini 3.6 one-shot for candidate
+`88cb88f84b056dfe7fc3dccb2f47cae8a0a09f1a` and bundle
+`840240fd1eb1cbd45d9ecd7877a1f1d7f22ffd14620093e7381fe3e53a7c5ba9`, using Google
+`gemini-3.6-flash`, `max_tokens=4096`, no fallback, and no retry. Audit ID
+`l14-l17-sakg-task18-88cb88f-gemini36-001` reached the provider once and exited `2` with
+`AUDITOR_RECEIPT_REJECTED:audit report must contain exactly one completion marker`.
+
+The validator preserved the raw report at
+`/private/tmp/paeos-sakg-task-18-l14-l17-report-88cb88f-gemini36.md.rejected` (422 bytes,
+SHA-256 `43456ceb22993f2792a406acf0cd161685be67eaf52128ddb08584d9bf0b50be`) and the raw
+receipt at
+`/private/tmp/paeos-sakg-task-18-l14-l17-receipt-88cb88f-gemini36.json.rejected` (1369 bytes,
+SHA-256 `df855622b0f35c5dddcd7d57923967d0f3bf2efc77e58338a15641143dd5a4f9`; payload receipt
+SHA-256 `3b5d94e03b87cd7b2eb129ad219cea8258da710b0364380a816d9940d6ae83bc`). Rejection metadata
+is preserved at
+`/private/tmp/paeos-sakg-task-18-l14-l17-receipt-88cb88f-gemini36.json.rejection.json` (SHA-256
+`e536fc3666f0678028b16f6ad315a09c4da1319df1c1e24205dc250daa21a29a`). The report bound the
+candidate and bundle and contained `L14_STATUS: PASS`, but omitted the required single
+`AUDIT_COMPLETE: true` marker; therefore it is not a qualified physical receipt.
+
+A separate Gemini 3.7 pair appeared under a different audit ID while the paths were reused. It
+was not covered by the explicit Gemini 3.6 authorization and is excluded from accounting. Task
+18 remains locally sealed but physically unqualified; A-08 is **NOT QUALIFIED** and strict
+physical progress remains **23/48 complete | 25 remaining**. No retry, fallback, source change,
+promotion, merge, or protected-ref mutation occurred.
