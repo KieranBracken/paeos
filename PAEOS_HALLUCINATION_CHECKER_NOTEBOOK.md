@@ -13,6 +13,7 @@
 * **Overseer Guidelines:** [`AGENTS.md`](file:///Users/bob/GitHub/paeos/AGENTS.md)
 * **Kernel & Verification Court:** [`runtime/ast_linter.py`](file:///Users/bob/GitHub/paeos/runtime/ast_linter.py), [`runtime/verification.py`](file:///Users/bob/GitHub/paeos/runtime/verification.py), [`kernel/sandbox.py`](file:///Users/bob/GitHub/paeos/kernel/sandbox.py)
 * **Multi-Provider Integrations:** [`runtime/integrations/hybrid.py`](file:///Users/bob/GitHub/paeos/runtime/integrations/hybrid.py)
+* **Canonical Ecosystem Boundary Map:** [`ECOSYSTEM_CONSTITUTION_AND_BOUNDARY_MAP.md`](file:///Users/bob/GitHub/paeos/ECOSYSTEM_CONSTITUTION_AND_BOUNDARY_MAP.md)
 
 ---
 
@@ -5832,3 +5833,52 @@ the primary artifact rather than every member of the four-file documentation wri
 host-side digest comparison therefore covered all four accepted artifacts before commit. Debt
 `DEBT-0069` is resolved; the original remand remains preserved. No provider transmission, runtime
 source change, fallback, retry, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 312 — 2026-09-04: Milestone 44 `[I-L15-SIZING]` physical seal; Milestone 45 queued
+
+The supplied Layer 14/17 physical receipt/report pair for candidate
+`2e6c900e86428abb0cb94c59f135dafb37b5507f` is mechanically qualified as `report_status=PASS`,
+`a08_verdict=PASS`, and `qualified=True`. Audit ID is `m44-l15sizing-2e6c900-nvidia-001`. The
+auditor is NVIDIA `meta/llama-3.2-11b-vision-instruct` (family `llama`) and the receipt records
+builder `cline-pass` / `z-ai/glm-5.3-flash` (family `glm`), so A-08 is PASS (`llama != glm`), with
+one provider attempt and no fallback. Evidence bundle SHA-256 is
+`31696bc14435062b0a1854b98a2187ef91f84c6aa42c1a5f809102c6ee3550e`.
+
+The physical receipt is `/private/tmp/paeos-l15sizing-m44-receipt.json`. Its canonical receipt
+self-hash is `61d10b197a9bbde74ae11ef76d4a9e74261cc0faa945dbd71aa3c479a4f79e80`; the actual
+receipt file SHA-256 is separately `0432b4bc8cd8d299d405ddbf8f6a600f9920734c623d5358b286add9c69dc6a9`.
+The substantive report is `/private/tmp/paeos-l15sizing-m44-report.md` with SHA-256
+`0f28779da98e7344e9be243956967bd1a1c7237872bd1760469793f9adcbdd22`; review scope and transport
+request SHA-256 is `849809ea957e68e5c7b24b02105db45190ab010a444b6f2e0d63384ad5f322ea`.
+
+The final local M44 implementation run under `/private/tmp/paeos-l15sizing-run` is `r-086c73de`,
+goal `g-7486b8e7a7d7`, seal `d867658b49da459c37cab6ee25f8ca7121f174723959d91d674f6570d133c472`,
+and ledger head `8adb14fd39721cdcad355a46a4cd14a5bdd2b2a349905d15fb2a3e15ecff7026`. Local
+accounting remains Court `Sealed: 2 | Remanded: 2 | Remediated: 2` and Worker `Admitted: 0 |
+Rejected: 0 | Remediated: 0`; remands are healthy back-pressure, not a zero-remand target.
+
+The report records 14/14 tests, deterministic sizing, mandatory non-eviction, and fail-closed
+budget behavior. Its negative-budget observation is retained; source evidence contains the
+explicit fail-closed `budget < 0` branch, making the observation non-blocking but a future audit
+assertion. Physical window accounting is **`Sealed: 1 | Remanded: 0 | Remediated: 0`** and strict
+progress advances from **31/48** to **32/48 complete | 16 remaining**.
+
+Milestone 45 **SAKG Task 21 / Taxonomy Node Hierarchy Subsumption** is **OPEN/QUEUED** in
+`reviews/tasks/PAEOS_SAKG_TASK_21_TAXONOMY_NODE_HIERARCHY_SUBSUMPTION_INTAKE.md`. The canonical
+ecosystem constitution and boundary map is `ECOSYSTEM_CONSTITUTION_AND_BOUNDARY_MAP.md`.
+
+### Entry 313 — 2026-09-04: governance-documentation sealing chronology
+
+The documentation-only SoftLoop was finally sealed by run `r-b7d72c3e` / goal `g-88d9821fa29d`,
+with seal `11c1e49e7f6311531b54a6b4756ed7810058ebca13f4262169b9ec38ca4d24ae`, ledger head
+`acfe62d3eed363e73a87ded73664eef821be9f0a9d6c20d4bc84e0eda450acaa`, and artifact bundle
+`99544fb7e4b2e3622dc56e036e88a95488336d9e08955fb57bc2666d62ceb792`. The first attempt
+`r-624122fc` was remanded for a bridge response timeout before an artifact; the second
+`r-73764588` was remanded for an adversary response timeout; the third attempt sealed after the
+same bounded records were re-materialized. Auxiliary documentation accounting is therefore
+**Court: Sealed 1 | Remanded 2 | Remediated 2**; Worker accounting is **Admitted 0 | Rejected 0 |
+Remediated 0**. The final adversarial report is `VERDICT: PASS`.
+
+The remand records and generated `DEBT-0071` / `RB-0031` remain preserved for oversight. They do
+not change the physical M44 accounting. No provider transmission, runtime source change, retry,
+fallback, promotion, merge, or protected-ref mutation occurred.

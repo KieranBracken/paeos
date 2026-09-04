@@ -3,18 +3,18 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-03 (Milestone 40 `[I-DURABLE-SCARS]` Court-sealed; Milestone 41 `[I-CEREMONY-WALK]` opened)
+> **Last updated:** 2026-09-04 (Milestone 44 `[I-L15-SIZING]` Court-sealed; Milestone 45 SAKG Task 21 opened)
 
-## Current canonical recovery frontier — 2026-09-03 (28/48 physical program seals; M40 sealed)
+## Current canonical recovery frontier — 2026-09-04 (32/48 physical program seals; M44 sealed)
 
 - **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); L17 Retrospective candidate is `fd17d209b6dbf0aead8ff5137f213439b13e580a`; no promotion to `main` or protected-ref mutation occurred.
 - **Gate status:** Gates A–F **SEALED**; SAKG Task 01–20 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, and Task 20 `[T-BASELINE]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective and Milestone 40 `[I-DURABLE-SCARS]` are **COURT_SEALED**; Milestone 41 `[I-CEREMONY-WALK]` is **OPEN/QUEUED**.
-- **Strict sealed progress:** **28/48 physical program seals complete | 20 remaining**. Task 20, L17 Retrospective, and M40 evidence are recorded; stale historical labels are preserved and superseded by canonical intake names.
+- **Strict sealed progress:** **32/48 physical program seals complete | 16 remaining**. Milestones 43 and 44 evidence are recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
 - **SAKG Subsystem:** Tasks 14–20 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`, `[T-NONAUTH]`, `[T-BASELINE]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; Task 19 has a local seal with 8 focused tests, clean import-boundary verification, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair; Task 20 has a local seal with 4 focused tests, baseline CLI, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair. Earlier failed and alternate audit attempts remain preserved as separate evidence. Mission 0 remains pending.
-- **Runtime Intakes:** Milestone 40 `[I-DURABLE-SCARS]` / RB-0026 is **COURT_SEALED**. Milestone 41 `[I-CEREMONY-WALK]` is open for isolated execution; it is not sealed.
+- **Runtime Intakes:** Milestone 44 `[I-L15-SIZING]` / L15 Dynamic Context Sizing is **COURT_SEALED**. Milestone 45 SAKG Task 21 / Taxonomy Node Hierarchy Subsumption is **OPEN/QUEUED** for isolated execution; it is not sealed.
 - **Repository Health:** No full-suite claim is made here; only the task-scoped evidence listed in the task checkpoints is accepted.
 
 
@@ -1945,3 +1945,48 @@ Founder/Court disposition is `COURT_SEALED`; window accounting is
 is `OPEN/QUEUED` in `reviews/tasks/PAEOS_MILESTONE_44_I_L15_SIZING_INTAKE.md`. Legacy
 `PAEOS_INTAKE_M44_*` files belong to an older sequence and remain unchanged. No host source change,
 provider transmission, retry, fallback, promotion, merge, or protected-ref mutation occurred.
+
+## 2026-09-04 — Milestone 44 `[I-L15-SIZING]` Court seal; Milestone 45 opened
+
+The supplied NVIDIA Layer 14/17 audit pair for candidate
+`2e6c900e86428abb0cb94c59f135dafb37b5507f` is mechanically qualified as `report_status=PASS`,
+`a08_verdict=PASS`, and `qualified=True`. Audit ID is `m44-l15sizing-2e6c900-nvidia-001`.
+The auditor is NVIDIA `meta/llama-3.2-11b-vision-instruct` (family `llama`) and the receipt
+records builder `cline-pass` / `z-ai/glm-5.3-flash` (family `glm`), so A-08 is PASS with exactly
+one provider attempt and no fallback. The bound evidence bundle SHA-256 is
+`31696bc14435062b0a1854b98a2187ef91f84c6aa42c1a5f809102c6ee3550e`.
+
+The physical receipt is `/private/tmp/paeos-l15sizing-m44-receipt.json`; its canonical self-hash
+is `61d10b197a9bbde74ae11ef76d4a9e74261cc0faa945dbd71aa3c479a4f79e80`, distinct from the
+receipt file SHA-256 `0432b4bc8cd8d299d405ddbf8f6a600f9920734c623d5358b286add9c69dc6a9`. The
+substantive report `/private/tmp/paeos-l15sizing-m44-report.md` has SHA-256
+`0f28779da98e7344e9be243956967bd1a1c7237872bd1760469793f9adcbdd22`; review scope and transport
+request SHA-256 is `849809ea957e68e5c7b24b02105db45190ab010a444b6f2e0d63384ad5f322ea`.
+
+The final local SoftLoop run under `/private/tmp/paeos-l15sizing-run` is `r-086c73de` with goal
+`g-7486b8e7a7d7`, seal `d867658b49da459c37cab6ee25f8ca7121f174723959d91d674f6570d133c472`,
+ledger head `8adb14fd39721cdcad355a46a4cd14a5bdd2b2a349905d15fb2a3e15ecff7026`, and artifact
+bundle `45703c8ca932ea5f968fdf96fecf4f69a47c0036113b981bf40a3dbc2dbb6014`. Reproduction is
+14/14 focused tests, 21/21 compatibility tests, full runtime exit 0, model-router 10/10,
+Ruff/Pyright exit 0, two-file AST clean, and mutation kill evidence 8/8. Local accounting is
+Court `Sealed: 2 | Remanded: 2 | Remediated: 2`; Worker `Admitted: 0 | Rejected: 0 | Remediated:
+0`. The report's negative-budget observation is preserved; source evidence contains the explicit
+fail-closed negative-budget branch, so it is non-blocking but remains a future assertion.
+
+Physical window accounting is **`Sealed: 1 | Remanded: 0 | Remediated: 0`** and strict physical
+progress advances from **31/48 complete | 17 remaining** to **32/48 complete | 16 remaining**.
+Milestone 45 **SAKG Task 21 / Taxonomy Node Hierarchy Subsumption** is **OPEN/QUEUED** in
+`reviews/tasks/PAEOS_SAKG_TASK_21_TAXONOMY_NODE_HIERARCHY_SUBSUMPTION_INTAKE.md`. The canonical
+ecosystem boundary map is `ECOSYSTEM_CONSTITUTION_AND_BOUNDARY_MAP.md`. No host runtime source,
+provider transmission, retry, fallback, promotion, merge, or protected-ref mutation occurred.
+
+### Governance-documentation SoftLoop accounting
+
+The documentation-only sealing run used the final local run `r-b7d72c3e`, goal
+`g-88d9821fa29d`, seal `11c1e49e7f6311531b54a6b4756ed7810058ebca13f4262169b9ec38ca4d24ae`,
+ledger head `acfe62d3eed363e73a87ded73664eef821be9f0a9d6c20d4bc84e0eda450acaa`, and final
+artifact bundle `99544fb7e4b2e3622dc56e036e88a95488336d9e08955fb57bc2666d62ceb792`. Two earlier
+documentation attempts are preserved as remands (builder response timeout, then adversary
+response timeout); re-running after each remand produced the final seal. This auxiliary window
+therefore records **Court: Sealed 1 | Remanded 2 | Remediated 2** and does not alter the physical
+M44 count above. The adversarial report concluded `VERDICT: PASS`.
