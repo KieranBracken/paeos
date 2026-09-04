@@ -6034,3 +6034,54 @@ reconciling the preserved M47 amendment without mutating historical evidence.
 
 No provider transmission, source promotion, merge, retry, fallback, or protected-ref mutation
 occurred in this governance update.
+
+### Entry 319 — 2026-09-04: Milestone 48 Program Invariant Synthesis physical qualification and final Court seal
+
+The supplied heterogeneous Layer 14/17 audit qualifies Milestone 48
+`[I-PROGRAM-INVARIANT-SYNTHESIS]` / Program Invariant Synthesis & Final Recovery Sealing for
+candidate `7be795002c51448c427062b1d26c9ff688c2cc07` (base
+`4d48cd5d23e9614e089577348fa3d8603a327ced`). Candidate clone:
+`/private/tmp/paeos-m48-program-invariant-candidate`. Evidence bundle:
+`/private/tmp/paeos-program-invariant-m48-bundle.json`, SHA-256
+`984a6e02f2363847d0b85ec8ea08aae1d098d52f70db7f28206e1ca3ccdb5f98`.
+
+The physical receipt `/private/tmp/paeos-program-invariant-m48-receipt.json` binds audit ID
+`m48-program-invariant-7be7950-nvidia-001`, candidate, and bundle. Its canonical/self SHA-256 is
+`05a977dfdabc32b27c4cd86cb469673c34400a7ae3f4db3cc3ae25ae43056946`; the receipt file SHA-256
+is `f8ff08733cad3a27671b5fee231d1c2f15c57974cf5d2d275e55104816317549`. Substantive report
+`/private/tmp/paeos-program-invariant-m48-report.md` has SHA-256
+`4de379799b36e7a40c5abc3b5c23179dbb8a1a772c5b8660d8d70fb2e2b3ce6e`, status `PASS`, and one
+terminal `AUDIT_COMPLETE: true` marker. Auditor provenance is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`) versus builder
+`z-ai/glm-5.3-flash` via `cline-pass` (family `glm`), so A-08 is **PASS** (`llama != glm`).
+Exactly one provider attempt was used; there was no fallback or retry.
+
+The isolated SoftLoop state root `/private/tmp/paeos-m48-program-invariant-run` is sealed for
+run `r-34bc0cc1`, goal `g-001ec9494b17`, with seal
+`10a05fb42f805035b7db057d2b8728ef0f29eb2cefbe4d402ed087f340842f2d`, ledger head
+`f2a7f806618e939ca418295fdedd9597efca302ae03f28a104776fc0120009e4`, and local accounting
+**Sealed: 1 | Remanded: 0 | Remediated: 0**. The baseline RED probe failed closed (missing
+module, exit `2`); candidate verification passed **9/9** focused invariant-synthesis tests and
+the full `tests/runtime` suite. The adversarial verdict is `PASS`, including CAS
+re-materialization, `py_compile`, no-provider boundary, amendment preservation, A-08, and
+forbidden-mutation checks.
+
+The M48 implementation is a PAEOS-local, read-only typed invariant synthesizer. It deterministically
+binds candidate/evidence/receipt/report/seal/ledger/debt/accounting records, preserves M47's
+`REMAND_WITH_AMENDMENTS` status and `DEBT-0070`, enforces stateless models and PAEOS state
+ownership, and rejects stale, contradictory, vacuous, unbound, same-family, promotion, merge,
+retry, fallback, and protected-ref mutation inputs. The physical report's observation that the
+implementation claim is unchanged from the previous milestone is retained as a scope-continuity
+finding; no claim is widened and no historical evidence is rewritten.
+
+Physical-window accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**. Strict physical
+progress advances exactly once from **35/48 complete | 13 remaining** to
+**36/48 complete | 12 remaining**. Founder/Court disposition is
+`COURT_SEALED` in
+`reviews/tasks/PAEOS_MILESTONE_48_PROGRAM_INVARIANT_SYNTHESIS_FOUNDER_COURT_DISPOSITION.md`.
+The final inventory is `reviews/tasks/PAEOS_GRAND_SYNTHESIS_SUMMARY.md`; no M49 intake is opened.
+
+No additional provider transmission, source promotion, merge, retry, fallback, or
+main/trunk/protected-ref mutation occurred. M47's remand and `DEBT-0070` remain preserved as
+healthy fail-closed evidence. This entry supersedes the earlier M47 handoff's statement that M48
+had not yet been sealed.
