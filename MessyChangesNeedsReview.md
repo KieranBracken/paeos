@@ -1632,3 +1632,19 @@ ref mutation occurred.
   to `33/48 complete | 15 remaining`, and M46 CER Gate Transition Verification Suite is opened
   and queued. No source-code change, provider transmission, retry, fallback, promotion, merge,
   or protected-ref mutation occurred.
+
+- 2026-09-04 The supplied NVIDIA/Llama Layer 14/17 pair qualified Milestone 46 `[I-CER-GATE-TRANSITION]`
+  for candidate `0ab7b09d3a892b2c5fcbfb30bbdaca2732014e2a` and evidence bundle
+  `6344115615c86571c52feb34475dce8f6b721cf420fd04d8273f9d5aa58f2448` (A-08 `PASS`,
+  `llama != glm`, one attempt, no fallback/retry). Receipt canonical SHA-256 is
+  `dcf19db01ce4179e007b5f7875d3b5ddf5e2b043bef9c8a21a2bd7215387623f`, receipt file SHA-256 is
+  `5c85e42b3a93215d4a5b93b51935431bb0bdad2e0a0058fab7f575cd2b4c4361`, and report SHA-256 is
+  `53f3280550f449b3187f8b45ace0a87dbb48984c91116687d5b9939a3ce7d8e1`. The report is `PASS`
+  with `AUDIT_COMPLETE: true`; its non-blocking observation that the focused command does not
+  explicitly exercise every listed fail-closed input is retained as follow-up risk. The final
+  SoftLoop run `r-c0c13b6f` under `/private/tmp/paeos-m46-gate-run-4` sealed with
+  `6df9f7dc72ad18537d4bb2d64da83fe412d5e52615f3d1e948fbbcdd4444ea47`; four earlier M46 remands
+  remain preserved. Founder/Court disposition is `COURT_SEALED`, physical progress advances to
+  `34/48 complete | 14 remaining`, and M47 CER Failure & Remand Recovery is opened and queued.
+  No source-code change, provider transmission, retry, fallback, promotion, merge, or
+  protected-ref mutation occurred.

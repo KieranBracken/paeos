@@ -5967,3 +5967,40 @@ Gate Transition Verification Suite — is **OPEN / QUEUED** in
 
 No additional provider transmission, source-code change, fallback, retry, promotion, merge, or
 main/trunk/protected-ref mutation occurred.
+
+### Entry 317 — 2026-09-04: Milestone 46 CER Gate Transition qualified and sealed; Milestone 47 queued
+
+The supplied NVIDIA/Llama Layer 14/17 physical pair qualifies Milestone 46
+`[I-CER-GATE-TRANSITION]` / L02-G1 for candidate
+`0ab7b09d3a892b2c5fcbfb30bbdaca2732014e2a` and evidence bundle
+`6344115615c86571c52feb34475dce8f6b721cf420fd04d8273f9d5aa58f2448`. Audit ID is
+`m46-cer-gate-0ab7b09-nvidia-001`; actual auditor is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`) and the receipt records builder
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`), so A-08 is **PASS** (`llama != glm`). The
+route used one provider attempt, with no fallback or retry. Receipt canonical/self SHA-256 is
+`dcf19db01ce4179e007b5f7875d3b5ddf5e2b043bef9c8a21a2bd7215387623f`; receipt file SHA-256 is
+`5c85e42b3a93215d4a5b93b51935431bb0bdad2e0a0058fab7f575cd2b4c4361`; report SHA-256 is
+`53f3280550f449b3187f8b45ace0a87dbb48984c91116687d5b9939a3ce7d8e1`; and review scope / transport
+request SHA-256 is `390072e201a511996a7a31e34c2d95d250a468e723ad2380049906caabd30afc`.
+
+The substantive report is `PASS` with `AUDIT_COMPLETE: true`. Its non-blocking finding is
+preserved: the focused command/result does not explicitly exercise every fail-closed negative
+input listed in the implementation claim. No claim widening or source change is authorized by
+this entry. The candidate contract itself provides typed observations/decisions, deterministic
+digests, ordered L02 → G1 transitions, explicit warranted Trace-A → Trace-B hand-offs, idempotent
+duplicates, Court/evidence binding, append-only discharge state, and PAEOS-local canonical state.
+
+The final isolated SoftLoop run under `/private/tmp/paeos-m46-gate-run-4` is `r-c0c13b6f`, goal
+`g-f7e0b19a2f19`, sealed with
+`6df9f7dc72ad18537d4bb2d64da83fe412d5e52615f3d1e948fbbcdd4444ea47`, ledger head
+`53c3c852353d39ae689813d0b6b8a86d1336f155c8008533b0f5929d5d978d01`, and artifact bundle
+`eefde3092d3a4d57a560607e2ef1b344a3a1aeb307876bda728618b89701ef6b`. Focused CER tests are 8/8
+and the full `tests/runtime` suite is 730/730. Four earlier fail-closed M46 remands remain
+preserved across the execution chronology; aggregate local accounting is Court `Sealed: 1 |
+Remanded: 4 | Remediated: 0`, Worker `Admitted: 0 | Rejected: 0 | Remediated: 0`.
+
+Physical window accounting is **`Sealed: 1 | Remanded: 0 | Remediated: 0`**; strict progress
+advances from **33/48 complete | 15 remaining** to **34/48 complete | 14 remaining**. Milestone 47
+— **CER Failure & Remand Recovery** — is **OPEN/QUEUED** in
+`reviews/tasks/PAEOS_MILESTONE_47_CER_FAILURE_REMAND_RECOVERY_INTAKE.md`. No provider transmission,
+retry, fallback, source promotion, merge, or main/trunk/protected-ref mutation occurred.
