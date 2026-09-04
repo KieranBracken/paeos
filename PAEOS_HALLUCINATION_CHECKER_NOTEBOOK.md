@@ -5882,3 +5882,88 @@ Remediated 0**. The final adversarial report is `VERDICT: PASS`.
 The remand records and generated `DEBT-0071` / `RB-0031` remain preserved for oversight. They do
 not change the physical M44 accounting. No provider transmission, runtime source change, retry,
 fallback, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 314 — 2026-09-04: Milestone 45 SAKG Task 21 isolated execution and candidate seal
+
+Milestone 45 SAKG Task 21 taxonomy-node hierarchy subsumption was executed through the isolated
+SoftLoop under `/private/tmp/paeos-m45-task21-run`. The first builder run timed out; the second
+remanded on elapsed-time pytest output; and the third remanded after A-08 adversarial inspection
+found a typed-identifier/hexadecimal-hash validation gap. These three remands remain preserved as
+healthy fail-closed back-pressure (`Court: Sealed 1 | Remanded 3 | Remediated 3`). Final run
+`r-530205f1` / goal `g-a8707365ba55` sealed with seal hash
+`5e768d9926917aa42f937c71cafb3f4721cf74d4d73dbee5aebaf5d0fe8d5252`, ledger head `66`, and
+canonical artifact bundle `8279b70a20760600bbe77e567b2f924e4017b558c8f27fe58eb73a58dc854c17`.
+The builder evidence binds source artifact
+`17d7f4102057b8d962984f90ef8873cfb996a680c574977139ad521edd1cc0a0` to deterministic output
+`M45-T21-TAXONOMY-SUBSUMPTION-PASS`; the adversary report is `PASS`. Candidate commit
+`afc06e911840c60b091161a5864ca514dd8c0bdd` exists only in the detached candidate clone, and the
+emitted manifest is `/private/tmp/paeos-sakg-task21-candidate-bundle.json` (file SHA-256
+`0bd0a8e3e811026078bd1513719bbd2fb1e5007b7ceae41519ce25f22c14db31`). Physical A-08
+report/receipt remain pending; no provider transmission, retry, fallback, source promotion,
+merge, or protected-ref mutation occurred.
+
+### Entry 315 — 2026-09-04: authorized Gemini M45 physical capture rejected, one-shot exhausted
+
+The Founder-authorized one-shot transmission for candidate
+`afc06e911840c60b091161a5864ca514dd8c0bdd` and evidence bundle
+`0bd0a8e3e811026078bd1513719bbd2fb1e5007b7ceae41519ce25f22c14db31` was sent once to Google
+`gemini-3.6-flash` with `max_tokens=4096`, `RetryPolicy.NONE`, and fallback disabled. The physical
+receipt records exactly one attempt, route `google:gemini-3.6-flash`, actual family `gemini`, and
+builder family `glm` (`A-08=PASS`), but PAEOS rejected the returned report because it was truncated
+before the required `AUDIT_COMPLETE: true` marker (`audit report must contain exactly one completion
+marker`). The rejected report is `/private/tmp/paeos-sakg-task21-m45-gemini36-report.md.rejected`
+(SHA-256 `85e10f43e260e4e40b7861276cb45552dd4526407d12b609ccc532b22941c08b`); the rejected receipt
+is `/private/tmp/paeos-sakg-task21-m45-gemini36-receipt.json.rejected` (file SHA-256
+`569b1f93ebdf97a16a3705dc30229f856c38252f81f5df787d7854284cf243f0`, canonical receipt field
+`c970943c5174a17fea21b6b66871abc630e5f0ec31a57a9b245906d25d7b4253`), and the rejection record is
+`/private/tmp/paeos-sakg-task21-m45-gemini36-receipt.json.rejection.json` (SHA-256
+`8bbcdb360da873e9ee268f9cc4bf746194107ad0698e5df469f828f5992c48ae`). The substantive physical
+audit is therefore **REJECTED/UNQUALIFIED**; no completion, progress advance, retry, fallback,
+code change, promotion, merge, or protected-ref mutation occurred.
+
+### Entry 316 — 2026-09-04: Milestone 45 SAKG Task 21 qualified physical seal; Milestone 46 queued
+
+The Founder-supplied Layer 14/17 physical receipt/report pair for M45 candidate
+`afc06e911840c60b091161a5864ca514dd8c0bdd` is mechanically qualified as `report_status=PASS`,
+`a08_verdict=PASS`, and `qualified=True`. Audit ID is
+`m45-sakg-task21-afc06e9-nvidia-001`. Actual auditor provenance is NVIDIA
+`meta/llama-3.2-11b-vision-instruct` (family `llama`), while the receipt records builder
+`cline-pass` / `z-ai/glm-5.3-flash` (family `glm`), so A-08 is `PASS` (`llama != glm`). The route
+was attempted once with no retry and no fallback.
+
+The exact candidate-bound evidence bundle SHA-256 is
+`0bd0a8e3e811026078bd1513719bbd2fb1e5007b7ceae41519ce25f22c14db31`. Receipt
+`/private/tmp/paeos-sakg-task21-m45-receipt.json` has canonical/self SHA-256
+`215242a20dd8dceb76c0eaa342fcf0c11fe52dba62a3cbc3868ecc31ab63dd09` and file SHA-256
+`8dfbc97ac4b6d61c0099f76d057b85f2dd8e6c3b8de048badfec045c862690c7`. Report
+`/private/tmp/paeos-sakg-task21-m45-report.md` has SHA-256
+`fbfd7fc75ef0585ef15c789209ffa053883c73ad2bcb7191d44e0e7f8f917bf5`; review scope and
+transport request SHA-256 is `6dfaceefb2db6bbc5c78854a58b371e75ff64faa1fd5c43fba5b6ea7a646e3d8`.
+The report contains the required `AUDIT_COMPLETE: true` marker and verifies typed SAKG node IDs,
+the exact `subsumes` relation, provenance/evidence hashes, ambiguity checks, deterministic scope
+transfer, and fail-closed behavior.
+
+The final local SoftLoop run under `/private/tmp/paeos-m45-task21-run` is `r-530205f1` / goal
+`g-a8707365ba55`, sealed by `5e768d9926917aa42f937c71cafb3f4721cf74d4d73dbee5aebaf5d0fe8d5252`,
+with ledger head `66` and artifact bundle
+`8279b70a20760600bbe77e567b2f924e4017b558c8f27fe58eb73a58dc854c17`. Local accounting is
+Court **Sealed: 1 | Remanded: 3 | Remediated: 3** and Worker **Admitted: 0 | Rejected: 0 |
+Remediated: 0**; focused M45 tests are 7/7 and the isolated `tests/sakg` suite passed. The three
+remands (bridge timeout, elapsed-time non-reproduction, and typed-ID/hash validation) remain
+visible healthy back-pressure and are not optimized away.
+
+The substantive report's non-blocking finding is preserved: a child scope outside the parent scope
+can raise `ScopeIncompatibilityError` without a sufficiently clear explanation of the incompatible
+scope classes/domains. No claim is made that this explanatory gap was fixed, and no scope widening
+is authorized. The separate one-shot Gemini attempt recorded in Entry 315 remains rejected for
+truncation and is not used for this seal.
+
+Founder/Court disposition is recorded as `COURT_SEALED` in
+`reviews/tasks/PAEOS_MILESTONE_45_SAKG_TASK_21_FOUNDER_COURT_DISPOSITION.md`. Physical-window
+accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**; strict progress advances exactly once
+from **32/48 complete | 16 remaining** to **33/48 complete | 15 remaining**. Milestone 46 — CER
+Gate Transition Verification Suite — is **OPEN / QUEUED** in
+`reviews/tasks/PAEOS_MILESTONE_46_CER_GATE_TRANSITION_VERIFICATION_SUITE_INTAKE.md`.
+
+No additional provider transmission, source-code change, fallback, retry, promotion, merge, or
+main/trunk/protected-ref mutation occurred.

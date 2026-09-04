@@ -1595,3 +1595,40 @@ physically unqualified and strict progress remains `22/48 complete | 26 remainin
   promotion, merge, or protected-ref mutation occurred. Unrelated pre-existing modifications
   remain untouched: `ops/auditor_receipt_capture.py`, `paeos/model_router/catalog.py`, and
   `ops/nudge_codex.py`.
+
+- 2026-09-04 Milestone 45 SAKG Task 21 was executed in the isolated SoftLoop. Three fail-closed
+  remands (bridge timeout, non-deterministic elapsed-time output, and an A-08 typed-ID/hash
+  validation finding) were preserved before final run `r-530205f1` sealed with seal
+  `5e768d9926917aa42f937c71cafb3f4721cf74d4d73dbee5aebaf5d0fe8d5252`. Candidate commit
+  `afc06e911840c60b091161a5864ca514dd8c0bdd` is held only in the detached candidate clone;
+  canonical artifact bundle `8279b70a20760600bbe77e567b2f924e4017b558c8f27fe58eb73a58dc854c17`
+  and manifest `/private/tmp/paeos-sakg-task21-candidate-bundle.json` (file SHA-256
+  `0bd0a8e3e811026078bd1513719bbd2fb1e5007b7ceae41519ce25f22c14db31`) are emitted for the
+  pending heterogeneous physical audit. Focused M45 tests are 7/7 and the full `tests/sakg`
+  suite passes. No provider transmission, retry, fallback, promotion, merge, or protected-ref
+  mutation occurred; host source remains unchanged.
+
+- 2026-09-04 The Founder-authorized one-shot physical capture for M45 candidate
+`afc06e911840c60b091161a5864ca514dd8c0bdd` and bundle
+`0bd0a8e3e811026078bd1513719bbd2fb1e5007b7ceae41519ce25f22c14db31` was sent exactly once to
+  Google `gemini-3.6-flash` (`max_tokens=4096`, no retry/fallback). The transport receipt proves
+  one Google attempt, Gemini family, and A-08 `PASS` versus the GLM builder, but PAEOS rejected the
+  response because it ended before the required `AUDIT_COMPLETE: true` marker. Rejected report
+  SHA-256 is `85e10f43e260e4e40b7861276cb45552dd4526407d12b609ccc532b22941c08b`; rejected receipt
+  file SHA-256 is `569b1f93ebdf97a16a3705dc30229f856c38252f81f5df787d7854284cf243f0`; rejection
+  record SHA-256 is `8bbcdb360da873e9ee268f9cc4bf746194107ad0698e5df469f828f5992c48ae`. The physical
+audit is rejected/unqualified; no retry, fallback, source change, promotion, merge, or protected
+ref mutation occurred.
+
+- 2026-09-04 The supplied NVIDIA/Llama Layer 14/17 pair qualified M45 SAKG Task 21 for candidate
+  `afc06e911840c60b091161a5864ca514dd8c0bdd` and bundle
+  `0bd0a8e3e811026078bd1513719bbd2fb1e5007b7ceae41519ce25f22c14db31` (A-08 `PASS`,
+  `llama != glm`, one attempt, no fallback/retry). Receipt canonical SHA-256 is
+  `215242a20dd8dceb76c0eaa342fcf0c11fe52dba62a3cbc3868ecc31ab63dd09`, receipt file SHA-256 is
+  `8dfbc97ac4b6d61c0099f76d057b85f2dd8e6c3b8de048badfec045c862690c7`, and report SHA-256 is
+  `fbfd7fc75ef0585ef15c789209ffa053883c73ad2bcb7191d44e0e7f8f917bf5`. The report is `PASS`
+  with `AUDIT_COMPLETE: true`; its ScopeIncompatibilityError explanation observation is retained
+  as a follow-up risk. Founder/Court disposition is `COURT_SEALED`, physical progress advances
+  to `33/48 complete | 15 remaining`, and M46 CER Gate Transition Verification Suite is opened
+  and queued. No source-code change, provider transmission, retry, fallback, promotion, merge,
+  or protected-ref mutation occurred.
