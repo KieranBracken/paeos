@@ -3,19 +3,47 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-04 (Milestone 46 CER Gate Transition Verification Suite Court-sealed; Milestone 47 opened)
+> **Last updated:** 2026-09-04 (Milestone 47 CER Failure & Remand Recovery Court-sealed; Milestone 48 opened)
 
-## Current canonical recovery frontier — 2026-09-04 (34/48 physical program seals; M46 sealed)
+## Current canonical recovery frontier — 2026-09-04 (35/48 physical program seals; M47 sealed)
 
 - **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); L17 Retrospective candidate is `fd17d209b6dbf0aead8ff5137f213439b13e580a`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–21 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, Task 20 `[T-BASELINE]`, and Task 21 `[SAKG TASK 21]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective, Milestone 40 `[I-DURABLE-SCARS]`, Milestone 43 `[I-CER-BASELINE]`, Milestone 44 `[I-L15-SIZING]`, Milestone 45 `[SAKG TASK 21]`, and Milestone 46 `[I-CER-GATE-TRANSITION]` are **COURT_SEALED**. Milestone 47 CER Failure & Remand Recovery is **OPEN/QUEUED**.
-- **Strict sealed progress:** **34/48 physical program seals complete | 14 remaining**. Milestones 43–46 evidence is recorded; stale historical labels are preserved and superseded by canonical intake names.
+- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–21 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, Task 20 `[T-BASELINE]`, and Task 21 `[SAKG TASK 21]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective, Milestone 40 `[I-DURABLE-SCARS]`, Milestone 43 `[I-CER-BASELINE]`, Milestone 44 `[I-L15-SIZING]`, Milestone 45 `[SAKG TASK 21]`, Milestone 46 `[I-CER-GATE-TRANSITION]`, and Milestone 47 `[I-CER-FAILURE-RECOVERY]` are **COURT_SEALED**. Milestone 48 Program Invariant Synthesis is **OPEN/QUEUED**.
+- **Strict sealed progress:** **35/48 physical program seals complete | 13 remaining**. Milestones 43–47 evidence is recorded; stale historical labels are preserved and superseded by canonical intake names.
 - **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
 - **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
 - **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. No debt is silently closed by this entry. Gate G remains unproven.
 - **SAKG Subsystem:** Tasks 14–20 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`, `[T-NONAUTH]`, `[T-BASELINE]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; Task 19 has a local seal with 8 focused tests, clean import-boundary verification, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair; Task 20 has a local seal with 4 focused tests, baseline CLI, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair. Earlier failed and alternate audit attempts remain preserved as separate evidence. Mission 0 remains pending.
-- **Runtime Intakes:** Milestones 44 `[I-L15-SIZING]` / L15 Dynamic Context Sizing, 45 SAKG Task 21 / Taxonomy Node Hierarchy Subsumption, and 46 `[I-CER-GATE-TRANSITION]` / L02-G1 CER Gate Transition Verification Suite are **COURT_SEALED**. Milestone 47 CER Failure & Remand Recovery is **OPEN/QUEUED** for isolated execution.
+- **Runtime Intakes:** Milestones 44 `[I-L15-SIZING]` / L15 Dynamic Context Sizing, 45 SAKG Task 21 / Taxonomy Node Hierarchy Subsumption, 46 `[I-CER-GATE-TRANSITION]` / L02-G1 CER Gate Transition Verification Suite, and 47 `[I-CER-FAILURE-RECOVERY]` / L02-R1 CER Failure & Remand Recovery are **COURT_SEALED**. Milestone 48 Program Invariant Synthesis & Final Recovery Sealing is **OPEN/QUEUED** for isolated execution.
 - **Repository Health:** M46 candidate evidence records 8/8 focused CER tests and 730/730 `tests/runtime` tests. Whole-repository pytest remains environment-sensitive in unrelated gateway, Seatbelt, and transaction-lock tests; no M46 CER test failed.
+
+## 2026-09-04 — Milestone 47 CER Failure & Remand Recovery Court seal; Milestone 48 queued
+
+The supplied heterogeneous Layer 14/17 pair qualifies the M47 physical window for candidate
+`773b5bce477d4b61364af4e02bdcd493092aa83c` and evidence bundle
+`e25751da28222fb82e33cc2c063fa9df649713ba94c4ed75e0cdeda204b2196f`. The NVIDIA
+`meta/llama-3.2-11b-vision-instruct` auditor (family `llama`) differs from builder
+`z-ai/glm-5.3-flash` (family `glm`), so A-08 is **PASS**; the physical route used one attempt with
+no fallback or retry. Receipt `/private/tmp/paeos-cer-failure-recovery-m47-receipt.json` has SHA-256
+`41511b6c79cfd8a24f661a0960bd1c93ce60d023b1fe13cdcdef777fce7d5356`; report
+`/private/tmp/paeos-cer-failure-recovery-m47-report.md` has SHA-256
+`06ff4530806fa6606b7b54e78ff8083365e745ceb4667b191712ea80da1e0b1f`.
+
+The report is retained as `REMAND_WITH_AMENDMENTS` with `AUDIT_COMPLETE: true`. Its finding that
+successful local tests and the earlier missing-artifact remand are not reconciled is preserved as
+a Milestone 48 obligation; this entry does not rewrite it to `PASS` or widen the implementation
+claim. M47 local SoftLoop state root `/private/tmp/paeos-m47-cer-recovery-run-2` is sealed with
+`bb90c0ad3b210529a758ad03e5193ac72528ff8b1eb512de03d347395bf83add`; ledger head is
+`d7c6419041532015ff93a1014bf7a5ca06b01245b47f20bffcf8942116558db1`. Local accounting is
+**Sealed: 1 | Remanded: 1 | Remediated: 1**, with `DEBT-0070` preserved; physical-window
+accounting is **Sealed: 1 | Remanded: 0 | Remediated: 0**.
+
+Strict physical progress advances exactly once from **34/48 complete | 14 remaining** to
+**35/48 complete | 13 remaining**. The Founder/Court disposition is
+`reviews/tasks/PAEOS_MILESTONE_47_CER_FAILURE_REMAND_RECOVERY_FOUNDER_COURT_DISPOSITION.md`.
+Milestone 48 — **Program Invariant Synthesis & Final Recovery Sealing** — is **OPEN/QUEUED** in
+`reviews/tasks/PAEOS_MILESTONE_48_PROGRAM_INVARIANT_SYNTHESIS_INTAKE.md`. No M48 implementation,
+physical audit, or completion seal exists yet.
 
 
 The current Gate F implementation candidate is

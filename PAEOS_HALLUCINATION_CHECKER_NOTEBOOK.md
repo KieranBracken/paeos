@@ -6004,3 +6004,33 @@ advances from **33/48 complete | 15 remaining** to **34/48 complete | 14 remaini
 — **CER Failure & Remand Recovery** — is **OPEN/QUEUED** in
 `reviews/tasks/PAEOS_MILESTONE_47_CER_FAILURE_REMAND_RECOVERY_INTAKE.md`. No provider transmission,
 retry, fallback, source promotion, merge, or main/trunk/protected-ref mutation occurred.
+
+### Entry 318 — 2026-09-04: Milestone 47 CER Failure & Remand Recovery physical qualification and Court seal
+
+The supplied candidate-bound Layer 14/17 pair for Milestone 47 `[I-CER-FAILURE-RECOVERY]` /
+L02-R1 is recorded against candidate
+`773b5bce477d4b61364af4e02bdcd493092aa83c` and evidence bundle
+`e25751da28222fb82e33cc2c063fa9df649713ba94c4ed75e0cdeda204b2196f`. The physical receipt
+`/private/tmp/paeos-cer-failure-recovery-m47-receipt.json` has SHA-256
+`41511b6c79cfd8a24f661a0960bd1c93ce60d023b1fe13cdcdef777fce7d5356`; the substantive report
+`/private/tmp/paeos-cer-failure-recovery-m47-report.md` has SHA-256
+`06ff4530806fa6606b7b54e78ff8083365e745ceb4667b191712ea80da1e0b1f`.
+
+Auditor provenance is NVIDIA `meta/llama-3.2-11b-vision-instruct` (family `llama`) versus
+builder `z-ai/glm-5.3-flash` (family `glm`), so A-08 is **PASS** (`llama != glm`), with exactly
+one provider attempt and no retry or fallback. The report terminates correctly but declares
+`L14_STATUS: REMAND_WITH_AMENDMENTS`; its concrete observation that successful local tests and
+the earlier missing-artifact remand are not reconciled is preserved, not normalized to `PASS`.
+The physical audit window itself is counted **Sealed: 1 | Remanded: 0 | Remediated: 0**.
+
+M47's isolated SoftLoop state root `/private/tmp/paeos-m47-cer-recovery-run-2` is sealed with
+`bb90c0ad3b210529a758ad03e5193ac72528ff8b1eb512de03d347395bf83add` and ledger head
+`d7c6419041532015ff93a1014bf7a5ca06b01245b47f20bffcf8942116558db1`. Local accounting is
+**Sealed: 1 | Remanded: 1 | Remediated: 1**, with `DEBT-0070` preserved. Strict physical
+progress advances once from **34/48** to **35/48 complete | 13 remaining**. Milestone 48 —
+Program Invariant Synthesis & Final Recovery Sealing — is opened and queued in
+`reviews/tasks/PAEOS_MILESTONE_48_PROGRAM_INVARIANT_SYNTHESIS_INTAKE.md`; its purpose includes
+reconciling the preserved M47 amendment without mutating historical evidence.
+
+No provider transmission, source promotion, merge, retry, fallback, or protected-ref mutation
+occurred in this governance update.
