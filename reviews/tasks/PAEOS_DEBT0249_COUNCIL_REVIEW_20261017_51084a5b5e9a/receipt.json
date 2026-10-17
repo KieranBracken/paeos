@@ -1,0 +1,86 @@
+{
+  "schema": "paeos.ordinary-source-review/1",
+  "operation_id": "paeos-debt0249-council-review-20261017-faae8dc56ed5442ca8ec51084a5b5e9a",
+  "opened_at_utc": "2026-10-17T02:43:23.660639+00:00",
+  "status": "HELD_NO_EFFECT_KNOWN_TERMINAL_MODEL_RETIREMENT",
+  "candidate_bindings": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  },
+  "canonical_source_preimage_sha256": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+  "request_sha256": "7dff0d7cac167a61d6338edcb4588c292c690402bc388ed973b5718adbd4ee52",
+  "request_policy_sha256": "5effc86014e06917dc7bbdfdb9afb9014e71701bf5aa760168b7fc97c892c0ce",
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "allow_fallback": false,
+  "retry_policy": "NONE",
+  "max_provider_attempts": 1,
+  "builder_family": "gpt",
+  "actual_provider_attempts": 0,
+  "provider_request_fingerprint": null,
+  "provider_response_fingerprint": null,
+  "generation_id": null,
+  "pool_resolved_candidates": [
+    {
+      "provider_id": "nvidia",
+      "model_id": "meta/llama-3.1-8b-instruct",
+      "family": "llama",
+      "cost_tier": "FREE",
+      "pricing_verified_free": true,
+      "live_verified": true,
+      "catalog_available": true,
+      "admission_state": "ADMITTED",
+      "provider_health": "HEALTHY",
+      "provider_last_error_type": "PROVIDER_UNAVAILABLE",
+      "active_requests": 0,
+      "aimd_admitted": true,
+      "aimd_reason": null
+    }
+  ],
+  "current_free_route_states": {
+    "google": {
+      "model_id": "gemini-3.6-flash",
+      "health_status": "EXHAUSTED",
+      "last_error_type": "QUOTA_EXHAUSTED",
+      "active_requests": 0,
+      "aimd_admitted": false,
+      "aimd_reason": "Provider google is EXHAUSTED"
+    },
+    "nvidia": {
+      "model_id": "meta/llama-3.1-8b-instruct",
+      "health_status": "HEALTHY",
+      "last_error_type": "PROVIDER_UNAVAILABLE",
+      "active_requests": 0,
+      "aimd_admitted": true,
+      "aimd_reason": null
+    },
+    "openrouter": {
+      "model_id": "openrouter/free",
+      "health_status": "EXHAUSTED",
+      "last_error_type": null,
+      "active_requests": 0,
+      "aimd_admitted": false,
+      "aimd_reason": "Provider openrouter is EXHAUSTED"
+    },
+    "cline": {
+      "model_id": "poolside/laguna-s-2.1:free",
+      "health_status": "EXHAUSTED",
+      "last_error_type": "QUOTA_EXHAUSTED",
+      "active_requests": 0,
+      "aimd_admitted": false,
+      "aimd_reason": "Provider cline is EXHAUSTED"
+    }
+  },
+  "known_retirement_evidence": {
+    "path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_RECOVERY_20261015_bd6c2e4f/retirement_baseline/redacted-response.json",
+    "sha256": "9059b9659d7c4e72adb6be4dd18d6abf4cff7d82355ca36bc0147494d279de61",
+    "http_status": 410,
+    "detail": "The model 'meta/llama-3.1-8b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available.",
+    "source_result": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_RECOVERY_20261015_bd6c2e4f/retirement_baseline/result.json",
+    "source_result_sha256": "121881774e20e89b258c9ad1217d5cecd7f9135f85265f1e69fadbb14c769d74"
+  },
+  "precise_no_effect_decision": "No provider call was made. The auto-selected free model is documented by the exact upstream response as permanently Gone (HTTP 410; EOL 2026-08-26). Google is provider-wide EXHAUSTED and AIMD denies admission. PAEOS catalog/health mismatch is preserved without resetting or editing router state.",
+  "local_refusal_sha256": "77154f65d35c12a4331eab322a366d2c2150a391938f11d1875449c5a51d490a",
+  "no_provider_response_exists": true,
+  "scope": "Fresh no-effect route decision for the pinned Council candidate; not a reviewer opinion, Court action, integration, or qualification."
+}
