@@ -1,0 +1,43 @@
+{
+  "court_adjudication": false,
+  "evidence": [
+    {
+      "artifact_hash": "83eb2871226dbbba5b04c0677f990ae3433fc0fde227b8e65a9165fd3b51578e",
+      "attestation": "pending-kernel-sig",
+      "claim_id": "FREE-POOL-PROVIDER-FREE",
+      "determinism": "DETERMINISTIC",
+      "environment_hash": "fbf8556df61311092b9d8df6581f54c56d59cacd2259d0052b56834f69b2f91d",
+      "evidence_hash": "9b09ef9fa230b9e376f0007a4714bd10a899640494bc3ca4026e7a3cc37eb74d",
+      "kind": "TEST",
+      "producer": {
+        "role": "BUILDER",
+        "session": "mcp"
+      },
+      "reproducible_command": "{\"argv\":[\"/Users/bob/.codex/worktrees/free-pool-repair-20261017/paeos/.venv/bin/python\",\"-I\",\"-B\",\".source_construction_verify.py\",\"tests/model_router/test_free_pool_repair.py\"],\"cwd\":\".\",\"environment\":{\"LC_ALL\":\"C\",\"PATH\":\"/Users/bob/.cargo/bin:/Users/bob/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"},\"schema\":\"paeos.structured-command/1\"}",
+      "result": {
+        "argv": [
+          "/Users/bob/.codex/worktrees/free-pool-repair-20261017/paeos/.venv/bin/python",
+          "-I",
+          "-B",
+          ".source_construction_verify.py",
+          "tests/model_router/test_free_pool_repair.py"
+        ],
+        "cwd": ".",
+        "environment_fingerprint": "fbf8556df61311092b9d8df6581f54c56d59cacd2259d0052b56834f69b2f91d",
+        "executable": "/Users/bob/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/bin/python3.13",
+        "executable_version": "sha256:3e96a8b2f541b3d5ded271fb6e2bc83aea0557e863d0a4c472fd4679d1983fec",
+        "exit_code": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "eb27a136c18598aedc0e4f11e6893b614a04335a9faf3ec03433325d777e2663"
+      }
+    }
+  ],
+  "evidence_count": 1,
+  "meaning": "Physical verifier observation only. The attestation is pending-kernel-sig; no Court adjudication or phase qualification is claimed.",
+  "qualification": false,
+  "run_id": "sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30",
+  "schema": "paeos.sanitized-court-observation/1",
+  "source_path": "/private/tmp/paeos-free-pool-repair-20261017/state-v3/court-submission.json",
+  "source_sha256": "6590ade225bd7b7d869f17d198657c533a4483f240bee9307b6abeb2fdd59a12",
+  "submission_started_record_sha256": "2d872f5fe84a174c458be825b108060ac2f5c257fdcef56f9522687f0224ed5d"
+}

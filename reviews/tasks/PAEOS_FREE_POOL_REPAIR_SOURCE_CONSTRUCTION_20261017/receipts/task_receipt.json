@@ -1,0 +1,92 @@
+{
+  "claims": {
+    "adjudicated": false,
+    "integrated": false,
+    "promoted": false,
+    "provider_calls": 0,
+    "qualified": false
+  },
+  "cost_meter": {
+    "meaning": "ChatBridge compatibility meter only; not account quota telemetry.",
+    "model_ver": "chat-bridge-compatibility",
+    "reported_tokens": 0
+  },
+  "dispatch_started": {
+    "record_path": "dispatch_started.json",
+    "record_sha256": "024015bffe96a51a42ed8f399feb42b7d2df3fe4ddc945d4ea8014698234867a",
+    "retry_authorized": false,
+    "started_at": "2026-10-17T03:34:16.801893+00:00"
+  },
+  "goal_id": "sc-g-d1c831a5fb934a9a978a03454a0dec30",
+  "initialization": {
+    "record_sha256": "74e2ab682f92ab7abd39f21f98899883246033ee911a018d74c4cbfb51143dc8",
+    "worker_dispatches": 0
+  },
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "package_original_sha256_private_reference": "da2d35c5437e0d35f3f1f57c14326c78a7fc7f922046db1c4974aa618788009f",
+  "package_receipt_sha256_redacted_copy": "package_receipt_sanitized.json",
+  "prompt_receipt": {
+    "bytes": 9968,
+    "content_included": false,
+    "original_path": "/private/tmp/paeos-free-pool-repair-20261017/state-v3/bridge/requests/sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30--t-30fb8836a9bd--implement.prompt.md",
+    "sha256": "67f4880588b1b80582f1d5242d4b3b14411d377e5a597e5ebd393327e95381c0"
+  },
+  "receiver_start": {
+    "reason": "Initialization records worker_dispatches=0. The dispatch marker and Bridge request prove local package/spool creation, but no receiving-turn start receipt exists. The bound session names the current Codex thread; this same thread authored the workspace files and invoked the completion adapter, which wrote the spool response. The ChatBridge COMPLETE result confirms spool response acceptance, not a separate worker turn.",
+    "receipt_path": null,
+    "separate_worker_start_proven": false
+  },
+  "response_receipt": {
+    "bytes": 9473,
+    "export_path": "bridge_response.json",
+    "original_path": "/private/tmp/paeos-free-pool-repair-20261017/state-v3/bridge/responses/sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30--t-30fb8836a9bd--implement.response.md",
+    "sha256": "046e6eb4ceee42e3b943d8c4e9916d17834970ddd1304a69361e0c88d9c0ea5c"
+  },
+  "result": {
+    "environment_identity": "e771a8e66f8e78da817a2f7626a95d5911dd6d80d21a8a81c868574012d7cc1f",
+    "integration_permitted": false,
+    "record_sha256": "af33407f3e2168bbcefd383a5bbe52bc99195688cc255ee62430e14141fc7ee3",
+    "source_status": "SOURCE_CAPTURED_REQUIRES_INDEPENDENT_VERIFICATION_AND_REVIEW",
+    "status": "COMPLETE",
+    "trace_ref": "046e6eb4ceee42e3b943d8c4e9916d17834970ddd1304a69361e0c88d9c0ea5c",
+    "workspace_identity": "4ec5da31bdc6e1e724ba17c0fbc62d5dc98f63fa9ccd2517348a59310c0b5180",
+    "written_paths": [
+      {
+        "path": "paeos/model_router/aimd.py",
+        "sha256": "fdeb57d074d04250ea35f11d26c2edb0c32122e8b875e767c906c3bf9fad6ed8"
+      },
+      {
+        "path": "paeos/model_router/catalog.py",
+        "sha256": "5cbb5130bb962afb79939ddf7387e8422523207a3aa989102190adc9ab51abe1"
+      },
+      {
+        "path": "paeos/model_router/errors.py",
+        "sha256": "b56a89b7763abfa6cd6b24eeb10aa2cf863bf633b96a72d9c9c2edae86a74c4d"
+      },
+      {
+        "path": "paeos/model_router/intelligence_tier.py",
+        "sha256": "3fec49d272324ed82025adf475ad6cd4f310c8f8341201658de65c16ff1fa907"
+      },
+      {
+        "path": "tests/model_router/test_free_pool_repair.py",
+        "sha256": "83eb2871226dbbba5b04c0677f990ae3433fc0fde227b8e65a9165fd3b51578e"
+      },
+      {
+        "path": "tests/model_router/test_gateway_server.py",
+        "sha256": "46807c314677f75b28f0ea7e2e72bd99b5bc29cc0665a1816b8dfb3b7f939aca"
+      },
+      {
+        "path": "tests/model_router/test_intelligence_tier_policy.py",
+        "sha256": "4d2dad0684ac7caa47a75752f8e5b23ea0067389ae108c838a4bfd5a6ae13641"
+      },
+      {
+        "path": "tests/model_router/test_routing_policy.py",
+        "sha256": "a340dbf69d5604eddb497b82258cbfd2b773d186e8774730372d55bb880304f3"
+      }
+    ]
+  },
+  "run_id": "sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30",
+  "schema": "paeos.sanitized-task-receipt/1",
+  "scope_sha256": "c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a",
+  "task_id": "t-30fb8836a9bd"
+}

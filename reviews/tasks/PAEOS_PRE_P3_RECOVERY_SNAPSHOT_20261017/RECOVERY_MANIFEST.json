@@ -176,14 +176,14 @@
     {
       "mode": "100644",
       "path": "MessyChangesNeedsReview.md",
-      "sha256": "94b6decb438c6bece0c815b0e4fa56292a99eceaea32c1fd71846874a5dac335",
-      "size": 635660
+      "sha256": "266710639096b15b1dbcb7bf7ce1d920c855d81c41999f216d480d4bfa127e20",
+      "size": 636754
     },
     {
       "mode": "100644",
       "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
-      "sha256": "50e0f052f7e82296f805365cf6916c265dde4d81b6cd4f99860bc49b1d8d64cf",
-      "size": 1411361
+      "sha256": "6f1a924536d2640136e905cb0bb12054a3ffcee6a38791e628db5b56e00a926a",
+      "size": 1413274
     },
     {
       "mode": "100644",
@@ -10162,6 +10162,114 @@
       "path": "reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/verify_candidate.py",
       "sha256": "6c637019d2f8c140cb05117f71f9631a0c48401f5658c91312c3dec48d4730a3",
       "size": 1658
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/README.md",
+      "sha256": "7adfae6c5a2c00dc032a1a850092a9de52eb6bccacbcbd14add2f8c52cc12b9c",
+      "size": 1425
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/paeos/model_router/aimd.py",
+      "sha256": "fdeb57d074d04250ea35f11d26c2edb0c32122e8b875e767c906c3bf9fad6ed8",
+      "size": 9015
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/paeos/model_router/catalog.py",
+      "sha256": "5cbb5130bb962afb79939ddf7387e8422523207a3aa989102190adc9ab51abe1",
+      "size": 13627
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/paeos/model_router/errors.py",
+      "sha256": "b56a89b7763abfa6cd6b24eeb10aa2cf863bf633b96a72d9c9c2edae86a74c4d",
+      "size": 12666
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/paeos/model_router/intelligence_tier.py",
+      "sha256": "3fec49d272324ed82025adf475ad6cd4f310c8f8341201658de65c16ff1fa907",
+      "size": 15324
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/tests/model_router/test_free_pool_repair.py",
+      "sha256": "83eb2871226dbbba5b04c0677f990ae3433fc0fde227b8e65a9165fd3b51578e",
+      "size": 4449
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/tests/model_router/test_gateway_server.py",
+      "sha256": "46807c314677f75b28f0ea7e2e72bd99b5bc29cc0665a1816b8dfb3b7f939aca",
+      "size": 4478
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/tests/model_router/test_intelligence_tier_policy.py",
+      "sha256": "4d2dad0684ac7caa47a75752f8e5b23ea0067389ae108c838a4bfd5a6ae13641",
+      "size": 12419
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/candidate/tests/model_router/test_routing_policy.py",
+      "sha256": "a340dbf69d5604eddb497b82258cbfd2b773d186e8774730372d55bb880304f3",
+      "size": 11384
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/EXPORT_MANIFEST.json",
+      "sha256": "9a5d67d6bcc1f32534648b58b48cde34e34c93c0225d86307e8538ea82ecb9d9",
+      "size": 1655
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/README.md",
+      "sha256": "cf8b9fba63d4be1cc9a4293f1a111811e9a9f9201b05e8f306bfc6e034ff894d",
+      "size": 1339
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/bridge_response.json",
+      "sha256": "046e6eb4ceee42e3b943d8c4e9916d17834970ddd1304a69361e0c88d9c0ea5c",
+      "size": 9473
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/completion_receipt.json",
+      "sha256": "b8cd27285b8feeeb68c53151b67a7264fb35b12722dc48c31528b4db025479b7",
+      "size": 1834
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/court_physical_observation.json",
+      "sha256": "fc164a854e216c122f14b2d7ba3fed03a0ca59ccea1a0faa60b440e9bff09ea2",
+      "size": 2401
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/dispatch_started.json",
+      "sha256": "024015bffe96a51a42ed8f399feb42b7d2df3fe4ddc945d4ea8014698234867a",
+      "size": 223
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/package_receipt_sanitized.json",
+      "sha256": "746a25dd7c9eb7f9b3dc8c1a89608f670f4eb43f7f0419a48ce25b2770cabb8d",
+      "size": 4187
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/receipts/task_receipt.json",
+      "sha256": "d52cefce86e5fdf9fa5740d6828b5f45a6f3e46ef238634c852736e3f3fd35ed",
+      "size": 4247
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017/worker-export-manifest.json",
+      "sha256": "c81b01561ff31b903db2919b09b01303b9022386ea521aec368981c8a6997657",
+      "size": 7775
     },
     {
       "mode": "100644",

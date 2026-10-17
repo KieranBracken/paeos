@@ -5397,3 +5397,10 @@ A parentless, manifest-backed branch `codex/pre-p3-clean-recovery-20261017` is b
 ## 2026-10-17 — Initial recovery checkpoint published
 
 GitHub read-back confirms `codex/pre-p3-clean-recovery-20261017` at commit `da3aa25bf731ba737cfa8c988c509c798b2a6fe3`. Its manifest records 2,261 files and all recorded content hashes verified; no state/key/database paths were included. This checkpoint is not a release or qualification claim.
+
+
+## 2026-10-17 — Free-pool repair candidate checkpoint
+
+Captured (unintegrated) exact eight-file candidate from PAEOS run `sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30`, task `t-30fb8836a9bd`, scope `c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a`. The candidate removes the retired NVIDIA model and repairs reset parsing/cooldown. Focused provider-free tests passed 12/12; one physical Court source observation exists, with no adjudication or qualification; no provider calls were made.
+
+Lifecycle boundary: the PAEOS result is a completed source-construction capture, but initialization records `worker_dispatches: 0` and the current Codex thread supplied the Builder response. No distinct pool worker start is proven. No free different-family INTERNAL reviewer route is available. Independent review, integration, activation, qualification, debt closure and P3 remain held. Owner: worker-pool route thread `01a13075-533b-72a1-b8f8-8f109414f707`. Exact wake: authenticated receiver-start and response receipts plus an eligible free INTERNAL route from a different model family.

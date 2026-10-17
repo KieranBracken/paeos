@@ -1,0 +1,176 @@
+{
+  "candidate_root": "/private/tmp/paeos-free-pool-repair-20261017/state-v3/candidate",
+  "court_observation": {
+    "court_adjudication": false,
+    "observation_count": 1,
+    "phase_qualification": false,
+    "receipt_sha256": "6590ade225bd7b7d869f17d198657c533a4483f240bee9307b6abeb2fdd59a12",
+    "submission_started_record_sha256": "2d872f5fe84a174c458be825b108060ac2f5c257fdcef56f9522687f0224ed5d"
+  },
+  "excluded_from_export": [
+    "kernel.key",
+    "ledger.sqlite",
+    "ledger.sqlite-wal",
+    "ledger.sqlite-shm",
+    "CAS/runtime state",
+    "worker qualifications",
+    "all non-write-scope source files"
+  ],
+  "files": [
+    {
+      "base_preimage_sha256": "51e49bd23c86e46b138f58b6083a249b374e5e472703e7f0acb414c32cf078f6",
+      "bytes": 13627,
+      "candidate_sha256": "5cbb5130bb962afb79939ddf7387e8422523207a3aa989102190adc9ab51abe1",
+      "path": "paeos/model_router/catalog.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": "dcb831673fa49e4f7e847cfd0643404f5ae38dfe1d3739d84b1c386681c5b825",
+      "bytes": 15324,
+      "candidate_sha256": "3fec49d272324ed82025adf475ad6cd4f310c8f8341201658de65c16ff1fa907",
+      "path": "paeos/model_router/intelligence_tier.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": "a04f94f15b153843ce023648370b661fa24f167e113ef1efc1cda11360207d92",
+      "bytes": 12666,
+      "candidate_sha256": "b56a89b7763abfa6cd6b24eeb10aa2cf863bf633b96a72d9c9c2edae86a74c4d",
+      "path": "paeos/model_router/errors.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": "219b3f87110575b07767a854335839b55779413882c6ee53a2f5991dd306fa46",
+      "bytes": 9015,
+      "candidate_sha256": "fdeb57d074d04250ea35f11d26c2edb0c32122e8b875e767c906c3bf9fad6ed8",
+      "path": "paeos/model_router/aimd.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": "d82b414ab2128800783f9ca02d3b6bd019fd3105dc465e5cb44568804313c9d0",
+      "bytes": 12419,
+      "candidate_sha256": "4d2dad0684ac7caa47a75752f8e5b23ea0067389ae108c838a4bfd5a6ae13641",
+      "path": "tests/model_router/test_intelligence_tier_policy.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": "a7edee6f658988a5e9e3b90206990bf37b5302fb245d5f55ed1a17f418b27838",
+      "bytes": 11384,
+      "candidate_sha256": "a340dbf69d5604eddb497b82258cbfd2b773d186e8774730372d55bb880304f3",
+      "path": "tests/model_router/test_routing_policy.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": "58625a0a08916a0d61310b6e21430f3eb479519e5f4c6409465af84901cb3755",
+      "bytes": 4478,
+      "candidate_sha256": "46807c314677f75b28f0ea7e2e72bd99b5bc29cc0665a1816b8dfb3b7f939aca",
+      "path": "tests/model_router/test_gateway_server.py",
+      "status": "modified"
+    },
+    {
+      "base_preimage_sha256": null,
+      "bytes": 4449,
+      "candidate_sha256": "83eb2871226dbbba5b04c0677f990ae3433fc0fde227b8e65a9165fd3b51578e",
+      "path": "tests/model_router/test_free_pool_repair.py",
+      "status": "added"
+    }
+  ],
+  "independent_review": {
+    "reviewer_family": null,
+    "status": "HELD_NO_ELIGIBLE_FREE_INTERNAL_ROUTE_VERIFIED"
+  },
+  "local_evidence_root": "/private/tmp/paeos-free-pool-repair-20261017/state-v3",
+  "patch_file": "free-pool-repair.patch",
+  "patch_generated_against": "da3aa25bf731ba737cfa8c988c509c798b2a6fe3",
+  "patch_sha256": "06ec4507ac8432ad6e549f9118538049b3afb93f890e0462e92552c31d7cd748",
+  "physical_source_observation": {
+    "adjudication": false,
+    "count": 1,
+    "receipt_sha256": "6590ade225bd7b7d869f17d198657c533a4483f240bee9307b6abeb2fdd59a12"
+  },
+  "provider_activity": {
+    "network_enabled_for_tests": false,
+    "provider_calls": 0
+  },
+  "qualification": {
+    "debt_closed": false,
+    "integrated": false,
+    "phase_qualified": false,
+    "production": false
+  },
+  "run_id": "sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30",
+  "safe_clean_base": "da3aa25bf731ba737cfa8c988c509c798b2a6fe3",
+  "safe_clean_branch": "codex/pre-p3-clean-recovery-20261017",
+  "safe_integration_base": "3712088ad954fd84d14ca1fd7f38d0a54ade152b",
+  "safe_integration_branch": "codex/pre-p3-clean-recovery-20261017",
+  "sanitized_receipt_export": {
+    "capability_value_included": false,
+    "kernel_key_or_sqlite_or_cas_included": false,
+    "manifest_sha256": "9a5d67d6bcc1f32534648b58b48cde34e34c93c0225d86307e8538ea82ecb9d9",
+    "path": "sanitized-receipts-v1.zip",
+    "sha256": "53d00d10466970bc5c08cc3f50d289b77af10eade4b7b3b524017a41021015fa"
+  },
+  "schema": "paeos.disposable-source-candidate/1",
+  "scope_sha256": "c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a",
+  "source_test_base": "e2ba93d01f67dabcc1f8d2ac1c487bbd56bcde36",
+  "status": "SOURCE_CAPTURED_REQUIRES_INDEPENDENT_VERIFICATION_AND_REVIEW",
+  "task_execution_evidence": {
+    "bound_package_sha256_private_receipt_only": "da2d35c5437e0d35f3f1f57c14326c78a7fc7f922046db1c4974aa618788009f",
+    "builder_session": "codex-thread:01a13075-533b-72a1-b8f8-8f109414f707:free-pool-builder",
+    "compatibility_cost_meter_tokens": 0,
+    "cost_meter_note": "ChatBridge compatibility output, not account quota usage evidence",
+    "dispatch_start_record_sha256": "024015bffe96a51a42ed8f399feb42b7d2df3fe4ddc945d4ea8014698234867a",
+    "dispatch_started_at": "2026-10-17T03:34:16.801893+00:00",
+    "interpretation": "The local PAEOS AgentDispatcher/ChatBridge wrapper returned COMPLETE after the current Codex thread authored the Bridge workspace and completion adapter wrote the spool response. This is not evidence of a separate receiving worker turn.",
+    "request_prompt_sha256": "67f4880588b1b80582f1d5242d4b3b14411d377e5a597e5ebd393327e95381c0",
+    "response_sha256": "046e6eb4ceee42e3b943d8c4e9916d17834970ddd1304a69361e0c88d9c0ea5c",
+    "separate_worker_start_proven": false,
+    "trace_ref": "046e6eb4ceee42e3b943d8c4e9916d17834970ddd1304a69361e0c88d9c0ea5c",
+    "worker_dispatches_counter": 0,
+    "worker_result_record_sha256": "af33407f3e2168bbcefd383a5bbe52bc99195688cc255ee62430e14141fc7ee3",
+    "worker_result_status": "COMPLETE",
+    "workspace_identity": "4ec5da31bdc6e1e724ba17c0fbc62d5dc98f63fa9ccd2517348a59310c0b5180"
+  },
+  "task_id": "t-30fb8836a9bd",
+  "touched_source_preimage_checks": [
+    {
+      "path": "paeos/model_router/catalog.py",
+      "sha256": "51e49bd23c86e46b138f58b6083a249b374e5e472703e7f0acb414c32cf078f6",
+      "unchanged": true
+    },
+    {
+      "path": "paeos/model_router/intelligence_tier.py",
+      "sha256": "dcb831673fa49e4f7e847cfd0643404f5ae38dfe1d3739d84b1c386681c5b825",
+      "unchanged": true
+    },
+    {
+      "path": "paeos/model_router/errors.py",
+      "sha256": "a04f94f15b153843ce023648370b661fa24f167e113ef1efc1cda11360207d92",
+      "unchanged": true
+    },
+    {
+      "path": "paeos/model_router/aimd.py",
+      "sha256": "219b3f87110575b07767a854335839b55779413882c6ee53a2f5991dd306fa46",
+      "unchanged": true
+    },
+    {
+      "path": "tests/model_router/test_intelligence_tier_policy.py",
+      "sha256": "d82b414ab2128800783f9ca02d3b6bd019fd3105dc465e5cb44568804313c9d0",
+      "unchanged": true
+    },
+    {
+      "path": "tests/model_router/test_routing_policy.py",
+      "sha256": "a7edee6f658988a5e9e3b90206990bf37b5302fb245d5f55ed1a17f418b27838",
+      "unchanged": true
+    },
+    {
+      "path": "tests/model_router/test_gateway_server.py",
+      "sha256": "58625a0a08916a0d61310b6e21430f3eb479519e5f4c6409465af84901cb3755",
+      "unchanged": true
+    }
+  ],
+  "touched_source_preimages_match_integration_base": true,
+  "verification": {
+    "command": "isolated venv Python -I -B .source_construction_verify.py tests/model_router/test_free_pool_repair.py",
+    "result": "12 passed; network-denied; repeated against captured candidate"
+  }
+}

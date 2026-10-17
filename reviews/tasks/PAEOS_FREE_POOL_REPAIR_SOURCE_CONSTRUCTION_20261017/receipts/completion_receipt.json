@@ -1,0 +1,49 @@
+{
+  "claims": {
+    "integrated": false,
+    "promoted": false,
+    "qualified": false,
+    "sealed": false
+  },
+  "mutable_candidate_files": [
+    {
+      "path": "paeos/model_router/aimd.py",
+      "sha256": "fdeb57d074d04250ea35f11d26c2edb0c32122e8b875e767c906c3bf9fad6ed8"
+    },
+    {
+      "path": "paeos/model_router/catalog.py",
+      "sha256": "5cbb5130bb962afb79939ddf7387e8422523207a3aa989102190adc9ab51abe1"
+    },
+    {
+      "path": "paeos/model_router/errors.py",
+      "sha256": "b56a89b7763abfa6cd6b24eeb10aa2cf863bf633b96a72d9c9c2edae86a74c4d"
+    },
+    {
+      "path": "paeos/model_router/intelligence_tier.py",
+      "sha256": "3fec49d272324ed82025adf475ad6cd4f310c8f8341201658de65c16ff1fa907"
+    },
+    {
+      "path": "tests/model_router/test_free_pool_repair.py",
+      "sha256": "83eb2871226dbbba5b04c0677f990ae3433fc0fde227b8e65a9165fd3b51578e"
+    },
+    {
+      "path": "tests/model_router/test_gateway_server.py",
+      "sha256": "46807c314677f75b28f0ea7e2e72bd99b5bc29cc0665a1816b8dfb3b7f939aca"
+    },
+    {
+      "path": "tests/model_router/test_intelligence_tier_policy.py",
+      "sha256": "4d2dad0684ac7caa47a75752f8e5b23ea0067389ae108c838a4bfd5a6ae13641"
+    },
+    {
+      "path": "tests/model_router/test_routing_policy.py",
+      "sha256": "a340dbf69d5604eddb497b82258cbfd2b773d186e8774730372d55bb880304f3"
+    }
+  ],
+  "run_id": "sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30",
+  "schema": "paeos.sanitized-completion-receipt/1",
+  "scope_sha256": "c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a",
+  "source_path": "/private/tmp/paeos-free-pool-repair-20261017/state-v3/completion.json",
+  "source_sha256": "a179fbe049f8ac8042ec4b7a45e93572d51a21d7d4bd5346bab68e4ab8169c58",
+  "status": "SOURCE_CAPTURED_REQUIRES_INDEPENDENT_VERIFICATION_AND_REVIEW",
+  "task_id": "t-30fb8836a9bd"
+}

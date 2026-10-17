@@ -1,0 +1,53 @@
+{
+  "allowed_files": [
+    {
+      "bytes": 1339,
+      "path": "README.md",
+      "sha256": "cf8b9fba63d4be1cc9a4293f1a111811e9a9f9201b05e8f306bfc6e034ff894d"
+    },
+    {
+      "bytes": 9473,
+      "path": "bridge_response.json",
+      "sha256": "046e6eb4ceee42e3b943d8c4e9916d17834970ddd1304a69361e0c88d9c0ea5c"
+    },
+    {
+      "bytes": 1834,
+      "path": "completion_receipt.json",
+      "sha256": "b8cd27285b8feeeb68c53151b67a7264fb35b12722dc48c31528b4db025479b7"
+    },
+    {
+      "bytes": 2401,
+      "path": "court_physical_observation.json",
+      "sha256": "fc164a854e216c122f14b2d7ba3fed03a0ca59ccea1a0faa60b440e9bff09ea2"
+    },
+    {
+      "bytes": 223,
+      "path": "dispatch_started.json",
+      "sha256": "024015bffe96a51a42ed8f399feb42b7d2df3fe4ddc945d4ea8014698234867a"
+    },
+    {
+      "bytes": 4187,
+      "path": "package_receipt_sanitized.json",
+      "sha256": "746a25dd7c9eb7f9b3dc8c1a89608f670f4eb43f7f0419a48ce25b2770cabb8d"
+    },
+    {
+      "bytes": 4247,
+      "path": "task_receipt.json",
+      "sha256": "d52cefce86e5fdf9fa5740d6828b5f45a6f3e46ef238634c852736e3f3fd35ed"
+    }
+  ],
+  "explicitly_excluded": [
+    "package.json capability token",
+    "kernel.key",
+    "ledger.sqlite",
+    "ledger.sqlite-wal",
+    "ledger.sqlite-shm",
+    "CAS directory",
+    "all unallowlisted state/source files"
+  ],
+  "receiver_start_status": "NOT_PROVEN; worker_dispatches=0; no receiver-start receipt",
+  "run_id": "sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30",
+  "schema": "paeos.sanitized-receipt-allowlist/1",
+  "scope_sha256": "c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a",
+  "task_id": "t-30fb8836a9bd"
+}

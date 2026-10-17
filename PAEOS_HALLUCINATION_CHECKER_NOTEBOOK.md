@@ -13644,3 +13644,16 @@ The new `codex/pre-p3-clean-recovery-20261017` checkpoint is constructed as a pa
 ### 2026-10-17 — Initial recovery checkpoint published
 
 The sanitized parentless recovery snapshot was pushed to `codex/pre-p3-clean-recovery-20261017` and read back from GitHub at commit `da3aa25bf731ba737cfa8c988c509c798b2a6fe3`. Its manifest records 2,261 files; all 2,261 content hashes were read back and verified, with zero state/key/database paths. This is backup evidence only.
+
+
+### 2026-10-17 — Free-pool repair source capture and lifecycle gap
+
+PAEOS source-construction run `sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30`, task `t-30fb8836a9bd`, scope SHA-256 `c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a`, produced an exact eight-file free-pool repair candidate. The task response and result are present in the sanitized receipt package. Provider-free focused tests: 12 passed. Physical Court observations: 1; adjudications: 0; qualifications: 0. Provider calls: 0.
+
+The PAEOS initialization record explicitly reports `worker_dispatches: 0`; the assigned Builder session is the current Codex thread. Therefore the run proves a scoped PAEOS source-construction result, but not that a distinct worker-pool receiver started. The candidate removes NVIDIA `meta/llama-3.1-8b-instruct` after upstream HTTP 410 and repairs positive finite Google RetryInfo/cooldown behavior. It adds no replacement provider. No eligible free different-family INTERNAL reviewer route was verified under current privacy policy.
+
+ALLOWED_NOW: Preserve the exact unintegrated candidate and its receipts; reproduce the 12 provider-free tests against captured bytes. Owner: worker-pool route thread `01a13075-533b-72a1-b8f8-8f109414f707`.
+
+HELD: Independent review, source integration, production route activation, qualification, debt closure, and P3. Wake only on a current eligible free INTERNAL reviewer route from a different family and an authenticated receiver-start/response receipt.
+
+AUTHORITY_OR_IMPLEMENTATION_GAP: `worker_dispatches` is zero and there is no receiver-start receipt; a dispatch/spool record alone does not attest worker execution. The independent reviewer route is also unavailable. The D0258 sole integrator remains Chat 1 `01a147d5-525b-7e31-9fb1-80de3a325e51`; its fresh Builder qualification is expired and its router database is not readable in the clean recovery tree.
