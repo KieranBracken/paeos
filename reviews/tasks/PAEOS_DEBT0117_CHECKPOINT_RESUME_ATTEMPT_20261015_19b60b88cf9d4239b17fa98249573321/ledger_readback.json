@@ -1,0 +1,330 @@
+{
+  "rows": [
+    {
+      "seq": 1,
+      "timestamp": "2026-10-15T16:29:17.752975+00:00",
+      "prev_hash": "407590d349641e2acaa71e4ebd02c48e788d46d6d144ecb21f9a0e79dda58c29",
+      "row_hash": "a20c62294c406a163d61df108a5cdae11a2ef070e0daec1b91b3e3e01bcd7fba",
+      "schema_ver": 1,
+      "kind": "MDG_TASK_SPAWNED",
+      "payload": {
+        "ceremony_trace": "TRACE_A",
+        "checkpoint_ref": null,
+        "fencing_token": 0,
+        "metadata": {
+          "objective": "DEBT-0117 bounded ordinary resume checkpoint validation. In ResumeEngine.attempt_resume, validate the existing saved checkpoint with restore_checkpoint and require its task_id and root_mission_id to match the suspended graph task before any fence advance, lease write, ledger event or graph activation. Missing, malformed, corrupt or wrong-lineage checkpoints must fail closed with unchanged state. Preserve existing stale-token and active-sibling rejection and the valid-checkpoint resume behavior. Keep the public method signatures and authority rules unchanged. Add discriminating coverage only in the dedicated named test file. This is a local reversible repair of an existing invariant, separate from the continuous physical qualification proof. Use authentic runtime observations and the actual admitted sandbox. Preserve the canonical host checkout and all other workers, protected paths, installed services, and existing task states. Implement only after the runtime admits this exact scope.",
+          "run_id": "r-e4d91059"
+        },
+        "nesting_depth": 0,
+        "parent_task_id": null,
+        "root_mission_id": "mission-paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+        "status": "ACTIVE",
+        "task_id": "DEBT0117_CHECKPOINT_RESUME_19b60b88cf9d4239b17fa98249573321"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 2,
+      "timestamp": "2026-10-15T16:29:17.754481+00:00",
+      "prev_hash": "a20c62294c406a163d61df108a5cdae11a2ef070e0daec1b91b3e3e01bcd7fba",
+      "row_hash": "c072ed1518fbe656d23413dc341450cf37c5a5be37a3f128821385b20d84ff2e",
+      "schema_ver": 1,
+      "kind": "goal_created",
+      "payload": {
+        "goal_id": "g-b5a5e9dfd171",
+        "weight_class": "ROUTINE"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 3,
+      "timestamp": "2026-10-15T16:29:17.754592+00:00",
+      "prev_hash": "c072ed1518fbe656d23413dc341450cf37c5a5be37a3f128821385b20d84ff2e",
+      "row_hash": "73771fbde81a84ebcd6705acf5bd3846154c3f195846171dcfe5784cb651484b",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L03",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 4,
+      "timestamp": "2026-10-15T16:29:17.754668+00:00",
+      "prev_hash": "73771fbde81a84ebcd6705acf5bd3846154c3f195846171dcfe5784cb651484b",
+      "row_hash": "8ce27bd7422c9101031af9f57db93eb0b41d3f491f68913648783a02db1a82db",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L04",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 5,
+      "timestamp": "2026-10-15T16:29:17.754733+00:00",
+      "prev_hash": "8ce27bd7422c9101031af9f57db93eb0b41d3f491f68913648783a02db1a82db",
+      "row_hash": "01110133d55c9e525e168fe884600d3186fd1848ea4e1b8ba38f22f213586129",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L05",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 6,
+      "timestamp": "2026-10-15T16:29:17.755006+00:00",
+      "prev_hash": "01110133d55c9e525e168fe884600d3186fd1848ea4e1b8ba38f22f213586129",
+      "row_hash": "503b18d7f0c7c14bcd2cbd196059970052cb4e787f8f7aca1bc7a324a5b10f5a",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L06",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 7,
+      "timestamp": "2026-10-15T16:29:17.755072+00:00",
+      "prev_hash": "503b18d7f0c7c14bcd2cbd196059970052cb4e787f8f7aca1bc7a324a5b10f5a",
+      "row_hash": "ab03a75cf639924f59fd2fdaace562748c882100e5444f1ee86834045777cfc5",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L07",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 8,
+      "timestamp": "2026-10-15T16:29:17.755131+00:00",
+      "prev_hash": "ab03a75cf639924f59fd2fdaace562748c882100e5444f1ee86834045777cfc5",
+      "row_hash": "69b87bf5c6d2ccfc10bd7802baa9f221b0ba263606ad931a0cb8ffe9ba06f074",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L08",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 9,
+      "timestamp": "2026-10-15T16:29:17.755190+00:00",
+      "prev_hash": "69b87bf5c6d2ccfc10bd7802baa9f221b0ba263606ad931a0cb8ffe9ba06f074",
+      "row_hash": "fef2fd4157f5f45090f43f35317fdf67b07d86cf7f0d335378a68844a443015e",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L09",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 10,
+      "timestamp": "2026-10-15T16:29:17.755336+00:00",
+      "prev_hash": "fef2fd4157f5f45090f43f35317fdf67b07d86cf7f0d335378a68844a443015e",
+      "row_hash": "ef80abfc9d0565867ce846fa632c3c6049708e8cddcebea58cf569a93191f9a5",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L10",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 11,
+      "timestamp": "2026-10-15T16:29:17.755393+00:00",
+      "prev_hash": "ef80abfc9d0565867ce846fa632c3c6049708e8cddcebea58cf569a93191f9a5",
+      "row_hash": "39c58654594ae4a88b29821cb80cb41da645841ab893e2f6211e1cb9e5b7032b",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L11",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 12,
+      "timestamp": "2026-10-15T16:29:17.755456+00:00",
+      "prev_hash": "39c58654594ae4a88b29821cb80cb41da645841ab893e2f6211e1cb9e5b7032b",
+      "row_hash": "9af0fae46ad71718dbc9a48bd27708fcd598368e738ba2011f9b66fe8d9ce4d1",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L17",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 13,
+      "timestamp": "2026-10-15T16:29:17.755514+00:00",
+      "prev_hash": "9af0fae46ad71718dbc9a48bd27708fcd598368e738ba2011f9b66fe8d9ce4d1",
+      "row_hash": "fee530367aad68f36aaba9c95c124109ed44fdaff1b7ec517924bb5a589bd9af",
+      "schema_ver": 1,
+      "kind": "layer_discharged",
+      "payload": {
+        "discharge": {
+          "by": "runtime",
+          "layer": "L18",
+          "reason": "trace_a",
+          "result": "auto_pass"
+        },
+        "goal_id": "g-b5a5e9dfd171",
+        "run_id": "r-e4d91059"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 14,
+      "timestamp": "2026-10-15T16:29:17.755605+00:00",
+      "prev_hash": "fee530367aad68f36aaba9c95c124109ed44fdaff1b7ec517924bb5a589bd9af",
+      "row_hash": "5701891a8d9f8b08341f1682d4985d895596c49311ec434ab9d1a9c509e576dd",
+      "schema_ver": 1,
+      "kind": "EVOLUTION_EVENT",
+      "payload": {
+        "goal_id": "g-b5a5e9dfd171",
+        "layer": "RETROSPECT",
+        "run_id": "r-e4d91059",
+        "status": "REMANDED",
+        "summary": "court remanded: P1 completeness run must use canonical Trace-B ceremony; recorded_at=2026-10-15T16:29:17.755596+00:00"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 15,
+      "timestamp": "2026-10-15T16:29:17.755693+00:00",
+      "prev_hash": "5701891a8d9f8b08341f1682d4985d895596c49311ec434ab9d1a9c509e576dd",
+      "row_hash": "dc39ed233b8bafe8ab6dbf81ddb6cc965b69556026f9f794abbde6f4e68ccf2f",
+      "schema_ver": 1,
+      "kind": "EVOLUTION_EVENT",
+      "payload": {
+        "goal_id": "g-b5a5e9dfd171",
+        "layer": "EVOLVE",
+        "run_id": "r-e4d91059",
+        "status": "REMANDED",
+        "summary": "recurrence=False; proposals=0; recorded_at=2026-10-15T16:29:17.755684+00:00"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 16,
+      "timestamp": "2026-10-15T16:29:17.755879+00:00",
+      "prev_hash": "dc39ed233b8bafe8ab6dbf81ddb6cc965b69556026f9f794abbde6f4e68ccf2f",
+      "row_hash": "cb3c8e22aa6349256cd32a1732ce97c5648d354f9db2b42367bb27312b0d5597",
+      "schema_ver": 1,
+      "kind": "EVOLUTION_EVENT",
+      "payload": {
+        "goal_id": "g-b5a5e9dfd171",
+        "layer": "MEMORY_UPDATE",
+        "run_id": "r-e4d91059",
+        "status": "REMANDED",
+        "summary": "scars_written=1; quarantined=0; recorded_at=2026-10-15T16:29:17.755870+00:00"
+      },
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 17,
+      "timestamp": "2026-10-15T16:29:17.755945+00:00",
+      "prev_hash": "cb3c8e22aa6349256cd32a1732ce97c5648d354f9db2b42367bb27312b0d5597",
+      "row_hash": "ae03ce3715e46008699d2a0086521e9137306d1100fa37c38dedb5d4baec8d96",
+      "schema_ver": 1,
+      "kind": "EVOLUTION_EVENT",
+      "payload": {
+        "goal_id": "g-b5a5e9dfd171",
+        "layer": "IMPROVE_RUNTIME",
+        "run_id": "r-e4d91059",
+        "status": "REMANDED",
+        "summary": "proposals=0; recorded_at=2026-10-15T16:29:17.755936+00:00"
+      },
+      "domain_tag": "PRODUCTION"
+    }
+  ],
+  "chain_recomputed": "PASS",
+  "sqlite_integrity": "ok",
+  "run_id": "r-e4d91059",
+  "registration_path": "/private/tmp/paeos-governed-run-roots/paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321/r-e4d91059/registration.json",
+  "registration_sha256": "7f5d8654d572d780f2bdadac5a0edc7add068c6fa4018b8dd88830c27c628aa8",
+  "registration_payload": {
+    "created_at": 1792081757,
+    "goal_signature": "DEBT0117_CHECKPOINT_RESUME_19b60b88cf9d4239b17fa98249573321",
+    "run_id": "r-e4d91059",
+    "schema": "paeos-run-registration/1",
+    "state": "REGISTERED"
+  },
+  "signature_authentication": "Not separately attested; runtime-created registration is not external authority enrollment",
+  "bridge_request_count": 0,
+  "bridge_response_count": 0,
+  "stage_completed_count": 0,
+  "source_pin_changes": []
+}

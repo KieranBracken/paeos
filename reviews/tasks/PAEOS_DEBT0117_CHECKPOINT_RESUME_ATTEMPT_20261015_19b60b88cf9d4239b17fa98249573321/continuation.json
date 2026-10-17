@@ -1,0 +1,112 @@
+{
+  "record_kind": "Retained D0117 worker continuation, not admission or a new design plan",
+  "recorded_at_utc": "2026-10-15T16:38:46.230796+00:00",
+  "status": "ACTIVE_TASK_WAITING_FOR_ACCEPTED_GENERIC_PRODUCTION_PROFILE_DEPENDENCY",
+  "owner_thread": "01a14042-e4a4-76b2-abf6-c3949fc745da",
+  "assignment_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "retained_objective": "Validate saved checkpoint bytes/task/root before ordinary ResumeEngine.attempt_resume mutations",
+  "retained_mutable_paths": [
+    "runtime/autonomy/resume_engine.py",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+  ],
+  "retained_source_preimage_sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+  "new_test_preimage": "ABSENT",
+  "retained_intake": {
+    "path": "/Users/bob/GitHub/paeos/ops/backlogs/intake-debt0117-checkpoint-resume-20261015-19b60b88cf9d4239b17fa98249573321.json",
+    "sha256": "21f3074ea871b26f709867feb11743b128abb48eec241415ed9185b1842e0361",
+    "trace": {
+      "trace": "trace_a",
+      "weight_class": "ROUTINE",
+      "verifiable": true,
+      "reversible": true
+    }
+  },
+  "prior_attempt": {
+    "result_path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_CHECKPOINT_RESUME_ATTEMPT_20261015_19b60b88cf9d4239b17fa98249573321/result.json",
+    "result_sha256": "61fa9638beaae46ae4abfe6d5a1f149906a7d3b5c90bf718b83b78c1530c1d82",
+    "run_id": "r-e4d91059",
+    "goal_id": "g-b5a5e9dfd171",
+    "task_id": "DEBT0117_CHECKPOINT_RESUME_19b60b88cf9d4239b17fa98249573321",
+    "root_mission_id": "mission-paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+    "state_directory": "/private/tmp/paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+    "terminal": "REMANDED",
+    "exact_gate": "P1 completeness run must use canonical Trace-B ceremony",
+    "ledger_head": "ae03ce3715e46008699d2a0086521e9137306d1100fa37c38dedb5d4baec8d96",
+    "ledger_rows": 17,
+    "MDG_root_status": "ACTIVE; unmodified by this worker",
+    "worker_dispatches": 0,
+    "same_attempt_must_not_be_relaunched": true
+  },
+  "dependency": {
+    "owner_binding": "Existing Manager/Chat1 with Architect and Root coordination; this worker does not implement their protected orchestrator/profile change",
+    "needed_behavior": "A genuine ordinary production profile that preserves real physical candidate/Court/L14 enforcement and truthful ordinary Trace-A classification while preserving the actual P1 manifest, P1 Trace-B requirement and protected verification path set",
+    "forbidden_substitutes": [
+      "change verifiable/reversible flags to force Trace-B",
+      "repo_root=None hermetic loop",
+      "remove completeness gate",
+      "replace physical Court/L14 with assertions",
+      "reuse consumed attempt or unauthenticated receipt"
+    ],
+    "accepted_contract_ref": null,
+    "accepted_implementation_manifest_ref": null,
+    "independent_review_receipt_ref": null,
+    "integration_or_admitted_candidate_ref": null
+  },
+  "next_accepted_contract_needs": [
+    "Exact accepted generic profile contract and installed or admitted candidate/source hashes, with current lifecycle binding verified",
+    "Physical evidence that ordinary production retains candidate-bound verification, Court and independent L14; P1-specific profile negative regressions preserve current protected path set and Trace-B rule",
+    "Manager assignment for this retained two-file repair, exact source preimage and absent test preimage, allowed read dependencies, runtime-selected profile and truthful Trace-A evidence",
+    "Runtime disposition/reconciliation of prior terminal REMAND and its persisted ACTIVE root, plus explicit supported successor/resume identity; no blind reuse of old state or launch claim",
+    "Actual runtime task/run/capability, stage, bridge session and isolated sandbox before implementation; frozen acceptance and validation commands under the existing lawful Trace-A mechanism",
+    "Fresh qualified Builder, physical verifier/Court and different-family L14 routes with current free/cost/privacy authority; prior ambiguous effects reconciled"
+  ],
+  "retained_acceptance_cases": [
+    {
+      "case": "valid_same_task_same_root",
+      "required": "Existing suspended task with valid checkpoint and no active blockers resumes once; normal return shape, fence, lease and graph transition remain correct"
+    },
+    {
+      "case": "absent_checkpoint_reference",
+      "required": "Fail closed before fence/lease/ledger/graph mutation"
+    },
+    {
+      "case": "missing_checkpoint_blob",
+      "required": "Fail closed before fence/lease/ledger/graph mutation"
+    },
+    {
+      "case": "changed_checkpoint_bytes",
+      "required": "Digest mismatch fails closed before any resume mutation"
+    },
+    {
+      "case": "malformed_checkpoint_payload",
+      "required": "Invalid encoding/JSON or missing required checkpoint fields cannot authorize resume"
+    },
+    {
+      "case": "wrong_task_identity",
+      "required": "Validly hashed checkpoint for another task is rejected with no resume mutation"
+    },
+    {
+      "case": "wrong_root_identity",
+      "required": "Validly hashed checkpoint from another root is rejected with no resume mutation"
+    },
+    {
+      "case": "active_sibling_blocker",
+      "required": "Existing sibling blocker rejection remains intact"
+    },
+    {
+      "case": "stale_token_or_duplicate_resume",
+      "required": "Existing stale-token and non-suspended duplicate rejection remain intact"
+    }
+  ],
+  "execution_on_dependency_acceptance": "Verify only changed relevant pins and required accepted receipts; consume the actual PAEOS-emitted package; baseline RED, minimum two-file implementation in its admitted sandbox, GREEN/regression, independent review and runtime disposition. Preserve canonical root and unrelated workers. Do not stop at another plan when admission exists.",
+  "source_scope_exclusions": [
+    "recover_interrupted_resume redesign",
+    "lease hydration/watchdog wiring",
+    "generic profile or orchestrator repair",
+    "DEBT-0258 custody implementation",
+    "full D0117 physical fault/death/restart qualification"
+  ],
+  "full_proof_dependencies": "Full DEBT-0117 composition qualification remains after stable/qualified0258 then qualified0260",
+  "delivery_or_wakeup_receipt": null,
+  "authority_claim": "This record preserves context and required evidence; it grants no execution or review authority."
+}

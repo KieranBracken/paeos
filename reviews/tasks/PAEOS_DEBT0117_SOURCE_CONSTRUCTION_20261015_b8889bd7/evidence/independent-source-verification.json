@@ -1,0 +1,32 @@
+{
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "verified_at_utc": "2026-10-15T17:25:33.663816+00:00",
+  "verifier": "codex-agent:/root",
+  "builder": "codex-thread:01a14042-e4a4-76b2-abf6-c3949fc745da",
+  "independent_of_builder": true,
+  "heterogeneous_review": false,
+  "command": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    ".source_construction_verify.py",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+  ],
+  "cwd": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/state/candidate",
+  "exit_code": 0,
+  "focused_cases": 38,
+  "regressions": 13,
+  "readonly_count_including_frozen_helper": 38,
+  "readonly_changed": [],
+  "candidate_import_origins_verified": true,
+  "network": "macOS sandbox-exec deny network",
+  "candidate_sha256": {
+    "runtime/autonomy/resume_engine.py": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5"
+  },
+  "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF",
+  "integration": false,
+  "qualification": false,
+  "debt_closed": false,
+  "findings": []
+}

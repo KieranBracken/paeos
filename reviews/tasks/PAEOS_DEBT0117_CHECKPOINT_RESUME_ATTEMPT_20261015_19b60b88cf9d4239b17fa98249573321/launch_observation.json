@@ -1,0 +1,22 @@
+{
+  "pid": 93185,
+  "started_at_utc": "2026-10-15T16:29:16.867183+00:00",
+  "argv": [
+    "/Users/bob/.local/bin/uv",
+    "run",
+    "--no-sync",
+    "python",
+    "-B",
+    "ops/autonomous_run.py",
+    "/Users/bob/GitHub/paeos/ops/backlogs/intake-debt0117-checkpoint-resume-20261015-19b60b88cf9d4239b17fa98249573321.json",
+    "/private/tmp/paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+    "1",
+    "1",
+    "chat-bridge"
+  ],
+  "cwd": "/Users/bob/GitHub/paeos",
+  "environment_overrides": {
+    "UV_OFFLINE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}

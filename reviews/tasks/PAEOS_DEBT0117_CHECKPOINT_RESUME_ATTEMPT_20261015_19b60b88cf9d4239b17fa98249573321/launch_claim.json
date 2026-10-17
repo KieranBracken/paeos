@@ -1,0 +1,19 @@
+{
+  "attempt_id": "19b60b88cf9d4239b17fa98249573321",
+  "claimed_at_utc": "2026-10-15T16:29:16.864253+00:00",
+  "argv": [
+    "/Users/bob/.local/bin/uv",
+    "run",
+    "--no-sync",
+    "python",
+    "-B",
+    "ops/autonomous_run.py",
+    "/Users/bob/GitHub/paeos/ops/backlogs/intake-debt0117-checkpoint-resume-20261015-19b60b88cf9d4239b17fa98249573321.json",
+    "/private/tmp/paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+    "1",
+    "1",
+    "chat-bridge"
+  ],
+  "intent_sha256": "8b5c563b308061c90e89344346ca5f4021bd4a811df435a81b74be1084d8f181",
+  "allowed_launches": 1
+}

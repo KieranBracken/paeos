@@ -1,0 +1,76 @@
+{
+  "builder_family": "openai",
+  "builder_session": "codex-thread:01a14042-e4a4-76b2-abf6-c3949fc745da",
+  "capability": {
+    "bound_to": {
+      "goal_id": "sc-g-d55c2a50fdae4eedbd299eefa807c643",
+      "role": "BUILDER",
+      "run_id": "sc-r-f795f89bff8d44e2ba140a4981a1ff0b",
+      "session": "codex-thread:01a14042-e4a4-76b2-abf6-c3949fc745da",
+      "stage": "IMPLEMENT"
+    },
+    "expires_seq": 1801,
+    "issued_seq": 1,
+    "operations": [
+      "mcp:court:submit_evidence",
+      "mcp:artifacts:publish"
+    ],
+    "token": "b872bab4aba7cccc9383ecb1cc2dabe64698eb66d505aa1d94968690a2a0afddd8c32aa11fa69d87ecd8bdcb9333878607f8b9b221e191747f2cd12287f17503"
+  },
+  "deadline_unix": 1792085893.3396502,
+  "goal_id": "sc-g-d55c2a50fdae4eedbd299eefa807c643",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "permissions": {
+    "mcp_servers": [
+      "court:submit_evidence",
+      "artifacts:publish"
+    ],
+    "read_scopes": [
+      ".source_construction_verify.py",
+      "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+      "kernel/__init__.py",
+      "kernel/cas.py",
+      "kernel/evidence.py",
+      "kernel/ledger.py",
+      "kernel/ledger_sqlite.py",
+      "kernel/types.py",
+      "paeos/semantic/__init__.py",
+      "paeos/semantic/delta_engine.py",
+      "paeos/semantic/freeze_guard.py",
+      "paeos/semantic/lineage.py",
+      "paeos/semantic/types.py",
+      "pyproject.toml",
+      "runtime/__init__.py",
+      "runtime/autonomy/__init__.py",
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/cycle_detector.py",
+      "runtime/autonomy/mdg.py",
+      "runtime/autonomy/mission_controller.py",
+      "runtime/autonomy/orca_lineage.py",
+      "runtime/autonomy/recovery_controller.py",
+      "runtime/autonomy/weakness_finder/__init__.py",
+      "runtime/autonomy/weakness_finder/coordinator.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "runtime/autonomy/weakness_finder/types.py",
+      "runtime/autonomy/weakness_finder_probes.py",
+      "spec/PAEOS-8-runtime-implementation-playbook.md",
+      "tests/__init__.py",
+      "tests/kernel/__init__.py",
+      "tests/kernel/test_cas.py",
+      "tests/runtime/__init__.py",
+      "tests/runtime/autonomy/__init__.py",
+      "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py",
+      "uv.lock"
+    ],
+    "skills": [],
+    "write_scopes": [
+      "runtime/autonomy/resume_engine.py",
+      "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+    ]
+  },
+  "run_id": "sc-r-f795f89bff8d44e2ba140a4981a1ff0b",
+  "task_id": "t-d50d9661643d"
+}

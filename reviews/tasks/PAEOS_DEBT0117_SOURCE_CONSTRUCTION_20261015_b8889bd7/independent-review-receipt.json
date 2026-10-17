@@ -1,0 +1,113 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "test_harness.py",
+    "--basetemp",
+    "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/d0117-apparatus-independent-hohdm29c"
+  ],
+  "cwd": "/private/tmp/paeos-d0117-source-successor.vSH0Tj",
+  "exit_code": 0,
+  "findings": [],
+  "mode": "SOURCE_CONSTRUCTION_APPARATUS_REVIEW",
+  "mutable_preimages_verified": {
+    "runtime/autonomy/resume_engine.py": true,
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": true
+  },
+  "pins": {
+    "harness.py": "f389d0917b72628657f2e9be755353899d6c08b3c71d8b90af702404ed5225e7",
+    "scope.json": "9a6ea1f0c036555e12564ce964ae8e62ce2989c0c0f9c658d0739b57635d3983",
+    "successor-scope-summary.json": "a80005237d602f79a2888b89c758f8678e8b228a383f7e8203fac71b504cb438",
+    "test_harness.py": "0eb440abbccec3b5daae9b0f96cdbf81ee840c531fe2c794e0b483e67ae39f8b",
+    "verify_candidate.py": "568a17831ceed3646288a58c9b9b9e228263eeb6dee986db2e191de9e8d58547"
+  },
+  "pins_unchanged": true,
+  "prior_failure_files": [
+    {
+      "original_matches": true,
+      "path": "binding.json",
+      "sha256": "25d438b753bd012b57721deb23d2f59ada4e6b9b57e29f14541a73e98bd80212"
+    },
+    {
+      "original_matches": true,
+      "path": "court-submission.started.json",
+      "sha256": "68e3acfa8d160c0b6627757849b800cef9d9018f798ba5bcf5368c3ad2e30576"
+    },
+    {
+      "original_matches": true,
+      "path": "court_pool/sc-r-f795f89bff8d44e2ba140a4981a1ff0b.jsonl",
+      "sha256": "8b0c0dd4b01c220b0fe57557684381e6ed290dff0c7caa1fba1808e506bdb185"
+    },
+    {
+      "original_matches": true,
+      "path": "initialization.json",
+      "sha256": "4d47fa8fce01643f84d5b8dc304dd38438428ecdf4c026a034540509200b40b2"
+    },
+    {
+      "original_matches": true,
+      "path": "package.json",
+      "sha256": "17bfc0c709ab8d4839b6ef9769fd37122764d07ee2fd7a4e94b3502f90331b89"
+    },
+    {
+      "original_matches": true,
+      "path": "scope.json",
+      "sha256": "7e6d400e013a900960cb187f7121f600e89366dd84fc3bfab8e645ea81f4bc98"
+    }
+  ],
+  "production_or_provider_dispatch": false,
+  "qualification": false,
+  "read_pins_verified": {
+    "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md": true,
+    "kernel/__init__.py": true,
+    "kernel/cas.py": true,
+    "kernel/evidence.py": true,
+    "kernel/ledger.py": true,
+    "kernel/ledger_sqlite.py": true,
+    "kernel/types.py": true,
+    "paeos/semantic/__init__.py": true,
+    "paeos/semantic/delta_engine.py": true,
+    "paeos/semantic/freeze_guard.py": true,
+    "paeos/semantic/lineage.py": true,
+    "paeos/semantic/types.py": true,
+    "pyproject.toml": true,
+    "runtime/__init__.py": true,
+    "runtime/autonomy/__init__.py": true,
+    "runtime/autonomy/authority.py": true,
+    "runtime/autonomy/cycle_detector.py": true,
+    "runtime/autonomy/mdg.py": true,
+    "runtime/autonomy/mission_controller.py": true,
+    "runtime/autonomy/orca_lineage.py": true,
+    "runtime/autonomy/recovery_controller.py": true,
+    "runtime/autonomy/weakness_finder/__init__.py": true,
+    "runtime/autonomy/weakness_finder/coordinator.py": true,
+    "runtime/autonomy/weakness_finder/sensor_pack_drift.py": true,
+    "runtime/autonomy/weakness_finder/sensor_pack_mdg.py": true,
+    "runtime/autonomy/weakness_finder/sensor_pack_semantic.py": true,
+    "runtime/autonomy/weakness_finder/sensor_pack_structural.py": true,
+    "runtime/autonomy/weakness_finder/types.py": true,
+    "runtime/autonomy/weakness_finder_probes.py": true,
+    "spec/PAEOS-8-runtime-implementation-playbook.md": true,
+    "tests/__init__.py": true,
+    "tests/kernel/__init__.py": true,
+    "tests/kernel/test_cas.py": true,
+    "tests/runtime/__init__.py": true,
+    "tests/runtime/autonomy/__init__.py": true,
+    "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py": true,
+    "uv.lock": true
+  },
+  "review_limit": "Apparatus review and seven isolated apparatus tests only; no worker dispatch, source test qualification, provider calls, Court replay, integration, or D0117 closure.",
+  "scenario14_status": "DEFERRED_FULL_AUTONOMY_PROOF",
+  "selected_regression_count": 13,
+  "stderr": "",
+  "stdout": ".......                                                                  [100%]\n7 passed in 4.95s\n",
+  "timestamp_utc": "2026-10-15T17:21:43.229855+00:00"
+}

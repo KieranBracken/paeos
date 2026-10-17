@@ -1,0 +1,42 @@
+{
+  "candidate_root": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/state/candidate",
+  "integration_permitted": false,
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "result": {
+    "artifacts": [
+      {
+        "hash": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+        "type": "artifact"
+      },
+      {
+        "hash": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5",
+        "type": "artifact"
+      }
+    ],
+    "cost": {
+      "model_ver": "chat-bridge-compatibility",
+      "skill_vers": [],
+      "tokens": 0,
+      "wallclock_s": 0.0
+    },
+    "environment_identity": "e771a8e66f8e78da817a2f7626a95d5911dd6d80d21a8a81c868574012d7cc1f",
+    "evidence": [],
+    "failure_code": null,
+    "status": "COMPLETE",
+    "task_id": "t-592130ac01f1",
+    "trace_ref": "33b908e30fd3e62ee9012dc05034cf070aeb865e4ac1d06b0a9e1666c6d0c8cb",
+    "workspace_identity": "88e84681571d92e35eba617ec2412d4dff8d729f98d08e6daf135dc421a10073",
+    "written_paths": [
+      [
+        "runtime/autonomy/resume_engine.py",
+        "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7"
+      ],
+      [
+        "tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+        "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5"
+      ]
+    ]
+  },
+  "scope_sha256": "b6016e1f9ad1b42d735abcbcc16a528c971ec1f4e772711790e96db683c35f7b",
+  "status": "SOURCE_CAPTURED_REQUIRES_INDEPENDENT_VERIFICATION_AND_REVIEW"
+}

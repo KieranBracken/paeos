@@ -1,0 +1,240 @@
+{
+  "authority_reference": "Root explicit correction to bounded source-construction verification scope 2026-10-15; preserves prior failed Court and DEFERRED_FULL_AUTONOMY_PROOF for scenario14. Original contract /private/tmp/paeos-source-construction-d0117.ChHNrT/accepted-contract.json",
+  "builder_family": "openai",
+  "builder_session": "codex-thread:01a14042-e4a4-76b2-abf6-c3949fc745da",
+  "canonical_baseline_preimages": {
+    "runtime/autonomy/resume_engine.py": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": null
+  },
+  "deferred_verification": [
+    {
+      "reason": "Physical production-controller startup and death/recovery proof remains canonically held behind DEBT-0258 then DEBT-0260. This source-only successor neither executes nor counts that proof as passing; prior failed physical observation remains preserved.",
+      "status": "DEFERRED_FULL_AUTONOMY_PROOF",
+      "test": "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py::test_scenario_14_physical_controller_death_acceptance_test"
+    }
+  ],
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "mutable_preimage_sources": {
+    "runtime/autonomy/resume_engine.py": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/captured-candidate/runtime/autonomy/resume_engine.py",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/captured-candidate/tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+  },
+  "mutable_preimages": {
+    "runtime/autonomy/resume_engine.py": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5"
+  },
+  "objective": "Explicit successor SOURCE_CONSTRUCTION_ONLY contract. Continue from exact two captured source preimages, not canonical installation. Validate existing implementation and remedy source-only findings within the exact two files.\nCheckpoint validation behavior remains: restore_checkpoint integrity; task_id and root_mission_id match before any fence/lease/ledger/graph mutation; valid resume and sibling/stale/duplicate protections preserved. Use real isolated fixture CAS/SQLite/graph, preserve method signature and tuple return, do not broaden to interrupted recovery/watchdog/lease hydration.\nThe prior Court submission is consumed and failed; never retry it. Its full candidate and evidence are retained in /private/tmp/paeos-d0117-source-successor.vSH0Tj/prior-failure-evidence.\nThis explicitly corrected successor accepts focused checkpoint validation tests plus pre-P2 scenarios01\u201313 as source regressions. Scenario14 is DEFERRED_FULL_AUTONOMY_PROOF behind0258\u21920260. It is outside this source-construction claim, never passed or claimed as skipped qualification. No production startup, provider, canonical installation, D0117 completion, or autonomy qualification is authorized.\nRun RED/GREEN only if code changes are needed; current captured source already has38 focused tests and13 regressions reported. Reproduce physical evidence honestly. Independent verifier and different-family review remain required before any integration decision.\nExisting behavior contract authority record: /private/tmp/paeos-source-construction-d0117.ChHNrT/accepted-contract.json",
+  "read_documents": [],
+  "read_file_pins": [
+    {
+      "path": "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+      "preimage": "PRESENT",
+      "sha256": "6292da5871b7e1120c8ca01de299e7b625c5937e58dd15e35aabdeb37c2c9d09"
+    },
+    {
+      "path": "kernel/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "kernel/cas.py",
+      "preimage": "PRESENT",
+      "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f"
+    },
+    {
+      "path": "kernel/evidence.py",
+      "preimage": "PRESENT",
+      "sha256": "29a8ae8d7e7612903dd0a1567333895d1c86689011e37de64bbaaafbf9cd5235"
+    },
+    {
+      "path": "kernel/ledger.py",
+      "preimage": "PRESENT",
+      "sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b"
+    },
+    {
+      "path": "kernel/ledger_sqlite.py",
+      "preimage": "PRESENT",
+      "sha256": "864b5151e753030f6fda4f1016d13772c6c7edf9ce41094090950f049df07f8c"
+    },
+    {
+      "path": "kernel/types.py",
+      "preimage": "PRESENT",
+      "sha256": "70f691b9d33157174b7b5c722e7196fa9bd2471c055c5909612d516add0b8b8c"
+    },
+    {
+      "path": "paeos/semantic/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "cb7710c169113ec08efd24fd17b5e68edfc0da10ced00e35ac15fbe05cdfbafd"
+    },
+    {
+      "path": "paeos/semantic/delta_engine.py",
+      "preimage": "PRESENT",
+      "sha256": "229a536bc39ee000e95c2d43a323524763d424265b0bf4807821e93e29ec4f13"
+    },
+    {
+      "path": "paeos/semantic/freeze_guard.py",
+      "preimage": "PRESENT",
+      "sha256": "97dc7b21e39a10e3b9fe5852d9e01a44701c883dc8002ccd1bd16923b9b6cb48"
+    },
+    {
+      "path": "paeos/semantic/lineage.py",
+      "preimage": "PRESENT",
+      "sha256": "57c50213f279f48ab9161a433b97a3524e72c36c3b862ec84fdea66d7512de95"
+    },
+    {
+      "path": "paeos/semantic/types.py",
+      "preimage": "PRESENT",
+      "sha256": "5646f98c7d361668ee483eb32c0a56474e56c6139e1d933346015a3fe6dc1540"
+    },
+    {
+      "path": "pyproject.toml",
+      "preimage": "PRESENT",
+      "sha256": "0ba9fa89f8a2ebc6b57abc9884986b7abb9194e3dcf4c0ef305e5491be580569"
+    },
+    {
+      "path": "runtime/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runtime/autonomy/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "d60f13829f2542db050c8a788466df1ee6b8faf0a066fb7c4767bcd4b3b0fab4"
+    },
+    {
+      "path": "runtime/autonomy/authority.py",
+      "preimage": "PRESENT",
+      "sha256": "ef1aaa769217f8c5a564e37fa515256afcd35a335e82ba4b2591a524582c42d8"
+    },
+    {
+      "path": "runtime/autonomy/cycle_detector.py",
+      "preimage": "PRESENT",
+      "sha256": "d75ef3b4c523849bef7918f0211e6f49a1594670e403fee773b053fa8d64b193"
+    },
+    {
+      "path": "runtime/autonomy/mdg.py",
+      "preimage": "PRESENT",
+      "sha256": "2c29ec9afd6c1349062a82f864fd3ea224849a2c13c7f865302f22e7131394be"
+    },
+    {
+      "path": "runtime/autonomy/mission_controller.py",
+      "preimage": "PRESENT",
+      "sha256": "1e604eb2d03dd9c6db178ff0021f6a72dd135c1940116fd863e36dd1ccb86dbe"
+    },
+    {
+      "path": "runtime/autonomy/orca_lineage.py",
+      "preimage": "PRESENT",
+      "sha256": "c09f9fa5c15cd98c6e58b496a095fcf1d88f1ee1cae7f8e0c6f7befed06b932d"
+    },
+    {
+      "path": "runtime/autonomy/recovery_controller.py",
+      "preimage": "PRESENT",
+      "sha256": "43092d239662f7ea2643edc796062d59cf6dadaeee39cc2b9e408662893d8a78"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "74ce8d342ccdd0e8f61c5ff253392ccb8acdcd911405bef74d58380653bd3beb"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/coordinator.py",
+      "preimage": "PRESENT",
+      "sha256": "7952e2e318703648005edbc5247023109e6fc205e6086361df9e7b2fdf63be43"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "preimage": "PRESENT",
+      "sha256": "3053e5459bafc2e975d336e47c4161af5ec18a458fecc47a659e273f752579be"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "preimage": "PRESENT",
+      "sha256": "495dd655cd92f82b24a15ec18a9759ea95929c3f265d3b5294466f37c1970321"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "preimage": "PRESENT",
+      "sha256": "19a99aea02ce5bbf3520aa200a6c59f7a98c47eedb8935f582a570d91da9f68b"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "preimage": "PRESENT",
+      "sha256": "1e10075c584c7401bc0413eaeea4c672f400b6da08b2ad15599f7a98e2e661d3"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/types.py",
+      "preimage": "PRESENT",
+      "sha256": "5d5523a549337e79d5356ef0e774b44d713fe3bb1f2137d6002b36d94cc23634"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder_probes.py",
+      "preimage": "PRESENT",
+      "sha256": "407b3773ec609d2a0aa93c43b06bf8ba9f4ff71d562203bcb600a4f5122931ac"
+    },
+    {
+      "path": "spec/PAEOS-8-runtime-implementation-playbook.md",
+      "preimage": "PRESENT",
+      "sha256": "50515e2eff6fc4648b5943fb2bffd9815e566d5f2a3ed0f464aa8d4e15a6746f"
+    },
+    {
+      "path": "tests/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/kernel/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/kernel/test_cas.py",
+      "preimage": "PRESENT",
+      "sha256": "4cabe3f3a5195f0dabcd2339986718cf62dc4dbeb4681479680fb8b2c84c9a66"
+    },
+    {
+      "path": "tests/runtime/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/runtime/autonomy/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py",
+      "preimage": "PRESENT",
+      "sha256": "2077724806127962bda8bb7e15b7915787ec6cc0d4e45533516d8ec2e256f625"
+    },
+    {
+      "path": "uv.lock",
+      "preimage": "PRESENT",
+      "sha256": "6e72ea0644ac24fa6552c23f09ef3807e3713a3630bc832f7913288fe130c1e4"
+    }
+  ],
+  "read_overrides": [],
+  "supersedes_failed_source_construction": {
+    "preserved_evidence": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/prior-failure-evidence",
+    "prior_scope_sha256": "7e6d400e013a900960cb187f7121f600e89366dd84fc3bfab8e645ea81f4bc98",
+    "prior_state": "/private/tmp/paeos-source-construction-d0117.ChHNrT/state",
+    "reuse_prior_operation": false,
+    "status": "FAILED_PHYSICAL_SOURCE_VERIFICATION_PRESERVED"
+  },
+  "timeout_seconds": 1800,
+  "verification": [
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        ".source_construction_verify.py",
+        "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+      ],
+      "artifact_path": "runtime/autonomy/resume_engine.py",
+      "claim_id": "SC-D0117-CHECKPOINT-AND-SCENARIOS01-13"
+    }
+  ],
+  "write_files": [
+    "runtime/autonomy/resume_engine.py",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+  ]
+}

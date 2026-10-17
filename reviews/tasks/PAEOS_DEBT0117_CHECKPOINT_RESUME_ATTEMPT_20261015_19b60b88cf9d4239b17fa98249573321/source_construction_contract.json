@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "contract_id": "debt0117-source-construction-2f95735be58843179046bd1777762cec",
+  "recorded_at_utc": "2026-10-15T16:56:19.475507+00:00",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "status": "PREPARED_AWAITING_DISTINCT_RUNTIME_BUILDER_PACKAGE",
+  "worker_thread": "01a14042-e4a4-76b2-abf6-c3949fc745da",
+  "assignment_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "assignment_basis": "Latest assigning-chat continuation directs a distinct CapabilityBroker -> AgentDispatcher -> ChatBridgeRuntime source-construction route, scoped sandbox first, then RED -> minimum implementation -> GREEN, independent verifier and free-family review. No source edit is authorized before the emitted package.",
+  "objective": "Validate saved checkpoint bytes/task/root before ordinary ResumeEngine.attempt_resume mutations",
+  "mutable_preimages": [
+    {
+      "path": "runtime/autonomy/resume_engine.py",
+      "preimage": "PRESENT",
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+      "preimage": "ABSENT",
+      "sha256": null
+    }
+  ],
+  "read_only_dependencies": {
+    "path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_CHECKPOINT_RESUME_ATTEMPT_20261015_19b60b88cf9d4239b17fa98249573321/source_construction_dependencies.json",
+    "sha256": "056c2d4cb4e006e503b1dd93d9d3c8ed1d879018a25c4c97dd4782ba8a47e9bf",
+    "count": 37
+  },
+  "acceptance_cases": [
+    {
+      "case": "valid_same_task_same_root",
+      "required": "Existing suspended task with valid checkpoint and no active blockers resumes once; normal return shape, fence, lease and graph transition remain correct"
+    },
+    {
+      "case": "absent_checkpoint_reference",
+      "required": "Fail closed before fence/lease/ledger/graph mutation"
+    },
+    {
+      "case": "missing_checkpoint_blob",
+      "required": "Fail closed before fence/lease/ledger/graph mutation"
+    },
+    {
+      "case": "changed_checkpoint_bytes",
+      "required": "Digest mismatch fails closed before any resume mutation"
+    },
+    {
+      "case": "malformed_checkpoint_payload",
+      "required": "Invalid encoding/JSON or missing required checkpoint fields cannot authorize resume"
+    },
+    {
+      "case": "wrong_task_identity",
+      "required": "Validly hashed checkpoint for another task is rejected with no resume mutation"
+    },
+    {
+      "case": "wrong_root_identity",
+      "required": "Validly hashed checkpoint from another root is rejected with no resume mutation"
+    },
+    {
+      "case": "active_sibling_blocker",
+      "required": "Existing sibling blocker rejection remains intact"
+    },
+    {
+      "case": "stale_token_or_duplicate_resume",
+      "required": "Existing stale-token and non-suspended duplicate rejection remain intact"
+    }
+  ],
+  "implementation_constraints": [
+    "Use restore_checkpoint to validate checkpoint integrity and require matching task_id and root_mission_id before advancing any fencing token, lease, ledger or graph state.",
+    "Preserve attempt_resume signature and tuple result contract, valid resume behavior, active-sibling rejection and stale-token/duplicate rejection.",
+    "Malformed, absent, missing, corrupted or wrong-lineage checkpoint cannot authorize resume; rejected attempts leave graph, fencing, lease state and ledger unchanged.",
+    "Do not invent stage identity binding: TaskNode has no canonical checkpoint stage identity.",
+    "No changes outside the exact two mutable paths; recover_interrupted_resume, lease hydration, watchdog wiring, generic production profiles and custody implementation remain outside scope."
+  ],
+  "test_construction": {
+    "dependencies": "Use real MissionDependencyGraph, ResumeEngine, CAS/FilesystemCasStore and Ledger/SqliteLedgerStore in isolated temporary fixture stores; no mocked checkpoint acceptance or test-only production hooks.",
+    "negative_observations": [
+      "result rejects resume",
+      "ledger head and rows unchanged",
+      "graph node and status unchanged",
+      "current fencing token unchanged",
+      "lease state unchanged"
+    ],
+    "positive_observations": [
+      "valid same-task/root checkpoint resumes once",
+      "fencing advances once",
+      "lease is recorded",
+      "graph becomes ACTIVE",
+      "duplicate resume is rejected"
+    ],
+    "red": [
+      "python",
+      "-B",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+    ],
+    "green_and_regression": [
+      "python",
+      "-B",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+      "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py"
+    ],
+    "execution_boundary": "All commands run from the runtime-emitted sandbox against verified candidate import origins, with no dependency installation/provider calls; harness-bound interpreter/env and temporary paths must be recorded. These are test fixtures, not production autonomy proof."
+  },
+  "required_runtime_package": {
+    "run_id": null,
+    "task_id": null,
+    "capability_id": null,
+    "stage_id": null,
+    "bridge_session": null,
+    "sandbox_path": null,
+    "harness_path": null,
+    "required_bindings": [
+      "distinct source-construction identity",
+      "isolated RECOVERY ledger/CAS",
+      "two-file write scope and pinned read dependencies",
+      "complete source candidate export",
+      "real Court submission adapter",
+      "separate verifier identity",
+      "eligible free different-family review route"
+    ]
+  },
+  "evidence_outputs": [
+    "baseline RED log and candidate import origins",
+    "GREEN/regression logs with exact command and environment",
+    "two-file patch and complete candidate export hashes",
+    "immutable dependency manifest comparison",
+    "separate verifier receipt",
+    "free-family raw review response and provenance",
+    "actual Court submission/disposition receipt if emitted"
+  ],
+  "prior_production_attempt": {
+    "result_path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_CHECKPOINT_RESUME_ATTEMPT_20261015_19b60b88cf9d4239b17fa98249573321/result.json",
+    "sha256": "61fa9638beaae46ae4abfe6d5a1f149906a7d3b5c90bf718b83b78c1530c1d82",
+    "run_id": "r-e4d91059",
+    "goal_id": "g-b5a5e9dfd171",
+    "terminal": "REMANDED",
+    "reuse": "FORBIDDEN; preserved unchanged"
+  },
+  "prior_continuation": {
+    "path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_CHECKPOINT_RESUME_ATTEMPT_20261015_19b60b88cf9d4239b17fa98249573321/continuation.json",
+    "sha256": "dc54402cac8bfc5ce99d3dcdfd484af6268469dd216c8c6c96d02c877689d8c0",
+    "effect": "This new contract permits preparation for distinct source construction without waiting for generic production-profile integration. Prior production admission/installation and full proof dependencies remain unchanged."
+  },
+  "separation_of_powers_reference": {
+    "path": "spec/PAEOS-8-runtime-implementation-playbook.md",
+    "sections": [
+      5,
+      6,
+      7
+    ],
+    "status_note": "Document header remains Draft for adversarial ratification; cited as construction/verification separation, not standalone authority or a ratification claim."
+  },
+  "excluded_claims": [
+    "resumption of terminal production run",
+    "full L01-L19 execution",
+    "external or Founder authority enrollment",
+    "canonical source installation",
+    "production admission",
+    "D0117 qualification",
+    "0258/0260 dependency satisfaction"
+  ],
+  "provider_calls_performed": 0,
+  "source_edits_performed": 0,
+  "runtime_package_observed": false
+}
