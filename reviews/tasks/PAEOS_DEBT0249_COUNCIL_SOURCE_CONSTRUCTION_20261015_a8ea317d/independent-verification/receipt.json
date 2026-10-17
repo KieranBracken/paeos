@@ -1,0 +1,108 @@
+{
+  "timestamp_utc": "2026-10-15T17:27:14.691610+00:00",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "reviewer_family": "openai",
+  "heterogeneous_approval": false,
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate/.source_construction_verify.py",
+        "tests/runtime/test_debt0249_remand14.py"
+      ],
+      "cwd": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate",
+      "exit_code": 71,
+      "output_sha256": "d34a4e4359a4dc36526cf5b363da32f7b7594a3a09eea17cbdfd6425b052d93e"
+    },
+    {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/independent-verification/adversarial.py"
+      ],
+      "cwd": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate",
+      "exit_code": 0,
+      "output_sha256": "fa9a186a48a7fd5bb9d66ef7c9f299029ae4614ecd2077914637608bd12be196"
+    },
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate/.source_construction_verify.py",
+        "tests/runtime/test_debt0249_remand14.py"
+      ],
+      "cwd": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate",
+      "exit_code": 0,
+      "output_sha256": "f49459bc887b231793b3be6b9b665504978623f07605cb4bfac2b4acc9ce9cd3",
+      "network": "frozen helper self-reexec under sandbox-exec deny network*"
+    }
+  ],
+  "candidate_manifest": {
+    "uv.lock": "6e72ea0644ac24fa6552c23f09ef3807e3713a3630bc832f7913288fe130c1e4",
+    ".source_construction_verify.py": "6b7a9325533c6231841a311d0251715e3cb20e81a9947c8dfdd42056641bd6ee",
+    "pyproject.toml": "0ba9fa89f8a2ebc6b57abc9884986b7abb9194e3dcf4c0ef305e5491be580569",
+    "runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "kernel/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "kernel/cas.py": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013",
+    "tests/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/runtime/test_l09_critique.py": "32359f82dca7cfc108b956c2c1d974c4b7d62f3fd90bb98e5501b63df49beac9"
+  },
+  "candidate_unchanged": true,
+  "physical_court_observation_count": 1,
+  "physical_court_exit_code": 0,
+  "court_adjudication": false,
+  "provider_calls": 0,
+  "adversarial_script_sha256": "cba213f26cc37c03d2991929ba5f4f026e0b1f2441e50c5ceb6d5317c646750b",
+  "canary_source_sha256": "956bb4260f9b5628a0f5208d95720eaff1a1cc80db19a0bc951878beba069eba",
+  "initial_frozen_invocation_issue": "Nested sandbox-exec refused sandbox_apply; rerun used helper built-in network sandbox exactly as frozen.",
+  "canonical_preimage_and_read_pin_checks": {
+    "runtime/critique.py": {
+      "expected": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+      "actual": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f"
+    },
+    "tests/runtime/test_debt0249_remand14.py": {
+      "expected": null,
+      "actual": null
+    },
+    "kernel/__init__.py": {
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "kernel/cas.py": {
+      "expected": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+      "actual": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f"
+    },
+    "runtime/__init__.py": {
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests/__init__.py": {
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests/runtime/__init__.py": {
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tests/runtime/test_l09_critique.py": {
+      "expected": "32359f82dca7cfc108b956c2c1d974c4b7d62f3fd90bb98e5501b63df49beac9",
+      "actual": "32359f82dca7cfc108b956c2c1d974c4b7d62f3fd90bb98e5501b63df49beac9"
+    }
+  },
+  "diff_sha256": "8913ee3883eb8ddd145b5d2642d87791eef61ae3671eb5b6327f02284968ada4",
+  "bounded_contract_review": "PASS: edits confined to Council dissent payload binding, duplicate/completeness verification, whole-record CAS binding; historic to_dict and unrelated L09 engine unchanged.",
+  "overall_independent_local_verifier": "PASS"
+}

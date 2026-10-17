@@ -1,0 +1,32 @@
+{
+  "operation_id": "l07-current-5399476b-A",
+  "run_id": "r-779c4b75",
+  "goal_id": "g-59677d6a4ac1",
+  "task_id": "t-4cfe8e88a0a4",
+  "bindings": [
+    {
+      "path": "context/artifact-004d99f119d5.txt",
+      "sha256": "004d99f119d58f3b62fb45b431b3c27ad1529bc59c9e080f391c8fd4ab331619"
+    },
+    {
+      "path": "context/artifact-1a5c100a02c0.txt",
+      "sha256": "1a5c100a02c072b958dfeb173abc6eba97c1dce2b9472dc8fb0d7bc55dfed74e"
+    },
+    {
+      "path": "context/artifact-a8b20763add9.txt",
+      "sha256": "a8b20763add938567557a0a7906f003cca07b15d13216e974ee90f4d308db77a"
+    },
+    {
+      "path": "context/artifact-bab96eb456dc.txt",
+      "sha256": "bab96eb456dc39d739fb55edb96472c25b13f5e0c20dc9a428f495d044d52b6c"
+    },
+    {
+      "path": "mitigation/catalogue-draft.md",
+      "sha256": "7577494b46aa3c5faa179cc743b13e43aef5ccb964efa192bda9feb8865c5782"
+    }
+  ],
+  "primary_source_sha256": "1b9877cca6ea3c685e681163aa1fd48fdd3652b915b23927c769691628769136",
+  "stage": "MITIGATION",
+  "runtime_stage_receipt": false,
+  "formal_L14_receipt": false
+}

@@ -1,0 +1,158 @@
+[
+  {
+    "archive": "run/PREFLIGHT1.analysis.json",
+    "sha256": "53e1c18e67667724f28cc95f5526ec00522e86ef4d14be442d4be0761ce920d1",
+    "size": 409,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.analysis.json"
+  },
+  {
+    "archive": "run/PREFLIGHT1.intent.json",
+    "sha256": "de4797ee522758a95a13699661f2761c6b2ca9ea81e6c243cd7151f92a1aa5f7",
+    "size": 2118,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.intent.json"
+  },
+  {
+    "archive": "run/PREFLIGHT1.launch.py",
+    "sha256": "a70208f84eed579e5180389d79f1e244a3f09fe2d4bad4d9a7d04be97d2d1ca5",
+    "size": 2038,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.launch.py"
+  },
+  {
+    "archive": "run/PREFLIGHT1.pid.json",
+    "sha256": "684a4e5df8f396c90c2cee8d3e80a4bdfe5d62ce1555ee36336dee6a7b9d207c",
+    "size": 49,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.pid.json"
+  },
+  {
+    "archive": "run/PREFLIGHT1.receipt.json",
+    "sha256": "c8b745cc9e002c240f98d85d4695fd284969ea9eb208f46ed6d3f8e4ddd68854",
+    "size": 2348,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.receipt.json"
+  },
+  {
+    "archive": "run/PREFLIGHT1.stderr.txt",
+    "sha256": "b5e5700b80ad606c5e1a65037988f8bcf014497a45a1309221623129cc27eb89",
+    "size": 333,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.stderr.txt"
+  },
+  {
+    "archive": "run/PREFLIGHT1.stdout.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREFLIGHT1.stdout.txt"
+  },
+  {
+    "archive": "run/PREPARED.json",
+    "sha256": "9e01108198701517d8c204bac3dbb041730e84aaf06fe78eeb5d7a5946ea51b7",
+    "size": 1304,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/PREPARED.json"
+  },
+  {
+    "archive": "run/RUN.intent.json",
+    "sha256": "91e5e423b6ffc3b13b91cf87debcf55bff5dc1ad37ef83580844c35fc89e5dc2",
+    "size": 2111,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/RUN.intent.json"
+  },
+  {
+    "archive": "run/RUN.pid.json",
+    "sha256": "1caae6fbdcdedba3788d1d70f57e224fb66099999e372691dbc41a16f29d90e8",
+    "size": 50,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/RUN.pid.json"
+  },
+  {
+    "archive": "run/RUN.receipt.json",
+    "sha256": "6dc4300d8ba3662da6dddfaeb6d2a383631d5768e2b23c538938500f27556977",
+    "size": 2341,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/RUN.receipt.json"
+  },
+  {
+    "archive": "run/RUN.stderr.txt",
+    "sha256": "8fbdb9e46cc1c9bcc1b9ba9f1a6c9bad3c51fac1107e7fb245614c3486bd00a0",
+    "size": 126,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/RUN.stderr.txt"
+  },
+  {
+    "archive": "run/RUN.stdout.txt",
+    "sha256": "fa419a24dea41b478334df22701fec64e72fd211259b573a6223a52101af6a5f",
+    "size": 353,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/RUN.stdout.txt"
+  },
+  {
+    "archive": "run/RUN_SOURCE_MANIFEST.json",
+    "sha256": "7f4462552e2f2644c26fa5ff458431dca36ba29d4fd4654b7b0df902dd38f4d2",
+    "size": 139870,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/RUN_SOURCE_MANIFEST.json"
+  },
+  {
+    "archive": "run/intake.json",
+    "sha256": "27288e48e66eebcde3ee91770f0c6530b7d128fd395a821756c9292459223d40",
+    "size": 4374,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/intake.json"
+  },
+  {
+    "archive": "run/launch.py",
+    "sha256": "8288f67258cb27b6584f7fb45c1b2f73bbcacccd79a61bec200bcdf0b2940ed6",
+    "size": 2030,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/launch.py"
+  },
+  {
+    "archive": "state/ledger.db",
+    "sha256": "a1b800f8727d495d7b0645de94523ef2ae757abeef0ec2f0ba5caa1f162279a8",
+    "size": 20480,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/ledger.db"
+  },
+  {
+    "archive": "state/bridge/requests/r-29471672--t-26ab63ea8e74--re_derive.prompt.md",
+    "sha256": "80b6a75b71dd941d27b549f52a030385fa81c0a13aaf76e5f4dcdc1545061f6e",
+    "size": 6090,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/bridge/requests/r-29471672--t-26ab63ea8e74--re_derive.prompt.md"
+  },
+  {
+    "archive": "state/bridge/requests/r-29471672--t-c77ed9cdb294--ideate.prompt.md",
+    "sha256": "6ccc10e4f67593888affb82304e7de8003b0be06fccf31d55edb6b6ca682a930",
+    "size": 6086,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/bridge/requests/r-29471672--t-c77ed9cdb294--ideate.prompt.md"
+  },
+  {
+    "archive": "state/bridge/responses/r-29471672--t-26ab63ea8e74--re_derive.response.md",
+    "sha256": "780d6350bf4ca3197213a7748caa2af9977867b001f711c8ddeb9ccc5d64a8af",
+    "size": 920,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/bridge/responses/r-29471672--t-26ab63ea8e74--re_derive.response.md"
+  },
+  {
+    "archive": "state/cas/2b/cad5d11b9063310e3df292c53088dde8252db2d5d5e3106c9fced7a4844c8a",
+    "sha256": "2bcad5d11b9063310e3df292c53088dde8252db2d5d5e3106c9fced7a4844c8a",
+    "size": 3943,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/cas/2b/cad5d11b9063310e3df292c53088dde8252db2d5d5e3106c9fced7a4844c8a"
+  },
+  {
+    "archive": "state/cas/78/0d6350bf4ca3197213a7748caa2af9977867b001f711c8ddeb9ccc5d64a8af",
+    "sha256": "780d6350bf4ca3197213a7748caa2af9977867b001f711c8ddeb9ccc5d64a8af",
+    "size": 920,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/cas/78/0d6350bf4ca3197213a7748caa2af9977867b001f711c8ddeb9ccc5d64a8af"
+  },
+  {
+    "archive": "state/cas/fe/6da83259f356ffbd82a0a3a4cdf6085707bfd579269b1448eae6d4cab6c909",
+    "sha256": "fe6da83259f356ffbd82a0a3a4cdf6085707bfd579269b1448eae6d4cab6c909",
+    "size": 101,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/cas/fe/6da83259f356ffbd82a0a3a4cdf6085707bfd579269b1448eae6d4cab6c909"
+  },
+  {
+    "archive": "state/evaluations/r-29471672_RE_DERIVE_score.json",
+    "sha256": "431bfebc0ac5bc05c2a2e1fd7098e60bbec976e4edf0a33085d539ad56f784c3",
+    "size": 259,
+    "source": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/evaluations/r-29471672_RE_DERIVE_score.json"
+  },
+  {
+    "archive": "run/generated-friction-DEBT-0001.md",
+    "sha256": "3f678f6a0427e3407f97585399fad30ec75d447b1586406a5b2b836052da52f0",
+    "size": 1470,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/source/ledger/debt/DEBT-0001.md"
+  },
+  {
+    "archive": "verification-source/kernel-ledger.py.txt",
+    "sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b",
+    "size": 14811,
+    "source": "/private/tmp/paeos-debt0249-run-82a4185550e948b4a677d68202977a11/source/kernel/ledger.py"
+  }
+]

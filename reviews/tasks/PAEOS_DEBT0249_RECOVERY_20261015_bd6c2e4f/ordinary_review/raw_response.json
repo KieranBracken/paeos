@@ -1,0 +1,22 @@
+{
+  "id": "yQPRav6tNdDlnsEPh4XxoQ0",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "### Adversarial Assessment\n\n#### Ranked Concrete Risks & Evidence\n\n1. **CRITICAL: Parameter Blindspot in Boundary Evaluator (R01/R05)**\n   * **Evidence**: `P:116-126` (`kernel/promotion.py`) and `R:68-89` (`runtime/autonomy/promotion.py`) accept candidate/CAS inputs only; neither signature accepts a stream ledger or origin proof.\n   * **Defect**: R01 safeguard demands origin validation but fails to update the entrypoint parameter contract. Without requiring an explicit stream parameter at the boundary, evaluators will accept default empty arguments or vacuous stubs.\n   * **Smallest Safe Amendment**: Amend R01 safeguard to explicitly require `evaluate_promotion` and `PromotionController.promote` signatures to accept a mandatory `stream_ledger` parameter, failing closed if `stream_ledger is None` or untrusted before AST/event checks execute.\n\n2. **HIGH: Type Escalation Crash during Canonical Normalization (R04)**\n   * **Evidence**: `C:436-455` (`runtime/critique.py`) lacks non-object JSON type filtering while `C:332-340` assumes dictionary key access.\n   * **Defect**: Normalizing `vote_cas_hash=\"\"` on non-dict decoded JSON payloads (e.g., arrays or scalar values) triggers unhandled runtime exceptions (`AttributeError`/`TypeError`) prior to verification denial logic.\n   * **Smallest Safe Amendment**: Amend R04 safeguard to mandate explicit `isinstance(decoded_record, dict)` guard checks prior to any key access, key sorting, or `vote_cas_hash` normalization.\n\n#### Unresolved Scope & Missing Primary-Source Constraints\n\n- Primary specification `spec/debt0249-successor-task.md` is absent from the provided workspace context (`mitigation/catalogue-draft.md`, line 12).\n- The authentic production stream producer, protected manifest, and build scripts (`scripts/build_debt0249_audit_package.py`) remain missing primary-source constraints.\n\n*No authority granted, risk accepted, stage certified, or lifecycle state updated.*",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792082881,
+  "model": "gemini-3.6-flash",
+  "object": "chat.completion",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 479,
+    "prompt_tokens": 8328,
+    "total_tokens": 10475
+  }
+}

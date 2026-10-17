@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-free-pool-baseline-20261015-408h2c0w/baseline.py",
+    "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-free-pool-baseline-20261015-408h2c0w"
+  ],
+  "cwd": "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-free-pool-baseline-20261015-408h2c0w",
+  "environment": {
+    "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+    "TMPDIR": "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-free-pool-baseline-20261015-408h2c0w",
+    "XDG_CACHE_HOME": "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-free-pool-baseline-20261015-408h2c0w/cache",
+    "LITELLM_LOCAL_MODEL_COST_MAP": "True",
+    "LITELLM_TELEMETRY": "False",
+    "DO_NOT_TRACK": "1"
+  },
+  "started_unix": 1792082994.888552,
+  "purpose": "deterministic canonical policy baseline; all network and non-temp writes denied by audit hook",
+  "exit_code": 0,
+  "ended_unix": 1792082996.801717,
+  "stdout_sha256": "0593010931b1d0fc5ecad8c3dbc49bfe8a2ef2c0d0edf10e298d5d77a743de41",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "harness_sha256": "5e5bc8c7aecd7944991b9119820f38dc8dba914fd276efebf2f052fe31f695e1"
+}

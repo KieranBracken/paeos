@@ -1,0 +1,880 @@
+{"import_origins": {"kernel.cas": "kernel/cas.py", "runtime.critique": "runtime/critique.py"}, "mode": "SOURCE_CONSTRUCTION_ONLY", "network": "macOS sandbox-exec deny network"}
+.FFFFFFFFFFFFFFFFFFF.FFFFFFF.FFFF...FFFF...                              [100%]
+=================================== FAILURES ===================================
+__________ test_each_payload_field_is_bound_and_typed[voter_id-other] __________
+
+cas = <kernel.cas.CAS object at 0x1033edd10>, field = 'voter_id'
+value = 'other'
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:76: Failed
+__________ test_each_payload_field_is_bound_and_typed[stance-REJECT] ___________
+
+cas = <kernel.cas.CAS object at 0x10349c640>, field = 'stance', value = 'REJECT'
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='3c9ca43c504cca83d0621758695eab5eefc1a56c91c53285464720b7b09f8d60', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x10349c640>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='3c9ca43c504cca83d0621758695eab5eefc1a56c91c53285464720b7b09f8d60', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x10349c640>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_____ test_each_payload_field_is_bound_and_typed[argument-other argument] ______
+
+cas = <kernel.cas.CAS object at 0x10349cc30>, field = 'argument'
+value = 'other argument'
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:76: Failed
+___________ test_each_payload_field_is_bound_and_typed[risks-value3] ___________
+
+cas = <kernel.cas.CAS object at 0x103466330>, field = 'risks'
+value = ['other risk']
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='284b180c269ae40371c4b8ae4218e185b813f839143e6982b960d7c0e2e2c532', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103466330>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='284b180c269ae40371c4b8ae4218e185b813f839143e6982b960d7c0e2e2c532', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103466330>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_______ test_each_payload_field_is_bound_and_typed[alternatives-value4] ________
+
+cas = <kernel.cas.CAS object at 0x1033f9e10>, field = 'alternatives'
+value = ['other alternative']
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='2260aa147a13d24ef990e734e6f91d94c3fff010758851fa019d153cc533d622', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1033f9e10>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='2260aa147a13d24ef990e734e6f91d94c3fff010758851fa019d153cc533d622', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1033f9e10>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+____________ test_each_payload_field_is_bound_and_typed[voter_id-3] ____________
+
+cas = <kernel.cas.CAS object at 0x1033fa7a0>, field = 'voter_id', value = 3
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:76: Failed
+__________ test_each_payload_field_is_bound_and_typed[stance-value6] ___________
+
+cas = <kernel.cas.CAS object at 0x103416850>, field = 'stance'
+value = ['DISSENT']
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='f603ba83f7a97340a5a341fd3cd249829078655500fbfc1f1ed8805e9e1ab9ce', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103416850>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='f603ba83f7a97340a5a341fd3cd249829078655500fbfc1f1ed8805e9e1ab9ce', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103416850>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+__________ test_each_payload_field_is_bound_and_typed[argument-None] ___________
+
+cas = <kernel.cas.CAS object at 0x103416f50>, field = 'argument', value = None
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:76: Failed
+____________ test_each_payload_field_is_bound_and_typed[risks-risk] ____________
+
+cas = <kernel.cas.CAS object at 0x103495f40>, field = 'risks', value = 'risk'
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='1095281b631e6a5a19375497441df79aff760700390d9454e72c74e31eace306', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103495f40>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='1095281b631e6a5a19375497441df79aff760700390d9454e72c74e31eace306', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103495f40>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_______ test_each_payload_field_is_bound_and_typed[alternatives-value9] ________
+
+cas = <kernel.cas.CAS object at 0x1034957c0>, field = 'alternatives'
+value = [3]
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='7aae4803042f2a25b04bc3da2cc0701846c0933dedc4ea4775dd34b36b45db0c', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034957c0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='7aae4803042f2a25b04bc3da2cc0701846c0933dedc4ea4775dd34b36b45db0c', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034957c0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+__________ test_each_payload_field_is_bound_and_typed[risks-value10] ___________
+
+cas = <kernel.cas.CAS object at 0x1033f3230>, field = 'risks', value = ['']
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='803841bd13e91b88252397b036ce74012ed69cd8609a7eea032b6ae287951328', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1033f3230>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='803841bd13e91b88252397b036ce74012ed69cd8609a7eea032b6ae287951328', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1033f3230>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_______ test_each_payload_field_is_bound_and_typed[alternatives-value11] _______
+
+cas = <kernel.cas.CAS object at 0x103456970>, field = 'alternatives'
+value = [' ']
+
+    @pytest.mark.parametrize("field,value", [
+        ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+        ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+        ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+        ("risks", "risk"), ("alternatives", [3]),
+        ("risks", [""]), ("alternatives", [" "]),
+    ])
+    def test_each_payload_field_is_bound_and_typed(cas, field, value):
+        record = make_record(cas)
+        dissent = record.votes[-1]
+        payload = dissent_payload(dissent)
+        payload[field] = value
+        changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='f4f108aa6e4bfc90560d26ef6578a1cd7fc86b83ef042a23002ab7bf6c440184', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103456970>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='f4f108aa6e4bfc90560d26ef6578a1cd7fc86b83ef042a23002ab7bf6c440184', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103456970>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+____________ test_nonobject_malformed_or_absent_fields_rejected[[]] ____________
+
+cas = <kernel.cas.CAS object at 0x1034a76c0>, raw = b'[]'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='74cb8c156cdce2546a57a979ba5f8be08ae8a5b8bc9a5ce547789c9a297501e0', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034a76c0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='74cb8c156cdce2546a57a979ba5f8be08ae8a5b8bc9a5ce547789c9a297501e0', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034a76c0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+___________ test_nonobject_malformed_or_absent_fields_rejected[null] ___________
+
+cas = <kernel.cas.CAS object at 0x1033af590>, raw = b'null'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='8d72765cdb4ea65a22ff2af052028833d11337f75f3c92f4bc19517366d3db99', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1033af590>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='8d72765cdb4ea65a22ff2af052028833d11337f75f3c92f4bc19517366d3db99', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1033af590>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+____________ test_nonobject_malformed_or_absent_fields_rejected[42] ____________
+
+cas = <kernel.cas.CAS object at 0x1034bc350>, raw = b'42'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='daa04aaa62166416fedf8315e121afaea4b220be10cfe1094cc846012a9ce086', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034bc350>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='daa04aaa62166416fedf8315e121afaea4b220be10cfe1094cc846012a9ce086', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034bc350>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+__________ test_nonobject_malformed_or_absent_fields_rejected["text"] __________
+
+cas = <kernel.cas.CAS object at 0x1034c8e10>, raw = b'"text"'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+>       assert_invalid(with_dissent(cas, record, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='23aa22dc49290d4e3ae12bb61d913320c397eb738e12db95c6ede008c504aec0', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034c8e10>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='23aa22dc49290d4e3ae12bb61d913320c397eb738e12db95c6ede008c504aec0', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034c8e10>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+____________ test_nonobject_malformed_or_absent_fields_rejected[{] _____________
+
+cas = <kernel.cas.CAS object at 0x1034c9230>, raw = b'{'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:85: Failed
+___________ test_nonobject_malformed_or_absent_fields_rejected[\xff] ___________
+
+cas = <kernel.cas.CAS object at 0x1034d4a50>, raw = b'\xff'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:85: Failed
+____________ test_nonobject_malformed_or_absent_fields_rejected[{}] ____________
+
+cas = <kernel.cas.CAS object at 0x1034d5130>, raw = b'{}'
+
+    @pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+    def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+        record = make_record(cas)
+        changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+        assert_invalid(with_dissent(cas, record, changed), cas)
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:85: Failed
+_____ test_whole_record_hash_binds_content_and_must_exist[vote_id-altered] _____
+
+cas = <kernel.cas.CAS object at 0x103451250>, field = 'vote_id'
+value = 'altered'
+
+    @pytest.mark.parametrize("field,value", [
+        ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+        ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+    ])
+    def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+        record = make_record(cas)
+>       assert_invalid(replace(record, **{field: value}), cas)
+
+tests/runtime/test_debt0249_remand14.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='altered', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<C... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103451250>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='altered', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<C... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103451250>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+___ test_whole_record_hash_binds_content_and_must_exist[proposal_id-altered] ___
+
+cas = <kernel.cas.CAS object at 0x103424ad0>, field = 'proposal_id'
+value = 'altered'
+
+    @pytest.mark.parametrize("field,value", [
+        ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+        ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+    ])
+    def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+        record = make_record(cas)
+>       assert_invalid(replace(record, **{field: value}), cas)
+
+tests/runtime/test_debt0249_remand14.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='altered', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Counc... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103424ad0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='altered', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Counc... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103424ad0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+______ test_whole_record_hash_binds_content_and_must_exist[topic-altered] ______
+
+cas = <kernel.cas.CAS object at 0x1034c3ee0>, field = 'topic', value = 'altered'
+
+    @pytest.mark.parametrize("field,value", [
+        ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+        ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+    ])
+    def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+        record = make_record(cas)
+>       assert_invalid(replace(record, **{field: value}), cas)
+
+tests/runtime/test_debt0249_remand14.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='altered', votes=(CouncilVote(voter_id='a', stance=<Co... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034c3ee0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='altered', votes=(CouncilVote(voter_id='a', stance=<Co... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034c3ee0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_ test_whole_record_hash_binds_content_and_must_exist[consensus_reached-False] _
+
+cas = <kernel.cas.CAS object at 0x1034c2580>, field = 'consensus_reached'
+value = False
+
+    @pytest.mark.parametrize("field,value", [
+        ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+        ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+    ])
+    def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+        record = make_record(cas)
+>       assert_invalid(replace(record, **{field: value}), cas)
+
+tests/runtime/test_debt0249_remand14.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034c2580>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034c2580>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_____ test_whole_record_hash_binds_content_and_must_exist[vote_cas_hash-] ______
+
+cas = <kernel.cas.CAS object at 0x103460b30>, field = 'vote_cas_hash'
+value = ''
+
+    @pytest.mark.parametrize("field,value", [
+        ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+        ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+    ])
+    def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+        record = make_record(cas)
+>       assert_invalid(replace(record, **{field: value}), cas)
+
+tests/runtime/test_debt0249_remand14.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun...aa4c06f5271e16f649fa618724704c77e6569d90329c3c714462f020e6c'),), vote_cas_hash='', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103460b30>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun...aa4c06f5271e16f649fa618724704c77e6569d90329c3c714462f020e6c'),), vote_cas_hash='', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103460b30>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_ test_whole_record_hash_binds_content_and_must_exist[vote_cas_hash-0000000000000000000000000000000000000000000000000000000000000000] _
+
+cas = <kernel.cas.CAS object at 0x1034618b0>, field = 'vote_cas_hash'
+value = '0000000000000000000000000000000000000000000000000000000000000000'
+
+    @pytest.mark.parametrize("field,value", [
+        ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+        ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+    ])
+    def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+        record = make_record(cas)
+>       assert_invalid(replace(record, **{field: value}), cas)
+
+tests/runtime/test_debt0249_remand14.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='0000000000000000000000000000000000000000000000000000000000000000', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034618b0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='0000000000000000000000000000000000000000000000000000000000000000', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034618b0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+______________ test_existing_unrelated_whole_record_blob_rejected ______________
+
+cas = <kernel.cas.CAS object at 0x1034615b0>
+
+    def test_existing_unrelated_whole_record_blob_rejected(cas):
+        record = make_record(cas)
+>       assert_invalid(replace(record, vote_cas_hash=cas.put(b"{}")), cas)
+
+tests/runtime/test_debt0249_remand14.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1034615b0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1034615b0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+____ test_dissent_view_compares_all_dataclass_fields[model_family-altered] _____
+
+cas = <kernel.cas.CAS object at 0x1033eab70>, field = 'model_family'
+value = 'altered'
+
+    @pytest.mark.parametrize("field,value", [
+        ("argument", "altered"), ("model_family", "altered"),
+        ("risks_identified", ("altered",)), ("suggested_alternatives", ("altered",)),
+        ("stance", CouncilVoteStance.REJECT), ("dissent_cas_hash", "0" * 64),
+    ])
+    def test_dissent_view_compares_all_dataclass_fields(cas, field, value):
+        record = make_record(cas)
+        changed = replace(record.dissenting_opinions[0], **{field: value})
+>       assert_invalid(rebind(cas, replace(record, dissenting_opinions=(changed,))), cas)
+
+tests/runtime/test_debt0249_remand14.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='ddab0c477405613edad7f4b5021f8d594e43d420e16bf389d82c6c422e7da6a5', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1033eab70>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='ddab0c477405613edad7f4b5021f8d594e43d420e16bf389d82c6c422e7da6a5', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1033eab70>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+___ test_dissent_view_compares_all_dataclass_fields[risks_identified-value2] ___
+
+cas = <kernel.cas.CAS object at 0x1035080b0>, field = 'risks_identified'
+value = ('altered',)
+
+    @pytest.mark.parametrize("field,value", [
+        ("argument", "altered"), ("model_family", "altered"),
+        ("risks_identified", ("altered",)), ("suggested_alternatives", ("altered",)),
+        ("stance", CouncilVoteStance.REJECT), ("dissent_cas_hash", "0" * 64),
+    ])
+    def test_dissent_view_compares_all_dataclass_fields(cas, field, value):
+        record = make_record(cas)
+        changed = replace(record.dissenting_opinions[0], **{field: value})
+>       assert_invalid(rebind(cas, replace(record, dissenting_opinions=(changed,))), cas)
+
+tests/runtime/test_debt0249_remand14.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1035080b0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1035080b0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+_ test_dissent_view_compares_all_dataclass_fields[suggested_alternatives-value3] _
+
+cas = <kernel.cas.CAS object at 0x103508650>, field = 'suggested_alternatives'
+value = ('altered',)
+
+    @pytest.mark.parametrize("field,value", [
+        ("argument", "altered"), ("model_family", "altered"),
+        ("risks_identified", ("altered",)), ("suggested_alternatives", ("altered",)),
+        ("stance", CouncilVoteStance.REJECT), ("dissent_cas_hash", "0" * 64),
+    ])
+    def test_dissent_view_compares_all_dataclass_fields(cas, field, value):
+        record = make_record(cas)
+        changed = replace(record.dissenting_opinions[0], **{field: value})
+>       assert_invalid(rebind(cas, replace(record, dissenting_opinions=(changed,))), cas)
+
+tests/runtime/test_debt0249_remand14.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103508650>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103508650>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+________ test_dissent_view_compares_all_dataclass_fields[stance-REJECT] ________
+
+cas = <kernel.cas.CAS object at 0x103508b90>, field = 'stance'
+value = <CouncilVoteStance.REJECT: 'REJECT'>
+
+    @pytest.mark.parametrize("field,value", [
+        ("argument", "altered"), ("model_family", "altered"),
+        ("risks_identified", ("altered",)), ("suggested_alternatives", ("altered",)),
+        ("stance", CouncilVoteStance.REJECT), ("dissent_cas_hash", "0" * 64),
+    ])
+    def test_dissent_view_compares_all_dataclass_fields(cas, field, value):
+        record = make_record(cas)
+        changed = replace(record.dissenting_opinions[0], **{field: value})
+>       assert_invalid(rebind(cas, replace(record, dissenting_opinions=(changed,))), cas)
+
+tests/runtime/test_debt0249_remand14.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='26fb092dbdfbcdf230522acca4a56eb515598165bc5f30c76aeb2b05a917b86d', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103508b90>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='26fb092dbdfbcdf230522acca4a56eb515598165bc5f30c76aeb2b05a917b86d', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103508b90>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+______________ test_dissent_view_and_voter_uniqueness[duplicate] _______________
+
+cas = <kernel.cas.CAS object at 0x103509610>, mode = 'duplicate'
+
+    @pytest.mark.parametrize("mode", ["omitted", "extra", "duplicate", "duplicate_voter"])
+    def test_dissent_view_and_voter_uniqueness(cas, mode):
+        record = make_record(cas)
+        if mode == "omitted":
+            changed = replace(record, dissenting_opinions=())
+        elif mode == "extra":
+            changed = replace(record, dissenting_opinions=(*record.dissenting_opinions, record.votes[0]))
+        elif mode == "duplicate":
+            changed = replace(record, dissenting_opinions=record.dissenting_opinions * 2)
+        else:
+            changed = replace(record, votes=(record.votes[0], record.votes[0], record.votes[-1]))
+>       assert_invalid(rebind(cas, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='b648ba04f4519c1c981a3651b2a27e923571942eb8652cd3304349897c314d1a', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x103509610>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='b648ba04f4519c1c981a3651b2a27e923571942eb8652cd3304349897c314d1a', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x103509610>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+___________ test_dissent_view_and_voter_uniqueness[duplicate_voter] ____________
+
+cas = <kernel.cas.CAS object at 0x1035096d0>, mode = 'duplicate_voter'
+
+    @pytest.mark.parametrize("mode", ["omitted", "extra", "duplicate", "duplicate_voter"])
+    def test_dissent_view_and_voter_uniqueness(cas, mode):
+        record = make_record(cas)
+        if mode == "omitted":
+            changed = replace(record, dissenting_opinions=())
+        elif mode == "extra":
+            changed = replace(record, dissenting_opinions=(*record.dissenting_opinions, record.votes[0]))
+        elif mode == "duplicate":
+            changed = replace(record, dissenting_opinions=record.dissenting_opinions * 2)
+        else:
+            changed = replace(record, votes=(record.votes[0], record.votes[0], record.votes[-1]))
+>       assert_invalid(rebind(cas, changed), cas)
+
+tests/runtime/test_debt0249_remand14.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='cabf3fbe7f17fbababb6f5e9e501b77d7474fcaafdcacd5a62ac0ff873dafaae', is_consensus_used_as_evidence=False)
+cas = <kernel.cas.CAS object at 0x1035096d0>
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='cabf3fbe7f17fbababb6f5e9e501b77d7474fcaafdcacd5a62ac0ff873dafaae', is_consensus_used_as_evidence=False), <kernel.cas.CAS object at 0x1035096d0>)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+__________________ test_duplicate_voter_rejected_at_creation ___________________
+
+cas = <kernel.cas.CAS object at 0x1033eb7d0>
+
+    def test_duplicate_voter_rejected_at_creation(cas):
+        original = votes()
+>       with pytest.raises(CouncilDissensionViolationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE CouncilDissensionViolationError
+
+tests/runtime/test_debt0249_remand14.py:138: Failed
+___________________ test_missing_cas_cannot_verify_grounding ___________________
+
+cas = <kernel.cas.CAS object at 0x1034617f0>
+
+    def test_missing_cas_cannot_verify_grounding(cas):
+>       assert_invalid(make_record(cas), None)
+
+tests/runtime/test_debt0249_remand14.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False)
+cas = None
+
+    def assert_invalid(record, cas):
+>       assert verify_council_deliberation_invariants(record, cas)
+E       AssertionError: assert []
+E        +  where [] = verify_council_deliberation_invariants(CouncilVoteRecord(vote_id='vote', proposal_id='proposal', topic='topic', votes=(CouncilVote(voter_id='a', stance=<Coun... vote_cas_hash='a99f656385e6658ed19b499f22967d4658f5c3ecd80a24dc97fec8e198882b31', is_consensus_used_as_evidence=False), None)
+
+tests/runtime/test_debt0249_remand14.py:47: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[voter_id-other]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[stance-REJECT]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[argument-other argument]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[risks-value3]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[alternatives-value4]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[voter_id-3]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[stance-value6]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[argument-None]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[risks-risk]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[alternatives-value9]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[risks-value10]
+FAILED tests/runtime/test_debt0249_remand14.py::test_each_payload_field_is_bound_and_typed[alternatives-value11]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected[[]]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected[null]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected[42]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected["text"]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected[{]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected[\xff]
+FAILED tests/runtime/test_debt0249_remand14.py::test_nonobject_malformed_or_absent_fields_rejected[{}]
+FAILED tests/runtime/test_debt0249_remand14.py::test_whole_record_hash_binds_content_and_must_exist[vote_id-altered]
+FAILED tests/runtime/test_debt0249_remand14.py::test_whole_record_hash_binds_content_and_must_exist[proposal_id-altered]
+FAILED tests/runtime/test_debt0249_remand14.py::test_whole_record_hash_binds_content_and_must_exist[topic-altered]
+FAILED tests/runtime/test_debt0249_remand14.py::test_whole_record_hash_binds_content_and_must_exist[consensus_reached-False]
+FAILED tests/runtime/test_debt0249_remand14.py::test_whole_record_hash_binds_content_and_must_exist[vote_cas_hash-]
+FAILED tests/runtime/test_debt0249_remand14.py::test_whole_record_hash_binds_content_and_must_exist[vote_cas_hash-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED tests/runtime/test_debt0249_remand14.py::test_existing_unrelated_whole_record_blob_rejected
+FAILED tests/runtime/test_debt0249_remand14.py::test_dissent_view_compares_all_dataclass_fields[model_family-altered]
+FAILED tests/runtime/test_debt0249_remand14.py::test_dissent_view_compares_all_dataclass_fields[risks_identified-value2]
+FAILED tests/runtime/test_debt0249_remand14.py::test_dissent_view_compares_all_dataclass_fields[suggested_alternatives-value3]
+FAILED tests/runtime/test_debt0249_remand14.py::test_dissent_view_compares_all_dataclass_fields[stance-REJECT]
+FAILED tests/runtime/test_debt0249_remand14.py::test_dissent_view_and_voter_uniqueness[duplicate]
+FAILED tests/runtime/test_debt0249_remand14.py::test_dissent_view_and_voter_uniqueness[duplicate_voter]
+FAILED tests/runtime/test_debt0249_remand14.py::test_duplicate_voter_rejected_at_creation
+FAILED tests/runtime/test_debt0249_remand14.py::test_missing_cas_cannot_verify_grounding

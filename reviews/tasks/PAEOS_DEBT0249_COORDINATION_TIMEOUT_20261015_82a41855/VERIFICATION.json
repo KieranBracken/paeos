@@ -1,0 +1,122 @@
+{
+  "builder_reached": false,
+  "cas": [
+    {
+      "sha256": "2bcad5d11b9063310e3df292c53088dde8252db2d5d5e3106c9fced7a4844c8a",
+      "size": 3943
+    },
+    {
+      "sha256": "780d6350bf4ca3197213a7748caa2af9977867b001f711c8ddeb9ccc5d64a8af",
+      "size": 920
+    },
+    {
+      "sha256": "fe6da83259f356ffbd82a0a3a4cdf6085707bfd579269b1448eae6d4cab6c909",
+      "size": 101
+    }
+  ],
+  "compatibility_reported_tokens": 0,
+  "court_counts": {
+    "remanded": 0,
+    "remediated": 0,
+    "sealed": 0
+  },
+  "court_reached": false,
+  "domain_counts": {
+    "PRODUCTION": 9
+  },
+  "excluded_state_files": [
+    "seal.key",
+    "mcp-config.json",
+    "scars.db"
+  ],
+  "goal_id": "g-28779efed40e",
+  "keys_read_or_copied": false,
+  "late_L04_response_present": false,
+  "ledger_chain_valid": true,
+  "ledger_head": "f225e078befbca95f22294c8905a4e2da311577df17f18b105de73d9cd07a730",
+  "ledger_rows": 9,
+  "ledger_writer": [
+    {
+      "id": 1,
+      "owner": "paeos-writer"
+    }
+  ],
+  "mode": "READ_ONLY_SQLITE_IMMUTABLE_NO_PROJECT_IMPORT",
+  "pid_observation": "PID_NOT_PRESENT",
+  "preserved_compatibility_model_label": "chat-bridge-compatibility",
+  "qualification_claim": false,
+  "receipt_checks": {
+    "PREFLIGHT1": {
+      "exit_code": 1,
+      "stderr_hash_matches": true,
+      "stdout_hash_matches": true
+    },
+    "RUN": {
+      "exit_code": 2,
+      "intake_hash_matches": true,
+      "source_manifest_hash_matches": true,
+      "stderr_hash_matches": true,
+      "stdout_hash_matches": true
+    }
+  },
+  "recorded_pid": 1979,
+  "requests": [
+    {
+      "mtime_utc": "2026-10-15T16:52:19.070956+00:00",
+      "path": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/bridge/requests/r-29471672--t-26ab63ea8e74--re_derive.prompt.md",
+      "sha256": "80b6a75b71dd941d27b549f52a030385fa81c0a13aaf76e5f4dcdc1545061f6e",
+      "workspace": "/Users/bob/GitHub/paeos/ops/.trusted-codex-worker/workspaces/paeos-t-26ab63ea8e74-bridge-hlhc5vtw",
+      "workspace_present": false
+    },
+    {
+      "mtime_utc": "2026-10-15T16:56:12.278542+00:00",
+      "path": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/bridge/requests/r-29471672--t-c77ed9cdb294--ideate.prompt.md",
+      "sha256": "6ccc10e4f67593888affb82304e7de8003b0be06fccf31d55edb6b6ca682a930",
+      "workspace": "/Users/bob/GitHub/paeos/ops/.trusted-codex-worker/workspaces/paeos-t-c77ed9cdb294-bridge-dbdu051q",
+      "workspace_present": false
+    }
+  ],
+  "responses": [
+    {
+      "path": "/private/tmp/paeos-debt0249-state-82a4185550e948b4a677d68202977a11/bridge/responses/r-29471672--t-26ab63ea8e74--re_derive.response.md",
+      "sha256": "780d6350bf4ca3197213a7748caa2af9977867b001f711c8ddeb9ccc5d64a8af"
+    }
+  ],
+  "run_id": "r-29471672",
+  "runtime_counts": {
+    "remanded": 1,
+    "remediated": 0,
+    "sealed": 0
+  },
+  "runtime_stdout_head_matches": true,
+  "schema": "paeos.terminated-run-evidence-readback/1",
+  "source_manifest_file_count": 903,
+  "source_matches": 903,
+  "source_mismatches": [],
+  "sqlite_integrity": "ok",
+  "stages": [
+    {
+      "goal_id": "g-28779efed40e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-29471672",
+      "seq": 4,
+      "session": "planner",
+      "stage": "RE_DERIVE",
+      "status": "COMPLETE",
+      "timestamp": "2026-10-15T16:56:12.255583+00:00",
+      "tokens": 0
+    },
+    {
+      "goal_id": "g-28779efed40e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-29471672",
+      "seq": 5,
+      "session": "planner",
+      "stage": "IDEATE",
+      "status": "FAILED",
+      "timestamp": "2026-10-15T17:01:12.451699+00:00",
+      "tokens": 0
+    }
+  ],
+  "verified_at_utc": "2026-10-15T17:05:58.905531+00:00"
+}

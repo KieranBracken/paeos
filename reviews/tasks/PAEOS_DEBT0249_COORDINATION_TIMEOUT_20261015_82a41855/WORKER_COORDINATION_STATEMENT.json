@@ -1,0 +1,9 @@
+{
+  "independent_physical_observation": false,
+  "parent_statement": "Root interruption17:00:41 then attemptedtakeover afterdeadline; root script assertedw.is_dir false beforeanywrite. No oldresponseexists.",
+  "received_via": "parent /root collaboration message",
+  "schema": "paeos.coordination-testimony/1",
+  "scope_note": "Historical worker writing activity and absence of pending tool are reported testimony, not independently reconstructed from deleted workspace. Current workspace and L04 response absence are independently checked in VERIFICATION.json.",
+  "worker": "code_seam_trace",
+  "worker_statement": "I mishandled the deadline. I spent too long reading the embedded source package, including one oversized, truncated read followed by narrower reads, then delayed writing while composing the comparison. No artifact or response file was written. No draft path exists; the draft remained unwritten. All tool calls had completed; none was pending. No implementation, tests, or provider calls occurred."
+}

@@ -1,0 +1,58 @@
+{
+  "operation_id": "l07-current-5399476b-A",
+  "run_id": "r-779c4b75",
+  "goal_id": "g-59677d6a4ac1",
+  "task_id": "t-4cfe8e88a0a4",
+  "bindings": [
+    {
+      "path": "context/artifact-004d99f119d5.txt",
+      "sha256": "004d99f119d58f3b62fb45b431b3c27ad1529bc59c9e080f391c8fd4ab331619"
+    },
+    {
+      "path": "context/artifact-1a5c100a02c0.txt",
+      "sha256": "1a5c100a02c072b958dfeb173abc6eba97c1dce2b9472dc8fb0d7bc55dfed74e"
+    },
+    {
+      "path": "context/artifact-a8b20763add9.txt",
+      "sha256": "a8b20763add938567557a0a7906f003cca07b15d13216e974ee90f4d308db77a"
+    },
+    {
+      "path": "context/artifact-bab96eb456dc.txt",
+      "sha256": "bab96eb456dc39d739fb55edb96472c25b13f5e0c20dc9a428f495d044d52b6c"
+    },
+    {
+      "path": "mitigation/catalogue-draft.md",
+      "sha256": "7577494b46aa3c5faa179cc743b13e43aef5ccb964efa192bda9feb8865c5782"
+    }
+  ],
+  "primary_source_sha256": "1b9877cca6ea3c685e681163aa1fd48fdd3652b915b23927c769691628769136",
+  "stage": "MITIGATION",
+  "runtime_stage_receipt": false,
+  "formal_L14_receipt": false,
+  "status": "FAILED",
+  "started_unix": 1792084199.7192059,
+  "prompt_sha256": "a5c677a6f85144af71cb086576ab3ef42077a6af4d61204a49ca25a93e4eff8b",
+  "request_sha256": "1ec6074c808575ec153c92c103923103e0c0fff6c5603f4b9b4c70b8801164d9",
+  "request_policy_sha256": "8ae8f6633481f7a07f06cd8b390fdae8560238ba74565ac2d6c3dcd426fe9e8d",
+  "eligible_candidates": [
+    {
+      "model_id": "gemini-3.6-flash",
+      "provider_id": "google",
+      "family": "gemini",
+      "cost_tier": "FREE",
+      "pricing_verified_free": true,
+      "live_verified": true,
+      "available": true,
+      "admission_state": "ADMITTED",
+      "context_window": 1048576,
+      "supports_tools": true,
+      "supports_json": true,
+      "verified_at": 1771680000.0,
+      "base_quality_score": 0.95,
+      "entitlement_notes": "Google AI Studio Free Tier (Zero-cost API key); live 200 OK verified."
+    }
+  ],
+  "error_type": "NormalizedError",
+  "message": "[PROVIDER_UNAVAILABLE] Provider=google HTTP=503 RetryAfter=30.0: OpenAIException - Error code: 503 - [{'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}]",
+  "ended_unix": 1792084205.561697
+}

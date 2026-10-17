@@ -1,0 +1,91 @@
+{
+  "schema": "paeos.ordinary-source-review/1",
+  "operation_id": "paeos-debt0249-review-recovery-20261015-bd6c2e4f",
+  "status": "COMPLETE",
+  "closed_run_reference": "r-1bc742d8",
+  "runtime_stage_receipt": false,
+  "formal_L14_receipt": false,
+  "bindings": [
+    {
+      "path": "context/artifact-0a2a817e6aa5.txt",
+      "sha256": "0a2a817e6aa585bde28e0e428405a1c42495397c0d3c526904dc7af53c8901eb"
+    },
+    {
+      "path": "context/artifact-4432798b2431.txt",
+      "sha256": "4432798b2431cd13d6fe1e0dfa196b993a480325a77b8939042535b796bd3862"
+    },
+    {
+      "path": "context/artifact-51ba0650e7b7.txt",
+      "sha256": "51ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947"
+    },
+    {
+      "path": "context/artifact-8f0de17d5c5e.txt",
+      "sha256": "8f0de17d5c5ea0feccbc6424ac048521d7e00a9268687d408be8160834d5a481"
+    },
+    {
+      "path": "mitigation/catalogue-draft.md",
+      "sha256": "b34f41d774d5652e9dd943fff3f96817ccf47a565262ecd905d6c89fc1f775dc"
+    }
+  ],
+  "prompt_sha256": "8b6f6e6c80009759ab4c9ff666f80d6bf4259204c3ad401bd601478ff019d9da",
+  "request_sha256": "578a4cc429228b20de4ab8288b5f4acc8a714067609aceea6e65a8a804153e9a",
+  "request_policy_sha256": "a3ed34facbe0361eb0274644c69503ccf516996d264845d069f15868be0e6490",
+  "previous_failure_receipt_sha256": "5202f4664bf5bad2d930952635705944f3eb2d357ec23f4d8ee53cdfff26e496",
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "allow_fallback": false,
+  "retry_policy": "none",
+  "maximum_provider_attempts": 1,
+  "eligible_candidates": [
+    {
+      "model_id": "gemini-3.6-flash",
+      "provider_id": "google",
+      "family": "gemini",
+      "cost_tier": "FREE",
+      "pricing_verified_free": true,
+      "live_verified": true,
+      "available": true,
+      "admission_state": "ADMITTED",
+      "context_window": 1048576,
+      "supports_tools": true,
+      "supports_json": true,
+      "verified_at": 1771680000.0,
+      "base_quality_score": 0.95,
+      "entitlement_notes": "Google AI Studio Free Tier (Zero-cost API key); live 200 OK verified."
+    }
+  ],
+  "started_unix": 1792082881.394305,
+  "checks": {
+    "complete": true,
+    "actual_second_family": true,
+    "catalog_family_matches": true,
+    "actual_model_matches": true,
+    "request_fingerprint_matches": true,
+    "response_fingerprint_matches": true,
+    "generation_identity_present": true
+  },
+  "response": {
+    "model_id": "gemini-3.6-flash",
+    "provider_id": "google",
+    "family": "gemini",
+    "actual_model": "gemini-3.6-flash",
+    "actual_family": "gemini",
+    "prompt_tokens": 8328,
+    "completion_tokens": 479,
+    "total_tokens": 8807,
+    "latency_ms": 22390.548944473267,
+    "attempts": 1,
+    "fallback_chain": [
+      "google:gemini-3.6-flash"
+    ],
+    "tool_calls": null,
+    "finish_reason": "stop",
+    "transport_request_sha256": "578a4cc429228b20de4ab8288b5f4acc8a714067609aceea6e65a8a804153e9a",
+    "transport_response_sha256": "3a4536340ded3a1a77788bc865487473b5cea610156d36037c3fa64beb8656d8",
+    "host_turn_uuid": null,
+    "external_generation_id": "yQPRav6tNdDlnsEPh4XxoQ0"
+  },
+  "report_sha256": "d0f9b8be3ad3eeff50012637d3e1e21576015da4eb41e26e935a33e21d1cbce2",
+  "raw_response_sha256": "f51f105f91ef8ed5342767d0df9739b40a7471f2cd42b23ed00768d0746ce938",
+  "ended_unix": 1792082903.791407
+}

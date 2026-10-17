@@ -1,0 +1,33 @@
+{
+  "builder_family": "openai",
+  "builder_session": "codex-thread:01a14042-702b-72b2-b6fe-4a421e74c4f7:subagent-council-builder",
+  "deadline_unix": 1792086773.129535,
+  "goal_id": "sc-g-4cd9d2014f354f90bc82d73ecd0aafe9",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "permissions": {
+    "mcp_servers": [
+      "court:submit_evidence",
+      "artifacts:publish"
+    ],
+    "read_scopes": [
+      ".source_construction_verify.py",
+      "kernel/__init__.py",
+      "kernel/cas.py",
+      "pyproject.toml",
+      "runtime/__init__.py",
+      "tests/__init__.py",
+      "tests/runtime/__init__.py",
+      "tests/runtime/test_l09_critique.py",
+      "uv.lock"
+    ],
+    "skills": [],
+    "write_scopes": [
+      "runtime/critique.py",
+      "tests/runtime/test_debt0249_remand14.py"
+    ]
+  },
+  "run_id": "sc-r-a8ea317d8e7f46889b4f8869a4b65531",
+  "task_id": "t-8c708b6648eb",
+  "original_package_sha256": "40925979e97499492e0fe12a7479f1574bc2944d65a3a85886f4d518551320c2",
+  "capability_omitted": true
+}

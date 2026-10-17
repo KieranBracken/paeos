@@ -1,0 +1,6 @@
+{
+  "command_file": "command.txt",
+  "observed_exit_code": 0,
+  "stdout": "stdout.txt",
+  "stderr": "stderr.txt"
+}

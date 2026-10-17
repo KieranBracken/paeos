@@ -1,0 +1,793 @@
+{
+  "evidence_kind": "Offline baseline regression; not implementation, actual Council decision, admission, provider qualification, or runtime success.",
+  "imports": {
+    "kernel.cas": "/Users/bob/GitHub/paeos/kernel/cas.py",
+    "runtime.critique": "/Users/bob/GitHub/paeos/runtime/critique.py"
+  },
+  "source_unchanged": true,
+  "temporary_cas_root": "/private/tmp/paeos-council-baseline-_74zh9df/cas",
+  "network_or_process_attempts_blocked": [],
+  "canonical_self_hash_field": "vote_cas_hash=\"\" in stored whole-record bytes",
+  "whole_record_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+  "dissent_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f",
+  "stored_dissent_payload": {
+    "alternatives": [
+      "Hold promotion until origin is bound."
+    ],
+    "argument": "Trusted stream origin is unresolved.",
+    "risks": [
+      "Origin is unbound."
+    ],
+    "stance": "DISSENT",
+    "voter_id": "offline-d"
+  },
+  "whole_record_cas_verified": true,
+  "dissent_cas_verified": true,
+  "whole_record_dissent_list_omits_risks_and_alternatives": true,
+  "invalid_cases_accepted": 7,
+  "rejection_controls_rejected": 3,
+  "cases": [
+    {
+      "case": "valid_control",
+      "expected_valid": true,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [],
+      "explanation": "Unmodified real-recorder output.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "stance_tampered",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "votes[2].stance",
+        "dissenting_opinions[0].stance"
+      ],
+      "explanation": "One logical vote field changed consistently in both views; original dissent and whole-record CAS retained.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "REJECT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "REJECT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "risks_tampered",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "votes[2].risks_identified",
+        "dissenting_opinions[0].risks_identified"
+      ],
+      "explanation": "One logical vote field changed consistently in both views; original CAS retained.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Different unreviewed risk."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Different unreviewed risk."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "alternatives_tampered",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "votes[2].suggested_alternatives",
+        "dissenting_opinions[0].suggested_alternatives"
+      ],
+      "explanation": "One logical vote field changed consistently in both views; original CAS retained.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Ship without binding."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Ship without binding."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "whole_record_hash_absent",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "vote_cas_hash"
+      ],
+      "explanation": "Valid-format hash known absent from this real CAS.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "dissent_list_stance_only",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "dissenting_opinions[0].stance"
+      ],
+      "explanation": "Vote remains DISSENT while its dissent-list copy becomes APPROVE.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "dissent_list_duplicate",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "dissenting_opinions"
+      ],
+      "explanation": "Duplicate dissent entry; original whole-record CAS retained.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "nonobject_presupplied_payload",
+      "expected_valid": false,
+      "violations": [],
+      "accepted": true,
+      "reopened_violations": [],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "votes[2].dissent_cas_hash"
+      ],
+      "explanation": "Real recorder accepts pre-supplied existing CAS payload [] and creates a fresh whole-record hash.",
+      "record": {
+        "vote_id": "offline-nonobject-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          }
+        ],
+        "vote_cas_hash": "8e5f95b5201e5e9e9dc5c5552a73bd7dc37f535e395025be2aba96624e0ae07a",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "argument_mismatch_rejection_control",
+      "expected_valid": false,
+      "violations": [
+        "DISSENT_CAS_CONTENT_MISMATCH: Stored CAS payload does not match voter offline-d dissent"
+      ],
+      "accepted": false,
+      "reopened_violations": [
+        "DISSENT_CAS_CONTENT_MISMATCH: Stored CAS payload does not match voter offline-d dissent"
+      ],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "votes[2].argument",
+        "dissenting_opinions[0].argument"
+      ],
+      "explanation": "Known checked field changed while original CAS retained.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "A different argument.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "A different argument.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "omission_rejection_control",
+      "expected_valid": false,
+      "violations": [
+        "DISSENT_SUPPRESSION_VIOLATION: Voter offline-d voted DISSENT but was omitted from dissenting_opinions"
+      ],
+      "accepted": false,
+      "reopened_violations": [
+        "DISSENT_SUPPRESSION_VIOLATION: Voter offline-d voted DISSENT but was omitted from dissenting_opinions"
+      ],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "dissenting_opinions"
+      ],
+      "explanation": "Dissent voter omitted from list.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "42c06557a04589c6e7427aab9d83afff0d77c9ee6ad0f7eb526234044028494f"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    },
+    {
+      "case": "missing_dissent_blob_rejection_control",
+      "expected_valid": false,
+      "violations": [
+        "DISSENT_CAS_NOT_FOUND: Dissent CAS hash ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff for voter offline-d not found in CAS store"
+      ],
+      "accepted": false,
+      "reopened_violations": [
+        "DISSENT_CAS_NOT_FOUND: Dissent CAS hash ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff for voter offline-d not found in CAS store"
+      ],
+      "reopen_agrees": true,
+      "changed_fields": [
+        "votes[2].dissent_cas_hash",
+        "dissenting_opinions[0].dissent_cas_hash"
+      ],
+      "explanation": "Dissent digest points to absent CAS blob.",
+      "record": {
+        "vote_id": "offline-vote-1",
+        "proposal_id": "offline-proposal-1",
+        "topic": "Local invariant regression fixture; no real Council or provider",
+        "votes": [
+          {
+            "voter_id": "offline-a",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-a",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-b",
+            "stance": "APPROVE",
+            "model_family": "offline-fixture-b",
+            "argument": "Approve bounded fixture.",
+            "risks_identified": [],
+            "suggested_alternatives": [],
+            "dissent_cas_hash": ""
+          },
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          }
+        ],
+        "consensus_reached": true,
+        "dissenting_opinions": [
+          {
+            "voter_id": "offline-d",
+            "stance": "DISSENT",
+            "model_family": "offline-fixture-c",
+            "argument": "Trusted stream origin is unresolved.",
+            "risks_identified": [
+              "Origin is unbound."
+            ],
+            "suggested_alternatives": [
+              "Hold promotion until origin is bound."
+            ],
+            "dissent_cas_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          }
+        ],
+        "vote_cas_hash": "84473ba421f4847920f14b1079f2673a4a51ac1e5b38f40c1da7e669bb82384d",
+        "is_consensus_used_as_evidence": false
+      }
+    }
+  ]
+}

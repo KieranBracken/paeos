@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    ".source_construction_verify.py",
+    "tests/runtime/test_debt0249_remand14.py"
+  ],
+  "cwd": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/workspaces/paeos-t-8c708b6648eb-bridge-vupphzhp",
+  "exit_code": 0,
+  "source_sha256": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  }
+}

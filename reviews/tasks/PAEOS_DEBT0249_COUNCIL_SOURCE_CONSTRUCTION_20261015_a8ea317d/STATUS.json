@@ -1,0 +1,49 @@
+{
+  "schema": "paeos.source-construction-checkpoint/1",
+  "timestamp_utc": "2026-10-15T17:28:49.779537+00:00",
+  "status": "SOURCE_CAPTURED_TESTED_INDEPENDENT_LOCAL_VERIFICATION_PASS_HETEROGENEOUS_REVIEW_PENDING",
+  "run_id": "sc-r-a8ea317d8e7f46889b4f8869a4b65531",
+  "task_id": "t-8c708b6648eb",
+  "worker_thread_id": "01a14042-702b-72b2-b6fe-4a421e74c4f7",
+  "original_state": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state",
+  "candidate_root": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_SOURCE_CONSTRUCTION_20261015_a8ea317d/candidate",
+  "scope_sha256": "9107573576120a80b2e20d314865b0ef17fa1d8dfc772767c1d681136ddb3ff4",
+  "mutable_preimages": {
+    "runtime/critique.py": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+    "tests/runtime/test_debt0249_remand14.py": null
+  },
+  "postimages": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  },
+  "apparatus_tests_passed": 5,
+  "red": {
+    "failed": 34,
+    "passed": 9,
+    "exit_code": 1
+  },
+  "final_tests_passed": 51,
+  "independent_local_verification": "PASS",
+  "additional_independent_controls": "Original NC-COUNCIL-01, real filesystem CAS reopen, mixed dissent/reject, reorder valid view, approve tampering, missing/extra payload keys, boolean risk, swapped hashes",
+  "court_physical_observations": 1,
+  "court_physical_exit_code": 0,
+  "court_adjudication": false,
+  "court_attestation": "pending-kernel-sig",
+  "heterogeneous_review": false,
+  "canonical_integration": false,
+  "integration_permitted": false,
+  "production_qualification": false,
+  "debt0249_closed": false,
+  "p3_activation": false,
+  "provider_calls_for_source_construction": 0,
+  "active_runner": false,
+  "active_provider_call_owned_by_this_worker": false,
+  "review_hold": "Eligible INTERNAL free independent provider unavailable; Google actual DAILY limit20 exhausted at17:12:18UTC with RetryInfo24461s, approx00:00UTC16Oct. Do not retry blindly, reset state or treat local verifier as different-family approval.",
+  "quota_evidence": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_L07_QUOTA_20261015_5399476b",
+  "next_action": "When an eligible different-family free route is actually available, review these exact source hashes; independently reconcile any findings, then obtain existing owner integration of exact preimages. This is only the Council subslice; promotion/AST/origin and full-lifecycle obligations remain.",
+  "not_copied": [
+    "kernel.key",
+    "raw capability token",
+    "state database containing raw capability token"
+  ]
+}

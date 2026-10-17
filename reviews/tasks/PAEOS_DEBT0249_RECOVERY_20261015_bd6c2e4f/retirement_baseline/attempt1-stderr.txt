@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "/private/tmp/paeos-nvidia410-baseline-fpp6ta02/reproduce.py", line 22, in <module>
+    from paeos.model_router.errors import normalize_error
+  File "/Users/bob/GitHub/paeos/paeos/model_router/__init__.py", line 48, in <module>
+    from paeos.model_router.provider_transports import (
+    ...<5 lines>...
+    )
+  File "/Users/bob/GitHub/paeos/paeos/model_router/provider_transports.py", line 17, in <module>
+    import litellm  # type: ignore[reportMissingImports]  # optional gateway dependency
+    ^^^^^^^^^^^^^^
+  File "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages/litellm/__init__.py", line 346, in <module>
+    from .utils import (
+    ...<23 lines>...
+    )
+  File "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages/litellm/utils.py", line 28, in <module>
+    encoding = tiktoken.get_encoding("cl100k_base")
+  File "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages/tiktoken/registry.py", line 86, in get_encoding
+    enc = Encoding(**constructor())
+                     ~~~~~~~~~~~^^
+  File "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages/tiktoken_ext/openai_public.py", line 76, in cl100k_base
+    mergeable_ranks = load_tiktoken_bpe(
+        "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken",
+        expected_hash="223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+    )
+  File "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages/tiktoken/load.py", line 161, in load_tiktoken_bpe
+    contents = read_file_cached(tiktoken_bpe_file, expected_hash)
+  File "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages/tiktoken/load.py", line 44, in read_file_cached
+    cache_dir = os.path.join(tempfile.gettempdir(), "data-gym-cache")
+                             ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/tempfile.py", line 315, in gettempdir
+    return _os.fsdecode(_gettempdir())
+                        ~~~~~~~~~~~^^
+  File "/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/tempfile.py", line 308, in _gettempdir
+    tempdir = _get_default_tempdir()
+  File "/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/tempfile.py", line 203, in _get_default_tempdir
+    fd = _os.open(filename, _bin_openflags, 0o600)
+  File "/private/tmp/paeos-nvidia410-baseline-fpp6ta02/reproduce.py", line 20, in guard
+    if writes and not target.is_relative_to(EVIDENCE):raise RuntimeError('Writes restricted to temporary evidence directory')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Writes restricted to temporary evidence directory

@@ -1,0 +1,31 @@
+{
+  "ledger_rows": 4,
+  "ledger_head": "ea1894c913b03e986e71cecf262a470d2f56ec58de5cada1d99ddfdd58dde97b",
+  "domain": "RECOVERY",
+  "chain": "PASS",
+  "integrity": "ok",
+  "events": [
+    {
+      "seq": 1,
+      "kind": "SOURCE_CONSTRUCTION_INITIALIZED",
+      "row_hash": "56aaffe40b5dd4f375f0dc28837f4007406e22c45fcb149f68bdd6e274cec754"
+    },
+    {
+      "seq": 2,
+      "kind": "SOURCE_CONSTRUCTION_SCOPE_BOUND",
+      "row_hash": "eeb2edb907d95b3b149664285a0f689173430009042702519748d6bc1b8ec94c"
+    },
+    {
+      "seq": 3,
+      "kind": "SOURCE_CONSTRUCTION_PACKAGE_DISPATCHED",
+      "row_hash": "bba27f9f9772af57479360308628c497d77e0029b96447e54a089764670d972b"
+    },
+    {
+      "seq": 4,
+      "kind": "SOURCE_CONSTRUCTION_RETURNED",
+      "row_hash": "ea1894c913b03e986e71cecf262a470d2f56ec58de5cada1d99ddfdd58dde97b"
+    }
+  ],
+  "original_ledger": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/ledger.sqlite",
+  "ledger_file_sha256": "bc2b98f7057a3ebfad081091d3bf41b239473538ccd6640cea7f717c8c500ed4"
+}

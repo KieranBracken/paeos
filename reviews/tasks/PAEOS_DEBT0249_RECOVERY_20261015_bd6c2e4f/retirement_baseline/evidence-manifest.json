@@ -1,0 +1,21 @@
+{
+  "successful_exit_code": 0,
+  "source_pins_unchanged": true,
+  "files": {
+    "attempt1-stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout.txt": "6a6c0545a44128e80aea173df03fc76ff668b999138c9007c4ce9cf34c1eebf3",
+    "actual_410.sqlite3": "ba989b11f22c9f0addef485b11822eed6553b49f4788303bef2578c0b4eae566",
+    "result.json": "121881774e20e89b258c9ad1217d5cecd7f9135f85265f1e69fadbb14c769d74",
+    "source-pins.json": "bdcf8becb796745ae25483cbbaf0a5fa9152183fde70a2c3e0ba1198e798a982",
+    "reproduce.py": "4e1795a044844cde1d466849754a82226a16ebe4e1331778b689df56daab5cf2",
+    "attempt1-command.txt": "e8c416d455cd548cd44429521c2ed4fed2d8fab50a2bbdaa6ab027959789c5db",
+    "import-cache.json": "d2db956388ea8bb8112611f3b6c87da1701603d698a96c78b13813ba905769f5",
+    "README.md": "edd27df9316449051f45afe88459e04bf094340f414d217d808d2af2771af179",
+    "attempt1-stderr.txt": "a4ae150bec812e866b86c56f89cdb95c7a54785871cb9a0fcd3a9149f908e6b9",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "redacted-response.json": "9059b9659d7c4e72adb6be4dd18d6abf4cff7d82355ca36bc0147494d279de61",
+    "explicit_model_unavailable.sqlite3": "f9ea716a3c95aa4224ab95ba6071b624725837619f9a801892852565322faf01",
+    "state_primitive_control.sqlite3": "94d49fc65d34374515e30b6ba4af758f3616b59a5f6102932104f603bfe22222",
+    "command.txt": "e3b8ee9e9d485043cbaa26a0cc03c75da8a395c1c5c5d59ff0fceead62975ddf"
+  }
+}

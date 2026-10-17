@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/test_harness.py",
+    "--basetemp",
+    "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-d0249-apparatus-tests-b3mbi7os"
+  ],
+  "cwd": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs",
+  "env_overrides": {
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}

@@ -1,0 +1,1 @@
+PYTHONDONTWRITEBYTECODE=1 /Users/bob/GitHub/paeos/.venv/bin/python -B /private/tmp/paeos-council-baseline-_74zh9df/reproduce.py > /private/tmp/paeos-council-baseline-_74zh9df/stdout.txt 2> /private/tmp/paeos-council-baseline-_74zh9df/stderr.txt

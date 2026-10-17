@@ -1,0 +1,8 @@
+{
+  "status": "LAUNCHER_IMPORT_ERROR_BEFORE_RUNTIME_ENTRY",
+  "state_exists": false,
+  "runtime_started": false,
+  "ledger_created": false,
+  "cause": "Launcher used nonexistent lifecycle guard name; actual public function is assert_canonical_lifecycle_bound. Runtime source unchanged.",
+  "next": "Correct launcher import; same unused prepared input/state allowed because main never imported or executed."
+}

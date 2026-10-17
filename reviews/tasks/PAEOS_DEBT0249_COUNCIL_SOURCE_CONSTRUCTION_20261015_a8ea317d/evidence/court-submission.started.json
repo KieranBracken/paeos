@@ -1,0 +1,19 @@
+{
+  "candidate_source_preserved_in_cas": true,
+  "manifest": {
+    ".source_construction_verify.py": "6b7a9325533c6231841a311d0251715e3cb20e81a9947c8dfdd42056641bd6ee",
+    "kernel/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "kernel/cas.py": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+    "pyproject.toml": "0ba9fa89f8a2ebc6b57abc9884986b7abb9194e3dcf4c0ef305e5491be580569",
+    "runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013",
+    "tests/runtime/test_l09_critique.py": "32359f82dca7cfc108b956c2c1d974c4b7d62f3fd90bb98e5501b63df49beac9",
+    "uv.lock": "6e72ea0644ac24fa6552c23f09ef3807e3713a3630bc832f7913288fe130c1e4"
+  },
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "status": "SOURCE_SUBMITTED_UNVERIFIED",
+  "workspace": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/workspaces/paeos-t-8c708b6648eb-bridge-vupphzhp"
+}

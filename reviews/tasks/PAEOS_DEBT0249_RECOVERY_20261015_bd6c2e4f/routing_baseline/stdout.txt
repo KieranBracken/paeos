@@ -1,0 +1,16 @@
+{
+  "status": "BASELINE_RED_CONFIRMED",
+  "counts": {
+    "defects_reproduced": 6,
+    "defect_cases": 6,
+    "positive_controls_passed": 6,
+    "positive_controls": 6
+  },
+  "results": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-free-pool-baseline-20261015-408h2c0w/baseline-results.json",
+  "blocked_events": [
+    {
+      "kind": "network",
+      "event": "socket.getaddrinfo"
+    }
+  ]
+}

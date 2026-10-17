@@ -1,0 +1,147 @@
+{
+  "python": "/Users/bob/GitHub/paeos/.venv/bin/python",
+  "python_version": "3.13.5 (main, Jun 12 2025, 12:22:43) [Clang 20.1.4 ]",
+  "cwd": "/Users/bob/GitHub/paeos",
+  "direct_imports": [
+    "paeos.model_router.errors.normalize_error",
+    "paeos.model_router.aimd.AIMDController",
+    "paeos.model_router.state.RouterStateDB",
+    "paeos.model_router.types.FailureScope/NormalizedError/NormalizedErrorType/ProviderHealth/ProviderId"
+  ],
+  "normalization": {
+    "dict": {
+      "type": "UNKNOWN",
+      "scope": "PROVIDER",
+      "scope_key": null,
+      "retry_after": null,
+      "http_status": 410
+    },
+    "json_string": {
+      "type": "UNKNOWN",
+      "scope": "PROVIDER",
+      "scope_key": null,
+      "retry_after": null,
+      "http_status": 410
+    },
+    "saved_exception_string": {
+      "type": "UNKNOWN",
+      "scope": "PROVIDER",
+      "scope_key": null,
+      "retry_after": null,
+      "http_status": 410
+    }
+  },
+  "actual_410_on_error": {
+    "before": {
+      "provider_health": "HEALTHY",
+      "model_health": "HEALTHY",
+      "sibling_health": "HEALTHY",
+      "model_admission": [
+        true,
+        null
+      ],
+      "sibling_admission": [
+        true,
+        null
+      ]
+    },
+    "after_on_error": {
+      "provider_health": "HEALTHY",
+      "model_health": "HEALTHY",
+      "sibling_health": "HEALTHY",
+      "model_admission": [
+        true,
+        null
+      ],
+      "sibling_admission": [
+        true,
+        null
+      ]
+    },
+    "after_reopen": {
+      "provider_health": "HEALTHY",
+      "model_health": "HEALTHY",
+      "sibling_health": "HEALTHY",
+      "model_admission": [
+        true,
+        null
+      ],
+      "sibling_admission": [
+        true,
+        null
+      ]
+    }
+  },
+  "explicit_model_unavailable_on_error": {
+    "before": {
+      "provider_health": "HEALTHY",
+      "model_health": "HEALTHY",
+      "sibling_health": "HEALTHY",
+      "model_admission": [
+        true,
+        null
+      ],
+      "sibling_admission": [
+        true,
+        null
+      ]
+    },
+    "after_on_error": {
+      "provider_health": "HEALTHY",
+      "model_health": "HEALTHY",
+      "sibling_health": "HEALTHY",
+      "model_admission": [
+        true,
+        null
+      ],
+      "sibling_admission": [
+        true,
+        null
+      ]
+    },
+    "after_reopen": {
+      "provider_health": "HEALTHY",
+      "model_health": "HEALTHY",
+      "sibling_health": "HEALTHY",
+      "model_admission": [
+        true,
+        null
+      ],
+      "sibling_admission": [
+        true,
+        null
+      ]
+    }
+  },
+  "state_primitive_control": {
+    "provider_health": "HEALTHY",
+    "model_health": "UNAVAILABLE",
+    "sibling_health": "HEALTHY",
+    "model_admission": [
+      false,
+      "Model meta/llama-3.1-8b-instruct is UNAVAILABLE"
+    ],
+    "sibling_admission": [
+      true,
+      null
+    ]
+  },
+  "state_primitive_after_reopen": {
+    "provider_health": "HEALTHY",
+    "model_health": "UNAVAILABLE",
+    "sibling_health": "HEALTHY",
+    "model_admission": [
+      false,
+      "Model meta/llama-3.1-8b-instruct is UNAVAILABLE"
+    ],
+    "sibling_admission": [
+      true,
+      null
+    ]
+  },
+  "network_or_process_attempts_denied": [
+    "socket.getaddrinfo"
+  ],
+  "state_scope": "Only three new explicit temporary SQLite paths; default production state never instantiated. Sibling is an offline health-control identity, not a claim of catalog eligibility.",
+  "baseline_discrimination": "CONFIRMED: exact saved retirement shape normalizes UNKNOWN; even explicit MODEL_UNAVAILABLE is ignored; existing scoped-state primitive correctly excludes only selected model."
+}
