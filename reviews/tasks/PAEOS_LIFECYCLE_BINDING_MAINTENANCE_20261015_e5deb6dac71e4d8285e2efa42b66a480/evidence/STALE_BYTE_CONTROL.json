@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-c",
+    "import hashlib,json,pathlib,socket,sys\nsource=pathlib.Path(sys.argv[1]);sys.path.insert(0,str(source))\ndef deny(*a,**k):raise RuntimeError(\"NETWORK_FORBIDDEN_SOURCE_TEST\")\nsocket.create_connection=deny;socket.socket.connect=deny\nimport runtime.ceremony as ceremony\nassert pathlib.Path(ceremony.__file__).resolve().is_relative_to(source)\np=pathlib.Path(sys.argv[2]);digest=hashlib.sha256(p.read_bytes()).hexdigest();assert digest==\"3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64\"\ntry:ceremony.assert_canonical_lifecycle_bound(p)\nexcept RuntimeError as e:\n assert \"source hash does not match\" in str(e);print(json.dumps({\"rejected\":True,\"sha256\":digest,\"origin\":ceremony.__file__,\"error\":str(e)}))\nelse:raise AssertionError(\"stale bytes accepted\")\n",
+    "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/source",
+    "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/fixtures/lifecycle-pre-application.md"
+  ],
+  "cwd": "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/source",
+  "exit_code": 0,
+  "started_unix": 1792081134.609232,
+  "ended_unix": 1792081134.7106,
+  "stdout_sha256": "b5a62d194a3ffaef434e95b9aef2548a169b7ebc90163361b276bb5c2d9e7133",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "network_calls_permitted": false
+}

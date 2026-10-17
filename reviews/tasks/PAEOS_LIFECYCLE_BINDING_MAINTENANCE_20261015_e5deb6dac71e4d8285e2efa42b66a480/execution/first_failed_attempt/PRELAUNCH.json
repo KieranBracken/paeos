@@ -1,0 +1,14 @@
+{
+  "status": "PRELAUNCH_READ_ONLY_CHECKS_PASSED",
+  "source": "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source",
+  "classify_paths": "HARD",
+  "trace": "trace_b",
+  "weight_class": "KERNEL_TOUCHING",
+  "protected_overlap": [],
+  "manifest_sha256": "a0fe19d27519af43d870b25352198481fcab1d77f5333b58ae5377c592ac0800",
+  "source_lifecycle_sha256": "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae",
+  "intake_sha256": "b142f9d3ebc44502aaea7af7f3b7d0aed49b13439240aa4c1f6d20270c785252",
+  "state_absent": true,
+  "code_integrated": false,
+  "formal_qualification": false
+}

@@ -1,0 +1,44 @@
+RESEARCH artifact prepared for goal g-d0cd25d2331e, run r-1bc742d8, task t-0033f358cdf4, role PLANNER, session planner.
+
+Artifact: research/source-grounded-findings.md
+SHA-256: 0a2a817e6aa585bde28e0e428405a1c42495397c0d3c526904dc7af53c8901eb
+
+Full local primary-source research follows. No external literature, execution, implementation, approval or qualification is claimed.
+
+# Source-grounded research findings
+
+Goal g-d0cd25d2331e; run r-1bc742d8; task t-0033f358cdf4; RESEARCH / PLANNER / planner.
+
+This is local primary-source research, not a literature survey or an external state-of-the-art claim. No implementation, experiment, provider observation or qualification is reported.
+
+## Sources and reproducibility
+
+The seeded source container spec/debt0249-successor-task.md hashes to b09d02e111a74d2ac15291ed8739fbc60ecc7821907b919b6b0dd3291ac48a70. Embedded snapshots were extracted, parsed and checked against their declared hashes. References below use original snapshot line numbers:
+
+- P: kernel/promotion.py, SHA-256 9abb08edd216d1798e09d5342d02afb94073a7248f4005854dfcf9d76a14e580.
+- A: runtime/ast_linter.py, SHA-256 fc167518cd747cd621cdc02bd9671aee675b9cc5c2baa7f68566590d1c383e8f.
+- C: runtime/critique.py, SHA-256 1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f.
+- R: runtime/autonomy/promotion.py, SHA-256 6a07a6ff9ad62e667b3750bc0dcb7344b26e8a781e3a920acffe7db933aa18d6.
+- S: spec/PAEOS-7.6-runtime-interface-contracts.md, SHA-256 87c686eb45f37899e292efb0d31e20f0a276eae2000354f88aaa09e0ac804ab2.
+
+Materialized derivation and architecture comparison hashes are respectively 51ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947 and 8f0de17d5c5ea0feccbc6424ac048521d7e00a9268687d408be8160834d5a481. These planning artifacts frame questions; the source snapshots support findings.
+
+## Trusted stream: integrity is implemented; origin binding remains unestablished
+
+A:237-249 accepts a ledger-like object, iterable or list. A:309-346 recomputes row hashes and checks previous-row continuity. Sequence, domain and lifecycle ordering checks also exist. Those mechanisms support structural integrity, but the function has no expected goal/run/candidate parameter or trusted-origin resolver. Recomputed hashes alone cannot distinguish an authentic runtime stream from freshly assembled consistent rows.
+
+P:116-126 exposes no event-stream input; its body contains neither helper call. R:68-89 forwards CAS and candidate inputs only. Thus the supplied interface does not yet demonstrate how authentic runtime events reach promotion. S sections 6-8 require artifact/environment-bound evidence, kernel attestation, immutable role/run capability binding and a single-writer ledger. These are normative requirements, not proof that an injectable producer exists.
+
+Inference: direct boundary validation remains the smaller candidate, but selecting its stream source requires the actual runtime producer/ledger ownership contract. A CAS bundle does not remove this dependency. Needed next evidence is the source of the legitimate caller, its owned ledger or attested stream reference, and how it binds candidate/run identity. None is established by these four snapshots; no global absence claim follows.
+
+## Council: an existing canonicalization convention can be extended
+
+C:332-340 serializes dissent using sorted JSON keys with voter_id, stance, argument, risks and alternatives. C:341-345 checks only existence for a supplied hash. C:436-455 compares only voter_id and argument and does not reject every decoded non-object value. No whole-record hash comparison occurs in the verifier.
+
+C:375-385 stores the serialized record before attaching vote_cas_hash. Therefore the established non-self-referential representation has an empty self-hash field. A complete verifier should use that convention while comparing all required fields and both vote/dissent representations. Compatibility questions remain for older incomplete payloads; no evidence here authorizes rewriting them or inventing missing values.
+
+## Fail-closed enforcement and bounded novelty
+
+R:83-93 denies when evaluator reasons exist before Git actions. This is existing local prior art for adding mandatory checks at the consequential boundary. P:129-140 retains bootstrap and automatic-promotion restrictions; those must remain. The work is integration and stronger content binding, not a new trust architecture.
+
+Discrimination must exercise actual evaluator/controller and Council functions: valid controls plus isolated malformed, missing, altered-field and stale-candidate cases. Local tests cannot establish genuine provider identity or L14 provenance. The package scripts, protected manifest and production producer are not included in the supplied source snapshots, so their behavior is unresolved here. Respect the exact nine-file implementation scope; stop before protected expansion. Preserve historical attempts, v14 artifacts, qualified baselines, P3-P9_BLOCKED and SENTIUM_FROZEN. No acceptance or qualification follows from this research.

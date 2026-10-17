@@ -1,0 +1,10 @@
+{
+  "status": "ACTUAL_RUN_REMANDED_AFTER_L03_TO_L06",
+  "run_id": "r-1bc742d8",
+  "goal_id": "g-d0cd25d2331e",
+  "assessment": "execution/live_successor/RUN_ASSESSMENT.json",
+  "repair_integrated": true,
+  "focused_tests": 20,
+  "formal_qualification": false,
+  "next_gap": "free pool availability and governed stage recovery; current18scope excludes modelrouter/protectedlifecycle"
+}

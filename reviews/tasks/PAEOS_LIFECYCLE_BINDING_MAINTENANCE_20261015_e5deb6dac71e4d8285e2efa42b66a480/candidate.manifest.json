@@ -1,0 +1,43 @@
+{
+  "scope": [
+    "runtime/ceremony.py",
+    "operations/WORKFLOW_STATE_MACHINE.yaml",
+    "tests/operations/test_lifecycle_projection_conformance.py"
+  ],
+  "files": [
+    {
+      "path": "runtime/ceremony.py",
+      "pre_sha256": "9a3c1f129d7eff81547db49f6f0dbe1f38f303cfe4f910bec88c8f189740ca22",
+      "post_sha256": "1a0624676ceb5a9fbb3a78e11a11f00c41e84191fec5f3d5e0af1b691b28e17e"
+    },
+    {
+      "path": "operations/WORKFLOW_STATE_MACHINE.yaml",
+      "pre_sha256": "4d8ff989af3d804f2b0440896a54629694591a124851ad4347cb1a075f98d5a6",
+      "post_sha256": "e8fc2040a53033fa89e0ff86b339d369331c12f229c243810f36a5ce63a04678"
+    },
+    {
+      "path": "tests/operations/test_lifecycle_projection_conformance.py",
+      "pre_sha256": "d4b80b8a7105116ab4d1ab44a3fc325d5134b1e19e18767d1c308857414db85d",
+      "post_sha256": "f8cad8e47df6b731697003061d4b9262736f25b0f77eea63e2bd330ab2856916"
+    }
+  ],
+  "patch_sha256": "7fd09ccaf2e0472675cbdb7a643c239a9b6db5cff97e07c8772f42da4c6de9d5",
+  "snapshot_sha256": "cb8c18bb962a0355175a0c3fb1891ef3f0fa8bba5e4b13c34e8a166704041127",
+  "changed_python_snapshot_paths": [
+    "operations/WORKFLOW_STATE_MACHINE.yaml",
+    "runtime/ceremony.py",
+    "tests/operations/test_lifecycle_projection_conformance.py"
+  ],
+  "approved_lifecycle_sha256": "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae",
+  "tests": {
+    "red_exit": 1,
+    "green_exit": 0,
+    "total": 20
+  },
+  "stale_byte_negative": {
+    "fixture_sha256": "3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64",
+    "rejected": true,
+    "error": "canonical lifecycle source hash does not match Founder IP-0017"
+  },
+  "status": "SOURCE_MAINTENANCE_BOOTSTRAP_CANDIDATE_NOT_PAEOS_ADMISSION"
+}

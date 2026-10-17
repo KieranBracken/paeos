@@ -1,0 +1,22 @@
+{
+  "status": "INVOKED_EXITED_BEFORE_WORKER",
+  "attempt_id": "paeos-debt0249-run-9c474028739941058c52988c35ba0d1e",
+  "exit_code": 1,
+  "failure": "SYNTHETIC_STATE_CONTAMINATION_REJECTED",
+  "objective_markers": {
+    "synthetic": 1636
+  },
+  "triggering_clause": "Preserve actual model identities; no synthetic sealed-context observations or qualification evidence.",
+  "interpretation": "negative instruction containing synthetic matched substring rejection in kernel/ledger.py:276; no evidence was submitted",
+  "ledger_table_row_counts": {
+    "ledger_rows": 0,
+    "ledger_writer": 1
+  },
+  "bridge_request_count": 0,
+  "bridge_response_count": 0,
+  "source_integration": false,
+  "run_receipt_sha256": "612720b5e39966391c4d8e79a6bd60ffeddcb0b80840a1b8206901c09067eb8d",
+  "stderr_sha256": "4897a88a0dcaf27cb3ba891289f9ade3172edf42542206f3f7d96f3172885785",
+  "observed_unix": 1792081305.676151,
+  "preserve_without_retry": true
+}

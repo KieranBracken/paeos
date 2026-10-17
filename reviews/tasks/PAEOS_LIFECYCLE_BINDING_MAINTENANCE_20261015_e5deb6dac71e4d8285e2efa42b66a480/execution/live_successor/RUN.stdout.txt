@@ -1,0 +1,15 @@
+{
+  "runs": 1,
+  "sealed": 0,
+  "stop_reason": "source-exhausted",
+  "remaining_tokens": 25000000,
+  "outcomes": [
+    {
+      "goal_id": "g-d0cd25d2331e",
+      "status": "REMANDED",
+      "detail": "MITIGATION worker failed: FAILED",
+      "seal_hash": null
+    }
+  ],
+  "ledger_head": "aafe2208c6cd1e2be1f69eef60130509dc832d0590fae54ed0f19c53f6d584e9"
+}

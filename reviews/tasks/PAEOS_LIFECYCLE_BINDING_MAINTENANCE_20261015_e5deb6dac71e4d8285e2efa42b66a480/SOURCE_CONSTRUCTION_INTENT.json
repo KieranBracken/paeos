@@ -1,0 +1,15 @@
+{
+  "status": "SOURCE_MAINTENANCE_BOOTSTRAP_STARTED_NOT_PAEOS_ADMISSION",
+  "operation_id": "lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480-build-1",
+  "request_sha256": "d358d7a4c8a02cd79eb689bf8726dbaa33d0d72c67f2d33f143a8a9fa01058f3",
+  "at_utc": "2026-10-15T16:07:16.071530+00:00",
+  "authority": "Fresh explicit human direction conveyed by assigning chat 01a1403f-1034-74c2-95ce-bd0f705dbaef on 2026-10-15: fix the lifecycle binding and get a real task running through PAEOS; use narrow source-maintenance bootstrap exception if cyclic. No cryptographic admission, Manager approval or EventGate receipt inferred.",
+  "mutable_paths": [
+    "runtime/ceremony.py",
+    "operations/WORKFLOW_STATE_MACHINE.yaml",
+    "tests/operations/test_lifecycle_projection_conformance.py"
+  ],
+  "manager_exact_successor_acceptance": "NOT_YET_OBSERVED",
+  "provider_calls": 0,
+  "integration_performed": false
+}

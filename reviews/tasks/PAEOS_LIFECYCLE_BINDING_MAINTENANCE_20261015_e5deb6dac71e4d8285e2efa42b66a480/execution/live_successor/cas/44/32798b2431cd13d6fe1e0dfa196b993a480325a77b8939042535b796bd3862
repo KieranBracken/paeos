@@ -1,0 +1,44 @@
+# Decision matrix and adversarial risk register
+
+Goal g-d0cd25d2331e; run r-1bc742d8; task t-1fcc4182f98c; TRADEOFF / PLANNER / planner.
+
+Planning only: no implementation, approval, test result, qualification or lifecycle advancement.
+
+## Evidence, assumptions and hard constraints
+
+Scoped specification SHA-256: b09d02e111a74d2ac15291ed8739fbc60ecc7821907b919b6b0dd3291ac48a70. Materialized research SHA-256: 0a2a817e6aa585bde28e0e428405a1c42495397c0d3c526904dc7af53c8901eb; candidate comparison: 8f0de17d5c5ea0feccbc6424ac048521d7e00a9268687d408be8160834d5a481; derivation: 51ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947. Hashes were checked here.
+
+Assume only supplied snapshots and the exact nine-file implementation scope. A trusted event producer is unresolved. Authentic origin, candidate/run binding, unavoidable enforcement and absence of protected-scope expansion are eligibility constraints; lower cost cannot compensate for failure. Comparative costs are estimates, not measurements.
+
+## Promotion options
+
+| Criterion | A: direct evaluator validation | B: CAS bundle with revalidation | C: wrapper/package-only checks |
+|---|---|---|---|
+| Enforcement coverage | Mandatory in existing evaluator/controller chain | Mandatory if evaluator resolves and verifies bundle | Bypassable through direct calls |
+| Accuracy/integrity | Exact candidate bytes and stream; origin unresolved | Identical content; CAS proves no origin | Stale or detached report possible |
+| Latency | Scan bytes and rows each evaluation | CAS reads plus validation; no proven speed gain | Cheap lookup but insufficient |
+| Memory | Bounded candidate processing possible; helper materializes rows | Bundle storage plus decoded rows | Small at promotion; work moved elsewhere |
+| Maintainability | Fewest concepts; API composition unresolved | Additional schema, version and anchoring rules | Simple helper, duplicated enforcement expectation |
+| Complexity/risk | Moderate; source binding decisive | Higher; storage integrity can resemble authority | Low cost, unacceptable bypass |
+| Eligibility | Conditional on genuine producer | Conditional on genuine anchor | Rejected as enforcement |
+
+A is recommended provisionally because it reuses the consequential boundary without another trust object. B remains viable only if existing interfaces expose an anchored CAS representation. Neither is implementation-ready until producer ownership and candidate/run binding are demonstrated within scope. A default-deny argument alone does not complete the invariant.
+
+For Council binding, prefer one canonical serializer shared by recording and verification over duplicated field lists. This reduces omission drift but creates common-mode risk requiring independent field-mutation controls. Preserve vote_cas_hash='' in the hashed representation before attaching its digest. Changing that convention requires compatibility analysis, not historical rewrites.
+
+## Risks for adversarial examination
+
+- R01 CRITICAL — fabricated origin: consistent locally assembled rows or CAS references could impersonate production evidence. Require a demonstrated runtime-owned producer/anchor and candidate/run binding; otherwise hold that design path.
+- R02 HIGH — candidate substitution: scanning one snapshot while hashing/promoting another creates a timing gap. Bind scanning to exact candidate bytes and reject changes; challenge symlinks and repository-relative test classification.
+- R03 HIGH — false lifecycle success: broad event-name prefixes can count failure or unrelated-run events. Resolve genuine success/identity fields; test failure events and mixed streams without editing protected emitters.
+- R04 HIGH — Council omission or schema drift: partial comparisons, non-object payloads, duplicate/mismatched voter entries and missing historical fields can hide dissent. Require complete consistency checks, explicit legacy disposition and one-field negatives.
+- R05 HIGH — vacuous verification: an unrelated bootstrap rejection can mask a missing check. Isolate the intended denial and minimally changed valid control through real evaluator/controller functions; no successful stubs or manufactured external observations.
+- R06 HIGH — scope/output expansion: tooling may touch historical artifacts or require protected producers. Inspect scoped sources, use permitted disposable outputs, and remand before any undeclared write or Builder expansion.
+
+These hazards require safeguards; none is accepted here.
+
+## Reversibility and stopping boundary
+
+Planning and isolated source changes are reversible. Production ref updates, historical package replacement and consumed-attempt reuse are unauthorized. Denial controls must establish absence of promotion/preparation effects. Preserve automatic-promotion, bootstrap, capability and protected-ref restrictions.
+
+No candidate freeze, v14 package-root update, qualification claim, provider substitution or protected verifier change is permitted. Preserve P1/PRE-P2/P2/DEBT-0250 qualified baselines, P3-P9_BLOCKED and SENTIUM_FROZEN. Immutable authority, find-delete, transcript-provenance and catalog-identity residuals remain separate. L07 should challenge R01-R06 before any option is treated as implementation-ready.

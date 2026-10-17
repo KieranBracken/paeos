@@ -1,0 +1,142 @@
+[
+  {
+    "seq": 1,
+    "timestamp": "2026-10-15T16:24:57.092260+00:00",
+    "prev_hash": "407590d349641e2acaa71e4ebd02c48e788d46d6d144ecb21f9a0e79dda58c29",
+    "row_hash": "ee1f224506cfcc22f63c88490dececf9c3788ad26e4bbbedfdeaa1fe59401904",
+    "schema_ver": 1,
+    "kind": "MDG_TASK_SPAWNED",
+    "payload": "{\"ceremony_trace\":\"TRACE_B\",\"checkpoint_ref\":null,\"fencing_token\":0,\"metadata\":{\"objective\":\"NEW HUMAN-DIRECTED STANDALONE SUCCESSOR TASK (2026-10-15). Advance only the non-immutable portion of DEBT-0249 Remand #14 through the governed SoftLoop. Implement and prove DEF-0249-14-05 (promotion-time AST mock detection plus production event-stream verification) and DEF-0249-14-06 (complete Council dissent CAS payload binding and vote_cas_hash binding), and improve the audit-package/CANARY tooling needed to make those controls reproducible. Do not claim qualification, do not freeze a candidate, and do not touch any immutable verifier, Court, sandbox, model-router, or protected production-lifecycle path. Preserve P1_QUALIFIED, PRE_P2_AUTONOMY_QUALIFIED, P2_QUALIFIED, DEBT_0250_QUALIFIED, P3-P9_BLOCKED, and SENTIUM_FROZEN. Mandatory constraints: Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence. The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around. Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution. Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice. This is a fresh root task, not a retry, continuation, child admission, or reuse of any consumed historical mission. Use only authentic runtime-observed sealed-context observations and qualification evidence; preserve actual model identities. Current source facts and exact scope are in spec/debt0249-successor-task.md.\",\"run_id\":\"r-1bc742d8\"},\"nesting_depth\":0,\"parent_task_id\":null,\"root_mission_id\":\"mission-paeos-debt0249-state-7df8fadd781147ffb563e97caa80b814\",\"status\":\"ACTIVE\",\"task_id\":\"domain:governance,task:debt-0249-human-successor-7df8fadd781147ffb563e97caa80b814\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 2,
+    "timestamp": "2026-10-15T16:24:57.092431+00:00",
+    "prev_hash": "ee1f224506cfcc22f63c88490dececf9c3788ad26e4bbbedfdeaa1fe59401904",
+    "row_hash": "7228364b1b041ed36c90ef0aef1102f428cfb76027cc5b28802014ae29d8a8ee",
+    "schema_ver": 1,
+    "kind": "goal_created",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"weight_class\":\"KERNEL_TOUCHING\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 3,
+    "timestamp": "2026-10-15T16:24:57.092612+00:00",
+    "prev_hash": "7228364b1b041ed36c90ef0aef1102f428cfb76027cc5b28802014ae29d8a8ee",
+    "row_hash": "9cd522ffa1a9a52e8de0a88864b0d2693e6df31f28fe9210fed42ab6fe1d601d",
+    "schema_ver": 1,
+    "kind": "L11_WEAKNESS_FINDER_ADVISORY_SCAN",
+    "payload": "{\"finding_ids\":[],\"findings_count\":0,\"goal_id\":\"g-d0cd25d2331e\",\"run_id\":\"r-1bc742d8\",\"scanned\":true}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 4,
+    "timestamp": "2026-10-15T16:27:45.332384+00:00",
+    "prev_hash": "9cd522ffa1a9a52e8de0a88864b0d2693e6df31f28fe9210fed42ab6fe1d601d",
+    "row_hash": "a10c5797a68879138472319fe99035c0393722d279ad9474b67be1bb89886570",
+    "schema_ver": 1,
+    "kind": "STAGE_COMPLETED",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"model_ver\":\"chat-bridge-compatibility\",\"run_id\":\"r-1bc742d8\",\"session\":\"planner\",\"stage\":\"RE_DERIVE\",\"status\":\"COMPLETE\",\"tokens\":0}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 5,
+    "timestamp": "2026-10-15T16:29:50.962609+00:00",
+    "prev_hash": "a10c5797a68879138472319fe99035c0393722d279ad9474b67be1bb89886570",
+    "row_hash": "05091601af3225d09386916a042d858e8565eddedac3900e3fa9ef0ff1b924f3",
+    "schema_ver": 1,
+    "kind": "STAGE_COMPLETED",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"model_ver\":\"chat-bridge-compatibility\",\"run_id\":\"r-1bc742d8\",\"session\":\"planner\",\"stage\":\"IDEATE\",\"status\":\"COMPLETE\",\"tokens\":0}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 6,
+    "timestamp": "2026-10-15T16:31:32.940651+00:00",
+    "prev_hash": "05091601af3225d09386916a042d858e8565eddedac3900e3fa9ef0ff1b924f3",
+    "row_hash": "90a44f6f4a74a636dcd1c74246e65952bbd0aa846f02626bae7a6ed31109a5ae",
+    "schema_ver": 1,
+    "kind": "STAGE_COMPLETED",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"model_ver\":\"chat-bridge-compatibility\",\"run_id\":\"r-1bc742d8\",\"session\":\"planner\",\"stage\":\"RESEARCH\",\"status\":\"COMPLETE\",\"tokens\":0}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 7,
+    "timestamp": "2026-10-15T16:31:33.022108+00:00",
+    "prev_hash": "90a44f6f4a74a636dcd1c74246e65952bbd0aa846f02626bae7a6ed31109a5ae",
+    "row_hash": "7c6083d40d6612f08783dcbf3d75d4f73c4e26b3e6debed3bdd22fc0e450a869",
+    "schema_ver": 1,
+    "kind": "L05_RESEARCH_PACKET_RECORDED",
+    "payload": "{\"citations_count\":1,\"constraints_count\":1,\"goal_id\":\"g-d0cd25d2331e\",\"hypotheses_count\":1,\"layer\":\"L05\",\"packet_cas_hash\":\"29006f42223eedb36ab9d71122cae53e99e6c4f4d7da9fd38b4bc27862ede58f\",\"packet_id\":\"RES-r-1bc742d8-g-d0cd25d2331e\",\"run_id\":\"r-1bc742d8\",\"topic\":\"NEW HUMAN-DIRECTED STANDALONE SUCCESSOR TASK (2026-10-15). Advance only the non-immutable portion of DEBT-0249 Remand #14 through the governed SoftLoop. Implement and prove DEF-0249-14-05 (promotion-time AST mock detection plus production event-stream verification) and DEF-0249-14-06 (complete Council dissent CAS payload binding and vote_cas_hash binding), and improve the audit-package/CANARY tooling needed to make those controls reproducible. Do not claim qualification, do not freeze a candidate, and do not touch any immutable verifier, Court, sandbox, model-router, or protected production-lifecycle path. Preserve P1_QUALIFIED, PRE_P2_AUTONOMY_QUALIFIED, P2_QUALIFIED, DEBT_0250_QUALIFIED, P3-P9_BLOCKED, and SENTIUM_FROZEN. Mandatory constraints: Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence. The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around. Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution. Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice. This is a fresh root task, not a retry, continuation, child admission, or reuse of any consumed historical mission. Use only authentic runtime-observed sealed-context observations and qualification evidence; preserve actual model identities. Current source facts and exact scope are in spec/debt0249-successor-task.md.\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 8,
+    "timestamp": "2026-10-15T16:33:47.368002+00:00",
+    "prev_hash": "7c6083d40d6612f08783dcbf3d75d4f73c4e26b3e6debed3bdd22fc0e450a869",
+    "row_hash": "728e7b89eea235ba9a6c97f8f7f9d4af66ab7ca634f560d86dcdcab118a08831",
+    "schema_ver": 1,
+    "kind": "STAGE_COMPLETED",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"model_ver\":\"chat-bridge-compatibility\",\"run_id\":\"r-1bc742d8\",\"session\":\"planner\",\"stage\":\"TRADEOFF\",\"status\":\"COMPLETE\",\"tokens\":0}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 9,
+    "timestamp": "2026-10-15T16:33:47.379716+00:00",
+    "prev_hash": "728e7b89eea235ba9a6c97f8f7f9d4af66ab7ca634f560d86dcdcab118a08831",
+    "row_hash": "de7eeac279187cf853d5f5a4202176f1df1f0247ceb6b6346ce1fb23d8a67872",
+    "schema_ver": 1,
+    "kind": "L06_TRADEOFF_MATRIX_RECORDED",
+    "payload": "{\"criteria_count\":3,\"decision_topic\":\"NEW HUMAN-DIRECTED STANDALONE SUCCESSOR TASK (2026-10-15). Advance only the non-immutable portion of DEBT-0249 Remand #14 through the governed SoftLoop. Implement and prove DEF-0249-14-05 (promotion-time AST mock detection plus production event-stream verification) and DEF-0249-14-06 (complete Council dissent CAS payload binding and vote_cas_hash binding), and improve the audit-package/CANARY tooling needed to make those controls reproducible. Do not claim qualification, do not freeze a candidate, and do not touch any immutable verifier, Court, sandbox, model-router, or protected production-lifecycle path. Preserve P1_QUALIFIED, PRE_P2_AUTONOMY_QUALIFIED, P2_QUALIFIED, DEBT_0250_QUALIFIED, P3-P9_BLOCKED, and SENTIUM_FROZEN. Mandatory constraints: Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence. The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around. Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution. Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice. This is a fresh root task, not a retry, continuation, child admission, or reuse of any consumed historical mission. Use only authentic runtime-observed sealed-context observations and qualification evidence; preserve actual model identities. Current source facts and exact scope are in spec/debt0249-successor-task.md.\",\"goal_id\":\"g-d0cd25d2331e\",\"layer\":\"L06\",\"matrix_cas_hash\":\"157aacaa697317cd9bbbc00d9c95bf2649377181f4dec349010fd6a8566b1e67\",\"matrix_id\":\"TOM-r-1bc742d8-g-d0cd25d2331e\",\"options_count\":2,\"recommended_option_id\":\"OPT-PRIMARY\",\"run_id\":\"r-1bc742d8\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 10,
+    "timestamp": "2026-10-15T16:38:47.625276+00:00",
+    "prev_hash": "de7eeac279187cf853d5f5a4202176f1df1f0247ceb6b6346ce1fb23d8a67872",
+    "row_hash": "7370f6569586a51032b85bbeaa164cb16724157afdb5082b1cc10b62e5f5ef4b",
+    "schema_ver": 1,
+    "kind": "STAGE_COMPLETED",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"model_ver\":\"chat-bridge-compatibility\",\"run_id\":\"r-1bc742d8\",\"session\":\"planner\",\"stage\":\"MITIGATION\",\"status\":\"FAILED\",\"tokens\":0}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 11,
+    "timestamp": "2026-10-15T16:38:47.636528+00:00",
+    "prev_hash": "7370f6569586a51032b85bbeaa164cb16724157afdb5082b1cc10b62e5f5ef4b",
+    "row_hash": "15d61a9c4714abaa3ea194ed77d453cc92d2a0d37d2c81e206a211784d0e4313",
+    "schema_ver": 1,
+    "kind": "EVOLUTION_EVENT",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"layer\":\"RETROSPECT\",\"run_id\":\"r-1bc742d8\",\"status\":\"REMANDED\",\"summary\":\"court remanded: MITIGATION worker failed: FAILED; recorded_at=2026-10-15T16:38:47.636438+00:00\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 12,
+    "timestamp": "2026-10-15T16:38:47.640530+00:00",
+    "prev_hash": "15d61a9c4714abaa3ea194ed77d453cc92d2a0d37d2c81e206a211784d0e4313",
+    "row_hash": "14c3a78a513d44baeae22be0a9cbd5ea0775736abde10fc13a61c1269425e34c",
+    "schema_ver": 1,
+    "kind": "EVOLUTION_EVENT",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"layer\":\"EVOLVE\",\"run_id\":\"r-1bc742d8\",\"status\":\"REMANDED\",\"summary\":\"recurrence=False; proposals=0; recorded_at=2026-10-15T16:38:47.640485+00:00\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 13,
+    "timestamp": "2026-10-15T16:38:47.644917+00:00",
+    "prev_hash": "14c3a78a513d44baeae22be0a9cbd5ea0775736abde10fc13a61c1269425e34c",
+    "row_hash": "6659096a54a742e94e99d72df79a0c88763ade4d6883007d6ddee95ad506d914",
+    "schema_ver": 1,
+    "kind": "EVOLUTION_EVENT",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"layer\":\"MEMORY_UPDATE\",\"run_id\":\"r-1bc742d8\",\"status\":\"REMANDED\",\"summary\":\"scars_written=1; quarantined=0; recorded_at=2026-10-15T16:38:47.644901+00:00\"}",
+    "domain_tag": "PRODUCTION"
+  },
+  {
+    "seq": 14,
+    "timestamp": "2026-10-15T16:38:47.645138+00:00",
+    "prev_hash": "6659096a54a742e94e99d72df79a0c88763ade4d6883007d6ddee95ad506d914",
+    "row_hash": "aafe2208c6cd1e2be1f69eef60130509dc832d0590fae54ed0f19c53f6d584e9",
+    "schema_ver": 1,
+    "kind": "EVOLUTION_EVENT",
+    "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"layer\":\"IMPROVE_RUNTIME\",\"run_id\":\"r-1bc742d8\",\"status\":\"REMANDED\",\"summary\":\"proposals=0; recorded_at=2026-10-15T16:38:47.645127+00:00\"}",
+    "domain_tag": "PRODUCTION"
+  }
+]

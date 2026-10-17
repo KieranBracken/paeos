@@ -1,0 +1,45 @@
+Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+    raise SystemExit(main(sys.argv[2:]))
+                     ~~~~^^^^^^^^^^^^^^
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/ops/autonomous_run.py", line 1026, in main
+    report = scheduler.run(backlog)
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/runtime/scheduler.py", line 185, in run
+    outcome = self._run_one(intake)
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/ops/autonomous_run.py", line 944, in run_one
+    outcome = loop.run(
+        objective=intake.objective,
+    ...<8 lines>...
+        capability_manifest=completeness_manifest,
+    )
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/runtime/orchestrator/__init__.py", line 604, in run
+    self._mission_controller.start_root_task(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        task_id=task_id,
+        ^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        metadata={"objective": objective, "run_id": run_id},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/runtime/autonomy/mission_controller.py", line 84, in start_root_task
+    return self.graph.spawn_task(
+           ~~~~~~~~~~~~~~~~~~~~~^
+        task_id=task_id,
+        ^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        metadata=metadata or {},
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/runtime/autonomy/mdg.py", line 163, in spawn_task
+    self._commit_event("MDG_TASK_SPAWNED", asdict(node))
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/runtime/autonomy/mdg.py", line 107, in _commit_event
+    return self._ledger.append(Event(1, kind, _json_safe(payload)))
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source/kernel/ledger.py", line 277, in append
+    raise ValueError(
+        "SYNTHETIC_STATE_CONTAMINATION_REJECTED: Event with synthetic/mock payload markers cannot be appended under PRODUCTION domain_tag"
+    )
+ValueError: SYNTHETIC_STATE_CONTAMINATION_REJECTED: Event with synthetic/mock payload markers cannot be appended under PRODUCTION domain_tag

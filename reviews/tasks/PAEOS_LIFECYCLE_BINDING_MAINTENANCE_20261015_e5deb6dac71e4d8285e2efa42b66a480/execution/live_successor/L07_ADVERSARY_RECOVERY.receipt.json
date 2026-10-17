@@ -1,0 +1,45 @@
+{
+  "operation_id": "l07-recovery-41d81cdb68104b27bd35d12fc50837c3",
+  "status": "FAILED",
+  "stage": "MITIGATION",
+  "role": "SUPPLEMENTAL_ADVERSARIAL_OPINION",
+  "run_id": "r-1bc742d8",
+  "goal_id": "g-d0cd25d2331e",
+  "task_id": "t-008fec4e3014",
+  "bridge_prompt_sha256": "0a79b8378a0ff6dc81c4e7921015b5fbfa8b2e81aff1d117d9a2753002fea726",
+  "bindings": [
+    {
+      "path": "context/artifact-0a2a817e6aa5.txt",
+      "sha256": "0a2a817e6aa585bde28e0e428405a1c42495397c0d3c526904dc7af53c8901eb"
+    },
+    {
+      "path": "context/artifact-4432798b2431.txt",
+      "sha256": "4432798b2431cd13d6fe1e0dfa196b993a480325a77b8939042535b796bd3862"
+    },
+    {
+      "path": "context/artifact-51ba0650e7b7.txt",
+      "sha256": "51ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947"
+    },
+    {
+      "path": "context/artifact-8f0de17d5c5e.txt",
+      "sha256": "8f0de17d5c5ea0feccbc6424ac048521d7e00a9268687d408be8160834d5a481"
+    },
+    {
+      "path": "mitigation/catalogue-draft.md",
+      "sha256": "b34f41d774d5652e9dd943fff3f96817ccf47a565262ecd905d6c89fc1f775dc"
+    }
+  ],
+  "prompt_sha256": "6e0dde4b141e8595094d74aba6db139aa47c99366d0f423792c4c6ff26a4842b",
+  "request_sha256": "2a64211c27af92b1ee34f8cf1bc2612ff9518b0866557391122f32ae4cda2662",
+  "retry_policy": "none",
+  "allow_fallback": false,
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "max_tokens": 6000,
+  "started_unix": 1792082290.426242,
+  "not_runtime_bound_provider_receipt": true,
+  "previous_failure_receipt_sha256": "eed273eb175b43542967b5536adc21cbd4a34836283d7e974c8e574d457d5d09",
+  "ended_unix": 1792082312.658379,
+  "error_type": "NormalizedError",
+  "message": "[PROVIDER_UNAVAILABLE] Provider=google HTTP=503 RetryAfter=30.0: OpenAIException - Error code: 503 - [{'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}]"
+}

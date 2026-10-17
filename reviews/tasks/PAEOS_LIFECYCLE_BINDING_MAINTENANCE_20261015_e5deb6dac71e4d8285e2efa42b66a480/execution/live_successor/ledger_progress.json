@@ -1,0 +1,55 @@
+{
+  "snapshot_unix": 1792081755.434669,
+  "rows": [
+    {
+      "seq": 1,
+      "timestamp": "2026-10-15T16:24:57.092260+00:00",
+      "prev_hash": "407590d349641e2acaa71e4ebd02c48e788d46d6d144ecb21f9a0e79dda58c29",
+      "row_hash": "ee1f224506cfcc22f63c88490dececf9c3788ad26e4bbbedfdeaa1fe59401904",
+      "schema_ver": 1,
+      "kind": "MDG_TASK_SPAWNED",
+      "payload": "{\"ceremony_trace\":\"TRACE_B\",\"checkpoint_ref\":null,\"fencing_token\":0,\"metadata\":{\"objective\":\"NEW HUMAN-DIRECTED STANDALONE SUCCESSOR TASK (2026-10-15). Advance only the non-immutable portion of DEBT-0249 Remand #14 through the governed SoftLoop. Implement and prove DEF-0249-14-05 (promotion-time AST mock detection plus production event-stream verification) and DEF-0249-14-06 (complete Council dissent CAS payload binding and vote_cas_hash binding), and improve the audit-package/CANARY tooling needed to make those controls reproducible. Do not claim qualification, do not freeze a candidate, and do not touch any immutable verifier, Court, sandbox, model-router, or protected production-lifecycle path. Preserve P1_QUALIFIED, PRE_P2_AUTONOMY_QUALIFIED, P2_QUALIFIED, DEBT_0250_QUALIFIED, P3-P9_BLOCKED, and SENTIUM_FROZEN. Mandatory constraints: Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence. The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around. Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution. Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice. This is a fresh root task, not a retry, continuation, child admission, or reuse of any consumed historical mission. Use only authentic runtime-observed sealed-context observations and qualification evidence; preserve actual model identities. Current source facts and exact scope are in spec/debt0249-successor-task.md.\",\"run_id\":\"r-1bc742d8\"},\"nesting_depth\":0,\"parent_task_id\":null,\"root_mission_id\":\"mission-paeos-debt0249-state-7df8fadd781147ffb563e97caa80b814\",\"status\":\"ACTIVE\",\"task_id\":\"domain:governance,task:debt-0249-human-successor-7df8fadd781147ffb563e97caa80b814\"}",
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 2,
+      "timestamp": "2026-10-15T16:24:57.092431+00:00",
+      "prev_hash": "ee1f224506cfcc22f63c88490dececf9c3788ad26e4bbbedfdeaa1fe59401904",
+      "row_hash": "7228364b1b041ed36c90ef0aef1102f428cfb76027cc5b28802014ae29d8a8ee",
+      "schema_ver": 1,
+      "kind": "goal_created",
+      "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"weight_class\":\"KERNEL_TOUCHING\"}",
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 3,
+      "timestamp": "2026-10-15T16:24:57.092612+00:00",
+      "prev_hash": "7228364b1b041ed36c90ef0aef1102f428cfb76027cc5b28802014ae29d8a8ee",
+      "row_hash": "9cd522ffa1a9a52e8de0a88864b0d2693e6df31f28fe9210fed42ab6fe1d601d",
+      "schema_ver": 1,
+      "kind": "L11_WEAKNESS_FINDER_ADVISORY_SCAN",
+      "payload": "{\"finding_ids\":[],\"findings_count\":0,\"goal_id\":\"g-d0cd25d2331e\",\"run_id\":\"r-1bc742d8\",\"scanned\":true}",
+      "domain_tag": "PRODUCTION"
+    },
+    {
+      "seq": 4,
+      "timestamp": "2026-10-15T16:27:45.332384+00:00",
+      "prev_hash": "9cd522ffa1a9a52e8de0a88864b0d2693e6df31f28fe9210fed42ab6fe1d601d",
+      "row_hash": "a10c5797a68879138472319fe99035c0393722d279ad9474b67be1bb89886570",
+      "schema_ver": 1,
+      "kind": "STAGE_COMPLETED",
+      "payload": "{\"goal_id\":\"g-d0cd25d2331e\",\"model_ver\":\"chat-bridge-compatibility\",\"run_id\":\"r-1bc742d8\",\"session\":\"planner\",\"stage\":\"RE_DERIVE\",\"status\":\"COMPLETE\",\"tokens\":0}",
+      "domain_tag": "PRODUCTION"
+    }
+  ],
+  "cas": [
+    {
+      "cas_path": "51/ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947",
+      "sha256": "51ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947"
+    },
+    {
+      "cas_path": "29/b8948627625ca05a4ecbbd1044e94ad43bd9406c83dad930bef0fb2432d2a2",
+      "sha256": "29b8948627625ca05a4ecbbd1044e94ad43bd9406c83dad930bef0fb2432d2a2"
+    }
+  ]
+}

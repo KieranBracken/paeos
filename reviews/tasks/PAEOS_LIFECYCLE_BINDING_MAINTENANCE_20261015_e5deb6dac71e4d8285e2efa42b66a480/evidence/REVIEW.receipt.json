@@ -1,0 +1,28 @@
+{
+  "status": "REVIEW_CALL_COMPLETED",
+  "argv": [
+    "/opt/homebrew/bin/claude",
+    "--safe-mode",
+    "--print",
+    "--tools",
+    "",
+    "--no-session-persistence",
+    "--output-format",
+    "json",
+    "--model",
+    "sonnet",
+    "--effort",
+    "low",
+    "--max-budget-usd",
+    "1"
+  ],
+  "prompt_sha256": "f8079a6c6ef86e2299f2891a1cf237efe5336498b757356794c58604e81de1d5",
+  "purpose": "one bounded independent heterogeneous source maintenance review; no PAEOS admission claim",
+  "tools_enabled": false,
+  "max_budget_usd": 1,
+  "started_unix": 1792080799.98494,
+  "exit_code": 1,
+  "ended_unix": 1792080803.535703,
+  "stdout_sha256": "1253b2da65a680d460d3135f3452be1beb00f026e659c4ca554fe61103b22007",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

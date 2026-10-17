@@ -1,0 +1,1 @@
+{"rejected": true, "sha256": "3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64", "origin": "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/source/runtime/ceremony.py", "error": "canonical lifecycle source hash does not match Founder IP-0017"}

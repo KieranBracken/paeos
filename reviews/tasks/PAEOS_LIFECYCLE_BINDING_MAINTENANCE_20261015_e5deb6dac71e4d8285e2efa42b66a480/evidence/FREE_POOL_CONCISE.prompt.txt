@@ -1,0 +1,98 @@
+Review this exact source-maintenance patch as a second-family independent opinion. Builder family OpenAI. Return at most 120 words with a terminal line VERDICT: READY or VERDICT: NOT_READY. Identify concrete behavioral defects only, or say none found. No tools, no claims of running tests. No PAEOS admission, L14, seal, qualification or lifecycle status change is being requested. Requirement: the approved provisional lifecycle file now has SHA256 0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae. Update just runtime/YAML pins and conformance tests, preserving fail-closed guard and all other semantics. The real20focused tests failed12 with stale pins then all20passed after pins; original7tests preserved; old authentic bytes, one-byte changed bytes, wrong prose and missing path all rejected. The lifecycle stays PROVISIONAL. Patch followed by full actual guard:
+--- a/runtime/ceremony.py
++++ b/runtime/ceremony.py
+@@ -45,7 +45,7 @@
+     "discharged_layers_for",
+ ]
+ 
+-CANONICAL_LIFECYCLE_SHA256 = "3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64"
++CANONICAL_LIFECYCLE_SHA256 = "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae"
+ 
+ 
+ def assert_canonical_lifecycle_bound(canonical_path: Path | None = None) -> None:
+--- a/operations/WORKFLOW_STATE_MACHINE.yaml
++++ b/operations/WORKFLOW_STATE_MACHINE.yaml
+@@ -14,7 +14,7 @@
+   classification: DERIVED_EXECUTABLE_PROJECTION
+   canonical_path: operations/ENGINEERING_LIFECYCLE.md
+   canonical_version: "1.3"
+-  canonical_sha256: 3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64
++  canonical_sha256: 0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae
+   precedence: canonical_prose_controls_unless_lawfully_amended
+   founder_disposition: PAEOS-IP-0017
+ 
+--- a/tests/operations/test_lifecycle_projection_conformance.py
++++ b/tests/operations/test_lifecycle_projection_conformance.py
+@@ -5,12 +5,13 @@
+ import hashlib
+ from pathlib import Path
+ 
++import pytest
+ import yaml
+ 
+ REPO_ROOT = Path(__file__).resolve().parents[2]
+ CANONICAL_PATH = REPO_ROOT / "operations" / "ENGINEERING_LIFECYCLE.md"
+ PROJECTION_PATH = REPO_ROOT / "operations" / "WORKFLOW_STATE_MACHINE.yaml"
+-CANONICAL_SHA256 = "3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64"
++CANONICAL_SHA256 = "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae"
+ EXPECTED_NAMES = (
+     "Intake",
+     "Triage",
+@@ -125,3 +126,40 @@
+ 
+     assert ORCHESTRATOR_FRONTEND == FRONTEND_PLANNER_STAGES
+     assert ORCHESTRATOR_POST_SEAL == POST_PROMOTION_STAGES
++
++
++def test_runtime_guard_accepts_exact_approved_lifecycle() -> None:
++    from runtime.ceremony import assert_canonical_lifecycle_bound
++
++    assert hashlib.sha256(CANONICAL_PATH.read_bytes()).hexdigest() == CANONICAL_SHA256
++    assert_canonical_lifecycle_bound(CANONICAL_PATH)
++    assert_canonical_lifecycle_bound()
++
++
++def test_runtime_guard_rejects_one_byte_change_preserving_version(tmp_path: Path) -> None:
++    from runtime.ceremony import assert_canonical_lifecycle_bound
++
++    approved = CANONICAL_PATH.read_bytes()
++    assert approved.startswith(b"# PAEOS")
++    modified = b"!" + approved[1:]
++    assert b"This is **v1.3**" in modified
++    altered = tmp_path / "one-byte-lifecycle.md"
++    altered.write_bytes(modified)
++    with pytest.raises(RuntimeError, match="source hash does not match"):
++        assert_canonical_lifecycle_bound(altered)
++
++
++def test_runtime_guard_rejects_wrong_prose_with_valid_version(tmp_path: Path) -> None:
++    from runtime.ceremony import assert_canonical_lifecycle_bound
++
++    wrong = tmp_path / "wrong-lifecycle.md"
++    wrong.write_bytes(b"This is **v1.3**\nUnapproved lifecycle content.\n")
++    with pytest.raises(RuntimeError, match="source hash does not match"):
++        assert_canonical_lifecycle_bound(wrong)
++
++
++def test_runtime_guard_rejects_unavailable_lifecycle(tmp_path: Path) -> None:
++    from runtime.ceremony import assert_canonical_lifecycle_bound
++
++    with pytest.raises(RuntimeError, match="source is unavailable"):
++        assert_canonical_lifecycle_bound(tmp_path / "absent-lifecycle.md")
+
+GUARD:
+CANONICAL_LIFECYCLE_SHA256 = "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae"
+
+
+def assert_canonical_lifecycle_bound(canonical_path: Path | None = None) -> None:
+    """Fail closed if the ceremony would run against an unratified lifecycle source."""
+
+    path = canonical_path or Path(__file__).resolve().parents[1] / "operations" / "ENGINEERING_LIFECYCLE.md"
+    try:
+        content = path.read_bytes()
+    except OSError as exc:
+        raise RuntimeError("canonical lifecycle source is unavailable") from exc
+    if hashlib.sha256(content).hexdigest() != CANONICAL_LIFECYCLE_SHA256:
+        raise RuntimeError("canonical lifecycle source hash does not match Founder IP-0017")
+    if b"This is **v1.3**" not in content:
+        raise RuntimeError("canonical lifecycle source does not declare v1.3")

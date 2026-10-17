@@ -1,0 +1,86 @@
+{
+  "status": "ACTUAL_RUN_REMANDED_AFTER_L03_TO_L06",
+  "run_id": "r-1bc742d8",
+  "goal_id": "g-d0cd25d2331e",
+  "row_count": 14,
+  "ledger_chain_valid": true,
+  "ledger_head": "aafe2208c6cd1e2be1f69eef60130509dc832d0590fae54ed0f19c53f6d584e9",
+  "stages": [
+    {
+      "goal_id": "g-d0cd25d2331e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-1bc742d8",
+      "session": "planner",
+      "stage": "RE_DERIVE",
+      "status": "COMPLETE",
+      "tokens": 0
+    },
+    {
+      "goal_id": "g-d0cd25d2331e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-1bc742d8",
+      "session": "planner",
+      "stage": "IDEATE",
+      "status": "COMPLETE",
+      "tokens": 0
+    },
+    {
+      "goal_id": "g-d0cd25d2331e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-1bc742d8",
+      "session": "planner",
+      "stage": "RESEARCH",
+      "status": "COMPLETE",
+      "tokens": 0
+    },
+    {
+      "goal_id": "g-d0cd25d2331e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-1bc742d8",
+      "session": "planner",
+      "stage": "TRADEOFF",
+      "status": "COMPLETE",
+      "tokens": 0
+    },
+    {
+      "goal_id": "g-d0cd25d2331e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-1bc742d8",
+      "session": "planner",
+      "stage": "MITIGATION",
+      "status": "FAILED",
+      "tokens": 0
+    }
+  ],
+  "summary": {
+    "runs": 1,
+    "sealed": 0,
+    "stop_reason": "source-exhausted",
+    "remaining_tokens": 25000000,
+    "outcomes": [
+      {
+        "goal_id": "g-d0cd25d2331e",
+        "status": "REMANDED",
+        "detail": "MITIGATION worker failed: FAILED",
+        "seal_hash": null
+      }
+    ],
+    "ledger_head": "aafe2208c6cd1e2be1f69eef60130509dc832d0590fae54ed0f19c53f6d584e9"
+  },
+  "l07_response_published": false,
+  "builder_ran": false,
+  "court_ran": false,
+  "runtime_counts": {
+    "runs": 1,
+    "sealed": 0,
+    "remanded": 1
+  },
+  "court_counts": {
+    "sealed": 0,
+    "remanded": 0,
+    "remediated": 0
+  },
+  "prior_startup_exception_count": 1,
+  "model_usage_note": "Bridge records0tokens/compatibilitymodel; actual external opinion usage/failures preserved separately; do not interpret0as total inference consumption",
+  "observed_unix": 1792082451.8044538
+}
