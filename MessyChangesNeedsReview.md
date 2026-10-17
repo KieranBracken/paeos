@@ -5430,3 +5430,8 @@ One earlier DEBT-0117 review request was sent to NVIDIA as `INTERNAL`, received 
 ## 2026-10-17 — Builder qualification identity reuse gate
 
 The existing supervisor allows qualification only for two fixed task/goal/run identity tuples, and the existing live wrapper uses those tuples and may retry after a restart-pending result before deleting its workspace. No safe fresh-ID renewal mode exists in the inspected checkout. Reusing the fixed IDs conflicts with the current no-reuse rule. The signed Builder qualification is expired; until a trusted authority provides a new unique identity and ambiguity-preserving physical canary, the authorized PAEOS scopes cannot start. No harness or provider request was made.
+
+
+## 2026-10-17 — one-time Builder bootstrap candidate
+
+User authorized a one-time bootstrap repair. The isolated candidate uses a fresh shared UUID across task/goal/run, supervisor-persisted one-use identity claims, an idle-queue and stale-PID-safe supervisor restart, exactly one provider request, and retained private workspace plus signed request/response envelopes. Candidate branch: `codex/builder-qualification-bootstrap-20261017`. Focused suite: 43 passed; Ruff lint, bytecode compilation and `git diff --check` passed. This is a recovery checkpoint, not a release or qualification. Independent review choice is pending; host install, live request and PAEOS dispatch have not occurred. Detailed limits and ALLOWED_NOW / HELD / AUTHORITY_OR_IMPLEMENTATION_GAP are in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md` and the task evidence package.

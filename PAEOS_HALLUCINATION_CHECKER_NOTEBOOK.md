@@ -13685,3 +13685,14 @@ A separate prior DEBT-0117 review request had `data_class=INTERNAL`, free-only/n
 ### 2026-10-17 — fresh Builder qualification identity gate
 
 Static read-only inspection found the supervisor only signs Builder qualification for two fixed task/goal/run tuples (`t-builder-transport-qualification` / `g-builder-transport-qualification` / `r-builder-transport-qualification`, and the corresponding `-restart` tuple). The sole local qualification harness uses those fixed identities; its restart branch can issue a second request and its `finally` removes the workspace. There is no parameterized fresh-identity, single-dispatch, ambiguity-preserving renewal path. Reusing those identities conflicts with the user-approved no-reuse rule. No harness/provider call, source edit, or signing occurred. The precise gate and source hashes are in `reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/builder-qualification-path-audit.json`. A trusted supervisor/authority owner must establish a fresh unique qualification identity plus a safe physical canary path, or the user must explicitly authorize that narrow out-of-band bootstrap repair, before PAEOS can dispatch Chat 1’s fresh scope.
+
+
+### 2026-10-17 — one-time Builder bootstrap repair authorized and captured
+
+The user authorized a single bounded out-of-band bootstrap repair: fresh UUID-correlated task/goal/run identities, supervisor-side one-use claims, one no-retry host qualification request, and preserved workspace/request/response evidence. Candidate source is isolated on `codex/builder-qualification-bootstrap-20261017`; exact file hashes and focused verification are in `reviews/tasks/PAEOS_BUILDER_TRANSPORT_BOOTSTRAP_20261017/`. The focused suite passed 43 tests; Ruff, bytecode compilation, and whitespace checks passed. This is a source checkpoint only. No installer was run, no provider request occurred, and the existing signed qualification remains expired. Independent code review selection is pending; deployment and live qualification remain held until that review and host preflight.
+
+ALLOWED_NOW: Finish the candidate review and publish a clearly labeled public recovery checkpoint. Owner: bootstrap integrator in this task.
+
+HELD: Install the immutable supervisor bundle, issue the single authorized gpt-5.6-sol qualification request, and admit a fresh PAEOS task. Wake only after the selected independent review is complete and the host queue/process preflight is still clear; an ambiguous request is terminal and must not be retried.
+
+AUTHORITY_OR_IMPLEMENTATION_GAP: The safe code path exists only in the isolated candidate branch; the host still runs the old bundle and its qualification is expired. Chat 1 remains the sole D0258 integrator. No new PAEOS admission, receiver start, Court adjudication, qualification, or P3 readiness is evidenced.

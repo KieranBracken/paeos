@@ -1,0 +1,91 @@
+{
+  "captured_at_utc": "2026-10-17T04:18:39.407768+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python3",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/runtime/test_trusted_codex_worker_transport.py",
+        "tests/runtime/test_builder_transport_readiness.py",
+        "tests/runtime/test_trusted_codex_client.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "...........................................                              [100%]\n"
+    },
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+        "check",
+        "ops/install_trusted_codex_worker_supervisor.py",
+        "ops/trusted_codex_worker_supervisor.py",
+        "ops/verify_builder_transport_ready.py",
+        "paeos/model_router/quota_tracker.py",
+        "runtime/integrations/process_supervisor.py",
+        "runtime/integrations/provider_broker.py",
+        "runtime/integrations/task_scoped_responses_broker.py",
+        "runtime/integrations/worker_confinement.py",
+        "runtime/planner_transport.py",
+        "runtime/integrations/trusted_codex_transport.py",
+        "tests/runtime/test_builder_transport_readiness.py",
+        "tests/runtime/test_trusted_codex_client.py",
+        "tests/runtime/test_trusted_codex_worker_transport.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+        "format",
+        "--check",
+        "ops/install_trusted_codex_worker_supervisor.py",
+        "ops/trusted_codex_worker_supervisor.py",
+        "ops/verify_builder_transport_ready.py",
+        "paeos/model_router/quota_tracker.py",
+        "runtime/integrations/process_supervisor.py",
+        "runtime/integrations/provider_broker.py",
+        "runtime/integrations/task_scoped_responses_broker.py",
+        "runtime/integrations/worker_confinement.py",
+        "runtime/planner_transport.py",
+        "runtime/integrations/trusted_codex_transport.py",
+        "tests/runtime/test_builder_transport_readiness.py",
+        "tests/runtime/test_trusted_codex_client.py",
+        "tests/runtime/test_trusted_codex_worker_transport.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "13 files already formatted\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "compileall",
+        "-q",
+        "ops/install_trusted_codex_worker_supervisor.py",
+        "ops/trusted_codex_worker_supervisor.py",
+        "ops/verify_builder_transport_ready.py",
+        "paeos/model_router/quota_tracker.py",
+        "runtime/integrations/process_supervisor.py",
+        "runtime/integrations/provider_broker.py",
+        "runtime/integrations/task_scoped_responses_broker.py",
+        "runtime/integrations/worker_confinement.py",
+        "runtime/planner_transport.py",
+        "runtime/integrations/trusted_codex_transport.py",
+        "tests/runtime/test_builder_transport_readiness.py",
+        "tests/runtime/test_trusted_codex_client.py",
+        "tests/runtime/test_trusted_codex_worker_transport.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "focused_test_count": 43,
+  "result": "PASS",
+  "schema": "paeos-builder-bootstrap-verification/1"
+}

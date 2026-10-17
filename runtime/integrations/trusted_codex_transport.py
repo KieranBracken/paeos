@@ -22,7 +22,6 @@ from runtime.integrations import SessionResult, SessionSpec, TrustedTransportFai
 from runtime.integrations.task_scoped_responses_broker import MAX_TASK_REQUESTS
 
 __all__ = [
-
     "DEFAULT_BUILDER_TRANSPORT_QUALIFICATION",
     "DEFAULT_BUILDER_TRANSPORT_VERIFY_KEY",
     "DEFAULT_CODEX_QUEUE",
@@ -93,8 +92,10 @@ class TrustedCodexTransportError(TrustedTransportFailure):
 
 
 def _is_sha256(value: object) -> bool:
-    return isinstance(value, str) and len(value) == 64 and all(
-        character in "0123456789abcdef" for character in value
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
     )
 
 
@@ -102,7 +103,9 @@ def _validate_failure_observation(value: object) -> dict[str, object] | None:
     if value is None:
         return None
     if not isinstance(value, dict) or set(value) != _FAILURE_OBSERVATION_FIELDS:
-        raise TrustedCodexTransportError("trusted supervisor failure observation fields are not exact")
+        raise TrustedCodexTransportError(
+            "trusted supervisor failure observation fields are not exact"
+        )
     if value["lifecycle_state"] not in _FAILURE_LIFECYCLE_STATES:
         raise TrustedCodexTransportError("trusted supervisor failure lifecycle is invalid")
     exit_code = value["exit_code"]
@@ -143,12 +146,35 @@ def _write_atomic(path: Path, payload: bytes) -> None:
         while offset < len(payload):
             written = os.write(fd, payload[offset:])
             if written <= 0:
-                raise TrustedCodexTransportError("trusted supervisor request write made no progress")
+                raise TrustedCodexTransportError(
+                    "trusted supervisor request write made no progress"
+                )
             offset += written
         os.fsync(fd)
     finally:
         os.close(fd)
     os.replace(temporary, path)
+
+
+def _write_receipt_once(path: Path, payload: bytes) -> None:
+    if not path.is_absolute() or path.is_symlink():
+        raise TrustedCodexTransportError("trusted supervisor receipt path is unsafe")
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError as exc:
+        raise TrustedCodexTransportError("trusted supervisor receipt already exists") from exc
+    try:
+        offset = 0
+        while offset < len(payload):
+            written = os.write(descriptor, payload[offset:])
+            if written <= 0:
+                raise TrustedCodexTransportError(
+                    "trusted supervisor receipt write made no progress"
+                )
+            offset += written
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
 
 
 class HostCodexWorkerTransport:
@@ -168,15 +194,25 @@ class HostCodexWorkerTransport:
         request_signing_key: SigningKey,
         response_verify_key: VerifyKey,
         timeout_s: float = DEFAULT_RESPONSE_TIMEOUT_S,
+        evidence_root: Path | None = None,
     ) -> None:
         if not queue_root.is_absolute() or queue_root.is_symlink():
-            raise TrustedCodexTransportError("trusted supervisor queue must be absolute and non-symlinked")
+            raise TrustedCodexTransportError(
+                "trusted supervisor queue must be absolute and non-symlinked"
+            )
         if not workspace_root.is_absolute() or workspace_root.is_symlink():
             raise TrustedCodexTransportError("trusted supervisor workspace root is unsafe")
         if timeout_s <= 0 or timeout_s > MAX_RESPONSE_TIMEOUT_S:
-            raise TrustedCodexTransportError("trusted supervisor timeout is outside the bounded range")
+            raise TrustedCodexTransportError(
+                "trusted supervisor timeout is outside the bounded range"
+            )
+        if evidence_root is not None and (
+            not evidence_root.is_absolute() or evidence_root.is_symlink()
+        ):
+            raise TrustedCodexTransportError("trusted supervisor evidence root is unsafe")
         self.queue_root = queue_root
         self.workspace_root = workspace_root.resolve()
+        self.evidence_root = evidence_root
         self._request_signing_key = request_signing_key
         self._response_verify_key = response_verify_key
         self._timeout_s = timeout_s
@@ -195,8 +231,13 @@ class HostCodexWorkerTransport:
 
     def _request_payload(self, spec: SessionSpec) -> dict[str, object]:
         if not self._workspace_is_approved(spec.workspace):
-            raise TrustedCodexTransportError("session workspace is outside the fixed supervisor root")
-        if not all(isinstance(value, str) and value for value in (spec.task_id, spec.goal_id, spec.run_id, spec.stage)):
+            raise TrustedCodexTransportError(
+                "session workspace is outside the fixed supervisor root"
+            )
+        if not all(
+            isinstance(value, str) and value
+            for value in (spec.task_id, spec.goal_id, spec.run_id, spec.stage)
+        ):
             raise TrustedCodexTransportError("session identity is incomplete")
         if "\x00" in spec.prompt or not spec.prompt.strip():
             raise TrustedCodexTransportError("session prompt is malformed")
@@ -236,15 +277,37 @@ class HostCodexWorkerTransport:
             raise TrustedCodexTransportError("trusted supervisor request exceeds bounded size")
         self.last_request_sha256 = _sha256(encoded)
         try:
+            if self.evidence_root is not None:
+                try:
+                    evidence_root = self.evidence_root.resolve(strict=True)
+                except OSError as exc:
+                    raise TrustedCodexTransportError(
+                        "trusted supervisor evidence root is unavailable"
+                    ) from exc
+                if (
+                    self.evidence_root.is_symlink()
+                    or not self.evidence_root.is_dir()
+                    or evidence_root != self.evidence_root
+                    or self.evidence_root.parent != spec.workspace
+                    or not evidence_root.is_relative_to(spec.workspace)
+                ):
+                    raise TrustedCodexTransportError(
+                        "trusted supervisor evidence root is outside the workspace"
+                    )
+                _write_receipt_once(self.evidence_root / "request-envelope.json", encoded)
             _write_atomic(request_path, encoded)
             deadline = time.monotonic() + self._timeout_s
             while time.monotonic() < deadline:
                 if response_path.is_file() and not response_path.is_symlink():
                     raw = response_path.read_bytes()
+                    if self.evidence_root is not None:
+                        _write_receipt_once(self.evidence_root / "response-envelope.json", raw)
                     response_path.unlink()
                     request_path.unlink(missing_ok=True)
                     if len(raw) > _MAX_RESPONSE_BYTES:
-                        raise TrustedCodexTransportError("trusted supervisor response exceeds bounded size")
+                        raise TrustedCodexTransportError(
+                            "trusted supervisor response exceeds bounded size"
+                        )
                     self.last_response_sha256 = _sha256(raw)
                     response = json.loads(raw.decode("utf-8"))
                     return self._validate_response(response, request_id=request_id, spec=spec)
@@ -254,7 +317,9 @@ class HostCodexWorkerTransport:
         except TrustedCodexTransportError:
             raise
         except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
-            raise TrustedCodexTransportError("trusted supervisor is unavailable or malformed") from exc
+            raise TrustedCodexTransportError(
+                "trusted supervisor is unavailable or malformed"
+            ) from exc
 
     def _validate_response(
         self,
@@ -272,7 +337,9 @@ class HostCodexWorkerTransport:
         try:
             self._response_verify_key.verify(_canonical_bytes(payload), bytes.fromhex(signature))
         except (BadSignatureError, ValueError) as exc:
-            raise TrustedCodexTransportError("trusted supervisor response signature is invalid") from exc
+            raise TrustedCodexTransportError(
+                "trusted supervisor response signature is invalid"
+            ) from exc
         if payload.get("schema") != _SCHEMA or payload.get("request_id") != request_id:
             raise TrustedCodexTransportError("trusted supervisor response fields are not exact")
         if payload.get("ok") is False:
@@ -281,18 +348,16 @@ class HostCodexWorkerTransport:
                 raise TrustedCodexTransportError("trusted supervisor failure fields are not exact")
             error_code = payload.get("error_code")
             if error_code not in _FAILURE_CODES or payload.get("error") != _FAILURE_ERROR:
-                raise TrustedCodexTransportError("trusted supervisor failure classification is invalid")
+                raise TrustedCodexTransportError(
+                    "trusted supervisor failure classification is invalid"
+                )
             failure_observation = _validate_failure_observation(payload.get("failure_observation"))
             lifecycle_state = (
                 str(failure_observation["lifecycle_state"])
                 if failure_observation is not None
                 else "STRUCTURED_FAILURE"
             )
-            exit_code = (
-                failure_observation["exit_code"]
-                if failure_observation is not None
-                else 1
-            )
+            exit_code = failure_observation["exit_code"] if failure_observation is not None else 1
             self.last_observation = failure_observation
             return SessionResult(
                 transcript=f"trusted_worker_failure:{error_code}",
@@ -303,18 +368,46 @@ class HostCodexWorkerTransport:
                 exit_code=exit_code if isinstance(exit_code, int) else 1,
                 failure_code=str(error_code),
             )
-        if set(payload) != {"schema", "ok", "request_id", "observation"} or payload.get("ok") is not True:
+        if (
+            set(payload) != {"schema", "ok", "request_id", "observation"}
+            or payload.get("ok") is not True
+        ):
             raise TrustedCodexTransportError("trusted supervisor rejected the launch")
         observation = payload.get("observation")
         if not isinstance(observation, dict):
             raise TrustedCodexTransportError("trusted supervisor observation is missing")
         required = {
-            "provider_id", "model_id", "family", "request_id", "task_id", "goal_id", "run_id", "stage",
-            "workspace_id", "workspace", "transcript", "stdout_sha256", "stderr_sha256", "stdout_bytes",
-            "stderr_bytes", "exit_code", "process_state", "lifecycle", "heartbeat_count", "executable",
-            "executable_version", "environment_fingerprint", "profile_sha256", "supervisor_identity_sha256",
-            "broker_evidence_sha256", "broker_request_count", "artifact_sha256", "boot_id", "canaries",
-            "fallback_used", "manual_chat_bridge",
+            "provider_id",
+            "model_id",
+            "family",
+            "request_id",
+            "task_id",
+            "goal_id",
+            "run_id",
+            "stage",
+            "workspace_id",
+            "workspace",
+            "transcript",
+            "stdout_sha256",
+            "stderr_sha256",
+            "stdout_bytes",
+            "stderr_bytes",
+            "exit_code",
+            "process_state",
+            "lifecycle",
+            "heartbeat_count",
+            "executable",
+            "executable_version",
+            "environment_fingerprint",
+            "profile_sha256",
+            "supervisor_identity_sha256",
+            "broker_evidence_sha256",
+            "broker_request_count",
+            "artifact_sha256",
+            "boot_id",
+            "canaries",
+            "fallback_used",
+            "manual_chat_bridge",
         }
         if set(observation) != required:
             raise TrustedCodexTransportError("trusted supervisor observation fields are not exact")
@@ -353,22 +446,37 @@ class HostCodexWorkerTransport:
             or observation["supervisor_identity_sha256"]
             != _sha256(bytes(self._response_verify_key))
         ):
-            raise TrustedCodexTransportError("trusted supervisor returned an unqualified observation")
+            raise TrustedCodexTransportError(
+                "trusted supervisor returned an unqualified observation"
+            )
         if observation["canaries"].get("supervisor_restart_no_fallback") == "UNPROVEN":
             raise TrustedCodexTransportError("supervisor restart qualification is pending")
         if not isinstance(observation["boot_id"], str) or not observation["boot_id"]:
             raise TrustedCodexTransportError("trusted supervisor boot identity is missing")
         for field in (
-            "stdout_sha256", "stderr_sha256", "environment_fingerprint", "profile_sha256",
-            "broker_evidence_sha256", "supervisor_identity_sha256", "artifact_sha256",
+            "stdout_sha256",
+            "stderr_sha256",
+            "environment_fingerprint",
+            "profile_sha256",
+            "broker_evidence_sha256",
+            "supervisor_identity_sha256",
+            "artifact_sha256",
         ):
             value = observation[field]
-            if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
-                raise TrustedCodexTransportError(f"trusted supervisor observation hash is invalid: {field}")
+            if (
+                not isinstance(value, str)
+                or len(value) != 64
+                or any(c not in "0123456789abcdef" for c in value)
+            ):
+                raise TrustedCodexTransportError(
+                    f"trusted supervisor observation hash is invalid: {field}"
+                )
         for field in ("stdout_bytes", "stderr_bytes", "exit_code", "heartbeat_count"):
             value = observation[field]
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
-                raise TrustedCodexTransportError(f"trusted supervisor observation integer is invalid: {field}")
+                raise TrustedCodexTransportError(
+                    f"trusted supervisor observation integer is invalid: {field}"
+                )
         self.last_observation = dict(observation)
         return SessionResult(
             transcript=transcript,
