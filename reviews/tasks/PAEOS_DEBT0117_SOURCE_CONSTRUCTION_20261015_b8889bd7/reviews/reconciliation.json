@@ -1,0 +1,46 @@
+{
+  "candidate_files": {
+    "runtime/autonomy/resume_engine.py": {
+      "candidate_postimage": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+      "canonical_preimage": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6"
+    },
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": {
+      "candidate_postimage": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5",
+      "canonical_preimage": "ABSENT"
+    }
+  },
+  "candidate_integrated": false,
+  "canonical_files_currently_unchanged": true,
+  "current_eligible_candidates": [
+    [
+      "nvidia",
+      "meta/llama-3.1-8b-instruct",
+      "llama",
+      "FREE"
+    ]
+  ],
+  "current_provider_health": {
+    "cline": "EXHAUSTED",
+    "google": "EXHAUSTED",
+    "kilo": "HEALTHY",
+    "nvidia": "HEALTHY",
+    "openrouter": "EXHAUSTED"
+  },
+  "dispatch_record": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/review-20261017T024236Z-b5510491/dispatch.json",
+  "independent_review": "NOT_COMPLETED",
+  "manifest_complete_match": true,
+  "manifest_entries": 66,
+  "manifest_matching_entries": 66,
+  "provider_operations": {
+    "google": "previous known HTTP 503; not repeated",
+    "nvidia": "one pinned free-route attempt; HTTP 410 model end of life; no retry/fallback"
+  },
+  "provider_response_received": false,
+  "qualification": false,
+  "request_record": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/review-20261017T024236Z-b5510491/request.json",
+  "request_sha256": "614d720f8c68e2577e9c155dfc3d6e6a59f448b02f9ba67639f8ee422065eec1",
+  "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF behind DEBT-0258 then DEBT-0260",
+  "source_construction_only": true,
+  "source_package": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7",
+  "status": "RECONCILED_REVIEW_HELD_NO_ELIGIBLE_ROUTE"
+}

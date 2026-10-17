@@ -1,0 +1,28 @@
+{
+  "candidate_changes": "none",
+  "canonical_integration": false,
+  "effective_eligible_free_routes_for_this_request": [],
+  "fallback": false,
+  "google_route": "prior reported HTTP 503; excluded from retries by instruction",
+  "implication": "Router admission state is stale relative to the provider EOL response; this is a routing/catalog issue, outside the exact two-file DEBT-0117 candidate scope.",
+  "nvidia_route": "policy still reports the catalogued candidate eligible, but this exact pinned model returned 410 model end-of-life; treat as operationally ineligible and do not repeat",
+  "other_route_state": "Cline and OpenRouter EXHAUSTED; Kilo HEALTHY but INTERNAL data-class privacy policy excludes it",
+  "paid_usage": false,
+  "policy_candidate_at_no-call_readback": [
+    {
+      "catalog_live_verified": true,
+      "family": "llama",
+      "model": "meta/llama-3.1-8b-instruct",
+      "operational_result": "HTTP 410 EOL",
+      "policy_health": "HEALTHY",
+      "provider": "nvidia"
+    }
+  ],
+  "provider_response": "none; NVIDIA returned HTTP 410 before any response body could be reviewed",
+  "qualification": false,
+  "request_record_sha256": "614d720f8c68e2577e9c155dfc3d6e6a59f448b02f9ba67639f8ee422065eec1",
+  "request_sha256": "614d720f8c68e2577e9c155dfc3d6e6a59f448b02f9ba67639f8ee422065eec1",
+  "retry_policy": "NONE",
+  "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF behind DEBT-0258 then DEBT-0260",
+  "status": "INDEPENDENT_REVIEW_NOT_COMPLETED"
+}
