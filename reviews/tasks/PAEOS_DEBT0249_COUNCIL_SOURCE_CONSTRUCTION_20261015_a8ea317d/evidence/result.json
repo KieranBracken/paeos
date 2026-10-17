@@ -1,0 +1,42 @@
+{
+  "candidate_root": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate",
+  "integration_permitted": false,
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "result": {
+    "artifacts": [
+      {
+        "hash": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+        "type": "artifact"
+      },
+      {
+        "hash": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013",
+        "type": "artifact"
+      }
+    ],
+    "cost": {
+      "model_ver": "chat-bridge-compatibility",
+      "skill_vers": [],
+      "tokens": 0,
+      "wallclock_s": 0.0
+    },
+    "environment_identity": "e771a8e66f8e78da817a2f7626a95d5911dd6d80d21a8a81c868574012d7cc1f",
+    "evidence": [],
+    "failure_code": null,
+    "status": "COMPLETE",
+    "task_id": "t-8c708b6648eb",
+    "trace_ref": "11d43423006b923784d60326caebd257b641ab3bad5f633960a5b77a628d71fc",
+    "workspace_identity": "9e4b9add4a932c7ef15d2117d0ad420a016bcb00e22cad6be0e6374c5fdf6ceb",
+    "written_paths": [
+      [
+        "runtime/critique.py",
+        "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e"
+      ],
+      [
+        "tests/runtime/test_debt0249_remand14.py",
+        "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+      ]
+    ]
+  },
+  "scope_sha256": "9107573576120a80b2e20d314865b0ef17fa1d8dfc772767c1d681136ddb3ff4",
+  "status": "SOURCE_CAPTURED_REQUIRES_INDEPENDENT_VERIFICATION_AND_REVIEW"
+}

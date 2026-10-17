@@ -1,0 +1,43 @@
+{
+  "schema": "paeos.ordinary-source-review/1",
+  "operation_id": "debt0258-review-3",
+  "status": "FAILED",
+  "started_unix": 1792084352.770876,
+  "bindings": [
+    {
+      "label": "runtime/scope_supersession.py",
+      "sha256": "47a0ad002c18487f5acc6290959bf5d41e9f2617aedd08995c6ddc78a8092144"
+    },
+    {
+      "label": "tests/runtime/test_scope_supersession.py",
+      "sha256": "fc5ac02fff3bd75f8acd8aa2266ff8c68ffe44696774d1d72a0519a2afc71e7c"
+    },
+    {
+      "label": "runtime/implementation_contract.py",
+      "sha256": "cff3cd9fbeca702e6775553b18595007dd388b9cad6787c3e14e1c2cd3aff2d0"
+    },
+    {
+      "label": "kernel/capability.py",
+      "sha256": "7f00bbef66ab7f028e431b3025254226c7f9f6b486e337d025dd88b637eb85bf"
+    },
+    {
+      "label": "independent_existing_ledger_primitive_check.json",
+      "sha256": "f55f5736afcd7de3e6c9a959870d488f92c8890ed997d749f135e5e79b087825"
+    }
+  ],
+  "spec_sha256": "2f1f41c4d8278ecd35b19c797faab15f7e484d4e5153f17208e83932d9155eb7",
+  "prompt_sha256": "cec0a1e8386fc8e40035c16add097bf998f5a949d01e4088c4345b3be41c07da",
+  "request_sha256": "c848269a34e858141c1296d986bfbe2858ca37152d446e9389be8679c5e960ad",
+  "free_worker_pool": true,
+  "allow_paid_usage": false,
+  "maximum_provider_attempts": 1,
+  "runtime_stage_receipt": false,
+  "formal_L14_receipt": false,
+  "error_class": "NormalizedError",
+  "error_type": "PROVIDER_UNAVAILABLE",
+  "http_status": null,
+  "retry_after": null,
+  "provider_id": null,
+  "model_id": null,
+  "ended_unix": 1792084352.771648
+}

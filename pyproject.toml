@@ -1,0 +1,60 @@
+[project]
+name = "paeos"
+version = "0.0.0"
+description = "PAEOS runtime — the constitutional engineering operating system (Phase 0 bootstrap)."
+requires-python = ">=3.12"
+# Runtime deps land with the tasks that need them (B0.1+). B0.0 is skeleton + toolchain only.
+dependencies = [
+    "litellm[proxy]>=1.9.4",
+    "mcp>=2.0.0",
+    "pynacl>=1.6.2",
+    "requests>=2.34.2",
+    "structlog>=26.1.0",
+    "websocket-client>=1.9.0",
+]
+
+[dependency-groups]
+# uv-managed dev toolchain — locked in PAEOS-8 §3. Run via `uv run <tool>`.
+dev = [
+    "ruff>=0.9",
+    "pyright>=1.1.390",
+    "pytest>=8",
+    "hypothesis>=6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["kernel", "runtime", "cli", "sakg", "concept"]
+
+# ---- ruff (lint + format) -------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["kernel", "runtime", "cli", "tests", "concept"]
+# Vendored/tooling dirs are not PAEOS source and are not linted.
+extend-exclude = [".agents", ".claude", ".runtime", "spec 2", "misc", "ops"]
+
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+# ---- pyright (strict on the TCB) -----------------------------------------
+# PAEOS-8 §8: pyright STRICT on kernel/ (the `strict` list), standard elsewhere.
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+reportUnknownMemberType = false
+reportMatchNotExhaustive = true
+include = ["kernel", "runtime", "cli", "sakg", "concept"]
+exclude = ["**/__pycache__", ".venv", ".agents", ".claude", "tests"]
+strict = ["kernel"]   # TCB is strictly typed
+
+
+# ---- pytest ---------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

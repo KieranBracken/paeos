@@ -1,0 +1,16 @@
+valid_control: ACCEPTED []
+stance_tampered: ACCEPTED []
+risks_tampered: ACCEPTED []
+alternatives_tampered: ACCEPTED []
+whole_record_hash_absent: ACCEPTED []
+dissent_list_stance_only: ACCEPTED []
+dissent_list_duplicate: ACCEPTED []
+nonobject_presupplied_payload: ACCEPTED []
+argument_mismatch_rejection_control: REJECTED ["DISSENT_CAS_CONTENT_MISMATCH: Stored CAS payload does not match voter offline-d dissent"]
+omission_rejection_control: REJECTED ["DISSENT_SUPPRESSION_VIOLATION: Voter offline-d voted DISSENT but was omitted from dissenting_opinions"]
+missing_dissent_blob_rejection_control: REJECTED ["DISSENT_CAS_NOT_FOUND: Dissent CAS hash ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff for voter offline-d not found in CAS store"]
+INVALID_CASES_ACCEPTED=7
+REJECTION_CONTROLS_REJECTED=3
+SOURCE_UNCHANGED=True
+NETWORK_OR_PROCESS_ATTEMPTS_BLOCKED=[]
+RESULT=/private/tmp/paeos-council-baseline-_74zh9df/result.json

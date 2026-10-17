@@ -1,0 +1,18 @@
+{
+  "status": "STARTED_ONE_POLICY_ROUTED_REVIEW",
+  "operation_id": "review-767f64959e844dbeac96718eb213abee",
+  "candidate": "gemini-3.6-flash",
+  "provider": "google",
+  "family": "gemini",
+  "task_class": "CODE_REVIEW",
+  "data_class": "INTERNAL",
+  "prompt_sha256": "2e2362f824414f505667dd79fb073ae99085fdd3d0670946561b2c65bc9b9baf",
+  "candidate_patch_sha256": "7fd09ccaf2e0472675cbdb7a643c239a9b6db5cff97e07c8772f42da4c6de9d5",
+  "retry_policy": "none",
+  "allow_fallback": false,
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "max_tokens": 1500,
+  "started_unix": 1792081084.165316,
+  "not_l14_or_admission": true
+}

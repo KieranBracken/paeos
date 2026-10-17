@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concept-os.local/schema/search.schema.json",
+  "title": "Concept OS search request and result",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/result"
+    }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "uri": {
+      "type": "string",
+      "pattern": "^concept://[a-z0-9][a-z0-9_-]{0,62}/[a-z0-9][a-z0-9-]{0,62}/[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,62}$"
+    },
+    "decimal": {
+      "type": "string",
+      "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+    },
+    "strings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespace",
+        "disclosure_policy",
+        "desired_output_kinds",
+        "required_edge_families",
+        "forbidden_edge_families",
+        "required_relations",
+        "forbidden_relations",
+        "constraints",
+        "representation_requirements",
+        "algorithm_allow_list",
+        "budgets",
+        "seed",
+        "ranking_weights",
+        "score_versions"
+      ],
+      "properties": {
+        "query_text": {
+          "type": "string"
+        },
+        "anchor_uris": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/uri"
+          }
+        },
+        "namespace": {
+          "$ref": "#/$defs/namespace"
+        },
+        "disclosure_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "desired_output_kinds": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Concept",
+              "Analogy",
+              "Transformation",
+              "SemanticNeighborhood",
+              "InspirationHeuristic",
+              "Hypothesis"
+            ]
+          }
+        },
+        "required_edge_families": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "derivation",
+              "analogy",
+              "recombination",
+              "abstraction",
+              "exemplification",
+              "neighborhood"
+            ]
+          }
+        },
+        "forbidden_edge_families": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "derivation",
+              "analogy",
+              "recombination",
+              "abstraction",
+              "exemplification",
+              "neighborhood"
+            ]
+          }
+        },
+        "required_relations": {
+          "$ref": "#/$defs/strings"
+        },
+        "forbidden_relations": {
+          "$ref": "#/$defs/strings"
+        },
+        "constraints": {
+          "type": "object"
+        },
+        "representation_requirements": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "symbolic",
+              "structural",
+              "exemplar_refs",
+              "vector_ref",
+              "probabilistic_ref",
+              "procedural_affordance",
+              "source_ref"
+            ]
+          }
+        },
+        "algorithm_allow_list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "version"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "budgets": {
+          "type": "object",
+          "required": [
+            "max_expansions",
+            "max_results",
+            "max_hops",
+            "max_tokens"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "max_expansions": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_hops": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_tokens": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "ranking_weights": {
+          "type": "object",
+          "propertyNames": {
+            "not": {
+              "const": "confidence"
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/decimal"
+          }
+        },
+        "score_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "query_text"
+          ]
+        },
+        {
+          "required": [
+            "anchor_uris"
+          ]
+        }
+      ]
+    },
+    "confidence": {
+      "const": "confidence"
+    },
+    "scoreComponents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relevance",
+        "novelty",
+        "coherence",
+        "diversity_contribution",
+        "cost",
+        "provenance_completeness"
+      ],
+      "properties": {
+        "relevance": {
+          "$ref": "#/$defs/decimal"
+        },
+        "novelty": {
+          "$ref": "#/$defs/decimal"
+        },
+        "coherence": {
+          "$ref": "#/$defs/decimal"
+        },
+        "diversity_contribution": {
+          "$ref": "#/$defs/decimal"
+        },
+        "cost": {
+          "$ref": "#/$defs/decimal"
+        },
+        "provenance_completeness": {
+          "$ref": "#/$defs/decimal"
+        }
+      }
+    },
+    "resultItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_uri",
+        "rank",
+        "score_components",
+        "why"
+      ],
+      "properties": {
+        "candidate_uri": {
+          "$ref": "#/$defs/uri"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "score_components": {
+          "$ref": "#/$defs/scoreComponents"
+        },
+        "why": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query_hash",
+        "graph_snapshot_hash",
+        "algorithm_versions",
+        "heuristic_versions",
+        "seeds",
+        "budgets_requested",
+        "budgets_consumed",
+        "results",
+        "rejected_by_reason",
+        "errors",
+        "omitted",
+        "truncated"
+      ],
+      "properties": {
+        "query_hash": {
+          "$ref": "#/$defs/hash"
+        },
+        "graph_snapshot_hash": {
+          "$ref": "#/$defs/hash"
+        },
+        "algorithm_versions": {
+          "type": "object"
+        },
+        "heuristic_versions": {
+          "type": "object"
+        },
+        "seeds": {
+          "type": "object"
+        },
+        "budgets_requested": {
+          "type": "object"
+        },
+        "budgets_consumed": {
+          "type": "object"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resultItem"
+          }
+        },
+        "rejected_by_reason": {
+          "type": "object"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "omitted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

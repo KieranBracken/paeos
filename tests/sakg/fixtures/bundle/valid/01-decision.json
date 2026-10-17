@@ -1,0 +1,40 @@
+{
+  "bundle_id": "sakg-bundle:sealed-goal-0001-01",
+  "goal_id": "g-sealed-goal-0001",
+  "namespace": "demo-project",
+  "nodes": [
+    {
+      "evidence": [
+        {
+          "hash": "4c16b9ee2dad7619d16074fb7d79af5d18c5aca6fdfe5a04125f0fcb2fd00029",
+          "kind": "test",
+          "reverification": "re-run the sealed PAEOS command against the CAS artifact",
+          "uri": "cas://paeos/evidence/01"
+        }
+      ],
+      "facets": {
+        "example_index": 1,
+        "origin": "paeos-l15-l16",
+        "reviewed": true
+      },
+      "id": "sakg://demo-project/Decision/01J00000000000000000000F01",
+      "label": "Decision emission fixture 1",
+      "provenance": {
+        "origin": {
+          "run_id": "sealed-goal-0001",
+          "system": "paeos"
+        },
+        "source_hash": "a44166d217b9c03008693c26e3269d45e044de7b4d93afa98ae2a546c6f9e5db"
+      },
+      "status": "candidate",
+      "summary": "Post-seal SAKG emission fixture with evidence references only.",
+      "type": "Decision"
+    }
+  ],
+  "producer": {
+    "system": "paeos",
+    "version": "0.1"
+  },
+  "schema_version": "paeos.sakg.emission-bundle/v1",
+  "sealed_at": "2026-09-02T12:00:00Z"
+}

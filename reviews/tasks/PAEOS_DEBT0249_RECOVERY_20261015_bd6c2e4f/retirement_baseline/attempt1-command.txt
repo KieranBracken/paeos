@@ -1,0 +1,2 @@
+cwd=/Users/bob/GitHub/paeos
+PYTHONDONTWRITEBYTECODE=1 LITELLM_LOCAL_MODEL_COST_MAP=True /Users/bob/GitHub/paeos/.venv/bin/python -B /private/tmp/paeos-nvidia410-baseline-fpp6ta02/reproduce.py

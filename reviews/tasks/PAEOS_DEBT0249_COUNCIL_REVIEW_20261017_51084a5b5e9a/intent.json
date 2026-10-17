@@ -1,0 +1,25 @@
+{
+  "status": "ROUTING_PREFLIGHT_COMPLETE",
+  "operation_id": "paeos-debt0249-council-review-20261017-faae8dc56ed5442ca8ec51084a5b5e9a",
+  "request_sha256": "7dff0d7cac167a61d6338edcb4588c292c690402bc388ed973b5718adbd4ee52",
+  "resolved_free_candidates": [
+    {
+      "provider_id": "nvidia",
+      "model_id": "meta/llama-3.1-8b-instruct",
+      "family": "llama",
+      "cost_tier": "FREE",
+      "pricing_verified_free": true,
+      "live_verified": true,
+      "catalog_available": true,
+      "admission_state": "ADMITTED",
+      "provider_health": "HEALTHY",
+      "provider_last_error_type": "PROVIDER_UNAVAILABLE",
+      "active_requests": 0,
+      "aimd_admitted": true,
+      "aimd_reason": null
+    }
+  ],
+  "provider_calls_authorized": true,
+  "provider_calls_made": 0,
+  "reason": "No provider call was made. The auto-selected free model is documented by the exact upstream response as permanently Gone (HTTP 410; EOL 2026-08-26). Google is provider-wide EXHAUSTED and AIMD denies admission. PAEOS catalog/health mismatch is preserved without resetting or editing router state."
+}

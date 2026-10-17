@@ -1,0 +1,42 @@
+{
+  "candidate_root": "/private/tmp/paeos-source-construction-v4.J5rMbO/state/candidate",
+  "integration_permitted": false,
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "result": {
+    "artifacts": [
+      {
+        "hash": "47a0ad002c18487f5acc6290959bf5d41e9f2617aedd08995c6ddc78a8092144",
+        "type": "artifact"
+      },
+      {
+        "hash": "fc5ac02fff3bd75f8acd8aa2266ff8c68ffe44696774d1d72a0519a2afc71e7c",
+        "type": "artifact"
+      }
+    ],
+    "cost": {
+      "model_ver": "chat-bridge-compatibility",
+      "skill_vers": [],
+      "tokens": 0,
+      "wallclock_s": 0.0
+    },
+    "environment_identity": "e771a8e66f8e78da817a2f7626a95d5911dd6d80d21a8a81c868574012d7cc1f",
+    "evidence": [],
+    "failure_code": null,
+    "status": "COMPLETE",
+    "task_id": "t-c42817849cc7",
+    "trace_ref": "45f087b5b0755b1acba281ddec7038b77aa253fa71d504d49408cd7363864aeb",
+    "workspace_identity": "e4a4237d00f0b0d24a9577a4a741f7877aedd231c188d46ab257b125a2439b3c",
+    "written_paths": [
+      [
+        "runtime/scope_supersession.py",
+        "47a0ad002c18487f5acc6290959bf5d41e9f2617aedd08995c6ddc78a8092144"
+      ],
+      [
+        "tests/runtime/test_scope_supersession.py",
+        "fc5ac02fff3bd75f8acd8aa2266ff8c68ffe44696774d1d72a0519a2afc71e7c"
+      ]
+    ]
+  },
+  "scope_sha256": "1daf72d6ec8773d28d9d5f91502985607254d52607f0bee9a37febadb290c2ef",
+  "status": "SOURCE_CAPTURED_REQUIRES_INDEPENDENT_VERIFICATION_AND_REVIEW"
+}

@@ -1,0 +1,2 @@
+cwd=/Users/bob/GitHub/paeos
+TMPDIR=/private/tmp/paeos-nvidia410-baseline-fpp6ta02 TIKTOKEN_CACHE_DIR=/private/tmp/paeos-nvidia410-baseline-fpp6ta02/tiktoken-cache PYTHONDONTWRITEBYTECODE=1 LITELLM_LOCAL_MODEL_COST_MAP=True /Users/bob/GitHub/paeos/.venv/bin/python -B /private/tmp/paeos-nvidia410-baseline-fpp6ta02/reproduce.py > /private/tmp/paeos-nvidia410-baseline-fpp6ta02/stdout.txt 2> /private/tmp/paeos-nvidia410-baseline-fpp6ta02/stderr.txt

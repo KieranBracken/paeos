@@ -1,0 +1,28 @@
+[
+  {
+    "objective": "Implement a durable SqliteScarStore in runtime/memory/ so PAEOS institutional memory (scars) survives process exits. Context: ScarStore in runtime/memory/__init__.py is a pure in-memory dict — every scar ever proposed by the EvolutionLayer evaporated at process exit, so no L01-L16 run ever benefited from prior runs' lessons (hallucination notebook Entries 138-142 and backlog/research/PAEOS_DURABLE_MEMORY_RB_v0.1.md). Deliverables: (1) a SqliteScarStore class in a new module runtime/memory/sqlite_store.py that preserves the ScarStore contract exactly — propose_scar (including ScarQuarantined for signatures with fewer than MIN_SIGNATURE_TAGS conditions), match_scars (subset signature match, sorted by id), get_precedent, injected_scars — but persists rows to a SQLite database file given at construction; ids must continue the scar-NNNN sequence across restarts (derive from max existing id); (2) wire it in ops/autonomous_run.py: construct SqliteScarStore(state_dir / 'scars.db') and pass it as SoftLoop's scar_store= parameter so EvolutionLayer (which takes loop.scar_store) writes durably; (3) tests in tests/runtime/test_sqlite_scar_store.py covering: a scar proposed in one store instance is visible in a fresh instance opened on the same file (cross-process persistence), quarantine semantics preserved, match_scars returns identical results to the in-memory store for the same data, and id sequence continues across restarts.",
+    "accept": [
+      "runtime/memory/sqlite_store.py exports SqliteScarStore with the full ScarStore contract, persistent to a SQLite file",
+      "ops/autonomous_run.py passes SqliteScarStore(state_dir / 'scars.db') into SoftLoop(scar_store=...)",
+      "tests/runtime/test_sqlite_scar_store.py proves cross-instance persistence, quarantine preservation, and match parity",
+      "uv run pytest -q tests/runtime/test_sqlite_scar_store.py passes"
+    ],
+    "changed_paths": [
+      "runtime/memory/sqlite_store.py",
+      "ops/autonomous_run.py",
+      "tests/runtime/test_sqlite_scar_store.py"
+    ],
+    "builder_evidence": [
+      {
+        "claim_id": "durable_scars",
+        "command": "uv run pytest -q tests/runtime/test_sqlite_scar_store.py",
+        "artifact_hash": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+        "exit_code": 0,
+        "stdout": "passed"
+      }
+    ],
+    "goal_signature": "runtime/memory persistence sqlite scars institutional-memory durability",
+    "verifiable": true,
+    "reversible": true
+  }
+]

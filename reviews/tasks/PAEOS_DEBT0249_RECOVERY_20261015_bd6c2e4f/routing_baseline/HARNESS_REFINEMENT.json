@@ -1,0 +1,5 @@
+{
+  "reason": "Intended missing-credential negative control exposed another real audit-specific reintroduction defect. Reclassified that outcome as a sixth defect and added corresponding non-audit missing-credential positive control. No implementation was changed.",
+  "previous_results": "first-controls.baseline-results.json",
+  "previous_harness": "baseline_v1.py"
+}

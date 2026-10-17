@@ -1,0 +1,13 @@
+{
+  "id": "CANARY-0002",
+  "category": "vacuous-evidence",
+  "description": "Deterministic evidence whose reproducible_command reproduces faithfully but never references, imports, or executes the artifact under review — zero discriminating power (the same PASS for the claim and its negation). Found by the live R4 Adversary; distinct from CANARY-0001 forged evidence (a result mismatch).",
+  "expected": "CAUGHT",
+  "detection_signature": "the command executes no interpreter/test — a bare literal echo exercises nothing; the probative check (does the command run the code under review?) catches it. Full detector: identical result whether the artifact is applied or not (B2.O).",
+  "artifact": {
+    "kind": "Evidence",
+    "determinism": "DETERMINISTIC",
+    "reproducible_command": "echo r4-classify-obj",
+    "claimed_result": { "exit_code": 0, "stdout": "r4-classify-obj\n" }
+  }
+}

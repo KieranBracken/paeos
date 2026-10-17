@@ -1,0 +1,36 @@
+{
+  "authority_reference": "Root explicit correction to bounded source-construction verification scope 2026-10-15; preserves prior failed Court and DEFERRED_FULL_AUTONOMY_PROOF for scenario14. Original contract /private/tmp/paeos-source-construction-d0117.ChHNrT/accepted-contract.json",
+  "deferred_verification": [
+    {
+      "reason": "Physical production-controller startup and death/recovery proof remains canonically held behind DEBT-0258 then DEBT-0260. This source-only successor neither executes nor counts that proof as passing; prior failed physical observation remains preserved.",
+      "status": "DEFERRED_FULL_AUTONOMY_PROOF",
+      "test": "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py::test_scenario_14_physical_controller_death_acceptance_test"
+    }
+  ],
+  "focused_test_file": "tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "mutable_preimages": {
+    "runtime/autonomy/resume_engine.py": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5"
+  },
+  "prior_failure_preserved": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/prior-failure-evidence",
+  "promotion": false,
+  "qualification": false,
+  "read_dependency_count": 37,
+  "regression_selectors": [
+    "test_scenario_01_one_level_remediation_and_autoresume",
+    "test_scenario_02_nested_remediation_unwind_5_levels",
+    "test_scenario_03_restart_while_deepest_child_active",
+    "test_scenario_04_exact_once_resume_under_replay",
+    "test_scenario_05_multiple_sibling_blockers",
+    "test_scenario_06_autonomous_recovery_from_child_failure",
+    "test_scenario_07_nonblocking_finding_isolation",
+    "test_scenario_08_deterministic_cycle_rejection",
+    "test_scenario_09_orphan_detection_and_reconciliation",
+    "test_scenario_10_interrupted_resume_recovery",
+    "test_scenario_11_root_envelope_authority_confinement",
+    "test_scenario_12_full_blocking_chain_observability",
+    "test_scenario_13_lawful_ceremony_depth_selection_in_nested_branch"
+  ],
+  "status": "PREPARED_NOT_DISPATCHED"
+}

@@ -1,0 +1,125 @@
+{
+  "ast_inventory_path": "ops/sakg/SAKG_AST_INVENTORY.json",
+  "ast_inventory_sha256": "798d592065fcb75996e5fbe55e662b210062f8148f43fe55ab57a88ecb81c9fc",
+  "axes": [
+    {
+      "axis": "latency",
+      "excerpt": "Latency",
+      "heading": "Dimension 3 \u2014 Objectives",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+      "source_sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+    },
+    {
+      "axis": "accuracy",
+      "excerpt": "Accuracy",
+      "heading": "Dimension 3 \u2014 Objectives",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+      "source_sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+    },
+    {
+      "axis": "cost",
+      "excerpt": "Cost",
+      "heading": "Dimension 3 \u2014 Objectives",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+      "source_sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+    },
+    {
+      "axis": "maintainability",
+      "excerpt": "Maintainability",
+      "heading": "Dimension 3 \u2014 Objectives",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+      "source_sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+    },
+    {
+      "axis": "reliability",
+      "excerpt": "Reliability",
+      "heading": "Dimension 3 \u2014 Objectives",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+      "source_sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+    },
+    {
+      "axis": "scalability",
+      "excerpt": "Scalability",
+      "heading": "Dimension 3 \u2014 Objectives",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+      "source_sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+    },
+    {
+      "axis": "complexity",
+      "excerpt": "Higher implementation complexity",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "security",
+      "excerpt": "Security",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "safety",
+      "excerpt": "Safety",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "performance",
+      "excerpt": "Performance",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "memory",
+      "excerpt": "Memory",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "maintainability",
+      "excerpt": "Maintainability",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "scalability",
+      "excerpt": "Scalability",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    },
+    {
+      "axis": "implementation difficulty",
+      "excerpt": "Implementation Difficulty",
+      "heading": "Layer 6 \u2014 Trade-off Analysis",
+      "source_path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+      "source_sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+    }
+  ],
+  "goals": [
+    {
+      "bundle_path": "tests/sakg/fixtures/extract/gate-a/expected_bundle.json",
+      "bundle_sha256": "4db2827f9eaf7b83a43b3a18deff4cc8f843199cb1b56d140f1d4edac4bc3db8",
+      "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F01",
+      "goal_id": "g-extract-gate-a"
+    },
+    {
+      "bundle_path": "tests/sakg/fixtures/extract/gate-b/expected_bundle.json",
+      "bundle_sha256": "55b4c65eae7d23296a72ef2f9985e40508e5f522e2f3aedef836f1f17d33ffa5",
+      "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F02",
+      "goal_id": "g-extract-gate-b"
+    },
+    {
+      "bundle_path": "tests/sakg/fixtures/extract/gate-c/expected_bundle.json",
+      "bundle_sha256": "cdf744f4deb4500028b497c1c6f124e1e947d520b9e721b17fc7166cfd9fcf8c",
+      "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F03",
+      "goal_id": "g-extract-gate-c"
+    }
+  ],
+  "schema": "paeos.sakg.tradeoff-axis-catalog/v1"
+}

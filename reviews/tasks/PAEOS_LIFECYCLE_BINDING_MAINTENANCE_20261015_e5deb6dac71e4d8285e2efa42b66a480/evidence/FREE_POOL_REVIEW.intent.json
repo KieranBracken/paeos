@@ -1,0 +1,31 @@
+{
+  "status": "STARTED_FREE_POOL_SECOND_OPINION",
+  "operation_id": "free-review-7e1034f6251c44b8b283fb966f9e5f1b",
+  "eligible_chain": [
+    {
+      "model": "gemini-3.6-flash",
+      "provider": "google",
+      "family": "gemini"
+    },
+    {
+      "model": "gemini-3.6-flash",
+      "provider": "google",
+      "family": "gemini"
+    },
+    {
+      "model": "meta/llama-3.1-8b-instruct",
+      "provider": "nvidia",
+      "family": "llama"
+    }
+  ],
+  "prompt_sha256": "2e2362f824414f505667dd79fb073ae99085fdd3d0670946561b2c65bc9b9baf",
+  "request_sha256": "fc5544911151bfafdac53f9c308a8b72d5a48a61638fa2a4258f97ea377dcde7",
+  "candidate_patch_sha256": "7fd09ccaf2e0472675cbdb7a643c239a9b6db5cff97e07c8772f42da4c6de9d5",
+  "retry_policy": "none",
+  "allow_fallback": true,
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "max_tokens": 2000,
+  "started_unix": 1792081277.881175,
+  "not_l14_or_admission": true
+}

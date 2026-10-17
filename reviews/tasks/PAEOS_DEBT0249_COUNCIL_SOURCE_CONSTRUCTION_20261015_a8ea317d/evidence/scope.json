@@ -1,0 +1,116 @@
+{
+  "absent_source_files": [],
+  "authority_reference": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/accepted-contract.json",
+  "builder_family": "openai",
+  "builder_session": "codex-thread:01a14042-702b-72b2-b6fe-4a421e74c4f7:subagent-council-builder",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "mutable_preimages": {
+    "runtime/critique.py": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+    "tests/runtime/test_debt0249_remand14.py": null
+  },
+  "objective": "Implement only the following frozen Council source contract.\n{\n  \"mode\": \"SOURCE_CONSTRUCTION_ONLY\",\n  \"task\": \"DEBT0249 Council CAS integrity subslice\",\n  \"authority\": \"Direct human continuation through implementation/testing/review; existing D0249 mutable intake scope, narrowed to two paths. Separate local source construction, not production admission or integration.\",\n  \"scope_source\": {\n    \"path\": \"ops/backlogs/intake-debt0249-remand-15-mutable-slice.json\",\n    \"sha256\": \"0bd4d69b497e5b840a90001a95f9a27118a8424f954e634aeb64528d02fafcf1\"\n  },\n  \"mutable_files\": [\n    \"runtime/critique.py\",\n    \"tests/runtime/test_debt0249_remand14.py\"\n  ],\n  \"requirements\": [\n    \"Validate complete dissent payload binding: voter_id, stance, argument, risks and alternatives. Require JSON object and correct field types/content; reject malformed or nonobject CAS payloads before field access. Enforce the same binding for pre-supplied hashes at record creation.\",\n    \"Verify whole-record vote_cas_hash existence and content binding against canonical existing record.to_dict() with vote_cas_hash reset to empty string. Preserve self-hash serialization compatibility; no historic artifact rewrite.\",\n    \"Require unique voter IDs and unique dissent entries; dissenting_opinions must be exactly the complete DISSENT/REJECT vote view, including all dataclass fields. Reject omitted, extra, duplicate or inconsistent entries.\",\n    \"Verification without a CAS store must not claim grounded binding. Keep current callable API and existing rejection tags for established controls where feasible; record creation of valid CAS-backed data remains accepted.\",\n    \"Retain minimum quorum, substantive dissent and prohibition on consensus as empirical evidence. Avoid unrelated L09 behavior changes.\",\n    \"Write genuine filesystem CAS tests with valid controls, one-field mutations, malformed/nonobject/absent payloads, duplicates, missing CAS, whole-record tampering and reopen persistence. Demonstrate RED before implementation and GREEN after.\"\n  ],\n  \"baseline\": \"/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_RECOVERY_20261015_bd6c2e4f/council_baseline\",\n  \"excluded\": [\n    \"promotion stream origin repair\",\n    \"model router\",\n    \"canonical integration\",\n    \"full lifecycle qualification\",\n    \"debt closure\"\n  ],\n  \"review_gate\": \"Independent local verifier plus eligible different-family source review before integration. No provider calls in this construction.\"\n}",
+  "read_documents": [],
+  "read_file_pins": [
+    {
+      "path": "kernel/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "kernel/cas.py",
+      "preimage": "PRESENT",
+      "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f"
+    },
+    {
+      "path": "runtime/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/runtime/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/runtime/test_l09_critique.py",
+      "preimage": "PRESENT",
+      "sha256": "32359f82dca7cfc108b956c2c1d974c4b7d62f3fd90bb98e5501b63df49beac9"
+    }
+  ],
+  "read_overrides": [],
+  "source_files": {
+    ".source_construction_verify.py": {
+      "read_only": true,
+      "sha256": "6b7a9325533c6231841a311d0251715e3cb20e81a9947c8dfdd42056641bd6ee",
+      "source": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/verify_candidate.py"
+    },
+    "kernel/__init__.py": {
+      "read_only": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/bob/GitHub/paeos/kernel/__init__.py"
+    },
+    "kernel/cas.py": {
+      "read_only": true,
+      "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+      "source": "/Users/bob/GitHub/paeos/kernel/cas.py"
+    },
+    "pyproject.toml": {
+      "read_only": true,
+      "sha256": "0ba9fa89f8a2ebc6b57abc9884986b7abb9194e3dcf4c0ef305e5491be580569",
+      "source": "/Users/bob/GitHub/paeos/pyproject.toml"
+    },
+    "runtime/__init__.py": {
+      "read_only": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/bob/GitHub/paeos/runtime/__init__.py"
+    },
+    "runtime/critique.py": {
+      "read_only": false,
+      "sha256": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+      "source": "/Users/bob/GitHub/paeos/runtime/critique.py"
+    },
+    "tests/__init__.py": {
+      "read_only": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/bob/GitHub/paeos/tests/__init__.py"
+    },
+    "tests/runtime/__init__.py": {
+      "read_only": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/bob/GitHub/paeos/tests/runtime/__init__.py"
+    },
+    "tests/runtime/test_l09_critique.py": {
+      "read_only": true,
+      "sha256": "32359f82dca7cfc108b956c2c1d974c4b7d62f3fd90bb98e5501b63df49beac9",
+      "source": "/Users/bob/GitHub/paeos/tests/runtime/test_l09_critique.py"
+    },
+    "uv.lock": {
+      "read_only": true,
+      "sha256": "6e72ea0644ac24fa6552c23f09ef3807e3713a3630bc832f7913288fe130c1e4",
+      "source": "/Users/bob/GitHub/paeos/uv.lock"
+    }
+  },
+  "timeout_seconds": 1800,
+  "verification": [
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        ".source_construction_verify.py",
+        "tests/runtime/test_debt0249_remand14.py"
+      ],
+      "artifact_path": "runtime/critique.py",
+      "claim_id": "SC-D0249-COUNCIL-FOCUSED-AND-L09"
+    }
+  ],
+  "write_files": [
+    "runtime/critique.py",
+    "tests/runtime/test_debt0249_remand14.py"
+  ]
+}

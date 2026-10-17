@@ -1,0 +1,7 @@
+{
+  "source": "L07_ADVERSARY.prompt.txt",
+  "method": "exact transmitted draft bytes extracted after final file marker",
+  "sha256": "b34f41d774d5652e9dd943fff3f96817ccf47a565262ecd905d6c89fc1f775dc",
+  "workspace_deleted_by_runtime": true,
+  "bridge_submitted": false
+}

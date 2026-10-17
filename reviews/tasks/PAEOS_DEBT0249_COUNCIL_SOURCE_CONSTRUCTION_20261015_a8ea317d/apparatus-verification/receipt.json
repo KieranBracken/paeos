@@ -1,0 +1,17 @@
+{
+  "timestamp_utc": "2026-10-15T17:22:17.021184+00:00",
+  "exit_code": 0,
+  "network": "sandbox-exec deny network*",
+  "dispatch_invoked": false,
+  "provider_calls": 0,
+  "files_sha256": {
+    "harness.py": "9c955e92d4e732b6a365af93a623aabda33608f46329e69b61d9d45286e1b634",
+    "test_harness.py": "f05252742505da79b76f0e0d8f165b2583fab898ca79a025d37458af9a18d618",
+    "scope.json": "03a335e4da6ddc6bb5717d2a30cf66c69e69c57951b757c5d66f7cda72132ba9",
+    "accepted-contract.json": "1824f29d12950f9db89b043f63f7926ca6a4af3909ede600f8f6b12e6b63bfd4",
+    "README.md": "b23864431a7e9568a1fc72f3a0b0475e88990b9890f31a800ccbef4ae92d979a",
+    "verify_candidate.py": "6b7a9325533c6231841a311d0251715e3cb20e81a9947c8dfdd42056641bd6ee"
+  },
+  "command_sha256": "d49e570c122e92ac8140f4111fd714b9cbbd7bd0e71a76358c36fb102cb99b05",
+  "output_sha256": "0bb4ae029111eb361338d44d45c96a56f2cc1aab6679290ea190306fae9e081b"
+}

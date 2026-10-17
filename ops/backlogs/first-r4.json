@@ -1,0 +1,24 @@
+[
+  {
+    "objective": "In runtime/lifetime.py add a NEW public function `classify_obj(obj: object) -> LifetimeClass` that returns `classify_type(type(obj).__name__)`, and add \"classify_obj\" to __all__. This function does NOT yet exist \u2014 add it.",
+    "changed_paths": [
+      "runtime/lifetime.py"
+    ],
+    "plan_write_scopes": [
+      "runtime/lifetime.py"
+    ],
+    "goal_signature": "domain:runtime,task:classify-obj",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": [
+      {
+        "claim_id": "classify-obj-behaves",
+        "kind": "TEST",
+        "command": "/Users/bob/GitHub/paeos/.venv/bin/python -c \"from runtime.lifetime import classify_obj, LifetimeClass; from runtime.task_package import ExecutionContext; assert classify_obj(ExecutionContext()) is LifetimeClass.L1; print('classify_obj-verified')\"",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "classify_obj-verified\n"
+      }
+    ]
+  }
+]

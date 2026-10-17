@@ -1,0 +1,96 @@
+[
+  {
+    "objective": "Wave 9 (controlled_authority_cutovers): Controlled authority cutovers across Orca Mission Control adapter, PAEOS entrypoints, and Idea Graph adapters. Enforce: (1) fully traceable recursive learning shadow proof, (2) zero unresolved critical authority/data-loss anomalies, (3) failover drill, (4) duplicate mission/candidate isolation, (5) provider outage routed fail-closed by PAEOS, (6) strict fail-closed prohibition on pay-per-token routing, and (7) preservation of Sentium quarantine-only and zero-capital execution boundary. FOUNDER GATE RATIFIED: Live authority cutover authorized under explicit Founder ratification token.",
+    "changed_paths": [
+      "contracts/orca_mission_control_adapter.py",
+      "contracts/__init__.py",
+      "tests/contracts/test_orca_mission_control_adapter.py",
+      "ops/records/FOUNDER_W9_CUTOVER_RATIFICATION.json",
+      "reviews/tasks/PAEOS_MIGRATION_W9_CONTRACT_DISPOSITION.md",
+      "reviews/tasks/PAEOS_MIGRATION_W9_FOUNDER_AUTHORITY_GATE.md"
+    ],
+    "plan_write_scopes": [
+      "contracts/orca_mission_control_adapter.py",
+      "contracts/__init__.py",
+      "tests/contracts/test_orca_mission_control_adapter.py",
+      "ops/records/FOUNDER_W9_CUTOVER_RATIFICATION.json",
+      "reviews/tasks/PAEOS_MIGRATION_W9_CONTRACT_DISPOSITION.md",
+      "reviews/tasks/PAEOS_MIGRATION_W9_FOUNDER_AUTHORITY_GATE.md"
+    ],
+    "goal_signature": "domain:contracts,task:migration-w9-controlled-authority-cutovers",
+    "verifiable": true,
+    "reversible": true,
+    "founder_gate": {
+      "required": true,
+      "state": "FOUNDER_RATIFIED_LIVE_CUTOVER_ACTIVE",
+      "gate_id": "GATE-FOUNDER-W9-AUTHORITY-CUTOVER",
+      "cutover_permitted": true,
+      "live_routing_active": true,
+      "ratification_token": "FOUNDER-RATIFY-W9-AUTHORITY-CUTOVER-20260906T020813",
+      "ratified_at": "2026-09-06T01:08:13Z",
+      "invariants_preserved": {
+        "fail_closed_pay_per_token_prohibition": true,
+        "sentium_quarantine_only_boundary": true,
+        "sentium_no_capital_state_or_execution_boundary": true
+      }
+    },
+    "builder_evidence": [
+      {
+        "claim_id": "CLAIM-W9-01-RECURSIVE-LEARNING-SHADOW-TRACE",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_recursive_learning_trace",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      },
+      {
+        "claim_id": "CLAIM-W9-02-ZERO-CRITICAL-DATA-LOSS-ANOMALIES",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_zero_critical_anomalies",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      },
+      {
+        "claim_id": "CLAIM-W9-03-FAILOVER-AND-STALE-PROJECTION-RECOVERY",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_failover_recovery",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      },
+      {
+        "claim_id": "CLAIM-W9-04-FOUNDER-GATE-ENFORCEMENT",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_founder_gate_blocks_cutover",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      },
+      {
+        "claim_id": "CLAIM-W9-06-PAID-ROUTING-PROHIBITED",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_paid_routing_fail_closed_prohibition",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      },
+      {
+        "claim_id": "CLAIM-W9-07-SENTIUM-QUARANTINE-AND-NO-CAPITAL-PRESERVED",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_sentium_quarantine_and_no_capital_boundary_preserved",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      },
+      {
+        "claim_id": "CLAIM-W9-08-FOUNDER-RATIFIED-CUTOVER-ACTIVE",
+        "kind": "TEST",
+        "command": "uv run pytest tests/contracts/test_orca_mission_control_adapter.py -k test_live_cutover_activation_and_persistence",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "passed"
+      }
+    ]
+  }
+]

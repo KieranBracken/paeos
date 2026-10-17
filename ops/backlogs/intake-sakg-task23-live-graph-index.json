@@ -1,0 +1,25 @@
+[
+  {
+    "objective": "Execute SAKG-2 Task 23 [I-LIVE-GRAPH-INDEX] from the ratified SAEOS-1 architecture (spec/SAEOS-1-architecture.md \u00a73.2, \u00a74.1). Ingest live AST & taxonomy entities across PAEOS modules (paeos/ and kernel/) into the live SQLite GraphStore (sakg.db). Extract Component, Pattern, Mechanism, and TaxonomyNode entities deterministically, linking them via typed edges (structural: part_of, instance_of; dependency: depends_on, calls, provides; constraint: constrained_by) to the 192 historical nodes admitted in Task 22. Author discriminating tests in tests/sakg/test_live_graph_integrity.py proving >= 50 new indexed nodes, edge acyclicity, deterministic reproducibility, and zero regression of the existing 115 SAKG tests.",
+    "accept": [
+      "uv run pytest tests/sakg/test_live_graph_integrity.py -q",
+      "uv run python -c \"import sakg.store; s = sakg.store.GraphStore(); assert len(s.query_nodes()) >= 50\"",
+      "uv run pytest tests/sakg/ -q",
+      "No runtime, kernel, protected ref, main/trunk, or historical evidence mutation"
+    ],
+    "changed_paths": [
+      "scripts/sakg_live_graph_index.py",
+      "tests/sakg/test_live_graph_integrity.py",
+      "sakg/store.py"
+    ],
+    "plan_write_scopes": [
+      "scripts/sakg_live_graph_index.py",
+      "tests/sakg/test_live_graph_integrity.py",
+      "sakg/"
+    ],
+    "goal_signature": "domain:sakg,task:task-23-live-graph-index",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

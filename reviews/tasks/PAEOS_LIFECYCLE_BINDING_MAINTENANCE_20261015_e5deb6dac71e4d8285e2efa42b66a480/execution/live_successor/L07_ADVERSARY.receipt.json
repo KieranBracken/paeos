@@ -1,0 +1,44 @@
+{
+  "operation_id": "l07-c5bb098f025a448a8c8cdc605ed5df21",
+  "status": "FAILED",
+  "stage": "MITIGATION",
+  "role": "SUPPLEMENTAL_ADVERSARIAL_OPINION",
+  "run_id": "r-1bc742d8",
+  "goal_id": "g-d0cd25d2331e",
+  "task_id": "t-008fec4e3014",
+  "bridge_prompt_sha256": "0a79b8378a0ff6dc81c4e7921015b5fbfa8b2e81aff1d117d9a2753002fea726",
+  "bindings": [
+    {
+      "path": "context/artifact-0a2a817e6aa5.txt",
+      "sha256": "0a2a817e6aa585bde28e0e428405a1c42495397c0d3c526904dc7af53c8901eb"
+    },
+    {
+      "path": "context/artifact-4432798b2431.txt",
+      "sha256": "4432798b2431cd13d6fe1e0dfa196b993a480325a77b8939042535b796bd3862"
+    },
+    {
+      "path": "context/artifact-51ba0650e7b7.txt",
+      "sha256": "51ba0650e7b7e543102d16b60ebd27d97f2fdc967657e3cea69905a9768fb947"
+    },
+    {
+      "path": "context/artifact-8f0de17d5c5e.txt",
+      "sha256": "8f0de17d5c5ea0feccbc6424ac048521d7e00a9268687d408be8160834d5a481"
+    },
+    {
+      "path": "mitigation/catalogue-draft.md",
+      "sha256": "b34f41d774d5652e9dd943fff3f96817ccf47a565262ecd905d6c89fc1f775dc"
+    }
+  ],
+  "prompt_sha256": "6e0dde4b141e8595094d74aba6db139aa47c99366d0f423792c4c6ff26a4842b",
+  "request_sha256": "15bfd1deb8322e8eb05f1ea79da8a4acad54b4910669dd92f8adda6288ad98fc",
+  "retry_policy": "none",
+  "allow_fallback": true,
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "max_tokens": 6000,
+  "started_unix": 1792082207.3168309,
+  "not_runtime_bound_provider_receipt": true,
+  "ended_unix": 1792082224.28585,
+  "error_type": "NormalizedError",
+  "message": "[UNKNOWN] Provider=nvidia HTTP=410 RetryAfter=None: OpenAIException - Error code: 410 - {'type': 'about:blank', 'title': 'Gone', 'status': 410, 'detail': \"The model 'meta/llama-3.1-8b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available.\"}"
+}

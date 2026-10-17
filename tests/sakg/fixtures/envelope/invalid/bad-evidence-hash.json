@@ -1,0 +1,43 @@
+{
+  "confidence": 0.85,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "000000000000000000000000000000000000000000000000000000000000000",
+      "kind": "artifact",
+      "reverification": "re-run",
+      "uri": "cas://bad"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 95
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/EvidenceRef/01J00000000000000000000095",
+  "label": "Example EvidenceRef 95",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-95",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "d16d01d942369e7a1dd7277804a7cb82f2efe9d3081d926fad40ade406ad1f53"
+  },
+  "status": "candidate",
+  "summary": "A deterministic evidenceref fixture exercising the universal envelope.",
+  "type": "EvidenceRef",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

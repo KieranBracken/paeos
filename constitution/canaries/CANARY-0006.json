@@ -1,0 +1,14 @@
+{
+  "artifact": {
+    "adapter_id": "retired-adapter",
+    "checkpoint_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "expected_detector": "reject stale checkpoint and post-rotation adapter claim",
+    "kind": "SupervisorClaim",
+    "rotation_epoch": 1
+  },
+  "category": "restart",
+  "description": "Gate C hidden supervisor mutation: restart.",
+  "detection_signature": "reject stale checkpoint and post-rotation adapter claim",
+  "expected": "CAUGHT",
+  "id": "CANARY-0006"
+}

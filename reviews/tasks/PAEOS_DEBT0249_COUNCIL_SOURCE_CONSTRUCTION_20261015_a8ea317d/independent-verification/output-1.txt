@@ -1,0 +1,3 @@
+{"import_origins": {"kernel.cas": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate/kernel/cas.py", "runtime.critique": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs/state/candidate/runtime/critique.py"}}
+NC-COUNCIL-01 AST-only: PASS; source sha256=956bb4260f9b5628a0f5208d95720eaff1a1cc80db19a0bc951878beba069eba
+Independent FS CAS: reopen, mixed reject/dissent and reordering controls, approve tampering, missing/extra keys, boolean risk, swapped dissent hashes: PASS

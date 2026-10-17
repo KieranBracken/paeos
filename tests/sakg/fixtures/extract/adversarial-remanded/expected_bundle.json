@@ -1,0 +1,43 @@
+{
+  "bundle_id": "sakg-bundle:extract-adversarial-remanded",
+  "goal_id": "g-extract-adversarial-remanded",
+  "namespace": "paeos-recovery",
+  "nodes": [
+    {
+      "evidence": [
+        {
+          "hash": "d85f71955197d20f20f58e0c33b6de5fa5309c262c2c57d8fa708a690e6736b0",
+          "kind": "source",
+          "reverification": "re-read the bound input artifact and compare its SHA-256",
+          "uri": "repo://reviews/tasks/adversarial-remanded"
+        }
+      ],
+      "facets": {
+        "decision_state": "rejected",
+        "emission_policy": "suppressed-until-sealed",
+        "extraction_case": "adversarial-remanded",
+        "l06_matrix": "present",
+        "lossless_claim": false,
+        "source_disposition": "REMANDED_WITH_AMENDMENTS"
+      },
+      "id": "sakg://paeos-recovery/Option/01J00000000000000000000F04",
+      "label": "Extraction fixture adversarial-remanded",
+      "provenance": {
+        "origin": {
+          "run_id": "extract-adversarial-remanded",
+          "system": "paeos-extraction-fixture"
+        },
+        "source_hash": "d85f71955197d20f20f58e0c33b6de5fa5309c262c2c57d8fa708a690e6736b0"
+      },
+      "status": "candidate",
+      "summary": "Expected candidate projection preserves source provenance and does not infer absent fields.",
+      "type": "Option"
+    }
+  ],
+  "producer": {
+    "system": "paeos",
+    "version": "0.1"
+  },
+  "schema_version": "paeos.sakg.emission-bundle/v1",
+  "sealed_at": "2026-09-02T12:00:00Z"
+}

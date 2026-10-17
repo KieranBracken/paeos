@@ -1,0 +1,19 @@
+{
+  "task_id": "TASK-01-CORE-SUBSTRATE",
+  "title": "Deterministic identity and package substrate",
+  "program": "CONCEPT_OS_1",
+  "slice": "C1",
+  "wave": 1,
+  "role": "Builder",
+  "status": "SEALED",
+  "audit_required": true,
+  "base_commit": "25782bc",
+  "candidate_commit": "c14ec8d",
+  "sealed_commit": "e8c83c6",
+  "worktree": "/private/tmp/concept-os-candidate",
+  "branch": "codex/concept-os-task-01",
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "started_at": "2026-09-04T20:45:00Z",
+  "sealed_at": "2026-09-04T21:05:00Z"
+}

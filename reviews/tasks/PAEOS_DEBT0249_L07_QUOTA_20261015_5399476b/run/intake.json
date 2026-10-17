@@ -1,0 +1,46 @@
+[
+  {
+    "objective": "NEW HUMAN-DIRECTED STANDALONE SUCCESSOR TASK (2026-10-15). Advance only the non-immutable portion of DEBT-0249 Remand #14 through the governed SoftLoop. Implement and prove DEF-0249-14-05 (promotion-time AST mock detection plus production event-stream verification) and DEF-0249-14-06 (complete Council dissent CAS payload binding and vote_cas_hash binding), and improve the audit-package/CANARY tooling needed to make those controls reproducible. Do not claim qualification, do not freeze a candidate, and do not touch any immutable verifier, Court, sandbox, model-router, or protected production-lifecycle path. Preserve P1_QUALIFIED, PRE_P2_AUTONOMY_QUALIFIED, P2_QUALIFIED, DEBT_0250_QUALIFIED, P3-P9_BLOCKED, and SENTIUM_FROZEN. Mandatory constraints: Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence. The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around. Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution. Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice. This is a fresh runtime attempt after preserved terminal run r-1bc742d8 remanded during MITIGATION. It has new state and run/task identities; every historical request, response and outcome remains unchanged. Use only authentic runtime-observed sealed-context observations and qualification evidence; preserve actual model identities. Current source facts and exact scope are in spec/debt0249-successor-task.md. Incorporate the completed ordinary second-family mitigation review as prior source feedback, not as a current stage receipt. Explicitly require authentic stream origin and candidate/run binding at promotion; reject non-object Council payloads before normalization. Preserve all scope limits. Primary source context is available in spec/debt0249-successor-task.md and backlog/debt0249-successor-task.md; require exact current-context review at MITIGATION. Separately preserved attempt r-29471672 completed RE_DERIVE but its IDEATE worker exceeded the fixed deadline before publishing. This fresh attempt uses the same source and scope with bounded planner reading/publication; no expired request or prior stage completion is reused.",
+    "additional_requirements": [
+      "Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence.",
+      "The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around.",
+      "Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution.",
+      "Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice."
+    ],
+    "changed_paths": [
+      "kernel/promotion.py",
+      "runtime/ast_linter.py",
+      "runtime/critique.py",
+      "runtime/autonomy/promotion.py",
+      "scripts/build_debt0249_audit_package.py",
+      "scripts/requalify_subsystems_semantic.py",
+      "tests/runtime/test_executable_law_canaries.py",
+      "tests/runtime/test_debt0249_remand14.py",
+      "tests/runtime/autonomy/test_promotion_controller.py"
+    ],
+    "plan_write_scopes": [
+      "kernel/promotion.py",
+      "runtime/ast_linter.py",
+      "runtime/critique.py",
+      "runtime/autonomy/promotion.py",
+      "scripts/build_debt0249_audit_package.py",
+      "scripts/requalify_subsystems_semantic.py",
+      "tests/runtime/test_executable_law_canaries.py",
+      "tests/runtime/test_debt0249_remand14.py",
+      "tests/runtime/autonomy/test_promotion_controller.py",
+      "derive/",
+      "ideate/",
+      "research/",
+      "tradeoff/",
+      "mitigation/",
+      "design/",
+      "critique/",
+      "plan/",
+      "review/"
+    ],
+    "goal_signature": "domain:governance,task:debt-0249-coordination-successor-5399476b303844c194f84f2cb1f821fc",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

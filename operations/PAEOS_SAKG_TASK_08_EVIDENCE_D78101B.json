@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "d78101b8de8263d6f7a0fd83eff7ab202889e639",
+  "l13_reproduction": {
+    "collected": 8,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-08-l13-focused-d78101b.log",
+    "focused_log_sha256": "208487434ebada63b138ca6b434058b61a9179b33eed50dd87214c746c9e1547",
+    "passed": 8,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_08_EVIDENCE",
+  "program_candidate_commit": "bd193c35df178f898144b5218944b50f70f24d2d",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1 / Runtime Outbox",
+  "task": "Task 08 \u2014 Outbox Event Fencing, Append-Only Durability & Post-Seal Ordering"
+}

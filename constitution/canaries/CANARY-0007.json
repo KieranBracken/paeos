@@ -1,0 +1,13 @@
+{
+  "artifact": {
+    "credential_env": "PAEOS_PROVIDER_KEY",
+    "credential_value": "<forbidden-secret-value>",
+    "expected_detector": "reject credential values in evidence or envelopes",
+    "kind": "EvidenceEnvelope"
+  },
+  "category": "privacy",
+  "description": "Gate C hidden supervisor mutation: privacy.",
+  "detection_signature": "reject credential values in evidence or envelopes",
+  "expected": "CAUGHT",
+  "id": "CANARY-0007"
+}

@@ -1,0 +1,43 @@
+{
+  "confidence": 0.75,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "59a042fe0f1fb220768666cde4d8f1df2da5a440b466954e6b2cdbdaec9d44e4",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/06"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 6
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/TradeOff/01J00000000000000000000006",
+  "label": "Example TradeOff 6",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "ingest",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-06",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "5eb595adc35a67431461abb85130aa7a3a8b44efc0f320db63c533d7b2fa02e2"
+  },
+  "status": "canonical",
+  "summary": "A deterministic tradeoff fixture exercising the universal envelope.",
+  "type": "TradeOff",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

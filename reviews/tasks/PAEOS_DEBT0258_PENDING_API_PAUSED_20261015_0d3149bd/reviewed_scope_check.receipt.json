@@ -1,0 +1,11 @@
+{
+  "capabilities_created": 0,
+  "dispatches": 0,
+  "harness_sha256": "b2e96766ba2d72f1a2c5a54fee187f594063f8bf2b4af732fc865efcf9cf24be",
+  "heterogeneous_review": "PENDING_NOT_FOR_INTEGRATION",
+  "kernel_imports": [],
+  "kernel_keys_created": 0,
+  "provider_calls": 0,
+  "scope_sha256": "828f26966d1ede113e8c85bc6a1ed88fb6deb6b0f978f2a53f53a9c8a2e1c8ac",
+  "status": "REVIEWED_SCOPE_VALIDATED_WITHOUT_INITIALIZATION"
+}

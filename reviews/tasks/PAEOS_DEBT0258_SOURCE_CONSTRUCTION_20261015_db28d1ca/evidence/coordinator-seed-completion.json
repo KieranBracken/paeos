@@ -1,0 +1,19 @@
+{
+  "action": "EXACT_TRUSTED_READ_SCOPE_SEED_COMPLETION",
+  "authority": "Root explicit coordinator materialization authorization 2026-10-15; no capability or scope change",
+  "canonical_sha256": "96794ba97fc9663404c789f29338eb1e16103b0e39198d98de4bbdf3cb975ccd",
+  "goal_id": "sc-g-8a2e3482cab441cbaee62500bffb927b",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "path": "paeos/model_router/credentials.py",
+  "production_gate_bypass": false,
+  "read_only": true,
+  "run_id": "sc-r-db28d1ca62154afe8518ee92b1e88190",
+  "runtime_issue": "direct-file _seed_workspace quarantines credentials.py before trusted-loader directory exception; exact already-bound tracked source supplied",
+  "scope_sha256": "1daf72d6ec8773d28d9d5f91502985607254d52607f0bee9a37febadb290c2ef",
+  "snapshot_sha256": "96794ba97fc9663404c789f29338eb1e16103b0e39198d98de4bbdf3cb975ccd",
+  "source_regular_non_symlink": true,
+  "source_tracked": true,
+  "task_id": "t-c42817849cc7",
+  "trusted_loader_exception_verified": true,
+  "workspace_sha256": "96794ba97fc9663404c789f29338eb1e16103b0e39198d98de4bbdf3cb975ccd"
+}

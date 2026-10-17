@@ -1,0 +1,457 @@
+# Concept OS CEO-1 implementation execution DAG
+# ================================================================
+# Authority: spec/CONCEPT_OS_1_ARCHITECTURE.md
+# Mission: I-CONCEPT-OS-CENSUS follow-on implementation
+# Scope: CEO-1 slices C1-C5 only
+# ================================================================
+
+meta:
+  backlog_id: CONCEPT-OS-1
+  version: 1.0.0
+  derives_from: spec/CONCEPT_OS_1_ARCHITECTURE.md
+  census: reviews/tasks/CONCEPT_OS_MISSION_0_CENSUS_REPORT.md
+  root_goal: >
+    Build a deterministic, append-only Concept Graph with a replayable Inspiration
+    Engine and Search Orchestra, expose only read-only MCP queries, and emit
+    provenance-complete candidate hypotheses into the PAEOS-mediated SAKG loop.
+  task_count: 8
+  terminal_task: TASK-08-INTEGRATION-SPIKE
+
+conventions:
+  completion: >
+    A task is complete only when every acceptance command exits 0 against the
+    candidate containing that task. Passing tests are evidence for review, not a
+    Court seal or self-ratification.
+  test_first: >
+    Each task begins with discriminating tests and fixtures that fail against its
+    dependency baseline before implementation is admitted.
+  append_only: >
+    Domain records are immutable. Changes append new records and explicit lineage;
+    no task may add update or delete operations for Concept Graph domain tables.
+  deterministic: >
+    Semantic results depend on canonical inputs, graph snapshot, versions, budgets,
+    and seeds; wall-clock scheduling may not affect result identity or order.
+  trust: >
+    Concept OS outputs are exploratory candidates. Novelty, relevance, coherence,
+    frequency, embeddings, and compression never promote engineering truth.
+  audit: >
+    Every physical task audit must use a reviewer model family different from the
+    builder family and preserve exact sealed, remanded, and remediated counts.
+
+audit_policy:
+  required_for_every_task: true
+  heterogeneous_family_rule: "builder_family != auditor_family"
+  evidence_artifact_pattern: "reviews/tasks/CONCEPT_OS_TASK_<NN>_AUDIT.md"
+  required_accounting_fields:
+    - sealed
+    - remanded
+    - remediated
+  missing_or_non_probative_evidence_disposition: REMANDED
+  note: >
+    Audit is an independent gate after task construction. It does not share the
+    Builder role and cannot be satisfied by the implementation's own test report.
+
+nodes:
+  - id: TASK-01-CORE-SUBSTRATE
+    title: Deterministic identity and package substrate
+    slice: C1
+    wave: 1
+    role: Builder
+    audit_required: true
+    deps: []
+    clauses:
+      - CEO-1 section 3.1
+      - CEO-1 section 4
+      - CEO-I1
+      - CEO-I3
+    deliverables: >
+      concept/__init__.py and concept/ids.py; recursive JsonValue/JsonObject type
+      aliases; typed canonicalization helpers;
+      SHA-256-to-fixed-26-character Crockford Base32 encoder; node and edge URI
+      constructors/validators; concept package registration in pyproject.toml;
+      golden identity fixtures covering Unicode NFC, ordered arrays, sorted sets,
+      decimal-score encoding, and invalid alphabets.
+    interfaces:
+      produces:
+        - "canonical_json(value: JsonValue) -> bytes"
+        - "content_hash(canonical_bytes: bytes) -> str"
+        - "node_uri(namespace: str, node_type: str, preimage: JsonObject) -> str"
+        - "edge_uri(namespace: str, preimage: JsonObject) -> str"
+        - "outbox_uri(namespace: str, event_preimage: JsonObject) -> str"
+        - "validate_concept_uri(uri: str) -> ConceptURI"
+      consumed_by:
+        - TASK-02-ONTOLOGY-SCHEMAS
+        - TASK-03-SQLITE-STORE
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/concept/test_ids.py -q"
+      - "uv run pytest tests/concept/test_ids_cross_process.py -q"
+      - "uv run pytest tests/concept/test_ids_collision.py -q"
+      - "uv run pytest tests/concept/test_ids_outbox.py -q"
+      - "uv run ruff check concept/ids.py tests/concept/test_ids.py tests/concept/test_ids_cross_process.py tests/concept/test_ids_collision.py tests/concept/test_ids_outbox.py"
+      - "uv run pyright concept/ids.py"
+
+  - id: TASK-02-ONTOLOGY-SCHEMAS
+    title: Freeze node, edge, query, result, and candidate-envelope schemas
+    slice: C1
+    wave: 2
+    role: Planner
+    audit_required: true
+    deps:
+      - TASK-01-CORE-SUBSTRATE
+    clauses:
+      - CEO-1 section 5
+      - CEO-1 section 6
+      - CEO-1 section 11.3
+      - CEO-I4
+      - CEO-I5
+      - CEO-I6
+    deliverables: >
+      concept/model.py with frozen typed envelopes and validation, plus JSON Schema
+      draft 2020-12 files under concept/schema/ for the universal node envelope, all
+      six node payloads, edge envelope and all six edge families,
+      SearchRequest/SearchResult, and CandidateHypothesisEnvelope; valid and invalid
+      fixtures for every node type, family, forbidden truth status, missing analogy
+      breaks, incomplete falsifiers, and missing provenance.
+    interfaces:
+      consumes:
+        - "TASK-01 URI grammar and canonicalization"
+      produces:
+        - "NodeEnvelope, EdgeEnvelope, SearchRequest, SearchResult, CandidateHypothesisEnvelope, CandidateOutboxEvent"
+        - "concept/schema/node.schema.json"
+        - "concept/schema/edge.schema.json"
+        - "concept/schema/search.schema.json"
+        - "concept/schema/candidate_hypothesis.schema.json"
+      consumed_by:
+        - TASK-03-SQLITE-STORE
+        - TASK-04-TYPED-TRAVERSAL
+        - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+        - TASK-06-SEARCH-ORCHESTRA
+        - TASK-07-READONLY-MCP
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/concept/test_node_schemas.py -q"
+      - "uv run pytest tests/concept/test_edge_schemas.py -q"
+      - "uv run pytest tests/concept/test_search_schema.py -q"
+      - "uv run pytest tests/concept/test_candidate_envelope_schema.py -q"
+      - "uv run pytest tests/concept/test_model.py -q"
+      - "uv run pytest tests/concept/test_node_schema_closed_coverage.py -q"
+      - "uv run pytest tests/concept/test_edge_schema_closed_coverage.py -q"
+      - "test $(find tests/concept/fixtures/nodes/valid -name '*.json' | wc -l) -ge 6"
+      - "test $(find tests/concept/fixtures/edges/valid -name '*.json' | wc -l) -ge 6"
+      - "uv run ruff check concept/model.py tests/concept/test_node_schemas.py tests/concept/test_edge_schemas.py tests/concept/test_search_schema.py tests/concept/test_candidate_envelope_schema.py tests/concept/test_model.py tests/concept/test_node_schema_closed_coverage.py tests/concept/test_edge_schema_closed_coverage.py"
+      - "uv run pyright concept/model.py"
+
+  - id: TASK-03-SQLITE-STORE
+    title: Pure SQLite WAL append-only Concept Graph store
+    slice: C1
+    wave: 3
+    role: Builder
+    audit_required: true
+    deps:
+      - TASK-01-CORE-SUBSTRATE
+      - TASK-02-ONTOLOGY-SCHEMAS
+    clauses:
+      - CEO-1 section 7
+      - CEO-I2
+      - CEO-I3
+      - CEO-I5
+    deliverables: >
+      concept/store.py implementing the strict SQLite node, edge, and candidate
+      outbox tables; WAL/FULL/foreign-key/busy-timeout pragmas; read-only query-only
+      connections; API and trigger-level update/delete rejection; atomic canonical-
+      order batches; byte-identical idempotence; full-hash collision rejection; and
+      deterministic graph snapshot hashes. Outbox rows include namespace and schema
+      version; API and BEFORE INSERT trigger checks require a same-namespace
+      Hypothesis endpoint.
+    interfaces:
+      consumes:
+        - "TASK-01 canonical bytes, hashes, and URIs"
+        - "TASK-02 validated node/edge/envelope types"
+      produces:
+        - "ConceptStore.append_node(node: NodeEnvelope) -> str"
+        - "ConceptStore.append_edge(edge: EdgeEnvelope) -> str"
+        - "ConceptStore.append_nodes_and_edges(nodes, edges) -> AppendReceipt"
+        - "ConceptStore.get_node(uri: str) -> NodeEnvelope | None"
+        - "ConceptStore.iter_nodes(query: NodeQuery) -> Iterator[NodeEnvelope]"
+        - "ConceptStore.iter_edges(query: EdgeQuery) -> Iterator[EdgeEnvelope]"
+        - "ConceptStore.snapshot_hash(namespace: str) -> str"
+        - "ConceptStore.append_outbox_event(event: CandidateOutboxEvent) -> str"
+      consumed_by:
+        - TASK-04-TYPED-TRAVERSAL
+        - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+        - TASK-06-SEARCH-ORCHESTRA
+        - TASK-07-READONLY-MCP
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/concept/test_store.py -q"
+      - "uv run pytest tests/concept/test_store_append_only.py -q"
+      - "uv run pytest tests/concept/test_store_wal.py -q"
+      - "uv run pytest tests/concept/test_store_transactions.py -q"
+      - "uv run pytest tests/concept/test_store_snapshot_hash.py -q"
+      - "uv run pytest tests/concept/test_store_property.py -q"
+      - "uv run pytest tests/concept/test_store_outbox_boundary.py -q"
+      - "uv run ruff check concept/store.py tests/concept/test_store*.py"
+      - "uv run pyright concept/store.py"
+
+  - id: TASK-04-TYPED-TRAVERSAL
+    title: Bounded typed traversal and SemanticNeighborhood snapshots
+    slice: C2
+    wave: 4
+    role: Builder
+    audit_required: true
+    deps:
+      - TASK-03-SQLITE-STORE
+    clauses:
+      - CEO-1 section 6
+      - CEO-1 section 8
+      - CEO-I3
+      - CEO-I6
+      - CEO-I8
+    deliverables: >
+      concept/traverse.py with namespace-gated incoming/outgoing traversal,
+      family/relation allow-lists, stable BFS/best-first ordering, derivation and
+      supersession cycle checks, non-transitive analogy/neighborhood handling,
+      complete why paths, exact consumption counters, and reproducible optional
+      SemanticNeighborhood materialization with whole-member drop-and-count.
+    interfaces:
+      consumes:
+        - "TASK-03 read snapshots and append-only neighborhood persistence"
+      produces:
+        - "traverse(snapshot, request: TraversalRequest) -> TraversalResult"
+        - "materialize_neighborhood(store, result: TraversalResult) -> ConceptURI"
+      consumed_by:
+        - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+        - TASK-06-SEARCH-ORCHESTRA
+        - TASK-07-READONLY-MCP
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/concept/test_traverse.py -q"
+      - "uv run pytest tests/concept/test_traverse_cycles.py -q"
+      - "uv run pytest tests/concept/test_traverse_nontransitive.py -q"
+      - "uv run pytest tests/concept/test_traverse_namespace.py -q"
+      - "uv run pytest tests/concept/test_neighborhood.py -q"
+      - "uv run pytest tests/concept/test_neighborhood_budget.py -q"
+      - "uv run ruff check concept/traverse.py tests/concept/test_traverse*.py tests/concept/test_neighborhood*.py"
+      - "uv run pyright concept/traverse.py"
+
+  - id: TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+    title: Analogy, recombination, novelty, and serendipity heuristics
+    # NOTE: Scoped strictly to local graph mathematics, distance metrics (dg, dv, ds),
+    # structural analogy mapping, two-node recombination, and novelty vectors defined
+    # in CEO-1 §9. This does NOT implement the external Inspiration Engine research refinery.
+    slice: C3
+    wave: 5
+    role: Builder
+    audit_required: true
+    deps:
+      - TASK-02-ONTOLOGY-SCHEMAS
+      - TASK-04-TYPED-TRAVERSAL
+    clauses:
+      - CEO-1 section 9
+      - CEO-I3
+      - CEO-I4
+      - CEO-I5
+      - CEO-I6
+    deliverables: >
+      concept/inspiration.py implementing graph, vector, and structural distances;
+      explicit missing-component weight renormalization; reified non-transitive
+      analogies with known breaks; at-least-two-source recombination; versioned
+      novelty vectors; serendipity projection; deterministic seeds; and complete
+      generated/rejected traces. Include golden fixtures where high novelty remains
+      an unvalidated candidate and incompatible sources are rejected visibly.
+    interfaces:
+      consumes:
+        - "TASK-02 Analogy, Transformation, InspirationHeuristic, and Hypothesis schemas"
+        - "TASK-04 traversal paths and graph snapshots"
+      produces:
+        - "distance(left, right, metric_set) -> DistanceResult"
+        - "propose_analogies(snapshot, request, budget, seed) -> ProposalResult"
+        - "propose_recombinations(snapshot, request, budget, seed) -> ProposalResult"
+        - "score_novelty(candidate, snapshot, heuristic) -> NoveltyResult"
+        - "score_serendipity(candidate, query, heuristic) -> SerendipityResult"
+      consumed_by:
+        - TASK-06-SEARCH-ORCHESTRA
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/concept/test_distance_metrics.py -q"
+      - "uv run pytest tests/concept/test_analogy.py -q"
+      - "uv run pytest tests/concept/test_recombination.py -q"
+      - "uv run pytest tests/concept/test_novelty.py -q"
+      - "uv run pytest tests/concept/test_serendipity.py -q"
+      - "uv run pytest tests/concept/test_inspiration_determinism.py -q"
+      - "uv run pytest tests/concept/test_novelty_never_promotes.py -q"
+      - "uv run ruff check concept/inspiration.py tests/concept/test_distance_metrics.py tests/concept/test_analogy.py tests/concept/test_recombination.py tests/concept/test_novelty.py tests/concept/test_serendipity.py tests/concept/test_inspiration_determinism.py tests/concept/test_novelty_never_promotes.py"
+      - "uv run pyright concept/inspiration.py"
+
+  - id: TASK-06-SEARCH-ORCHESTRA
+    title: Deterministic multi-algorithm conceptual Search Orchestra
+    slice: C4
+    wave: 6
+    role: Builder
+    audit_required: true
+    deps:
+      - TASK-04-TYPED-TRAVERSAL
+      - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+    clauses:
+      - CEO-1 section 10
+      - CEO-I3
+      - CEO-I6
+      - CEO-I8
+    deliverables: >
+      concept/search.py with canonical query compilation, SearchArm protocol, at
+      least two independently behaving arms, fixed per-arm allocation, optional
+      concurrent execution, visible arm failures, URI-based deduplication, separate
+      relevance/novelty/coherence/diversity/cost/provenance components, stable merge
+      and tie-breaking, whole-result budgets, and a complete replay manifest.
+    interfaces:
+      consumes:
+        - "TASK-04 traversal and neighborhood operations"
+        - "TASK-05 proposer and score interfaces"
+      produces:
+        - "compile_query(request: SearchRequest) -> CompiledSearchRequest"
+        - "SearchArm.search(request, snapshot, budget, seed) -> SearchArmResult"
+        - "SearchOrchestra.search(request: SearchRequest) -> SearchResult"
+      consumed_by:
+        - TASK-07-READONLY-MCP
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/concept/test_search_compile.py -q"
+      - "uv run pytest tests/concept/test_search_arms.py -q"
+      - "uv run pytest tests/concept/test_search_orchestra.py -q"
+      - "uv run pytest tests/concept/test_search_determinism.py -q"
+      - "uv run pytest tests/concept/test_search_budget.py -q"
+      - "uv run pytest tests/concept/test_search_arm_failure.py -q"
+      - "uv run pytest tests/concept/test_search_replay.py -q"
+      - "uv run ruff check concept/search.py tests/concept/test_search*.py"
+      - "uv run pyright concept/search.py"
+
+  - id: TASK-07-READONLY-MCP
+    title: Structurally read-only Concept OS MCP query surface
+    slice: C5
+    wave: 7
+    role: Builder
+    audit_required: true
+    deps:
+      - TASK-02-ONTOLOGY-SCHEMAS
+      - TASK-03-SQLITE-STORE
+      - TASK-06-SEARCH-ORCHESTRA
+    clauses:
+      - CEO-1 section 11.1
+      - CEO-I4
+      - CEO-I7
+      - CEO-I8
+    deliverables: >
+      concept/mcp_server.py exposing exactly concept_get, concept_search,
+      concept_neighborhood, concept_path, and concept_hypothesis_get; SQLite mode=ro
+      plus query_only connections; fixed exploratory/untrusted response tags;
+      namespace and budget enforcement; graceful empty/unreachable-store behavior;
+      and structural tests proving no writer or mutation-like tool is reachable.
+    interfaces:
+      consumes:
+        - "TASK-03 read-only store interface"
+        - "TASK-06 SearchOrchestra.search"
+      produces:
+        - "five read-only MCP tools named in CEO-1 section 11.1"
+      consumed_by:
+        - TASK-08-INTEGRATION-SPIKE
+    accept:
+      - "uv run pytest tests/mcp/test_concept_server.py -q"
+      - "uv run pytest tests/mcp/test_concept_server_readonly.py -q"
+      - "uv run pytest tests/mcp/test_concept_server_tags.py -q"
+      - "uv run pytest tests/mcp/test_concept_server_budget.py -q"
+      - "uv run pytest tests/mcp/test_concept_server_degradation.py -q"
+      - "uv run ruff check concept/mcp_server.py tests/mcp/test_concept_server*.py"
+      - "uv run pyright concept/mcp_server.py"
+
+  - id: TASK-08-INTEGRATION-SPIKE
+    title: Candidate-only SAKG bridge and end-to-end constitutional spike
+    slice: C5
+    wave: 8
+    role: Builder
+    audit_required: true
+    deps:
+      - TASK-01-CORE-SUBSTRATE
+      - TASK-02-ONTOLOGY-SCHEMAS
+      - TASK-03-SQLITE-STORE
+      - TASK-04-TYPED-TRAVERSAL
+      - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+      - TASK-06-SEARCH-ORCHESTRA
+      - TASK-07-READONLY-MCP
+    clauses:
+      - CEO-1 section 11.2
+      - CEO-1 section 11.3
+      - CEO-1 section 11.4
+      - CEO-1 section 11.5
+      - CEO-1 section 14
+      - CEO-I7
+    deliverables: >
+      concept/bridge.py and an end-to-end fixture corpus; deterministic candidate
+      envelope creation and append-only outbox emission; delivery idempotence;
+      provenance-complete read-only SAKG source references; a spike report at
+      reviews/spikes/concept-os-ceo1-integration.md demonstrating seed graph to
+      two-arm search to Analogy/Recombination to replayable Hypothesis to MCP query
+      to candidate envelope. Include poisoned-candidate and static boundary probes
+      proving no SAKG promotion, provider invocation, PAEOS ledger mutation, or
+      Sentium execution path is reachable.
+    interfaces:
+      consumes:
+        - "all TASK-01 through TASK-07 public contracts"
+      produces:
+        - "build_candidate_envelope(hypothesis_uri: str, evaluation_kind: str) -> CandidateHypothesisEnvelope"
+        - "emit_candidate(store: ConceptStore, envelope: CandidateHypothesisEnvelope) -> str"
+        - "reviews/spikes/concept-os-ceo1-integration.md"
+    accept:
+      - "uv run pytest tests/concept/test_candidate_bridge.py -q"
+      - "uv run pytest tests/concept/test_candidate_bridge_idempotent.py -q"
+      - "uv run pytest tests/concept/test_end_to_end.py -q"
+      - "uv run pytest tests/concept/test_poisoned_candidate_cannot_promote.py -q"
+      - "uv run pytest tests/concept/test_constitutional_boundary.py -q"
+      - "test -f reviews/spikes/concept-os-ceo1-integration.md"
+      - "! rg -q 'import (runtime.integrations|sakg.store|sentium)|from (runtime.integrations|sakg.store|sentium)' concept/"
+      - "uv run pytest tests/concept tests/mcp/test_concept_server*.py -q"
+      - "uv run ruff check concept/ tests/concept/ tests/mcp/test_concept_server*.py"
+      - "uv run pyright concept/"
+
+dag_properties:
+  nodes: 8
+  roots:
+    - TASK-01-CORE-SUBSTRATE
+  terminal:
+    - TASK-08-INTEGRATION-SPIKE
+  topological_order:
+    - TASK-01-CORE-SUBSTRATE
+    - TASK-02-ONTOLOGY-SCHEMAS
+    - TASK-03-SQLITE-STORE
+    - TASK-04-TYPED-TRAVERSAL
+    - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+    - TASK-06-SEARCH-ORCHESTRA
+    - TASK-07-READONLY-MCP
+    - TASK-08-INTEGRATION-SPIKE
+  critical_path:
+    - TASK-01-CORE-SUBSTRATE
+    - TASK-02-ONTOLOGY-SCHEMAS
+    - TASK-03-SQLITE-STORE
+    - TASK-04-TYPED-TRAVERSAL
+    - TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY
+    - TASK-06-SEARCH-ORCHESTRA
+    - TASK-07-READONLY-MCP
+    - TASK-08-INTEGRATION-SPIKE
+  invariant_tests:
+    - deterministic IDs and replay
+    - append-only SQLite domain state
+    - six closed node types and six closed edge families
+    - non-transitive analogy and neighborhood membership
+    - novelty and frequency never promote
+    - read-only MCP by construction
+    - candidate-only PAEOS-mediated SAKG export
+    - no direct provider or Sentium execution authority
+  out_of_scope:
+    - autonomous living concepts or concept-agent societies
+    - native hypergraph storage
+    - arbitrary executable hypotheses stored in the graph
+    - learned search allocation or automatically invented algorithms
+    - MDL as a global admission or truth objective
+    - wake/sleep consolidation, pruning, forgetting, or in-place rewrites
+    - distributed sharding, raw-perception grounding, and causal experiment design
+    - SAKG claim validation/promotion and Sentium execution

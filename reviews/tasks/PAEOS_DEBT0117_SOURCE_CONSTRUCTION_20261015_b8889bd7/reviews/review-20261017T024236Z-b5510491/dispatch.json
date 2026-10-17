@@ -1,0 +1,8 @@
+{
+  "status": "FAILED",
+  "request_sha256": "614d720f8c68e2577e9c155dfc3d6e6a59f448b02f9ba67639f8ee422065eec1",
+  "error_type": "NormalizedError",
+  "error": "[UNKNOWN] Provider=nvidia HTTP=410 RetryAfter=None: OpenAIException - Error code: 410 - {'type': 'about:blank', 'title': 'Gone', 'status': 410, 'detail': \"The model 'meta/llama-3.1-8b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available.\"}",
+  "attempts_policy": "NONE",
+  "fallback_disabled": true
+}

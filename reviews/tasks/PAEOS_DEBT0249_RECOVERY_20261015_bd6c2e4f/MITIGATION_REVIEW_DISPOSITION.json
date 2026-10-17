@@ -1,0 +1,18 @@
+{
+  "schema": "paeos.ordinary-source-review-disposition/1",
+  "review_report_sha256": "d0f9b8be3ad3eeff50012637d3e1e21576015da4eb41e26e935a33e21d1cbce2",
+  "status": "SOURCE_FINDINGS_RECONCILED_NO_STAGE_COMPLETION",
+  "findings": [
+    {
+      "id": "R01",
+      "disposition": "ACCEPT_REQUIREMENT_WITH_DESIGN_LIMIT",
+      "detail": "Mandatory promotion stream input and fail-closed origin validation are required, but a caller-supplied stream_ledger alone cannot prove origin. Current source search found evaluate_promotion called only by PromotionController.promote, with no runtime production constructor caller. Trusted injection and candidate/run binding remain to be implemented within accepted scope; do not pretend parameter addition alone closes defect."
+    },
+    {
+      "id": "R04",
+      "disposition": "ACCEPT_SHAPE_GUARD_CORRECT_CURRENT_EFFECT",
+      "detail": "Require decoded dictionary shape before normalization. Current verifier silently accepts non-object decoded dissent, rather than performing the proposed normalization and crashing. The review describes a plausible future implementation mistake; preserve distinction from observed current defect."
+    }
+  ],
+  "missing_primary_sources": "Exact preserved source specification exists in run source spec; future stage package must explicitly materialize scoped source/script/manifest evidence. No fabricated observed source or stage binding."
+}

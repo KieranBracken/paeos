@@ -1,0 +1,41 @@
+{
+  "bundle_id": "sakg-bundle:extract-gate-a",
+  "goal_id": "g-extract-gate-a",
+  "namespace": "paeos-recovery",
+  "nodes": [
+    {
+      "evidence": [
+        {
+          "hash": "2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe",
+          "kind": "source",
+          "reverification": "re-read the bound input artifact and compare its SHA-256",
+          "uri": "repo://reviews/tasks/gate-a"
+        }
+      ],
+      "facets": {
+        "extraction_case": "gate-a",
+        "l06_matrix": "present",
+        "lossless_claim": false,
+        "source_disposition": "COURT_SEALED"
+      },
+      "id": "sakg://paeos-recovery/Decision/01J00000000000000000000F01",
+      "label": "Extraction fixture gate-a",
+      "provenance": {
+        "origin": {
+          "run_id": "extract-gate-a",
+          "system": "paeos-extraction-fixture"
+        },
+        "source_hash": "2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe"
+      },
+      "status": "candidate",
+      "summary": "Expected candidate projection preserves source provenance and does not infer absent fields.",
+      "type": "Decision"
+    }
+  ],
+  "producer": {
+    "system": "paeos",
+    "version": "0.1"
+  },
+  "schema_version": "paeos.sakg.emission-bundle/v1",
+  "sealed_at": "2026-09-02T12:00:00Z"
+}

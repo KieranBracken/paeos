@@ -1,0 +1,69 @@
+{
+  "_note": "Architectural invariants registry (IP-0010). Each entry carries a runnable verifier so CI executes architectural truth every commit. JSON (not YAML) keeps the executor dependency-free. `kind`: grep-absent | loc-budget | test are executed by ops/ci/invariants.py; pyright | script | supply-chain are DELEGATED to the existing CI steps that already run them.",
+  "AI-001": {
+    "name": "Runtime Transport Independence",
+    "rule": "the CORE runtime imports no vendor MCP SDK; transports live behind ports",
+    "basis": ["reviews/architecture/evidence-source-cer1.md", "R5.3"],
+    "verify": {"kind": "grep-absent", "pattern": "import mcp\\b|from mcp\\b|from mcp\\.", "paths": ["runtime"], "exclude": ["runtime/transports"]}
+  },
+  "AI-002": {
+    "name": "Single Constitutional Writer",
+    "rule": "the operational loop never authors L3 memory; only the Evolution Layer proposes scars (Stage 17)",
+    "basis": ["IP-0005", "IP-0006", "B2.G"],
+    "verify": {"kind": "grep-absent", "pattern": "propose_scar", "paths": ["runtime/orchestrator"]}
+  },
+  "AI-003": {
+    "name": "Read-only Evidence Interface",
+    "rule": "the runtime depends on EvidenceSource (read); it never depends on a write facet",
+    "basis": ["reviews/architecture/evidence-source-cer1.md"],
+    "verify": {"kind": "pyright"}
+  },
+  "AI-004": {
+    "name": "Seal requires adversary PASS",
+    "rule": "no goal seals over a blocking adversarial dissent (FR-3)",
+    "basis": ["IP-0007", "B2.K"],
+    "verify": {"kind": "test", "target": "tests/runtime/test_soft_loop.py::test_adversary_block_remands_the_seal"}
+  },
+  "AI-005": {
+    "name": "Evidence must be probative",
+    "rule": "evidence with the same result with and without the change cannot seal (vacuous)",
+    "basis": ["B2.O", "CANARY-0002"],
+    "verify": {"kind": "test", "target": "tests/runtime/test_verification.py::test_vacuous_commands_flags_non_discriminating"}
+  },
+  "AI-006": {
+    "name": "Kernel LOC budget",
+    "rule": "kernel LOC <= 20000",
+    "basis": ["F1"],
+    "verify": {"kind": "loc-budget", "paths": ["kernel"], "max": 20000}
+  },
+  "AI-007": {
+    "name": "TCB HARD-LOOP",
+    "rule": "kernel/ or constitution/ diffs route to HARD-LOOP",
+    "basis": ["F2"],
+    "verify": {"kind": "script", "run": "ops/ci/tcb_diff.py", "note": "needs the merge-base diff; the existing F2 CI step runs it"}
+  },
+  "AI-008": {
+    "name": "No committed keys",
+    "rule": "signing keys never committed; lockfile present",
+    "basis": ["F3"],
+    "verify": {"kind": "supply-chain", "note": "the existing F3 CI step runs it"}
+  },
+  "AI-009": {
+    "name": "Constitution read-only",
+    "rule": "no agent write API to Z0; ledger.append is not exposed via MCP",
+    "basis": ["PAEOS-7 §3.7"],
+    "verify": {"kind": "grep-absent", "pattern": "def append", "paths": ["runtime/transports/mcp/servers.py"]}
+  },
+  "AI-010": {
+    "name": "Port Independence",
+    "rule": "the core depends only on ports (Protocols); adapters/vendors are leaves under runtime/transports/",
+    "basis": ["reviews/phase3_architectural_review.md", "R5.1-R5.3"],
+    "verify": {"kind": "grep-absent", "pattern": "from runtime\\.transports|import subprocess", "paths": ["runtime/orchestrator", "runtime/transport.py"]}
+  },
+  "AI-011": {
+    "name": "Least-Privilege Interface",
+    "rule": "the core depends on the minimal read-only facet of a port (EvidenceSource, not WorkerTransport)",
+    "basis": ["reviews/phase3_architectural_review.md"],
+    "verify": {"kind": "pyright"}
+  }
+}

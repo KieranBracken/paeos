@@ -1,0 +1,172 @@
+"""Durable ledger backend — SQLite `LedgerStore` (DEBT-0003 / FR-5).
+
+Repays DEBT-0003: a **durable, append-only, single-writer** persistence backend behind the
+`LedgerStore` narrow waist (kernel/ledger.py), so events survive process restart and multi-session
+runs share one ledger. SQLite is single-writer *by nature* (exactly FR-5), append-only here by
+construction (INSERT only; `seq` is the primary key so a fork/duplicate seq fails atomically), and
+needs no service — the roadmap's Postgres remains the production-scale target and drops in behind
+the same Protocol (PAEOS-IP-0003 note; the debt tracks the *capability*, not the engine).
+
+The hash-chain algebra is unchanged — this backend only stores and returns `LedgerRow`s; the
+`Ledger` in `ledger.py` computes and verifies the chain over it exactly as over the in-memory store.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import sqlite3
+import threading
+from pathlib import Path
+
+from kernel.ledger import Event, ForkRejected, JsonValue, LedgerRow, SingleWriterViolation
+
+__all__ = ["SqliteLedgerStore"]
+
+_SCHEMA = """
+CREATE TABLE IF NOT EXISTS ledger_rows (
+    seq        INTEGER PRIMARY KEY,   -- dense, 1-based; PK ⇒ duplicate seq (fork) fails atomically
+    timestamp  TEXT    NOT NULL,
+    prev_hash  TEXT    NOT NULL,
+    row_hash   TEXT    NOT NULL,
+    schema_ver INTEGER NOT NULL,
+    kind       TEXT    NOT NULL,
+    payload    TEXT    NOT NULL,       -- canonical JSON of the event payload
+    domain_tag TEXT    NOT NULL DEFAULT 'PRODUCTION' CHECK (domain_tag IN ('PRODUCTION', 'SYNTHETIC', 'RECOVERY', 'ADVERSARIAL', 'TEST', 'REPLAY', 'SHADOW', 'SIMULATION'))
+);
+CREATE TABLE IF NOT EXISTS ledger_writer (
+    id     INTEGER PRIMARY KEY CHECK (id = 1),
+    owner  TEXT
+);
+INSERT OR IGNORE INTO ledger_writer (id, owner) VALUES (1, NULL);
+"""
+
+
+class SqliteLedgerStore:
+    """A durable `LedgerStore` over a SQLite file. Satisfies the same contract as
+    `InMemoryLedgerStore`: strict dense seq, single writer, atomic fork rejection."""
+
+    def __init__(self, path: str | os.PathLike[str]) -> None:
+        self._path = Path(path)
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        # `check_same_thread=False` lets the connection be used from ConcurrentScheduler worker
+        # threads; `_lock` (reentrant — `append_row` calls `count`) then serializes EVERY connection
+        # operation, so a SQLite connection that is not itself concurrency-safe is only ever touched
+        # by one thread at a time. K8 single-writer integration under parallel generation (M2).
+        self._db = sqlite3.connect(
+            str(self._path), isolation_level=None, check_same_thread=False
+        )  # autocommit
+        self._lock = threading.RLock()
+        self._db.execute("PRAGMA journal_mode=WAL")
+        self._db.execute("PRAGMA synchronous=FULL")
+        self._db.execute("PRAGMA busy_timeout=5000")
+        self._db.executescript(_SCHEMA)
+        cols = [c[1] for c in self._db.execute("PRAGMA table_info(ledger_rows)").fetchall()]
+        if "domain_tag" not in cols:
+            self._db.execute("ALTER TABLE ledger_rows ADD COLUMN domain_tag TEXT NOT NULL DEFAULT 'PRODUCTION'")
+
+    def acquire_writer(self, owner: str) -> None:
+        with self._lock:
+            row = self._db.execute("SELECT owner FROM ledger_writer WHERE id = 1").fetchone()
+            current: str | None = row[0] if row is not None else None
+            if current is not None and current != owner:
+                raise SingleWriterViolation(
+                    f"ledger already owned by writer {current!r}; {owner!r} refused"
+                )
+            self._db.execute("UPDATE ledger_writer SET owner = ? WHERE id = 1", (owner,))
+
+    def release_writer(self, owner: str) -> None:
+        with self._lock:
+            self._db.execute(
+                "UPDATE ledger_writer SET owner = NULL WHERE id = 1 AND owner = ?", (owner,)
+            )
+
+    def head(self) -> LedgerRow | None:
+        with self._lock:
+            row = self._db.execute(
+                "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag "
+                "FROM ledger_rows ORDER BY seq DESC LIMIT 1"
+            ).fetchone()
+        return _to_row(row) if row is not None else None
+
+    def append_row(self, row: LedgerRow) -> None:
+        with self._lock:
+            expected = self.count() + 1
+            if row.seq != expected:
+                raise ForkRejected(
+                    f"expected seq {expected} (head+1); got {row.seq} — fork refused"
+                )
+            domain = getattr(row, "domain_tag", "PRODUCTION") or "PRODUCTION"
+            try:
+                self._db.execute(
+                    "INSERT INTO ledger_rows "
+                    "(seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        row.seq,
+                        row.timestamp,
+                        row.prev_hash,
+                        row.row_hash,
+                        row.event.schema_ver,
+                        row.event.kind,
+                        json.dumps(dict(row.event.payload), sort_keys=True, separators=(",", ":")),
+                        domain,
+                    ),
+                )
+            except sqlite3.IntegrityError as exc:  # duplicate seq PK ⇒ a racing fork
+                raise ForkRejected(f"seq {row.seq} already present — fork refused") from exc
+
+    def read(self, start: int, end: int | None) -> list[LedgerRow]:
+        if start < 1:
+            raise ValueError(f"start must be >= 1, got {start}")
+        if end is not None and end < start:
+            raise ValueError(f"end ({end}) must be >= start ({start})")
+        with self._lock:
+            if end is None:
+                rows = self._db.execute(
+                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag "
+                    "FROM ledger_rows WHERE seq >= ? ORDER BY seq",
+                    (start,),
+                ).fetchall()
+            else:
+                rows = self._db.execute(
+                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag "
+                    "FROM ledger_rows WHERE seq >= ? AND seq < ? ORDER BY seq",
+                    (start, end),
+                ).fetchall()
+        return [_to_row(r) for r in rows]
+
+    def count(self) -> int:
+        with self._lock:
+            row = self._db.execute("SELECT COUNT(*) FROM ledger_rows").fetchone()
+        return int(row[0]) if row is not None else 0
+
+    def close(self) -> None:
+        with self._lock:
+            self._db.close()
+
+
+def _to_row(record: tuple[object, ...]) -> LedgerRow:
+    if len(record) >= 8:
+        seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag = record[:8]
+        assert isinstance(domain_tag, str)
+    else:
+        seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload = record[:7]
+        domain_tag = "PRODUCTION"
+    assert isinstance(seq, int)
+    assert isinstance(timestamp, str)
+    assert isinstance(prev_hash, str)
+    assert isinstance(row_hash, str)
+    assert isinstance(schema_ver, int)
+    assert isinstance(kind, str)
+    assert isinstance(payload, str)
+    parsed: JsonValue = json.loads(payload)
+    assert isinstance(parsed, dict)
+    return LedgerRow(
+        seq=seq,
+        timestamp=timestamp,
+        event=Event(schema_ver=schema_ver, kind=kind, payload=parsed),
+        prev_hash=prev_hash,
+        row_hash=row_hash,
+        domain_tag=domain_tag,
+    )

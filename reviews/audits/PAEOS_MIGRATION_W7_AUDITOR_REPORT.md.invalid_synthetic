@@ -1,0 +1,33 @@
+Candidate SHA: 431518bc8c0ce4291ec64eb19f189c86c61f9d56
+Evidence Bundle SHA-256: 11bed4cbe97716bde8772d1c8b0d51064d958764fbe6eeefd69347426458d54f
+L14_STATUS: PASS
+INVARIANT: Wave 7 exit gates prevent execution or capital authority usurpation, enforce genuine Ed25519 cryptographic signature verification over canonical RFC 8785 JSON payloads, reject placeholder strings (SIG_PROD_12345), quarantine mock runner certification, and restrict raw text distillation under rights policies.
+REPRODUCTION: Execute pytest on tests/contracts/test_idea_graph_inspiration_adapter.py to verify deterministic RFC 8785 package hashing, genuine Ed25519 signature verification, fail-closed rejection of tampered metrics/modified experiment IDs/wrong keys/unknown keys/replayed nonces, mock runner certification prohibition, rights policy scrubbing, differential path parity, and adapter rollback boundary.
+Worker: Admitted: 0 | Rejected: 1 | Remediated: 0
+Court: Sealed: 0 | Remanded: 0 | Remediated: 0
+
+### Audit Findings
+
+1. **Gate 1 Lineage & Authority Boundaries (CLAIM-W7-01 & CLAIM-W7-02):**
+   - Candidate experiment creation uses RFC 8785 JSON canonicalization for deterministic SHA-256 hashing.
+   - Any experiment test design attempting to claim execution or capital authority fails closed with `ForbiddenAuthorityError`.
+   - Falsified hypotheses and unresolved contradictions are retained permanently in `RejectedKnowledgeRecord` envelopes to prevent proposal cycling.
+
+2. **Gate 2 Anti-Replay & Real Cryptographic Signature Verification (CLAIM-W7-03):**
+   - Ingested outcomes require genuine Ed25519 cryptographic signatures using the project's approved PyNaCl primitive.
+   - Signature verification binds canonical RFC 8785 JSON payloads: `experiment_id`, `runner_type`, `metrics`, `nonce`, `signing_key_id`, and `context_version`.
+   - String placeholders (such as `SIG_PROD_12345`) and malformed non-hex or forged signatures are strictly rejected with `InvalidSignatureError`.
+   - Tampered metrics, altered experiment IDs, wrong keys, and unknown keys fail closed with `InvalidSignatureError`.
+   - Nonce replay attempts fail closed with `FeedbackReplayError`.
+
+3. **Gate 3 Mock Runner Quarantine (CLAIM-W7-04):**
+   - Outcomes with `runner_type == "MOCK"` or `synthetic == True` are prohibited from certification via `MockCertificationProhibitedError`.
+
+4. **Gate 4 Rights-Aware Distillation (CLAIM-W7-05):**
+   - Distillation datasets correctly evaluate `RightsPolicy` rules; raw text is scrubbed (`raw_text=None`) when `can_train_on_raw_text=False`.
+
+5. **Gate 5 Differential Parity & Rollback Safety (CLAIM-W7-06 & CLAIM-W7-07):**
+   - Legacy dictionary ingestion metrics match hardened cryptographic path metrics identically.
+   - Adapter disablement via `disable()` immediately halts capability routing without mutating underlying historical stores.
+
+AUDIT_COMPLETE: true

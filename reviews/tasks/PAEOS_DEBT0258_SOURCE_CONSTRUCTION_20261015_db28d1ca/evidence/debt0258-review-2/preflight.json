@@ -1,0 +1,6 @@
+{
+  "status": "REJECTED_CHANGED_INPUT_BEFORE_PROVIDER",
+  "reason": "module hash changed before request construction",
+  "provider_calls": 0,
+  "request_persisted": false
+}

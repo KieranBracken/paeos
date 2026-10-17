@@ -1,0 +1,41 @@
+{
+  "confidence": 0.85,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 91
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Decision/01J00000000000000000000091",
+  "label": "Example Decision 91",
+  "namespace": "demo-project",
+  "promotion": {
+    "domains": 3,
+    "references": 5,
+    "threshold": 0.75
+  },
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-91",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "77a782f73b9af0b1ff0be52d954e143c1cc1db6c66c2ec5316f845bb63ad8577"
+  },
+  "status": "canonical",
+  "summary": "A deterministic decision fixture exercising the universal envelope.",
+  "type": "Decision",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

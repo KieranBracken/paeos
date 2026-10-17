@@ -1,0 +1,10 @@
+[
+  {
+    "objective": "Implement verification capability upgrades (AST Linter, Property Tests, Vacuous Checks).",
+    "changed_paths": [
+      "kernel/",
+      "runtime/",
+      "tests/"
+    ]
+  }
+]

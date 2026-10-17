@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "view": "verifier",
+  "entries": [
+    {"id": "stale_claim", "expected_failure_code": "STALE_CLAIM"},
+    {"id": "competing_claim", "expected_failure_code": "COMPETING_CLAIM"},
+    {"id": "scope_escape", "expected_failure_code": "SCOPE_ESCAPE"},
+    {"id": "duplicate_response", "expected_failure_code": "DUPLICATE_RESPONSE"},
+    {"id": "quota_loss", "expected_failure_code": "QUOTA_LOSS"},
+    {"id": "hung_worker", "expected_failure_code": "WORKER_HUNG"},
+    {"id": "vacuous_evidence", "expected_failure_code": "VACUOUS_EVIDENCE"},
+    {"id": "baseline_contamination", "expected_failure_code": "BASELINE_CONTAMINATION"},
+    {"id": "homogeneous_audit", "expected_failure_code": "HOMOGENEOUS_AUDIT"},
+    {"id": "misleading_completion", "expected_failure_code": "MISLEADING_COMPLETION"},
+    {"id": "pre_side_effect_crash", "expected_failure_code": "PRE_SIDE_EFFECT_CRASH"},
+    {"id": "post_side_effect_crash", "expected_failure_code": "POST_SIDE_EFFECT_CRASH"},
+    {"id": "prompt_injection", "expected_failure_code": "PROMPT_INJECTION"},
+    {"id": "opaque_alias", "expected_failure_code": "OPAQUE_ALIAS"},
+    {"id": "policy_expiry", "expected_failure_code": "POLICY_EXPIRED"},
+    {"id": "resource_exhaustion", "expected_failure_code": "RESOURCE_EXHAUSTION"},
+    {"id": "stale_target_head", "expected_failure_code": "STALE_TARGET_HEAD"},
+    {"id": "projection_poisoning", "expected_failure_code": "PROJECTION_POISONING"},
+    {"id": "false_physical_provenance", "expected_failure_code": "FALSE_PHYSICAL_PROVENANCE"}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "runs": 1,
+  "sealed": 0,
+  "stop_reason": "source-exhausted",
+  "remaining_tokens": 25000000,
+  "outcomes": [
+    {
+      "goal_id": "g-b5a5e9dfd171",
+      "status": "REMANDED",
+      "detail": "P1 completeness run must use canonical Trace-B ceremony",
+      "seal_hash": null
+    }
+  ],
+  "ledger_head": "ae03ce3715e46008699d2a0086521e9137306d1100fa37c38dedb5d4baec8d96"
+}

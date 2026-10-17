@@ -1,0 +1,18 @@
+{
+  "claims": {
+    "full_lifecycle": false,
+    "production": false,
+    "qualification": false,
+    "sealed": false
+  },
+  "created_at": "2026-10-15T17:22:43.086721+00:00",
+  "goal_id": "sc-g-39e3ba35a64d4196a388da5d18a1e86a",
+  "harness_sha256": "f389d0917b72628657f2e9be755353899d6c08b3c71d8b90af702404ed5225e7",
+  "key_public_hex": "945eb7ba1df6e07e76a8181e3ee8264bb00d7d409a62255002a3cda6ec916263",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "run_id": "sc-r-b8889bd7c5fe4a38b8dea65bfc854968",
+  "schema": 1,
+  "source_root": "/Users/bob/GitHub/paeos",
+  "state_root": "/private/tmp/paeos-d0117-source-successor.vSH0Tj/state",
+  "worker_dispatches": 0
+}

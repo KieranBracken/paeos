@@ -1,0 +1,163 @@
+[
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "MDG_TASK_SPAWNED",
+    "payload": {
+      "ceremony_trace": "TRACE_B",
+      "checkpoint_ref": null,
+      "fencing_token": 0,
+      "metadata": {
+        "objective": "NEW HUMAN-DIRECTED STANDALONE SUCCESSOR TASK (2026-10-15). Advance only the non-immutable portion of DEBT-0249 Remand #14 through the governed SoftLoop. Implement and prove DEF-0249-14-05 (promotion-time AST mock detection plus production event-stream verification) and DEF-0249-14-06 (complete Council dissent CAS payload binding and vote_cas_hash binding), and improve the audit-package/CANARY tooling needed to make those controls reproducible. Do not claim qualification, do not freeze a candidate, and do not touch any immutable verifier, Court, sandbox, model-router, or protected production-lifecycle path. Preserve P1_QUALIFIED, PRE_P2_AUTONOMY_QUALIFIED, P2_QUALIFIED, DEBT_0250_QUALIFIED, P3-P9_BLOCKED, and SENTIUM_FROZEN. Mandatory constraints: Use authentic RED controls before each change, then GREEN and negative discrimination controls with no mocks, fake provider returns, or self-reported evidence. The immutable A4/A5 residuals are recorded in DEBT-0253: AuthorityEnvelope enforcement, find-delete target derivation, physical provenance/transcript enforcement, and catalog-verified identity remain blocked and must not be weakened or worked around. Use only the explicitly mutable paths below and their direct tests. If the planner or sealed-context gate identifies any immutable overlap, remand before Builder execution. Run the targeted mutable suites and report exact results; do not update the v14 package root or create a qualification claim from this slice. This is a fresh runtime attempt after preserved terminal run r-1bc742d8 remanded during MITIGATION. It has new state and run/task identities; every historical request, response and outcome remains unchanged. Use only authentic runtime-observed sealed-context observations and qualification evidence; preserve actual model identities. Current source facts and exact scope are in spec/debt0249-successor-task.md. Incorporate the completed ordinary second-family mitigation review as prior source feedback, not as a current stage receipt. Explicitly require authentic stream origin and candidate/run binding at promotion; reject non-object Council payloads before normalization. Preserve all scope limits. Primary source context is available in spec/debt0249-successor-task.md and backlog/debt0249-successor-task.md; require exact current-context review at MITIGATION.",
+        "run_id": "r-29471672"
+      },
+      "nesting_depth": 0,
+      "parent_task_id": null,
+      "root_mission_id": "mission-paeos-debt0249-state-82a4185550e948b4a677d68202977a11",
+      "status": "ACTIVE",
+      "task_id": "domain:governance,task:debt-0249-recovery-successor-82a4185550e948b4a677d68202977a11"
+    },
+    "prev_hash": "407590d349641e2acaa71e4ebd02c48e788d46d6d144ecb21f9a0e79dda58c29",
+    "recomputed_row_hash": "6b3cd099d2fc3dddd443f9e56189158a4633533dcedac5401e5686b6c935760b",
+    "row_hash": "6b3cd099d2fc3dddd443f9e56189158a4633533dcedac5401e5686b6c935760b",
+    "schema_ver": 1,
+    "seq": 1,
+    "timestamp": "2026-10-15T16:52:19.062930+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "goal_created",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "weight_class": "KERNEL_TOUCHING"
+    },
+    "prev_hash": "6b3cd099d2fc3dddd443f9e56189158a4633533dcedac5401e5686b6c935760b",
+    "recomputed_row_hash": "9b0068acdfe235059ef52413221eb9f7acca4cfc4c2e6e6955fecf3ab66a0065",
+    "row_hash": "9b0068acdfe235059ef52413221eb9f7acca4cfc4c2e6e6955fecf3ab66a0065",
+    "schema_ver": 1,
+    "seq": 2,
+    "timestamp": "2026-10-15T16:52:19.063099+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "L11_WEAKNESS_FINDER_ADVISORY_SCAN",
+    "payload": {
+      "finding_ids": [],
+      "findings_count": 0,
+      "goal_id": "g-28779efed40e",
+      "run_id": "r-29471672",
+      "scanned": true
+    },
+    "prev_hash": "9b0068acdfe235059ef52413221eb9f7acca4cfc4c2e6e6955fecf3ab66a0065",
+    "recomputed_row_hash": "5ec47d73d999ab08b2fd4e47d9cd23ffebcd44519f94056c9ab1399423e3351e",
+    "row_hash": "5ec47d73d999ab08b2fd4e47d9cd23ffebcd44519f94056c9ab1399423e3351e",
+    "schema_ver": 1,
+    "seq": 3,
+    "timestamp": "2026-10-15T16:52:19.063284+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "STAGE_COMPLETED",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-29471672",
+      "session": "planner",
+      "stage": "RE_DERIVE",
+      "status": "COMPLETE",
+      "tokens": 0
+    },
+    "prev_hash": "5ec47d73d999ab08b2fd4e47d9cd23ffebcd44519f94056c9ab1399423e3351e",
+    "recomputed_row_hash": "3b788a6a153823c419bcc3763f031db2453c94df1f188787f210ba5e506c6268",
+    "row_hash": "3b788a6a153823c419bcc3763f031db2453c94df1f188787f210ba5e506c6268",
+    "schema_ver": 1,
+    "seq": 4,
+    "timestamp": "2026-10-15T16:56:12.255583+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "STAGE_COMPLETED",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "model_ver": "chat-bridge-compatibility",
+      "run_id": "r-29471672",
+      "session": "planner",
+      "stage": "IDEATE",
+      "status": "FAILED",
+      "tokens": 0
+    },
+    "prev_hash": "3b788a6a153823c419bcc3763f031db2453c94df1f188787f210ba5e506c6268",
+    "recomputed_row_hash": "c004a1f3792f050df4c649cda7de9c266cb0700e15ea4f7b46f728a2ba612093",
+    "row_hash": "c004a1f3792f050df4c649cda7de9c266cb0700e15ea4f7b46f728a2ba612093",
+    "schema_ver": 1,
+    "seq": 5,
+    "timestamp": "2026-10-15T17:01:12.451699+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "EVOLUTION_EVENT",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "layer": "RETROSPECT",
+      "run_id": "r-29471672",
+      "status": "REMANDED",
+      "summary": "court remanded: IDEATE worker failed: FAILED; recorded_at=2026-10-15T17:01:12.463355+00:00"
+    },
+    "prev_hash": "c004a1f3792f050df4c649cda7de9c266cb0700e15ea4f7b46f728a2ba612093",
+    "recomputed_row_hash": "623744e2206322312656e5cf5f40d8324aaf464757c96c580c47f599208885d3",
+    "row_hash": "623744e2206322312656e5cf5f40d8324aaf464757c96c580c47f599208885d3",
+    "schema_ver": 1,
+    "seq": 6,
+    "timestamp": "2026-10-15T17:01:12.463599+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "EVOLUTION_EVENT",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "layer": "EVOLVE",
+      "run_id": "r-29471672",
+      "status": "REMANDED",
+      "summary": "recurrence=False; proposals=0; recorded_at=2026-10-15T17:01:12.466244+00:00"
+    },
+    "prev_hash": "623744e2206322312656e5cf5f40d8324aaf464757c96c580c47f599208885d3",
+    "recomputed_row_hash": "5970939d6c713cf689933d54ee1d099b029123c242794355c4ef110e37792058",
+    "row_hash": "5970939d6c713cf689933d54ee1d099b029123c242794355c4ef110e37792058",
+    "schema_ver": 1,
+    "seq": 7,
+    "timestamp": "2026-10-15T17:01:12.466274+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "EVOLUTION_EVENT",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "layer": "MEMORY_UPDATE",
+      "run_id": "r-29471672",
+      "status": "REMANDED",
+      "summary": "scars_written=1; quarantined=0; recorded_at=2026-10-15T17:01:12.479445+00:00"
+    },
+    "prev_hash": "5970939d6c713cf689933d54ee1d099b029123c242794355c4ef110e37792058",
+    "recomputed_row_hash": "5c127bd219656fa1fc53179e6610d20485b54402f9a78af0c042c45ca1b8241e",
+    "row_hash": "5c127bd219656fa1fc53179e6610d20485b54402f9a78af0c042c45ca1b8241e",
+    "schema_ver": 1,
+    "seq": 8,
+    "timestamp": "2026-10-15T17:01:12.479501+00:00"
+  },
+  {
+    "domain_tag": "PRODUCTION",
+    "kind": "EVOLUTION_EVENT",
+    "payload": {
+      "goal_id": "g-28779efed40e",
+      "layer": "IMPROVE_RUNTIME",
+      "run_id": "r-29471672",
+      "status": "REMANDED",
+      "summary": "proposals=0; recorded_at=2026-10-15T17:01:12.486651+00:00"
+    },
+    "prev_hash": "5c127bd219656fa1fc53179e6610d20485b54402f9a78af0c042c45ca1b8241e",
+    "recomputed_row_hash": "f225e078befbca95f22294c8905a4e2da311577df17f18b105de73d9cd07a730",
+    "row_hash": "f225e078befbca95f22294c8905a4e2da311577df17f18b105de73d9cd07a730",
+    "schema_ver": 1,
+    "seq": 9,
+    "timestamp": "2026-10-15T17:01:12.486699+00:00"
+  }
+]

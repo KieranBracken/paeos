@@ -1,0 +1,1 @@
+Separate SOURCE_CONSTRUCTION_ONLY Council repair. Derived from the D0117 apparatus, narrowed to the exact existing D0249 two-path subslice. No production retry, qualification, provider call or integration. The independently tested apparatus uses real scoped PAEOS dispatch and physical Court observations.

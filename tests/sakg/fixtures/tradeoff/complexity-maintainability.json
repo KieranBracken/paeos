@@ -1,0 +1,38 @@
+{
+  "case": "complexity-maintainability",
+  "expected": {
+    "results": [
+      {
+        "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F03",
+        "outcome": {
+          "id": "sakg://paeos-recovery/Outcome/01J00000000000000000000F13",
+          "status": "realized",
+          "summary": "Gate C adapter and canary controls were sealed under explicit advisory boundaries."
+        },
+        "score": 0.89,
+        "why": [
+          "TradeOff axes matched: complexity,maintainability",
+          "TradeOff resolves_to Decision",
+          "Decision realized_as Outcome"
+        ]
+      }
+    ]
+  },
+  "query": {
+    "axes": [
+      "complexity",
+      "maintainability"
+    ],
+    "goal_id": "g-extract-gate-c",
+    "method": "tradeoff_precedents",
+    "subject": "complexity versus maintainability in adapter governance"
+  },
+  "schema_version": "paeos.sakg.tradeoff-fixture/v1",
+  "source": {
+    "excerpt": "Performance; Complexity; Scalability; Maintainability; Reliability; Security; Safety; Cost; Latency; Memory; Implementation Difficulty",
+    "heading": "Layer 6 \u2014 Trade-off Analysis",
+    "inventory_sha256": "798d592065fcb75996e5fbe55e662b210062f8148f43fe55ab57a88ecb81c9fc",
+    "path": "/Users/bob/GitHub/SAKG/Phase 0.5 \u2014 Reasoning Model.txt",
+    "sha256": "7d1137720bdc481c7989aab2af129ca115cd2be9569540bc5f6b825292e1cbc4"
+  }
+}

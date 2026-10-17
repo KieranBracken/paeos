@@ -1,0 +1,27 @@
+{
+  "cas_hashes_match": 11,
+  "cas_objects": 11,
+  "court": "NOT_REACHED",
+  "goal_id": "g-59677d6a4ac1",
+  "ledger_head": "86e590cc344950d0e99df4d0f68b626821283195e87f01c66d01aeb0365cedc4",
+  "ledger_integrity": "ok",
+  "ledger_rows": 14,
+  "pid": 5617,
+  "pid_present_at_check": false,
+  "review_order": [
+    "L07_REVIEW_A: HTTP 503 PROVIDER_UNAVAILABLE",
+    "L07_REVIEW_B: HTTP 503 PROVIDER_UNAVAILABLE",
+    "L07_REVIEW_C: HTTP 429 QUOTA_EXHAUSTED"
+  ],
+  "run_id": "r-779c4b75",
+  "runtime_counts": {
+    "remanded": 1,
+    "remediated": 0,
+    "sealed": 0
+  },
+  "runtime_exit_code": 2,
+  "source_files": 903,
+  "source_manifest_sha256": "11e1d761e8f8789f183020d3a172b6c5a2a1c28c225fcdd0930d2d6ebf8ac48e",
+  "source_matches": 903,
+  "verified_at_utc": "2026-10-15T17:23:18.210334+00:00"
+}

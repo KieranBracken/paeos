@@ -1,0 +1,26 @@
+{
+  "runtime/critique.py": {
+    "sha256": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+    "bytes": 17431
+  },
+  "kernel/cas.py": {
+    "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+    "bytes": 8658
+  },
+  "runtime/__init__.py": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "kernel/__init__.py": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "tests/runtime/test_executable_law_canaries.py": {
+    "sha256": "956bb4260f9b5628a0f5208d95720eaff1a1cc80db19a0bc951878beba069eba",
+    "bytes": 95353
+  },
+  "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md": {
+    "sha256": "6292da5871b7e1120c8ca01de299e7b625c5937e58dd15e35aabdeb37c2c9d09",
+    "bytes": 18796
+  }
+}

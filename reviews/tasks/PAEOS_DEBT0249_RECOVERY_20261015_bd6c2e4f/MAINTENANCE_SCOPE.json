@@ -1,0 +1,99 @@
+{
+  "schema": "paeos.source-maintenance-scope-proposal/1",
+  "created_at": "2026-10-15T16:49:40.886377+00:00",
+  "status": "EXACT_SCOPE_PREPARED_NOT_ACCEPTED",
+  "task": "Repair demonstrated audit-candidate eligibility and explicit model-retirement handling",
+  "existing_owner_reconciliation": "Assigning chat coordinates with Manager and sole DEBT0258 integrator for protected scope. This record does not self-authorize expansion of D0249 mutable slice.",
+  "source_paths": [
+    "paeos/model_router/policy.py",
+    "paeos/model_router/errors.py",
+    "paeos/model_router/aimd.py",
+    "paeos/model_router/catalog.py"
+  ],
+  "test_paths": [
+    "tests/model_router/test_routing_policy.py",
+    "tests/model_router/test_free_worker_pool_fallback.py",
+    "tests/model_router/test_error_normalization.py",
+    "tests/model_router/test_state_and_aimd.py"
+  ],
+  "preimages": [
+    {
+      "path": "paeos/model_router/policy.py",
+      "present": true,
+      "sha256": "2c850db0621890fe13cd6ed5af5092e7604799621ccd0055960162bd67721e08",
+      "protected_by_current_P1_manifest": true,
+      "git_status": "M paeos/model_router/policy.py"
+    },
+    {
+      "path": "paeos/model_router/errors.py",
+      "present": true,
+      "sha256": "a04f94f15b153843ce023648370b661fa24f167e113ef1efc1cda11360207d92",
+      "protected_by_current_P1_manifest": true,
+      "git_status": "M paeos/model_router/errors.py"
+    },
+    {
+      "path": "paeos/model_router/aimd.py",
+      "present": true,
+      "sha256": "219b3f87110575b07767a854335839b55779413882c6ee53a2f5991dd306fa46",
+      "protected_by_current_P1_manifest": true,
+      "git_status": "M paeos/model_router/aimd.py"
+    },
+    {
+      "path": "paeos/model_router/catalog.py",
+      "present": true,
+      "sha256": "51e49bd23c86e46b138f58b6083a249b374e5e472703e7f0acb414c32cf078f6",
+      "protected_by_current_P1_manifest": true,
+      "git_status": "M paeos/model_router/catalog.py"
+    },
+    {
+      "path": "tests/model_router/test_routing_policy.py",
+      "present": true,
+      "sha256": "a7edee6f658988a5e9e3b90206990bf37b5302fb245d5f55ed1a17f418b27838",
+      "protected_by_current_P1_manifest": false,
+      "git_status": ""
+    },
+    {
+      "path": "tests/model_router/test_free_worker_pool_fallback.py",
+      "present": true,
+      "sha256": "fa5a7ef249eed399927430f1a1447c4af5690ac8c7ba3fef4dc24ff3dbe28cba",
+      "protected_by_current_P1_manifest": false,
+      "git_status": "?? tests/model_router/test_free_worker_pool_fallback.py"
+    },
+    {
+      "path": "tests/model_router/test_error_normalization.py",
+      "present": true,
+      "sha256": "c5554a0fbd8015c78bd8b0726d7deb3a1165a63209169f6385b51df7f4204b05",
+      "protected_by_current_P1_manifest": false,
+      "git_status": ""
+    },
+    {
+      "path": "tests/model_router/test_state_and_aimd.py",
+      "present": true,
+      "sha256": "f3ba0e0f286aca07ef2d158f86f9b180e72d75270baa4b944da8a68a1727c041",
+      "protected_by_current_P1_manifest": false,
+      "git_status": ""
+    }
+  ],
+  "manifest_sha256": "372e4b2f307074f1cf5e7483707505805db323a67cb0cf079580fd764494eea8",
+  "preserved_failure": "r-1bc742d8 / t-008fec4e3014 remains REMANDED; no late bridge response",
+  "bounded_changes": [
+    "Select heterogeneous auditors only from already filtered candidates; never reintroduce excluded entries; stable deduplicate provider/model; reject same or UNKNOWN auditor family. Preserve meaningful existing preference order.",
+    "Normalize candidate-bound structured NVIDIA HTTP410 end-of-life response as model-scoped MODEL_UNAVAILABLE; ambiguous unrelated errors must not disable sibling models.",
+    "Persist exact model-scoped UNAVAILABLE in AIMD and demonstrate restart persistence with healthy sibling/provider unaffected.",
+    "Mark observed retired meta/llama-3.1-8b-instruct unavailable in initial catalog; retain retirement evidence and do not invent/admit replacement."
+  ],
+  "unchanged_boundaries": [
+    "No privacy relabeling, paid routes, invented provider identity or qualification",
+    "No P1 manifest weakening, lifecycle/Court/protected source changes outside this separately proposed set",
+    "No old state/request retry, late completion or fabricated L07/L10/L14 evidence",
+    "All eight proposed preimages are current dirty checkout bytes; do not restore HEAD"
+  ],
+  "required_discrimination": [
+    "Filtered context/capability/pool/model-health candidates do not return through auditor preference",
+    "Unique provider/model order and no same/UNKNOWN family auditors",
+    "Actual-shaped explicit410 model retirement recognized, unrelated410 remains conservatively scoped",
+    "Unavailable model persists after database reopen; siblings and provider remain healthy",
+    "Catalog excludes exact retired model"
+  ],
+  "external_review_result": "ordinary_review/receipt.json; completed genuine Gemini opinion on preserved mitigation draft, not source patch review"
+}

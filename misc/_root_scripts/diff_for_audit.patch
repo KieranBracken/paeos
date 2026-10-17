@@ -1,0 +1,1236 @@
+diff --git a/AGENT_README.md b/AGENT_README.md
+index 7c7ccfd..9c0aa36 100644
+--- a/AGENT_README.md
++++ b/AGENT_README.md
+@@ -2,9 +2,56 @@
+ 
+ Welcome to **PAEOS** (Portable AI Engineering Operating System).
+ 
+-## Mandatory Operational Governance Rules
++---
+ 
+-On every task execution, you MUST read and obey all governance principles in the `operations/` directory:
++## 1. Operational Entry Points & Execution Commands
++
++### A. Autonomous Pipeline Driver (Live Mission Execution)
++Drives a backlog of goals through the 19-stage lifecycle autonomously using live worker sessions.
++
++* **File**: `ops/autonomous_run.py`
++* **Usage**:
++  ```bash
++  PYTHONPATH=. uv run python ops/autonomous_run.py <backlog.json> <state_dir> [max_concurrency] [max_runs]
++  ```
++* **Example (Running SAKG Mission 1)**:
++  ```bash
++  PYTHONPATH=. uv run python ops/autonomous_run.py ops/backlogs/sakg-1-intakes.json state_sakg/ 1 25
++  ```
++
++### B. CLI Control Plane (Manual & Inspection)
++The operator CLI to create goals, advance stages, inspect states, or dump event logs.
++
++* **File**: `cli/paeos.py`
++* **Commands**: `create-goal`, `advance`, `seal`, `inspect`, `ledger`, `replay`, `demo`
++* **Example (Running the Interactive Demo Flow)**:
++  ```bash
++  PYTHONPATH=. uv run python cli/paeos.py demo
++  ```
++* **Example (Dumping Ledger Event Log)**:
++  ```bash
++  PYTHONPATH=. uv run python cli/paeos.py ledger
++  ```
++
++### C. Test Suite & Verification Commands
++* **Run Unit/Integration Tests**:
++  ```bash
++  uv run pytest
++  ```
++* **Run Strict Type Check**:
++  ```bash
++  uv run pyright
++  ```
++* **Run Linter**:
++  ```bash
++  uv run ruff check .
++  ```
++
++---
++
++## 2. Mandatory Operational Governance Rules
++
++On every task execution, agents and operators MUST obey all governance principles in the `operations/` directory:
+ 
+ 1. **`operations/CONSTITUTIONAL_REFLECTION_PRINCIPLE.md`**:
+    - **Mandatory Constitutional Review**: Every completed task MUST conclude with a Constitutional Review testing spec assumptions against empirical implementation reality.
+@@ -27,7 +74,9 @@ On every task execution, you MUST read and obey all governance principles in the
+ 4. **`operations/IMPLEMENTATION_REVIEW_PROTOCOL.md`**:
+    - Mandatory end-of-task review in `reviews/tasks/<task_id>_review.md`.
+ 
+-## Key Architectural Principles
++---
++
++## 3. Key Architectural Principles
+ 
+ - **Memory Lifetime Hierarchy (IP-0004 / IP-0005)**:
+   - **Layer 1 (Ephemeral Working Memory)**: Destroyed when task step finishes.
+diff --git a/ops/autonomous_run.py b/ops/autonomous_run.py
+index 9ba35c7..91aac97 100644
+--- a/ops/autonomous_run.py
++++ b/ops/autonomous_run.py
+@@ -32,6 +32,7 @@ from runtime.evolution import EvolutionLayer
+ # RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
+ from runtime.friction import FrictionCategory, classify_friction, record_friction
+ from runtime.integrations import ClaudeCodeRuntime
++from runtime.integrations.antigravity import AntigravityRuntime
+ from runtime.orchestrator import Intake, RunOutcome, RunStatus, SoftLoop
+ from runtime.scheduler import (
+     ConcurrentScheduler,
+@@ -44,8 +45,8 @@ from runtime.transports.mcp.transport import McpWorkerTransport
+ 
+ 
+ def build_scheduler(
+-    state_dir: Path, repo_root: Path, *, global_budget: GlobalBudget, max_concurrency: int = 1
+-) -> tuple[ContinuousScheduler | ConcurrentScheduler, EvolutionLayer, Ledger]:
++    state_dir: Path, repo_root: Path, *, global_budget: GlobalBudget, max_concurrency: int = 1, runtime_type: str = "antigravity"
++) -> tuple[ContinuousScheduler | ConcurrentScheduler, EvolutionLayer, Ledger, SoftLoop]:
+     """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`.
+ 
+     `max_concurrency > 1` runs goals in parallel (ConcurrentScheduler). This is K8-safe: the ledger
+@@ -62,11 +63,27 @@ def build_scheduler(
+     config_file.write_text(json.dumps(transport.mcp_config()), encoding="utf-8")
+ 
+     cas = CAS(FilesystemCasStore(state_dir / "cas"))
+-    runtime = ClaudeCodeRuntime(
+-        workspace_source=repo_root,  # B2.J: seed the constitution + write scopes into the sandbox
+-        artifact_resolver=cas.get,
+-        mcp_config_path=config_file,
+-    )
++    
++    if runtime_type == "claude":
++        runtime = ClaudeCodeRuntime(
++            workspace_source=repo_root,
++            artifact_resolver=cas.get,
++            mcp_config_path=config_file,
++        )
++    elif runtime_type == "chat-bridge":
++        from runtime.integrations.chat_bridge import ChatBridgeRuntime
++        runtime = ChatBridgeRuntime(
++            workspace_source=repo_root,
++            artifact_resolver=cas.get,
++            mcp_config_path=config_file,
++        )
++    else:
++        runtime = AntigravityRuntime(
++            workspace_source=repo_root,
++            artifact_resolver=cas.get,
++            mcp_config_path=config_file,
++        )
++    
+     ledger = Ledger(SqliteLedgerStore(state_dir / "ledger.db"))
+     signing_key = load_or_create_signing_key(state_dir / "seal.key")
+     loop = SoftLoop(
+@@ -121,38 +138,70 @@ def build_scheduler(
+         if max_concurrency > 1
+         else ContinuousScheduler(run_one, governor=governor, budget_by_class=DEFAULT_BUDGETS)
+     )
+-    return scheduler, evolution, ledger
++    return scheduler, evolution, ledger, loop
+ 
+ 
+ def main(argv: list[str] | None = None) -> int:
+     argv = list(sys.argv[1:] if argv is None else argv)
+-    if not 2 <= len(argv) <= 4:
++    if not 2 <= len(argv) <= 5:
+         print(
+             "usage: python ops/autonomous_run.py <backlog.json> <state_dir> "
+-            "[max_concurrency] [max_runs]",
++            "[max_concurrency] [max_runs] [runtime]",
+             file=sys.stderr,
+         )
+         return 64
+     backlog_path, state_dir = Path(argv[0]), Path(argv[1])
+     max_concurrency = int(argv[2]) if len(argv) >= 3 else 1
+     max_runs = int(argv[3]) if len(argv) >= 4 else 25
++    runtime_type = argv[4] if len(argv) >= 5 else "antigravity"
+     repo_root = Path.cwd()
+ 
+     backlog = parse_backlog(json.loads(backlog_path.read_text(encoding="utf-8")))
+-    scheduler, _evolution, ledger = build_scheduler(
++    scheduler, _evolution, ledger, loop = build_scheduler(
+         state_dir,
+         repo_root,
+         # A contained ceiling: enough for specified runs; halts (not spins) when exhausted.
+         global_budget=GlobalBudget(tokens=25_000_000, wallclock_s=72_000, runs=max_runs),
+         max_concurrency=max_concurrency,
++        runtime_type=runtime_type,
+     )
+-    report = scheduler.run(backlog)
+-
+-    sealed = [o for o in report.outcomes if o.status is RunStatus.SEALED]
++    
++    outcomes = []
++    final_stop_reason = ""
++    while True:
++        report = scheduler.run(backlog)
++        outcomes.extend(report.outcomes)
++        final_stop_reason = report.stop_reason.value
++        
++        from runtime.scheduler import StopReason
++        if report.stop_reason != StopReason.SOURCE_EXHAUSTED or report.remaining.tokens <= 0:
++            break
++            
++        # Verify completeness before halting or running ADE
++        # 1. No outstanding debt
++        outstanding_debt = list(repo_root.glob("ledger/debt/DEBT-*.md"))
++        if not outstanding_debt:
++            # 2. Check if we have an adversary block or court failure in this run
++            sealed_this_run = [o for o in report.outcomes if o.status is RunStatus.SEALED]
++            if sealed_this_run and len(report.outcomes) > 0 and len(sealed_this_run) == len(report.outcomes):
++                # We might be complete. In a true implementation, we would run a full verification pass
++                pass
++                
++        print("Backlog exhausted. Commencing Architecture Discovery (ADE)...", file=sys.stderr)
++        from runtime.ade import run_ade
++        new_intake = run_ade(repo_root, loop._playbook._dispatcher._runtime, loop._cas)
++        if new_intake:
++            print(f"Synthesized new intake via ADE: {new_intake.objective}", file=sys.stderr)
++            backlog = [new_intake]
++        else:
++            print("ADE determined architecture is complete or failed to synthesize.", file=sys.stderr)
++            break
++
++    sealed = [o for o in outcomes if o.status is RunStatus.SEALED]
+     summary = {
+-        "runs": len(report.outcomes),
++        "runs": len(outcomes),
+         "sealed": len(sealed),
+-        "stop_reason": report.stop_reason.value,
++        "stop_reason": final_stop_reason,
+         "remaining_tokens": report.remaining.tokens,
+         "outcomes": [
+             {
+@@ -161,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
+                 "detail": o.detail,
+                 "seal_hash": (o.seal.seal_hash if o.seal is not None else None),
+             }
+-            for o in report.outcomes
++            for o in outcomes
+         ],
+         "ledger_head": ledger.verify_chain(),  # K3: the seal is on a verified hash chain
+     }
+diff --git a/pyproject.toml b/pyproject.toml
+index 4c4e416..f79cf09 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -8,6 +8,7 @@ dependencies = [
+     "mcp>=2.0.0",
+     "pynacl>=1.6.2",
+     "structlog>=26.1.0",
++    "google-antigravity>=0.1.0",
+ ]
+ 
+ [dependency-groups]
+diff --git a/runtime/agents/__init__.py b/runtime/agents/__init__.py
+index 3f229b2..8daed88 100644
+--- a/runtime/agents/__init__.py
++++ b/runtime/agents/__init__.py
+@@ -46,12 +46,48 @@ class RoleSpec:
+     skills: tuple[SkillRef, ...]
+ 
+ 
++_RE_DERIVE = RoleSpec(
++    stage=StageId.RE_DERIVE,
++    role=Role.PLANNER,
++    objective="Re-derive the goal from first principles and establish root constraints.",
++    write_scopes=("derivation/",),
++    read_scopes=(
++        "constitution/",
++        "spec/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++    ),
++    mcp_servers=("constitution", "memory:read", "artifacts"),
++    required_evidence=(
++        EvidenceObligation(
++            claim_id="first_principles_derived",
++            kind=EvidenceKind.CITATION,
++            acceptance="root constraints derived from first principles; assumptions validated",
++        ),
++    ),
++    skills=(SkillRef("architecture", "1.0"), SkillRef("hidden-assumptions", "1.0")),
++)
++
+ _DESIGN = RoleSpec(
+     stage=StageId.DESIGN,
+     role=Role.PLANNER,
+     objective="Produce the system design (component graph, interfaces, data flow, state machines).",
+     write_scopes=("design/",),  # Planner writes design artifacts only — never production code
+-    read_scopes=("constitution/", "spec/", "design/"),
++    read_scopes=(
++        "constitution/",
++        "spec/",
++        "design/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++    ),
+     mcp_servers=("constitution", "memory:read", "artifacts"),
+     required_evidence=(
+         EvidenceObligation(
+@@ -68,7 +104,17 @@ _PLAN = RoleSpec(
+     role=Role.PLANNER,
+     objective="Produce the formal implementation plan: work units, evidence plan, rollback plan.",
+     write_scopes=("plan/",),
+-    read_scopes=("constitution/", "design/", "plan/"),
++    read_scopes=(
++        "constitution/",
++        "design/",
++        "plan/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++    ),
+     mcp_servers=("constitution", "memory:read", "artifacts"),
+     required_evidence=(
+         EvidenceObligation(
+@@ -85,7 +131,20 @@ _IMPLEMENT = RoleSpec(
+     role=Role.BUILDER,
+     objective="Implement per the ratified plan on an isolated branch; run local tests.",
+     write_scopes=(),  # provided per-plan at dispatch (the exact files the plan authorizes)
+-    read_scopes=("constitution/", "design/", "plan/"),
++    read_scopes=(
++        "constitution/",
++        "design/",
++        "plan/",
++        "spec/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++        "sakg/",
++        "tests/",
++    ),
+     mcp_servers=("constitution", "artifacts", "memory:read"),
+     required_evidence=(
+         EvidenceObligation(claim_id="builds", kind=EvidenceKind.BUILD, acceptance="exit 0"),
+@@ -96,15 +155,99 @@ _IMPLEMENT = RoleSpec(
+     skills=(SkillRef("testing", "2.1"),),
+ )
+ 
++_RESEARCH = RoleSpec(
++    stage=StageId.RESEARCH,
++    role=Role.PLANNER,
++    objective="Perform independent architectural research and propose a solution.",
++    write_scopes=(),
++    read_scopes=(
++        "constitution/",
++        "spec/",
++        "design/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++    ),
++    mcp_servers=("constitution", "memory:read", "artifacts"),
++    required_evidence=(),
++    skills=(SkillRef("architecture", "1.0"),),
++)
++
++_CRITIQUE = RoleSpec(
++    stage=StageId.CRITIQUE,
++    role=Role.CRITIC,
++    objective="Perform adversarial critique on the provided proposals.",
++    write_scopes=(),
++    read_scopes=(
++        "constitution/",
++        "spec/",
++        "design/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++    ),
++    mcp_servers=("constitution", "memory:read", "artifacts"),
++    required_evidence=(),
++    skills=(SkillRef("architecture", "1.0"),),
++)
++
++_TRADEOFF = RoleSpec(
++    stage=StageId.TRADEOFF,
++    role=Role.PLANNER,
++    objective="Synthesize proposals and critiques into a final recommendation. Write a valid Intake JSON object to ops/backlogs/ade_intake.json.",
++    write_scopes=("ops/backlogs/",),
++    read_scopes=(
++        "constitution/",
++        "spec/",
++        "design/",
++        "reviews/",
++        "ledger/",
++        "backlog/",
++        "docs/",
++        "architecture/",
++        "operations/",
++    ),
++    mcp_servers=("constitution", "memory:read", "artifacts"),
++    required_evidence=(),
++    skills=(SkillRef("architecture", "1.0"),),
++)
++
++_MISSION_CONTROL = RoleSpec(
++    stage=StageId.INTAKE,
++    role=Role.PLANNER,
++    objective="Analyze the canonical PAEOS architecture and gap analysis to determine the next un-implemented layer. Write a valid Intake JSON object to ops/backlogs/next_intake.json to construct it.",
++    write_scopes=("ops/backlogs/",),  # Mission Control writes the Intake JSON here
++    read_scopes=(
++        "constitution/",
++        "spec/",
++        "reviews/",
++        "architecture/",
++    ),
++    mcp_servers=("constitution", "artifacts"),
++    required_evidence=(),
++    skills=(SkillRef("architecture", "1.0"),),
++)
++
+ ROLE_SPECS: dict[StageId, RoleSpec] = {
++    StageId.RE_DERIVE: _RE_DERIVE,
+     StageId.DESIGN: _DESIGN,
+     StageId.PLAN: _PLAN,
+     StageId.IMPLEMENT: _IMPLEMENT,
++    StageId.INTAKE: _MISSION_CONTROL,
++    StageId.RESEARCH: _RESEARCH,
++    StageId.CRITIQUE: _CRITIQUE,
++    StageId.TRADEOFF: _TRADEOFF,
+ }
+ 
+ 
+ def role_spec(stage: StageId) -> RoleSpec:
+-    """The RoleSpec for a stage. Raises NoRoleForStage outside DESIGN/PLAN/IMPLEMENT."""
++    """The RoleSpec for a stage. Raises NoRoleForStage if undefined."""
+     try:
+         return ROLE_SPECS[stage]
+     except KeyError:
+diff --git a/runtime/context_compiler.py b/runtime/context_compiler.py
+index 9556d28..e58c8fb 100644
+--- a/runtime/context_compiler.py
++++ b/runtime/context_compiler.py
+@@ -15,8 +15,9 @@ from __future__ import annotations
+ 
+ import hashlib
+ import json
+-from dataclasses import dataclass
++from dataclasses import dataclass, asdict
+ 
++from kernel.state import ContextPolicy, ReasoningState
+ from kernel.types import ArtifactRef
+ 
+ __all__ = ["CompiledContext", "ContextCompiler"]
+@@ -27,12 +28,13 @@ class CompiledContext:
+     """A compiled, content-addressed task context."""
+ 
+     objective: str
++    context_policy: ContextPolicy
+     context_refs: tuple[ArtifactRef, ...]  # deterministic order (sorted by (type, hash))
+     content_hash: str  # sha256 over the canonical compiled context — same inputs ⇒ same hash
+ 
+ 
+ class ContextCompiler:
+-    """Compiles an objective + injected refs (+ matched scars) into a deterministic bundle."""
++    """Compiles an objective + injected refs (+ matched scars) + reasoning state into a deterministic bundle."""
+ 
+     def compile(
+         self,
+@@ -40,19 +42,84 @@ class ContextCompiler:
+         objective: str,
+         context_refs: tuple[ArtifactRef, ...] = (),
+         scars: tuple[ArtifactRef, ...] = (),
++        reasoning_state: ReasoningState | None = None,
++        context_policy: ContextPolicy = ContextPolicy.FULL_CONTINUATION,
+     ) -> CompiledContext:
+         # FR-6: matched scars are always on the path. Deduplicate and order deterministically so
+         # the same set of refs always compiles to the same content hash (K2 / PAEOS-9A determinism).
+         merged = {(ref.type, ref.hash): ref for ref in (*context_refs, *scars)}
+         ordered = tuple(sorted(merged.values(), key=lambda r: (r.type, r.hash)))
++        
++        # Apply epistemic filtering based on the context policy
++        filtered_state = {}
++        if reasoning_state is not None:
++            # We convert dataclasses to dicts for serialization
++            state_dict = asdict(reasoning_state)
++            
++            if context_policy in (ContextPolicy.FULL_CONTINUATION, ContextPolicy.RECONSTRUCTION):
++                # Inherits everything
++                filtered_state = state_dict
++                
++            elif context_policy == ContextPolicy.MINIMUM_SUFFICIENT:
++                # Inherits Active Constraints, Facts
++                filtered_state = {
++                    "constraints": state_dict.get("constraints", []),
++                    "facts": state_dict.get("facts", []),
++                }
++                
++            elif context_policy == ContextPolicy.FRESH:
++                # Inherits Constraints, Evidence (refs), Rejections
++                filtered_state = {
++                    "constraints": state_dict.get("constraints", []),
++                    "rejections": state_dict.get("rejections", []),
++                    "facts": state_dict.get("facts", []),
++                }
++                
++            elif context_policy == ContextPolicy.BLIND_CONCLUSION:
++                # Inherits Constraints, Objective Evidence, Tests (Artifacts)
++                filtered_state = {
++                    "constraints": state_dict.get("constraints", []),
++                    "facts": state_dict.get("facts", []),
++                    "results": state_dict.get("results", []),
++                }
++                
++            elif context_policy == ContextPolicy.INDEPENDENT_ADVERSARIAL:
++                # Inherits Constraints, Evidence, Artifacts (NO Decision)
++                filtered_state = {
++                    "constraints": state_dict.get("constraints", []),
++                    "facts": state_dict.get("facts", []),
++                    "results": state_dict.get("results", []),
++                }
++                
++            elif context_policy == ContextPolicy.DECISION_TARGETED_ADVERSARIAL:
++                # Inherits Constraints, Evidence, Original Decision (w/o persuasive rationale)
++                decisions = []
++                for d in state_dict.get("decisions", []):
++                    # strip rationale to encourage independent critique
++                    decisions.append({**d, "rationale": "<stripped for adversarial review>"})
++                filtered_state = {
++                    "constraints": state_dict.get("constraints", []),
++                    "facts": state_dict.get("facts", []),
++                    "results": state_dict.get("results", []),
++                    "decisions": decisions,
++                }
++                
+         canonical = json.dumps(
+             {
+                 "objective": objective,
++                "context_policy": context_policy.value,
+                 "context_refs": [[r.type, r.hash] for r in ordered],
++                "reasoning_state": filtered_state,
+             },
+             sort_keys=True,
+             separators=(",", ":"),
+             ensure_ascii=True,
++            default=lambda o: o.value if hasattr(o, "value") else str(o)
+         )
+         content_hash = hashlib.sha256(canonical.encode("ascii")).hexdigest()
+-        return CompiledContext(objective=objective, context_refs=ordered, content_hash=content_hash)
++        return CompiledContext(
++            objective=objective,
++            context_policy=context_policy,
++            context_refs=ordered,
++            content_hash=content_hash
++        )
+diff --git a/runtime/integrations/__init__.py b/runtime/integrations/__init__.py
+index b163651..f940869 100644
+--- a/runtime/integrations/__init__.py
++++ b/runtime/integrations/__init__.py
+@@ -33,6 +33,8 @@ from runtime.claude_code import AgentWrite, RunOutput, within_scopes
+ from runtime.task_package import Cost, TaskPackage, TaskStatus
+ 
+ __all__ = [
++    "AntigravityRuntime",
++    "ChatBridgeRuntime",
+     "ClaudeCodeRuntime",
+     "CliInvoker",
+     "SessionResult",
+@@ -95,18 +97,20 @@ def build_prompt(package: TaskPackage) -> str:
+         "# Forbidden (documented intent; enforced by capability):",
+         *[f"  - {item}" for item in package.forbidden],
+     ]
+-    # The court is the BUILDER's channel to submit probative evidence about the artifact it
+-    # produces (R5.3). Planner stages produce artifacts adjudicated by their own stage gates, not
+-    # the court pool — so only the Builder is told to submit, and only the Builder gets the tool.
+     if package.role is Role.BUILDER:
+         lines += [
+             "",
+-            "# Submitting evidence to the court (autonomous, R5.3):",
++            "CRITICAL DIRECTIVE — DELIVERABLE MATERIALIZATION & COURT EVIDENCE (R5.3):",
+             f"  Your run_id is EXACTLY: {package.run_id}",
+-            "  After you write the artifact, call the MCP tool `submit_evidence` once per required",
+-            "  claim above.",
++            "  1. YOU ARE THE BUILDER. You MUST write the actual deliverable files onto disk in your workspace.",
++            "     Check `context/` or `design/` for upstream DESIGN/PLAN content.",
++            "     If the deliverable text (e.g. `reviews/spikes/sakg-s1-extraction-probe.md`, `sakg/schema/envelope.schema.json`)",
++            "     was drafted in an upstream context artifact, COPY or WRITE that content into its exact required target path on disk.",
++            "  2. BEFORE ending your session, you MUST call the MCP tool `submit_evidence`",
++            "     (or `mcp__paeos-court__submit_evidence`) once per required claim above.",
+             "  If no required claims are listed above, you MUST submit at least one claim",
+             "  (claim_id: 'builds') verifying your artifact.",
++            "  Failure to call `submit_evidence` before stopping will cause the court to REMAND your run immediately.",
+             "  Pass: run_id (exactly the run_id above), claim_id, command (a REAL, PROBATIVE",
+             "  shell command, e.g., pytest or test -f, whose result would DIFFER if your change",
+             "  were absent, run against ONLY the file(s) you wrote), artifact_hash (sha256 of",
+@@ -317,3 +321,7 @@ def _parse_cost(transcript: str, default_model: str) -> Cost:
+     model = data.get("model")
+     model_ver = model if isinstance(model, str) else default_model
+     return Cost(tokens=tokens, wallclock_s=wallclock, model_ver=model_ver)
++
++
++from .antigravity import AntigravityRuntime
++from .chat_bridge import ChatBridgeRuntime
+diff --git a/runtime/orchestrator/__init__.py b/runtime/orchestrator/__init__.py
+index 48620ce..1a5cccb 100644
+--- a/runtime/orchestrator/__init__.py
++++ b/runtime/orchestrator/__init__.py
+@@ -142,9 +142,69 @@ class RunOutcome:
+     high_leverage_intake: Intake | None = None
+ 
+ 
++from kernel.state import Checkpoint, ReasoningState
++
+ class SoftLoop:
+     """Runs one intake to a sealed (or remanded/halted) change, unattended."""
+ 
++    def emit_checkpoint(
++        self,
++        *,
++        goal_id: str,
++        run_id: str,
++        stage: StageId,
++        reasoning_state: ReasoningState,
++        context_revision: str,
++        parent_checkpoint: str | None = None,
++        active_task: str | None = None,
++        invocation_lineage: tuple[str, ...] = (),
++    ) -> Checkpoint:
++        """Serialize and record a durability checkpoint to the ledger."""
++        state_dict = json.dumps(
++            {k: v for k, v in reasoning_state.__dict__.items()},
++            default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o)
++        ).encode("utf-8")
++        reasoning_state_hash = self._cas.put(state_dict)
++        
++        # Git revision resolution (simplified for the vertical slice)
++        git_revision = "unknown"
++
++        cp_id = "cp-" + uuid.uuid4().hex[:12]
++        cp = Checkpoint(
++            checkpoint_id=cp_id,
++            goal_id=goal_id,
++            run_id=run_id,
++            stage=stage.value,
++            reasoning_state_hash=reasoning_state_hash,
++            git_revision=git_revision,
++            context_revision=context_revision,
++            active_task=active_task,
++            parent_checkpoint=parent_checkpoint,
++            invocation_lineage=invocation_lineage,
++        )
++        
++        self._ledger.append(
++            Event(
++                1, "checkpoint_created",
++                {
++                    "checkpoint_id": cp.checkpoint_id,
++                    "goal_id": cp.goal_id,
++                    "run_id": cp.run_id,
++                    "stage": cp.stage,
++                    "reasoning_state_hash": cp.reasoning_state_hash,
++                    "git_revision": cp.git_revision,
++                }
++            )
++        )
++        return cp
++
++    def resume_from(self, checkpoint_id: str) -> RunOutcome:
++        """Hydrate from a checkpoint and continue the run. (Vertical slice mockup)."""
++        # In a full implementation, this reads the ledger/CAS for the Checkpoint ID,
++        # restores ReasoningState, validates the git revision, and jumps to the given Stage.
++        raise NotImplementedError("Resumption logic implemented in vertical slice tests")
++
++
+     def __init__(
+         self,
+         *,
+@@ -240,7 +300,7 @@ class SoftLoop:
+         )
+ 
+         try:
+-            # --- Planner: DESIGN then PLAN (matched scars injected, FR-6) ---
++            # --- Planner: RE_DERIVE then DESIGN then PLAN (matched scars injected, FR-6) ---
+             # Stage context chains forward (B2.J): PLAN sees DESIGN, IMPLEMENT sees design + plan —
+             # so the live Builder has a plan to implement against (it blocked without one).
+             # The goal objective is threaded into every stage (B2.L) so DESIGN designs FOR it, PLAN
+@@ -248,7 +308,7 @@ class SoftLoop:
+             # only a generic role objective and the Builder had nothing concrete to implement.
+             goal_detail = f"Goal objective: {objective}"
+             planner_artifacts: list[ArtifactRef] = []
+-            for stage in (StageId.DESIGN, StageId.PLAN):
++            for stage in (StageId.RE_DERIVE, StageId.DESIGN, StageId.PLAN):
+                 scars = self._scar_refs(goal_signature, stage)
+                 result = self._playbook.run_stage(
+                     goal_id=goal_id, run_id=run_id, stage=stage, session="planner",
+@@ -470,6 +530,17 @@ class Intake:
+     goal_signature: str = ""
+     verifiable: bool = True
+     reversible: bool = True
++    inferred_write_scopes: tuple[str, ...] = ()
++
++    @property
++    def effective_write_scopes(self) -> tuple[str, ...]:
++        """Union of explicit plan_write_scopes and runtime inferred_write_scopes (DEBT-0103)."""
++        return tuple(sorted(set(self.plan_write_scopes) | set(self.inferred_write_scopes)))
++
++    @property
++    def effective_changed_paths(self) -> tuple[str, ...]:
++        """Union of explicit changed_paths and runtime inferred_write_scopes (DEBT-0103)."""
++        return tuple(sorted(set(self.changed_paths) | set(self.inferred_write_scopes)))
+ 
+ 
+ class SelfHostRunner:
+@@ -493,8 +564,8 @@ class SelfHostRunner:
+             outcomes.append(
+                 self._loop.run(
+                     objective=intake.objective,
+-                    changed_paths=intake.changed_paths,
+-                    plan_write_scopes=intake.plan_write_scopes,
++                    changed_paths=intake.effective_changed_paths,
++                    plan_write_scopes=intake.effective_write_scopes,
+                     builder_evidence=intake.builder_evidence,
+                     goal_signature=intake.goal_signature,
+                     verifiable=intake.verifiable,
+diff --git a/runtime/selfhost.py b/runtime/selfhost.py
+index 28e7b9c..b560362 100644
+--- a/runtime/selfhost.py
++++ b/runtime/selfhost.py
+@@ -120,16 +120,16 @@ def _parse_intake(item: object) -> Intake:
+     evidence = tuple(_parse_evidence(e) for e in _as_list(obj.get("builder_evidence", [])))
+ 
+     inferred_scopes = infer_write_scopes(objective, accept, changed_paths, plan_write_scopes)
+-    inferred_changed = tuple(sorted(set(changed_paths) | set(inferred_scopes)))
+ 
+     return Intake(
+         objective=objective,
+-        changed_paths=inferred_changed,
+-        plan_write_scopes=inferred_scopes,
++        changed_paths=changed_paths,
++        plan_write_scopes=plan_write_scopes,
+         builder_evidence=evidence,
+         goal_signature=_as_str(obj.get("goal_signature")) or "",
+         verifiable=_as_bool(obj.get("verifiable")),
+         reversible=_as_bool(obj.get("reversible")),
++        inferred_write_scopes=inferred_scopes,
+     )
+ 
+ 
+@@ -155,6 +155,9 @@ def _parse_evidence(raw: object) -> Evidence:
+     )
+ 
+ 
++
++
++
+ def run_backlog(
+     backlog: list[Intake],
+     *,
+@@ -188,7 +191,11 @@ def run_backlog(
+ 
+     queue = deque(backlog)
+     outcomes: list[RunOutcome] = []
+-    while queue:
++    
++    # Run the continuous queue, synthesizing new goals if empty
++    while True:
++        if not queue:
++            break
+         intake = queue.popleft()
+         (outcome,) = runner.run_backlog([intake])
+         evolution.run(
+@@ -208,6 +215,7 @@ def run_backlog(
+                 outcome = replace(outcome, high_leverage_intake=friction.high_leverage_intake)
+                 queue.appendleft(friction.high_leverage_intake)
+         outcomes.append(outcome)
++        
+     return outcomes
+ 
+ 
+diff --git a/runtime/task_package.py b/runtime/task_package.py
+index 6264051..a92aeb4 100644
+--- a/runtime/task_package.py
++++ b/runtime/task_package.py
+@@ -85,6 +85,8 @@ class Budget:
+     retries: int
+ 
+ 
++from kernel.state import ContextPolicy
++
+ @dataclass(frozen=True, slots=True)
+ class TaskPackage:
+     """The fully-scoped unit handed to an agent session (PAEOS-7.6 §5)."""
+@@ -100,6 +102,7 @@ class TaskPackage:
+     required_evidence: tuple[EvidenceObligation, ...]
+     context_refs: tuple[ArtifactRef, ...]  # injected: design, plan, and MATCHED SCARS (FR-6)
+     budget: Budget
++    context_policy: ContextPolicy = ContextPolicy.FULL_CONTINUATION
+     forbidden: tuple[str, ...] = ()  # documentation of intent; enforcement is by capability (T1)
+     ephemeral_context: ExecutionContext = field(default_factory=ExecutionContext)
+ 
+diff --git a/state_sakg/ledger.db b/state_sakg/ledger.db
+index b6da416..3b2c7b1 100644
+Binary files a/state_sakg/ledger.db and b/state_sakg/ledger.db differ
+diff --git a/tests/runtime/test_soft_loop.py b/tests/runtime/test_soft_loop.py
+index b9f0b13..1c63231 100644
+--- a/tests/runtime/test_soft_loop.py
++++ b/tests/runtime/test_soft_loop.py
+@@ -102,7 +102,7 @@ def test_unattended_run_reaches_seal() -> None:
+     assert outcome.verdict is not None and outcome.verdict.outcome is VerdictOutcome.PASS
+     # all four roles ran, in order
+     assert runtime.stages_run == [
+-        StageId.DESIGN, StageId.PLAN, StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW,
++        StageId.RE_DERIVE, StageId.DESIGN, StageId.PLAN, StageId.IMPLEMENT, StageId.ADVERSARIAL_REVIEW,
+     ]
+     # Planner and Builder roles were correctly scoped
+     assert runtime.packages[StageId.DESIGN].role is Role.PLANNER
+diff --git a/uv.lock b/uv.lock
+index bebcc39..5eaf98e 100644
+--- a/uv.lock
++++ b/uv.lock
+@@ -6,6 +6,15 @@ resolution-markers = [
+     "python_full_version < '3.14'",
+ ]
+ 
++[[package]]
++name = "absl-py"
++version = "2.5.0"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/d0/4f/d79676ab82f2e42fc3611618139f13a9c4c31d0cff4b486982047679a802/absl_py-2.5.0.tar.gz", hash = "sha256:0c996f25c0490700fadabe6351630f6111534fa0ae252cc6d2014ea3b141135f", size = 118119, upload-time = "2026-07-03T10:57:48.157Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/58/0a/a10b45aab35b175aded078a462dc8d0c698f5b13946e7cb0869097b78bb6/absl_py-2.5.0-py3-none-any.whl", hash = "sha256:0f17b89f2a4eaaedc4f28c622998aa690564b3012a396a4ffad0821007fe03ba", size = 137410, upload-time = "2026-07-03T10:57:46.735Z" },
++]
++
+ [[package]]
+ name = "annotated-types"
+ version = "0.8.0"
+@@ -37,6 +46,15 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309", size = 67548, upload-time = "2026-03-19T14:22:23.645Z" },
+ ]
+ 
++[[package]]
++name = "certifi"
++version = "2026.7.22"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/a3/c2/24167ea9858356b47a87a50d39908bfdb72ceeefe0041586e704e5376b3a/certifi-2026.7.22.tar.gz", hash = "sha256:741e2c3b351ddf169a738da9f2c048608ff7f2c5cc02f1ebc6b118bb090d5d55", size = 138112, upload-time = "2026-07-22T03:35:12.644Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl", hash = "sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775", size = 136983, upload-time = "2026-07-22T03:35:11.276Z" },
++]
++
+ [[package]]
+ name = "cffi"
+ version = "2.1.0"
+@@ -122,6 +140,67 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/a0/17/1073b53b68c9b5ca6914adf5f8bf55aacc2d3be102418c90700160ea8605/cffi-2.1.0-cp315-cp315t-win_arm64.whl", hash = "sha256:cbb7640ce37159548d2147b5b8c241f962143d4c71231431820783f4dc78f210", size = 186405, upload-time = "2026-07-06T21:34:24.857Z" },
+ ]
+ 
++[[package]]
++name = "charset-normalizer"
++version = "3.4.9"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/bd/2a/23f34ec9d04624958e137efdc394888716353190e75f25dd22c7a2c7a8aa/charset_normalizer-3.4.9.tar.gz", hash = "sha256:673611bbd43f0810bec0b0f028ddeaaa501190339cac411f347ac76917c3ae7b", size = 152439, upload-time = "2026-07-07T14:34:58.454Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/70/4a/ecbd131485c07fcdfad54e28946d513e3da22ef3b4bd854dcafae54ec739/charset_normalizer-3.4.9-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:45b0cc4e3556cd875e09102988d1ab8356c998b596c9fced84547c8138b487a0", size = 319300, upload-time = "2026-07-07T14:33:15.666Z" },
++    { url = "https://files.pythonhosted.org/packages/ec/96/5d9364e3342d69f3a045e1777bc47c85c383e6e9466d561b33fdb419d1f9/charset_normalizer-3.4.9-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9b2aff1c7b3884512b9512c3eaadd9bab39fb45042ffaaa1dd08ff2b9f8109d9", size = 215802, upload-time = "2026-07-07T14:33:17.031Z" },
++    { url = "https://files.pythonhosted.org/packages/4b/4c/5361f9aa7f2cb58d94f2ab831b3d493f69efb1d239654b4744e3c09527cb/charset_normalizer-3.4.9-cp312-cp312-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:9104ed0bd76a429d46f9ec0dbc9b08ad1d2dcdf2b00a5a0daa1c145329b35b44", size = 237171, upload-time = "2026-07-07T14:33:18.576Z" },
++    { url = "https://files.pythonhosted.org/packages/50/78/ce342ca4ff30b2eb49fe6d9578df85974f90c67d294113e94efdd9664cbd/charset_normalizer-3.4.9-cp312-cp312-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:7b86a2b16095d250c6f58b3d9b2eee6f4147754344f3dab0922f7c9bf7d226c9", size = 233075, upload-time = "2026-07-07T14:33:20.084Z" },
++    { url = "https://files.pythonhosted.org/packages/01/c4/4fa4c8b3097a11f3c5f09a35b72ed6855fb1d332469504962ab7bafcc702/charset_normalizer-3.4.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5e226f6218febc71f6c1fc2fafb91c226f75bdc1d8fb12d66823716e891608fd", size = 224256, upload-time = "2026-07-07T14:33:21.747Z" },
++    { url = "https://files.pythonhosted.org/packages/87/3a/ad914516df7e358a81aae018caa5e0470ba827fa6d763b1d2e87d920a5f6/charset_normalizer-3.4.9-cp312-cp312-manylinux_2_31_armv7l.whl", hash = "sha256:90c44bc373b7687f6948b693cceaea1348ae0975d7474746559494468e3c1d84", size = 208784, upload-time = "2026-07-07T14:33:23.313Z" },
++    { url = "https://files.pythonhosted.org/packages/d7/74/3c12f9755717dfe5c5c87da63f35d765fa0c00382ec26bf23f7fae34f2ba/charset_normalizer-3.4.9-cp312-cp312-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:9cdef90ae47919cae358d8ab15797a800ed41da7aba5d72419fb510729e2ed4b", size = 219928, upload-time = "2026-07-07T14:33:24.814Z" },
++    { url = "https://files.pythonhosted.org/packages/33/9a/895095b83e7907abd6d3d99aad3a38ad0d9686cc186cb0c94c24320fe63e/charset_normalizer-3.4.9-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:60f44ade2cf573dad7a277e6f8ca9a51a21dda572b13bd7d8539bb3cd5dbedde", size = 218489, upload-time = "2026-07-07T14:33:26.42Z" },
++    { url = "https://files.pythonhosted.org/packages/a1/34/ef5c05f412f42520d7709b7d3784d19640839eb7366ded1755511585429f/charset_normalizer-3.4.9-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:a1786910334ed46ab1dd73222f2cd1e05c2c3bb39f6dddb4f8b36fc382058a39", size = 210267, upload-time = "2026-07-07T14:33:27.952Z" },
++    { url = "https://files.pythonhosted.org/packages/83/dc/9b29fa4412b318bf3bfea985c35d67eb55e04b59a7c3f2237168b0e0be6f/charset_normalizer-3.4.9-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:03d07803992c6c7bbc976327f34b18b6160327fc81cb82c9d504720ac0be3b62", size = 226030, upload-time = "2026-07-07T14:33:29.397Z" },
++    { url = "https://files.pythonhosted.org/packages/0e/42/6dbc00b8cd16011691203e33570fa42ed5746599a2e878112d16eab403a3/charset_normalizer-3.4.9-cp312-cp312-win32.whl", hash = "sha256:78841cccf1af7b40f6f716338d50c0902dbe88d9f800b3c973b7a9a0a693a642", size = 151185, upload-time = "2026-07-07T14:33:30.781Z" },
++    { url = "https://files.pythonhosted.org/packages/80/cc/f920afd1a23c58ccd53c1d36085a71893a4737ff5e66e0371efab6809850/charset_normalizer-3.4.9-cp312-cp312-win_amd64.whl", hash = "sha256:4b3dac63058cc36820b0dd072f89898604e2d39686fe05321729d00d8ac185a0", size = 162557, upload-time = "2026-07-07T14:33:32.176Z" },
++    { url = "https://files.pythonhosted.org/packages/f0/e6/0386d43a261ff4e4b30c5857af7df877254b46bec7b9d1b74b6bf969a90b/charset_normalizer-3.4.9-cp312-cp312-win_arm64.whl", hash = "sha256:78fa18e436a1a0e58dbd7e02fc4473f3f32cceb12df9dfca542d075961c307d2", size = 152665, upload-time = "2026-07-07T14:33:33.711Z" },
++    { url = "https://files.pythonhosted.org/packages/b2/06/97ec2aeae780b31d742b6352218b43841a6871e2564578ca522dce4a45c3/charset_normalizer-3.4.9-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:440eede837960000d74978f0eba527be106b5b9aee0daf779d395276ed0b0614", size = 317688, upload-time = "2026-07-07T14:33:35.408Z" },
++    { url = "https://files.pythonhosted.org/packages/d0/39/8ff066c672434225f8d25f8b739f992af250944392173dcc88362681c9bf/charset_normalizer-3.4.9-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:21e764fd1e70b6a3e205a0e46f3051701f98a8cb3fad66eeb80e48bb502f8698", size = 214982, upload-time = "2026-07-07T14:33:36.996Z" },
++    { url = "https://files.pythonhosted.org/packages/92/8f/3a47a3667c83c2df9483d91644c6c107de3bf8874aa1793da9d3012eb986/charset_normalizer-3.4.9-cp313-cp313-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:e4fd89cc178bced6ad29cb3e6dd4aa63fa5017c3524dbd0b25998fb64a87cc8b", size = 236460, upload-time = "2026-07-07T14:33:38.536Z" },
++    { url = "https://files.pythonhosted.org/packages/f1/60/b22cdbee7e4013dab8b0d7647fc6181120fbbbc8f7025c226d15bd5a47fc/charset_normalizer-3.4.9-cp313-cp313-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:bd47ba7fc3ca94896759ea0109775132d3e7ab921fbf54038e1bab2e46c313c9", size = 232003, upload-time = "2026-07-07T14:33:40.059Z" },
++    { url = "https://files.pythonhosted.org/packages/ea/f8/72eb13dcabe7257035cea8aefd922caad2f110d252bf9f67c4c2ca763aee/charset_normalizer-3.4.9-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:84fd18bcc17526fc2b3c1af7d2b9217d32c9c04448c16ec693b9b4f1985c3d33", size = 223149, upload-time = "2026-07-07T14:33:41.631Z" },
++    { url = "https://files.pythonhosted.org/packages/b0/3e/faee8f9de92b14ee1198e9163252bb15efee7301b31256a3b6d9ebfdd0dd/charset_normalizer-3.4.9-cp313-cp313-manylinux_2_31_armv7l.whl", hash = "sha256:5b10cd92fc5c498b35a8635df6d5a100207f88b63a4dc1de7ef9a548e1e2cd63", size = 207901, upload-time = "2026-07-07T14:33:43.209Z" },
++    { url = "https://files.pythonhosted.org/packages/3a/25/45f30093ae27dd7b92a793b61882a38685f993700113ca36e0c9c14965e1/charset_normalizer-3.4.9-cp313-cp313-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:a4fbdde9dd4a9ce5fd52c2b3a347bb50cc89483ef783f1cb00d408c13f7a96c0", size = 219176, upload-time = "2026-07-07T14:33:44.725Z" },
++    { url = "https://files.pythonhosted.org/packages/48/18/c8f397329c35e32f6a837e488986f4ae03bd2abebc453b48714991630c2f/charset_normalizer-3.4.9-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:416c229f77e5ea25b3dfd4b582f8d73d7e43c22320302b9ab128a2d3a0b38efe", size = 217356, upload-time = "2026-07-07T14:33:46.192Z" },
++    { url = "https://files.pythonhosted.org/packages/86/7e/5ce0bba863470fd1902d5e5843968951bddf38abe4742fc97116ef4598b3/charset_normalizer-3.4.9-cp313-cp313-musllinux_1_2_armv7l.whl", hash = "sha256:75286256590a6320cf106a0d28970d3560aad9ee09aa7b34fb40524792436d35", size = 209614, upload-time = "2026-07-07T14:33:47.705Z" },
++    { url = "https://files.pythonhosted.org/packages/6c/ef/2473d3c4d869155be4af1191111d59c4d5c4e0173026f7e85b176e23bf65/charset_normalizer-3.4.9-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:69b157c5d3292bcd443faca052f3096f637f1e074b98212a933c074ae23dc3b8", size = 224991, upload-time = "2026-07-07T14:33:49.238Z" },
++    { url = "https://files.pythonhosted.org/packages/d0/a3/53ddae3db108a088156aa8ddfafd411ebbc1340f48c5573f697b27f69a39/charset_normalizer-3.4.9-cp313-cp313-win32.whl", hash = "sha256:51307f5c71007673a2bf8232ad973483d281e74cb99c8c5a990af1eefa6277d9", size = 150622, upload-time = "2026-07-07T14:33:50.711Z" },
++    { url = "https://files.pythonhosted.org/packages/e8/ef/6953a77c7cf2c2ff9998e6f575ab3e380119f100223381565a4f94c1f836/charset_normalizer-3.4.9-cp313-cp313-win_amd64.whl", hash = "sha256:fe2c7201c642b7c308f1675355ad7ff7b66acfe3541625efe5a3ad38f29d6115", size = 161947, upload-time = "2026-07-07T14:33:52.197Z" },
++    { url = "https://files.pythonhosted.org/packages/6e/fb/d560d1d1555debbfe7849d9cac6145c1b537709d79576bf22557ed803b82/charset_normalizer-3.4.9-cp313-cp313-win_arm64.whl", hash = "sha256:611057cc5d5c0afc743ba8be6bd828c17e0aaa8643f9d0a9b9bb7dea80eb8012", size = 152594, upload-time = "2026-07-07T14:33:53.486Z" },
++    { url = "https://files.pythonhosted.org/packages/7e/8d/496817fa0944239ecae662dd57ea765cfeaec6a735f9f025d4b7b72e7143/charset_normalizer-3.4.9-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:0327fcd59a935777d83410750c50600ee9571af2846f71ce40f25b13da1ef380", size = 317253, upload-time = "2026-07-07T14:33:54.994Z" },
++    { url = "https://files.pythonhosted.org/packages/2b/f9/ef4a69ea338ad3c0deceea0f5f7d2380ae8b52132b06d652cb0d2cd86706/charset_normalizer-3.4.9-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8a79d9f4d8001473a30c163556b3c3bfebec837495a412dde78b51672f6134f9", size = 215898, upload-time = "2026-07-07T14:33:56.334Z" },
++    { url = "https://files.pythonhosted.org/packages/8c/e7/5ddfd76fc061eb52de219658a4aa431cbacadf0a0219c8854f00da50d289/charset_normalizer-3.4.9-cp314-cp314-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:33bdcc2a32c0a0e861f60841a512c8acc658c87c2ac59d89e3a46dacf7d866e4", size = 236718, upload-time = "2026-07-07T14:33:57.9Z" },
++    { url = "https://files.pythonhosted.org/packages/49/ba/768fa3f36048d81c477a0ce61f813bc1454d80917ccfe550abd9f44f5e24/charset_normalizer-3.4.9-cp314-cp314-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:f840ed6d8ecba8255df8c42b87fadeda98ddfc6eeec05e2dc66e26d46dd6f58a", size = 232519, upload-time = "2026-07-07T14:33:59.811Z" },
++    { url = "https://files.pythonhosted.org/packages/f4/c4/b3e049d2aa3766180c78507110543d9d50894cc97f57de543f1be521dcdc/charset_normalizer-3.4.9-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c25fe15c70c59eb7c5ce8c06a1f3fa1da0ecc5ea1e7a5922c40fd2fa9b0d5046", size = 223143, upload-time = "2026-07-07T14:34:01.517Z" },
++    { url = "https://files.pythonhosted.org/packages/19/79/55c32d06d76ae4feafe053f061f3e3ab70bcf19f4007797ce8c3efda7830/charset_normalizer-3.4.9-cp314-cp314-manylinux_2_31_armv7l.whl", hash = "sha256:f7fb7d750cfa0a070d2c24e831fd3481019a60dd317ea2b39acbcebc08b6ed81", size = 206742, upload-time = "2026-07-07T14:34:03.04Z" },
++    { url = "https://files.pythonhosted.org/packages/10/e0/47c079dd82d217c807479cd59ffd30af56307ea31c108b75758970459ad3/charset_normalizer-3.4.9-cp314-cp314-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:4d1c96a7a18b9690a4d46df09e3e3382406ae3213727cd1019ebade1c4a81917", size = 219191, upload-time = "2026-07-07T14:34:04.657Z" },
++    { url = "https://files.pythonhosted.org/packages/42/ab/b9bc2e77d6b44a7e46ef62ec5cac1c9a6ba7b9135a5d560f002696ec9995/charset_normalizer-3.4.9-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:a4cfde78a9f2880208d16a93b795726a3017d5977e08d1e162a7a31322479c41", size = 218328, upload-time = "2026-07-07T14:34:06.115Z" },
++    { url = "https://files.pythonhosted.org/packages/f1/78/c9c71d599f5aa2d42bcdd35cbbd46d7f535351a57e40ff7d8e5a7e219401/charset_normalizer-3.4.9-cp314-cp314-musllinux_1_2_armv7l.whl", hash = "sha256:d4d6fcde76f94f5cb9e43e9e9a61f16dacefd228cbbf6f1a09bd9b219a92f1a1", size = 207406, upload-time = "2026-07-07T14:34:07.554Z" },
++    { url = "https://files.pythonhosted.org/packages/f6/39/c914445c321a845097ce4f6ac7de9a18228a77b766272125a1ce00d851eb/charset_normalizer-3.4.9-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:898f0e9068ca27d37f8e83a5b962821df851532e6c4a7d615c1c033f9da6eedf", size = 225157, upload-time = "2026-07-07T14:34:09.061Z" },
++    { url = "https://files.pythonhosted.org/packages/9b/f2/c0d4b8508565a36bc5c624e88ed297f5b0b1095011034d7f5b83a69908b5/charset_normalizer-3.4.9-cp314-cp314-win32.whl", hash = "sha256:c1c948747b03be832dceed96ca815cef7360de9aa19d37c730f8e3f6101aca48", size = 151095, upload-time = "2026-07-07T14:34:10.901Z" },
++    { url = "https://files.pythonhosted.org/packages/49/fd/a1d26144398c67486422a72bf5812cda22cb4ccfcd95a290fb41ceb4b8e2/charset_normalizer-3.4.9-cp314-cp314-win_amd64.whl", hash = "sha256:16b65ea0f2465b6fb52aa22de5eca612aa964ddfec00a912e26f4656cbef890b", size = 162796, upload-time = "2026-07-07T14:34:12.47Z" },
++    { url = "https://files.pythonhosted.org/packages/20/95/d75e82f8ce9fd323ebf059c16c9aadefb22a1ecde13b7840b35835e4886c/charset_normalizer-3.4.9-cp314-cp314-win_arm64.whl", hash = "sha256:40a126142a56b2dfc0aacbad1de8310cbf60da7656db0e6b16eebd48e3e93519", size = 153334, upload-time = "2026-07-07T14:34:14.044Z" },
++    { url = "https://files.pythonhosted.org/packages/00/5e/17398df3a139985ba9d11ed072531986f408c8fca952835ef1ab1820c02b/charset_normalizer-3.4.9-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:609b3ba8fcc0fb5ab7af00719d0fb6ad0cb518e48e7712d12fd68f1327951198", size = 338848, upload-time = "2026-07-07T14:34:15.688Z" },
++    { url = "https://files.pythonhosted.org/packages/cd/91/7253a32e86b7e1d1239b1b36ba6dd0f021a21107ab33054b53119cc083b9/charset_normalizer-3.4.9-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:51447e9aa2684679af07ca5021c3db526e0284347ebf4ffcec1154c3350cfe32", size = 223022, upload-time = "2026-07-07T14:34:17.248Z" },
++    { url = "https://files.pythonhosted.org/packages/cb/32/2e64bd2be10e89c61e57ebe6a93fd98ae88eb7ebe414b5121f22c96c69eb/charset_normalizer-3.4.9-cp314-cp314t-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:cc1b0fff8ead343dae06305f954eb8468ba0ec1a97881f42489d198e4ce3c632", size = 241590, upload-time = "2026-07-07T14:34:18.813Z" },
++    { url = "https://files.pythonhosted.org/packages/3d/ef/d96ec496cfea0c21db43b0ad03891308b02388d054cc902cf0e5a1ad6a88/charset_normalizer-3.4.9-cp314-cp314t-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:fa36ec09ef71d158186bc79e359ff5fdd6e7996fe8ab638f00d6b93139ba4fcf", size = 239584, upload-time = "2026-07-07T14:34:20.52Z" },
++    { url = "https://files.pythonhosted.org/packages/d4/ce/9af95f7876194bd7a14e3dfe4a4de2e0bff02666a3910d72beafd06cc297/charset_normalizer-3.4.9-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:df115d4d83168fdf2cae48ef1ff6d1cb4c466364e30861b37121de0f3bf1b990", size = 230224, upload-time = "2026-07-07T14:34:22.189Z" },
++    { url = "https://files.pythonhosted.org/packages/52/94/af74dde74a3996bd959c350709bfe50e297823d70a8c1cbd54b838880863/charset_normalizer-3.4.9-cp314-cp314t-manylinux_2_31_armv7l.whl", hash = "sha256:f86c6358749bd4fda175388691e3ba8c46e24c5347d0afd20f9b7edfc9faf07d", size = 212667, upload-time = "2026-07-07T14:34:23.857Z" },
++    { url = "https://files.pythonhosted.org/packages/ee/f0/f1c4fe746c395922961b5916ed1d7d6e7d4c84851d19ed43cc89980ec953/charset_normalizer-3.4.9-cp314-cp314t-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:32286a2c8d167e897177b673176c1e3e00d4057caf5d2b64eef9a3666b03018e", size = 227179, upload-time = "2026-07-07T14:34:25.586Z" },
++    { url = "https://files.pythonhosted.org/packages/e4/56/6c745619ac397e8871e2bcd3cea1eec86b877488f33888b3aef5c3ed506e/charset_normalizer-3.4.9-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:83aed2c10721ddd90f68140685391b50811a880af20654c59af6b6c66c40513c", size = 225372, upload-time = "2026-07-07T14:34:27.212Z" },
++    { url = "https://files.pythonhosted.org/packages/78/ad/98aae8630ac71f16711968e38a5acfecce41b778bf2f0312851020f565a8/charset_normalizer-3.4.9-cp314-cp314t-musllinux_1_2_armv7l.whl", hash = "sha256:cd6c3d4b783c556fa00bf540854e42f135e2f256abd29669fcd0da0f2dec79c2", size = 215222, upload-time = "2026-07-07T14:34:28.774Z" },
++    { url = "https://files.pythonhosted.org/packages/f7/40/9593d54209765207a7f11073c06494c1721e4ca4a0a426c597679bf7f91e/charset_normalizer-3.4.9-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:ee2f2a527e3c1a6e6411eb4209642e138b544a2d72fe5d0d76daf77b24063534", size = 231958, upload-time = "2026-07-07T14:34:30.345Z" },
++    { url = "https://files.pythonhosted.org/packages/b1/27/693ee5e8a18191eb38647360c51cd505013e2bd3b366aa43fd5344c21e3c/charset_normalizer-3.4.9-cp314-cp314t-win32.whl", hash = "sha256:0d861473f743244d349b50f850d10eb87aeb22bbdcc8e64f79273c94af5a8226", size = 155580, upload-time = "2026-07-07T14:34:31.884Z" },
++    { url = "https://files.pythonhosted.org/packages/80/3f/bd97d3d9c613013d07cb7733d299385b41df37f0471310f5a73dc359f0b8/charset_normalizer-3.4.9-cp314-cp314t-win_amd64.whl", hash = "sha256:9b8e0f3107e2200b76f6054de99016eac3ee6762713587b36baaa7e4bd2ae177", size = 167620, upload-time = "2026-07-07T14:34:33.438Z" },
++    { url = "https://files.pythonhosted.org/packages/3d/c6/eee9dca4439b1061f76373f06ea855678cc4a64c1c3c90b50e479edbb8eb/charset_normalizer-3.4.9-cp314-cp314t-win_arm64.whl", hash = "sha256:19ac87f93086ce37b86e098888555c4b4bc48102279bae3350098c0ed664b501", size = 158037, upload-time = "2026-07-07T14:34:35.018Z" },
++    { url = "https://files.pythonhosted.org/packages/98/2b/f97f1c193fb855c345d678f5077d6926034db0722df74c8f057020e05a25/charset_normalizer-3.4.9-py3-none-any.whl", hash = "sha256:68e5f26a1ad57ded6d1cfb85331d1c1a195314756471d97758c48498bb4dcdf5", size = 64538, upload-time = "2026-07-07T14:34:56.993Z" },
++]
++
+ [[package]]
+ name = "click"
+ version = "8.4.2"
+@@ -193,6 +272,75 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/57/30/4a22984d4f1bdfb8c054f07a92bc176b97a3134cc1d6c4b3bffb1f3688b4/cryptography-50.0.0-cp39-abi3-win_amd64.whl", hash = "sha256:d24fead1d4d076e1bfb006dcec392074a3cd8d7b4fc8a595aa64073b2b7a96ba", size = 3874135, upload-time = "2026-07-31T14:24:50.085Z" },
+ ]
+ 
++[[package]]
++name = "distro"
++version = "1.9.0"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed", size = 60722, upload-time = "2023-12-24T09:54:32.31Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2", size = 20277, upload-time = "2023-12-24T09:54:30.421Z" },
++]
++
++[[package]]
++name = "google-antigravity"
++version = "0.1.10"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "absl-py" },
++    { name = "google-genai" },
++    { name = "mcp" },
++    { name = "protobuf" },
++    { name = "pydantic" },
++    { name = "uvicorn" },
++    { name = "websockets" },
++]
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/a7/85/9e0f2856eee59dd86d8e4b1f320eb21edc3b0bb6a386d2a8821e93412b5d/google_antigravity-0.1.10-py3-none-macosx_11_0_arm64.whl", hash = "sha256:e1e009a8a0b93d8a94aa49738a5074d2599700afc686ca421f5b913c33e5bae7", size = 31503795, upload-time = "2026-08-05T18:16:12.768Z" },
++    { url = "https://files.pythonhosted.org/packages/bf/e5/27caa566ec39f7b5a742c728cb14c2c5401fb9fd30b357724d46f05e7244/google_antigravity-0.1.10-py3-none-manylinux_2_17_aarch64.whl", hash = "sha256:50dc44d2b22789e83c71020ffc26a95165dd6bb1162aabd68e35c22afc88bc8e", size = 36970562, upload-time = "2026-08-05T18:16:16.03Z" },
++    { url = "https://files.pythonhosted.org/packages/46/9b/58237a8448386fc3c724ae4006964894b28448c3840b7af555166bed8f29/google_antigravity-0.1.10-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:de1c66ce0a0ac6da4514fedd2aeb067aa68c0b47f2b380f4773643ccd6850e2a", size = 39135723, upload-time = "2026-08-05T18:16:19.061Z" },
++    { url = "https://files.pythonhosted.org/packages/36/d6/81d9fe792d0655b3971d73fef0a4df97ba67625e0d3403e497ec12e183d5/google_antigravity-0.1.10-py3-none-win_amd64.whl", hash = "sha256:0940242a1067d82d19d21e89cb3215f01079cc09687b0ff92654be09d744a093", size = 36445298, upload-time = "2026-08-05T18:16:23.091Z" },
++    { url = "https://files.pythonhosted.org/packages/5d/2f/3570e48ab50abf5e6724928aa73718da99bd51c917940ea31a69dad823b3/google_antigravity-0.1.10-py3-none-win_arm64.whl", hash = "sha256:be2b34d19f33ea9da4df9bb947477837614d8e35643e9383134ddfd454c3a543", size = 32856371, upload-time = "2026-08-05T18:16:26.033Z" },
++]
++
++[[package]]
++name = "google-auth"
++version = "2.56.3"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "cryptography" },
++    { name = "pyasn1-modules" },
++]
++sdist = { url = "https://files.pythonhosted.org/packages/db/4c/fa42116a48bab3f7a143cf5042ecff7df9c8b73f8a376203cd534d1dc966/google_auth-2.56.3.tar.gz", hash = "sha256:40e229fc901f0a305b553050e5fce562d509bee0435be053abfa91582b51b90c", size = 367110, upload-time = "2026-08-06T06:24:01.36Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/bc/b3/6117b2f24065cd7e2c4f140e9a193e215f089ca8ba314cf91eb9d0b7fe0a/google_auth-2.56.3-py3-none-any.whl", hash = "sha256:8ec438808f813ad034535000261eed1067475d229d05bbf4216e78c3f2362e53", size = 259116, upload-time = "2026-08-06T06:22:51.788Z" },
++]
++
++[package.optional-dependencies]
++requests = [
++    { name = "requests" },
++]
++
++[[package]]
++name = "google-genai"
++version = "2.17.0"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "anyio" },
++    { name = "distro" },
++    { name = "google-auth", extra = ["requests"] },
++    { name = "httpx" },
++    { name = "pydantic" },
++    { name = "requests" },
++    { name = "sniffio" },
++    { name = "tenacity" },
++    { name = "typing-extensions" },
++    { name = "websockets" },
++]
++sdist = { url = "https://files.pythonhosted.org/packages/58/2e/03a0486e192cde27f7ffbb20c63fa934a132396a667b1a0e1b7e5f606ad7/google_genai-2.17.0.tar.gz", hash = "sha256:6b640a2390c82b4a240873eddb9f518c6d2c33244b2de16ed3d14526a6da7f57", size = 648676, upload-time = "2026-08-06T05:10:41.382Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/b3/37/71e397a5b93d9a3c139e95acdcb00b4169ed59ae20e16616f2875170abb7/google_genai-2.17.0-py3-none-any.whl", hash = "sha256:a4835563c60aee646c9c4b261c507aa4a624710d25017012d20dc65abf3d9a54", size = 1044950, upload-time = "2026-08-06T05:10:39.308Z" },
++]
++
+ [[package]]
+ name = "h11"
+ version = "0.16.0"
+@@ -202,6 +350,19 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86", size = 37515, upload-time = "2025-04-24T03:35:24.344Z" },
+ ]
+ 
++[[package]]
++name = "httpcore"
++version = "1.0.9"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "certifi" },
++    { name = "h11" },
++]
++sdist = { url = "https://files.pythonhosted.org/packages/06/94/82699a10bca87a5556c9c59b5963f2d039dbd239f25bc2a63907a05a14cb/httpcore-1.0.9.tar.gz", hash = "sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8", size = 85484, upload-time = "2025-04-24T22:06:22.219Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl", hash = "sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55", size = 78784, upload-time = "2025-04-24T22:06:20.566Z" },
++]
++
+ [[package]]
+ name = "httpcore2"
+ version = "2.9.1"
+@@ -215,6 +376,21 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/9f/fb/46c52b781975c335a2bcf1072c7bbc007cbdc8d674217f5ee1daba2c848b/httpcore2-2.9.1-py3-none-any.whl", hash = "sha256:6182472379e855fe4221246a2bb7ecede403bc61c6798062ae1787d051ccde26", size = 82809, upload-time = "2026-07-24T09:21:01.178Z" },
+ ]
+ 
++[[package]]
++name = "httpx"
++version = "0.28.1"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "anyio" },
++    { name = "certifi" },
++    { name = "httpcore" },
++    { name = "idna" },
++]
++sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406, upload-time = "2024-12-06T15:37:23.222Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517, upload-time = "2024-12-06T15:37:21.509Z" },
++]
++
+ [[package]]
+ name = "httpx2"
+ version = "2.9.1"
+@@ -398,6 +574,7 @@ name = "paeos"
+ version = "0.0.0"
+ source = { editable = "." }
+ dependencies = [
++    { name = "google-antigravity" },
+     { name = "mcp" },
+     { name = "pynacl" },
+     { name = "structlog" },
+@@ -413,6 +590,7 @@ dev = [
+ 
+ [package.metadata]
+ requires-dist = [
++    { name = "google-antigravity", specifier = ">=0.1.0" },
+     { name = "mcp", specifier = ">=2.0.0" },
+     { name = "pynacl", specifier = ">=1.6.2" },
+     { name = "structlog", specifier = ">=26.1.0" },
+@@ -435,6 +613,42 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+ ]
+ 
++[[package]]
++name = "protobuf"
++version = "7.35.1"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/da/01/9ef0afd7999eb9badb3a768b4aedd78c86d4c65cfaf1958ab276199e76b4/protobuf-7.35.1.tar.gz", hash = "sha256:ce115a26fe0c39a2c29973d914d327e516a6455464489fe3cd1e51a1b354f81a", size = 458717, upload-time = "2026-06-11T21:55:40.257Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/10/03/8aeeb7458d22546bf64b5250ca1daeb5ff757d900e8e4a7476c6f0db843e/protobuf-7.35.1-cp310-abi3-macosx_10_9_universal2.whl", hash = "sha256:24f857477359a85c0c235261b8ba905fd51b2562f4a64ca1df5473f29850cbf6", size = 433226, upload-time = "2026-06-11T21:55:31.719Z" },
++    { url = "https://files.pythonhosted.org/packages/37/4b/dfb89eb0e652a1ff073c39a59fb5e3a83cfe9b57a2c83fa6d78270101767/protobuf-7.35.1-cp310-abi3-manylinux2014_aarch64.whl", hash = "sha256:11d6b0ec246892d85215b0a13ca6e0233cf5284b68f0ac02646427f4ff88a799", size = 328847, upload-time = "2026-06-11T21:55:34.035Z" },
++    { url = "https://files.pythonhosted.org/packages/0f/58/dc12f2cd484951524af6e3382c785869b9b3fb5e52ee95ae23add53ee8f9/protobuf-7.35.1-cp310-abi3-manylinux2014_s390x.whl", hash = "sha256:b73f9489a4b8b1c9cb1f8ed951c736392592edb24b9d6819f36d2e10b171d5b4", size = 344030, upload-time = "2026-06-11T21:55:34.941Z" },
++    { url = "https://files.pythonhosted.org/packages/e4/be/5b3cfe508bfab6761414ff944e3366eb13be4fd71efcd69450f89ba39f43/protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl", hash = "sha256:74758715c53d7158fb76caf4f0cfdacc5329a4b1bb994f865d6cf302d413a1c4", size = 327130, upload-time = "2026-06-11T21:55:35.921Z" },
++    { url = "https://files.pythonhosted.org/packages/d8/bc/6d6c7ba8709c85f8f2c390b2b118d6fb08a783676a572271851bf45a7d22/protobuf-7.35.1-cp310-abi3-win32.whl", hash = "sha256:353652e4efd0bca5b5fc2656abf8307ef351f0cf938c9eba09f0e09c20a25c30", size = 428945, upload-time = "2026-06-11T21:55:37.034Z" },
++    { url = "https://files.pythonhosted.org/packages/0a/19/8d0cb6f20a1ef7b18f1c8986ad5783f22f84cce39c6ce9a6e645ea55192e/protobuf-7.35.1-cp310-abi3-win_amd64.whl", hash = "sha256:230a75ddfc2de4806e56696ce9640c1cdfdb6543b7cfce98d42a4c0a0e7bdb87", size = 439996, upload-time = "2026-06-11T21:55:38.123Z" },
++    { url = "https://files.pythonhosted.org/packages/19/c7/5f7c636ec43e0c545e28d1f1db71990108306f7bdcb89f069ba97e428e7f/protobuf-7.35.1-py3-none-any.whl", hash = "sha256:4bc97768d8fe4ad6743c8a19403e314511ed9f6d13205b687e52421c023ac1b9", size = 171659, upload-time = "2026-06-11T21:55:39.155Z" },
++]
++
++[[package]]
++name = "pyasn1"
++version = "0.6.4"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/a4/9a/23310166d960def5897e91fe20e5b724601b02a22e84ba1f94232c0b7f67/pyasn1-0.6.4.tar.gz", hash = "sha256:9c447d8431c947fe4c8febc4ed9e760bc29011a5b01e5c74b67025bd9fb8ce81", size = 151262, upload-time = "2026-07-09T01:12:33.988Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/9a/3b/6163796d69c3977d1e4287bea4a6979161cbbdd170ebb430511e8e1999ce/pyasn1-0.6.4-py3-none-any.whl", hash = "sha256:deda9277cfd454080ec40b207fb6df82206a3a2688735233cdcd8d3d565f088b", size = 84410, upload-time = "2026-07-09T01:12:32.92Z" },
++]
++
++[[package]]
++name = "pyasn1-modules"
++version = "0.4.2"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "pyasn1" },
++]
++sdist = { url = "https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-0.4.2.tar.gz", hash = "sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6", size = 307892, upload-time = "2025-03-28T02:41:22.17Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/47/8d/d529b5d697919ba8c11ad626e835d4039be708a35b0d22de83a269a6682c/pyasn1_modules-0.4.2-py3-none-any.whl", hash = "sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a", size = 181259, upload-time = "2025-03-28T02:41:19.028Z" },
++]
++
+ [[package]]
+ name = "pycparser"
+ version = "3.0"
+@@ -663,6 +877,21 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/2c/58/ca301544e1fa93ed4f80d724bf5b194f6e4b945841c5bfd555878eea9fcb/referencing-0.37.0-py3-none-any.whl", hash = "sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231", size = 26766, upload-time = "2025-10-13T15:30:47.625Z" },
+ ]
+ 
++[[package]]
++name = "requests"
++version = "2.34.2"
++source = { registry = "https://pypi.org/simple" }
++dependencies = [
++    { name = "certifi" },
++    { name = "charset-normalizer" },
++    { name = "idna" },
++    { name = "urllib3" },
++]
++sdist = { url = "https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-2.34.2.tar.gz", hash = "sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed", size = 142856, upload-time = "2026-05-14T19:25:27.735Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl", hash = "sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0", size = 73075, upload-time = "2026-05-14T19:25:26.443Z" },
++]
++
+ [[package]]
+ name = "rpds-py"
+ version = "2026.6.3"
+@@ -784,6 +1013,15 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/57/c9/e69b1ff4c8b69093ef08b8919ab767af0569666865b39c30a8795d88d3c6/ruff-0.15.22-py3-none-win_arm64.whl", hash = "sha256:e1168075b72158510839f250027659cdd78476f40507dd517892304c41318661", size = 11298172, upload-time = "2026-07-16T15:14:10.51Z" },
+ ]
+ 
++[[package]]
++name = "sniffio"
++version = "1.3.1"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964ddf5cfdbd/sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc", size = 20372, upload-time = "2024-02-25T23:20:04.057Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2", size = 10235, upload-time = "2024-02-25T23:20:01.196Z" },
++]
++
+ [[package]]
+ name = "sortedcontainers"
+ version = "2.4.0"
+@@ -828,6 +1066,15 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/a9/18/489c97b834dfff9cf2fc2507cede4bcd4b11e67f84bc462acd1992496f86/structlog-26.1.0-py3-none-any.whl", hash = "sha256:e081a26d6c373e6d201eca24eede26d8ffab07f88f477822e679183428d3d91e", size = 73764, upload-time = "2026-06-06T07:33:38.046Z" },
+ ]
+ 
++[[package]]
++name = "tenacity"
++version = "9.1.4"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697ee8a44d3d69222b344920433d3b6666ccd9b374630c/tenacity-9.1.4.tar.gz", hash = "sha256:adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a", size = 49413, upload-time = "2026-02-07T10:45:33.841Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/d7/c1/eb8f9debc45d3b7918a32ab756658a0904732f75e555402972246b0b8e71/tenacity-9.1.4-py3-none-any.whl", hash = "sha256:6095a360c919085f28c6527de529e76a06ad89b23659fa881ae0649b867a9d55", size = 28926, upload-time = "2026-02-07T10:45:32.24Z" },
++]
++
+ [[package]]
+ name = "truststore"
+ version = "0.10.4"
+@@ -858,6 +1105,15 @@ wheels = [
+     { url = "https://files.pythonhosted.org/packages/dc/9b/47798a6c91d8bdb567fe2698fe81e0c6b7cb7ef4d13da4114b41d239f65d/typing_inspection-0.4.2-py3-none-any.whl", hash = "sha256:4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7", size = 14611, upload-time = "2025-10-01T02:14:40.154Z" },
+ ]
+ 
++[[package]]
++name = "urllib3"
++version = "2.7.0"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/53/0c/06f8b233b8fd13b9e5ee11424ef85419ba0d8ba0b3138bf360be2ff56953/urllib3-2.7.0.tar.gz", hash = "sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c", size = 433602, upload-time = "2026-05-07T16:13:18.596Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl", hash = "sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897", size = 131087, upload-time = "2026-05-07T16:13:17.151Z" },
++]
++
+ [[package]]
+ name = "uvicorn"
+ version = "0.52.0"
+@@ -870,3 +1126,80 @@ sdist = { url = "https://files.pythonhosted.org/packages/05/c8/2d307868453a4bca6
+ wheels = [
+     { url = "https://files.pythonhosted.org/packages/39/e6/b5c0630ace9757232aec07112be8146b812787db52141ff9d50674aa7634/uvicorn-0.52.0-py3-none-any.whl", hash = "sha256:3d887809810b89ed33501bcf0a9aba469b06ecd608158efce04bd6b48d8c9b08", size = 79058, upload-time = "2026-07-29T08:45:32.492Z" },
+ ]
++
++[[package]]
++name = "websockets"
++version = "16.1.1"
++source = { registry = "https://pypi.org/simple" }
++sdist = { url = "https://files.pythonhosted.org/packages/21/f7/bc3a25c5ec26ce62ce487690becc2f3710bbc7b33338f005ad390db0b986/websockets-16.1.1.tar.gz", hash = "sha256:db234eda965dcce15df96bb9709f587cd87d4d52aaf0e80e2f34ec04c7670c57", size = 182204, upload-time = "2026-07-17T22:51:05.858Z" }
++wheels = [
++    { url = "https://files.pythonhosted.org/packages/17/9d/681cda21c9eee743203a6cb79b9d3d05adad9aa60ec660c6c9bf4dd619ca/websockets-16.1.1-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:cc97814dfb786a83b6e2dc2e79351e1b83e6d715647d6887fcabd83026417a00", size = 179600, upload-time = "2026-07-17T22:49:13.92Z" },
++    { url = "https://files.pythonhosted.org/packages/fb/8d/6195a88b45e8d2a8f745fc2046e36f885a3c9763e6767d2c46229bf9510c/websockets-16.1.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:e047dc87ef7ca50f4d309bf775ad4a71711c58556d75d7bd0604b2317f43e94b", size = 177272, upload-time = "2026-07-17T22:49:15.453Z" },
++    { url = "https://files.pythonhosted.org/packages/73/e3/fe2d498c64dea0095c9a9f9a351af4cd6eef31b618395582bc1f38ba45ff/websockets-16.1.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:01fbdcbac298efe19360b94bc0039c8f746f0220ba570f327577bfee81059175", size = 177542, upload-time = "2026-07-17T22:49:16.875Z" },
++    { url = "https://files.pythonhosted.org/packages/fe/ed/f1831681fce0e3242346e5458486003c5f124ed69e5e0b847fd029db4973/websockets-16.1.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:0f62863e8a00a6d33c3d6566ec0b89f23787b747ffe0c3bc71ec0e76b82c94b1", size = 187137, upload-time = "2026-07-17T22:49:18.323Z" },
++    { url = "https://files.pythonhosted.org/packages/6f/79/4ff9dcc1bb46f6b4c536936dde1fd60f9b564f3304307274db97f4c9496d/websockets-16.1.1-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8087e82f842609734c9b5a1330464f8e94e346ba0e18c832c08bafa4b0d63c15", size = 188374, upload-time = "2026-07-17T22:49:19.65Z" },
++    { url = "https://files.pythonhosted.org/packages/62/c3/5c49b6efb36cab733d23773f6de575e1dba65736ead17d5d2b2a1daef779/websockets-16.1.1-cp312-cp312-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:2bb5d041a8307d2e18782e7ce777f6fdb1e8c2f5d09291484b18c294b789d9aa", size = 191155, upload-time = "2026-07-17T22:49:21.331Z" },
++    { url = "https://files.pythonhosted.org/packages/6e/f6/56ccceda3a4838d18f1d40821480da4775397e8b1eecf4031e20c50e2e90/websockets-16.1.1-cp312-cp312-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:1db4de4a0e95673f7545d393c49eeb0c2f18ac1ef93073218c79d5cdb2ee75ab", size = 189011, upload-time = "2026-07-17T22:49:22.889Z" },
++    { url = "https://files.pythonhosted.org/packages/86/d6/ad5286241a2bce1107e2798d3bfbd62cf79aee167bdb654f8cb1e9dbf949/websockets-16.1.1-cp312-cp312-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:f17dbe07eb3ea7f99e4df9b7e0efefe80fbf30d37a8cc4d561a0aed310bc8847", size = 187766, upload-time = "2026-07-17T22:49:24.339Z" },
++    { url = "https://files.pythonhosted.org/packages/bc/67/d65c970b7e347fdca69479beb7811c2060529956730a7a4e3ae7c66b0e31/websockets-16.1.1-cp312-cp312-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:4b57693728576d84ede0a77987ab16881b783d2cd9f1dc180a8fbbc3f79c4428", size = 185173, upload-time = "2026-07-17T22:49:25.743Z" },
++    { url = "https://files.pythonhosted.org/packages/1d/5b/14af3cd4ee69d8ea9baca58f3dc3cfb1ba78332a347fd478cb096549d60e/websockets-16.1.1-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:2a636ff1e7a5c4edf71ef0e79adae7f25dba93b4fcbe3dc958733477ffeb0eaf", size = 187809, upload-time = "2026-07-17T22:49:27.147Z" },
++    { url = "https://files.pythonhosted.org/packages/7b/11/be301710d70de97e3e7b3586e6d492c9c06d6a61bf1c2202c36cf0c75607/websockets-16.1.1-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:d6bec75c290fe484a8ba4cacdf838501e17c06ecfbbf31eede81a9e431bd7751", size = 186412, upload-time = "2026-07-17T22:49:28.611Z" },
++    { url = "https://files.pythonhosted.org/packages/db/07/fe1435bf6fe738a3d3b54dbe0c18dabf12cba4d909ac8b58b539ce27c1f4/websockets-16.1.1-cp312-cp312-musllinux_1_2_ppc64le.whl", hash = "sha256:54509b8e92fee4453e152b7558ddef37ce9705a044922f2095a6105e3f80c96f", size = 188290, upload-time = "2026-07-17T22:49:29.965Z" },
++    { url = "https://files.pythonhosted.org/packages/8a/0a/81f394aff8efcbb01208c1ced77df0a3c7fcce584a88c7273663697946c2/websockets-16.1.1-cp312-cp312-musllinux_1_2_riscv64.whl", hash = "sha256:f0aa4aad3b1b69ad3fd85a0fd0952ec64331c762bd77ec51cc814170873890b2", size = 185844, upload-time = "2026-07-17T22:49:31.447Z" },
++    { url = "https://files.pythonhosted.org/packages/39/5c/dd485b995473f415510251fe9bd708f2d24458f439fce958daf8d66dc7c6/websockets-16.1.1-cp312-cp312-musllinux_1_2_s390x.whl", hash = "sha256:42290eb6db4ccaca7012656738214f8514082fb6fa40cdeb61bb9a471b52e383", size = 186823, upload-time = "2026-07-17T22:49:33.104Z" },
++    { url = "https://files.pythonhosted.org/packages/9d/0b/f78de76ff446f1e66af12b43c48a35f31744de93cfdec2f4ea67d5d7bbf1/websockets-16.1.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:53260c8930da5771cec89439bff99c20c8cb03ddb9588b980697355a83cd4bd3", size = 187102, upload-time = "2026-07-17T22:49:34.616Z" },
++    { url = "https://files.pythonhosted.org/packages/37/a1/4cf892007778eaf84ad162bfc98046e0ed89b63ac55949e3236626b2a23f/websockets-16.1.1-cp312-cp312-win32.whl", hash = "sha256:1d27fa8462ad6a1cb36206a3d0640b2333340def181fae11ed7f9adeaa5c0747", size = 179943, upload-time = "2026-07-17T22:49:36.213Z" },
++    { url = "https://files.pythonhosted.org/packages/d9/de/6abe251d28c3a3f217096575400b27750b18e0b1d2fff3a2a239960fea07/websockets-16.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:b436f6ec4fc3a6b4237c84d3f83170ed2b40bb584222f0ac47a0c8a5921980c7", size = 180243, upload-time = "2026-07-17T22:49:37.626Z" },
++    { url = "https://files.pythonhosted.org/packages/ce/fd/6ec6c6d2850aea25b1b2aa9901a016980bb87d01e89b3eb00470b1b5d471/websockets-16.1.1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:ab59169ace05dcb49a1d4118f0bde139557adf45091bd85747e36bf5de984dd1", size = 179587, upload-time = "2026-07-17T22:49:38.959Z" },
++    { url = "https://files.pythonhosted.org/packages/5f/d8/1d299d2dd34087db39831a34cc645ef8a6f89d78efada6983093513cd81c/websockets-16.1.1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:5e3b7d601f6f84156b08cc4a5e541c2b50ad7b36cfc302b657a12477c904a5df", size = 177272, upload-time = "2026-07-17T22:49:40.293Z" },
++    { url = "https://files.pythonhosted.org/packages/3d/86/0a70d3ae2f0f2256bb41302d9804dbca65d4360281e7feb3e1f94102ac46/websockets-16.1.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:cd2ca96a082a36964aca83e992f72abeb61b7306c1a6cba4c7d06a7b93750cac", size = 177530, upload-time = "2026-07-17T22:49:41.786Z" },
++    { url = "https://files.pythonhosted.org/packages/b5/c2/c676c69444d9db448b3f0a55a98dcc534affce0bce961d9d2f0b8499b10a/websockets-16.1.1-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:f5d497865f05bb222cab7016c6034542e84e5f29f49c6fd3f4939cda7197b5b8", size = 187197, upload-time = "2026-07-17T22:49:43.658Z" },
++    { url = "https://files.pythonhosted.org/packages/0b/13/88137fbaf726ebe29d62c1117fa11fa2bbb6209dc79d4ad738efbe36a2aa/websockets-16.1.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:bae954c382e013d5ea5b190d2830526bfa45ad121c326da0049b8c769f185db6", size = 188433, upload-time = "2026-07-17T22:49:45.147Z" },
++    { url = "https://files.pythonhosted.org/packages/01/6d/46c2f2ce6751cb26f39293e1ecbf8544cb01321397cd476c2756b98c216d/websockets-16.1.1-cp313-cp313-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:e09f753a169951eb4f28c2c774f71069304f66e7277e0f5a2892423599cfa854", size = 189868, upload-time = "2026-07-17T22:49:46.581Z" },
++    { url = "https://files.pythonhosted.org/packages/29/2b/170a9e8097636cfde4dc3c592b6e00b18a44a2f5407606d96ca542dd5838/websockets-16.1.1-cp313-cp313-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:024193f8551a2b0eafbdd160911012c4e6c228c28430c84433253299a9e42d6a", size = 189059, upload-time = "2026-07-17T22:49:47.972Z" },
++    { url = "https://files.pythonhosted.org/packages/a7/48/f0d4ebc9ab4b473b8861b9e20fdb663d515d42f7befdf62cdb60fee7a1ec/websockets-16.1.1-cp313-cp313-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:aabe464bfd13bd25f4821faf111da6fefdc389f870265a53105580e45b0a2e49", size = 187814, upload-time = "2026-07-17T22:49:49.344Z" },
++    { url = "https://files.pythonhosted.org/packages/d5/ba/39a41d3ae8e72696a9492581900611c5a91e2b07563b0bcd2523adea9854/websockets-16.1.1-cp313-cp313-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:a28fcbc9b6baf54a2e23f8655f308e4ccc6afdd7266f8fe7954f320dcda0f785", size = 185229, upload-time = "2026-07-17T22:49:50.787Z" },
++    { url = "https://files.pythonhosted.org/packages/3c/36/ac15b604f850d1907f0a85ed721cefe47cd45034b3620069b829746cccbe/websockets-16.1.1-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:79eace538c6a97e96d0d03d4f9d314f9677f5ed85a8a984992ffd90b13cb8a56", size = 187874, upload-time = "2026-07-17T22:49:52.228Z" },
++    { url = "https://files.pythonhosted.org/packages/a8/f3/3fbd5d71d59299c3770faa5884d4f45070236ca5a35ab3a61830812c409a/websockets-16.1.1-cp313-cp313-musllinux_1_2_armv7l.whl", hash = "sha256:496af849a472b531f758dbd4d61338f5000538cb1a7b3d20d9d32a264517f509", size = 186469, upload-time = "2026-07-17T22:49:53.776Z" },
++    { url = "https://files.pythonhosted.org/packages/b4/fc/dd90349bba58af2a53ef2ddd9c32716c81eb6d59a0687939fff561860878/websockets-16.1.1-cp313-cp313-musllinux_1_2_ppc64le.whl", hash = "sha256:5283810d2646741a0d8da2aa733d6aefa0545809afccb2a5d105a26bc45125f1", size = 188347, upload-time = "2026-07-17T22:49:55.202Z" },
++    { url = "https://files.pythonhosted.org/packages/4c/f3/f73ba86427682da59b78c11d77ba56d5b801c32e84afe79b274bbd6a9bb2/websockets-16.1.1-cp313-cp313-musllinux_1_2_riscv64.whl", hash = "sha256:4e3b680b1e0a27457e727a0d572fd81dffa87b6dbf8b228ab57da64f7d85aead", size = 185903, upload-time = "2026-07-17T22:49:56.75Z" },
++    { url = "https://files.pythonhosted.org/packages/34/7c/f95eb20e80104173b3a0a092291f89ea4047ef6e608e0a57ca06eb14eecb/websockets-16.1.1-cp313-cp313-musllinux_1_2_s390x.whl", hash = "sha256:69159730a823dde3ea8d08783e8d47ef135a6d7e8d44eb127e32b321c9db8e3e", size = 186855, upload-time = "2026-07-17T22:49:58.467Z" },
++    { url = "https://files.pythonhosted.org/packages/b0/35/dd875b3e050ff232d60fa377707f890e369f74d134f1be32e8f68879747c/websockets-16.1.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:ed5bb271084b46530ee2ddc0410537a9961152c5ccba2fc98c5276d992ccba87", size = 187140, upload-time = "2026-07-17T22:50:00.016Z" },
++    { url = "https://files.pythonhosted.org/packages/e8/dc/5cbfcb41824502f6af93b8f3943a4d06c67c23c7d2e31eb18748c4a5b2a7/websockets-16.1.1-cp313-cp313-win32.whl", hash = "sha256:cfb70b4eb56cac4da0a83588f3ad50d46beb0690391082f3d4e2d488c70b68ea", size = 179928, upload-time = "2026-07-17T22:50:01.685Z" },
++    { url = "https://files.pythonhosted.org/packages/b0/c1/71e5deb5b7f8f226997ab64908c184ac3105c0155ce2d486f318e5dd08a8/websockets-16.1.1-cp313-cp313-win_amd64.whl", hash = "sha256:d9531d9cbeac99af6f038fb1bc351403531f7d634a2c2e10e2f7c854c6ed5b68", size = 180242, upload-time = "2026-07-17T22:50:03.117Z" },
++    { url = "https://files.pythonhosted.org/packages/73/a2/ba78a164eeea4620df4a4df4bd2ed6017438c4655cc0f36f2c0bc0432355/websockets-16.1.1-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:443aefe96b7fdb132e2a70806cca1f2af49bb3f28e47abcd7c2e9dcf4d8fa1b8", size = 179635, upload-time = "2026-07-17T22:50:05.001Z" },
++    { url = "https://files.pythonhosted.org/packages/b9/08/d26d7a7628cd4ac34cbbdb63ac80914ca842ed8e42938c40a53567806df3/websockets-16.1.1-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:6456ff333092d509127d75a638cb411afae8ff17f092635015d1902efec8a293", size = 177320, upload-time = "2026-07-17T22:50:06.427Z" },
++    { url = "https://files.pythonhosted.org/packages/0f/45/ebec83e6269536aa5932533c67b0af5c781f3e73fdbcd68672dcf43f4f44/websockets-16.1.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:fce6c48559c86d1ac3632ccb1bebc7d5442fbe79bd9bb0e40379ee54be2a4051", size = 177544, upload-time = "2026-07-17T22:50:07.834Z" },
++    { url = "https://files.pythonhosted.org/packages/c9/d5/abc614d2297f6c1c3e01e61260364457a47c25cc1cf6a879038902bc6aa8/websockets-16.1.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:92b820d345f7a3fc7b8163949ee92df910f290c3fc517b3d5301c78065adafe1", size = 187270, upload-time = "2026-07-17T22:50:09.275Z" },
++    { url = "https://files.pythonhosted.org/packages/52/71/4c99af3b87dff1b2927981f6876607d4acb45338c665242168d3982f7758/websockets-16.1.1-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:2a606d9c24035242a3e256e9d5b77ed9cd6bccfcb7cf993e5ca3c0f6f68fb6a7", size = 188509, upload-time = "2026-07-17T22:50:10.722Z" },
++    { url = "https://files.pythonhosted.org/packages/9b/b4/5c8ca14b0df7eb84ed0524165c5359150210140817a3312aee57bf62a1cf/websockets-16.1.1-cp314-cp314-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:414e596c75f74e0994084694189d7dc9229fb278e33064d6784b73ffbba3ca31", size = 189882, upload-time = "2026-07-17T22:50:12.293Z" },
++    { url = "https://files.pythonhosted.org/packages/25/c1/bedfba9e70557129cb8083748d167bdcc01483dedf0f0df143676df05cbe/websockets-16.1.1-cp314-cp314-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:536676848fc5961aca9d20389951f59169508f765637a172403dc5434d722fa0", size = 189114, upload-time = "2026-07-17T22:50:13.789Z" },
++    { url = "https://files.pythonhosted.org/packages/df/09/aa835b2787835aebd839114be5de51b797cb480b63ba42b26d34dfe147cb/websockets-16.1.1-cp314-cp314-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:97fd3a0e8b53efa41970ac1dff3d8cf0d2884cadeb4caaf95db7ad1526926ee3", size = 187861, upload-time = "2026-07-17T22:50:15.179Z" },
++    { url = "https://files.pythonhosted.org/packages/20/26/f6408330694dbc9830857d9d23bc14ac4f6875127a480cfdda8d5ca21198/websockets-16.1.1-cp314-cp314-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:7b1b19636af86a3c7995d4d028dbe376f39b4bf31541146f9c123582a6c94562", size = 185286, upload-time = "2026-07-17T22:50:16.741Z" },
++    { url = "https://files.pythonhosted.org/packages/17/9a/e0675e70dd8a80762cf35bb18799d3f290a4890ffe6439bc51d222796083/websockets-16.1.1-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:41c8e77f17294c0ac18008a7309b99b34ee72247ef10b6dff4c3f8b5ac29896b", size = 187935, upload-time = "2026-07-17T22:50:18.213Z" },
++    { url = "https://files.pythonhosted.org/packages/33/c1/3234cfb86afde01b81e9bddcc6e534c440975d60a13991259e833069ab3e/websockets-16.1.1-cp314-cp314-musllinux_1_2_armv7l.whl", hash = "sha256:9f63bcef7f4b02b06b35fc01c93b96c43b5e88e1e8868676caacf493d5a31f3a", size = 186444, upload-time = "2026-07-17T22:50:19.67Z" },
++    { url = "https://files.pythonhosted.org/packages/89/87/9c15206e1d778923d8daa9657de07aa62ea815e13448319c98458c37b281/websockets-16.1.1-cp314-cp314-musllinux_1_2_ppc64le.whl", hash = "sha256:dab9eb87869da2d6ed3af3f3adf28414baae6ec9d4df355ffc18889132f3436c", size = 188409, upload-time = "2026-07-17T22:50:21.28Z" },
++    { url = "https://files.pythonhosted.org/packages/f2/00/cf5de5c67676de2d3eef8b2a518f168f6796595447a5b7161ba0d012915c/websockets-16.1.1-cp314-cp314-musllinux_1_2_riscv64.whl", hash = "sha256:43e3a9fdd7cbf7ba6040c31fae0faf84ca1474fef777c4e37912f1540f854499", size = 185958, upload-time = "2026-07-17T22:50:22.719Z" },
++    { url = "https://files.pythonhosted.org/packages/62/c0/731b6ddede2e4136912ec4cff2cffbda35af73546be4762c3d7bd3bd79af/websockets-16.1.1-cp314-cp314-musllinux_1_2_s390x.whl", hash = "sha256:056ae37939ed7e9974f364f5864e76e49182622d8f9751ac1903c0d09b013985", size = 186911, upload-time = "2026-07-17T22:50:24.108Z" },
++    { url = "https://files.pythonhosted.org/packages/8c/7f/39c634472c4469a24a7c09cecddffb08fac6d0e74f73881a94ee8a40a196/websockets-16.1.1-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:a0eadbbf2c30f01efa58e1f110eb6fa293261f6b0b1aa38f7f48707107690af9", size = 187204, upload-time = "2026-07-17T22:50:25.548Z" },
++    { url = "https://files.pythonhosted.org/packages/26/89/9667c256c256dafcc62d21328ce7a40067da857969b68ee9af375b0aaf72/websockets-16.1.1-cp314-cp314-win32.whl", hash = "sha256:195c978b065fa40910582464f99d6b15c8b314c68e0546549a55ed83f4735328", size = 179603, upload-time = "2026-07-17T22:50:27.086Z" },
++    { url = "https://files.pythonhosted.org/packages/bd/dd/1c099d6c0fc5deb6b46ccdbb6981fdb4b12c917869cb3952408409dc18db/websockets-16.1.1-cp314-cp314-win_amd64.whl", hash = "sha256:4e8d01cc3bcae7bbf8167f944aeafefed590fae5693552bba9794a9df68371cc", size = 179948, upload-time = "2026-07-17T22:50:28.521Z" },
++    { url = "https://files.pythonhosted.org/packages/35/25/9956b2d5e0529d5d23924f21bba1440d4c5c88a562e4f08550871ffa97a7/websockets-16.1.1-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:0ffd3031ea8bda8d61762e84220186105ba3b748b3c8da2ae4f7816fac03e573", size = 179963, upload-time = "2026-07-17T22:50:29.982Z" },
++    { url = "https://files.pythonhosted.org/packages/17/06/55ffc976c488b6aee9ea05761ff7c4e88e7c1fd82818c8ca7b556ad2f90c/websockets-16.1.1-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:84a2cef8deffbd9ab8ee0ea546a2a6a7030c28f44e6cdd4547dbfeb489eb8999", size = 177497, upload-time = "2026-07-17T22:50:31.396Z" },
++    { url = "https://files.pythonhosted.org/packages/0c/e8/f7dac2e980bacc92bdc26cebae4ae4d50cae5380732c50980598fc0bbae4/websockets-16.1.1-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:3df13f73af9b3b38ab1195eb299ecb67a4330c911c97ae04043ff74085728abe", size = 177698, upload-time = "2026-07-17T22:50:32.829Z" },
++    { url = "https://files.pythonhosted.org/packages/b2/39/26762f734113e22da2b942c3aca85798e0c0405d64c256549540ff31e5a1/websockets-16.1.1-cp314-cp314t-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:23253dd5bcae3f9aaee0a1d30967a8dbd52e5d3cff93a2e5b84df57b77d4750d", size = 187561, upload-time = "2026-07-17T22:50:34.24Z" },
++    { url = "https://files.pythonhosted.org/packages/11/94/c3f330851806b9b02138b774d593478323e73c99238681b4b93efe64e02d/websockets-16.1.1-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9c1c5705e314449e3308872fe084b8571ce078ee4fc55a98a769bdefe5917392", size = 188732, upload-time = "2026-07-17T22:50:36.088Z" },
++    { url = "https://files.pythonhosted.org/packages/d1/f2/eb2c450f052de334ae33cf200ece6e87b0e14d186807074e4eb1cd2cdea2/websockets-16.1.1-cp314-cp314t-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:69e52d175a0a7d1e13b4b67ad41c560b7d98e8c6f6126eb0bda496c784faf8c7", size = 190872, upload-time = "2026-07-17T22:50:38.008Z" },
++    { url = "https://files.pythonhosted.org/packages/70/31/2ac8cecf3a74f7fed9132129fc3d90b3998a1554570c11a69b2a8c20332d/websockets-16.1.1-cp314-cp314t-manylinux2014_ppc64le.manylinux_2_17_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:1f79c89b5eb034d1722938a891916582f8f7f503f58ca22518a63c3f2cd18499", size = 189305, upload-time = "2026-07-17T22:50:39.53Z" },
++    { url = "https://files.pythonhosted.org/packages/6a/cf/8ab19650d3c0d4562c92e70ab47c257c4aa5c6a713ed87fe63766b31fefc/websockets-16.1.1-cp314-cp314t-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:39f2a024af5c345ffe8fcf1ee18c049c024c94df393bb09b044a6917c77bde43", size = 188033, upload-time = "2026-07-17T22:50:40.912Z" },
++    { url = "https://files.pythonhosted.org/packages/66/d7/a49a38a6127a4acb134fb1912b215d900cc657605cff32445bf519f3acc4/websockets-16.1.1-cp314-cp314t-manylinux_2_31_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:952303a7318d4cbe1011400839bb2051c9f84fa0a35923267f5daba34b15d458", size = 185748, upload-time = "2026-07-17T22:50:42.559Z" },
++    { url = "https://files.pythonhosted.org/packages/95/3e/ad1fa40388c7f2e0bb2c7930d0090b6c5498594bd1cdaec18864df3d9e97/websockets-16.1.1-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:249116b4a76063d930a46391ad56e135c286e4562a18309029fc2c73f4ed4c62", size = 188285, upload-time = "2026-07-17T22:50:43.974Z" },
++    { url = "https://files.pythonhosted.org/packages/35/b8/d5db28ca264b9104f82196f92dc8843e35fd391f763d42e4ad358f5bc97e/websockets-16.1.1-cp314-cp314t-musllinux_1_2_armv7l.whl", hash = "sha256:61922544a0587a13fd3f53e4c0e5e606510c7b0d9d22c8444e5fae22a06b38cb", size = 186777, upload-time = "2026-07-17T22:50:45.474Z" },
++    { url = "https://files.pythonhosted.org/packages/42/9c/726cb39d0cc43ae848dce4aa2acb04eecc6738b1264ec6d700bf6bcfb9f8/websockets-16.1.1-cp314-cp314t-musllinux_1_2_ppc64le.whl", hash = "sha256:46dcaa042cd1de6c59e7d9269fa63ff7572b6df40510600b678f0826b3c7af51", size = 188682, upload-time = "2026-07-17T22:50:46.973Z" },
++    { url = "https://files.pythonhosted.org/packages/be/c7/1168704de8c2dd483edabe4a22cbe4465dd8be8dd95561d214f9fe092871/websockets-16.1.1-cp314-cp314t-musllinux_1_2_riscv64.whl", hash = "sha256:38565aca3e01ea8734e578fb2118dade0ecb0250533f29e22b8d1a7a196cf4d0", size = 186377, upload-time = "2026-07-17T22:50:48.413Z" },
++    { url = "https://files.pythonhosted.org/packages/ca/40/f9ff2d630ffce4e7dfea0b2288e1caf9ebbf9ff8a9ec9396136ce8b94935/websockets-16.1.1-cp314-cp314t-musllinux_1_2_s390x.whl", hash = "sha256:42f599f4d48c7e1a3338fdaac3acd075be3b3cf02d4b274f3bf2767aedd3d217", size = 187148, upload-time = "2026-07-17T22:50:49.845Z" },
++    { url = "https://files.pythonhosted.org/packages/b5/71/e177c8299f78d7cbe2d14df228643c10c70c0e86e108e092056bbcc16e46/websockets-16.1.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:dcc04fedf83effaeb9cce98abc9469bb1b42ef85f03e01c8c1f4438ef7555737", size = 187578, upload-time = "2026-07-17T22:50:51.619Z" },
++    { url = "https://files.pythonhosted.org/packages/49/b2/b6987faf330f5af5c787a2610124c2e8403d51724f9001ec4fff6311fe7a/websockets-16.1.1-cp314-cp314t-win32.whl", hash = "sha256:8483c2096363120eea8b07c06ae7304d520f686665fffd4811fad423930a65d7", size = 179729, upload-time = "2026-07-17T22:50:53.269Z" },
++    { url = "https://files.pythonhosted.org/packages/a2/6e/fbac6ed878dd362fbad7d415fa4f84d38e3e33fed8cde45c64e783acf826/websockets-16.1.1-cp314-cp314t-win_amd64.whl", hash = "sha256:bcce07e23e5769375158f5efdcdafa8d5cd014b93c6683865b840ed65b96f231", size = 180072, upload-time = "2026-07-17T22:50:54.969Z" },
++    { url = "https://files.pythonhosted.org/packages/be/4d/2d0d67834092e354d2b0498f014a41249a89556bc406cf86f3e1557bb463/websockets-16.1.1-py3-none-any.whl", hash = "sha256:6abbd3e82c731c8e531714466acd5d87b5e88ac3243465337ba71d68e23ae7e3", size = 173814, upload-time = "2026-07-17T22:51:04.184Z" },
++]

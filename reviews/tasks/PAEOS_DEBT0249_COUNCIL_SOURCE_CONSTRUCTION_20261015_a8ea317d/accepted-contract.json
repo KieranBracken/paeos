@@ -1,0 +1,30 @@
+{
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "task": "DEBT0249 Council CAS integrity subslice",
+  "authority": "Direct human continuation through implementation/testing/review; existing D0249 mutable intake scope, narrowed to two paths. Separate local source construction, not production admission or integration.",
+  "scope_source": {
+    "path": "ops/backlogs/intake-debt0249-remand-15-mutable-slice.json",
+    "sha256": "0bd4d69b497e5b840a90001a95f9a27118a8424f954e634aeb64528d02fafcf1"
+  },
+  "mutable_files": [
+    "runtime/critique.py",
+    "tests/runtime/test_debt0249_remand14.py"
+  ],
+  "requirements": [
+    "Validate complete dissent payload binding: voter_id, stance, argument, risks and alternatives. Require JSON object and correct field types/content; reject malformed or nonobject CAS payloads before field access. Enforce the same binding for pre-supplied hashes at record creation.",
+    "Verify whole-record vote_cas_hash existence and content binding against canonical existing record.to_dict() with vote_cas_hash reset to empty string. Preserve self-hash serialization compatibility; no historic artifact rewrite.",
+    "Require unique voter IDs and unique dissent entries; dissenting_opinions must be exactly the complete DISSENT/REJECT vote view, including all dataclass fields. Reject omitted, extra, duplicate or inconsistent entries.",
+    "Verification without a CAS store must not claim grounded binding. Keep current callable API and existing rejection tags for established controls where feasible; record creation of valid CAS-backed data remains accepted.",
+    "Retain minimum quorum, substantive dissent and prohibition on consensus as empirical evidence. Avoid unrelated L09 behavior changes.",
+    "Write genuine filesystem CAS tests with valid controls, one-field mutations, malformed/nonobject/absent payloads, duplicates, missing CAS, whole-record tampering and reopen persistence. Demonstrate RED before implementation and GREEN after."
+  ],
+  "baseline": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_RECOVERY_20261015_bd6c2e4f/council_baseline",
+  "excluded": [
+    "promotion stream origin repair",
+    "model router",
+    "canonical integration",
+    "full lifecycle qualification",
+    "debt closure"
+  ],
+  "review_gate": "Independent local verifier plus eligible different-family source review before integration. No provider calls in this construction."
+}

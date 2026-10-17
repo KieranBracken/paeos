@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "classes": [
+    "stale_claim",
+    "competing_claim",
+    "scope_escape",
+    "duplicate_response",
+    "quota_loss",
+    "hung_worker",
+    "vacuous_evidence",
+    "baseline_contamination",
+    "homogeneous_audit",
+    "misleading_completion",
+    "pre_side_effect_crash",
+    "post_side_effect_crash",
+    "prompt_injection",
+    "opaque_alias",
+    "policy_expiry",
+    "resource_exhaustion",
+    "stale_target_head",
+    "projection_poisoning",
+    "false_physical_provenance"
+  ]
+}

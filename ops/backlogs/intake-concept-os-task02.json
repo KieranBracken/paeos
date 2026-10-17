@@ -1,0 +1,41 @@
+[
+  {
+    "objective": "Execute TASK-02-ONTOLOGY-SCHEMAS from backlog/CONCEPT_OS_1_EXECUTION_DAG.yaml against spec/CONCEPT_OS_1_ARCHITECTURE.md. Work in strict RED -> GREEN TDD order: first create the requested Concept OS fixtures and schema/model test suites and run them to prove expected baseline failures; then implement concept/schema/node.schema.json, edge.schema.json, search.schema.json, candidate_hypothesis.schema.json and concept/model.py with frozen typed envelopes, closed six-node/six-edge ontology, recursive immutable JSON values, schema validation, serialization round trips, provenance and namespace invariants, analogy known-break requirement, exploratory hypothesis lifecycle, no ranking confidence field, and candidate-only non-evidentiary exports. Run every acceptance command from the task specification, including fixture counts, Ruff, Pyright, and runtime.ast_linter.check_ast. Do not alter PAEOS kernel/runtime code, protected refs, main/trunk, or unrelated worktree changes. The implementation must be routed through this bound Chat-Bridge sandbox and its final response must report actual commands and results without self-ratifying a Court seal.",
+    "changed_paths": [
+      "concept/model.py",
+      "concept/__init__.py",
+      "concept/schema/node.schema.json",
+      "concept/schema/edge.schema.json",
+      "concept/schema/search.schema.json",
+      "concept/schema/candidate_hypothesis.schema.json",
+      "tests/concept/fixtures/nodes/valid/",
+      "tests/concept/fixtures/nodes/invalid/",
+      "tests/concept/fixtures/edges/valid/",
+      "tests/concept/fixtures/edges/invalid/",
+      "tests/concept/test_node_schemas.py",
+      "tests/concept/test_edge_schemas.py",
+      "tests/concept/test_search_schema.py",
+      "tests/concept/test_candidate_envelope_schema.py",
+      "tests/concept/test_model.py",
+      "tests/concept/test_node_schema_closed_coverage.py",
+      "tests/concept/test_edge_schema_closed_coverage.py"
+    ],
+    "plan_write_scopes": [
+      "concept/model.py",
+      "concept/__init__.py",
+      "concept/schema/",
+      "tests/concept/fixtures/",
+      "tests/concept/test_node_schemas.py",
+      "tests/concept/test_edge_schemas.py",
+      "tests/concept/test_search_schema.py",
+      "tests/concept/test_candidate_envelope_schema.py",
+      "tests/concept/test_model.py",
+      "tests/concept/test_node_schema_closed_coverage.py",
+      "tests/concept/test_edge_schema_closed_coverage.py"
+    ],
+    "goal_signature": "domain:concept-os,task:task-02-ontology-schemas",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

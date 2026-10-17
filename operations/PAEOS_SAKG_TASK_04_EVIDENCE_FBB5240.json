@@ -1,0 +1,22 @@
+{
+  "candidate_commit": "fbb52403b16af0a581848938f274fd266ec0cd9e",
+  "l13_reproduction": {
+    "collected": 15,
+    "failed": 0,
+    "focused_log": "/private/tmp/paeos-sakg-task-04-l13-focused-fbb5240.log",
+    "focused_log_sha256": "d5f20e781cdedce49f011cb4d8868ac1951446a50e52ca7f5ef6eba958d77447",
+    "passed": 15,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "manifest_kind": "PAEOS_SAKG_TASK_04_EVIDENCE",
+  "program_candidate_commit": "e02821cf3e68fcfe2843d102e3b2e7fc40f845be",
+  "schema_version": 1,
+  "static_analysis": {
+    "pyright": "PASS",
+    "ruff": "PASS",
+    "swallowed_exceptions": 0
+  },
+  "subsystem": "SAKG-1",
+  "task": "Task 04 \u2014 Traversal Engine, Acyclic Invariants & Cross-Namespace Gating"
+}

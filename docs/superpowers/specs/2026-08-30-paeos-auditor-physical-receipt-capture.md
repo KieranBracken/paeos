@@ -1,0 +1,77 @@
+# PAEOS Task 9A — Physical Auditor Receipt Capture
+
+**Status:** Founder-authorized isolated recovery task; no Gate A closure claim.
+
+## Purpose
+
+The existing model router records provider/model/family observations but does not produce an
+invocation-bound artifact proving which physical model performed a Layer 14 audit. This task adds
+the smallest provider-neutral receipt seam needed to unblock a future L14 review without exposing
+credentials or changing worker admission, Court, or lifecycle authority.
+
+## Boundary
+
+- The router remains the sole policy authority for provider selection, health, quota, fallback, and
+  retry behavior.
+- The receipt capture layer consumes one completed `RouterResponse`; it does not select providers,
+  retry, or fall back independently.
+- A receipt is eligible only when the completed response proves exactly one provider attempt and no
+  fallback candidate.
+- Actual provider/model/family facts come from the completed transport response. Logical aliases,
+  configured catalog family, chat labels, and manually supplied model names cannot qualify.
+- Candidate SHA, evidence-bundle SHA, and a SHA-256 hash of the exact audit request are bound into
+  the receipt. The request must explicitly name the candidate and evidence hash.
+- Receipt payloads contain identifiers, hashes, counts, and disposition only. Prompt text,
+  response text, credentials, headers, and raw provider bodies are never persisted.
+- The one audit response is returned to the caller as a separate report payload. If an operational
+  caller persists it, the report is a distinct create-only artifact; it is never embedded in the
+  physical receipt and must be reviewed for secret leakage before publication.
+- If post-capture report or receipt validation fails, the operational CLI must preserve the exact
+  response in a private create-only `*.rejected` report, preserve the unbound physical receipt in a
+  distinct private create-only `*.rejected` receipt, and write a content-free `*.rejection.json`
+  record binding their hashes to the exact validator reason. These quarantine artifacts are not a
+  valid report/receipt pair and cannot authorize a retry, audit pass, or gate advancement.
+- A-08 is re-evaluated from the physical builder and auditor families. Unknown or same-family
+  results fail closed.
+- Receipt persistence is create-only, canonical JSON, mode `0600`, and fsync-backed. Existing
+  artifacts cannot be overwritten.
+
+## Required receipt fields
+
+The canonical schema `paeos.auditor-physical-receipt/1` contains:
+
+- audit, session, candidate, evidence, and request-scope identities;
+- builder provider/model/family;
+- configured and actual auditor provider/model/family;
+- one-attempt/fallback telemetry and a transport identity;
+- non-secret request, response, and transcript hashes;
+- captured timestamp, A-08 verdict, and the receipt hash.
+
+## Explicit non-goals
+
+This task does not run a live provider call, repair the repository-wide Ruff/Pyright baseline,
+change Cline admission, close Gate A, execute Task 10, alter Gate B–G, or promote any branch.
+
+## Unblock sequence after implementation
+
+1. Run focused and mutation tests for the receipt contract.
+2. Run one approved non-GLM audit through the PAEOS router and persist its machine-captured
+   receipt plus its separate audit report against the exact Task 8 candidate.
+3. Re-run the independent L13 matrix and reconcile static/environment findings.
+4. Re-run L14. Only a physically proven non-GLM receipt plus a green/dispositioned L13 can release
+   Task 10's three fresh Cline SDK probes.
+
+## 6. Two-phase adjudication amendment — 2026-08-31
+
+The receipt task now separates the auditor's substantive evidence review from physical provenance
+validation. The substantive request must embed the evidence bytes and carry the exact candidate and
+evidence bindings; it must not require the auditor's own future receipt. After the response returns,
+the caller captures the physical provider/model/family receipt and validates A-08. A pair qualifies
+only when the report status is `PASS` and the report-bound physical receipt is valid and decorrelated.
+
+Capture requests express `RetryPolicy.NONE` and `allow_fallback=False` on `TaskRequest`, so a
+provider failure cannot silently create a second transmission. Existing reports and receipts are
+immutable: a valid receipt never upgrades a prior `REMAND_WITH_AMENDMENTS` or
+`BLOCKED_UNQUALIFIABLE` report. The CLI rejects non-canonical or path-only prompts before router
+construction and emits `report_status`, `a08_verdict`, and `qualified` as evidence metadata only;
+it does not seal a Court result, close a gate, or authorize promotion.

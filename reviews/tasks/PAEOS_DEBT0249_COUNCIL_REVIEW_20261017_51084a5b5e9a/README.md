@@ -1,0 +1,1 @@
+Fresh free-only PAEOS router preflight for the exact Council candidate postimages. No provider request was made: the selected NVIDIA model has exact HTTP 410 Gone/EOL evidence, and Google remains provider-wide EXHAUSTED. This receipt preserves fresh operation and request fingerprints. Provider response fingerprint and generation ID are absent because no provider response exists.

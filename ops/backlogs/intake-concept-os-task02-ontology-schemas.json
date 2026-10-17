@@ -1,0 +1,16 @@
+{
+  "task_id": "TASK-02-ONTOLOGY-SCHEMAS",
+  "title": "Freeze node, edge, query, result, and candidate-envelope schemas",
+  "program": "CONCEPT_OS_1",
+  "slice": "C1",
+  "wave": 2,
+  "role": "Planner",
+  "status": "QUEUED_QUOTA_RESET",
+  "audit_required": true,
+  "base_commit": "e8c83c6",
+  "worktree": "/private/tmp/concept-os-candidate",
+  "branch": "codex/concept-os-task-02",
+  "model": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "target_reset_time": "2026-09-05T01:00:00+01:00"
+}

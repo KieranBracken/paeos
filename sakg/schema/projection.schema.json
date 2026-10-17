@@ -1,0 +1,133 @@
+{
+  "$id": "https://paeos.local/sakg/schema/projection.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SAKG Projection Request and Response",
+  "description": "Budget-bounded, read-only SAKG projection contract. SAKG output is advisory and never gate authority.",
+  "oneOf": [
+    {"$ref": "#/$defs/request"},
+    {"$ref": "#/$defs/response"}
+  ],
+  "$defs": {
+    "namespace": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "node_id": {
+      "type": "string",
+      "pattern": "^sakg://[^/]+/(?:Decision|Problem|Option|Constraint|Objective|TradeOff|Mechanism|Pattern|Component|Outcome|Scar|EvidenceRef)/[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["canonical", "candidate", "refuted"]
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["SUMMARY", "INDEX"]
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "query_architectures",
+        "dependency_impact",
+        "tradeoff_precedents",
+        "pattern_retrieval",
+        "memory_augment"
+      ]
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_tokens", "max_nodes", "tier"],
+      "properties": {
+        "max_tokens": {"type": "integer", "minimum": 1},
+        "max_nodes": {"type": "integer", "minimum": 1},
+        "tier": {"$ref": "#/$defs/tier"}
+      }
+    },
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_confidence", "as_of", "status"],
+      "properties": {
+        "min_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "as_of": {"type": "string", "format": "date-time"},
+        "status": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/status"},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "subject", "namespace", "budget", "filters"],
+      "properties": {
+        "method": {"$ref": "#/$defs/method"},
+        "subject": {"type": "string", "minLength": 1, "maxLength": 512},
+        "namespace": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/namespace"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "budget": {"$ref": "#/$defs/budget"},
+        "filters": {"$ref": "#/$defs/filters"}
+      }
+    },
+    "node_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "namespace", "status", "label", "summary"],
+      "properties": {
+        "id": {"$ref": "#/$defs/node_id"},
+        "type": {
+          "type": "string",
+          "enum": [
+            "Decision", "Problem", "Option", "Constraint", "Objective",
+            "TradeOff", "Mechanism", "Pattern", "Component", "Outcome",
+            "Scar", "EvidenceRef"
+          ]
+        },
+        "namespace": {"$ref": "#/$defs/namespace"},
+        "status": {"$ref": "#/$defs/status"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 160},
+        "summary": {"type": "string", "maxLength": 280}
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_summary", "score", "why"],
+      "properties": {
+        "node_summary": {"$ref": "#/$defs/node_summary"},
+        "score": {"type": "number", "minimum": 0, "maximum": 1},
+        "why": {"type": "string", "minLength": 1, "maxLength": 1024}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sakg_version", "corpus_hash", "query_hash"],
+      "properties": {
+        "sakg_version": {"type": "string", "minLength": 1},
+        "corpus_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "query_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["results", "provenance", "truncated", "omitted", "trust", "tier"],
+      "properties": {
+        "results": {"type": "array", "items": {"$ref": "#/$defs/result"}},
+        "provenance": {"$ref": "#/$defs/provenance"},
+        "truncated": {"type": "boolean"},
+        "omitted": {"type": "integer", "minimum": 0},
+        "trust": {"const": "untrusted"},
+        "tier": {"$ref": "#/$defs/tier"}
+      }
+    }
+  }
+}

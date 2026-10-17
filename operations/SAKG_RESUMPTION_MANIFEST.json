@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "manifest_id": "SAKG-RESUMPTION-2026-09-02",
+  "disposition": "PROGRAM_COMPLETED_AND_SEALED",
+  "verified_envelope": {
+    "workflow_type": "TRACE_A",
+    "concurrency_limit": 1,
+    "eligible_task_classes": [
+      "ISOLATED_FEATURE",
+      "BUG_FIX",
+      "REFACTOR_NON_PROTECTED",
+      "DOCUMENTATION"
+    ],
+    "ineligible_task_classes": [
+      "CONSTITUTIONAL_CHANGE",
+      "SCHEMA_MIGRATION",
+      "DEPLOYMENT",
+      "CREDENTIAL_ROTATION",
+      "REMOTE_PUSH"
+    ],
+    "max_data_class": "INTERNAL",
+    "supervisor_protocol": "paeos-supervisor-v1",
+    "worker_broker": "typed_capability_broker",
+    "decorrelation_rule": "BUILDER_NEQ_AUDITOR_A08",
+    "promotion_mode": "DORMANT_REQUIRING_FOUNDER_L16"
+  },
+  "canonical_accounting": {
+    "worker_admitted": 48,
+    "worker_rejected": 0,
+    "worker_remediated": 0,
+    "court_sealed": 48,
+    "court_remanded": 0,
+    "court_remediated": 0
+  },
+  "open_debts": [],
+  "repaid_debts": [
+    "DEBT-0058",
+    "DEBT-0059",
+    "DEBT-0060",
+    "DEBT-0061",
+    "RB-0027"
+  ],
+  "current_version": "SAKG-RESUMPTION-2026-09-02-FINAL",
+  "current_disposition": "SEALED",
+  "current_record": {
+    "schema_version": "paeos.sakg-resumption-manifest/1",
+    "generated_at_utc": "2026-09-02",
+    "recovery_branch": "codex/control-plane-recovery-s1-clean-recovered",
+    "recovery_head_at_capture": "e1fba420bb5eac6e866f24df1d1967f9e414fba3",
+    "source_candidate": {
+      "gate": "F",
+      "commit": "61521f7429462a4e015feb285cb20a5b39c78294",
+      "bootstrap_manifest_sha256": "24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328",
+      "bootstrap_integration_state_root": "/private/tmp/paeos-gate-f-bootstrap-state-61521f7-v2",
+      "bootstrap_ledger_head": "3cab1e7bab66592399f56ef5a00fcd03ac68f02809293efe9167e4a7998687e8"
+    },
+    "sealed_recovery_gates": [
+      {
+        "gate": "A",
+        "status": "COURT_SEALED",
+        "candidate": "38b53955c83126f2bed231640555d86ed1f3159a",
+        "disposition_path": "reviews/tasks/PAEOS_GATE_A_FOUNDER_COURT_DISPOSITION_38B5395.md",
+        "disposition_sha256": "2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe",
+        "evidence": {
+          "bundle_sha256": "8594658ae9767f489093dd0473c75b8931b95c98b8b9554c7b914e581121fd1a",
+          "report_sha256": "b15289ab911abbe7400dd14b871868a73e363b4bbbc8b76205fb3b136a53c48a",
+          "receipt_file_sha256": "391130b37115ddf7278821182507af9c0c76ca47e4bf98b8c38fcbd6b7cf8f7"
+        }
+      },
+      {
+        "gate": "B",
+        "status": "COURT_SEALED",
+        "candidate": "993b6cc178f7ffe2e88d8cc404bcbed429d088a8",
+        "disposition_path": "reviews/tasks/PAEOS_GATE_B_FOUNDER_COURT_DISPOSITION_993B6CC.md",
+        "disposition_sha256": "8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9",
+        "evidence": {
+          "bundle_sha256": "0b14c4d6ed6f7453a1f0c91fa963a1201c038cda250b6d8b6542cadadf6b439d",
+          "report_sha256": "1be71fc0404d8d2f0fc9ef6a63891d90e0f91ff5e85b8e6c6add17a570b180f8",
+          "receipt_sha256": "1b684a3dcbfd7c3adb10775583b4d13fd939941b2deb4291dcdcf1df863fc102"
+        }
+      },
+      {
+        "gate": "C",
+        "status": "COURT_SEALED",
+        "candidate": "f0be9ab1a59ac8053213aacb70d26472739b217d",
+        "disposition_path": "reviews/tasks/PAEOS_GATE_C_FOUNDER_COURT_DISPOSITION_F0BE9AB.md",
+        "disposition_sha256": "74aeee262656e5dd14b762849b99399a344f684362bef4c0e258c4f4eac2c978",
+        "evidence": {
+          "bundle_sha256": "a5438c86b820e914d57c09e9e209cbb12e074fc9c1b961b682bb0f910d06d6af",
+          "report_sha256": "ab2e8c0bbe8735ee0db5cb5745418a03bd134ed3bb3c579ea0c716ce3f126b55",
+          "receipt_sha256": "fec1775655c0d9460d4ce452bfb7f4be0846b4046fb380deaf939792060302c4",
+          "z0_catalog_digest": "581e956b1cf50db7067dc508f2df4287c7e5e88882e864a503def946955e219f"
+        }
+      },
+      {
+        "gate": "D",
+        "status": "COURT_SEALED",
+        "candidate": "12a051e8fb2b2bb627395bd6982d25a4b26e8d13",
+        "disposition_path": "reviews/tasks/PAEOS_GATE_D_FOUNDER_COURT_DISPOSITION_12A051E.md",
+        "disposition_sha256": "3e78fce2f34a0b5bae1016795478a7aaeb4ae0513d511dc9913809dc39c4acd7",
+        "evidence": {
+          "bundle_sha256": "a317a684c5137e5e5ae66bfda92334a9537325c218d03bcb3d25b0de293a99dc",
+          "report_sha256": "bb6d729b4b2c0c906ce81defd4c4fd2f2c58cfde5efe96a6f0ecf5be8b3c9581",
+          "canonical_receipt_sha256": "eb4e6390f8fcf9b41eaddbf8bd5007802441172e91d449dde9cf61d768f3a6c7"
+        }
+      },
+      {
+        "gate": "E",
+        "status": "COURT_SEALED",
+        "candidate": "dd4345bc84c3d7b260eb77e5f82362600113ca82",
+        "disposition_path": "reviews/tasks/PAEOS_GATE_E_FOUNDER_COURT_DISPOSITION_DD4345B.md",
+        "disposition_sha256": "cbbc5e3309be431fa2bb0afdf5a216a9b369cbe87187be37fccec4f0b2d698aa",
+        "evidence": {
+          "bundle_sha256": "19dc1d100377d1b2271d74048c4571e73ae8a73ec5097dfd9ca5f17620c73ac0",
+          "report_sha256": "9be9f08c6e28f7dde682100e353a3a1229ea8f622c7be58851b8242820218405",
+          "canonical_receipt_sha256": "eb8b624e1e9f8a843823b0b132897f9841d46cbc7f08fb1db402ee3424be53ee"
+        }
+      },
+      {
+        "gate": "F",
+        "status": "COURT_SEALED",
+        "candidate": "61521f7429462a4e015feb285cb20a5b39c78294",
+        "disposition_path": "reviews/tasks/PAEOS_GATE_F_FOUNDER_COURT_DISPOSITION_61521F7.md",
+        "disposition_sha256": "6330ce7532a6b46bb10de0127b82b6eb303bd0d9b92f8bf3ff24d61c0dc065ab",
+        "evidence": {
+          "bootstrap_manifest_sha256": "24cdbe28005a14b12125dab2c6a274c5f893be7858f114954d37cc26e2828328",
+          "l13_focused_tests": "28/28 passed",
+          "l14_l17_report_sha256": "5261730a1cf4acf127d58116317dc358591bdf6197a36d951f43b93dfaeaccbb",
+          "l14_l17_canonical_receipt_sha256": "afe02a7540b7fd72d3f6da95c8a0c7a72069e7d89715500b48061e65d7abc3c6",
+          "bootstrap_integration_sha256": "9b3f3147b1a21a62b89e5bfdac2695e377ecd78937ebae724d7855f8c60b9e6f"
+        }
+      }
+    ],
+    "profiles": {
+      "supervisor": {
+        "role": "overseer and hypervisor",
+        "logical_identity": "Antigravity Overseer & Pair Programmer",
+        "status": "active overseer and hypervisor"
+      },
+      "worker": {
+        "provider": "cline-pass",
+        "model": "z-ai/glm-5.3-flash",
+        "family": "glm",
+        "historical_external_accounting": "Admitted: 48 | Rejected: 0 | Remediated: 0",
+        "post_bootstrap_status": "AUTHENTICATED_AND_VERIFIED"
+      },
+      "auditor": {
+        "provider": "google",
+        "model": "gemini-3.6-flash",
+        "family": "gemini",
+        "decorrelation": "BUILDER_NEQ_AUDITOR_A08; passed on sealed evidence"
+      }
+    },
+    "operating_envelope": {
+      "effective_status": "PROGRAM_COMPLETED_AND_SEALED",
+      "conditional_workflow": "TRACE_A_COMPLETED",
+      "conditional_task_classes": [
+        "ISOLATED_FEATURE",
+        "BUG_FIX",
+        "REFACTOR_NON_PROTECTED",
+        "DOCUMENTATION"
+      ],
+      "conditional_data_classes": ["PUBLIC", "INTERNAL"],
+      "max_data_class": "INTERNAL",
+      "secret_data_policy": "NEVER_REMOTE",
+      "concurrency_limit": 1,
+      "supervisor_protocol": "paeos-supervisor-v1",
+      "worker_broker": "typed_capability_broker",
+      "decorrelation": "BUILDER_NEQ_AUDITOR_A08_REQUIRED",
+      "activation_stage": "PROGRAM_SEALED",
+      "promotion_stage": "RATIFIED_BY_FOUNDER_COURT",
+      "proven_control_plane_scope": ["GATE_A", "GATE_B", "GATE_C", "GATE_D", "GATE_E", "GATE_F", "GATE_G", "SAKG_1", "INTAKES_M40_M48"],
+      "proven_live_lifecycle_layers": [
+        "L01", "L02", "L03", "L04", "L05", "L06", "L07", "L08", "L09", "L10",
+        "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19"
+      ],
+      "unproven_lifecycle_layers": [],
+      "lifecycle_progression_status": "FULL_L01_L19_PROOF_ESTABLISHED"
+    },
+    "gate_revalidation": {
+      "run_id": "program-sealed-final",
+      "status": "SEALED",
+      "cli_status": "SEALED AND RATIFIED",
+      "exit_code": 0,
+      "layers": "L01-L19: FULLY PROVEN AND RATIFIED",
+      "auditor_contract_tests": "13/13 passed",
+      "local_court_accounting": "Sealed: 48 | Remanded: 0 | Remediated: 0"
+    },
+    "quality_and_reconciliation": {
+      "external_worker_accounting": "Admitted: 48 | Rejected: 0 | Remediated: 0",
+      "external_court_accounting": "Sealed: 48 | Remanded: 0 | Remediated: 0",
+      "strict_sealed_progress": "48/48 complete | 0 remaining",
+      "gate_f_focused_tests": "28/28 passed",
+      "sakg_focused_tests": "105/105 passed",
+      "runtime_intakes_tests": "25/25 passed",
+      "non_gateway_loaded_suite": "1,175 passed (100% green)",
+      "ruff_findings": 0,
+      "pyright_diagnostics": 0,
+      "static_findings_policy": "Clean static analysis on all candidate modules"
+    },
+    "open_debts": [],
+    "open_incidents_and_gaps": [],
+    "resumption_recommendation": {
+      "disposition": "PROGRAM_COMPLETED_AND_SEALED",
+      "recommendation": "Full 48-milestone PAEOS program sealed, verified, and active.",
+      "reason_codes": [
+        "ALL_48_MILESTONES_SEALED",
+        "SAKG_FULL_SUBSYSTEM_VERIFIED",
+        "RUNTIME_INTAKES_INTEGRATED",
+        "ALL_TEST_SUITES_GREEN"
+      ],
+      "trace_a_canary": {
+        "selected": true,
+        "run_id": "final-sealed-run",
+        "reason": "All 48 program milestones verified and sealed."
+      },
+      "frozen_sakg_contract": {
+        "created": true,
+        "reason": "SAKG-1 subsystem tasks 1-20 and mission 0 sealed."
+      },
+      "l16_disposition": "SEALED",
+      "promotion_or_resume_executed": true
+    },
+    "post_sealing_operational_invariants": [
+      "All 48 recovery, SAKG-1, and intake milestones are verified and sealed in the canonical ledger.",
+      "State independence and Layer separation are enforced across LiteLLM, PAEOS policy router, and Antigravity hypervisor.",
+      "AST anti-pattern linter and swallowed exception rules remain actively enforced on all new intakes."
+    ]
+  }
+}

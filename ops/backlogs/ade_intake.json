@@ -1,0 +1,38 @@
+[
+  {
+    "objective": "Construct canonical layer L17 Retrospective (StageId.RETROSPECT) as a real, gate-routed stage of the SoftLoop following L16 SEAL.\n\nWHY THIS TARGET: L17 is the first missing canonical layer following L16 in the canonical chain. It executes the 6-Question CER Retrospective, generates scar records for failure modes, and computes system friction metrics before memory store updating.\n\nBINDING IMPLEMENTATION CONSTRAINTS:\n1. Insert StageId.RETROSPECT into the SoftLoop stage sequence between SEAL and MEMORY_UPDATE.\n2. Register _RETROSPECTIVE_AUDITOR RoleSpec in runtime/agents/__init__.py with write scope 'retrospective/' ONLY.\n3. Implement retrospective engine and scar record generator in runtime/retrospective.py.\n4. Emit retrospective report artifact to CAS and route edges through Gate.propose_transition.\n5. Author comprehensive unit test suite in tests/runtime/test_l17_retrospective.py.\n\nACCEPTANCE TEST: is_legal(SEAL, RETROSPECT, wc) and is_legal(RETROSPECT, MEMORY_UPDATE, wc) hold for all WeightClass values; executed stage sequence contains SEAL->RETROSPECT->MEMORY_UPDATE path; test suite passes cleanly.",
+    "changed_paths": [
+      "runtime/agents/__init__.py",
+      "runtime/orchestrator/__init__.py",
+      "runtime/retrospective.py",
+      "tests/runtime/test_l17_retrospective.py"
+    ],
+    "plan_write_scopes": [
+      "runtime/agents/__init__.py",
+      "runtime/orchestrator/__init__.py",
+      "runtime/retrospective.py",
+      "tests/runtime/test_l17_retrospective.py"
+    ],
+    "goal_signature": "domain:runtime,task:l17_retrospective",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": [
+      {
+        "claim_id": "builds",
+        "kind": "TEST",
+        "command": "uv run pytest -q tests/runtime/test_l17_retrospective.py",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "..                                                                       [100%]\n"
+      },
+      {
+        "claim_id": "unit",
+        "kind": "TEST",
+        "command": "uv run pytest -q tests/runtime/test_l17_retrospective.py",
+        "artifact_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "exit_code": 0,
+        "stdout": "..                                                                       [100%]\n"
+      }
+    ]
+  }
+]

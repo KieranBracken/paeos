@@ -1,0 +1,43 @@
+{
+  "confidence": 0.55,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "93c804413823b6e7f9a209c805dc211276495125143438aed3010ebce05f6c81",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/12"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 12
+    }
+  },
+  "falsifier": "A bound contradictory observation",
+  "id": "sakg://demo-project/EvidenceRef/01J00000000000000000000012",
+  "label": "Example EvidenceRef 12",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "ingest",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-12",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "fb3e2fa091316b9ee1147a95c14b15bca724944421185dbc6e3bb69ec0632eb3"
+  },
+  "status": "refuted",
+  "summary": "A deterministic evidenceref fixture exercising the universal envelope.",
+  "type": "EvidenceRef",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

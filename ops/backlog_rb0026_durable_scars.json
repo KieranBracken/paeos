@@ -1,0 +1,32 @@
+[
+  {
+    "objective": "Make institutional memory durable (RB-0026): the ScarStore in runtime/memory/__init__.py keeps scars in a plain in-memory dict, so every scar the EvolutionLayer writes during ops/autonomous_run.py evaporates when the process exits — zero durable learning across runs for all of L01-L16. Add a SQLite-backed durable variant (e.g. class DurableScarStore) in runtime/memory/__init__.py with the SAME contract as ScarStore (propose_scar, match_scars, get_precedent, injected_scars) plus the T3 quarantine rule (signatures with fewer than MIN_SIGNATURE_TAGS raise ScarQuarantined). It must load existing rows from its database file on construction and write through on every propose_scar; scar IDs stay stable across reopen. Do NOT break the existing in-memory ScarStore or its tests — add the durable variant alongside it and reuse shared logic where sensible. Then wire ops/autonomous_run.py: build_scheduler constructs the durable store at state_dir/scars.db and passes it as SoftLoop(scar_store=...), so EvolutionLayer scar writes and _scar_refs stage injection both become durable across processes. Add tests/runtime/test_scar_durability.py proving: (1) a scar proposed via one DurableScarStore instance is returned by match_scars on a FRESH instance opened on the same file, (2) quarantine still raises for under-specified signatures, (3) injected_scars gating by INJECTION_STAGES still holds. The durable store must use only the Python standard library (sqlite3) — no new dependencies.",
+    "accept": [
+      "runtime/memory/__init__.py contains a SQLite-backed durable ScarStore variant with the same contract and quarantine rule",
+      "ops/autonomous_run.py constructs the durable scar store from state_dir and passes it to SoftLoop",
+      "tests/runtime/test_scar_durability.py proves cross-instance persistence, quarantine, and injection gating",
+      "uv run pytest -q tests/runtime/test_scar_durability.py tests/runtime/test_scars.py tests/runtime/test_evolution.py passes"
+    ],
+    "changed_paths": [
+      "runtime/memory/__init__.py",
+      "ops/autonomous_run.py",
+      "tests/runtime/test_scar_durability.py"
+    ],
+    "plan_write_scopes": ["runtime/", "ops/", "tests/", "backlog/"],
+    "goal_signature": "memory,durability,scarstore,sqlite,institutional-memory",
+    "builder_evidence": [
+      {
+        "claim_id": "durable",
+        "command": "uv run pytest -q tests/runtime/test_scar_durability.py",
+        "artifact_hash": "live"
+      },
+      {
+        "claim_id": "regression",
+        "command": "uv run pytest -q tests/runtime/test_scars.py tests/runtime/test_evolution.py",
+        "artifact_hash": "live"
+      }
+    ],
+    "verifiable": true,
+    "reversible": true
+  }
+]

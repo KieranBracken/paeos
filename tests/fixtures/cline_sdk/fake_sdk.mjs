@@ -1,0 +1,302 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+
+export class ClineCore {
+  static async create(options = {}) {
+    return new ClineCore(options);
+  }
+
+  constructor(options) {
+    this.options = options;
+    this.listeners = new Set();
+  }
+
+  subscribe(listener) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  emit(event) {
+    for (const listener of this.listeners) listener(event);
+  }
+
+  async start(input) {
+    if (typeof input.config.systemPrompt !== "string" || !input.config.systemPrompt.trim()) {
+      throw new TypeError("systemPrompt is required");
+    }
+    const routingRules = input.config.toolRoutingRules;
+    if (
+      !Array.isArray(routingRules) ||
+      routingRules.length !== 1 ||
+      routingRules[0]?.name !== "paeos-admission-probe-allowlist" ||
+      routingRules[0]?.mode !== "act" ||
+      JSON.stringify(routingRules[0]?.enableTools) !== JSON.stringify(["editor", "run_commands"]) ||
+      JSON.stringify(routingRules[0]?.disableTools) !==
+        JSON.stringify([
+          "read_files",
+          "search_codebase",
+          "fetch_web_content",
+          "apply_patch",
+          "skills",
+          "ask_question",
+          "submit_and_exit",
+        ])
+    ) {
+      throw new TypeError("probe tool capability allowlist mismatch");
+    }
+    const sessionId = input.config.sessionId;
+    const probe = input.prompt.startsWith("PAEOS_SDK_PROBE:")
+      ? JSON.parse(input.prompt.slice("PAEOS_SDK_PROBE:".length))
+      : null;
+    if (probe?.probe_id === "probe-start-throws") {
+      throw new Error("synthetic start failure");
+    }
+    if (probe?.probe_id === "probe-start-auth-error") {
+      const error = new Error("credentials require reauthentication");
+      error.name = "OAuthReauthRequiredError";
+      throw error;
+    }
+    let manifestPath = `/profile/sessions/${sessionId}/${sessionId}.json`;
+    let messagesPath = `/profile/sessions/${sessionId}/${sessionId}.messages.json`;
+    if (probe) {
+      const sessionRoot = join(process.env.CLINE_DATA_DIR, "sessions", sessionId);
+      await mkdir(sessionRoot, { recursive: true });
+      manifestPath = join(sessionRoot, `${sessionId}.json`);
+      messagesPath = join(sessionRoot, `${sessionId}.messages.json`);
+      await writeFile(
+        manifestPath,
+        JSON.stringify({
+          version: 1,
+          session_id:
+            probe.probe_id === "probe-manifest-session" ? "other-session" : sessionId,
+          source: "core",
+          pid: process.pid,
+          started_at: new Date().toISOString(),
+          ended_at: new Date().toISOString(),
+          exit_code: 0,
+          status: "completed",
+          interactive: false,
+          provider:
+            probe.probe_id === "probe-manifest-provider"
+              ? "other-provider"
+              : input.config.providerId,
+          model:
+            probe.probe_id === "probe-manifest-model"
+              ? "cline-pass/deepseek-v4"
+              : input.config.modelId,
+          cwd: input.config.cwd,
+          workspace_root: input.config.cwd,
+          enable_tools: true,
+          enable_spawn: input.config.enableSpawnAgent,
+          enable_teams:
+            probe.probe_id === "probe-manifest-capabilities"
+              ? true
+              : input.config.enableAgentTeams,
+          prompt: input.prompt,
+          metadata: {},
+          messages_path: messagesPath,
+        }),
+      );
+      await writeFile(
+        messagesPath,
+        JSON.stringify({
+          messages: [
+            {
+              modelInfo: { id: input.config.modelId, provider: input.config.providerId },
+              role: "assistant",
+            },
+          ],
+          sessionId,
+        }),
+      );
+    }
+    if (probe?.probe_id === "probe-early-provider-attempt") {
+      await this.options.fetch(new Request("data:application/json,%7B%7D"));
+      this.emit({
+        type: "session_ended",
+        sessionId,
+        result: {
+          model: { id: input.config.modelId, provider: input.config.providerId },
+        },
+      });
+      return { sessionId, manifestPath, messagesPath };
+    }
+    if (probe?.probe_id === "probe-ended-event") {
+      this.emit({
+        type: "ended",
+        payload: { sessionId, reason: "completed", ts: Date.now() },
+      });
+      return {
+        sessionId,
+        manifestPath,
+        messagesPath,
+        result: {
+          model: { id: input.config.modelId, provider: input.config.providerId },
+          usage: undefined,
+        },
+      };
+    }
+    setTimeout(async () => {
+      try {
+        if (probe?.probe_id === "probe-timeout-unfinished") {
+          await this.options.fetch(new Promise(() => {}));
+          return;
+        }
+        if (probe?.probe_id === "probe-auth-failed") {
+          this.emit({
+            type: "session_failed",
+            sessionId,
+            normalizedError: "AUTH_FAILED",
+          });
+          return;
+        }
+        await this.options.fetch(
+          new Request("data:application/json,%7B%7D", {
+            headers: {
+              Authorization: "Bearer synthetic-secret-never-serialize",
+              "X-Prompt": "private-prompt-never-serialize",
+            },
+          }),
+        );
+        if (input.prompt.includes("double-fetch-before-tool")) {
+          await this.options.fetch(new Request("data:application/json,%7B%7D"));
+        }
+        if (probe?.probe_id === "probe-hidden-retry") {
+          await this.options.fetch(new Request("data:application/json,%7B%7D"));
+        }
+        const unauthorized = probe?.probe_id.startsWith("probe-unauthorized-")
+          ? probe.probe_id.slice("probe-unauthorized-".length)
+          : null;
+        const firstToolInput = probe
+          ? {
+              path: probe.artifact_path,
+              old_text: probe.initial_text,
+              new_text: probe.expected_text,
+            }
+          : { path: "/sandbox/artifact.txt", old_text: "old", new_text: "new" };
+        const approvalRequest = (toolCallId, toolName, toolInput, iteration) => ({
+          sessionId,
+          agentId: "agent-001",
+          conversationId: "conversation-001",
+          iteration,
+          toolCallId,
+          toolName,
+          input: toolInput,
+          policy: { enabled: true, autoApprove: false },
+        });
+        const decision = await input.capabilities.requestToolApproval(
+          approvalRequest("tool-call-001", unauthorized ?? "editor", firstToolInput, 1),
+        );
+        if (probe?.probe_id === "probe-batched-approvals") {
+          const verificationInput = { commands: [probe.verification_command] };
+          const verification = await input.capabilities.requestToolApproval(
+            approvalRequest("tool-call-002", "run_commands", verificationInput, 1),
+          );
+          if (decision.approved) {
+            await input.capabilities.toolExecutors.editor(firstToolInput, "/sandbox", {
+              sessionId,
+              agentId: "agent-001",
+              conversationId: "conversation-001",
+              iteration: 1,
+              toolCallId: "tool-call-001",
+            });
+          }
+          if (verification.approved) {
+            await input.capabilities.toolExecutors.bash(
+              probe.verification_command,
+              "/sandbox",
+              {
+                sessionId,
+                agentId: "agent-001",
+                conversationId: "conversation-001",
+                iteration: 1,
+                toolCallId: "tool-call-002",
+              },
+            );
+          }
+          if (decision.approved && verification.approved) {
+            await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          }
+          this.emit({
+            type: "session_ended",
+            sessionId,
+            result: {
+              approved: decision.approved && verification.approved,
+              model: { id: input.config.modelId, provider: input.config.providerId },
+            },
+          });
+        } else if (probe && !unauthorized) {
+          if (decision.approved) {
+            await input.capabilities.toolExecutors.editor(firstToolInput, "/sandbox", {
+              sessionId,
+              agentId: "agent-001",
+              conversationId: "conversation-001",
+              iteration: 1,
+              toolCallId: "tool-call-001",
+            });
+          }
+          await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          const expansions = {
+            cd: `cd / && ${probe.verification_command}`,
+            extra: `${probe.verification_command} --extra`,
+            pipe: `${probe.verification_command} | true`,
+            redirection: `${probe.verification_command} > result.txt`,
+            separator: `${probe.verification_command}; true`,
+            substitution: `${probe.verification_command} $(whoami)`,
+          };
+          const expansionKind = probe.probe_id.startsWith("probe-expansion-")
+            ? probe.probe_id.slice("probe-expansion-".length)
+            : null;
+          const verificationInput = {
+            commands: [expansions[expansionKind] ?? probe.verification_command],
+          };
+          const verification = await input.capabilities.requestToolApproval(
+            approvalRequest("tool-call-002", "run_commands", verificationInput, 2),
+          );
+          if (verification.approved) {
+            await input.capabilities.toolExecutors.bash(
+              probe.verification_command,
+              "/sandbox",
+              {
+                sessionId,
+                agentId: "agent-001",
+                conversationId: "conversation-001",
+                iteration: 2,
+                toolCallId: "tool-call-002",
+              },
+            );
+          }
+          if (decision.approved && verification.approved) {
+            await this.options.fetch(new Request("data:application/json,%7B%7D"));
+          }
+          this.emit({
+            type: "session_ended",
+            sessionId,
+            result: {
+              approved: decision.approved && verification.approved,
+              model: { id: input.config.modelId, provider: input.config.providerId },
+            },
+          });
+        } else {
+          this.emit({ type: "session_ended", sessionId, result: { approved: decision.approved } });
+        }
+      } catch (error) {
+        this.emit({ type: "session_failed", sessionId, errorClass: error.name });
+      }
+    }, 0);
+    return {
+      sessionId,
+      manifest: { provider: input.config.providerId, model: input.config.modelId },
+      manifestPath,
+      messagesPath,
+    };
+  }
+
+  async abort(sessionId) {
+    this.emit({ type: "session_aborted", sessionId });
+  }
+
+  async stop(sessionId) {
+    this.emit({ type: "session_stopped", sessionId });
+  }
+}

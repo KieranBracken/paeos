@@ -1,0 +1,28 @@
+[
+  {
+    "objective": "Make L17-L19 evolution events durable and auditable by appending them to the PAEOS ledger. Context: the ledger (.paeos_state/ledger.db) contains ONLY goal (125) and seal (25) rows — zero RETROSPECT / EVOLVE / MEMORY_UPDATE / IMPROVE_RUNTIME events have ever been recorded, so the EvolutionLayer (runtime/evolution.py, invoked from ops/autonomous_run.py:103) has run without leaving any auditable trace, and institutional learning cannot be verified (hallucination notebook Entries 141-142; backlog/research/PAEOS_DURABLE_MEMORY_RB_v0.1.md). Deliverables: (1) extend EvolutionLayer to accept an optional ledger (kernel.ledger.Ledger) and clock callable; after each stage it must append an Event with kind EVOLUTION_EVENT and payload {layer: RETROSPECT|EVOLVE|MEMORY_UPDATE|IMPROVE_RUNTIME, run_id, goal_id, status, summary}; events must be appended via the kernel's ledger append API only — never raw SQL; (2) wire it in ops/autonomous_run.py so the constructed EvolutionLayer receives the same Ledger instance the SoftLoop uses; (3) tests in tests/runtime/test_evolution_ledger.py proving: a completed run appends the four evolution events in order, a failed run appends at minimum the RETROSPECT event with the failure status, and the ledger chain still verifies (verify_chain) after the appends.",
+    "accept": [
+      "runtime/evolution.py EvolutionLayer appends EVOLUTION_EVENT rows via the kernel ledger API for each L17-L19 stage",
+      "ops/autonomous_run.py passes the shared Ledger into EvolutionLayer",
+      "tests/runtime/test_evolution_ledger.py proves ordered appends, failure-path appends, and chain verification stays green",
+      "uv run pytest -q tests/runtime/test_evolution_ledger.py passes"
+    ],
+    "changed_paths": [
+      "runtime/evolution.py",
+      "ops/autonomous_run.py",
+      "tests/runtime/test_evolution_ledger.py"
+    ],
+    "builder_evidence": [
+      {
+        "claim_id": "evolution_ledger",
+        "command": "uv run pytest -q tests/runtime/test_evolution_ledger.py",
+        "artifact_hash": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+        "exit_code": 0,
+        "stdout": "passed"
+      }
+    ],
+    "goal_signature": "runtime/evolution ledger durability L17 L18 L19 evolution events auditability",
+    "verifiable": true,
+    "reversible": true
+  }
+]

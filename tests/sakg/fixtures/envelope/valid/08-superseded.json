@@ -1,0 +1,43 @@
+{
+  "confidence": 0.55,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "ec362d5f4706a63cce780e6f8ffdd85c9d2ae60b9b491387471828606e7f9f4b",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/08"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 8
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Pattern/01J00000000000000000000008",
+  "label": "Example Pattern 8",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "ingest",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-08",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "fe4062169952ffef94bd653fcf2c3a5fd1616c6c1886e19e10c6b55a8b894f03"
+  },
+  "status": "superseded",
+  "summary": "A deterministic pattern fixture exercising the universal envelope.",
+  "type": "Pattern",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

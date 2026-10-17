@@ -1,0 +1,195 @@
+{
+  "schema": "paeos.free-pool-policy-baseline/1",
+  "utc": "2026-10-15T16:49:08.340668+00:00",
+  "canonical_root": "/Users/bob/GitHub/paeos",
+  "python": "/Users/bob/GitHub/paeos/.venv/bin/python",
+  "python_version": "3.13.5 (main, Jun 12 2025, 12:22:43) [Clang 20.1.4 ]",
+  "provider_calls": 0,
+  "router_route_calls": 0,
+  "scope": "deterministic policy API fixture checks; no live availability or qualification claims",
+  "cases": [
+    {
+      "name": "audit_candidate_is_not_duplicated",
+      "kind": "defect",
+      "expected": [
+        "google:gemini-3.6-flash"
+      ],
+      "actual": [
+        "google:gemini-3.6-flash",
+        "google:gemini-3.6-flash"
+      ],
+      "contract_passed": false,
+      "details": {}
+    },
+    {
+      "name": "non_audit_selection_control",
+      "kind": "positive_control",
+      "expected": [
+        "google:gemini-3.6-flash"
+      ],
+      "actual": [
+        "google:gemini-3.6-flash"
+      ],
+      "contract_passed": true,
+      "details": {}
+    },
+    {
+      "name": "audit_does_not_reintroduce_subscription_outside_free_pool",
+      "kind": "defect",
+      "expected": [
+        "google:gemini-3.6-flash"
+      ],
+      "actual": [
+        "google:fixture/subscription-gemini",
+        "google:gemini-3.6-flash"
+      ],
+      "contract_passed": false,
+      "details": {}
+    },
+    {
+      "name": "free_pool_filter_control",
+      "kind": "positive_control",
+      "expected": [
+        "google:gemini-3.6-flash"
+      ],
+      "actual": [
+        "google:gemini-3.6-flash"
+      ],
+      "contract_passed": true,
+      "details": {}
+    },
+    {
+      "name": "audit_does_not_reintroduce_context_excluded_model",
+      "kind": "defect",
+      "expected": [
+        "google:fixture/long-context-gemini"
+      ],
+      "actual": [
+        "google:gemini-3.6-flash",
+        "google:fixture/long-context-gemini"
+      ],
+      "contract_passed": false,
+      "details": {
+        "estimated_tokens": 1124,
+        "first_context_window": 32
+      }
+    },
+    {
+      "name": "context_filter_control",
+      "kind": "positive_control",
+      "expected": [
+        "google:fixture/long-context-gemini"
+      ],
+      "actual": [
+        "google:fixture/long-context-gemini"
+      ],
+      "contract_passed": true,
+      "details": {}
+    },
+    {
+      "name": "audit_does_not_reintroduce_scoped_unavailable_model",
+      "kind": "defect",
+      "expected": [
+        "google:fixture/healthy-gemini"
+      ],
+      "actual": [
+        "google:gemini-3.6-flash",
+        "google:fixture/healthy-gemini"
+      ],
+      "contract_passed": false,
+      "details": {}
+    },
+    {
+      "name": "scoped_health_filter_control",
+      "kind": "positive_control",
+      "expected": [
+        "google:fixture/healthy-gemini"
+      ],
+      "actual": [
+        "google:fixture/healthy-gemini"
+      ],
+      "contract_passed": true,
+      "details": {}
+    },
+    {
+      "name": "audit_rejects_unknown_family",
+      "kind": "defect",
+      "expected": [],
+      "actual": [
+        "openrouter:openrouter/free"
+      ],
+      "contract_passed": false,
+      "details": {}
+    },
+    {
+      "name": "unavailable_model_control",
+      "kind": "positive_control",
+      "expected": [],
+      "actual": [],
+      "contract_passed": true,
+      "details": {}
+    },
+    {
+      "name": "missing_credentials_control",
+      "kind": "positive_control",
+      "expected": [],
+      "actual": [
+        "google:gemini-3.6-flash"
+      ],
+      "contract_passed": false,
+      "details": {}
+    }
+  ],
+  "imports": {
+    "paeos.model_router.policy": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/policy.py",
+      "sha256": "2c850db0621890fe13cd6ed5af5092e7604799621ccd0055960162bd67721e08"
+    },
+    "paeos.model_router.audit": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/audit.py",
+      "sha256": "04b8ce086b9448e089c0af37e7b6dbdacb02548a75f131dc30b893a42be9c5c9"
+    },
+    "paeos.model_router.a08_enforcer": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/a08_enforcer.py",
+      "sha256": "70d9e0d91f0f0b8a62a20c0694f90f4f70039e12a1881c7f4557423f5b38fcd1"
+    },
+    "paeos.model_router.catalog": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/catalog.py",
+      "sha256": "51e49bd23c86e46b138f58b6083a249b374e5e472703e7f0acb414c32cf078f6"
+    },
+    "paeos.model_router.state": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/state.py",
+      "sha256": "836d018ae3d64e3c560c9f5b8e1cacde4d297dde29689756c6e84bbc773fe640"
+    },
+    "paeos.model_router.aimd": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/aimd.py",
+      "sha256": "219b3f87110575b07767a854335839b55779413882c6ee53a2f5991dd306fa46"
+    },
+    "paeos.model_router.credentials": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/credentials.py",
+      "sha256": "96794ba97fc9663404c789f29338eb1e16103b0e39198d98de4bbdf3cb975ccd"
+    },
+    "paeos.model_router.types": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/types.py",
+      "sha256": "789f2efa38e0e22fc3f57290842abd34b5d69f55011e8cee5b8d18732f3fc954"
+    },
+    "paeos.model_router.intelligence_tier": {
+      "path": "/Users/bob/GitHub/paeos/paeos/model_router/intelligence_tier.py",
+      "sha256": "dcb831673fa49e4f7e847cfd0643404f5ae38dfe1d3739d84b1c386681c5b825"
+    }
+  },
+  "counts": {
+    "defects_reproduced": 5,
+    "defect_cases": 5,
+    "positive_controls_passed": 5,
+    "positive_controls": 6
+  },
+  "canonical_import_hashes_unchanged": true,
+  "status": "UNEXPECTED_BASELINE",
+  "blocked_events": [
+    {
+      "kind": "network",
+      "event": "socket.getaddrinfo"
+    }
+  ]
+}

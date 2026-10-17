@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "-I",
+    "-B",
+    "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COORDINATION_TIMEOUT_20261015_82a41855/verify_archive.py"
+  ],
+  "cwd": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COORDINATION_TIMEOUT_20261015_82a41855",
+  "exit_code": 0,
+  "stdout_sha256": "42532c81b5bd8e62052174eed89881338021b25f05368021ba75b46e08c3b839",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "verified_at_utc": "2026-10-15T17:07:37.488062+00:00"
+}

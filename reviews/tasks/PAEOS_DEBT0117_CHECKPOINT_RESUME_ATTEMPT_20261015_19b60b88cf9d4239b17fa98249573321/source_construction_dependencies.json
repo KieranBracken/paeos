@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "record_kind": "Read-only source/test dependency preimages for D0117 source construction",
+  "recorded_at_utc": "2026-10-15T16:56:19.475507+00:00",
+  "canonical_root": "/Users/bob/GitHub/paeos",
+  "method": "AST local import closure including existing package initializers from listed seeds; no repository module imported or executed",
+  "seeds": [
+    "runtime.autonomy.resume_engine",
+    "kernel.cas",
+    "kernel.ledger",
+    "kernel.ledger_sqlite",
+    "tests.runtime.autonomy.test_pre_p2_qualification_scenarios",
+    "tests.kernel.test_cas"
+  ],
+  "read_only_dependency_pins": [
+    {
+      "path": "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+      "preimage": "PRESENT",
+      "sha256": "6292da5871b7e1120c8ca01de299e7b625c5937e58dd15e35aabdeb37c2c9d09"
+    },
+    {
+      "path": "kernel/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "kernel/cas.py",
+      "preimage": "PRESENT",
+      "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f"
+    },
+    {
+      "path": "kernel/evidence.py",
+      "preimage": "PRESENT",
+      "sha256": "29a8ae8d7e7612903dd0a1567333895d1c86689011e37de64bbaaafbf9cd5235"
+    },
+    {
+      "path": "kernel/ledger.py",
+      "preimage": "PRESENT",
+      "sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b"
+    },
+    {
+      "path": "kernel/ledger_sqlite.py",
+      "preimage": "PRESENT",
+      "sha256": "864b5151e753030f6fda4f1016d13772c6c7edf9ce41094090950f049df07f8c"
+    },
+    {
+      "path": "kernel/types.py",
+      "preimage": "PRESENT",
+      "sha256": "70f691b9d33157174b7b5c722e7196fa9bd2471c055c5909612d516add0b8b8c"
+    },
+    {
+      "path": "paeos/semantic/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "cb7710c169113ec08efd24fd17b5e68edfc0da10ced00e35ac15fbe05cdfbafd"
+    },
+    {
+      "path": "paeos/semantic/delta_engine.py",
+      "preimage": "PRESENT",
+      "sha256": "229a536bc39ee000e95c2d43a323524763d424265b0bf4807821e93e29ec4f13"
+    },
+    {
+      "path": "paeos/semantic/freeze_guard.py",
+      "preimage": "PRESENT",
+      "sha256": "97dc7b21e39a10e3b9fe5852d9e01a44701c883dc8002ccd1bd16923b9b6cb48"
+    },
+    {
+      "path": "paeos/semantic/lineage.py",
+      "preimage": "PRESENT",
+      "sha256": "57c50213f279f48ab9161a433b97a3524e72c36c3b862ec84fdea66d7512de95"
+    },
+    {
+      "path": "paeos/semantic/types.py",
+      "preimage": "PRESENT",
+      "sha256": "5646f98c7d361668ee483eb32c0a56474e56c6139e1d933346015a3fe6dc1540"
+    },
+    {
+      "path": "pyproject.toml",
+      "preimage": "PRESENT",
+      "sha256": "0ba9fa89f8a2ebc6b57abc9884986b7abb9194e3dcf4c0ef305e5491be580569"
+    },
+    {
+      "path": "runtime/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runtime/autonomy/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "d60f13829f2542db050c8a788466df1ee6b8faf0a066fb7c4767bcd4b3b0fab4"
+    },
+    {
+      "path": "runtime/autonomy/authority.py",
+      "preimage": "PRESENT",
+      "sha256": "ef1aaa769217f8c5a564e37fa515256afcd35a335e82ba4b2591a524582c42d8"
+    },
+    {
+      "path": "runtime/autonomy/cycle_detector.py",
+      "preimage": "PRESENT",
+      "sha256": "d75ef3b4c523849bef7918f0211e6f49a1594670e403fee773b053fa8d64b193"
+    },
+    {
+      "path": "runtime/autonomy/mdg.py",
+      "preimage": "PRESENT",
+      "sha256": "2c29ec9afd6c1349062a82f864fd3ea224849a2c13c7f865302f22e7131394be"
+    },
+    {
+      "path": "runtime/autonomy/mission_controller.py",
+      "preimage": "PRESENT",
+      "sha256": "1e604eb2d03dd9c6db178ff0021f6a72dd135c1940116fd863e36dd1ccb86dbe"
+    },
+    {
+      "path": "runtime/autonomy/orca_lineage.py",
+      "preimage": "PRESENT",
+      "sha256": "c09f9fa5c15cd98c6e58b496a095fcf1d88f1ee1cae7f8e0c6f7befed06b932d"
+    },
+    {
+      "path": "runtime/autonomy/recovery_controller.py",
+      "preimage": "PRESENT",
+      "sha256": "43092d239662f7ea2643edc796062d59cf6dadaeee39cc2b9e408662893d8a78"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "74ce8d342ccdd0e8f61c5ff253392ccb8acdcd911405bef74d58380653bd3beb"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/coordinator.py",
+      "preimage": "PRESENT",
+      "sha256": "7952e2e318703648005edbc5247023109e6fc205e6086361df9e7b2fdf63be43"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "preimage": "PRESENT",
+      "sha256": "3053e5459bafc2e975d336e47c4161af5ec18a458fecc47a659e273f752579be"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "preimage": "PRESENT",
+      "sha256": "495dd655cd92f82b24a15ec18a9759ea95929c3f265d3b5294466f37c1970321"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "preimage": "PRESENT",
+      "sha256": "19a99aea02ce5bbf3520aa200a6c59f7a98c47eedb8935f582a570d91da9f68b"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "preimage": "PRESENT",
+      "sha256": "1e10075c584c7401bc0413eaeea4c672f400b6da08b2ad15599f7a98e2e661d3"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/types.py",
+      "preimage": "PRESENT",
+      "sha256": "5d5523a549337e79d5356ef0e774b44d713fe3bb1f2137d6002b36d94cc23634"
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder_probes.py",
+      "preimage": "PRESENT",
+      "sha256": "407b3773ec609d2a0aa93c43b06bf8ba9f4ff71d562203bcb600a4f5122931ac"
+    },
+    {
+      "path": "spec/PAEOS-8-runtime-implementation-playbook.md",
+      "preimage": "PRESENT",
+      "sha256": "50515e2eff6fc4648b5943fb2bffd9815e566d5f2a3ed0f464aa8d4e15a6746f"
+    },
+    {
+      "path": "tests/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/kernel/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/kernel/test_cas.py",
+      "preimage": "PRESENT",
+      "sha256": "4cabe3f3a5195f0dabcd2339986718cf62dc4dbeb4681479680fb8b2c84c9a66"
+    },
+    {
+      "path": "tests/runtime/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/runtime/autonomy/__init__.py",
+      "preimage": "PRESENT",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_pre_p2_qualification_scenarios.py",
+      "preimage": "PRESENT",
+      "sha256": "2077724806127962bda8bb7e15b7915787ec6cc0d4e45533516d8ec2e256f625"
+    },
+    {
+      "path": "uv.lock",
+      "preimage": "PRESENT",
+      "sha256": "6e72ea0644ac24fa6552c23f09ef3807e3713a3630bc832f7913288fe130c1e4"
+    }
+  ],
+  "nonlocal_import_names": [
+    "__future__",
+    "collections",
+    "collections.abc",
+    "dataclasses",
+    "datetime",
+    "enum",
+    "hashlib",
+    "json",
+    "os",
+    "pathlib",
+    "pytest",
+    "re",
+    "shlex",
+    "signal",
+    "sqlite3",
+    "subprocess",
+    "sys",
+    "tempfile",
+    "threading",
+    "time",
+    "typing"
+  ],
+  "limits": "Static import closure and named test/config references, not proof of every dynamic import or installed environment. Harness must bind complete candidate export and environment; newly necessary dependencies are read-only and must be recorded before use.",
+  "mutable_files_excluded": [
+    "runtime/autonomy/resume_engine.py",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+  ]
+}

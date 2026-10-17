@@ -1,0 +1,24 @@
+[
+  {
+    "objective": "Execute SAKG-2 Task 24 [I-KAE-CAS-CITATIONS] from the ratified SAEOS-1 architecture (spec/SAEOS-1-architecture.md \u00a75.2, RB-0004). Implement kae/citation_pipeline.py to extract byte-anchored citations from external documents/RFCs stored in immutable CAS, minting schema-compliant EvidenceRef nodes in the live SAKG SQLite GraphStore (sakg.db). Connect these EvidenceRef nodes to Decisions and Constraints via \"justified_by\" or \"evidence\" edges. Author tests in tests/kae/test_citation_pipeline.py verifying byte-exact CAS anchoring, idempotent ingestion, deterministic evidence hashing, and fail-closed rejection of corrupted or missing CAS references.",
+    "accept": [
+      "uv run pytest tests/kae/test_citation_pipeline.py -q",
+      "uv run pytest tests/sakg/ -q",
+      "No runtime, kernel, protected ref, main/trunk, or historical evidence mutation"
+    ],
+    "changed_paths": [
+      "kae/citation_pipeline.py",
+      "tests/kae/test_citation_pipeline.py"
+    ],
+    "plan_write_scopes": [
+      "kae/citation_pipeline.py",
+      "tests/kae/test_citation_pipeline.py",
+      "sakg/store.py",
+      "sakg/extract.py"
+    ],
+    "goal_signature": "domain:sakg,task:task-24-kae-citations",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

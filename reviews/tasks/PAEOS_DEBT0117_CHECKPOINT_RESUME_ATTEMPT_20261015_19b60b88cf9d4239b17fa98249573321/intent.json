@@ -1,0 +1,89 @@
+{
+  "created_at_utc": "2026-10-15T16:28:52.493814+00:00",
+  "status": "PREPARED_SINGLE_FRESH_ATTEMPT",
+  "attempt_id": "19b60b88cf9d4239b17fa98249573321",
+  "owner_thread": "01a14042-e4a4-76b2-abf6-c3949fc745da",
+  "source_assignment_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "human_direction_message": "01a1404e-02a5-7a50-8294-43859f92a22e",
+  "authority_boundary": "Fresh standalone ordinary task through unchanged normal runner as directed; this record grants no source scope or qualification. PAEOS owns admission and may remand. No old scope, refused operation, existing state or root is reused.",
+  "canonical_cwd": "/Users/bob/GitHub/paeos",
+  "argv": [
+    "/Users/bob/.local/bin/uv",
+    "run",
+    "--no-sync",
+    "python",
+    "-B",
+    "ops/autonomous_run.py",
+    "/Users/bob/GitHub/paeos/ops/backlogs/intake-debt0117-checkpoint-resume-20261015-19b60b88cf9d4239b17fa98249573321.json",
+    "/private/tmp/paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+    "1",
+    "1",
+    "chat-bridge"
+  ],
+  "state_directory": "/private/tmp/paeos-debt0117-state-19b60b88cf9d4239b17fa98249573321",
+  "intake_path": "/Users/bob/GitHub/paeos/ops/backlogs/intake-debt0117-checkpoint-resume-20261015-19b60b88cf9d4239b17fa98249573321.json",
+  "intake_sha256": "21f3074ea871b26f709867feb11743b128abb48eec241415ed9185b1842e0361",
+  "mutable_paths": [
+    "runtime/autonomy/resume_engine.py",
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+  ],
+  "protected_manifest_overlap": [],
+  "triage_observed": {
+    "trace": "trace_a",
+    "weight_class": "ROUTINE",
+    "verifiable": true,
+    "reversible": true
+  },
+  "source_pins": [
+    {
+      "path": "runtime/autonomy/resume_engine.py",
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+      "present": true
+    },
+    {
+      "path": "tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+      "sha256": null,
+      "present": false
+    },
+    {
+      "path": "runtime/ceremony.py",
+      "sha256": "1a0624676ceb5a9fbb3a78e11a11f00c41e84191fec5f3d5e0af1b691b28e17e",
+      "present": true
+    },
+    {
+      "path": "operations/WORKFLOW_STATE_MACHINE.yaml",
+      "sha256": "e8fc2040a53033fa89e0ff86b339d369331c12f229c243810f36a5ce63a04678",
+      "present": true
+    },
+    {
+      "path": "ops/autonomous_run.py",
+      "sha256": "87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280",
+      "present": true
+    },
+    {
+      "path": "runtime/orchestrator/__init__.py",
+      "sha256": "f56a0aac982e8fec7c47256391aa5467dc1bdd209b0fd4952726fd4f68995bff",
+      "present": true
+    },
+    {
+      "path": "runtime/triage.py",
+      "sha256": "725e5185f675620afe04caf470eaaaa79c30a622e73901d67cae1b34357a7ad9",
+      "present": true
+    },
+    {
+      "path": "ops/manifests/p1_authoritative_completeness_manifest.json",
+      "sha256": "372e4b2f307074f1cf5e7483707505805db323a67cb0cf079580fd764494eea8",
+      "present": true
+    }
+  ],
+  "coordination": "D0249 active on its distinct mutable-slice task g-d0cd25d2331e/r-1bc742d8. No overlap in proposed source scope, unique intake and state. Existing Manager/Architect/Root/Overseer and Chat1 ownership retained. No cross-chat delivery claimed.",
+  "limits": {
+    "max_runs": 1,
+    "max_concurrency": 1,
+    "paid_provider_authority": false,
+    "full_D0117_fault_or_qualification_run": false,
+    "runtime_type": "chat-bridge",
+    "retry_on_remand": false
+  },
+  "launch_count": 0
+}

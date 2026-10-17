@@ -1,0 +1,21 @@
+{
+  "model_id": "gemini-3.6-flash",
+  "provider_id": "google",
+  "family": "gemini",
+  "actual_model": "gemini-3.6-flash",
+  "actual_family": "gemini",
+  "prompt_tokens": 1819,
+  "completion_tokens": 112,
+  "total_tokens": 1931,
+  "latency_ms": 7194.413900375366,
+  "attempts": 1,
+  "fallback_chain": [
+    "google:gemini-3.6-flash"
+  ],
+  "tool_calls": null,
+  "finish_reason": "stop",
+  "transport_request_sha256": "0fc37c4ccbe81b8708aeb713b0092436133de29c055a2e3f5054501b029a3fc4",
+  "transport_response_sha256": "6a97663c46cd6d5f0457bf4a5b6eff2ed61f5fca4e2190bdfe8b14ad7dd71a9e",
+  "host_turn_uuid": null,
+  "external_generation_id": "0f3QasreMvSFvdIP7-jFoAI"
+}

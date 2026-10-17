@@ -1,0 +1,43 @@
+{
+  "current_wave": "W9",
+  "paeos_run_id": "court-run-w9-20260906-100951",
+  "lifecycle_state": "PRE_SENTIUM_ECOSYSTEM_COMPLETE",
+  "active_worker": "Antigravity (Meta-Overseer) / Codex (Execution Overseer) / PAEOS Court (Kernel Verifier)",
+  "model_provider": "gemini-3.7-flash (Auditor/Overseer) / gpt-5.6-sol (Codex Overseer/Architectural) / gpt-5.6-luna (Routine Worker) / Admitted Free Mesh",
+  "last_progress": "2026-09-06T10:15:00.000000+00:00",
+  "current_blocker": null,
+  "court_state": "PASS",
+  "next_dag_action": "STEADY_STATE_WATCHDOG_MONITORING",
+  "control_plane_attested": true,
+  "accounting": {
+    "authoritative_waves_total": 11,
+    "required_waves_sealed": 10,
+    "required_waves_total": 10,
+    "optional_wave_w10_status": "W10_NOT_REQUIRED",
+    "auxiliary_milestones_sealed": 1,
+    "migration_wave_completion_percent": 100.0,
+    "court_adjudications": {
+      "sealed": 12,
+      "remanded": 4,
+      "remediated": 4,
+      "active_debt": 0,
+      "active_anomalies": 0
+    },
+    "sealed_waves": 11
+  },
+  "sentinel_status": {
+    "last_check": "2026-10-17T03:29:00.474041+00:00",
+    "healthy": false,
+    "interval_seconds": 300,
+    "codex_alive": true,
+    "codex_overseer": {
+      "status": "RUNNING",
+      "alive": true,
+      "age_seconds": 7.3,
+      "pid": 1490,
+      "session_id": "01a071e4-9d98-7402-b458-b7dfedcb72df",
+      "mission": "Sentium Ecosystem Migration (Waves W0-W12)"
+    },
+    "cline_alive": false
+  }
+}

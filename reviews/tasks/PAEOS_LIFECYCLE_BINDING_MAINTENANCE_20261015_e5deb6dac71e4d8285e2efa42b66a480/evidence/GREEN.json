@@ -1,0 +1,19 @@
+{
+  "phase": "GREEN",
+  "argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-c",
+    "import pathlib,sys,socket\nsource=pathlib.Path(sys.argv[1]);sys.path.insert(0,str(source))\ndef deny(*a,**k):raise RuntimeError(\"NETWORK_FORBIDDEN_SOURCE_TEST\")\nsocket.create_connection=deny;socket.socket.connect=deny\nimport pytest\nrc=pytest.main([\"-p\",\"no:cacheprovider\",\"-q\",\"tests/operations/test_lifecycle_projection_conformance.py\",\"tests/runtime/test_ceremony_contract.py\",\"--basetemp=\"+sys.argv[2]])\nwrong=[]\nfor name,module in tuple(sys.modules.items()):\n p=getattr(module,\"__file__\",None)\n if p and name.split(\".\")[0] in {\"runtime\",\"kernel\",\"paeos\",\"contracts\",\"ops\",\"tests\"} and not pathlib.Path(p).resolve().is_relative_to(source):wrong.append((name,p))\nprint(\"IMPORT_ORIGIN_ERRORS\",wrong)\nsys.exit(99 if wrong else rc)\n",
+    "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/source",
+    "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/test-tmp/green"
+  ],
+  "cwd": "/private/tmp/lifecycle-binding-successor-e5deb6dac71e4d8285e2efa42b66a480/source",
+  "exit_code": 0,
+  "started_unix": 1792080706.442755,
+  "ended_unix": 1792080707.453622,
+  "stdout_sha256": "1bd704b45d93b5611823c617ff033a970f3925645817b4faacc291c3375f3968",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "network_calls_permitted": false
+}

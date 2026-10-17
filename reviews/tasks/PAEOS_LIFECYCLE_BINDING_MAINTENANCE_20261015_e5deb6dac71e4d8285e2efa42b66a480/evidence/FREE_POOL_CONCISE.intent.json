@@ -1,0 +1,28 @@
+{
+  "operation_id": "free-concise-49ea79e02bea48f0a9240fcc970dfa76",
+  "status": "STARTED",
+  "eligible_chain": [
+    [
+      "google",
+      "gemini-3.6-flash"
+    ],
+    [
+      "google",
+      "gemini-3.6-flash"
+    ],
+    [
+      "nvidia",
+      "meta/llama-3.1-8b-instruct"
+    ]
+  ],
+  "prompt_sha256": "24a72ca10b55d70da30fe03aef36836fce3f05136ab916179d328bcfb5d57983",
+  "patch_sha256": "7fd09ccaf2e0472675cbdb7a643c239a9b6db5cff97e07c8772f42da4c6de9d5",
+  "request_sha256": "0fc37c4ccbe81b8708aeb713b0092436133de29c055a2e3f5054501b029a3fc4",
+  "retry_policy": "none",
+  "allow_fallback": true,
+  "allow_paid_usage": false,
+  "free_worker_pool": true,
+  "max_tokens": 4000,
+  "started_unix": 1792081361.2865112,
+  "not_l14_or_admission": true
+}

@@ -1,0 +1,32 @@
+{
+  "cases": {
+    "adversarial-missing-l06": {
+      "disposition": "COURT_SEALED",
+      "expected_bundle_sha256": "8a26c7948ec8d8a2da0ff12741eab4278d581e0f1a8f292434dadc70529a405f",
+      "input_sha256": "c38d23095a8cfba2905a2fc1f041fcb27eed1e820955955b8dc9c36facba5bf4",
+      "l06_matrix": "absent"
+    },
+    "adversarial-remanded": {
+      "disposition": "REMANDED_WITH_AMENDMENTS",
+      "expected_bundle_sha256": "caeaeec27ae99a49538431c4464f9071bee8ea23b3e5b55d4241a17ff503148e",
+      "input_sha256": "d85f71955197d20f20f58e0c33b6de5fa5309c262c2c57d8fa708a690e6736b0"
+    },
+    "gate-a": {
+      "disposition": "COURT_SEALED",
+      "expected_bundle_sha256": "4db2827f9eaf7b83a43b3a18deff4cc8f843199cb1b56d140f1d4edac4bc3db8",
+      "input_sha256": "2e42f4823c970b4e0379182b8c31c1e5eae0730d905d57ab04a127e6d9641bfe"
+    },
+    "gate-b": {
+      "disposition": "COURT_SEALED",
+      "expected_bundle_sha256": "55b4c65eae7d23296a72ef2f9985e40508e5f522e2f3aedef836f1f17d33ffa5",
+      "input_sha256": "8c8214b39deee9c4d125f98ea5a3dd83c04d1b639432274028da3eaf5b723ed9"
+    },
+    "gate-c": {
+      "disposition": "COURT_SEALED",
+      "expected_bundle_sha256": "cdf744f4deb4500028b497c1c6f124e1e947d520b9e721b17fc7166cfd9fcf8c",
+      "input_sha256": "74aeee262656e5dd14b762849b99399a344f684362bef4c0e258c4f4eac2c978"
+    }
+  },
+  "schema": "paeos.sakg.extract-fixture-manifest/v1",
+  "source_contract": "every expected bundle is a candidate projection; provenance is retained and absent L06 data is not inferred"
+}

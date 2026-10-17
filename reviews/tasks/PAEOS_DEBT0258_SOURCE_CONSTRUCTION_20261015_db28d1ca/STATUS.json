@@ -1,0 +1,24 @@
+{
+  "schema": "paeos.source-construction-handoff/1",
+  "timestamp": "2026-10-15T17:20:18.913712+00:00",
+  "run_id": "sc-r-db28d1ca62154afe8518ee92b1e88190",
+  "task_id": "t-c42817849cc7",
+  "status": "SOURCE_CAPTURED_TESTED_HETEROGENEOUS_REVIEW_PENDING",
+  "original_state": "/private/tmp/paeos-source-construction-v4.J5rMbO/state",
+  "candidate_root": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/candidate",
+  "source_construction_complete": true,
+  "focused_tests_passed": 57,
+  "independent_extra_controls_passed": 4,
+  "heterogeneous_review": false,
+  "court_physical_observations": 1,
+  "court_adjudication": false,
+  "integration_permitted": false,
+  "production_activation": false,
+  "baseline_qualification": false,
+  "debt0258_closed": false,
+  "hold": "Configured eligible free independent providers unavailable; do not replay failed review attempts or treat local tests as approval.",
+  "not_copied": [
+    "kernel.key",
+    "ephemeral signed execution capabilities"
+  ]
+}

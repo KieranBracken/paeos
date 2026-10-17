@@ -1,0 +1,12 @@
+{
+  "http_status": 410,
+  "body": {
+    "type": "about:blank",
+    "title": "Gone",
+    "status": 410,
+    "detail": "The model 'meta/llama-3.1-8b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+  },
+  "wrapped_exception_message": "OpenAIException - Error code: 410 - {'type': 'about:blank', 'title': 'Gone', 'status': 410, 'detail': \"The model 'meta/llama-3.1-8b-instruct' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available.\"}",
+  "source_receipt_sha256": "eed273eb175b43542967b5536adc21cbd4a34836283d7e974c8e574d457d5d09",
+  "redaction": "Only public error fields retained; all task/prompt/request envelope fields omitted. No original HTTP response bytes are present in the saved receipt."
+}

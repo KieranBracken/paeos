@@ -1,0 +1,36 @@
+{
+  "confidence": 0.65,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 93
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Option/01J00000000000000000000093",
+  "label": "Example Option 93",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "agent",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-93",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "not-a-sha"
+  },
+  "status": "candidate",
+  "summary": "A deterministic option fixture exercising the universal envelope.",
+  "type": "Option",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

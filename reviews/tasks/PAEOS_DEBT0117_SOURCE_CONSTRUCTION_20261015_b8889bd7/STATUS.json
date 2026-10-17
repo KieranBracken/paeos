@@ -1,0 +1,20 @@
+{
+  "status": "SOURCE_CAPTURED_TESTED_HETEROGENEOUS_REVIEW_PENDING",
+  "run_id": "sc-r-b8889bd7c5fe4a38b8dea65bfc854968",
+  "task_id": "t-592130ac01f1",
+  "scope_sha256": "b6016e1f9ad1b42d735abcbcc16a528c971ec1f4e772711790e96db683c35f7b",
+  "source_construction_complete": true,
+  "focused_tests_passed": 38,
+  "selected_regressions_passed": 13,
+  "prior_consumed_failure_preserved": true,
+  "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF",
+  "heterogeneous_review": false,
+  "integration_permitted": false,
+  "production_activation": false,
+  "qualification": false,
+  "debt0117_closed": false,
+  "not_copied": [
+    "kernel.key",
+    "ephemeral signed execution capabilities"
+  ]
+}

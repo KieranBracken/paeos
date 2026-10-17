@@ -1,0 +1,2 @@
+{"id":"concept://demo/transformation/00000000000000000000000000","type":"Transformation","namespace":"demo","schema_version":1,"payload":{"operator_name":"invert","operator_version":"1","input_signature":{},"output_signature":{},"preconditions":["semantic input"],"postconditions":["bounded output"],"parameters_schema":{"type":"object"},"determinism":"declarative","implementation_ref":null},"representations":[],"provenance_refs":["cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"],"recorded_at":"2026-09-04T20:02:00Z"}
+

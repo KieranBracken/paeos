@@ -1,0 +1,4 @@
+`, and `tests/operations/test_lifecycle_projection_conformance.py`.
+- No extraneous changes or policy/semantic drifts were introduced.
+- Guard functions in `runtime/ceremony.py` retain fail-closed behavior (checking SHA-256 and v1.3 marker).
+- Added test coverage in `test_lifecycle_projection_

@@ -1,0 +1,38 @@
+{
+  "case": "cost-reliability",
+  "expected": {
+    "results": [
+      {
+        "decision_id": "sakg://paeos-recovery/Decision/01J00000000000000000000F02",
+        "outcome": {
+          "id": "sakg://paeos-recovery/Outcome/01J00000000000000000000F12",
+          "status": "realized",
+          "summary": "Gate B transaction fencing was sealed with the open debt carried forward."
+        },
+        "score": 0.91,
+        "why": [
+          "TradeOff axes matched: cost,reliability",
+          "TradeOff resolves_to Decision",
+          "Decision realized_as Outcome"
+        ]
+      }
+    ]
+  },
+  "query": {
+    "axes": [
+      "cost",
+      "reliability"
+    ],
+    "goal_id": "g-extract-gate-b",
+    "method": "tradeoff_precedents",
+    "subject": "cost versus reliability in transaction fencing"
+  },
+  "schema_version": "paeos.sakg.tradeoff-fixture/v1",
+  "source": {
+    "excerpt": "Latency; Accuracy; Cost; Maintainability; Reliability; Scalability",
+    "heading": "Dimension 3 \u2014 Objectives",
+    "inventory_sha256": "798d592065fcb75996e5fbe55e662b210062f8148f43fe55ab57a88ecb81c9fc",
+    "path": "/Users/bob/GitHub/SAKG/Phase 0.4 \u2014 Metadata Schema.txt",
+    "sha256": "a1564211681009a6ad03cce495889ee3dc5306b423623af2a150741ace41ca29"
+  }
+}

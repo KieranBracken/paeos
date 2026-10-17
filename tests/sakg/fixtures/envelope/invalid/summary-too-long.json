@@ -1,0 +1,36 @@
+{
+  "confidence": 0.75,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 94
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Constraint/01J00000000000000000000094",
+  "label": "Example Constraint 94",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "ingest",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-94",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "e3ad9cb266c4a316f09a625e03ae491419a8cb35829b994644d6341929c97c07"
+  },
+  "status": "candidate",
+  "summary": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "type": "Constraint",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

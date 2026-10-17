@@ -1,0 +1,31 @@
+{
+  "status": "SINGLE_REAL_RUN_COMPLETED",
+  "argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-c",
+    "import pathlib,sys\nsource=pathlib.Path(sys.argv[1]);sys.path.insert(0,str(source))\nfrom ops.autonomous_run import main\nraise SystemExit(main(sys.argv[2:]))\n",
+    "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source",
+    "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/intake.json",
+    "/private/tmp/paeos-debt0249-state-9c474028739941058c52988c35ba0d1e",
+    "1",
+    "1",
+    "chat-bridge"
+  ],
+  "cwd": "/private/tmp/paeos-debt0249-run-9c474028739941058c52988c35ba0d1e/source",
+  "started_unix": 1792081198.969546,
+  "unpromoted_runtime_candidate": true,
+  "candidate_patch_sha256": "7fd09ccaf2e0472675cbdb7a643c239a9b6db5cff97e07c8772f42da4c6de9d5",
+  "state": "/private/tmp/paeos-debt0249-state-9c474028739941058c52988c35ba0d1e",
+  "intake_sha256": "b142f9d3ebc44502aaea7af7f3b7d0aed49b13439240aa4c1f6d20270c785252",
+  "new_root_task": true,
+  "historical_mission_reused": false,
+  "max_runs": 1,
+  "max_concurrency": 1,
+  "transport": "chat-bridge",
+  "exit_code": 1,
+  "ended_unix": 1792081200.888903,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "4897a88a0dcaf27cb3ba891289f9ade3172edf42542206f3f7d96f3172885785"
+}

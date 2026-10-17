@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "manifest_kind": "PAEOS_AUTONOMY_BOOTSTRAP_CANDIDATE",
+  "candidate_base_commit": "63368089c4b824ff0d04d62d7bbeb34a8627d8b6",
+  "implementation_commits": ["38e91c0", "175599b", "6336808"],
+  "recovery_branch": "codex/control-plane-recovery-s1-clean-recovered",
+  "protected_refs_mutated": false,
+  "promotion_executed": false,
+  "prebootstrap_activation_stage": "AWAITING_FOUNDER_BOOTSTRAP",
+  "gate_f_focused_tests": {"collected": 28, "passed": 28, "failed": 0, "skipped": 0},
+  "synthetic_canary_ladder": {
+    "distinct_canaries": 3,
+    "pass": 3,
+    "remand": 0,
+    "evidence_roots": [
+      "/private/tmp/paeos-gate-f-ladder-001",
+      "/private/tmp/paeos-gate-f-ladder-002",
+      "/private/tmp/paeos-gate-f-ladder-003"
+    ]
+  },
+  "repository_quality": {
+    "non_gateway_collected": 1154,
+    "non_gateway_full_load_passed": 1152,
+    "non_gateway_full_load_failed": 2,
+    "isolated_timeout_cases_passed": 5,
+    "ruff_findings": 557,
+    "pyright_errors": 120,
+    "ruff_log_sha256": "faf6cd6806fc27304da1e80152422d6922cf60d20633659ff8643d60221723c5",
+    "pyright_log_sha256": "1583fc8c2e7122321cb16335c01cccc8102ee450257b38b32f633b0856155b61",
+    "full_suite_log_sha256": "b6d9b2c85946f2ed6714b0ec0d61e7d985042b36b458bb9b945a87c977f54ca9"
+  },
+  "external_accounting": {
+    "worker": {"admitted": 3, "rejected": 3, "remediated": 0},
+    "court": {"sealed": 5, "remanded": 0, "remediated": 0},
+    "open_debt": ["DEBT-0060", "RB-0027"]
+  },
+  "bootstrap_status": "NOT_READY",
+  "blocking_reasons": [
+    "LIVE_ROUTE_PROBE_ROTATION_QUOTA_EVIDENCE_MISSING",
+    "REPOSITORY_STATIC_DEBT_UNRESOLVED",
+    "FOUNDER_BOOTSTRAP_FACT_MISSING",
+    "FULL_LOAD_CLINE_TIMEOUT_CASES_REMAIN"
+  ],
+  "mandatory_stop": "Founder L16 disposition is required before any bootstrap integration or promotion"
+}

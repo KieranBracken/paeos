@@ -1,0 +1,6 @@
+{
+  "pid": 8462,
+  "command": "/Users/bob/GitHub/paeos/.venv/bin/python -B /private/tmp/paeos-source-construction-d0117.ChHNrT/harness.py dispatch --state /private/tmp/paeos-source-construction-d0117.ChHNrT/state --scope-sha256 7e6d400e013a900960cb187f7121f600e89366dd84fc3bfab8e645ea81f4bc98",
+  "timestamp": "2026-10-15T17:23:59.922834+00:00",
+  "reason": "Consumed Court submission failed; complete candidate and failed evidence preserved before cancelling obsolete idle bridge wait. No response fabricated; no retry permitted."
+}

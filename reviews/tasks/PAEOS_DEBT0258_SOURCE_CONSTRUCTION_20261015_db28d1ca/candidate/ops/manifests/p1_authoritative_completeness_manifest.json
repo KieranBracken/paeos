@@ -1,0 +1,166 @@
+{
+  "schema": "paeos.authoritative-completeness-manifest/1",
+  "manifest_id": "P1-COMPLETENESS-REQUALIFICATION-20260907",
+  "milestone_id": "P1-COMPLETENESS-REQUALIFICATION",
+  "expected_capability_ids": [
+    "CLAIM-CF-01-CAPABILITY-DISPOSITION",
+    "CLAIM-CF-02-OPERATIONAL-TRANSPORT-PROOF",
+    "CLAIM-CF-03-AUTHORITATIVE-PATH-TRUTH",
+    "CLAIM-CF-04-PROFILE-TRIGGERED-OBLIGATIONS",
+    "CLAIM-CF-05-MANDATORY-E2E-EVIDENCE",
+    "CLAIM-CF-06-L16-PROMOTION-GENUINE-L14-RECEIPT",
+    "CLAIM-CF-07-ANTI-CIRCULAR-SEPARATION",
+    "CLAIM-CF-08-CANARY-DISCRIMINATION",
+    "CLAIM-CF-09-MANIFEST-OMISSION-PREVENTION",
+    "CLAIM-CF-10-UNFORGEABLE-TRANSPORT-ATTESTATION",
+    "CLAIM-CF-11-SOFTLOOP-L11-L13-L16-WIRING"
+  ],
+  "verification_obligations": [
+    {"claim_id": "CLAIM-CF-01-CAPABILITY-DISPOSITION", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_omitted_capabilities_without_disposition"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-02-OPERATIONAL-TRANSPORT-PROOF", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_unreachable_phantom_adapter"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-03-AUTHORITATIVE-PATH-TRUTH", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_undisclosed_production_stub_fallback or test_canary_blocks_hardcoded_authoritative_ui_metric"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-04-PROFILE-TRIGGERED-OBLIGATIONS", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_cross_system_integration_with_fixtures_only"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-05-MANDATORY-E2E-EVIDENCE", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_completion_claims_lacking_e2e_evidence"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-06-L16-PROMOTION-GENUINE-L14-RECEIPT", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_invalid_synthetic_l14_provenance"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-07-ANTI-CIRCULAR-SEPARATION", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_p1_bootstrap_execution_substrate.py", "-q", "-k", "test_mcp_success_stores_only_verifier_derived_physical_fields"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-08-CANARY-DISCRIMINATION", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_court.py", "-q", "-k", "test_reproducibly_failing_verification_is_remanded"], "timeout_s": 180, "kind": "NEGATIVE_COURT_CONTROL"},
+    {"claim_id": "CLAIM-CF-09-MANIFEST-OMISSION-PREVENTION", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_omitted_capabilities_from_authoritative_manifest"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-10-UNFORGEABLE-TRANSPORT-ATTESTATION", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_completeness_firewall.py", "-q", "-k", "test_canary_blocks_unattested_or_forged_auditor_receipt"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"},
+    {"claim_id": "CLAIM-CF-11-SOFTLOOP-L11-L13-L16-WIRING", "argv": ["{python}", "-m", "pytest", "tests/runtime/test_p1_production_lifecycle.py", "tests/runtime/test_orchestrator.py", "-q", "-k", "test_production_softloop_materializes_and_verifies_candidate"], "timeout_s": 180, "kind": "CANDIDATE_DISCRIMINATION"}
+  ],
+  "verification_support_paths": [
+    "tests/runtime/test_completeness_firewall.py",
+    "tests/runtime/test_court.py",
+    "tests/runtime/test_p1_bootstrap_execution_substrate.py",
+    "tests/runtime/test_p1_production_lifecycle.py"
+  ],
+  "verification_source_paths": [
+    "kernel/evidence.py",
+    "kernel/lifecycle.py",
+    "kernel/sandbox.py",
+    "kernel/sandbox_backend.py",
+    "kernel/types.py",
+    "ops/p1_runtime_l14_audit.py",
+    "paeos/model_router/__init__.py",
+    "paeos/model_router/aimd.py",
+    "paeos/model_router/audit_prompt.py",
+    "paeos/model_router/auditor_receipt.py",
+    "paeos/model_router/catalog.py",
+    "paeos/model_router/errors.py",
+    "paeos/model_router/intelligence_tier.py",
+    "paeos/model_router/policy.py",
+    "paeos/model_router/router.py",
+    "paeos/model_router/state.py",
+    "paeos/model_router/types.py",
+    "runtime/candidate_materialization.py",
+    "runtime/ceremony.py",
+    "runtime/claude_code.py",
+    "runtime/court/__init__.py",
+    "runtime/court/completeness_firewall.py",
+    "runtime/builder_transport.py",
+    "runtime/agents/__init__.py",
+    "runtime/integrations/__init__.py",
+    "runtime/integrations/hybrid.py",
+    "runtime/integrations/process_supervisor.py",
+    "runtime/integrations/provider_broker.py",
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "runtime/integrations/trusted_codex_planner_transport.py",
+    "runtime/integrations/trusted_codex_transport.py",
+    "runtime/integrations/worker_confinement.py",
+    "runtime/lifecycle_projection.py",
+    "runtime/planner_transport.py",
+    "runtime/run_state_registry.py",
+    "runtime/orchestrator/__init__.py",
+    "runtime/p1_discrimination.py",
+    "runtime/review/__init__.py",
+    "runtime/task_package.py",
+    "runtime/transports/mcp/court_server.py",
+    "runtime/verification.py"
+  ],
+  "required_profiles": [
+    "PROFILE_USER_FACING",
+    "PROFILE_CROSS_BOUNDARY",
+    "PROFILE_CRITICAL_EXECUTION"
+  ],
+  "required_transport_kinds": [
+    "SUBPROCESS_RUN",
+    "PAEOS_MODEL_ROUTER",
+    "KERNEL_ED25519",
+    "SQLITE_WAL_LEDGER"
+  ],
+  "pre_audit_transport_kinds": [
+    "SUBPROCESS_RUN",
+    "SQLITE_WAL_LEDGER"
+  ],
+  "post_audit_transport_kinds": [
+    "PAEOS_MODEL_ROUTER",
+    "KERNEL_ED25519"
+  ],
+  "required_e2e_classes": [
+    "production_intake",
+    "l11_manifest_freeze",
+    "l12_implementation",
+    "l13_physical_verification",
+    "l14_external_audit",
+    "l15_documentation_ledger",
+    "l16_promotion"
+  ],
+  "pre_audit_e2e_classes": [
+    "production_intake",
+    "l11_manifest_freeze",
+    "l12_implementation",
+    "l13_physical_verification"
+  ],
+  "post_audit_e2e_classes": [
+    "l14_external_audit",
+    "l15_documentation_ledger",
+    "l16_promotion"
+  ],
+  "slo_obligations": [
+    "no_expected_result_injection",
+    "failing_command_remands",
+    "forged_receipt_rejected",
+    "l10_family_match_requires_independent_sealed_context",
+    "substantive_audit_pass_required",
+    "sentium_quarantine_preserved"
+  ],
+  "pre_audit_slo_obligations": [
+    "no_expected_result_injection",
+    "failing_command_remands",
+    "forged_receipt_rejected",
+    "l10_family_match_requires_independent_sealed_context",
+    "sentium_quarantine_preserved"
+  ],
+  "post_audit_slo_obligations": [
+    "substantive_audit_pass_required"
+  ],
+  "explicit_exclusions": [
+    "sentium_external_estate",
+    "trading_state",
+    "order_execution",
+    "legacy_orca_credentials",
+    "raw_research_notes",
+    "generated_databases"
+  ],
+  "deferred_debt": [
+    "credential_rotation_operator_confirmation",
+    "phase2_phase3_phase4_requalification_after_p1"
+  ],
+  "derivation_refs": [
+    "reviews/audits/completeness/01_ECOSYSTEM_COMPLETENESS_SCOPE.md",
+    "reviews/audits/completeness/02_INTENDED_CAPABILITY_CENSUS.md",
+    "reviews/audits/completeness/03_IMPLEMENTATION_AND_REACHABILITY_CENSUS.md",
+    "reviews/audits/completeness/04_MOCK_STUB_PLACEHOLDER_REGISTER.md",
+    "reviews/audits/completeness/05_USER_JOURNEY_AND_E2E_MATRIX.md",
+    "reviews/audits/completeness/06_CODE_AND_ARCHITECTURE_QUALITY_FINDINGS.md",
+    "reviews/audits/completeness/07_TEST_COVERAGE_CLASSIFICATION.md",
+    "reviews/audits/completeness/08_DOCUMENTATION_VS_RUNTIME_DRIFT.md",
+    "reviews/audits/completeness/09_SYSTEM_BY_SYSTEM_READINESS.md",
+    "reviews/audits/completeness/10_CROSS_ECOSYSTEM_COMPLETENESS_GAPS.md",
+    "reviews/audits/completeness/11_PAEOS_COMPLETENESS_FIREWALL_SPEC.md",
+    "reviews/audits/completeness/12_REMEDIATION_DEPENDENCY_DAG.md",
+    "reviews/audits/completeness/13_REVISED_ECOSYSTEM_READINESS_ASSESSMENT.md",
+    "reviews/governance/PAEOS_P1_L10_FAMILY_DECORRELATION_AMENDMENT_20260918.md"
+  ],
+  "manifest_sha256": "a0fe19d27519af43d870b25352198481fcab1d77f5333b58ae5377c592ac0800"
+}

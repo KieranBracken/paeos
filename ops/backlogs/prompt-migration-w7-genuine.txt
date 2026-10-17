@@ -1,0 +1,69 @@
+# PAEOS L14/L17 Substantive Audit Request
+
+AUDIT_PHASE: SUBSTANTIVE_EVIDENCE_REVIEW
+PHYSICAL_RECEIPT_PHASE: POST_RESPONSE_CALLER_VALIDATION
+PROVENANCE_ABSENCE_POLICY: DO_NOT_BLOCK_SUBSTANTIVE_REPORT
+
+Candidate SHA: 431518bc8c0ce4291ec64eb19f189c86c61f9d56
+Evidence Bundle SHA-256: 11bed4cbe97716bde8772d1c8b0d51064d958764fbe6eeefd69347426458d54f
+Worker: Admitted: 0 | Rejected: 1 | Remediated: 0
+Court: Sealed: 0 | Remanded: 0 | Remediated: 0
+
+Independently review only the embedded evidence below. Treat builder prose as claims, not proof.
+Do not modify code, invoke tools, advance a gate, promote a branch, or self-ratify.
+
+The caller captures and validates physical provider/model/family provenance only after your
+response returns. Do not claim your physical identity. Do not block the substantive report merely
+because that future receipt is absent from this request. Your report will qualify only if the
+caller later proves an exact report-bound A-08 receipt from a family different from the builder.
+
+Return exactly one substantive status from PASS, REMAND_WITH_AMENDMENTS, or
+BLOCKED_UNQUALIFIABLE. Include these machine-readable lines with factual explanations:
+
+Candidate SHA: <candidate-sha-from-header>
+Evidence Bundle SHA-256: <evidence-bundle-sha256-from-header>
+L14_STATUS: <status>
+INVARIANT: <finding>
+REPRODUCTION: <finding>
+Worker: Admitted: 0 | Rejected: 1 | Remediated: 0
+Court: Sealed: 0 | Remanded: 0 | Remediated: 0
+
+Add a `### Audit Findings` section with at least one concrete evidence-based finding. End your
+response with the exact final line `AUDIT_COMPLETE: true`; do not emit any text after that marker.
+
+
+-----BEGIN PAEOS EMBEDDED EVIDENCE-----
+# Migration Wave 7 (W7) Substantive Evidence Bundle & Crypto Remediation
+
+## 1. Migration Scope & Context
+- Wave: Wave 7 — Expose Full Inspiration Capability Through Idea Graph (07_MIGRATION_DEPENDENCY_DAG.yaml)
+- Architecture Reference: Section 19/4 and Section 22 of FOUNDER_ECOSYSTEM_TARGET_ARCHITECTURE_v0.2.md
+- Candidate Commit: 431518bc8c0ce4291ec64eb19f189c86c61f9d56
+- Evidence Bundle SHA-256: 11bed4cbe97716bde8772d1c8b0d51064d958764fbe6eeefd69347426458d54f
+
+## 2. Cryptographic Signature Assurance Remediation (Defect Fix)
+In contracts/idea_graph_inspiration_adapter.py, the previous implementation validated only trusted key ID and non-empty placeholder signatures (SIG_PROD_12345), without cryptographic verification against payload bytes.
+The remediation implements:
+1. Genuine Ed25519 verification using PyNaCl (nacl.signing.SigningKey, nacl.signing.VerifyKey, nacl.exceptions.BadSignatureError).
+2. Canonical payload binding via compute_feedback_canonical_payload():
+   - Canonical RFC 8785 JSON bytes binding: experiment_id, runner_type, metrics (sorted lexicographically), nonce, signing_key_id, and context_version ("v1").
+3. Strict fail-closed verification in ingest_feedback_outcome():
+   - Rejects non-hex, placeholder strings (SIG_PROD_12345), and malformed signatures with InvalidSignatureError.
+   - Rejects tampered metrics, altered experiment IDs, wrong keys, and unknown keys with InvalidSignatureError.
+   - Rejects duplicate/replayed nonces with FeedbackReplayError.
+
+## 3. Exit Gate Evaluation & Negative Test Matrix
+In tests/contracts/test_idea_graph_inspiration_adapter.py, the test suite comprehensively validates:
+- CLAIM-W7-01-DETERMINISTIC-EXPERIMENT-LINEAGE: Deterministic RFC 8785 package hash and ID lineage; forbidden execution/capital authority terms rejected (ForbiddenAuthorityError).
+- CLAIM-W7-02-CONTRADICTION-PRESERVATION: Negative evidence and contradiction preservation via RejectedKnowledgeRecord.
+- CLAIM-W7-03-FEEDBACK-SIGNATURE-AND-REPLAY-REJECTION: Fail-closed rejection of placeholder signatures (SIG_PROD_12345), forged 128-hex chars, modified metrics, altered experiment IDs, wrong keys, unknown keys, and duplicate nonces.
+- CLAIM-W7-04-MOCK-RUNNER-CANNOT-CERTIFY: Mock runners (runner_type == "MOCK" or synthetic == True) cannot certify outcomes for distillation (MockCertificationProhibitedError).
+- CLAIM-W7-05-RIGHTS-AWARE-DATASET: Redacts raw text (raw_text=None) when can_train_on_raw_text=False.
+- CLAIM-W7-06-LEGACY-OUTCOME-PATH-DIFFERENTIAL: Differential parity between legacy dictionary ingestion and hardened typed path.
+- CLAIM-W7-07-ROLLBACK-BOUNDARY: Disabling adapter immediately halts capability exposure without mutating source estate.
+- CLAIM-W7-08-CANARY-DISCRIMINATION: CANARY-0002 non-vacuity discrimination verified.
+
+## 4. Test Suite Execution
+- uv run pytest tests/contracts/test_idea_graph_inspiration_adapter.py: 7 passed in 0.23s.
+- uv run pytest tests/contracts/: 88 passed in 0.29s.
+-----END PAEOS EMBEDDED EVIDENCE-----

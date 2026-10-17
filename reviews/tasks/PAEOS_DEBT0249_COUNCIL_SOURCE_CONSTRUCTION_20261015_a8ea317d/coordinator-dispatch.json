@@ -1,0 +1,21 @@
+{
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "status": "REAL_BUILDER_PACKAGE_EMITTED",
+  "root": "/private/tmp/paeos-source-construction-d0249-p2z_vhfs",
+  "run_id": "sc-r-a8ea317d8e7f46889b4f8869a4b65531",
+  "task_id": "t-8c708b6648eb",
+  "scope_sha256": "9107573576120a80b2e20d314865b0ef17fa1d8dfc772767c1d681136ddb3ff4",
+  "builder_session": "codex-thread:01a14042-702b-72b2-b6fe-4a421e74c4f7:subagent-council-builder",
+  "source_origin": "canonical exact preimage",
+  "mutable_preimages": {
+    "runtime/critique.py": "1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f",
+    "tests/runtime/test_debt0249_remand14.py": null
+  },
+  "deadline_unix": 1792086773.129535,
+  "apparatus_tests_passed": 5,
+  "provider_calls": 0,
+  "production": false,
+  "integration": false,
+  "qualification": false,
+  "heterogeneous_review": "PENDING_PROVIDER_ELIGIBILITY"
+}

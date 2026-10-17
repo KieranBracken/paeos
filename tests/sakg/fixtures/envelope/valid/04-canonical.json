@@ -1,0 +1,43 @@
+{
+  "confidence": 0.55,
+  "coordinates": {
+    "domain": [
+      "software-architecture"
+    ],
+    "tier": [
+      "SUMMARY"
+    ]
+  },
+  "evidence": [
+    {
+      "hash": "2d493f25558c40ad587a79b276fa7cd7804aba795e2db16f13e979cb3cf3b1eb",
+      "kind": "artifact",
+      "reverification": "re-run the bound deterministic check",
+      "uri": "cas://evidence/04"
+    }
+  ],
+  "facets": {
+    "saeos": {
+      "derived": true,
+      "example": 4
+    }
+  },
+  "falsifier": null,
+  "id": "sakg://demo-project/Constraint/01J00000000000000000000004",
+  "label": "Example Constraint 4",
+  "namespace": "demo-project",
+  "provenance": {
+    "author_kind": "ingest",
+    "ingested_at": "2026-09-02T12:00:00Z",
+    "origin": {
+      "run_id": "fixture-04",
+      "system": "paeos-envelope-fixture"
+    },
+    "source_hash": "48973630ec8562483241b67835398d5a6445a2f1da0652e05a53f70a342fd92e"
+  },
+  "status": "canonical",
+  "summary": "A deterministic constraint fixture exercising the universal envelope.",
+  "type": "Constraint",
+  "valid_from": "2026-09-02T12:00:00Z",
+  "valid_until": null
+}

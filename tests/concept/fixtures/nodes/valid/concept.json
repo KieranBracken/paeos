@@ -1,0 +1,2 @@
+{"id":"concept://demo/concept/00000000000000000000000000","type":"Concept","namespace":"demo","schema_version":1,"payload":{"label":"Feedback","description":"A response loop.","domain_tags":["systems"]},"representations":[{"kind":"symbolic","label":"Feedback","language":"en","definition":"A response loop."}],"provenance_refs":["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],"recorded_at":"2026-09-04T20:00:00Z"}
+
