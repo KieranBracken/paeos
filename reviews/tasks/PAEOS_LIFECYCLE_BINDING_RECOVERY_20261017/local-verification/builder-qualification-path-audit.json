@@ -13,15 +13,31 @@
       "tracked_in_current_checkout": false
     }
   },
+  "fixed_supervisor_qualification_identities": [
+    {
+      "goal_id": "g-builder-transport-qualification",
+      "run_id": "r-builder-transport-qualification",
+      "stage": "IMPLEMENT",
+      "task_id": "t-builder-transport-qualification"
+    },
+    {
+      "goal_id": "g-builder-transport-qualification-restart",
+      "run_id": "r-builder-transport-qualification-restart",
+      "stage": "IMPLEMENT",
+      "task_id": "t-builder-transport-qualification-restart"
+    }
+  ],
+  "fresh_unique_identity_admitted_by_existing_path": false,
   "harness_run": false,
   "keys_read_by_this_audit": false,
   "kind": "builder-qualification-renewal-path-static-audit",
   "markdown_documented_renewal_command_found": false,
   "observed_at_utc": "2026-10-17T03:58:10Z",
+  "plan_conflict": "The user-approved recovery plan prohibits reuse of prior task/run identities and requires fresh PAEOS admission; using either fixed tuple is therefore not an acceptable renewal.",
   "provider_calls": 0,
   "qualification_path": "ops/.trusted-codex-worker/qualification.json",
   "qualification_status": "NOT_READY: qualification is expired or stale; verifier max age 86400 seconds",
-  "required_action": "Use an existing legitimate supervisor-signed physical canary path that issues exactly one request, preserves workspace and receipts for ambiguous outcomes, and yields a current qualification; otherwise scope and test such a guarded renewal path under a valid PAEOS Builder admission. Do not run the current live wrapper as-is.",
+  "required_action": "A trusted supervisor/authority owner must establish a new one-time qualification identity and a single-dispatch, no-retry, ambiguity-preserving physical canary path, or the user must explicitly authorize that narrow out-of-band bootstrap repair. Then provide the signed qualification and receipts so PAEOS can admit a fresh task.",
   "safe_renewal_command_found": false,
   "source_edits": 0,
   "static_findings": [
@@ -44,6 +60,16 @@
       "file": "ops/probe_builder_transport_ready.py",
       "finding": "The live command calls qualify(); exposed commands are host, capabilities, liveness, live, and negative. No single-dispatch/no-cleanup option was found.",
       "lines": "320-349"
+    },
+    {
+      "file": "ops/trusted_codex_worker_supervisor.py",
+      "finding": "The supervisor only signs Builder qualification for two fixed task/goal/run identities.",
+      "lines": "104-119"
+    },
+    {
+      "file": "ops/verify_builder_transport_ready.py",
+      "finding": "The only provided qualification harness uses the fixed identities; no fresh unique identity is parameterized.",
+      "lines": "162-165,189-193"
     }
   ],
   "supervisor_identity_or_private_key_values_recorded": false

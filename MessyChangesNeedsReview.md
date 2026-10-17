@@ -5425,3 +5425,8 @@ The previous statement that the router DB was unreadable referred to the sanitiz
 The host’s signed Builder qualification is expired. A local read-only audit found the only live qualification wrapper can perform a second request after a pending-restart response and deletes its workspace in `finally`; no safe single-dispatch renewal mode or documented command was found. It was not run. The action needed is a current supervisor-signed physical qualification with one request and ambiguity-preserving evidence.
 
 One earlier DEBT-0117 review request was sent to NVIDIA as `INTERNAL`, received HTTP 410 for an end-of-life model, and returned no review response. Its payload has no high-confidence credential/private-key/local-state pattern matches, but it included D0117 context. NVIDIA’s trial terms permit submitted content to improve its products/models, so do not repeat that request. Exact request/dispatch hashes and a privacy disposition are in `reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/d0117-review-attempt-policy-audit.json`. No provider call occurred during this turn.
+
+
+## 2026-10-17 — Builder qualification identity reuse gate
+
+The existing supervisor allows qualification only for two fixed task/goal/run identity tuples, and the existing live wrapper uses those tuples and may retry after a restart-pending result before deleting its workspace. No safe fresh-ID renewal mode exists in the inspected checkout. Reusing the fixed IDs conflicts with the current no-reuse rule. The signed Builder qualification is expired; until a trusted authority provides a new unique identity and ambiguity-preserving physical canary, the authorized PAEOS scopes cannot start. No harness or provider request was made.

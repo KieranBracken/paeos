@@ -1,5 +1,5 @@
 {
-  "authority_or_implementation_gap": "The live task is held by expired Builder qualification. The earlier database-open failure was environment-specific: host read-only open and SQLite quick_check succeeded. Current tests and source-construction receipts still do not establish a separate receiver start.",
+  "authority_or_implementation_gap": "PAEOS cannot admit a new builder task while the signed qualification is stale. Existing renewal script cannot produce a new unique task identity without reuse and is not ambiguity-safe. No source edits or harness calls are authorized/performed.",
   "authorized_next_action": "Start a fresh PAEOS-bound lifecycle-binding task and separately the user-authorized public atomic-ledger, canonical-contract, and public-key-only CapabilityVerifier scopes; do not reuse old task capabilities or report worker start without a receiving-turn receipt.",
   "kind": "lifecycle-binding-gap-observation",
   "observed_at_utc": "2026-10-17T03:54:59Z",
@@ -27,11 +27,11 @@
     "transport_tests": "37 focused tests passed in the active dirty checkout; four of the five test modules are untracked and absent from 5b, so this receipt is local evidence and is not reproducible from the published checkpoint as-is."
   },
   "runtime_state_reconciliation": {
-    "current_admission_blocker": "Existing signed Trusted Codex Builder qualification fails the production verifier as expired or stale; verifier max age is 86400 seconds.",
+    "current_admission_blocker": "Expired signed Trusted Codex Builder qualification; existing renewal wrapper only admits two fixed task/goal/run identities, uses retry-and-cleanup behavior on restart pending, and has no fresh unique ID mode. Router DB itself is accessible read-only.",
     "host_router_database": "Accessible read-only at ~/.local/share/paeos/model-router/state.sqlite3; PRAGMA quick_check=ok; schema names only, no row data read.",
     "required_user_or_supervisor_action": "Renew through an existing legitimate supervisor-signed physical qualification process; do not create keys or fabricate/sign records.",
     "sanitized_recovery_tree": "Runtime database intentionally absent from public recovery checkout."
   },
   "status": "OPEN_IMPLEMENTATION_GAP",
-  "wake_condition": "A currently valid supervisor-signed Builder qualification (the existing verifier requires a maximum age of 86400 seconds), followed by fresh PAEOS admission and a receiver-start receipt cryptographically bound to exact run/task/scope/workspace/session; the host router DB is already readable read-only."
+  "wake_condition": "Trusted supervisor authorizes a new unique qualification identity and one physical canary whose request, response, workspace, and ambiguous outcome receipts are preserved; resulting signature must pass the existing 86400-second readiness verifier. Then create a fresh PAEOS run/task/scope and prove receiver start."
 }
