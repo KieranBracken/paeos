@@ -136,6 +136,32 @@ def test_enabled_controller_updates_only_expected_feature_ref(tmp_path: Path) ->
     base_tree = git("rev-parse", f"{base}^{{tree}}")
     rollback = git("commit-tree", base_tree, "-p", reviewed, input="rollback\n")
 
+    import hashlib
+    import json
+    from kernel.cas import CAS, InMemoryCasStore
+
+    cand_file = repo / "state.txt"
+    tree = {cand_file.name: hashlib.sha256(cand_file.read_bytes()).hexdigest()}
+    computed_root = hashlib.sha256(json.dumps(tree, sort_keys=True).encode("utf-8")).hexdigest()
+
+    cas = CAS(InMemoryCasStore())
+    l11_hash = cas.put(json.dumps({"candidate_root": computed_root}).encode("utf-8"))
+    l13_hash = cas.put(json.dumps({"candidate_root": computed_root}).encode("utf-8"))
+    report_hash = cas.put(b"AUDIT_COMPLETE: true\nL14_STATUS: PASS\n")
+    l14_receipt_hash = cas.put(json.dumps({
+        "builder_family": "glm",
+        "auditor_family": "gemini",
+        "a08_verdict": "PASS",
+        "candidate_sha256": computed_root,
+        "evidence_bundle_sha256": l13_hash,
+        "report_sha256": report_hash,
+        "external_generation_id": "gen-test-promotion-ctrl",
+        "host_turn_uuid": "d3b07384-d113-4e2a-9f5e-26f53ef58941",
+        "transport_request_sha256": "1" * 64,
+        "transport_response_sha256": "2" * 64,
+    }).encode("utf-8"))
+    l15_hash = cas.put(json.dumps({"candidate_root": computed_root}).encode("utf-8"))
+
     intent = PromotionIntent(
         repository_id="repo-enabled",
         target_ref="refs/heads/feature",
@@ -145,6 +171,7 @@ def test_enabled_controller_updates_only_expected_feature_ref(tmp_path: Path) ->
         rollback_commit=rollback,
         health_command_id="pytest-focused",
         expires_seq=100,
+        candidate_root_hash=computed_root,
     )
     broker = CapabilityBroker()
     token = broker.mint(
@@ -159,19 +186,21 @@ def test_enabled_controller_updates_only_expected_feature_ref(tmp_path: Path) ->
     )
     evidence = PromotionEvidence(
         bootstrap_verified=True,
-        l11_contract_hash="1" * 64,
-        l13_evidence_hash="2" * 64,
-        l14_receipt_hash="3" * 64,
-        l15_document_hash="4" * 64,
+        l11_contract_hash=l11_hash,
+        l13_evidence_hash=l13_hash,
+        l14_receipt_hash=l14_receipt_hash,
+        l15_document_hash=l15_hash,
         builder_family="glm",
         auditor_family="gemini",
         rollback_verified=True,
         health_passed=True,
+        candidate_root_hash=computed_root,
     )
     controller = PromotionController(
         capability_broker=broker,
         bootstrap_manifest_hash="b" * 64,
         state_root=tmp_path / "state",
+        cas=cas,
     )
 
     receipt = controller.promote(
@@ -181,6 +210,8 @@ def test_enabled_controller_updates_only_expected_feature_ref(tmp_path: Path) ->
         current_target_head=base,
         evidence=evidence,
         repository_path=repo,
+        candidate_files=[cand_file],
+        candidate_base_dir=repo,
     )
 
     assert isinstance(receipt, PromotionReceipt)
@@ -194,6 +225,8 @@ def test_enabled_controller_updates_only_expected_feature_ref(tmp_path: Path) ->
             current_target_head=base,
             evidence=evidence,
             repository_path=repo,
+            candidate_files=[cand_file],
+            candidate_base_dir=repo,
         )
     except PromotionError as exc:
         assert "single-use" in str(exc)

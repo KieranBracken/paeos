@@ -12,17 +12,20 @@ from collections.abc import Callable
 from pathlib import Path
 
 from kernel.capability import CapabilityBroker
-from kernel.cas import CAS, InMemoryCasStore
+from kernel.cas import CAS, CasMiss, InMemoryCasStore
 from kernel.evidence import EvidenceKind
-from kernel.types import Role, StageId
+from kernel.types import ArtifactRef, Role, StageId
 from nacl.signing import SigningKey
 from runtime.claude_code import AgentDispatcher
 from runtime.integrations import ClaudeCodeRuntime, SessionResult, SessionSpec, build_prompt
+from runtime.integrations.process_supervisor import ProcessLifecycleState, ProcessObservation
+from runtime.review import InformationBarrierManager, ReviewHarness
 from runtime.task_package import (
     Budget,
     EvidenceObligation,
     Permissions,
     TaskPackage,
+    TaskStatus,
 )
 
 _TRANSCRIPT = json.dumps(
@@ -75,6 +78,25 @@ def test_prompt_is_compiled_from_the_package() -> None:
     assert "BUILDER at stage IMPLEMENT" in prompt
 
 
+def test_adversary_prompt_names_physical_bundle_boundary() -> None:
+    from dataclasses import replace
+
+    prompt = build_prompt(
+        replace(
+            _package(),
+            stage=StageId.ADVERSARIAL_REVIEW,
+            role=Role.ADVERSARY,
+            permissions=Permissions(
+                ("review/adversary_report.md",), ("context/",), ("constitution",)
+            ),
+            context_refs=(ArtifactRef(hash="a" * 64, type="candidate"),),
+        )
+    )
+    assert "physically materialized only under `context/`" in prompt
+    assert "builder/planner source paths" in prompt
+    assert "Research Backlog" not in prompt
+
+
 # ---- run: writes collected + scope-filtered -------------------------------
 
 
@@ -118,6 +140,51 @@ def test_run_parses_cost_from_transcript() -> None:
     assert out.cost.wallclock_s == 2.5
     assert out.cost.model_ver == "claude-sonnet-x"
     assert out.trace  # the transcript is persisted
+
+
+def test_failed_trusted_worker_returns_failed_without_collecting_writes() -> None:
+    def failed_invoker(spec: SessionSpec) -> SessionResult:
+        (spec.workspace / "runtime/feature.py").parent.mkdir(parents=True, exist_ok=True)
+        (spec.workspace / "runtime/feature.py").write_text("must-not-become-an-artifact\n")
+        return SessionResult(
+            transcript="provider output is not a governed failure observation",
+            lifecycle_state="FAILED",
+            exit_code=17,
+            failure_code="provider_execution_failure",
+        )
+
+    out = ClaudeCodeRuntime(invoker=failed_invoker).run(_package())
+
+    assert out.status is TaskStatus.FAILED
+    assert out.writes == ()
+    assert out.trace == b"trusted_worker_failure:provider_execution_failure"
+    assert b"provider output" not in out.trace
+
+
+def test_l12_provider_failure_is_classified_before_capture() -> None:
+    """The .08 boundary must distinguish provider failure from capture/materialization failure."""
+
+    captured: dict[str, Path] = {}
+
+    def failed_provider(spec: SessionSpec) -> SessionResult:
+        captured["workspace"] = spec.workspace
+        target = spec.workspace / "runtime" / "feature.py"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"partial-provider-write\n")
+        return SessionResult(
+            transcript="provider execution failed",
+            lifecycle_state="FAILED",
+            exit_code=1,
+            failure_code="provider_execution_failure",
+        )
+
+    out = ClaudeCodeRuntime(invoker=failed_provider).run(_package())
+
+    assert out.status is TaskStatus.FAILED
+    assert out.failure_code == "provider_execution_failure"
+    assert out.writes == ()
+    assert out.trace == b"trusted_worker_failure:provider_execution_failure"
+    assert not captured["workspace"].exists()
 
 
 def test_unparseable_transcript_yields_zero_cost_not_fabricated() -> None:
@@ -217,23 +284,29 @@ def test_planner_allow_list_omits_bash_least_privilege() -> None:
     assert {"Read", "Write", "Edit"} <= set(allowed)  # still gets the scoped non-exec tools
 
 
-def test_live_invoker_passes_dangerously_skip_permissions(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+def test_live_invoker_passes_dangerously_skip_permissions(monkeypatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
     import runtime.integrations as integ
 
     captured: dict[str, list[str]] = {}
 
-    class _Proc:
-        stdout = _TRANSCRIPT
-        returncode = 0  # CRITICAL-002 fail-loud check requires the real exit status
-        stderr = ""
-
     def _fake_run(cmd, **kwargs):  # type: ignore[no-untyped-def]
         captured["cmd"] = cmd
-        return _Proc()
+        return ProcessObservation(
+            argv=tuple(cmd),
+            executable="/usr/local/bin/claude",
+            executable_version="sha256:test",
+            cwd=str(kwargs["cwd"]),
+            environment_fingerprint="e" * 64,
+            stdout=_TRANSCRIPT.encode(),
+            stderr=b"",
+            exit_code=0,
+            duration_ms=1,
+            lifecycle_state=ProcessLifecycleState.RETURNED,
+        )
 
-    monkeypatch.setattr(integ.subprocess, "run", _fake_run)
+    monkeypatch.setattr(integ, "run_bounded_process", _fake_run)
     invoker = integ.claude_cli_invoker(_package())
-    invoker(SessionSpec(Path("/tmp"), "p", ("Write",), (), 60))
+    invoker(SessionSpec(tmp_path, "p", ("Write",), (), 60))
     assert "--dangerously-skip-permissions" in captured["cmd"]
 
 
@@ -269,6 +342,99 @@ def test_context_refs_are_materialized_from_the_resolver(tmp_path: Path) -> None
 
     ClaudeCodeRuntime(invoker=_inspect, artifact_resolver=lambda _h: b"the plan").run(pkg)
     assert captured["content"] == b"the plan"  # the injected context is readable in the workspace
+
+
+def test_adversary_bundle_is_physically_reviewable_in_scoped_context(tmp_path: Path) -> None:
+    """Reproduce the .07 failure at the real adapter boundary.
+
+    The review bundle must be materialized under a deterministic, explicitly named directory.
+    The worker must not depend on a content hash being interpreted as a filesystem path, and no
+    source/planner overlay may be present in this isolated review workspace.
+    """
+    candidate = b"candidate bytes"
+    evidence = b"physical evidence bytes"
+    cas = CAS(InMemoryCasStore())
+    candidate_hash = cas.put(candidate)
+    evidence_hash = cas.put(evidence)
+    ibm = InformationBarrierManager()
+    bundle = ibm.seal(
+        artifact_refs=(ArtifactRef(hash=candidate_hash, type="candidate"),),
+        evidence_refs=(evidence_hash,),
+    )
+    observed: dict[str, object] = {}
+
+    def _inspect(spec: SessionSpec) -> SessionResult:
+        observed["read_scopes"] = spec.read_scopes
+        observed["prompt"] = spec.prompt
+        observed["context_files"] = tuple(
+            sorted(
+                str(path.relative_to(spec.workspace))
+                for path in (spec.workspace / "context").rglob("*")
+                if path.is_file()
+            )
+        )
+        observed["forbidden_paths"] = tuple(
+            name for name in ("design", "plan", "review") if (spec.workspace / name).exists()
+        )
+        report = spec.workspace / "review" / "adversary_report.md"
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text("VERDICT: PASS\n")
+        return SessionResult(_TRANSCRIPT)
+
+    runtime = ClaudeCodeRuntime(invoker=_inspect, artifact_resolver=cas.get)
+    dispatcher = AgentDispatcher(
+        CapabilityBroker(SigningKey.generate()), cas, runtime, clock=lambda: 0
+    )
+    result = ReviewHarness(ibm, dispatcher).review(
+        goal_id="g",
+        run_id="r",
+        session="adversary",
+        bundle=bundle,
+        budget=Budget(100000, 60, 1),
+    )
+
+    assert result.status is TaskStatus.COMPLETE
+    assert observed["read_scopes"] == ("context/",)
+    assert "context/" in observed["prompt"]  # type: ignore[operator]
+    assert observed["context_files"] == (
+        f"context/candidate-{candidate_hash[:12]}.txt",
+        f"context/evidence-{evidence_hash[:12]}.txt",
+    )
+    assert observed["forbidden_paths"] == ()
+
+
+def test_adversary_missing_bundle_blob_fails_closed_before_worker_launch() -> None:
+    """A sealed adversary chamber cannot silently review an empty/missing bundle."""
+    invoked = False
+
+    def _unexpected_worker(_spec: SessionSpec) -> SessionResult:
+        nonlocal invoked
+        invoked = True
+        return SessionResult(_TRANSCRIPT)
+
+    def _missing(_hash: str) -> bytes:
+        raise CasMiss("missing")
+
+    runtime = ClaudeCodeRuntime(invoker=_unexpected_worker, artifact_resolver=_missing)
+    pkg = _package()
+    from dataclasses import replace
+
+    adversary = replace(
+        pkg,
+        stage=StageId.ADVERSARIAL_REVIEW,
+        role=Role.ADVERSARY,
+        permissions=Permissions(
+            ("review/adversary_report.md",), ("context/",), ("constitution",)
+        ),
+        context_refs=(ArtifactRef(hash="f" * 64, type="evidence"),),
+    )
+
+    out = runtime.run(adversary)
+
+    assert out.status is TaskStatus.FAILED
+    assert out.failure_code == "sealed_bundle_context_missing"
+    assert out.writes == ()
+    assert not invoked
 
 
 # ---- plugs into the dispatcher (it IS an AgentRuntime) --------------------

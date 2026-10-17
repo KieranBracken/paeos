@@ -1,0 +1,24 @@
+[
+  {
+    "objective": "Execute SAKG-2 Task 26 [I-LIVE-MCP-SPIKE] under SAEOS-1 §5.3 and §3.3. Author tests/mcp/test_live_mcp_query.py to validate that the SAKG MCP server (sakg/mcp_server.py) successfully queries the live SQLite graph store (sakg.db), returning outcome-joined TradeOff precedents with complete 'why' traversal paths within the token budget. Generate the empirical validation spike report at reviews/spikes/sakg-live-mcp-precedent-query.md proving end-to-end multi-model precedent query retrieval.",
+    "accept": [
+      "uv run pytest tests/mcp/test_live_mcp_query.py -q",
+      "test -f reviews/spikes/sakg-live-mcp-precedent-query.md",
+      "uv run pytest tests/mcp/ tests/sakg/ tests/kae/ -q",
+      "No runtime, kernel, protected ref, main/trunk, or historical evidence mutation"
+    ],
+    "changed_paths": [
+      "tests/mcp/test_live_mcp_query.py",
+      "reviews/spikes/sakg-live-mcp-precedent-query.md"
+    ],
+    "plan_write_scopes": [
+      "tests/mcp/test_live_mcp_query.py",
+      "reviews/spikes/sakg-live-mcp-precedent-query.md",
+      "sakg/mcp_server.py"
+    ],
+    "goal_signature": "domain:sakg,task:task-26-live-mcp-spike",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

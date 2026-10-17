@@ -1,11 +1,11 @@
 """S2 tradeoff precedent query over typed SAKG graph objects.
 
 The method is deliberately read-only: it matches every requested axis on TradeOff nodes,
-follows an explicit ``resolves_to`` edge to a Decision, then joins only a realized Outcome
-through a ``realized_as`` edge.  The join is fail-closed by construction: malformed or
-negated links, untypeable nodes, namespace mismatches, unknown decisions, and candidate
-outcomes are all skipped, and the returned ``why`` path makes the three-hop evidence chain
-visible to callers.
+follows an explicit resolving edge to a Decision, then joins only a realized or verified
+Outcome through a causal outcome edge.  The join is fail-closed by construction: malformed
+or negated links, untypeable nodes, namespace mismatches, unknown decisions, and unverified
+candidate outcomes are all skipped, and the returned ``why`` path makes the three-hop
+evidence chain visible to callers.
 """
 
 from __future__ import annotations
@@ -121,11 +121,19 @@ def _axis_text(value: object) -> str | None:
 
 
 def _axes(node: Mapping[str, object]) -> frozenset[str]:
-    containers: list[Mapping[str, object]] = [node]
-    for name in ("facets", "coordinates", "data", "payload"):
-        candidate = node.get(name)
-        if isinstance(candidate, Mapping):
-            containers.append(candidate)
+    containers: list[Mapping[str, object]] = []
+    pending: list[Mapping[str, object]] = [node]
+    seen: set[int] = set()
+    while pending:
+        container = pending.pop()
+        if id(container) in seen:
+            continue
+        seen.add(id(container))
+        containers.append(container)
+        for name in ("facets", "coordinates", "data", "payload", "properties", "tradeoff"):
+            candidate = container.get(name)
+            if isinstance(candidate, Mapping):
+                pending.append(candidate)
     raw_values: list[object] = []
     for container in containers:
         for key in ("axes", "axis", "dimensions", "tradeoff_axes"):
@@ -219,14 +227,31 @@ def _affirmative(relation: str) -> bool:
 def _is_resolving(edge: Mapping[str, object]) -> bool:
     relation = _relation(edge)
     return _affirmative(relation) and "resolv" in relation and (
-        "decision" in relation or relation in {"resolves_to", "resolves_to_decision"}
+        "decision" in relation
+        or relation in {"resolves", "resolves_to", "resolves_to_decision"}
     )
 
 
 def _is_realization(edge: Mapping[str, object]) -> bool:
     relation = _relation(edge)
     return _affirmative(relation) and (
-        "realized_as" in relation or ("realiz" in relation and "outcome" in relation)
+        (_family(edge) == "causal" and relation == "outcome")
+        or "realized_as" in relation
+        or ("realiz" in relation and "outcome" in relation)
+    )
+
+
+def _outcome_state(node: Mapping[str, object]) -> str | None:
+    value = _field(node, "state")
+    if isinstance(value, Mapping):
+        value = value.get("value")
+    return value.strip().upper() if isinstance(value, str) and value.strip() else None
+
+
+def _is_completed_outcome(node: Mapping[str, object]) -> bool:
+    status = _field(node, "status")
+    return status == "realized" or (
+        status == "candidate" and _outcome_state(node) == "VERIFIED"
     )
 
 
@@ -252,11 +277,11 @@ def tradeoff_precedents(
     min_confidence: float = 0.0,
     namespace: str | None = None,
 ) -> tuple[dict[str, object], ...]:
-    """Return ranked TradeOff -> Decision -> realized Outcome precedent records.
+    """Return ranked TradeOff -> Decision -> completed Outcome precedent records.
 
     All links are directed and explicit, and every hop must carry an explicit node
     type (a ``type`` field or a ``sakg://`` URI that yields one).  A malformed or
-    negated link, a missing hop, an untypeable node, a non-realized outcome, or a
+    negated link, a missing hop, an untypeable node, an incomplete outcome, or a
     namespace mismatch simply cannot become a result; no inference is invented.
     """
     query_axes = _query_axes(axes)
@@ -317,13 +342,25 @@ def tradeoff_precedents(
                 outcome = outcome_by_id[outcome_id]
                 status = _field(outcome, "status")
                 summary = _field(outcome, "summary")
-                if status != "realized" or not isinstance(summary, str) or not summary.strip():
+                if (
+                    not _is_completed_outcome(outcome)
+                    or not isinstance(summary, str)
+                    or not summary.strip()
+                ):
                     continue
                 if namespace is not None and _namespace(outcome) != namespace:
                     continue
                 score = _score(tradeoff, decision, outcome, edge=resolving)
                 if score < float(min_confidence):
                     continue
+                outcome_result: dict[str, object] = {
+                    "id": outcome_id,
+                    "status": status,
+                    "summary": summary.strip(),
+                }
+                state = _outcome_state(outcome)
+                if state is not None:
+                    outcome_result["state"] = state
                 result: dict[str, object] = {
                     "decision_id": decision_id,
                     "score": score,
@@ -332,7 +369,7 @@ def tradeoff_precedents(
                         "TradeOff resolves_to Decision",
                         "Decision realized_as Outcome",
                     ],
-                    "outcome": {"id": outcome_id, "status": "realized", "summary": summary.strip()},
+                    "outcome": outcome_result,
                 }
                 key = (decision_id, outcome_id)
                 prior = results.get(key)

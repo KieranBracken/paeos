@@ -39,3 +39,8 @@
      2. *Queue Congestion & Staggered Messages:* Detect if multiple prompts or authorizations were queued/staggered in the UI without execution.
      3. *Truncation & UI Halts:* Check for truncated responses, stalled spinners, stuck tools, or modal authorization prompts.
      4. *Anti-Hallucination Integrity:* Confirm the model is not outputting fabricated claims, self-ratifying without Court disposition, or bypassing safety machinery.
+
+5. **Mermaid Diagram Renderer Compatibility Invariant**:
+   * **NEVER emit `pie` or `pie title` Mermaid diagrams** in chat messages, reports, or markdown artifacts.
+   * The Antigravity chat UI and artifact parser supports only: `flowchart`/`graph`, `stateDiagram-v2`, `sequenceDiagram`, `classDiagram`, `erDiagram`, and `xychart-beta`.
+   * For progress metrics, use `flowchart LR`/`flowchart TD` with status nodes or ASCII/Unicode progress bars (`[████████████████████] 100.0%`).

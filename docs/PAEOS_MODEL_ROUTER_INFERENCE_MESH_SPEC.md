@@ -149,7 +149,11 @@ Antigravity interacts exclusively with 5 logical endpoints:
    $$\text{Cline Validated Free} \longrightarrow \text{GLM-5.2} \longrightarrow \text{Hy3} \longrightarrow \text{Laguna S2.1} \longrightarrow \text{Gemini 3.7}$$
 4. **`paeos-cheap`**: Quota-preservation tier for routine tasks, variable renames, and minor edits:
    $$\text{Kilo Free} \longrightarrow \text{OpenRouter Free} \longrightarrow \text{Weaker Cline Free}$$
-5. **`paeos-audit`**: Heterogeneous Adversarial Review tier. **Strict invariant:** The reviewer family MUST differ from the builder family:
+5. **`paeos-audit`**: Adversarial Review tier. Family diversity is preferred for L09 and L10;
+   same-family review is eligible only under the ratified C/D/F safeguards and K3 augmentation.
+   Strict family inequality remains mandatory for L14 and every other constrained stage. The
+   following provider/model combinations are illustrative routing guidance only; they establish
+   no capability, qualification, health, or task eligibility:
    $$\text{Builder} = \text{DeepSeek/Minimax} \implies \text{Auditor} = \text{Gemini 3.7}$$
    $$\text{Builder} = \text{Gemini 3.7} \implies \text{Auditor} = \text{GLM-5.2}$$
    $$\text{Builder} = \text{GLM-5.2} \implies \text{Auditor} = \text{Gemini 3.7}$$
@@ -324,7 +328,8 @@ OPENROUTER_API_KEY=
 - [ ] **Phase 3 (Economy of Reasoning & Ensembles):**
   - Multi-stage constraint pipeline (Privacy $\rightarrow$ Capability $\rightarrow$ Context $\rightarrow$ Health $\rightarrow$ Quota $\rightarrow$ Score).
   - Quota partitioning (70/20/10) on Gemini 3.7.
-  - Automated heterogeneous adversarial ensemble auditing (`Builder != Auditor`).
+  - Automated adversarial ensemble auditing with family diversity preferred for L09/L10; actual
+    eligibility follows the ratified role/stage crosswalk and does not relax L07/L13/L14/L17/L18.
 
 ---
 
@@ -334,5 +339,7 @@ Before executing any prompt, dispatch, code modification, or architectural refac
 1. **State Independence:** Is the task state persisted locally in PAEOS rather than relying on LLM context?
 2. **Single Policy Authority:** Does PAEOS Router control all retries, fallbacks, and quotas, with LiteLLM functioning strictly as transport?
 3. **Privacy Eligibility:** Does the task data class match the provider's data policy before calculating routing scores?
-4. **Heterogeneous Audit Invariant:** Is code being reviewed by a distinct model family from the builder (`Builder != Auditor`)?
+4. **Heterogeneous Audit Invariant:** For code-review stages where it applies, is code being
+   reviewed by a distinct model family from the builder (`Builder != Auditor`)? This preserves
+   the strict L14 rule and does not create an L09/L10 prerequisite for an L19 amendment.
 5. **Cost Invariant:** Is OpenRouter restricted strictly to `openrouter/free` (`FREE_ONLY=true`)?

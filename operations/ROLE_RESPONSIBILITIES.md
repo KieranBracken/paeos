@@ -13,8 +13,8 @@
 | **Planner** | GENERATE×GOALSTRUCT + SELECT×GOALSTRUCT | L02–L08, L11 | Opus |
 | **Researcher** | GENERATE/FALSIFY on knowledge-goals | L03, L05 | Gemini + Opus |
 | **Builder** | GENERATE×WORK | L04 (candidates), L12 | Sonnet |
-| **Reviewer** | FALSIFY×WORK (multi-stance) | L09 | Gemini/Opus |
-| **Court** | SELECT×POLICY + FALSIFY×GOALSTRUCT | L10, L19 | Opus (+decorrelated) |
+| **Reviewer** | FALSIFY×WORK (multi-stance) | L09 | Capability-qualified worker (family diversity preferred) |
+| **Court** | SELECT×POLICY + FALSIFY×GOALSTRUCT | L10, L19 | Admitted Court contract (family diversity preferred) |
 | **Adversary** | FALSIFY (any domain) | L07, L10, L13-adversarial | Opus/Gemini |
 | **Auditor** | FALSIFY×WORK/TRUNK | L13, L14, L17, L18 | ≠ Builder family |
 | **Runtime** | kernel: reconciler+Compiler+reactor+syscalls | orchestrates all; owns L01, L15 | — |
@@ -51,12 +51,12 @@
 ## Court
 - **Responsibility:** adversarial ratification (L10) and constitutional evolution judgment (L19). Renders verdicts (RATIFY / RATIFY-WITH-AMENDMENTS / REJECT) in the 3.5/5.5 format — every finding with violated-principle, evidence, severity, smallest-amendment.
 - **Owns:** the gate verdict at L10 and L19; the blocking-amendment ledger.
-- **Authority limit:** judges designs and amendments; **does not author** the designs it judges (decorrelation). Kernel-surface amendments it proposes still require **Founder** ratification (§14.5) — the Court recommends, the Founder decides irreversible constitutional change.
+- **Authority limit:** judges designs and amendments; **does not author** the designs it judges (artifact independence). Kernel-surface amendments it proposes still require **Founder** ratification (§14.5) — the Court recommends, the Founder decides irreversible constitutional change. This non-authorship rule is distinct from provider-family selection and does not create a same-family exception for any stage.
 
 ## Adversary
 - **Responsibility:** attempt to falsify — at L07 (attack mitigations), L10 (prove the design wrong), L13 (construct failing inputs). Constructs the failing case; does not approve.
 - **Owns:** refuting evidence and adversarial reports.
-- **Authority limit:** **must differ in model family from the Builder** it attacks (A-08). May only produce refuting-or-surviving evidence; may not modify the artifact under test.
+- **Authority limit:** L07 and L13-adversarial retain the existing different-family rule; only L10 receives the prospective same-family condition under the ratified worker-pool amendment and its K3 safeguards. Adversaries remain evidence-only and cannot modify the artifact under test.
 
 ## Auditor
 - **Responsibility:** independent verification (L13), independent audit (L14 — hunt AI slop, hidden mocks, fake implementations, dead code, architecture violations, security flaws, regressions), retrospective (L17), and knowledge extraction (L18, Steward stance).
@@ -64,7 +64,7 @@
 - **Authority limit:** the L14 auditor **MUST be a different model family than the L12 builder** (A-08) — a same-family audit is void. As Steward (L18), owns userland policy authoring; **no other role may amend userland**, and the Auditor may not amend the kernel (Founder-only).
 
 ## Runtime
-- **Responsibility:** orchestration — the kernel made operational. Assigns states to agents, **compiles their context** (constitution + role + capability-resolved skills + links + evidence — never hand-written prompts, K5), enforces gates and global rules, records evidence, and **selects the model** per role and per decorrelation requirement.
+- **Responsibility:** orchestration — the kernel made operational. Assigns states to agents, **compiles their context** (constitution + role + capability-resolved skills + links + evidence — never hand-written prompts, K5), enforces gates and global rules, records evidence, and selects configured workers by the role/stage crosswalk, recording the exact selected and observed provider, model, and family identity.
 - **Owns:** L01 intake, L15 ledger sync, the write lease (single-writer), and the scheduler (budget-bounded skill/context admission, §6.4).
 - **Authority limit:** **mechanical only** — the Runtime executes the state machine; it makes no engineering judgments and holds no authority the state machine doesn't grant. It cannot approve gates that name a human/Court approver. It is bound by the same invariants it enforces (it has no bypass — reactor/validator writes go through validation like any client). Assumed non-Byzantine (Ω-13); its long-run check is dual-adapter differential conformance, not self-attestation.
 
@@ -95,13 +95,16 @@ as follows. No new role or authority is created.
 The Runtime binds each role to a model at dispatch. Recommended defaults above are
 advisory; two rules are **mandatory**:
 
-1. **Decorrelation (A-08/I3):** the family that verifies/audits (L10, L13-adversarial,
-   L14) MUST differ from the family that built (L12). The Runtime refuses a same-family
-   audit assignment.
+1. **Stage-scoped family policy (A-08/I3):** L09 and L10 prefer family diversity and permit
+   same-family review only under their ratified stage-specific safeguards, fresh independent
+   context/provenance, no Builder write authority, no self-certification, and K3/mechanical
+   augmentation. L13-adversarial and L14 retain their existing family inequality; the Runtime
+   refuses a same-family assignment for those stages.
 2. **Provenance (5.5 B-02):** the Runtime stamps actor/role/model server-side into every
    artifact's provenance; agents cannot self-report identity. This is what makes
    decorrelation auditable rather than claimed.
 
 Model classes are interchangeable across vendors (Opus/Sonnet/Gemini/local) — the doctrine
-names *capability classes and family-distinctness*, never specific models, so it survives
-model churn (A5).
+names *capability classes and stage-scoped family policy*, never specific models, so it survives
+model churn (A5). Capability classes are vendor-neutral; no L09/L10 rule extends to another
+stage or vendor.

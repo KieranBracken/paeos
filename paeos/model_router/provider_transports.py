@@ -289,8 +289,21 @@ def _tool_calls(message: Any) -> list[dict[str, Any]] | None:
 
 def _normalized_error(exc: Exception, model_entry: ModelCatalogEntry) -> NormalizedError:
     status_code = getattr(exc, "status_code", getattr(exc, "http_status", None))
-    response_body = getattr(exc, "response", getattr(exc, "message", str(exc)))
+    response = getattr(exc, "response", None)
+    if status_code is None and response is not None:
+        candidate_status = getattr(response, "status_code", None)
+        if isinstance(candidate_status, int) and not isinstance(candidate_status, bool):
+            status_code = candidate_status
+    response_body = getattr(exc, "message", str(exc))
+    if not isinstance(response_body, str):
+        response_body = str(response_body)
     headers = getattr(exc, "headers", None)
+    if headers is None and response is not None:
+        response_headers = getattr(response, "headers", None)
+        if isinstance(response_headers, Mapping):
+            retry_after = response_headers.get("Retry-After")
+            if retry_after is not None:
+                headers = {"Retry-After": retry_after}
     return normalize_error(
         http_status=status_code,
         body=response_body,

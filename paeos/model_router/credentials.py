@@ -55,6 +55,20 @@ class CredentialStore:
             if val and val.strip():
                 self._keys[env_var] = val.strip()
 
+        # 1b. Load CLINE_API_KEY from ~/.cline/data/settings/providers.json if unset
+        if "CLINE_API_KEY" not in self._keys:
+            cline_providers_path = Path.home() / ".cline" / "data" / "settings" / "providers.json"
+            if cline_providers_path.is_file():
+                try:
+                    import json
+                    pdata = json.loads(cline_providers_path.read_text(encoding="utf-8"))
+                    cauth = pdata.get("providers", {}).get("cline", {}).get("settings", {}).get("auth", {})
+                    token = cauth.get("accessToken")
+                    if token and isinstance(token, str) and token.strip():
+                        self._keys["CLINE_API_KEY"] = token.strip()
+                except Exception:
+                    pass
+
         # 2. Canonical file configuration overrides ambient environment
         if self.env_file.exists():
             try:

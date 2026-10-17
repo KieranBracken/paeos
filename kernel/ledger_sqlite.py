@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS ledger_rows (
     row_hash   TEXT    NOT NULL,
     schema_ver INTEGER NOT NULL,
     kind       TEXT    NOT NULL,
-    payload    TEXT    NOT NULL        -- canonical JSON of the event payload
+    payload    TEXT    NOT NULL,       -- canonical JSON of the event payload
+    domain_tag TEXT    NOT NULL DEFAULT 'PRODUCTION' CHECK (domain_tag IN ('PRODUCTION', 'SYNTHETIC', 'RECOVERY', 'ADVERSARIAL', 'TEST', 'REPLAY', 'SHADOW', 'SIMULATION'))
 );
 CREATE TABLE IF NOT EXISTS ledger_writer (
     id     INTEGER PRIMARY KEY CHECK (id = 1),
@@ -60,6 +61,9 @@ class SqliteLedgerStore:
         self._db.execute("PRAGMA synchronous=FULL")
         self._db.execute("PRAGMA busy_timeout=5000")
         self._db.executescript(_SCHEMA)
+        cols = [c[1] for c in self._db.execute("PRAGMA table_info(ledger_rows)").fetchall()]
+        if "domain_tag" not in cols:
+            self._db.execute("ALTER TABLE ledger_rows ADD COLUMN domain_tag TEXT NOT NULL DEFAULT 'PRODUCTION'")
 
     def acquire_writer(self, owner: str) -> None:
         with self._lock:
@@ -80,7 +84,7 @@ class SqliteLedgerStore:
     def head(self) -> LedgerRow | None:
         with self._lock:
             row = self._db.execute(
-                "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
+                "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag "
                 "FROM ledger_rows ORDER BY seq DESC LIMIT 1"
             ).fetchone()
         return _to_row(row) if row is not None else None
@@ -92,11 +96,12 @@ class SqliteLedgerStore:
                 raise ForkRejected(
                     f"expected seq {expected} (head+1); got {row.seq} — fork refused"
                 )
+            domain = getattr(row, "domain_tag", "PRODUCTION") or "PRODUCTION"
             try:
                 self._db.execute(
                     "INSERT INTO ledger_rows "
-                    "(seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "(seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         row.seq,
                         row.timestamp,
@@ -105,6 +110,7 @@ class SqliteLedgerStore:
                         row.event.schema_ver,
                         row.event.kind,
                         json.dumps(dict(row.event.payload), sort_keys=True, separators=(",", ":")),
+                        domain,
                     ),
                 )
             except sqlite3.IntegrityError as exc:  # duplicate seq PK ⇒ a racing fork
@@ -118,13 +124,13 @@ class SqliteLedgerStore:
         with self._lock:
             if end is None:
                 rows = self._db.execute(
-                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
+                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag "
                     "FROM ledger_rows WHERE seq >= ? ORDER BY seq",
                     (start,),
                 ).fetchall()
             else:
                 rows = self._db.execute(
-                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload "
+                    "SELECT seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag "
                     "FROM ledger_rows WHERE seq >= ? AND seq < ? ORDER BY seq",
                     (start, end),
                 ).fetchall()
@@ -141,7 +147,12 @@ class SqliteLedgerStore:
 
 
 def _to_row(record: tuple[object, ...]) -> LedgerRow:
-    seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload = record
+    if len(record) >= 8:
+        seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag = record[:8]
+        assert isinstance(domain_tag, str)
+    else:
+        seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload = record[:7]
+        domain_tag = "PRODUCTION"
     assert isinstance(seq, int)
     assert isinstance(timestamp, str)
     assert isinstance(prev_hash, str)
@@ -157,4 +168,5 @@ def _to_row(record: tuple[object, ...]) -> LedgerRow:
         event=Event(schema_ver=schema_ver, kind=kind, payload=parsed),
         prev_hash=prev_hash,
         row_hash=row_hash,
+        domain_tag=domain_tag,
     )

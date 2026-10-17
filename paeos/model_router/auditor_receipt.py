@@ -18,6 +18,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
+from nacl.signing import SigningKey, VerifyKey
 from paeos.model_router.a08_enforcer import (
     A08EnforcementResult,
     A08Enforcer,
@@ -222,12 +223,19 @@ class PhysicalAuditorReceipt:
     captured_at_unix: float
     a08_verdict: str
     report_sha256: str | None = None
+    transport_attestation: str | None = None
+    host_turn_uuid: str | None = None
+    external_generation_id: str | None = None
 
     @property
     def receipt_sha256(self) -> str:
-        return _sha256(_canonical_bytes(self.to_dict(include_hash=False)))
+        return _sha256(
+            _canonical_bytes(self.to_dict(include_hash=False, include_attestation=False))
+        )
 
-    def to_dict(self, *, include_hash: bool = True) -> dict[str, object]:
+    def to_dict(
+        self, *, include_hash: bool = True, include_attestation: bool = True
+    ) -> dict[str, object]:
         payload: dict[str, object] = {
             "a08_verdict": self.a08_verdict,
             "actual_family": self.actual_family.value,
@@ -253,11 +261,49 @@ class PhysicalAuditorReceipt:
             "transport_response_sha256": self.transport_response_sha256,
             "transcript_sha256": self.transcript_sha256,
         }
+        if self.host_turn_uuid is not None:
+            payload["host_turn_uuid"] = self.host_turn_uuid
+        if self.external_generation_id is not None:
+            payload["external_generation_id"] = self.external_generation_id
         if self.report_sha256 is not None:
             payload["report_sha256"] = self.report_sha256
+        if include_attestation and self.transport_attestation is not None:
+            payload["transport_attestation"] = self.transport_attestation
         if include_hash:
             payload["receipt_sha256"] = self.receipt_sha256
         return payload
+
+
+def sign_auditor_receipt(
+    receipt: PhysicalAuditorReceipt,
+    signing_key: SigningKey | None = None,
+) -> PhysicalAuditorReceipt:
+    """Attach an unforgeable Ed25519 signature over receipt_sha256."""
+    if signing_key is None:
+        from kernel.keystore import load_or_create_signing_key
+
+        signing_key = load_or_create_signing_key()
+    signature_bytes = signing_key.sign(receipt.receipt_sha256.encode("ascii")).signature
+    return replace(receipt, transport_attestation=signature_bytes.hex())
+
+
+def verify_transport_attestation(
+    receipt: PhysicalAuditorReceipt,
+    verify_key: VerifyKey | None = None,
+) -> bool:
+    """Verify that the receipt's transport_attestation was signed by the router/kernel authority."""
+    if receipt.transport_attestation is None:
+        return False
+    if verify_key is None:
+        from kernel.keystore import load_or_create_signing_key
+
+        verify_key = load_or_create_signing_key().verify_key
+    try:
+        sig_bytes = bytes.fromhex(receipt.transport_attestation)
+        verify_key.verify(receipt.receipt_sha256.encode("ascii"), sig_bytes)
+        return True
+    except Exception:
+        return False
 
 
 @dataclass(frozen=True, slots=True)
@@ -271,8 +317,11 @@ class AuditorCaptureResult:
 def _validate_contract(contract: AuditorReceiptContract) -> None:
     if not contract.audit_id or any(character.isspace() for character in contract.audit_id):
         raise AuditorReceiptError("audit identity missing or contains whitespace")
-    if not _is_hex(contract.candidate_sha256, 40):
-        raise AuditorReceiptError("candidate commit SHA is invalid")
+    if not (
+        _is_hex(contract.candidate_sha256, 40)
+        or _is_hex(contract.candidate_sha256, 64)
+    ):
+        raise AuditorReceiptError("candidate identity SHA is invalid")
     for field_name, value in (
         ("evidence bundle", contract.evidence_bundle_sha256),
         ("review scope", contract.review_scope_sha256),
@@ -296,6 +345,8 @@ def validate_auditor_receipt(
     catalog: ModelCatalog,
     *,
     require_report_binding: bool = False,
+    require_transport_attestation: bool = True,
+    verify_key: VerifyKey | None = None,
 ) -> A08EnforcementResult:
     """Validate every binding and return the physical A-08 result; fail closed on any mismatch."""
 
@@ -364,6 +415,17 @@ def validate_auditor_receipt(
     )
     if not result.passed:
         raise AuditorReceiptError(f"auditor A-08 disposition is {result.verdict.value}")
+
+    if require_transport_attestation:
+        if not receipt.transport_attestation:
+            raise AuditorReceiptError(
+                "transport attestation missing; receipt is unverified or synthetic"
+            )
+        if not verify_transport_attestation(receipt, verify_key=verify_key):
+            raise AuditorReceiptError(
+                "transport attestation verification failed; forged or tampered receipt"
+            )
+
     return result
 
 
@@ -456,7 +518,10 @@ def capture_auditor_interaction(
         transcript_sha256=transcript_hash,
         captured_at_unix=time.time(),
         a08_verdict=a08_result.verdict.value,
+        host_turn_uuid=getattr(response, "host_turn_uuid", None),
+        external_generation_id=getattr(response, "external_generation_id", None),
     )
+    receipt = sign_auditor_receipt(receipt)
     validate_auditor_receipt(receipt, contract, router.catalog)
     return AuditorCaptureResult(receipt=receipt, response_content=response.content)
 
@@ -524,13 +589,21 @@ def validate_auditor_report(
 
 
 def bind_auditor_report(
-    receipt: PhysicalAuditorReceipt, content: str
+    receipt: PhysicalAuditorReceipt,
+    content: str,
+    *,
+    signing_key: SigningKey | None = None,
 ) -> PhysicalAuditorReceipt:
     """Return a receipt bound to the exact UTF-8 bytes of one persisted report."""
 
     if not content.strip():
         raise AuditorReceiptError("audit report is empty")
-    return replace(receipt, report_sha256=_sha256(content.encode("utf-8")))
+    if receipt.transport_attestation is not None and not verify_transport_attestation(receipt):
+        raise AuditorReceiptError("cannot bind report to forged or unverified receipt")
+    bound = replace(receipt, report_sha256=_sha256(content.encode("utf-8")))
+    if receipt.transport_attestation is not None:
+        bound = sign_auditor_receipt(bound, signing_key=signing_key)
+    return bound
 
 
 def _validate_auditor_artifact_pair(
@@ -698,8 +771,8 @@ def load_auditor_receipt(path: Path) -> PhysicalAuditorReceipt:
         "transport_response_sha256",
         "transcript_sha256",
     }
-    allowed = required | {"report_sha256"}
-    if set(payload) not in (required, allowed):
+    allowed = required | {"report_sha256", "transport_attestation", "external_generation_id", "host_turn_uuid"}
+    if not (required.issubset(set(payload)) and set(payload).issubset(allowed)):
         raise AuditorReceiptError("receipt schema keys are not exact")
     fallback = payload.get("fallback_chain")
     if not isinstance(fallback, list) or not all(isinstance(item, str) for item in fallback):
@@ -738,6 +811,21 @@ def load_auditor_receipt(path: Path) -> PhysicalAuditorReceipt:
             report_sha256=(
                 _string_value(payload, "report_sha256")
                 if "report_sha256" in payload
+                else None
+            ),
+            transport_attestation=(
+                _string_value(payload, "transport_attestation")
+                if "transport_attestation" in payload
+                else None
+            ),
+            host_turn_uuid=(
+                _string_value(payload, "host_turn_uuid")
+                if "host_turn_uuid" in payload
+                else None
+            ),
+            external_generation_id=(
+                _string_value(payload, "external_generation_id")
+                if "external_generation_id" in payload
                 else None
             ),
         )

@@ -1,0 +1,59 @@
+# CONCEPT OS TASK 02: ONTOLOGY SCHEMAS & ENVELOPES [TASK-02-ONTOLOGY-SCHEMAS]
+
+You are the Lead Architect & Builder for Concept OS 1.0 (Option A Headless Codex).
+You are operating in the candidate worktree: `/private/tmp/concept-os-candidate` on branch `codex/concept-os-task-02`.
+
+## Task Specification
+Implement `TASK-02-ONTOLOGY-SCHEMAS` per `spec/CONCEPT_OS_1_ARCHITECTURE.md` and `backlog/CONCEPT_OS_1_EXECUTION_DAG.yaml`.
+
+### Deliverables
+1. `concept/model.py`:
+   - Frozen typed envelopes, payloads, and schema validators.
+   - Types: `NodeEnvelope`, `EdgeEnvelope`, `SearchRequest`, `SearchResult`, `CandidateHypothesisEnvelope`, `CandidateOutboxEvent`.
+   - Node payloads for all 6 closed types: `Concept`, `Analogy`, `Transformation`, `SemanticNeighborhood`, `InspirationHeuristic`, `Hypothesis`.
+   - Edge envelopes for all 6 closed families: `derivation`, `analogy`, `recombination`, `abstraction`, `exemplification`, `neighborhood`.
+   - Representation descriptors: `symbolic`, `structural`, `exemplar_refs`, `vector_ref`, `probabilistic_ref`, `procedural_affordance`, `source_ref`.
+2. JSON Schemas (Draft 2020-12) under `concept/schema/`:
+   - `concept/schema/node.schema.json`
+   - `concept/schema/edge.schema.json`
+   - `concept/schema/search.schema.json`
+   - `concept/schema/candidate_hypothesis.schema.json`
+3. Fixtures under `tests/concept/fixtures/`:
+   - `tests/concept/fixtures/nodes/valid/` (at least 6, one for each node type)
+   - `tests/concept/fixtures/nodes/invalid/` (forbidden truth status, missing fields, invalid types)
+   - `tests/concept/fixtures/edges/valid/` (at least 6, one for each edge family)
+   - `tests/concept/fixtures/edges/invalid/` (missing provenance, self-loops, bad relations)
+4. Comprehensive test suites:
+   - `tests/concept/test_node_schemas.py`
+   - `tests/concept/test_edge_schemas.py`
+   - `tests/concept/test_search_schema.py`
+   - `tests/concept/test_candidate_envelope_schema.py`
+   - `tests/concept/test_model.py`
+   - `tests/concept/test_node_schema_closed_coverage.py`
+   - `tests/concept/test_edge_schema_closed_coverage.py`
+
+### Invariants & Falsifiers (CANARY-0002)
+- Follow strict RED -> GREEN TDD discipline. Write tests and fixture assertions first.
+- Node type closed set: strictly the 6 CEO-1 types.
+- Edge family closed set: strictly the 6 CEO-1 families.
+- Analogy nodes: MUST have at least one entry in `known_breaks` or explicit marker `"not_yet_tested"`.
+- Hypothesis nodes: `lifecycle` MUST be one of `draft`, `candidate`, `exported`, `dismissed`, `superseded`. Values like `validated`, `proven`, `canonical` MUST fail schema validation.
+- Search result rankings: MUST NOT use the forbidden field name `confidence`.
+- Candidate export envelopes: MUST identify hypothesis as exploratory proposal, with non-evidentiary score vectors.
+
+### Acceptance Verification
+Run and ensure 100% pass:
+```bash
+uv run pytest tests/concept/test_node_schemas.py -q
+uv run pytest tests/concept/test_edge_schemas.py -q
+uv run pytest tests/concept/test_search_schema.py -q
+uv run pytest tests/concept/test_candidate_envelope_schema.py -q
+uv run pytest tests/concept/test_model.py -q
+uv run pytest tests/concept/test_node_schema_closed_coverage.py -q
+uv run pytest tests/concept/test_edge_schema_closed_coverage.py -q
+test $(find tests/concept/fixtures/nodes/valid -name '*.json' | wc -l) -ge 6
+test $(find tests/concept/fixtures/edges/valid -name '*.json' | wc -l) -ge 6
+uv run ruff check concept/model.py tests/concept/
+uv run pyright concept/model.py
+uv run python -c "import glob; from runtime.ast_linter import check_ast; files = glob.glob('concept/**/*.py', recursive=True) + glob.glob('tests/concept/**/*.py', recursive=True); [check_ast(open(f).read()) for f in files]"
+```

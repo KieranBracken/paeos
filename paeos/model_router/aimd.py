@@ -9,6 +9,7 @@ import time
 from paeos.model_router.providers import ProviderRegistry, build_builtin_provider_registry
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import (
+    FailureScope,
     NormalizedError,
     NormalizedErrorType,
     ProviderHealth,
@@ -62,6 +63,8 @@ class AIMDController:
         self,
         provider_id: ProviderId,
         estimated_tokens: int = 2000,
+        *,
+        model_id: str | None = None,
     ) -> tuple[bool, str | None]:
         """
         Multidimensional admission check: (Concurrency) AND (RPM < Target) AND (TPM < Target) AND (RPD < Target)
@@ -84,6 +87,15 @@ class AIMDController:
 
         if health in (ProviderHealth.EXHAUSTED.value, ProviderHealth.QUARANTINED.value, ProviderHealth.UNAVAILABLE.value):
             return False, f"Provider {provider_id.value} is {health}"
+
+        if model_id:
+            scoped = self.state_db.get_scoped_health(provider_id, FailureScope.MODEL, model_id)
+            if scoped["health_status"] in (
+                ProviderHealth.EXHAUSTED.value,
+                ProviderHealth.QUARANTINED.value,
+                ProviderHealth.UNAVAILABLE.value,
+            ):
+                return False, f"Model {model_id} is {scoped['health_status']}"
 
         # 2. Concurrency Limit Check
         current_limit = state["current_concurrency"]
@@ -153,7 +165,19 @@ class AIMDController:
         if error.error_type == NormalizedErrorType.AUTH_FAILED:
             self.state_db.set_health(provider_id, ProviderHealth.QUARANTINED, error_type=error.error_type)
         elif error.error_type == NormalizedErrorType.QUOTA_EXHAUSTED:
-            self.state_db.set_health(provider_id, ProviderHealth.EXHAUSTED, error_type=error.error_type)
+            # Only model-scoped observations are safe to narrow. An entitlement key may
+            # represent a shared account/quota domain that is not model-addressable here;
+            # keep it provider-wide until a separately governed entitlement map exists.
+            if error.failure_scope is FailureScope.MODEL and error.scope_key:
+                self.state_db.set_scoped_health(
+                    provider_id,
+                    FailureScope.MODEL,
+                    error.scope_key,
+                    ProviderHealth.EXHAUSTED,
+                    error_type=error.error_type,
+                )
+            else:
+                self.state_db.set_health(provider_id, ProviderHealth.EXHAUSTED, error_type=error.error_type)
         elif error.error_type == NormalizedErrorType.PROVIDER_UNAVAILABLE:
             self.state_db.set_health(
                 provider_id, ProviderHealth.COOLDOWN, error_type=error.error_type, cooldown_seconds=error.retry_after or 60.0

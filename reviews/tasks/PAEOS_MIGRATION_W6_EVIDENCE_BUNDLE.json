@@ -1,0 +1,87 @@
+{
+  "court_run_id": "court-run-w6-20260905-230557",
+  "timestamp": "2026-09-05T23:05:57.693468+00:00",
+  "artifact_hash": "84ee2d7e2204834610424243f44ad264de03057ac774d67581042180950ecc2d",
+  "verdict": "PASS",
+  "claims_evaluated": 7,
+  "unmet_claims": [],
+  "evidence_bundle": [
+    {
+      "claim_id": "CLAIM-W6-01-SOURCE-RIGHTS-ROUND-TRIP",
+      "evidence_hash": "b6fdd4f4d0d735081adfcee3929e31254221e335d21e5aacf1e140f2bcfd6c80",
+      "statement": "Exit Gate 1: Verifies source rights policy round trip, citation masking, and raw content access control",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_kae_lof_federation_adapter.py', '-k', 'test_source_rights'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('SOURCE_RIGHTS_ROUND_TRIP_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "SOURCE_RIGHTS_ROUND_TRIP_PASS\n"
+      },
+      "actual_stdout": "SOURCE_RIGHTS_ROUND_TRIP_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W6-02-CONTENT-HASH-CITATION-PARITY",
+      "evidence_hash": "46709718d24fa30e1b2f197ef09bcf45e7665db95fbb734e85f631eab10a25c5",
+      "statement": "Exit Gate 2: Verifies KAE CAS digest matches LOF source hash and byte-anchors match exact spans",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_kae_lof_federation_adapter.py', '-k', 'test_citation_parity'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('CONTENT_HASH_CITATION_PARITY_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "CONTENT_HASH_CITATION_PARITY_PASS\n"
+      },
+      "actual_stdout": "CONTENT_HASH_CITATION_PARITY_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W6-03-DEDUPLICATION-AND-ISOLATION",
+      "evidence_hash": "239e8cbc31dd0ac8909faeb5e9d4ecb810b7338f397ad5bbe132100bcbd63520",
+      "statement": "Exit Gate 3: Verifies duplicate ingestion deduplicates idempotently and failed adapters are isolated",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_kae_lof_federation_adapter.py', '-k', 'test_dedup_and_isolation'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('DEDUPLICATION_AND_ISOLATION_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "DEDUPLICATION_AND_ISOLATION_PASS\n"
+      },
+      "actual_stdout": "DEDUPLICATION_AND_ISOLATION_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W6-04-REVOKED-SOURCE-HANDLING",
+      "evidence_hash": "ebf54e79713ac9b5222c7d28734fe508c2055a7d52c76bd9866b1c7eb4dab9d9",
+      "statement": "Exit Gate 4: Verifies revoked sources fail closed, taint evidence refs, suppress citations, and block raw access",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_kae_lof_federation_adapter.py', '-k', 'test_revoked_source'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('REVOKED_SOURCE_HANDLING_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "REVOKED_SOURCE_HANDLING_PASS\n"
+      },
+      "actual_stdout": "REVOKED_SOURCE_HANDLING_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W6-05-CORPUS-QUERY-EQUIVALENCE",
+      "evidence_hash": "93f06c7690b3fbaf836ad7e2904dfd95621985b5c5c05f6aad0d63527fe6ff0a",
+      "statement": "Exit Gate 5: Verifies historical corpus queries yield deterministic query equivalence across source filters",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_kae_lof_federation_adapter.py', '-k', 'test_query_equivalence'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('CORPUS_QUERY_EQUIVALENCE_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "CORPUS_QUERY_EQUIVALENCE_PASS\n"
+      },
+      "actual_stdout": "CORPUS_QUERY_EQUIVALENCE_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W6-06-ROLLBACK-BOUNDARY",
+      "evidence_hash": "4399d8ef43c46302efe429db4c3e3d58e99073575f64d345582ed609f9556970",
+      "statement": "Rollback Boundary: Verifies disabling adapter halts federation without mutating source estate",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_kae_lof_federation_adapter.py', '-k', 'test_rollback_boundary'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('ROLLBACK_BOUNDARY_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "ROLLBACK_BOUNDARY_PASS\n"
+      },
+      "actual_stdout": "ROLLBACK_BOUNDARY_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W6-07-CANARY-DISCRIMINATION",
+      "evidence_hash": "c484cb66fa4025ca8a0e355d89b7316e59aef0f80335758bc7d6326f551f6671",
+      "statement": "CANARY-0002: Non-vacuous court evidence discrimination proving check actively discriminates against malformed payloads",
+      "reproducible_command": "uv run python -c \"from contracts.kae_lof_federation_adapter import KaeLofFederationAdapter, MalformedSourcePayloadError, RevokedSourceAccessError;\nadapter = KaeLofFederationAdapter();\ntry:\n    adapter.federate_source({'source_id': 'SRC-CANARY', 'content_hash': 'bad_non_hex'});\n    raise AssertionError('Should have raised MalformedSourcePayloadError');\nexcept MalformedSourcePayloadError:\n    pass;\nprint('CANARY_DISCRIMINATION_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "CANARY_DISCRIMINATION_PASS\n"
+      },
+      "actual_stdout": "CANARY_DISCRIMINATION_PASS\n"
+    }
+  ]
+}

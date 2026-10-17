@@ -3,19 +3,30 @@
 > **Purpose:** single durable handoff for any agent/session resuming work on PAEOS.
 > **Rule:** update this file at every significant state change. If your context was
 > compacted, THIS FILE is your ground truth — do not reconstruct state from memory.
-> **Last updated:** 2026-09-04 (Milestone 48 Program Invariant Synthesis Court-sealed; Grand Synthesis recorded)
+> **Last updated:** 2026-09-04 (12 historical SAKG windows reconciled; full 48/48 physical seal closure recorded)
 
-## Current canonical recovery frontier — 2026-09-04 (36/48 physical program seals; M48 sealed)
+## Current canonical recovery frontier — 2026-09-04 (Control Plane & SAKG Complete; Concept OS Active)
 
-- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); L17 Retrospective candidate is `fd17d209b6dbf0aead8ff5137f213439b13e580a`; no promotion to `main` or protected-ref mutation occurred.
-- **Gate status:** Gates A–F **SEALED**; SAKG Task 01–21 records remain governed by their candidate-bound checkpoints; Task 15 `[I-TRAVERSE]`, Task 16 `[I-PROJ]`, Task 17 `[I-TRADEOFF]`, Task 18 `[I-MCP]`, Task 19 `[T-NONAUTH]`, Task 20 `[T-BASELINE]`, and Task 21 `[SAKG TASK 21]` are **COURT_SEALED** with qualified heterogeneous A-08 evidence. L17 Retrospective, Milestone 40 `[I-DURABLE-SCARS]`, Milestone 43 `[I-CER-BASELINE]`, Milestone 44 `[I-L15-SIZING]`, Milestone 45 `[SAKG TASK 21]`, Milestone 46 `[I-CER-GATE-TRANSITION]`, Milestone 47 `[I-CER-FAILURE-RECOVERY]`, and Milestone 48 `[I-PROGRAM-INVARIANT-SYNTHESIS]` are **COURT_SEALED**. M48 is the final listed milestone; no M49 intake is authorized.
-- **Strict sealed progress:** **36/48 physical program seals complete | 12 remaining**. Milestones 43–48 evidence is recorded; stale historical labels are preserved and superseded by canonical intake names.
-- **Worker accounting:** External Gate G record remains **Admitted: 3 | Rejected: 3 | Remediated: 0**; no new admission was created by this reconciliation.
-- **Court accounting:** Control-plane record remains **Sealed: 6 | Remanded: 0 | Remediated: 0**. The Task 12 remediation window separately recorded **Sealed: 1 | Remanded: 5 | Remediated: 5**; all five remediation debts are now closed with evidence.
-- **Open debt:** `DEBT-0060` and `RB-0027` remain open; `DEBT-0068` is closed/repaid with the Task 13 evidence. M47's `DEBT-0070` remains preserved as historical remand/recovery evidence. No debt is silently closed by this entry. Gate G remains unproven.
-- **SAKG Subsystem:** Tasks 14–20 (`[I-BACKFILL]`, `[I-TRAVERSE]`, `[I-PROJ]`, `[I-TRADEOFF]`, `[I-MCP]`, `[T-NONAUTH]`, `[T-BASELINE]`) are physically qualified and Court-sealed. Task 18 has a local SoftLoop seal with 5 MCP tests, clean Pyright/Ruff, and a qualified Gemini 3.7 A-08 pair; Task 19 has a local seal with 8 focused tests, clean import-boundary verification, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair; Task 20 has a local seal with 4 focused tests, baseline CLI, Ruff/Pyright, and a qualified Gemini 3.7 A-08 pair. Earlier failed and alternate audit attempts remain preserved as separate evidence. Mission 0 remains pending.
-- **Runtime Intakes:** Milestones 44 `[I-L15-SIZING]` / L15 Dynamic Context Sizing, 45 SAKG Task 21 / Taxonomy Node Hierarchy Subsumption, 46 `[I-CER-GATE-TRANSITION]` / L02-G1 CER Gate Transition Verification Suite, 47 `[I-CER-FAILURE-RECOVERY]` / L02-R1 CER Failure & Remand Recovery, and 48 `[I-PROGRAM-INVARIANT-SYNTHESIS]` / Program Invariant Synthesis & Final Recovery Sealing are **COURT_SEALED**. No runtime intake is open after M48.
-- **Repository Health:** M46 candidate evidence records 8/8 focused CER tests and 730/730 `tests/runtime` tests; M48 candidate evidence records 9/9 focused invariant-synthesis tests and a passing full `tests/runtime` suite. Whole-repository pytest remains environment-sensitive in unrelated gateway, Seatbelt, and transaction-lock tests; no M48 invariant test failed.
+- **Branch:** recovery `codex/control-plane-recovery-s1-clean-recovered` at current `HEAD` (verify with `git rev-parse HEAD`); full 48/48 control-plane programme permanently sealed.
+- **Gate status:** Gates A–F **SEALED**; SAKG Tasks 01–26 (Missions 0–7) **100% COURT_SEALED**; live graph `sakg.db` populated with 631 nodes and 939 typed edges.
+- **Concept OS Subsystem:**
+  - **Mission 0 (`[I-CONCEPT-OS-CENSUS]`):** **COURT_SEALED** at commit `6d619f2` (Entry 327 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`).
+  - **Architecture & DAG:** `spec/CONCEPT_OS_1_ARCHITECTURE.md` (940 lines, pure SQLite WAL append-only, Crockford Base32 26-char URIs, 6 node types, 6 edge families, Search Orchestra, Inspiration Engine, read-only MCP) and `backlog/CONCEPT_OS_1_EXECUTION_DAG.yaml` (8 acyclic tasks, strict Builder != Auditor separation).
+  - **Task 01 (`TASK-01-CORE-SUBSTRATE`):** **COURT_SEALED** at commit `c14ec8d` (Entry 328 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`, `reviews/tasks/CONCEPT_OS_TASK_01_AUDIT.md`). Implemented `concept/ids.py` (Crockford Base32 128-bit 26-char encoder, canonical JSON, Unicode NFC, URI constructors/validators, collision detection), registered `concept` package, 71/71 tests passing, clean AST and Pyright.
+  - **Task 02 (`TASK-02-ONTOLOGY-SCHEMAS`):** **COURT_SEALED** at commit `7a5bc5d` (Entry 329 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`, `reviews/tasks/CONCEPT_OS_TASK_02_AUDIT.md`). Implemented `concept/model.py` (frozen slot-allocated dataclasses for 6 node types and 6 edge families, fail-closed constructor invariants), 4 standalone Draft 2020-12 JSON schemas under `concept/schema/`, 112/112 tests passing in 0.39s, clean Ruff, Pyright, and AST linting.
+  - **Task 03 (`TASK-03-SQLITE-STORE`):** **COURT_SEALED (Read-Only Revalidated, Provenance Annotated)** at commit `b11fe81` / `efb544f` (Entry 330 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`, `reviews/tasks/CONCEPT_OS_TASK_03_AUDIT.md`). Implemented `concept/store.py` (pure SQLite WAL append-only graph store, UPDATE/DELETE rejecting triggers, read pool of 4 query-only connections, idempotence, collision rejection, order-invariant snapshot hashes, hypothesis outbox boundary). 132/132 tests passing in 0.67s, clean Ruff, Pyright, and AST linter. Authoritatively sealed following strictly read-only revalidation pass.
+  - **Task 04 (`TASK-04-TYPED-TRAVERSAL`):** **COURT_SEALED** at candidate `9d6d845`, canonical merge `090fa5a` (Entry 331 remand under `DEBT-0083` → Entry 332 court re-audit & seal, `reviews/tasks/CONCEPT_OS_TASK_04_AUDIT.md`). Implemented `concept/traverse.py` (786 lines: `TraversalRequest`, `TraversalResult`, `traverse()`, `materialize_neighborhood()`, directional traversal, namespace gating, edge family allowlists, cycle prevention, non-transitive analogy bounds, why-paths, consumption counters, whole-member drop-and-count budgeting). 146/146 tests passing in 1.09s, clean Ruff, Pyright, and AST linting across all 32 concept files.
+  - **Task 05 (`TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY`):** **COURT_SEALED** at candidate `6cd3e70`, canonical merge `4f6def8` (Entry 333 builder verification → Entry 334 court seal, `reviews/tasks/CONCEPT_OS_TASK_05_AUDIT.md`). Implemented `concept/inspiration.py` (1,103 lines: `distance()`, `propose_analogies()`, `propose_recombinations()`, `score_novelty()`, `score_serendipity()`, graph hop distance $d_g$, vector distance $d_v$, structural distance $d_s$, non-transitive analogy role mapping, two-node recombination with rejection traces, novelty vectors with exploratory lifecycle guarantee, serendipity projection, deterministic seeds). 173/173 tests passing in 1.36s, clean Ruff, Pyright, and AST linting across all 41 concept files.
+  - **Task 06 (`TASK-06-SEARCH-ORCHESTRA`):** **COURT_SEALED** at candidate `1981bbd`, canonical merge `a8f9b19` (Entry 336 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`, `reviews/tasks/CONCEPT_OS_TASK_06_AUDIT.md`). Implemented `concept/search.py` (1,113 lines: `compile_query()`, `SearchArm` protocol, `TraversalSearchArm`, `SeededRandomWalkSearchArm`, `SearchOrchestra`, multi-component scoring without forbidden confidence field, stable ranking, replay manifest). 186/186 tests passing in 1.68s, clean Ruff, Pyright, and AST linting across all 49 concept files.
+  - **Task 07 (`TASK-07-READ-ONLY-MCP`):** **COURT_SEALED** at candidate `66d502f`, canonical merge `305dad1` (Entry 337 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`, `reviews/tasks/CONCEPT_OS_TASK_07_AUDIT.md`). Implemented `concept/mcp_server.py` (759 lines: `ConceptMCPServer`, `build_concept_mcp_server()`, exactly 5 read-only tools: `concept_get`, `concept_search`, `concept_neighborhood`, `concept_path`, `concept_hypothesis_get`; strict SQLite `mode=ro` and `PRAGMA query_only = ON`, mandatory advisory candidate envelope, single-transaction read pinning, bounded budgets, and fail-closed same-namespace isolation). 219/219 concept and MCP tests passing in 1.69s, clean Ruff, Pyright (0 errors/warnings), and AST linting.
+  - **Task 08 (`TASK-08-INTEGRATION-SPIKE`):** **COURT_SEALED — CONCEPT OS MILESTONE 1 COMPLETE (8/8 TASKS)** at candidate `650eaf0`, canonical merge `591a346` (Entry 338 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`, `reviews/tasks/CONCEPT_OS_TASK_08_AUDIT.md`). Implemented `concept/bridge.py` (337 lines: `CandidateHypothesisEnvelope`, `build_candidate_envelope()`, `emit_candidate()`, deterministic Crockford Base32 outbox URIs, mandatory falsifiers, fail-closed non-evidentiary scores, pull-based PAEOS mediation, idempotent emission), 5 focused test suites (candidate bridge, idempotence, end-to-end integration spike, poisoned candidate containment, constitutional AST boundaries), and spike report `reviews/spikes/concept-os-ceo1-integration.md` demonstrating CEO-D1 through CEO-D10. 232/232 concept and MCP tests passing in 1.68s, clean Ruff, Pyright (0 errors/warnings), AST linter (66 files), and zero forbidden imports.
+  - **PAEOS R4 Conformance Closure:** **FORMALLY RATIFIED & SEALED (2026-09-05, Entry 335 in `PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md`)**. All 6 closure workstreams verified green across 1,263 core tests: L02 $v \times r$ ceremony depth assignment, Run Ceremony Contract, Trace-A K1 discharge evidence stubs, L06->L07 mitigation ordering, A-08 fail-closed multi-family decorrelation, durable L17/L18 SQLite persistence, and end-to-end self-hosted Trace-A/Trace-B execution. `operations/PAEOS_TWO_AXIS_CONFORMANCE_MAP_v1.md` updated from `R4-ALIGNED / NOT R4-CONFORMANT` to **`R4-CONFORMANT`**.
+  - **Ecosystem Architecture:** Non-authoritative forensic research and candidate topology documented in `ECOSYSTEM_ARCHAEOLOGICAL_RECONSTRUCTION.md`. DAG reconciliation recorded in `reviews/spikes/CONCEPT_OS_DAG_RECONCILIATION.md` (Task 05 ratified as local heuristics engine).
+- **Strict sealed progress:**
+  - Control Plane: **48/48 physical program seals complete | 0 remaining**.
+  - SAKG Programme: **7/7 Missions complete (Tasks 01–26 100% Court-Sealed) | 0 remaining**.
+  - Concept OS: **MILESTONE 1 COMPLETE (Tasks 01–08 100% Court-Sealed) | 0 tasks remaining**.
+  - PAEOS R4 Autonomy Rung: **R4-CONFORMANT formally established | All 19 lifecycle layers conformant**.
 
 ## 2026-09-04 — Milestone 47 CER Failure & Remand Recovery Court seal; Milestone 48 queued
 
@@ -94,6 +105,47 @@ are recorded in `reviews/tasks/PAEOS_GRAND_SYNTHESIS_SUMMARY.md`; no M49 intake 
 No additional provider transmission, source promotion, merge, retry, fallback, or
 main/trunk/protected-ref mutation occurred. The detached M48 candidate remains separate from the
 host governance branch.
+
+## 2026-09-04 — Historical SAKG Tasks 01–12 reconciled and admitted; full 48/48 closure
+
+The Founder authorizes formal qualification and physical admission of the twelve previously
+unadmitted historical SAKG windows. This reconciliation consumes the existing candidate-bound
+manifests, Founder/Court dispositions, L14/L17 checkpoints, and qualified Google
+`gemini-3.6-flash` A-08 records; it makes no new provider call and does not rewrite any artifact.
+Each window is admitted exactly once with physical-window accounting **Sealed: 1 | Remanded: 0 |
+Remediated: 0**, for an aggregate **Sealed: 12 | Remanded: 0 | Remediated: 0**.
+
+| Task | Candidate commit | Evidence manifest (SHA-256) | L13 record |
+|---|---|---|---:|
+| 01 — Pure SQLite storage / append-only invariants | `310afb58c699a56f6d1aaafd2530c11d0003599f` | `operations/PAEOS_SAKG_TASK_01_EVIDENCE_310AFB5.json` (`0f937a9494b4052398a9467c966d7687e703ea7eb1845c390df8cc189dc69ec8`) | 11/11 |
+| 02 — AST/tradeoff extraction with explicit gaps | `d1c51ccff26a2a27b70cf7f3b65aca2aecb0f995` | `operations/PAEOS_SAKG_TASK_02_EVIDENCE_D1C51CC.json` (`9130d166d6cb91c9c3e683279478407d2688216a4db08319e040486694820c40`) | 14/14 |
+| 03 — Ingestion, idempotency, candidate-only landing | `34e2080332206ed08b0955fc88c092d3821b8647` | `operations/PAEOS_SAKG_TASK_03_EVIDENCE_34E2080.json` (`ec8e2d3b1889c9094720b9f29a31726a85933546187fc7285cdbeb537478629d`) | 4/4 |
+| 04 — Traversal, acyclicity, cross-namespace gating | `fbb52403b16af0a581848938f274fd266ec0cd9e` | `operations/PAEOS_SAKG_TASK_04_EVIDENCE_FBB5240.json` (`a0307b6c07069b8362c0fc74068ca6eb7e4bb7636fa6a6769e9d6afbc72f7320`) | 15/15 |
+| 05 — Context projection, token budgets, trust invariants | `1e3def4ea9496fd545e343e2f47d10e59e8e2400` | `operations/PAEOS_SAKG_TASK_05_EVIDENCE_1E3DEF4.json` (`59576e675eeadbfd3e844341d0bf25f883035ce3d31979d854942c4ece442e57`) | 15/15 |
+| 06 — Edge families, non-authority boundaries, no-mutating egress | `f45df32057aae9cbe4aba6c9fb3687e42ac28784` | `operations/PAEOS_SAKG_TASK_06_EVIDENCE_F45DF32.json` (`124dd05d263d93da5e17aed821dd90b35ad547e8a36af3a142c2abaa96a86ce7`) | 9/9 |
+| 07 — Tradeoff precedents and outcome joins | `10d71877354e9f7c8d25b787602067014aa2351a` | `operations/PAEOS_SAKG_TASK_07_EVIDENCE_10D7187.json` (`ba34d19eee298b657ce6164be9322212ae261aac932b6ec83b15fd0d14e5ccb2`) | 10/10 |
+| 08 — Outbox fencing, append-only durability, post-seal ordering | `d78101b8de8263d6f7a0fd83eff7ab202889e639` | `operations/PAEOS_SAKG_TASK_08_EVIDENCE_D78101B.json` (`2f2ddd14fa5bd73a383041abd669d3c45a0bf35f0a5970226bbf5090109c0642`) | 8/8 |
+| 09 — MCP server, read-only enforcement, graceful degradation | `01076b89a2a89c6de250dc84a552b4451bb42ae2` | `operations/PAEOS_SAKG_TASK_09_EVIDENCE_01076B8.json` (`f711c9b164c230a23c036f2dec9a1637d97e19f2a87af7d03c82f1b6d39614d4`) | 6/6 |
+| 10 — Universal envelope schema and roundtrip properties | `3f2279cd2f2a547eab5fb64ab9f87846d2b49a80` | `operations/PAEOS_SAKG_TASK_10_EVIDENCE_3F2279C.json` (`1855cfe77d6e10877d2b33898af2d36883d391437ebcec93dda9073cb2de1c99`) | 12/12 |
+| 11 — Poisoned-corpus defense and untrusted-knowledge fencing | `fe075bc1c6845466b28aca5cefb7a49d32aae206` | `operations/PAEOS_SAKG_TASK_11_EVIDENCE_FE075BC.json` (`0839063896b47ab6bbfb19cca9a9cee770e575d744827d589bb622516ff2d15f`) | 2/2 |
+| 12 — Frequency never promotes invariant (historical window) | `fe075bc1c6845466b28aca5cefb7a49d32aae206` | `operations/PAEOS_SAKG_TASK_12_EVIDENCE_FE075BC.json` (`e10cbd3d4df5231159ff1d87fa6c63991e31702f8331cbd9218e625229529204`) | 1/1 |
+
+The manifest/disposition verifier confirmed all twelve manifest hashes, task identities, PASS
+L13 records, `ruff=PASS`, `pyright=PASS`, and `swallowed_exceptions=0`. Repository reproduction
+passed **115/115 `tests/sakg` tests** (`uv run pytest tests/sakg -v`), `uv run ruff check sakg/
+tests/sakg/`, and `uv run pyright sakg/ tests/sakg/` with **0 errors, 0 warnings, 0
+informations**. The twelve disposition/checkpoint pairs remain the source of their physical
+Google/A-08 qualification; the admission is a ledger reconciliation, not a retroactive audit.
+
+Task 12 requires an explicit boundary note: this admission covers the historical “Frequency Never
+Promotes Invariant” window and its existing qualified physical record. The separate current
+`[F-BUDGET-FIX]` remand and all associated debt/remand evidence remain preserved and are not
+promoted, erased, or reclassified by this entry. Tasks 11 and 12 share candidate `fe075bc` but
+retain distinct program candidates, manifests, and physical records.
+
+Strict physical progress advances exactly once from **36/48 complete | 12 remaining** to
+**48/48 complete | 0 remaining**. No source code, claim scope, provider policy, promotion,
+merge, retry, fallback, main/trunk/protected-ref state, or historical remand/debt record changed.
 
 
 The current Gate F implementation candidate is

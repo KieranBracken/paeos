@@ -107,3 +107,28 @@ class ScarStore:
         if stage not in INJECTION_STAGES:
             return []
         return self.match_scars(signature)
+
+    def derive_scar_obligations(
+        self, signature: str, subsystem_id: str = "SUB-SCAR"
+    ) -> tuple[Any, ...]:
+        """Automatically derive L11 frozen verification obligations from matching historical scars (SCO-038)."""
+        from paeos.semantic.types import (
+            AuthoritativeSourceTier,
+            ObligationNature,
+            SemanticObligation,
+        )
+
+        matched = self.match_scars(signature)
+        obligations = []
+        for scar in matched:
+            obligations.append(
+                SemanticObligation(
+                    obligation_id=f"SCO-{scar.id.upper().replace('-', '_')}",
+                    subsystem_id=subsystem_id,
+                    description=f"Must verify against historical defect: {scar.lesson} (detection: {scar.detection})",
+                    source_tier=AuthoritativeSourceTier.TIER_6_HISTORICAL_DESIGN_RATIONALE,
+                    source_reference=f"SAKG_SCAR_{scar.id}",
+                    obligation_nature=ObligationNature.DERIVED_INFERENCE,
+                )
+            )
+        return tuple(obligations)

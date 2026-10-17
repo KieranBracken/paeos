@@ -50,9 +50,9 @@ def test_retrospective_auditor_scope_is_exact() -> None:
 def test_frozen_kernel_requires_canonical_evolve_hop() -> None:
     for weight in WeightClass:
         assert is_legal(StageId.SEAL, StageId.RETROSPECT, weight)
-        assert is_legal(StageId.RETROSPECT, StageId.EVOLVE, weight)
-        assert is_legal(StageId.EVOLVE, StageId.MEMORY_UPDATE, weight)
-        assert not is_legal(StageId.RETROSPECT, StageId.MEMORY_UPDATE, weight)
+        assert is_legal(StageId.RETROSPECT, StageId.MEMORY_UPDATE, weight)
+        assert is_legal(StageId.MEMORY_UPDATE, StageId.EVOLVE, weight)
+        assert not is_legal(StageId.RETROSPECT, StageId.EVOLVE, weight)
 
 
 def test_rejected_gate_is_not_silently_accepted() -> None:

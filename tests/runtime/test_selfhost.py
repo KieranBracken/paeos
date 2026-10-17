@@ -136,7 +136,88 @@ def test_infer_write_scopes() -> None:
         explicit_changed=("runtime/selfhost.py",),
         explicit_scopes=(),
     )
-    assert scopes == ("runtime/selfhost.py", "sakg/", "tests/")
+    assert scopes == ("runtime/selfhost.py",)
+
+
+def test_informational_path_references_cannot_broaden_builder_authority() -> None:
+    from runtime.selfhost import infer_write_scopes
+
+    scopes = infer_write_scopes(
+        objective=(
+            "Repair runtime/selfhost.py while preserving immutable verification support "
+            "in runtime/court/completeness_firewall.py and tests/runtime/test_completeness_firewall.py."
+        ),
+        accept=(
+            "Run pytest tests/runtime/test_completeness_firewall.py and inspect kernel/sandbox.py.",
+        ),
+        explicit_changed=("runtime/selfhost.py",),
+        explicit_scopes=(),
+    )
+    assert scopes == ("runtime/selfhost.py",)
+
+
+def test_declared_file_scopes_are_not_collapsed_by_informational_directory_mentions() -> None:
+    from runtime.selfhost import infer_write_scopes
+
+    scopes = infer_write_scopes(
+        objective=(
+            "Update runtime/selfhost.py and tests/runtime/test_selfhost.py; inspect "
+            "runtime/court/ and tests/runtime/ for immutable verification support."
+        ),
+        accept=(
+            "Run pytest tests/runtime/test_selfhost.py and review runtime/court/ only.",
+        ),
+        explicit_changed=("runtime/selfhost.py", "tests/runtime/test_selfhost.py"),
+        explicit_scopes=("runtime/selfhost.py", "tests/runtime/test_selfhost.py"),
+    )
+    assert scopes == ("runtime/selfhost.py", "tests/runtime/test_selfhost.py")
+
+
+def test_explicit_directory_scope_does_not_collapse_explicit_candidate_paths() -> None:
+    from runtime.selfhost import infer_write_scopes
+
+    scopes = infer_write_scopes(
+        objective="The prose is informational even when it names kernel/sandbox.py.",
+        accept=("Inspect tests/runtime/test_completeness_firewall.py.",),
+        explicit_changed=("runtime/selfhost.py", "tests/runtime/test_selfhost.py"),
+        explicit_scopes=("runtime/",),
+    )
+    assert scopes == ("runtime/", "runtime/selfhost.py", "tests/runtime/test_selfhost.py")
+
+
+def test_parse_backlog_preserves_structured_candidate_paths_and_scope_authority() -> None:
+    from runtime.selfhost import parse_backlog
+
+    (intake,) = parse_backlog(
+        [
+            {
+                "objective": "Inspect kernel/sandbox.py while updating the declared candidate.",
+                "accept": ["pytest tests/runtime/test_completeness_firewall.py"],
+                "changed_paths": ["runtime/selfhost.py"],
+                "plan_write_scopes": ["tests/runtime/test_selfhost.py"],
+            }
+        ]
+    )
+    assert intake.changed_paths == ("runtime/selfhost.py",)
+    assert intake.plan_write_scopes == (
+        "runtime/selfhost.py",
+        "tests/runtime/test_selfhost.py",
+    )
+
+
+def test_prose_alone_grants_no_builder_mutation_authority() -> None:
+    from runtime.selfhost import parse_backlog
+
+    (intake,) = parse_backlog(
+        [
+            {
+                "objective": "Modify runtime/selfhost.py.",
+                "accept": ["pytest tests/runtime/test_selfhost.py"],
+            }
+        ]
+    )
+    assert intake.changed_paths == ()
+    assert intake.plan_write_scopes == ()
 
 
 def test_selfhost_default_run_creates_no_repository_relative_evaluations(
@@ -154,4 +235,3 @@ def test_selfhost_default_run_creates_no_repository_relative_evaluations(
     )
     assert outcomes
     assert not (tmp_path / ".paeos_state").exists()
-

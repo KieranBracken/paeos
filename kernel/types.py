@@ -20,14 +20,21 @@ placement since B0.8 depends on B0.4). Both are now included below, verbatim fro
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 __all__ = [
+    "ActionPermission",
     "ArtifactRef",
+    "AuthorityEnvelope",
+    "AuthorityExpansionForbiddenError",
+    "AuthorityTier",
     "CapabilityBinding",
     "CapabilityToken",
     "Claim",
+    "DomainTag",
     "EvidenceRef",
     "GoalId",
     "Hash",
@@ -63,9 +70,12 @@ type EvidenceRef = Hash
 
 
 class StageId(Enum):
-    """The 21 canonical stage constants — the single source of truth for state identity
-    across Kernel, Runtime, ledger, and traces (PAEOS-7.6 §3). Order of definition follows
-    the spec's list verbatim."""
+    """The 21 kernel/runtime stage identifiers transcribed from PAEOS-7.6 §3.
+
+    These are not a second lifecycle definition. Their binding to canonical L01-L19 layers is
+    the derived map in :mod:`runtime.lifecycle_projection`; RAW, IMPROVE_RUNTIME, and RESTART
+    are runtime controls with no L-layer identity.
+    """
 
     RAW = "RAW"
     RE_DERIVE = "RE_DERIVE"
@@ -118,6 +128,89 @@ class Outcome(Enum):
     REJECT = "REJECT"
     QUARANTINE = "QUARANTINE"
     ABORT = "ABORT"
+
+
+class DomainTag(str, Enum):
+    """Execution/state domain tags for physical state segregation (ELH-10)."""
+
+    PRODUCTION = "PRODUCTION"
+    SYNTHETIC = "SYNTHETIC"
+    RECOVERY = "RECOVERY"
+    ADVERSARIAL = "ADVERSARIAL"
+    TEST = "TEST"
+    REPLAY = "REPLAY"
+    SHADOW = "SHADOW"
+    SIMULATION = "SIMULATION"
+
+
+class AuthorityTier(str, Enum):
+    A0_IMPLEMENTATION = "A0_IMPLEMENTATION"
+    A1_LOCAL_SUBSYSTEM = "A1_LOCAL_SUBSYSTEM"
+    A2_CROSS_SUBSYSTEM = "A2_CROSS_SUBSYSTEM"
+    A3_ACCEPTANCE_CONTRACT = "A3_ACCEPTANCE_CONTRACT"
+    A4_CONSTITUTIONAL = "A4_CONSTITUTIONAL"
+    A5_SOVEREIGN = "A5_SOVEREIGN"
+
+
+class ActionPermission(str, Enum):
+    AUTONOMOUS = "AUTONOMOUS"
+    GOVERNED_REVIEW = "GOVERNED_REVIEW"
+    COUNCIL_EVIDENCE_GATE = "COUNCIL_EVIDENCE_GATE"
+    FOUNDER_RATIFICATION = "FOUNDER_RATIFICATION"
+    FOUNDER_EXCLUSIVE = "FOUNDER_EXCLUSIVE"
+
+
+class AuthorityExpansionForbiddenError(RuntimeError):
+    """Child task attempted to expand scope beyond the root mission authorized envelope."""
+
+
+@dataclass(frozen=True, slots=True)
+class AuthorityEnvelope:
+    root_mission_id: str
+    authorized_paths: frozenset[str]
+    delegated_ceiling: AuthorityTier
+    allowed_action: ActionPermission
+    is_reversible: bool = True
+
+    def contains_path(self, path: str, *, cwd: str | Path | None = None) -> bool:
+        p_str = path.strip().replace("\\", "/")
+        normalized = os.path.normpath(p_str).strip("/")
+        if normalized.startswith("..") or "/../" in normalized:
+            return False
+
+        base_path = Path(cwd) if cwd is not None else None
+        try:
+            if base_path is not None and not os.path.isabs(p_str):
+                resolved_target = (base_path / p_str).resolve()
+            else:
+                resolved_target = Path(p_str).resolve()
+            resolved_str = os.path.normpath(str(resolved_target)).strip("/")
+        except Exception:
+            resolved_str = normalized
+
+        for auth in self.authorized_paths:
+            auth_str = auth.strip().replace("\\", "/")
+            auth_norm = os.path.normpath(auth_str).strip("/")
+            try:
+                if base_path is not None and not os.path.isabs(auth_str):
+                    auth_resolved_target = (base_path / auth_str).resolve()
+                else:
+                    auth_resolved_target = Path(auth_str).resolve()
+                auth_resolved = os.path.normpath(str(auth_resolved_target)).strip("/")
+            except Exception:
+                auth_resolved = auth_norm
+
+            if normalized == auth_norm or normalized.startswith(auth_norm + "/"):
+                if resolved_str != normalized:
+                    if resolved_str == auth_resolved or resolved_str.startswith(auth_resolved + "/"):
+                        return True
+                    return False
+                return True
+            if resolved_str == auth_resolved or resolved_str.startswith(auth_resolved + "/"):
+                return True
+        return False
+
+
 
 
 # ---- value contracts (PAEOS-7.6 §3-4) -------------------------------------

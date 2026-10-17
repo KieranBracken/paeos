@@ -1,10 +1,9 @@
 """B0.SLICE — the Phase-0 vertical slice capstone (PAEOS-8 §11).
 
 Goal `hello-paeos` walks the lifecycle end to end; the ledger demonstrates all seven §11
-properties. NOTE: §11's literal `INTAKE→IMPLEMENT→VERIFY→SEAL` predates PAEOS-IP-0003;
-under the ratified StageId edge table those exact edges are not legal, so the slice drives the goal
-through the actual lawful ROUTINE path — RAW→INTAKE→TRIAGE→IMPLEMENT→VERIFY→ADVERSARIAL_REVIEW→
-LEDGER_SYNC→SEAL — which exercises the identical spine (the kernel governs on any disagreement).
+properties. The routine slice uses canonical v1.3 order with lawful Trace-A discharge:
+RAW→INTAKE→TRIAGE→IMPLEMENT→VERIFY→LEDGER_SYNC→SEAL. L03-L11 are represented by ceremony
+discharge evidence rather than a post-verification adversarial StageId.
 
 If any spine piece is wrong this fails loudly; it cannot be faked green because the kernel re-runs
 the evidence itself.
@@ -36,8 +35,7 @@ _PATH = (
     (StageId.INTAKE, StageId.TRIAGE),
     (StageId.TRIAGE, StageId.IMPLEMENT),
     (StageId.IMPLEMENT, StageId.VERIFY),
-    (StageId.VERIFY, StageId.ADVERSARIAL_REVIEW),
-    (StageId.ADVERSARIAL_REVIEW, StageId.LEDGER_SYNC),
+    (StageId.VERIFY, StageId.LEDGER_SYNC),
     (StageId.LEDGER_SYNC, StageId.SEAL),
 )
 

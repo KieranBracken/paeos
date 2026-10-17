@@ -75,6 +75,13 @@ class RunOutput:
     evidence: tuple[EvidenceRef, ...]
     trace: bytes  # full I/O transcript
     cost: Cost = field(default_factory=lambda: Cost(0, 0.0, "unknown"))
+    # Trusted runtime observations of the isolated worker execution. These are identity
+    # bindings, not Builder-authored evidence and are intentionally optional for test doubles.
+    workspace_identity: str = ""
+    environment_identity: str = ""
+    # Bounded, transport-owned failure classification. Provider output and exception text never
+    # cross this boundary; a failed worker still cannot produce authored writes or artifacts.
+    failure_code: str | None = None
 
 
 class AgentRuntime(Protocol):
@@ -200,4 +207,7 @@ class AgentDispatcher:
             trace_ref=trace_ref,
             cost=output.cost,
             written_paths=tuple(written_paths),
+            workspace_identity=output.workspace_identity,
+            environment_identity=output.environment_identity,
+            failure_code=output.failure_code,
         )

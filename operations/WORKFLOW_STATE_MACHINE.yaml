@@ -1,11 +1,22 @@
-# PAEOS Engineering Lifecycle — Executable State Machine v1.0
+# PAEOS Engineering Lifecycle — Executable State Machine v1.3 projection
 # Machine-readable form of operations/ENGINEERING_LIFECYCLE.md.
+# Authority: derived executable projection of ENGINEERING_LIFECYCLE.md v1.3 (IP-0017).
+# On semantic conflict, canonical prose controls unless a later validly ratified amendment
+# explicitly supersedes the provision. This notice changes no executable state or transition.
 # The future PAEOS Runtime consumes this to drive engineering automatically.
 # Implementation-independent; multi-model; router-compatible via ceremony_depth.
 
-version: "1.1"    # v1.1 Constitutional Execution Rules amendment, founder-ratified 2026-07-21
+version: "1.3"
 frozen: true
 governs: [paeos-runtime, sentium, orca-strator, inspiration-engine, library-of-fire, sakg, "*future"]
+
+authority:
+  classification: DERIVED_EXECUTABLE_PROJECTION
+  canonical_path: operations/ENGINEERING_LIFECYCLE.md
+  canonical_version: "1.3"
+  canonical_sha256: 0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae
+  precedence: canonical_prose_controls_unless_lawfully_amended
+  founder_disposition: PAEOS-IP-0017
 
 constitutional_rule: >
   No engineering artifact may transition directly to Implementation. Every artifact
@@ -253,22 +264,22 @@ states:
     recommended_model: sonnet
     entry: "approved contract on isolated branch/worktree (A-16)"
     required_artifacts: [implementation, commits_referencing_contract]
-    produced_evidence: [branch_commits]
-    exit: "runnable code matches contract"
+    produced_evidence: [implementation_artifacts, builder_execution_self_report]
+    exit: "scope built and runnable; no scope creep"
     transitions: {L13: "implementation complete"}
     failure: "cannot satisfy contract without un-derived architecture -> HALT (CER-6), emit proposal"
 
   L13:
     name: Verification
     phase: IV-Engineering
-    role: builder
-    recommended_model: sonnet
+    role: [auditor, runtime, adversary]
+    recommended_model: [local, sonnet, opus]
     entry: "L12 complete"
-    required_artifacts: [executable_test_results, signed_exec_evidence] # A-09
-    produced_evidence: [exec_evidence_object]
-    exit: "all evidence specs satisfied + signed"
-    transitions: {L14: "evidence signed"}
-    failure: "failing tests -> iterate in L12; forged evidence -> immediate halt"
+    required_artifacts: [evidence_records, test_logs, coverage, signed_exec_evidence] # A-09
+    produced_evidence: [signed_execution_evidence, test_logs, coverage, performance_results]
+    exit: "L11 acceptance criteria satisfied by live signed independent evidence; no live refutation"
+    transitions: {L14: "acceptance criteria satisfied and evidence signed"}
+    failure: "any refutation -> regress and record incident; forged evidence -> immediate halt"
 
   L14:
     name: Independent Audit
@@ -288,7 +299,7 @@ states:
   L15:
     name: Documentation & Ledger
     phase: V-Integration
-    role: builder
+    role: [runtime, builder]
     recommended_model: sonnet
     entry: "L14 passed"
     required_artifacts: [doc_updates, ledger_entry, changelog_entry, implementation_atlas] # docs/IMPLEMENTATION_ATLAS.md
@@ -301,7 +312,7 @@ states:
   L16:
     name: Promotion Decision
     phase: V-Integration
-    role: integrators   # single-threaded integration (I9/K8)
+    role: [integrator, founder]   # single-threaded integration (I9/K8)
     recommended_model: opus
     entry: "L15 complete; artifact verified"
     required_artifacts: [final_disposition]  # merge | seal | reject | research_only | dormant

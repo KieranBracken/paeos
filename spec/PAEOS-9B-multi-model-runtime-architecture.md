@@ -1,6 +1,9 @@
 # 📐 PAEOS-9B — Multi-Model Runtime Architecture & Autonomous Self-Hosting Specification (v1.0)
 
-**Document Status:** Sealed Canonical Specification  
+**Document Status:** Historical architecture specification; lifecycle descriptions are non-authoritative.
+**Lifecycle authority:** `operations/ENGINEERING_LIFECYCLE.md` v1.3 and validly ratified
+amendments within their lawful scope, per Founder disposition of PAEOS-IP-0017. The historical
+layer labels and diagrams below are retained for provenance and must not govern execution.
 **System Version:** PAEOS v5.0 (19-Layer Canonical Execution Spine)  
 **Host Environment:** macOS (AArch64) · Python 3.13 Virtualenv (`uv`)  
 **Overseer Agent:** Google Antigravity (Overseer & Hypervisor)  

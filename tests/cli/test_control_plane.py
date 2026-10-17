@@ -60,20 +60,20 @@ def test_operator_drives_goal_through_states() -> None:
     from kernel.types import Outcome
 
     for frm, to in (
-        (StageId.RAW, StageId.RE_DERIVE),
-        (StageId.RE_DERIVE, StageId.INTAKE),
+        (StageId.RAW, StageId.INTAKE),
         (StageId.INTAKE, StageId.TRIAGE),
+        (StageId.TRIAGE, StageId.RE_DERIVE),
     ):
         result = _advance(plane, goal, frm, to)
         assert result.outcome is Outcome.COMMITTED  # type: ignore[attr-defined]
         assert result.committed_seq is not None  # type: ignore[attr-defined]
-    assert plane.inspect(goal) == "TRIAGE"
+    assert plane.inspect(goal) == "RE_DERIVE"
 
 
 def test_all_actions_appear_on_the_ledger() -> None:
     plane = _plane()
     goal = plane.create_goal("x", WeightClass.SUBSTANTIAL)
-    _advance(plane, goal, StageId.RAW, StageId.RE_DERIVE)
+    _advance(plane, goal, StageId.RAW, StageId.INTAKE)
     kinds = [row.event.kind for row in plane.ledger_events()]
     assert kinds == [GOAL_CREATED, TRANSITION_COMMITTED]  # every action ledgered, in order
 
@@ -81,9 +81,9 @@ def test_all_actions_appear_on_the_ledger() -> None:
 def test_replay_verifies_after_driving() -> None:
     plane = _plane()
     goal = plane.create_goal("x", WeightClass.SUBSTANTIAL)
-    _advance(plane, goal, StageId.RAW, StageId.RE_DERIVE)
+    _advance(plane, goal, StageId.RAW, StageId.INTAKE)
     projection = plane.replay_and_verify()  # raises if stale/poisoned
-    assert projection.state[goal] == "RE_DERIVE"
+    assert projection.state[goal] == "INTAKE"
 
 
 def test_advance_from_wrong_stage_is_refused() -> None:
@@ -168,7 +168,7 @@ def test_authorised_seal_commits_to_ledger() -> None:
 def test_actions_are_metered() -> None:
     plane = _plane()
     goal = plane.create_goal("x", WeightClass.SUBSTANTIAL)
-    _advance(plane, goal, StageId.RAW, StageId.RE_DERIVE)
+    _advance(plane, goal, StageId.RAW, StageId.INTAKE)
     actions = [row.action for row in plane.meter.rows]
     assert "create_goal" in actions
     assert "acquire_capability" in actions
@@ -178,4 +178,4 @@ def test_actions_are_metered() -> None:
 def test_demo_runs_end_to_end() -> None:
     plane = run_demo()
     assert len(plane.goal_states()) == 1
-    assert next(iter(plane.goal_states().values())) == "TRIAGE"
+    assert next(iter(plane.goal_states().values())) == "RE_DERIVE"

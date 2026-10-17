@@ -174,7 +174,20 @@ _IMPLEMENT = RoleSpec(
     role=Role.BUILDER,
     objective="Implement per the ratified plan on an isolated branch; run local tests.",
     write_scopes=(),  # provided per-plan at dispatch (the exact files the plan authorizes)
-    read_scopes=("constitution/", "design/", "plan/"),
+    # The Builder's verifier must see the exact non-sensitive package closure used by the
+    # production runtime.  Quarantined credential/Sentium paths are filtered at seeding time.
+    read_scopes=(
+        "constitution/",
+        "design/",
+        "plan/",
+        "kernel/",
+        "runtime/",
+        "paeos/",
+        "ops/",
+        "tests/",
+        "pyproject.toml",
+        "uv.lock",
+    ),
     mcp_servers=("constitution", "artifacts", "court", "memory:read"),
     required_evidence=(
         EvidenceObligation(

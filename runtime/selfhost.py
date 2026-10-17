@@ -17,7 +17,6 @@ via the court MCP (B2.B Observation 1) — the last live-integration refinement 
 
 from __future__ import annotations
 
-import re
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -61,56 +60,19 @@ DEFAULT_BUDGETS: dict[WeightClass, Budget] = {
 
 _DEFAULT_ENV_HASH = content_hash(b"paeos-selfhost-env")
 
-VALID_TOP_DIRS: tuple[str, ...] = (
-    "architecture/",
-    "backlog/",
-    "cli/",
-    "constitution/",
-    "derivation/",
-    "design/",
-    "docs/",
-    "genesis/",
-    "kernel/",
-    "ledger/",
-    "methodology/",
-    "operations/",
-    "ops/",
-    "plan/",
-    "prompts/",
-    "proposals/",
-    "reviews/",
-    "runtime/",
-    "sakg/",
-    "skills/",
-    "spec/",
-    "templates/",
-    "tests/",
-)
-
-
 def infer_write_scopes(
     objective: str,
     accept: tuple[str, ...],
     explicit_changed: tuple[str, ...],
     explicit_scopes: tuple[str, ...],
 ) -> tuple[str, ...]:
-    """Infer required write scopes from declared deliverables and explicit scopes (DEBT-0023)."""
-    found = set(explicit_changed) | set(explicit_scopes)
-    text = objective + " " + " ".join(accept)
-    for word in re.findall(r"[a-zA-Z0-9_.-]+/[a-zA-Z0-9_./*-]+", text):
-        top = word.split("/")[0] + "/"
-        if top in VALID_TOP_DIRS:
-            found.add(top)
+    """Return only explicitly structured Builder authority, in canonical order.
 
-    top_level = {p for p in found if p in VALID_TOP_DIRS}
-    non_redundant = set()
-    for p in found:
-        top = p.split("/")[0] + "/"
-        if top in top_level and p != top:
-            continue
-        non_redundant.add(p)
-
-    return tuple(sorted(non_redundant))
+    ``objective`` and ``accept`` are informational inputs retained in this API for compatibility;
+    path-shaped prose must never grant, broaden, collapse, or reinterpret mutation authority.
+    """
+    del objective, accept
+    return tuple(sorted(set(explicit_changed) | set(explicit_scopes)))
 
 
 def parse_backlog(raw: object) -> list[Intake]:
@@ -129,11 +91,9 @@ def _parse_intake(item: object) -> Intake:
     evidence = tuple(_parse_evidence(e) for e in _as_list(obj.get("builder_evidence", [])))
 
     inferred_scopes = infer_write_scopes(objective, accept, changed_paths, plan_write_scopes)
-    inferred_changed = tuple(sorted(set(changed_paths) | set(inferred_scopes)))
-
     return Intake(
         objective=objective,
-        changed_paths=inferred_changed,
+        changed_paths=changed_paths,
         plan_write_scopes=inferred_scopes,
         builder_evidence=evidence,
         goal_signature=_as_str(obj.get("goal_signature")) or "",

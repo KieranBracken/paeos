@@ -1,0 +1,24 @@
+[
+  {
+    "objective": "Execute SAKG-2 Task 24 [I-KAE-CAS-CITATIONS] under SAEOS-1 §5.2 and RB-0004. Implement kae/citation_pipeline.py as a deterministic, append-only KAE bridge: read external RFC/literature documents only by verified SHA-256 CAS address, extract byte-anchored citation spans with exact offsets and line coordinates, mint schema-compliant candidate EvidenceRef nodes in the live SAKG GraphStore, and bind them with typed justified_by/evidence edges to existing sealed Decisions and Constraints. Missing or corrupt CAS references must fail closed; replay must be idempotent; models and protected repository state remain untouched.",
+    "accept": [
+      "uv run pytest tests/kae/test_citation_pipeline.py -q",
+      "uv run pytest tests/sakg/ -q",
+      "Byte-exact CAS anchoring, deterministic citation hashes, idempotent replay, typed Decision/Constraint linkage, and fail-closed missing/mismatched CAS checks",
+      "No UPDATE or DELETE statements, provider transmission, protected-ref mutation, or source promotion"
+    ],
+    "changed_paths": [
+      "kae/citation_pipeline.py",
+      "tests/kae/test_citation_pipeline.py"
+    ],
+    "plan_write_scopes": [
+      "kae/",
+      "tests/kae/",
+      "sakg/"
+    ],
+    "goal_signature": "domain:kae,task:task-24-kae-cas-citations",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

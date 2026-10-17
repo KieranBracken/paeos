@@ -7,14 +7,18 @@ information barrier import boundaries, and DAG dependency constraints.
 from __future__ import annotations
 
 import ast
+import json
 from dataclasses import dataclass
 from pathlib import Path
+import re
 
 __all__ = [
+    "ArchitectureImpactVector",
     "ArchitectureViolation",
     "DependencyGraph",
     "check_kernel_isolation",
     "check_layer_dag",
+    "evaluate_architecture_impact",
     "extract_imports",
     "verify_architectural_conformance",
 ]
@@ -153,3 +157,121 @@ def verify_architectural_conformance(repo_root: Path) -> tuple[ArchitectureViola
     violations.extend(check_kernel_isolation(repo_root))
     violations.extend(check_layer_dag(repo_root))
     return tuple(violations)
+
+
+@dataclass(frozen=True, slots=True)
+class ArchitectureImpactVector:
+    """Deterministic structural invariant impact vector (ELH-13)."""
+
+    changed_files: tuple[str, ...]
+    affected_subsystems: tuple[str, ...]
+    violated_invariants: tuple[str, ...]
+    violations: tuple[ArchitectureViolation, ...]
+    risk_tier: str
+    requires_founder: bool
+    is_conforming: bool
+
+
+def evaluate_architecture_impact(
+    repo_root: Path,
+    changed_files: tuple[str, ...] = (),
+) -> ArchitectureImpactVector:
+    """Evaluate architectural impact of changed files against architecture/invariants.json (ELH-13)."""
+    subsystems: set[str] = set()
+    for f in changed_files:
+        norm = f.strip().replace("\\", "/").strip("/")
+        parts = norm.split("/")
+        if parts:
+            subsystems.add(parts[0])
+
+    affects_constitution = any(
+        f.startswith("constitution") or "ENGINEERING_LIFECYCLE.md" in f
+        for f in changed_files
+    )
+    affects_kernel = any(f.startswith("kernel") for f in changed_files)
+
+    if affects_constitution:
+        risk_tier = "CONSTITUTIONAL"
+        requires_founder = True
+    elif affects_kernel:
+        risk_tier = "HIGH"
+        requires_founder = False
+    elif any(s in {"paeos", "runtime"} for s in subsystems):
+        risk_tier = "MEDIUM"
+        requires_founder = False
+    else:
+        risk_tier = "LOW"
+        requires_founder = False
+
+    violations = list(verify_architectural_conformance(repo_root))
+
+    # Validate against architecture/invariants.json if present
+    invariants_path = repo_root / "architecture" / "invariants.json"
+    if invariants_path.exists():
+        try:
+            inv_data = json.loads(invariants_path.read_text(encoding="utf-8"))
+            for inv_id, inv_spec in inv_data.items():
+                if inv_id.startswith("_") or not isinstance(inv_spec, dict):
+                    continue
+                verify_info = inv_spec.get("verify", {})
+                kind = verify_info.get("kind")
+                if kind == "grep-absent":
+                    pattern = verify_info.get("pattern", "")
+                    paths = verify_info.get("paths", [])
+                    excludes = set(verify_info.get("exclude", []))
+                    if pattern:
+                        regex = re.compile(pattern)
+                        for target_rel in paths:
+                            target_dir = repo_root / target_rel
+                            if target_dir.is_dir():
+                                for py_file in target_dir.rglob("*.py"):
+                                    rel = str(py_file.relative_to(repo_root)).replace("\\", "/")
+                                    if any(rel.startswith(exc) for exc in excludes):
+                                        continue
+                                    try:
+                                        content = py_file.read_text(encoding="utf-8")
+                                        if regex.search(content):
+                                            violations.append(
+                                                ArchitectureViolation(
+                                                    source_path=rel,
+                                                    imported_target=pattern,
+                                                    rule_id=inv_id,
+                                                    description=f"{inv_spec.get('name', inv_id)}: forbidden pattern '{pattern}' matched",
+                                                )
+                                            )
+                                    except Exception:
+                                        pass
+                elif kind == "loc-budget":
+                    max_loc = verify_info.get("max", 0)
+                    paths = verify_info.get("paths", [])
+                    for target_rel in paths:
+                        target_dir = repo_root / target_rel
+                        if target_dir.is_dir():
+                            total_loc = 0
+                            for py_file in target_dir.rglob("*.py"):
+                                try:
+                                    total_loc += len(py_file.read_text(encoding="utf-8").splitlines())
+                                except Exception:
+                                    pass
+                            if max_loc > 0 and total_loc > max_loc:
+                                violations.append(
+                                    ArchitectureViolation(
+                                        source_path=target_rel,
+                                        imported_target="LOC_BUDGET",
+                                        rule_id=inv_id,
+                                        description=f"LOC budget exceeded: {total_loc} > {max_loc}",
+                                    )
+                                )
+        except Exception:
+            pass
+
+    violated_rule_ids = tuple(sorted({v.rule_id for v in violations}))
+    return ArchitectureImpactVector(
+        changed_files=changed_files,
+        affected_subsystems=tuple(sorted(subsystems)),
+        violated_invariants=violated_rule_ids,
+        violations=tuple(violations),
+        risk_tier=risk_tier,
+        requires_founder=requires_founder,
+        is_conforming=(len(violations) == 0),
+    )

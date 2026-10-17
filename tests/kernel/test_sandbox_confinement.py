@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import errno
 import hashlib
+import os
 import shutil
 import signal
 import socket
@@ -85,13 +86,40 @@ def run_portable(
     profile: SandboxProfile,
     tmp: Path,
     environment: dict[str, str] | None = None,
+    authorized_paths: frozenset[str] | None = None,
 ) -> SandboxResult:
+    from kernel.capability import CapabilityBroker, Role, StageId
+    from kernel.types import ActionPermission, AuthorityEnvelope, AuthorityTier
+
+    if authorized_paths is None:
+        auth_path = str(profile.workspace_root) if profile.workspace_root is not None else str(tmp)
+        authorized_paths = frozenset({auth_path})
+    envelope = AuthorityEnvelope(
+        root_mission_id="test-workspace",
+        authorized_paths=authorized_paths,
+        delegated_ceiling=AuthorityTier.A2_CROSS_SUBSYSTEM,
+        allowed_action=ActionPermission.AUTONOMOUS,
+    )
+    broker = CapabilityBroker()
+    token = broker.mint(
+        goal_id="test",
+        run_id="test",
+        stage=StageId.IMPLEMENT,
+        role=Role.BUILDER,
+        session="test",
+        operations=("write",),
+        issued_seq=1,
+        expires_seq=100,
+    )
     return backend.run(
         SandboxedInvocation(
             argv=argv,
             cwd=tmp,
             profile=profile,
             environment=environment if environment is not None else {},
+            authority_envelope=envelope,
+            capability_token=token,
+            broker=broker,
         )
     )
 
@@ -461,6 +489,35 @@ def test_row11_timeout_process_group_cleanup_no_survivors(tmp_path: Path) -> Non
     assert heartbeat_growth_stops(heartbeat)
 
 
+def test_row11_teardown_retries_transient_eperm_before_confirming_empty(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A transient post-kill EPERM must not become an immediate false cleanup failure."""
+    backend = PortableSandboxBackend()
+    facts: list[RunFact] = []
+    probes = 0
+
+    def fake_killpg(_pgid: int, signal_number: int) -> None:
+        nonlocal probes
+        if signal_number == signal.SIGKILL:
+            return
+        probes += 1
+        if probes == 1:
+            return  # group exists before the kill
+        if probes == 2:
+            raise OSError(errno.EPERM, "transient process-group probe denial")
+        raise ProcessLookupError
+
+    monkeypatch.setattr(os, "killpg", fake_killpg)
+    backend._teardown_group(12345, facts, grace=0.2)
+
+    assert any(
+        fact.kind is FactKind.COMPLETION and "confirmed empty" in fact.os_fact
+        for fact in facts
+    )
+    assert not any(fact.kind is FactKind.CLEANUP_ERROR for fact in facts)
+
+
 def test_row12_output_caps_truncation_fact(tmp_path: Path) -> None:
     """Row 12: emit beyond the cap -> output is truncated, a TRUNCATION fact is
     reported (never laundered as success), the stream is severed, the payload is
@@ -694,7 +751,13 @@ def test_workspace_write_confined_by_seatbelt(tmp_path: Path) -> None:
             "except OSError as exc:\n"
             "    print('OUTSIDE_DENIED', exc.errno)\n"
         )
-        result = run_portable(seatbelt, (PY, "-c", child), ws_profile, tmp_path)
+        result = run_portable(
+            seatbelt,
+            (PY, "-c", child),
+            ws_profile,
+            tmp_path,
+            authorized_paths=frozenset({str(tmp_path), str(outside)}),
+        )
         assert result.exit_code == 0
         assert "INSIDE_OK" in result.stdout
         assert "OUTSIDE_DENIED" in result.stdout

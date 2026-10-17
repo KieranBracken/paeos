@@ -168,6 +168,7 @@ class ChatBridgeRuntime:
                     workspace,
                     self._workspace_source,
                     package.permissions.write_scopes,
+                    package.permissions.read_scopes,
                 )
                 _seed_constitution(workspace, self._workspace_source)
             if self._artifact_resolver is not None:
@@ -178,9 +179,6 @@ class ChatBridgeRuntime:
                 )
 
             prompt = package.objective
-            source_root = self._workspace_source or workspace
-            court_path = self._paths.state_root / "court"
-
             prompt_content = f"""# PAEOS Task: {package.goal_id} ({package.run_id})
 **Stage:** {package.stage.name} | **Role:** {package.role.name}
 **Bound worker session:** {package.capability.bound_to.session}
@@ -192,9 +190,6 @@ class ChatBridgeRuntime:
 Execute all work inside the isolated sandboxed workspace:
 `{workspace.absolute()}`
 
-The workspace source for this compatibility run is:
-`{source_root}`
-
 Do not modify repository files outside the sandbox. The capability is already bound to this
 worker session. Do not spawn subagents, invoke skills, change terminals, ratify, promote to
 main/trunk, or claim lifecycle advancement.
@@ -205,50 +200,10 @@ main/trunk, or claim lifecycle advancement.
 ```
 
 ## Court Evidence for Builder Roles
-Use real, kernel-reproducible values only. Replace both required values, then run this script
-inside the sandbox:
-
-```python
-import shlex
-import subprocess
-import sys
-from pathlib import Path
-
-sys.path.insert(0, "{source_root}")
-from kernel.cas import content_hash
-from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
-from kernel.types import Role
-from runtime.orchestrator import FileCourtEvidencePool
-
-artifact_path = Path("REPLACE_WITH_THE_ARTIFACT_YOU_ACTUALLY_BUILT")
-command = "REPLACE_WITH_THE_REAL_VERIFICATION_COMMAND"
-
-proc = subprocess.run(
-    shlex.split(command),
-    capture_output=True,
-    text=True,
-    timeout=600,
-)
-pool = FileCourtEvidencePool(Path("{court_path}"))
-pool.submit(
-    "{package.run_id}",
-    Evidence(
-        hash=content_hash(f"{{command}}:{{proc.returncode}}".encode()),
-        kind=EvidenceKind.TEST,
-        claim_id="builds",
-        artifact_hash=content_hash(artifact_path.read_bytes()),
-        environment_hash=content_hash(sys.executable.encode()),
-        reproducible_command=command,
-        producer=EvidenceProducer(
-            role=Role.BUILDER,
-            session="{package.capability.bound_to.session}",
-        ),
-        determinism=Determinism.DETERMINISTIC,
-        result={{"exit_code": proc.returncode, "stdout": proc.stdout}},
-        attestation="pending-kernel-sig",
-    ),
-)
-```
+Submit evidence only through the configured Court MCP boundary using the exact run identifier.
+The trusted verifier, not this worker, derives argv, stdout/stderr, exit code, artifact hash,
+executable identity, environment identity, and evidence identity. If the Court MCP tool is
+unavailable, stop with failure; never write the Court pool or manufacture observations.
 
 When complete, write the full response bytes as strict UTF-8 exactly once to:
 `{output_path.absolute()}`
@@ -314,11 +269,19 @@ When complete, write the full response bytes as strict UTF-8 exactly once to:
                 workspace,
                 package.permissions.write_scopes,
             )
+            workspace_identity = hashlib.sha256(
+                str(workspace.resolve()).encode("utf-8")
+            ).hexdigest()
+            environment_identity = hashlib.sha256(
+                b"paeos-chat-bridge-clean-contract/v1"
+            ).hexdigest()
             return RunOutput(
                 status=TaskStatus.COMPLETE,
                 writes=writes,
                 evidence=(),
                 trace=raw_response,
+                workspace_identity=workspace_identity,
+                environment_identity=environment_identity,
                 cost=Cost(
                     tokens=0,
                     wallclock_s=0.0,
@@ -371,7 +334,12 @@ class BoundClineWorkerRuntime:
         )
         try:
             if self._workspace_source is not None:
-                _seed_workspace(workspace, self._workspace_source, package.permissions.write_scopes)
+                _seed_workspace(
+                    workspace,
+                    self._workspace_source,
+                    package.permissions.write_scopes,
+                    package.permissions.read_scopes,
+                )
                 _seed_constitution(workspace, self._workspace_source)
             if self._artifact_resolver is not None:
                 _materialize_context(workspace, package.context_refs, self._artifact_resolver)

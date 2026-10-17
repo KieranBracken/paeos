@@ -134,3 +134,7 @@ class TaskResult:
     # (repo-relative path, CAS hash) for each file the session wrote, so a verification workspace
     # can apply the change at its real path and the court can test it probatively (B2.N).
     written_paths: tuple[tuple[str, Hash], ...] = ()
+    workspace_identity: str = ""
+    environment_identity: str = ""
+    # Transport-owned bounded failure classification; never raw provider output.
+    failure_code: str | None = None

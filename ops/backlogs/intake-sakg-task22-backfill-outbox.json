@@ -1,0 +1,23 @@
+[
+  {
+    "objective": "Execute SAKG-2 Task 22 [I-BACKFILL-OUTBOX] from the ratified SAEOS-1 architecture. Implement scripts/sakg_historical_backfill.py as a deterministic, append-only historical admission tool: discover the 48 canonical Court-sealed programme windows (Gates A-F mapped to milestones 01-18, SAKG Tasks 01-20 mapped to 19-38, L17 retrospective mapped to 39, and Milestones 40-48), validate COURT_SEALED markers and candidate/evidence provenance, and populate a namespace-bound SQLite GraphStore at sakg.db with Decision, TradeOff, Constraint, and Scar nodes plus typed provenance edges. The --verify-only path must parse and validate the complete 48-window inventory without writing sakg.db; normal execution must be idempotent and append-only. Author discriminating tests first and preserve PAEOS state ownership, stateless models, non-authority boundaries, historical remands, and protected-branch invariants.",
+    "accept": [
+      "uv run python scripts/sakg_historical_backfill.py --verify-only",
+      "uv run pytest tests/sakg/test_live_ingest_historical.py",
+      "The test suite proves 48 deterministic records, four typed nodes per record, provenance/evidence binding, typed edges, idempotent replay, verify-only non-mutation, and fail-closed rejection of missing Court seals",
+      "No runtime, kernel, protected ref, main/trunk, or historical evidence mutation"
+    ],
+    "changed_paths": [
+      "scripts/sakg_historical_backfill.py",
+      "tests/sakg/test_live_ingest_historical.py"
+    ],
+    "plan_write_scopes": [
+      "scripts/sakg_historical_backfill.py",
+      "tests/sakg/test_live_ingest_historical.py"
+    ],
+    "goal_signature": "domain:sakg,task:task-22-backfill-outbox",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

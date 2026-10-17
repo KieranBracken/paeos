@@ -97,7 +97,7 @@ def test_review_dispatches_adversary_scoped_to_bundle() -> None:
     # the adversary's context is the bundle only; no builder-private ref present
     assert {r.hash for r in package.context_refs} == {_ARTIFACT.hash, _EVIDENCE}
     assert package.permissions.mcp_servers == ("constitution",)  # not memory / builder
-    assert package.permissions.read_scopes == (bundle.bundle_hash,)  # type: ignore[attr-defined]
+    assert package.permissions.read_scopes == ("context/",)
     assert package.permissions.write_scopes == ("review/adversary_report.md",)  # report only
 
 

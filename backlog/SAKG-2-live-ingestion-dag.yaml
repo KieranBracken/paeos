@@ -1,0 +1,93 @@
+# SAKG-2 Live Ingestion & Ecosystem Integration DAG Backlog (v1.0)
+# ============================================================================
+# This file is the decomposition of SAKG Step 3 & Ecosystem Integration:
+# Populating the live SQLite SAKG knowledge graph from historical PAEOS seals,
+# connecting the KAE citation bridge, and activating the S3 outcome loop.
+#
+# Authority: spec/SAEOS-1-architecture.md (Ratified 2026-09-04)
+# Mission: RB-0005 Phase D
+# Prerequisites: SAKG Tasks 01–21 Court-Sealed, 115/115 tests passing.
+# ============================================================================
+
+meta:
+  backlog_id: SAKG-2
+  version: 1.0.0
+  derives_from: spec/SAEOS-1-architecture.md
+  mission: "RB-0005 Phase D"
+  slices_in_scope: [S3, S4, S5]
+  root_goal: >
+    Populate the live SAKG knowledge graph from all sealed PAEOS milestones and
+    provenance artifacts, connect the KAE citation pipeline, and verify live
+    architectural precedent queries via MCP with 100% test reproducibility.
+
+nodes:
+
+  - id: TASK-22-BACKFILL-OUTBOX
+    title: Ingest historical PAEOS Court-sealed milestones into live SAKG graph
+    clause: [SAEOS-1 §5.1, SAEOS-1 §3.1]
+    role: Implementer
+    slice: S3
+    wave: 1
+    deps: []
+    deliverables: >
+      scripts/sakg_historical_backfill.py — script to parse all 48 Court-sealed
+      dispositions and emission outbox bundles into the live SQLite graph store,
+      yielding valid Decision, TradeOff, Constraint, and Scar nodes.
+    accept:
+      - "uv run python scripts/sakg_historical_backfill.py --verify-only"
+      - "uv run pytest tests/sakg/test_live_ingest_historical.py -q"
+
+  - id: TASK-23-LIVE-GRAPH-INDEX
+    title: Live Semantic AST & Taxonomy Indexing across PAEOS modules
+    clause: [SAEOS-1 §3.2, SAEOS-1 §4.1]
+    role: Implementer
+    slice: S3
+    wave: 2
+    deps: [TASK-22-BACKFILL-OUTBOX]
+    deliverables: >
+      Live graph populated with Component, Pattern, Mechanism, and TaxonomyNode
+      entities extracted deterministically from paeos/ and kernel/ codebase.
+    accept:
+      - "uv run pytest tests/sakg/test_live_graph_integrity.py -q"
+      - "uv run python -c 'import sakg.store; s = sakg.store.GraphStore(); assert len(s.query_nodes()) >= 50'"
+
+  - id: TASK-24-KAE-CAS-CITATIONS
+    title: KAE CAS-anchored Citation & Literature Ingestion Pipeline
+    clause: [SAEOS-1 §5.2, RB-0004]
+    role: Implementer
+    slice: S4
+    wave: 3
+    deps: [TASK-23-LIVE-GRAPH-INDEX]
+    deliverables: >
+      kae/citation_pipeline.py — extracts byte-anchored citations from external
+      RFCs/literature in CAS and mints immutable EvidenceRef nodes in SAKG.
+    accept:
+      - "uv run pytest tests/kae/test_citation_pipeline.py -q"
+
+  - id: TASK-25-S3-OUTCOME-LOOP
+    title: Automated Longitudinal Outcome Observer & Belief Revision Loop
+    clause: [SAEOS-1 §2.2, SAEOS-1 §3.2]
+    role: Implementer
+    slice: S3
+    wave: 3
+    deps: [TASK-23-LIVE-GRAPH-INDEX]
+    deliverables: >
+      sakg/outcome_observer.py — background watcher recording test regressions
+      and verified recoveries as candidate Outcome nodes joined to Decisions.
+    accept:
+      - "uv run pytest tests/sakg/test_outcome_observer.py -q"
+
+  - id: TASK-26-LIVE-MCP-SPIKE
+    title: Live Multi-Model MCP Precedent Query Validation
+    clause: [SAEOS-1 §5.3, SAEOS-1 §3.3]
+    role: Auditor
+    slice: S5
+    wave: 4
+    deps: [TASK-24-KAE-CAS-CITATIONS, TASK-25-S3-OUTCOME-LOOP]
+    deliverables: >
+      reviews/spikes/sakg-live-mcp-precedent-query.md — live execution probe
+      proving tradeoff_precedents tool returns real, outcome-joined precedents
+      with valid why traversal paths to PAEOS workers within token budget.
+    accept:
+      - "uv run pytest tests/mcp/test_live_mcp_query.py -q"
+      - "test -f reviews/spikes/sakg-live-mcp-precedent-query.md"

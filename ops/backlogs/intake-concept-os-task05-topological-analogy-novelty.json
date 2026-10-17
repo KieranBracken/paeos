@@ -1,0 +1,17 @@
+[
+  {
+    "objective": "Implement Concept OS TASK-05-TOPOLOGICAL-ANALOGY-AND-NOVELTY, Slice C3 Wave 5, strictly inside concept/inspiration.py and tests/concept/. Follow TDD: add comprehensive tests first, verify RED, then implement local graph distance metrics d_g/d_v/d_s, deterministic analogy and recombination proposers, novelty and serendipity result types and scorers. Use only the existing ConceptStore, ontology models, and typed traversal interfaces. Do not implement external Inspiration Engine ingestion, remote providers, Celery, Postgres, SAKG promotion, truth lifecycle changes, or external actions. Verify the focused suites, full tests/concept suite, ruff, pyright, and runtime.ast_linter.check_ast().",
+    "changed_paths": [
+      "concept/inspiration.py",
+      "tests/concept/"
+    ],
+    "plan_write_scopes": [
+      "concept/",
+      "tests/concept/"
+    ],
+    "goal_signature": "concept-os-task-05-topological-analogy-novelty",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

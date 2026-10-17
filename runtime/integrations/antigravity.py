@@ -141,7 +141,12 @@ class AntigravityRuntime:
         )
         try:
             if self._workspace_source is not None:
-                _seed_workspace(workspace, self._workspace_source, package.permissions.write_scopes)
+                _seed_workspace(
+                    workspace,
+                    self._workspace_source,
+                    package.permissions.write_scopes,
+                    package.permissions.read_scopes,
+                )
                 _seed_constitution(workspace, self._workspace_source)
             if self._artifact_resolver is not None:
                 _materialize_context(workspace, package.context_refs, self._artifact_resolver)

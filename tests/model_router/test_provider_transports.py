@@ -13,6 +13,7 @@ from paeos.model_router.provider_transports import (
     OpenAICompatibleTransport,
     ProviderTransport,
     ProviderTransportRegistry,
+    _normalized_error,
     build_builtin_transport_registry,
 )
 from paeos.model_router.transport import LiteLLMTransport
@@ -21,6 +22,7 @@ from paeos.model_router.types import (
     DataClass,
     ModelCatalogEntry,
     ModelFamily,
+    NormalizedErrorType,
     ProviderId,
     RouterResponse,
     TaskRequest,
@@ -250,3 +252,30 @@ def test_builtin_registry_binds_all_legacy_provider_surfaces() -> None:
     )
     for provider in ProviderId:
         assert registry.resolve_for_provider(provider) is not None
+
+
+def test_normalized_error_recovers_http_metadata_from_response_object() -> None:
+    """LiteLLM may expose status/headers on response instead of the exception."""
+    class ResponseOnlyError(Exception):
+        response = SimpleNamespace(
+            status_code=429,
+            headers={"Retry-After": "9"},
+            text='{"error":{"message":"rate limit reached"}}',
+        )
+
+        def __init__(self) -> None:
+            super().__init__("provider request failed")
+
+    error = _normalized_error(
+        ResponseOnlyError(),
+        ModelCatalogEntry(
+            model_id="gemini-3.6-flash",
+            provider_id=ProviderId.GOOGLE,
+            family=ModelFamily.GEMINI,
+            cost_tier=CostTier.FREE,
+        ),
+    )
+
+    assert error.error_type is NormalizedErrorType.RATE_LIMITED
+    assert error.http_status == 429
+    assert error.retry_after == 9.0

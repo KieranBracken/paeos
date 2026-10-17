@@ -96,4 +96,10 @@ class Court:
                 verify_deterministic(evidence, artifact_under_review, runner=self._runner)
             except (ReproductionMismatch, StaleEvidence, NotReproducible):
                 return False  # forgery / stale / unreproducible ⇒ claim unmet (T2)
+            # A verification claim is a success obligation, not merely a reproducible process.
+            # A physically observed non-zero verifier exit therefore remands even when replay
+            # matches it exactly; otherwise a deliberately failing CANARY could be misclassified
+            # as a valid PASS claim.
+            if isinstance(evidence.result, dict) and evidence.result.get("exit_code") != 0:
+                return False
         return True

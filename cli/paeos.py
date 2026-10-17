@@ -312,9 +312,9 @@ def run_demo() -> ControlPlane:
     run = "r-1"
     artifact = "a" * 64
     chain: Iterable[tuple[StageId, StageId]] = (
-        (StageId.RAW, StageId.RE_DERIVE),
-        (StageId.RE_DERIVE, StageId.INTAKE),
+        (StageId.RAW, StageId.INTAKE),
         (StageId.INTAKE, StageId.TRIAGE),
+        (StageId.TRIAGE, StageId.RE_DERIVE),
     )
     for from_state, to_state in chain:
         token = plane.acquire_token(

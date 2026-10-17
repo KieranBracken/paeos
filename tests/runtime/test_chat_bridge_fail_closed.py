@@ -143,9 +143,11 @@ def test_bridge_evidence_template_has_no_placeholders() -> None:
     assert "dummy_hash_for_now" not in BRIDGE_SOURCE
     assert "dummy_env" not in BRIDGE_SOURCE
     assert '"test passed"' not in BRIDGE_SOURCE  # invented stdout
-    # the template must instruct a real command run + real artifact hash
-    assert "subprocess.run" in BRIDGE_SOURCE
-    assert "artifact_path.read_bytes()" in BRIDGE_SOURCE
+    # The compatibility bridge must not contain a worker-authored evidence helper.  Physical
+    # observations belong to the trusted Court MCP verifier boundary.
+    assert "subprocess.run" not in BRIDGE_SOURCE
+    assert "artifact_path.read_bytes()" not in BRIDGE_SOURCE
+    assert "trusted verifier" in BRIDGE_SOURCE
 
 
 def test_glm_invoker_refuses_silent_provider_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -164,7 +166,7 @@ def test_codex_invoker_refuses_silent_provider_fallback(monkeypatch: pytest.Monk
 
 def test_invokers_fail_loud_on_cli_error() -> None:
     """A nonzero exit or empty transcript must raise, not become a zero-cost success."""
-    assert "check=False" in HYBRID_SOURCE
+    assert "run_bounded_process" in HYBRID_SOURCE
     assert "RuntimeError" in HYBRID_SOURCE
     assert "timeout_transcript" not in HYBRID_SOURCE  # the silent timeout-transcript path is gone
 

@@ -64,7 +64,8 @@ def build_substantive_audit_prompt(
 ) -> str:
     """Build one canonical audit request containing all substantive evidence bytes."""
 
-    _validate_digest(candidate_sha, name="candidate SHA", length=40)
+    if not (len(candidate_sha) in (40, 64) and _HEX_RE.fullmatch(candidate_sha)):
+        raise AuditorPromptError("candidate SHA must be 40 or 64 lowercase hexadecimal characters")
     _validate_digest(evidence_sha256, name="evidence SHA-256", length=64)
     _validate_counts(worker_counts, name="worker")
     _validate_counts(court_counts, name="Court")
@@ -121,7 +122,8 @@ def validate_substantive_audit_prompt(
 ) -> None:
     """Fail closed unless a prompt has one unambiguous two-phase evidence binding."""
 
-    _validate_digest(candidate_sha, name="candidate SHA", length=40)
+    if not (len(candidate_sha) in (40, 64) and _HEX_RE.fullmatch(candidate_sha)):
+        raise AuditorPromptError("candidate SHA must be 40 or 64 lowercase hexadecimal characters")
     _validate_digest(evidence_sha256, name="evidence SHA-256", length=64)
     if not content.strip():
         raise AuditorPromptError("audit prompt must not be empty")

@@ -1,0 +1,2 @@
+{"id":"concept://demo/edge/00000000000000000000000001","namespace":"demo","family":"analogy","relation":"has_source","source_uri":"concept://demo/analogy/00000000000000000000000000","target_uri":"concept://demo/concept/00000000000000000000000000","schema_version":1,"payload":{"role_name":"river","correspondence_index":0},"provenance_refs":["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],"recorded_at":"2026-09-04T21:01:00Z"}
+

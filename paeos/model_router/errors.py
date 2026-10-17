@@ -8,7 +8,29 @@ import json
 import re
 from typing import Any
 
-from paeos.model_router.types import NormalizedError, NormalizedErrorType, ProviderId
+from paeos.model_router.types import FailureScope, NormalizedError, NormalizedErrorType, ProviderId
+
+_TRUSTED_CLINE_MODEL_QUOTA_CODES = frozenset(
+    {"INFERENCE_CAP_ERROR", "DAILY_FREE_QUOTA_EXHAUSTED"}
+)
+
+
+def _trusted_cline_quota_scope(
+    provider_id: ProviderId | None,
+    model_id: str | None,
+    body_data: dict[str, Any],
+) -> tuple[FailureScope, str | None]:
+    """Narrow quota scope only for exact structured Cline model codes."""
+
+    if provider_id is not ProviderId.CLINE or not model_id:
+        return FailureScope.PROVIDER, None
+    provider_error = body_data.get("error")
+    if not isinstance(provider_error, dict):
+        return FailureScope.PROVIDER, None
+    code = str(provider_error.get("code", "")).strip().upper()
+    if code in _TRUSTED_CLINE_MODEL_QUOTA_CODES:
+        return FailureScope.MODEL, model_id
+    return FailureScope.PROVIDER, None
 
 
 def parse_retry_after(headers: dict[str, Any] | None, body_str: str = "") -> float | None:
@@ -81,7 +103,12 @@ def normalize_error(
     retry_after = parse_retry_after(headers, raw_str)
 
     # 1. Daily Free Inference Cap / Quota Exhaustion
-    if "inference_cap_error" in lower_msg or "daily free limit reached" in lower_msg:
+    if (
+        "inference_cap_error" in lower_msg
+        or "daily free limit reached" in lower_msg
+        or "daily_free_quota_exhausted" in lower_msg
+    ):
+        failure_scope, scope_key = _trusted_cline_quota_scope(provider_id, model_id, body_data)
         return NormalizedError(
             error_type=NormalizedErrorType.QUOTA_EXHAUSTED,
             message=err_msg or "Daily free model allowance exhausted (DAILY_FREE_QUOTA_EXHAUSTED)",
@@ -90,6 +117,22 @@ def normalize_error(
             http_status=http_status or 429,
             retry_after=retry_after or 3600.0,
             raw_response=raw_str,
+            failure_scope=failure_scope,
+            scope_key=scope_key,
+        )
+
+    # Ambiguous quota language is intentionally provider-wide. Only the exact structured
+    # Cline codes above have enough provenance to narrow the failure to one model.
+    if "quota exhausted" in lower_msg or "quota exceeded" in lower_msg:
+        return NormalizedError(
+            error_type=NormalizedErrorType.QUOTA_EXHAUSTED,
+            message=err_msg or "Provider quota exhausted",
+            provider_id=provider_id,
+            model_id=model_id,
+            http_status=http_status,
+            retry_after=retry_after,
+            raw_response=raw_str,
+            failure_scope=FailureScope.PROVIDER,
         )
 
     # 2. Context Length Exceeded (can arrive as 400 on Kilo/OpenAI or 413)

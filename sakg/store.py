@@ -45,7 +45,7 @@ EDGE_FAMILIES: tuple[str, ...] = (
 )
 _EDGE_FAMILY_SET = frozenset(EDGE_FAMILIES)
 _NODE_ID = re.compile(
-    r"^sakg://[^/]+/(?:Decision|Problem|Option|Constraint|Objective|TradeOff|Mechanism|Pattern|Component|Outcome|Scar|EvidenceRef)/[0-9A-HJKMNP-TV-Z]{26}$"
+    r"^sakg://[^/]+/(?:Decision|Problem|Option|Constraint|Objective|TradeOff|Mechanism|Pattern|Component|Outcome|Scar|EvidenceRef|TaxonomyNode)/[0-9A-HJKMNP-TV-Z]{26}$"
 )
 _NAMESPACE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
 _HASH = re.compile(r"^[0-9a-f]{64}$")
@@ -64,6 +64,7 @@ _NODE_TYPES = frozenset(
         "Outcome",
         "Scar",
         "EvidenceRef",
+        "TaxonomyNode",
     }
 )
 _STATUSES = frozenset({"candidate", "canonical", "superseded", "refuted"})
@@ -309,7 +310,7 @@ def _normalise_edge(value: Edge | Mapping[str, object], namespace: str) -> dict[
 class GraphStore:
     """Namespace-scoped SQLite graph store with append-only enforcement."""
 
-    def __init__(self, path: str | Path, namespace: str) -> None:
+    def __init__(self, path: str | Path = "sakg.db", namespace: str = "paeos-history") -> None:
         if _NAMESPACE.fullmatch(namespace) is None:
             raise NamespaceViolation("store namespace is malformed")
         self.namespace = namespace
@@ -401,6 +402,15 @@ class GraphStore:
             "SELECT payload FROM nodes WHERE namespace = ? ORDER BY node_id", (self.namespace,)
         ).fetchall()
         return tuple(dict(json.loads(str(row["payload"]))) for row in rows)
+
+    def query_nodes(self, node_type: str | None = None) -> tuple[dict[str, object], ...]:
+        """Read-only operator query over the append-only node projection."""
+        values = self.nodes()
+        if node_type is None:
+            return values
+        if node_type not in _NODE_TYPES:
+            raise ValueError(f"unknown node type: {node_type}")
+        return tuple(node for node in values if node["type"] == node_type)
 
     def append_edge(self, edge: Edge | Mapping[str, object]) -> str:
         data = _normalise_edge(edge, self.namespace)

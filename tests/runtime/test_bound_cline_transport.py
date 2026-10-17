@@ -257,6 +257,12 @@ def test_dispatch_executes_only_preapproved_editor_and_exact_command(tmp_path: P
     assert isinstance(result, WorkerDispatchSuccess)
     assert (config.recovery_worktree / "sandbox" / "artifact.txt").read_text() == "updated"
     assert len(result.tool_decisions) == 2
+    lifecycle_path = config.state_root / "worker-lifecycle" / "request-1.json"
+    lifecycle = json.loads(lifecycle_path.read_text(encoding="utf-8"))
+    assert lifecycle["terminal_state"] == "RETURNED"
+    states = [event["state"] for event in lifecycle["events"]]
+    assert states[:3] == ["NOT_STARTED", "STARTED", "RUNNING"]
+    assert "RETURNED" in states
 
 
 def test_unknown_tool_is_rejected_before_execution(tmp_path: Path) -> None:
@@ -285,6 +291,10 @@ def test_partial_frame_honors_deadline_and_is_not_success(tmp_path: Path) -> Non
     result = dispatch_once(request_path, prompt_path, replace(config, timeout_seconds=0.1))
     assert isinstance(result, WorkerDispatchFailure)
     assert result.failure.kind is TransportFailureKind.TIMEOUT
+    lifecycle = json.loads(
+        (config.state_root / "worker-lifecycle" / "request-1.json").read_text(encoding="utf-8")
+    )
+    assert lifecycle["terminal_state"] == "TIMED_OUT"
 
 
 def test_post_terminal_frame_is_rejected(tmp_path: Path) -> None:

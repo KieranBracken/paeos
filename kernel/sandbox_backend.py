@@ -34,8 +34,10 @@ import contextlib
 import errno
 import hashlib
 import os
+import re
 import resource
 import selectors
+import shlex
 import signal
 import subprocess
 import sys
@@ -47,12 +49,18 @@ from enum import StrEnum
 from pathlib import Path
 from typing import BinaryIO, Protocol, cast
 
+from kernel.capability import CapabilityBroker, CapabilityError
 from kernel.sandbox import (
     FactKind,
     RunFact,
     SandboxError,
     SandboxResult,
     allowlisted_path,
+)
+from kernel.types import (
+    AuthorityEnvelope,
+    AuthorityExpansionForbiddenError,
+    CapabilityToken,
 )
 
 __all__ = [
@@ -72,7 +80,9 @@ __all__ = [
     "SeatbeltSandboxBackend",
     "UnsupportedDimension",
     "build_claim_registry",
+    "build_seatbelt_path_profile",
     "negotiate",
+    "verify_invocation_authority",
 ]
 
 _MB = 1024 * 1024
@@ -196,6 +206,232 @@ class SandboxedInvocation:
     profile: SandboxProfile
     stdin: bytes = b""
     environment: Mapping[str, str] = field(default_factory=dict[str, str])
+    capability_token: CapabilityToken | None = None
+    authority_envelope: AuthorityEnvelope | None = None
+    broker: CapabilityBroker | None = None
+    target_paths: tuple[str, ...] = ()
+
+
+_MUTATING_COMMANDS = frozenset({
+    "rm", "mkdir", "touch", "cp", "mv", "chmod", "chown", "truncate",
+    "tee", "sed", "patch", "ln", "unlink", "install"
+})
+_GIT_MUTATING_SUBCOMMANDS = frozenset({
+    "commit", "apply", "checkout", "merge", "rebase", "reset",
+    "revert", "clean", "add", "rm", "branch", "tag", "stash", "init"
+})
+
+
+def _detect_mutating_invocation(invocation: SandboxedInvocation) -> tuple[bool, tuple[str, ...]]:
+    """Determine whether invocation attempts mutation and derive target paths from argv.
+    
+    target_paths CANNOT override or hide actual argv mutation targets.
+    """
+    if not invocation.argv:
+        if invocation.target_paths:
+            return True, tuple(invocation.target_paths)
+        return False, ()
+
+    cmd = Path(invocation.argv[0]).name.lower()
+    is_mutating = bool(invocation.target_paths)
+    derived_targets: list[str] = []
+
+    if cmd in _MUTATING_COMMANDS:
+        is_mutating = True
+        for arg in invocation.argv[1:]:
+            if not arg.startswith("-"):
+                derived_targets.append(arg)
+    elif cmd == "env":
+        inner_argv: list[str] = []
+        split_string_cmd: str | None = None
+        i = 1
+        while i < len(invocation.argv):
+            arg = invocation.argv[i]
+            if arg in ("-i", "-0", "-v"):
+                i += 1
+                continue
+            if arg in ("-S", "--split-string") and i + 1 < len(invocation.argv):
+                split_string_cmd = invocation.argv[i + 1]
+                i += 2
+                continue
+            if arg.startswith("-S") and len(arg) > 2:
+                split_string_cmd = arg[2:]
+                i += 1
+                continue
+            if arg.startswith("--split-string=") and len(arg) > len("--split-string="):
+                split_string_cmd = arg.split("=", 1)[1]
+                i += 1
+                continue
+            if arg in ("-u", "-C") and i + 1 < len(invocation.argv):
+                i += 2
+                continue
+            if "=" in arg and not arg.startswith(("/", ".")):
+                i += 1
+                continue
+            inner_argv = list(invocation.argv[i:])
+            break
+
+        if split_string_cmd:
+            try:
+                tokens = shlex.split(split_string_cmd)
+            except Exception:
+                tokens = split_string_cmd.split()
+            if tokens:
+                inner_argv = tokens + inner_argv
+
+        if inner_argv:
+            inner_inv = SandboxedInvocation(
+                argv=tuple(inner_argv),
+                cwd=invocation.cwd,
+                profile=invocation.profile,
+                environment=invocation.environment,
+                capability_token=invocation.capability_token,
+                authority_envelope=invocation.authority_envelope,
+                broker=invocation.broker,
+                target_paths=(),
+            )
+            inner_mut, inner_t = _detect_mutating_invocation(inner_inv)
+            if inner_mut:
+                is_mutating = True
+                derived_targets.extend(inner_t)
+        else:
+            is_mutating = True
+            derived_targets.append(str(invocation.cwd))
+    elif cmd == "find":
+        has_mutating_action = any(
+            arg in ("-delete", "-exec", "-execdir", "-ok", "-okdir")
+            for arg in invocation.argv[1:]
+        )
+        if has_mutating_action:
+            is_mutating = True
+            for arg in invocation.argv[1:]:
+                if arg.startswith("-"):
+                    break
+                derived_targets.append(arg)
+
+            for exec_flag in ("-exec", "-execdir", "-ok", "-okdir"):
+                if exec_flag in invocation.argv:
+                    idx = invocation.argv.index(exec_flag)
+                    cmd_parts: list[str] = []
+                    for part in invocation.argv[idx + 1:]:
+                        if part in (";", "+", "\\;"):
+                            break
+                        if part != "{}":
+                            cmd_parts.append(part)
+                    if cmd_parts:
+                        inner_exec_inv = SandboxedInvocation(
+                            argv=tuple(cmd_parts),
+                            cwd=invocation.cwd,
+                            profile=invocation.profile,
+                            environment=invocation.environment,
+                            capability_token=invocation.capability_token,
+                            authority_envelope=invocation.authority_envelope,
+                            broker=invocation.broker,
+                            target_paths=(),
+                        )
+                        emut, etargets = _detect_mutating_invocation(inner_exec_inv)
+                        if emut:
+                            derived_targets.extend(etargets)
+    elif cmd == "git" and len(invocation.argv) > 1:
+        git_dirs: list[str] = []
+        sub_idx = 1
+        i = 1
+        while i < len(invocation.argv):
+            arg = invocation.argv[i]
+            if arg == "-C" and i + 1 < len(invocation.argv):
+                git_dirs.append(invocation.argv[i + 1])
+                i += 2
+                continue
+            if arg.startswith("-C") and len(arg) > 2:
+                git_dirs.append(arg[2:])
+                i += 1
+                continue
+            if arg in ("--git-dir", "--work-tree") and i + 1 < len(invocation.argv):
+                git_dirs.append(invocation.argv[i + 1])
+                i += 2
+                continue
+            if arg.startswith(("--git-dir=", "--work-tree=")):
+                git_dirs.append(arg.split("=", 1)[1])
+                i += 1
+                continue
+            if not arg.startswith("-"):
+                sub_idx = i
+                break
+            i += 1
+        sub = invocation.argv[sub_idx].lower() if sub_idx < len(invocation.argv) else ""
+        if sub in _GIT_MUTATING_SUBCOMMANDS:
+            is_mutating = True
+            derived_targets.extend(git_dirs)
+            for arg in invocation.argv[sub_idx + 1:]:
+                if not arg.startswith("-"):
+                    derived_targets.append(arg)
+    else:
+        read_only_cmds = frozenset({
+            "echo", "ls", "cat", "pwd", "true", "false", "head", "tail",
+            "grep", "diff", "wc", "which", "id", "uname"
+        })
+        if cmd not in read_only_cmds:
+            is_mutating = True
+            for i, arg in enumerate(invocation.argv[1:], 1):
+                if arg in ("-c", "-command") and i < len(invocation.argv) - 1:
+                    code_str = invocation.argv[i + 1]
+                    path_matches = re.findall(r'(?:[\'"\s=]|^)(/[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*)', code_str)
+                    derived_targets.extend([p for p in path_matches if not p.startswith("/dev/")])
+                    derived_targets.append(str(invocation.cwd))
+                    break
+                elif arg.endswith((".py", ".sh", ".bash", ".zsh")):
+                    derived_targets.append(arg)
+                    break
+            if not derived_targets:
+                if invocation.profile.workspace_root is not None:
+                    derived_targets.append(str(invocation.profile.workspace_root))
+                else:
+                    derived_targets.append(str(invocation.cwd))
+
+    all_targets = list(dict.fromkeys(list(derived_targets) + list(invocation.target_paths)))
+    return is_mutating, tuple(all_targets)
+
+
+def verify_invocation_authority(
+    invocation: SandboxedInvocation,
+    *,
+    require_token: bool | None = None,
+) -> None:
+    """Enforce ELH-02 authority and capability confinement."""
+    is_mutating, effective_targets = _detect_mutating_invocation(invocation)
+    must_require_token = True if is_mutating else bool(require_token)
+
+    if is_mutating:
+        if invocation.authority_envelope is None:
+            raise AuthorityExpansionForbiddenError("Un-enveloped mutation attempt: AuthorityEnvelope required for mutating command")
+        if must_require_token and invocation.capability_token is None:
+            raise AuthorityExpansionForbiddenError("Un-tokenized mutation attempt: CapabilityToken required")
+        for p in effective_targets:
+            if not invocation.authority_envelope.contains_path(p, cwd=invocation.cwd):
+                raise AuthorityExpansionForbiddenError(f"Subprocess write attempt outside envelope: {p}")
+    elif must_require_token and invocation.capability_token is None:
+        raise AuthorityExpansionForbiddenError("Un-tokenized mutation attempt: CapabilityToken required")
+
+    if invocation.capability_token is not None:
+        if invocation.broker is None:
+            raise AuthorityExpansionForbiddenError("CapabilityToken verification requires active CapabilityBroker")
+        try:
+            b = invocation.capability_token.bound_to
+            op = "write" if is_mutating else (
+                invocation.capability_token.operations[0] if invocation.capability_token.operations else "read"
+            )
+            invocation.broker.verify(
+                invocation.capability_token,
+                goal_id=b.goal_id,
+                run_id=b.run_id,
+                stage=b.stage,
+                role=b.role,
+                operation=op,
+                current_seq=invocation.capability_token.issued_seq,
+                session=b.session,
+            )
+        except CapabilityError as exc:
+            raise AuthorityExpansionForbiddenError(f"CapabilityToken verification failed: {exc}") from exc
 
 
 class SandboxBackend(Protocol):
@@ -763,6 +999,127 @@ def _seatbelt_profile_text(
     return "\n".join(lines)
 
 
+def build_seatbelt_path_profile(
+    *,
+    read_roots: tuple[Path, ...],
+    write_roots: tuple[Path, ...],
+    allow_network: bool,
+    loopback_port: int | None = None,
+    read_files: tuple[Path, ...] = (),
+    read_probe_paths: tuple[Path, ...] = (),
+    network_hosts: tuple[str, ...] = (),
+    preference_domains: tuple[str, ...] = (),
+) -> str:
+    """Build the existing Seatbelt profile grammar for an explicit path boundary.
+
+    Provider workers need a narrower read boundary than the general sandbox profile exposes.
+    Keeping this compiler in the kernel backend makes the worker adapter reuse the established
+    OS mechanism rather than maintaining a second, subtly different policy language.
+    """
+
+    if isinstance(loopback_port, bool) or (
+        loopback_port is not None and not isinstance(loopback_port, int)
+    ):
+        raise SandboxError("loopback_port must be an integer or None")
+    if loopback_port is not None and not 1 <= loopback_port <= 65535:
+        raise SandboxError("loopback_port must be between 1 and 65535")
+    if allow_network and loopback_port is not None:
+        raise SandboxError("unscoped network cannot be combined with an exact loopback port")
+    if allow_network and network_hosts:
+        raise SandboxError("unscoped network cannot be combined with an endpoint allow-list")
+    if any(
+        not isinstance(host, str)
+        or not host
+        or len(host) > 253
+        or host.startswith(".")
+        or host.endswith(".")
+        or any(character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-" for character in host)
+        for host in network_hosts
+    ):
+        raise SandboxError("network endpoint allow-list is malformed")
+    if any(
+        not isinstance(domain, str)
+        or not domain
+        or len(domain) > 253
+        or any(
+            character
+            not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_"
+            for character in domain
+        )
+        for domain in preference_domains
+    ):
+        raise SandboxError("preference-domain allow-list is malformed")
+    roots = tuple(dict.fromkeys((*read_roots, *write_roots)))
+    if not roots or any(not path.is_absolute() for path in roots):
+        raise SandboxError("Seatbelt path profile requires absolute roots")
+    if any(any(character in str(path) for character in ('"', "\n", "\r")) for path in roots):
+        raise SandboxError("Seatbelt path profile contains an unsupported root")
+    dependency_files = tuple(dict.fromkeys(read_files))
+    if any(not path.is_absolute() for path in dependency_files):
+        raise SandboxError("Seatbelt path profile requires absolute dependency files")
+    if any(
+        any(character in str(path) for character in ('"', "\n", "\r"))
+        or not path.is_file()
+        or path.is_symlink()
+        for path in dependency_files
+    ):
+        raise SandboxError("Seatbelt path profile contains an unavailable dependency file")
+    probe_paths = tuple(dict.fromkeys(read_probe_paths))
+    if any(
+        not path.is_absolute()
+        or ".." in path.parts
+        or any(character in str(path) for character in ('"', "\n", "\r"))
+        for path in probe_paths
+    ):
+        raise SandboxError("Seatbelt path profile contains an invalid read probe path")
+    ancestors: set[Path] = {Path("/")}
+    for path in (*roots, *dependency_files, *probe_paths):
+        parent = path.parent
+        while parent != Path("/"):
+            ancestors.add(parent)
+            parent = parent.parent
+    ordered_ancestors = tuple(sorted(ancestors, key=lambda item: (len(item.parts), str(item))))
+    if allow_network:
+        network_rules = ("(allow network*)",)
+    elif loopback_port is not None:
+        network_rules = (
+            f'(allow network-outbound (remote tcp "localhost:{loopback_port}"))',
+        )
+    elif network_hosts:
+        network_rules = tuple(
+            f'(allow network-outbound (remote tcp "{host}:443"))'
+            for host in sorted(dict.fromkeys(network_hosts))
+        )
+    else:
+        network_rules = ("(deny network*)",)
+    lines = [
+        "(version 1)",
+        "(deny default)",
+        '(deny file-read* (subpath "/"))',
+        '(deny file-write* (subpath "/"))',
+        "(allow process-fork)",
+        "(allow process-exec)",
+        "(allow mach-lookup)",
+        "(allow signal)",
+        "(allow sysctl*)",
+        *[f'(allow file-read* (literal "{path}"))' for path in ordered_ancestors],
+        *[f'(allow file-read* (subpath "{path}"))' for path in read_roots],
+        *[f'(allow file-read* (literal "{path}"))' for path in dependency_files],
+        *[f'(allow file-read* (literal "{path}"))' for path in probe_paths],
+        *[f'(allow file-write* (literal "{path}"))' for path in ordered_ancestors],
+        *[f'(allow file-write* (subpath "{path}"))' for path in write_roots],
+        '(allow file-read* (literal "/dev/null"))',
+        '(allow file-write* (literal "/dev/null"))',
+        '(allow file-write* (literal "/dev/tty"))',
+    ]
+    lines.extend(
+        f'(allow user-preference-read (preference-domain "{domain}"))'
+        for domain in sorted(dict.fromkeys(preference_domains))
+    )
+    lines.extend(network_rules)
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # The confining backend. `supports()` is a thin boolean view of the negotiation;
 # `run()` executes the negotiated profile verbatim and is the only execution
@@ -855,6 +1212,10 @@ class _ConfiningBackend:
         raise NotImplementedError
 
     def run(self, invocation: SandboxedInvocation) -> SandboxResult:
+        verify_invocation_authority(
+            invocation,
+            require_token=None,
+        )
         profile = invocation.profile
         negotiation = self.negotiate(profile)
         if not negotiation.enforceable:
@@ -1088,7 +1449,7 @@ class _ConfiningBackend:
                 )
             )
 
-    def _teardown_group(self, pgid: int, facts: list[RunFact], grace: float = 2.0) -> None:
+    def _teardown_group(self, pgid: int, facts: list[RunFact], grace: float = 4.0) -> None:
         try:
             os.killpg(pgid, 0)
         except ProcessLookupError:
@@ -1102,15 +1463,16 @@ class _ConfiningBackend:
             )
             return
         except OSError as exc:
-            facts.append(
-                _fact(
-                    FactKind.CLEANUP_ERROR,
-                    None,
-                    "killpg_ladder",
-                    f"killpg probe failed: errno {exc.errno}",
+            if exc.errno != errno.EPERM:
+                facts.append(
+                    _fact(
+                        FactKind.CLEANUP_ERROR,
+                        None,
+                        "killpg_ladder",
+                        f"killpg probe failed: errno {exc.errno}",
+                    )
                 )
-            )
-            return
+                return
         self._kill_group(pgid, facts)
         end = time.monotonic() + grace
         while True:
@@ -1127,15 +1489,16 @@ class _ConfiningBackend:
                 )
                 return
             except OSError as exc:
-                facts.append(
-                    _fact(
-                        FactKind.CLEANUP_ERROR,
-                        None,
-                        "killpg_ladder",
-                        f"killpg probe failed: errno {exc.errno}",
+                if exc.errno != errno.EPERM:
+                    facts.append(
+                        _fact(
+                            FactKind.CLEANUP_ERROR,
+                            None,
+                            "killpg_ladder",
+                            f"killpg probe failed: errno {exc.errno}",
+                        )
                     )
-                )
-                return
+                    return
             if time.monotonic() >= end:
                 facts.append(
                     _fact(

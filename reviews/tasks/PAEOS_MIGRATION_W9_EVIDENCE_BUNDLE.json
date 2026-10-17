@@ -1,0 +1,98 @@
+{
+  "court_run_id": "court-run-w9-20260906-100951",
+  "timestamp": "2026-09-06T10:09:51.198314+00:00",
+  "artifact_hash": "86ed3fbadbafb10b3726acf627bc34f1698263adc92858710ff0ab140f22076c",
+  "verdict": "PASS",
+  "claims_evaluated": 8,
+  "unmet_claims": [],
+  "evidence_bundle": [
+    {
+      "claim_id": "CLAIM-W9-01-RECURSIVE-LEARNING-SHADOW-TRACE",
+      "evidence_hash": "79e383a013045eb5cdf09bc8211e738e8535a408919be9109f8750cd7224180f",
+      "statement": "Exit Gate 1: Verifies fully traceable 7-step recursive learning shadow proof and replay provenance",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_orca_mission_control_adapter.py', '-k', 'test_recursive_learning_trace'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('RECURSIVE_LEARNING_SHADOW_TRACE_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "RECURSIVE_LEARNING_SHADOW_TRACE_PASS\n"
+      },
+      "actual_stdout": "RECURSIVE_LEARNING_SHADOW_TRACE_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-02-ZERO-CRITICAL-DATA-LOSS-ANOMALIES",
+      "evidence_hash": "1390005eeab3020a249f194ad17abb54dc9fd7ef847c6a7d486b887e2a808f84",
+      "statement": "Exit Gate 2: Verifies duplicate mission/candidate quarantine isolation and fail-closed provider outage routing",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_orca_mission_control_adapter.py', '-k', 'test_zero_critical_anomalies'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('ZERO_CRITICAL_DATA_LOSS_ANOMALIES_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "ZERO_CRITICAL_DATA_LOSS_ANOMALIES_PASS\n"
+      },
+      "actual_stdout": "ZERO_CRITICAL_DATA_LOSS_ANOMALIES_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-03-FAILOVER-AND-STALE-PROJECTION-RECOVERY",
+      "evidence_hash": "4ba9b16ff1f4da65a450b057d978a6eaf8a37ba4e947dd55990e2c55d6bb9718",
+      "statement": "Exit Gate 3: Verifies break-glass direct PAEOS entry, stale projection rejection, and Orca outage recovery",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_orca_mission_control_adapter.py', '-k', 'test_failover_recovery'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('FAILOVER_AND_STALE_PROJECTION_RECOVERY_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "FAILOVER_AND_STALE_PROJECTION_RECOVERY_PASS\n"
+      },
+      "actual_stdout": "FAILOVER_AND_STALE_PROJECTION_RECOVERY_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-04-FOUNDER-GATE-ENFORCEMENT",
+      "evidence_hash": "1f962bc0649fec62753d6a5a09ebb1b739140af7d6ed30f1bc4038ac0d8d5c00",
+      "statement": "Exit Gate 4: Verifies hard Founder Gate strictly blocks unratified authority cutovers and rehearses rollback",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_orca_mission_control_adapter.py', '-k', 'test_founder_gate_blocks_cutover'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('FOUNDER_GATE_ENFORCEMENT_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "FOUNDER_GATE_ENFORCEMENT_PASS\n"
+      },
+      "actual_stdout": "FOUNDER_GATE_ENFORCEMENT_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-05-CANARY-DISCRIMINATION",
+      "evidence_hash": "98091f034204b5e336234bd9f8533eaa8a608f5d566a9fc42f019ba4091695ae",
+      "statement": "CANARY-0002: Non-vacuous court evidence discrimination proving verifier actively rejects unratified live cutover",
+      "reproducible_command": "uv run python -c \"from contracts.orca_mission_control_adapter import OrcaMissionControlAdapter, FounderAuthorityGateLockedError;\nadapter = OrcaMissionControlAdapter();\ntry:\n    adapter.activate_live_cutover('');\n    raise AssertionError('Should have raised FounderAuthorityGateLockedError');\nexcept FounderAuthorityGateLockedError:\n    pass;\nprint('CANARY_DISCRIMINATION_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "CANARY_DISCRIMINATION_PASS\n"
+      },
+      "actual_stdout": "CANARY_DISCRIMINATION_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-06-PAID-ROUTING-PROHIBITED",
+      "evidence_hash": "71c73456fce83bbe038e051740fac6ee0f3020633268ecb1cf9a3a7c55afb95d",
+      "statement": "Exit Gate 5: Verifies fail-closed prohibition on pay-per-token routing ($0 marginal cost leakage)",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_orca_mission_control_adapter.py', '-k', 'test_paid_routing_fail_closed_prohibition'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('PAID_ROUTING_PROHIBITED_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "PAID_ROUTING_PROHIBITED_PASS\n"
+      },
+      "actual_stdout": "PAID_ROUTING_PROHIBITED_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-07-SENTIUM-QUARANTINE-AND-NO-CAPITAL-PRESERVED",
+      "evidence_hash": "01d12d7d7746a062dbd18c97e5147e9d7d3658fcb048e36c8c004acad9ca9cf7",
+      "statement": "Exit Gate 6: Verifies Sentium candidate admission strictly enforces quarantine-only boundary and prohibits capital state",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_orca_mission_control_adapter.py', '-k', 'test_sentium_quarantine_and_no_capital_boundary_preserved'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('SENTIUM_QUARANTINE_AND_NO_CAPITAL_PRESERVED_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "SENTIUM_QUARANTINE_AND_NO_CAPITAL_PRESERVED_PASS\n"
+      },
+      "actual_stdout": "SENTIUM_QUARANTINE_AND_NO_CAPITAL_PRESERVED_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W9-08-FOUNDER-RATIFIED-CUTOVER-ACTIVE",
+      "evidence_hash": "259601b2b9c4f6205c5e50dc7360769b7a7a6964733ff4562054f65f8135455f",
+      "statement": "Exit Gate 7: Verifies Founder-ratified live authority cutover is active with valid token and preserved invariants",
+      "reproducible_command": "uv run python -c \"from contracts.orca_mission_control_adapter import OrcaMissionControlAdapter;\nadapter = OrcaMissionControlAdapter(load_persisted=True);\nstate = adapter.get_gate_state();\nassert state.is_locked is False, 'Gate should be unlocked';\nassert state.cutover_permitted is True, 'Cutover should be permitted';\nassert state.live_routing_active is True, 'Live routing should be active';\nassert state.ratification_token.startswith('FOUNDER-RATIFY-'), 'Invalid token';\nprint('FOUNDER_RATIFIED_CUTOVER_ACTIVE_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "FOUNDER_RATIFIED_CUTOVER_ACTIVE_PASS\n"
+      },
+      "actual_stdout": "FOUNDER_RATIFIED_CUTOVER_ACTIVE_PASS\n"
+    }
+  ]
+}

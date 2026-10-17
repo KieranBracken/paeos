@@ -95,6 +95,15 @@ amendment may change constitutional law.
   only buffer (waiting longer for session limit reset). Status: **RATIFIED BY FOUNDER** (2026-08-05).
 
 - `PAEOS-IP-0015-l14-report-binding-and-accounting.md` — Cryptographically bind L14 reports to
-  physical receipts and enforce canonical worker/Court accounting (source: Gate C headless
-  supervisor L14 review). Status: **AWAITING FOUNDER RATIFICATION**.
+physical receipts and enforce canonical worker/Court accounting (source: Gate C headless
+supervisor L14 review). Status: **AWAITING FOUNDER RATIFICATION**.
 
+- `PAEOS-IP-0018.md` — Parent-owned source-task acceptance and child-dispatch custody boundary
+  for DEBT-0249. Status: **DRAFT — NOT RATIFIED**; conditional adapter over existing kernel
+  TaskPackage/CapabilityBroker/Ledger/CAS, with CER-6 escalation if the accountable parent
+  producer and source-of-truth cannot be evidenced.
+
+- `PAEOS-IP-0019.md` — Board-labeled D0258 authority workstream: first-install Genesis
+  provisioning and operational L19 crosswalk, distinct from canonical DEBT-0258. Status:
+  **REGISTERED DRAFT — NOT SUBMITTED, NOT ADMITTED, NOT RATIFIED**; source draft SHA-256
+  `b3cbea3343079842afbaf16f56e6829f1f676b2fa19f41ddcde4a20c0f1443c8`.

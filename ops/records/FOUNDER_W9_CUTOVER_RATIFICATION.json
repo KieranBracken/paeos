@@ -1,0 +1,16 @@
+{
+  "gate_id": "GATE-FOUNDER-W9-AUTHORITY-CUTOVER",
+  "ratification_token": "FOUNDER-RATIFY-W9-AUTHORITY-CUTOVER-20260906T020813",
+  "authorizing_founder": "Founder",
+  "ratified_at": "2026-09-06T01:08:13Z",
+  "live_cutover_permitted": true,
+  "live_routing_active": true,
+  "invariants_preserved": {
+    "fail_closed_pay_per_token_prohibition": true,
+    "sentium_quarantine_only_boundary": true,
+    "sentium_no_capital_state_or_execution_boundary": true,
+    "paeos_canonical_engineering_state_ownership": true,
+    "orca_advisory_resource_coordination_only": true,
+    "heterogeneous_audit_separation": true
+  }
+}

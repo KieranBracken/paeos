@@ -66,6 +66,14 @@ def test_claim_with_no_evidence_is_remanded() -> None:
     assert court.adjudicate(_ART, [empty]).outcome is VerdictOutcome.REMAND
 
 
+def test_reproducibly_failing_verification_is_remanded() -> None:
+    """A matching non-zero verifier result is still a failed verification obligation."""
+    court = Court()
+    ev = _evidence(command="false", result={"exit_code": 1, "stdout": ""})
+    court.submit_evidence(ev)
+    assert court.adjudicate(_ART, [_claim(ev)]).outcome is VerdictOutcome.REMAND
+
+
 def test_submit_is_inert_until_adjudicate() -> None:
     court = Court()
     ev = _evidence(command="echo real", result={"exit_code": 0, "stdout": "real\n"})

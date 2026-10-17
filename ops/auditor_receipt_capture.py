@@ -164,11 +164,16 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--receipt-path", required=True, type=Path)
     parser.add_argument("--max-tokens", type=int, default=512)
     parser.add_argument("--auditor-model")
+    parser.add_argument("--builder-family", default="glm")
+    parser.add_argument("--builder-provider", default="cline-pass")
+    parser.add_argument("--builder-model-id", default="z-ai/glm-5.3-flash")
+    parser.add_argument("--worker-counts", type=int, nargs=3, default=[0, 1, 0])
+    parser.add_argument("--court-counts", type=int, nargs=3, default=[0, 0, 0])
     args = parser.parse_args(argv)
     if not args.audit_id or any(character.isspace() for character in args.audit_id):
         parser.error("--audit-id must be non-empty and contain no whitespace")
-    if not _SHA40.fullmatch(args.candidate_sha):
-        parser.error("--candidate-sha must be a lowercase 40-character commit SHA")
+    if not (_SHA40.fullmatch(args.candidate_sha) or _SHA64.fullmatch(args.candidate_sha)):
+        parser.error("--candidate-sha must be a lowercase 40- or 64-character candidate SHA")
     if not _SHA64.fullmatch(args.evidence_sha):
         parser.error("--evidence-sha must be a lowercase 64-character SHA-256")
     if args.max_tokens <= 0:
@@ -191,6 +196,12 @@ def run(argv: list[str] | None = None) -> int:
             raise AuditorReceiptError("--report-path must be absolute")
         prompt = prompt_file.read_text(encoding="utf-8")
         validate_substantive_audit_prompt(prompt, args.candidate_sha, args.evidence_sha)
+
+        try:
+            builder_family = ModelFamily(args.builder_family.lower())
+        except ValueError:
+            builder_family = ModelFamily.UNKNOWN
+
         request = TaskRequest(
             messages=[
                 {
@@ -213,7 +224,7 @@ def run(argv: list[str] | None = None) -> int:
             data_class=DataClass.INTERNAL,
             logical_model=LogicalModel.PAEOS_AUDIT,
             explicit_model=args.auditor_model,
-            builder_family=ModelFamily.GLM,
+            builder_family=builder_family,
             max_tokens=args.max_tokens,
             temperature=0.0,
             retry_policy=RetryPolicy.NONE,
@@ -224,11 +235,11 @@ def run(argv: list[str] | None = None) -> int:
             candidate_sha256=args.candidate_sha,
             evidence_bundle_sha256=args.evidence_sha,
             review_scope_sha256=request_fingerprint(request),
-            builder_provider="cline-pass",
-            builder_model_id="z-ai/glm-5.3-flash",
-            builder_family=ModelFamily.GLM,
-            expected_worker_counts=(0, 1, 0),
-            expected_court_counts=(0, 0, 0),
+            builder_provider=args.builder_provider,
+            builder_model_id=args.builder_model_id,
+            builder_family=builder_family,
+            expected_worker_counts=tuple(args.worker_counts),
+            expected_court_counts=tuple(args.court_counts),
         )
         router = ModelRouter()
         interaction = capture_auditor_interaction(router, contract, request)

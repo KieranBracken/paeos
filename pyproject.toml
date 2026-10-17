@@ -27,13 +27,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["kernel", "runtime", "cli", "sakg"]
+packages = ["kernel", "runtime", "cli", "sakg", "concept"]
 
 # ---- ruff (lint + format) -------------------------------------------------
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["kernel", "runtime", "cli", "tests"]
+src = ["kernel", "runtime", "cli", "tests", "concept"]
 # Vendored/tooling dirs are not PAEOS source and are not linted.
 extend-exclude = [".agents", ".claude", ".runtime", "spec 2", "misc", "ops"]
 
@@ -49,7 +49,7 @@ pythonVersion = "3.12"
 typeCheckingMode = "standard"
 reportUnknownMemberType = false
 reportMatchNotExhaustive = true
-include = ["kernel", "runtime", "cli", "sakg"]
+include = ["kernel", "runtime", "cli", "sakg", "concept"]
 exclude = ["**/__pycache__", ".venv", ".agents", ".claude", "tests"]
 strict = ["kernel"]   # TCB is strictly typed
 

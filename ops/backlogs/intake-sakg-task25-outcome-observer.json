@@ -1,0 +1,25 @@
+[
+  {
+    "objective": "Execute SAKG-2 Task 25 [I-S3-OUTCOME-LOOP] under SAEOS-1 §2.2 and §3.2. Implement sakg/outcome_observer.py as an automated longitudinal outcome observer and belief revision loop: observe runtime outcomes (such as test regressions, scars, debt records, or court remands and recoveries), mint schema-compliant candidate Outcome nodes in the live SAKG SQLite GraphStore (sakg.db), and link them via typed outcome or revises edges to their source Decision and TradeOff nodes. Author comprehensive tests in tests/sakg/test_outcome_observer.py verifying deterministic Outcome node generation, idempotent updates, belief revision state transitions, and fail-closed handling of unbound decisions.",
+    "accept": [
+      "uv run pytest tests/sakg/test_outcome_observer.py -q",
+      "uv run pytest tests/sakg/ -q",
+      "uv run pytest tests/kae/test_citation_pipeline.py -q",
+      "No runtime, kernel, protected ref, main/trunk, or historical evidence mutation"
+    ],
+    "changed_paths": [
+      "sakg/outcome_observer.py",
+      "tests/sakg/test_outcome_observer.py"
+    ],
+    "plan_write_scopes": [
+      "sakg/outcome_observer.py",
+      "tests/sakg/test_outcome_observer.py",
+      "sakg/store.py",
+      "sakg/extract.py"
+    ],
+    "goal_signature": "domain:sakg,task:task-25-outcome-observer",
+    "verifiable": true,
+    "reversible": true,
+    "builder_evidence": []
+  }
+]

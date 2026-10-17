@@ -136,10 +136,20 @@ def build_sakg_mcp_server(
         max_tokens: int = _DEFAULT_MAX_TOKENS,
     ) -> dict[str, object]:
         """Return ranked, advisory TradeOff precedents without any write capability."""
-        if not isinstance(subject, str) or not subject.strip():
-            raise ValueError("subject must be a non-empty string")
         max_nodes_value = _positive(max_nodes, "max_nodes")
         max_tokens_value = _positive(max_tokens, "max_tokens")
+        subject_value = subject.strip()
+        if not subject_value or not axes:
+            return {
+                "provenance": "sakg",
+                "trust": "untrusted",
+                "tier": tier,
+                "method": "tradeoff_precedents",
+                "subject": subject_value,
+                "results": [],
+                "truncated": False,
+                "omitted": 0,
+            }
         try:
             raw = tradeoff_precedents(
                 tuple(node for node in node_snapshot if node.get("type") in {None, "TradeOff"}),
@@ -158,7 +168,7 @@ def build_sakg_mcp_server(
             "trust": "untrusted",
             "tier": tier,
             "method": "tradeoff_precedents",
-            "subject": subject.strip(),
+            "subject": subject_value,
             "results": results,
             "truncated": omitted > 0,
             "omitted": omitted,

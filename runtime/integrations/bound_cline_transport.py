@@ -23,6 +23,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import BinaryIO, cast
 
+from kernel.sandbox import SandboxError, allowlisted_path, run_sandboxed_argv
 from paeos.model_router.types import ModelFamily
 
 from .bridge_protocol import (
@@ -44,6 +45,7 @@ from .cline_sdk_protocol import (
     ProtocolError,
     encode_frame,
 )
+from .process_supervisor import ProcessLifecycleState
 
 __all__ = [
     "BoundWorkerConfig",
@@ -555,19 +557,22 @@ def _execute_approved_tool(
             raise TransportProtocolError("command is not safely tokenized") from exc
         if not argv:
             raise TransportProtocolError("command is empty")
-        completed = subprocess.run(
-            argv,
+        result = run_sandboxed_argv(
+            tuple(argv),
             cwd=workspace,
-            env={"LANG": "C.UTF-8", "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin"},
-            shell=False,
-            capture_output=True,
-            check=False,
-            timeout=30,
+            environment={"LC_ALL": "C", "PATH": allowlisted_path()},
         )
+        exit_code = 124 if result.timed_out else result.exit_code
         return {
-            "exit_code": completed.returncode,
-            "stdout_sha256": hashlib.sha256(completed.stdout).hexdigest(),
-            "stderr_sha256": hashlib.sha256(completed.stderr).hexdigest(),
+            "argv": list(result.argv),
+            "cwd": ".",
+            "environment_fingerprint": result.environment_fingerprint,
+            "executable": result.executable,
+            "executable_version": result.executable_version,
+            "exit_code": exit_code,
+            "stderr_sha256": hashlib.sha256(result.stderr.encode()).hexdigest(),
+            "stdout_sha256": hashlib.sha256(result.stdout.encode()).hexdigest(),
+            "duration_ms": result.duration_ms,
         }
     raise TransportProtocolError("unsupported tool")
 
@@ -617,6 +622,93 @@ def _fsync_directory(path: Path) -> None:
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
+
+
+def _lifecycle_state_path(config: BoundWorkerConfig, request: RequestEnvelope) -> Path:
+    """Return a state-root-owned lifecycle path for this immutable invocation."""
+
+    return config.state_root / "worker-lifecycle" / f"{_safe_component(request.request_id)}.json"
+
+
+def _write_lifecycle_state(path: Path, state: dict[str, object]) -> None:
+    """Atomically persist a secret-blind lifecycle snapshot."""
+
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path.parent, 0o700)
+    payload = (json.dumps(state, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        offset = 0
+        while offset < len(payload):
+            written = os.write(descriptor, payload[offset:])
+            if written <= 0:
+                raise OSError("lifecycle state write made no progress")
+            offset += written
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    os.replace(temporary, path)
+    _fsync_directory(path.parent)
+
+
+class _LifecycleRecorder:
+    """Persist transport liveness separately from stage/layer advancement."""
+
+    def __init__(self, request: RequestEnvelope, config: BoundWorkerConfig, argv: list[str]) -> None:
+        self._started_at = time.monotonic()
+        self._path = _lifecycle_state_path(config, request)
+        environment = {
+            "CLINE_DATA_DIR": str(config.state_root),
+            "LANG": "C.UTF-8",
+            "PATH": allowlisted_path(),
+        }
+        self._state: dict[str, object] = {
+            "schema": "paeos.worker-lifecycle/1",
+            "request_id": request.request_id,
+            "transaction_key": request.transaction_key,
+            "argv": argv,
+            "executable": str(config.node_executable.resolve()),
+            "executable_version": "sha256:" + _hash_bytes(config.node_executable.read_bytes()),
+            "cwd": request.workspace_root,
+            "environment_fingerprint": _hash_bytes(
+                json.dumps(environment, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            ),
+            "pid": None,
+            "events": [],
+            "terminal_state": ProcessLifecycleState.NOT_STARTED.value,
+            "heartbeat_count": 0,
+        }
+        self.record(ProcessLifecycleState.NOT_STARTED, reason="invocation accepted")
+
+    def record(
+        self,
+        state: ProcessLifecycleState,
+        *,
+        reason: str,
+        pid: int | None = None,
+        protocol_event: str | None = None,
+    ) -> None:
+        events = self._state["events"]
+        assert isinstance(events, list)
+        event: dict[str, object] = {
+            "state": state.value,
+            "reason": reason,
+            "elapsed_ms": int((time.monotonic() - self._started_at) * 1000),
+        }
+        if protocol_event is not None:
+            event["protocol_event"] = protocol_event
+        events.append(event)
+        self._state["terminal_state"] = state.value
+        if pid is not None:
+            self._state["pid"] = pid
+        if state is ProcessLifecycleState.RUNNING:
+            self._state["heartbeat_count"] = int(self._state["heartbeat_count"]) + 1
+        _write_lifecycle_state(self._path, self._state)
+
+    @property
+    def path(self) -> Path:
+        return self._path
 
 
 def _safe_component(value: str) -> str:
@@ -729,9 +821,28 @@ def _stop_process(
             with suppress(ProcessLookupError):
                 os.killpg(process.pid, signal.SIGKILL)
             process.wait(timeout=1)
-    if process.stderr is None:
+    return _drain_pipe(process.stderr, timeout_s=0.2)
+
+
+def _drain_pipe(stream: BinaryIO | None, *, timeout_s: float) -> bytes:
+    """Drain available bytes without allowing a descendant-held pipe to block the host."""
+
+    if stream is None:
         return b""
-    return process.stderr.read()
+    chunks: list[bytes] = []
+    deadline = time.monotonic() + timeout_s
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0 or not select.select([stream], [], [], remaining)[0]:
+            break
+        try:
+            chunk = os.read(stream.fileno(), 65536)
+        except OSError:
+            break
+        if not chunk:
+            break
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _read_frame_until(stream: BinaryIO, deadline: float) -> dict[str, object]:
@@ -743,7 +854,13 @@ def _read_frame_until(stream: BinaryIO, deadline: float) -> dict[str, object]:
             remaining = deadline - time.monotonic()
             if remaining <= 0 or not select.select([stream], [], [], remaining)[0]:
                 raise TimeoutError("worker frame read deadline exceeded")
-            chunk = stream.read(size - len(data))
+            # Do not use BufferedReader.read here.  It may wait for the full requested
+            # length after select() reported only a partial frame, defeating the per-byte
+            # deadline and allowing a silent worker to hold the parent indefinitely.
+            try:
+                chunk = os.read(stream.fileno(), size - len(data))
+            except OSError as exc:
+                raise ProtocolError("worker frame read failed") from exc
             if not chunk:
                 raise ProtocolError("truncated frame")
             data.extend(chunk)
@@ -791,6 +908,39 @@ def _run_host_once(
         "sequence": 0,
         "type": "start",
     }
+    lifecycle = _LifecycleRecorder(
+        request,
+        config,
+        argv=[str(config.node_executable), str(config.host_module)],
+    )
+
+    def fail(
+        request: RequestEnvelope,
+        kind: TransportFailureKind,
+        message: str,
+        stdout: bytes,
+        stderr: bytes,
+        *,
+        exit_code: int | None = None,
+        certainty: SideEffectCertainty = SideEffectCertainty.NOT_DISPATCHED,
+    ) -> WorkerDispatchFailure:
+        result = _failure(
+            request,
+            kind,
+            message,
+            stdout,
+            stderr,
+            exit_code=exit_code,
+            certainty=certainty,
+        )
+        lifecycle.record(
+            ProcessLifecycleState.TIMED_OUT
+            if kind is TransportFailureKind.TIMEOUT
+            else ProcessLifecycleState.FAILED,
+            reason=message,
+        )
+        return result
+
     try:
         process = subprocess.Popen(
             argv,
@@ -807,8 +957,9 @@ def _run_host_once(
             stderr=subprocess.PIPE,
             bufsize=0,
         )
-    except OSError as exc:
-        return _failure(request, TransportFailureKind.PROCESS_FAILED, str(exc), b"", b"")
+    except OSError:
+        return fail(request, TransportFailureKind.PROCESS_FAILED, "worker failed to launch", b"", b"")
+    lifecycle.record(ProcessLifecycleState.STARTED, reason="launch acknowledged", pid=process.pid)
     assert process.stdin is not None and process.stdout is not None
     process.stdin.write(encode_frame(start))
     process.stdin.flush()
@@ -833,7 +984,7 @@ def _run_host_once(
                     session_id=config.session_id,
                     sequence=command_sequence,
                 )
-                return _failure(
+                return fail(
                     request,
                     TransportFailureKind.TIMEOUT,
                     "worker deadline exceeded",
@@ -847,6 +998,12 @@ def _run_host_once(
             event_type = event["type"]
             payload = event["payload"]
             assert isinstance(payload, dict)
+            lifecycle.record(
+                ProcessLifecycleState.RUNNING,
+                reason="validated protocol event observed",
+                pid=process.pid,
+                protocol_event=str(event_type),
+            )
             if event_type == "provider_attempt_started":
                 turn_id = payload.get("turn_id")
                 if not isinstance(turn_id, str):
@@ -859,7 +1016,7 @@ def _run_host_once(
                         session_id=config.session_id,
                         sequence=command_sequence,
                     )
-                    return _failure(
+                    return fail(
                         request,
                         TransportFailureKind.PROVIDER_ATTEMPT_OVERFLOW,
                         "more than one provider attempt in a model turn",
@@ -882,7 +1039,7 @@ def _run_host_once(
                         request=request, policy=policy, tool_name=tool_name, tool_input=tool_input
                     )
                     decision.update({"approved": True, "result": result})
-                except (OSError, subprocess.SubprocessError, TransportProtocolError) as exc:
+                except (OSError, SandboxError, subprocess.SubprocessError, TransportProtocolError) as exc:
                     kind = (
                         TransportFailureKind.COMMAND_MISMATCH
                         if tool_name == "run_commands"
@@ -894,7 +1051,7 @@ def _run_host_once(
                         session_id=config.session_id,
                         sequence=command_sequence,
                     )
-                    return _failure(
+                    return fail(
                         request,
                         kind,
                         str(exc),
@@ -927,7 +1084,7 @@ def _run_host_once(
                     session_id=config.session_id,
                     sequence=command_sequence,
                 )
-                return _failure(
+                return fail(
                     request,
                     TransportFailureKind.PROCESS_FAILED,
                     f"worker emitted {event_type}",
@@ -949,7 +1106,7 @@ def _run_host_once(
             if isinstance(exc, (ProtocolError, ValueError))
             else TransportFailureKind.PROCESS_FAILED
         )
-        return _failure(
+        return fail(
             request,
             kind,
             str(exc),
@@ -967,7 +1124,7 @@ def _run_host_once(
                 session_id=config.session_id,
                 sequence=command_sequence,
             )
-            return _failure(
+            return fail(
                 request,
                 TransportFailureKind.PROTOCOL_VIOLATION,
                 "post-terminal frame emitted",
@@ -985,7 +1142,7 @@ def _run_host_once(
             session_id=config.session_id,
             sequence=command_sequence,
         )
-        return _failure(
+        return fail(
             request,
             TransportFailureKind.TIMEOUT,
             str(exc),
@@ -993,9 +1150,9 @@ def _run_host_once(
             stderr,
             certainty=SideEffectCertainty.UNKNOWN,
         )
-    stderr = process.stderr.read() if process.stderr is not None else b""
+    stderr = _drain_pipe(process.stderr, timeout_s=0.2)
     if process.returncode != 0 or terminal_payload is None:
-        return _failure(
+        return fail(
             request,
             TransportFailureKind.PROCESS_FAILED,
             "worker exited without a confirmed terminal response",
@@ -1004,6 +1161,12 @@ def _run_host_once(
             exit_code=process.returncode,
             certainty=SideEffectCertainty.UNKNOWN,
         )
+    lifecycle.record(
+        ProcessLifecycleState.RETURNED,
+        reason="terminal protocol accepted and process exited",
+        pid=process.pid,
+        protocol_event="terminal",
+    )
     return WorkerDispatchSuccess(
         request_id=request.request_id,
         transaction_key=request.transaction_key,

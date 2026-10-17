@@ -1,0 +1,87 @@
+{
+  "court_run_id": "court-run-w8-20260905-231438",
+  "timestamp": "2026-09-05T23:14:38.791687+00:00",
+  "artifact_hash": "3672b18a9a65f7d993fd4812ac55cd93d518f8263ea494c1183c4653e5f3b501",
+  "verdict": "PASS",
+  "claims_evaluated": 7,
+  "unmet_claims": [],
+  "evidence_bundle": [
+    {
+      "claim_id": "CLAIM-W8-01-VECTORS-AND-TAMPER",
+      "evidence_hash": "d647ba3a36a0bc0536d97db2a84a9426f0a3df9029dcf6a048c37c9908aea07b",
+      "statement": "Exit Gate 1: Verifies signed package conformance matrix across valid, tampered, wrong-key, wrong-context, and replay vectors",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_sentium_shadow_conformance_harness.py', '-k', 'test_vectors_and_tamper'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('VECTORS_AND_TAMPER_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "VECTORS_AND_TAMPER_PASS\n"
+      },
+      "actual_stdout": "VECTORS_AND_TAMPER_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W8-02-FORBIDDEN-ACTION-LANGUAGE",
+      "evidence_hash": "d08ac01fa06d8365c8a1d93dce8e402a4f00b215a3c6c2cdf2d37758baec5e62",
+      "statement": "Exit Gate 2a: Verifies rejection of forbidden authority language and execution directives",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_sentium_shadow_conformance_harness.py', '-k', 'test_forbidden_authority_language'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('FORBIDDEN_ACTION_LANGUAGE_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "FORBIDDEN_ACTION_LANGUAGE_PASS\n"
+      },
+      "actual_stdout": "FORBIDDEN_ACTION_LANGUAGE_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W8-03-QUARANTINE-ONLY",
+      "evidence_hash": "d33d964c52a4aeef70cfaa3cd7f13258100b4d738ad145028851680ec7f20a96",
+      "statement": "Exit Gate 2b: Verifies quarantine-only initial reception and strict prohibition of live production admission",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_sentium_shadow_conformance_harness.py', '-k', 'test_quarantine_only'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('QUARANTINE_ONLY_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "QUARANTINE_ONLY_PASS\n"
+      },
+      "actual_stdout": "QUARANTINE_ONLY_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W8-04-NO-CAPITAL-STATE",
+      "evidence_hash": "73df1c3f1ee5c5c455d8a015c2ccaf1ff41b9c1dd475a8862e23941aa74fd7b8",
+      "statement": "Exit Gate 3: Verifies signed redacted outcome vectors with absolute zero capital state or trade directives",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_sentium_shadow_conformance_harness.py', '-k', 'test_no_capital_state'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('NO_CAPITAL_STATE_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "NO_CAPITAL_STATE_PASS\n"
+      },
+      "actual_stdout": "NO_CAPITAL_STATE_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W8-05-DURABLE-REPLAY",
+      "evidence_hash": "3b93de331ea9d4a1f1ba33a0ea896eb886048c8e7a7de4f91dfe286526e38cd2",
+      "statement": "Exit Gate 4: Verifies append-only audit ledger and deterministic restart replay reproduction",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_sentium_shadow_conformance_harness.py', '-k', 'test_durable_replay'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('DURABLE_REPLAY_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "DURABLE_REPLAY_PASS\n"
+      },
+      "actual_stdout": "DURABLE_REPLAY_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W8-06-ROLLBACK-BOUNDARY",
+      "evidence_hash": "cf7c4565b4284b91ab9f57c663e3c1cd849484c3b547af43f7097fb5970ff64e",
+      "statement": "Rollback Boundary: Verifies disabling harness halts shadow routing without mutating external state",
+      "reproducible_command": "uv run python -c \"import subprocess; res=subprocess.run(['uv', 'run', 'pytest', 'tests/contracts/test_sentium_shadow_conformance_harness.py', '-k', 'test_rollback_boundary'], capture_output=True, text=True, check=True); assert '1 passed' in res.stdout; print('ROLLBACK_BOUNDARY_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "ROLLBACK_BOUNDARY_PASS\n"
+      },
+      "actual_stdout": "ROLLBACK_BOUNDARY_PASS\n"
+    },
+    {
+      "claim_id": "CLAIM-W8-07-CANARY-DISCRIMINATION",
+      "evidence_hash": "c7856fa93f47141439d4b8f0adf3eb7918c034054aa9946414e676e4259bc1d0",
+      "statement": "CANARY-0002: Non-vacuous court evidence discrimination proving check actively discriminates against live production attempts",
+      "reproducible_command": "uv run python -c \"from contracts.sentium_shadow_conformance_harness import SentiumShadowConformanceHarness, LiveProductionAdmissionProhibitedError;\nfrom contracts.envelopes import ResearchCandidatePackage;\nharness = SentiumShadowConformanceHarness();\nbad_pkg = ResearchCandidatePackage(package_id='P', candidate_id='C', author='A', submission_timestamp='2026-09-06T00:00:00Z', strategy_class='S', parameters={}, evidence_hashes=(), signature='SIG', environment='simulation', network_id='sim-harness', quarantine_only=False);\ntry:\n    harness.validate_candidate_package(bad_pkg);\n    raise AssertionError('Should have raised LiveProductionAdmissionProhibitedError');\nexcept LiveProductionAdmissionProhibitedError:\n    pass;\nprint('CANARY_DISCRIMINATION_PASS')\"",
+      "expected_result": {
+        "exit_code": 0,
+        "stdout": "CANARY_DISCRIMINATION_PASS\n"
+      },
+      "actual_stdout": "CANARY_DISCRIMINATION_PASS\n"
+    }
+  ]
+}

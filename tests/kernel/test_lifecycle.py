@@ -1,8 +1,8 @@
-"""B0.5 acceptance tests for is_legal (PAEOS-7 §4.1, ratified PAEOS-IP-0003).
+"""Acceptance tests for the canonical v1.3-derived transition oracle.
 
 Enumerates all 21x21 StageId pairs across all 3 weight classes and checks is_legal against an
-*independent* transcription of the ratified edge table (so the module cannot silently drift
-from the spec). Also pins: illegal edges → False; fast-path vs full-path differ by weight class.
+*independent* transcription of the Founder-selected lifecycle projection (so the module cannot
+silently drift from the canonical prose). Also pins illegal edges and Trace-A compression.
 """
 
 from __future__ import annotations
@@ -12,23 +12,22 @@ import itertools
 from kernel.lifecycle import FORWARD_EDGES, ROUTINE_FASTPATH_EDGES, is_legal
 from kernel.types import StageId, WeightClass
 
-# Independent transcription of the ratified forward chain (PAEOS-IP-0003 / founder message).
+# Independent transcription of the canonical v1.3 forward chain plus runtime controls.
 # This is the test's own copy of the spec — if kernel.lifecycle drifts, this diverges.
 _RATIFIED_CHAIN = [
-    "RAW", "RE_DERIVE", "INTAKE", "TRIAGE", "IDEATE", "RESEARCH", "TRADEOFF", "MITIGATION",
-    "DESIGN", "CRITIQUE", "PLAN", "IMPLEMENT", "VERIFY", "ADVERSARIAL_REVIEW", "LEDGER_SYNC",
-    "SEAL", "RETROSPECT", "EVOLVE", "MEMORY_UPDATE", "IMPROVE_RUNTIME", "RESTART",
+    "RAW", "INTAKE", "TRIAGE", "RE_DERIVE", "IDEATE", "RESEARCH", "TRADEOFF", "MITIGATION",
+    "DESIGN", "CRITIQUE", "ADVERSARIAL_REVIEW", "PLAN", "IMPLEMENT", "VERIFY", "LEDGER_SYNC",
+    "SEAL", "RETROSPECT", "MEMORY_UPDATE", "EVOLVE", "IMPROVE_RUNTIME", "RESTART",
 ]
 
-# Expected forward edges (all weight classes): consecutive pairs + RESTART→RE_DERIVE.
+# Expected forward edges (all weight classes): consecutive pairs + RESTART→RE_DERIVE recovery.
 _EXPECTED_FORWARD = {
     (StageId[a], StageId[b]) for a, b in itertools.pairwise(_RATIFIED_CHAIN)
 } | {(StageId.RESTART, StageId.RE_DERIVE)}
 
-# ROUTINE-only compression edges.
+# ROUTINE-only compression edge for Trace-A discharge.
 _EXPECTED_ROUTINE_EXTRA = {
     (StageId.TRIAGE, StageId.IMPLEMENT),
-    (StageId.RAW, StageId.INTAKE),
 }
 
 
@@ -81,20 +80,20 @@ def test_full_forward_chain_is_legal_for_every_weight_class() -> None:
 
 
 def test_fast_path_differs_by_weight_class() -> None:
-    # The ratified difference: ROUTINE admits the compression edges; the heavier classes do not.
+    # ROUTINE admits the compression edge; the heavier classes do not.
     for edge in (
         (StageId.TRIAGE, StageId.IMPLEMENT),
-        (StageId.RAW, StageId.INTAKE),
     ):
         assert is_legal(*edge, WeightClass.ROUTINE) is True
         assert is_legal(*edge, WeightClass.SUBSTANTIAL) is False
         assert is_legal(*edge, WeightClass.KERNEL_TOUCHING) is False
 
 
-def test_kernel_touching_must_traverse_re_derive() -> None:
-    # A KERNEL_TOUCHING goal cannot take the RAW→INTAKE shortcut past RE_DERIVE.
-    assert is_legal(StageId.RAW, StageId.INTAKE, WeightClass.KERNEL_TOUCHING) is False
-    assert is_legal(StageId.RAW, StageId.RE_DERIVE, WeightClass.KERNEL_TOUCHING) is True
+def test_kernel_touching_must_traverse_intake_and_triage() -> None:
+    # KERNEL_TOUCHING follows canonical L01 Intake → L02 Triage → L03 Re-Derivation.
+    assert is_legal(StageId.RAW, StageId.INTAKE, WeightClass.KERNEL_TOUCHING) is True
+    assert is_legal(StageId.INTAKE, StageId.TRIAGE, WeightClass.KERNEL_TOUCHING) is True
+    assert is_legal(StageId.TRIAGE, StageId.RE_DERIVE, WeightClass.KERNEL_TOUCHING) is True
 
 
 def test_reverse_edges_are_illegal() -> None:

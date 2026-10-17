@@ -29,6 +29,8 @@ from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Protocol, runtime_checkable
 
+from kernel.types import DomainTag
+
 __all__ = [
     "GENESIS_HASH",
     "ChainCorruption",
@@ -101,6 +103,7 @@ class LedgerRow:
     event: Event
     prev_hash: str  # row_hash of seq-1 (GENESIS_HASH for seq 1)
     row_hash: str  # sha256 over (prev_hash, seq, timestamp, event) — see compute_row_hash
+    domain_tag: str = "PRODUCTION"  # ELH-10 state segregation (PRODUCTION, TEST, REPLAY, etc.)
 
 
 # ---- hashing --------------------------------------------------------------
@@ -117,10 +120,16 @@ def _canonical(obj: JsonValue) -> bytes:
     ).encode("ascii")
 
 
-def compute_row_hash(prev_hash: str, seq: int, timestamp: str, event: Event) -> str:
+def compute_row_hash(
+    prev_hash: str,
+    seq: int,
+    timestamp: str,
+    event: Event,
+    domain_tag: str | None = "PRODUCTION",
+) -> str:
     """The row's content hash: binds it to its predecessor and its own fields.
 
-    Any change to prev_hash, seq, timestamp, or any event field changes this hash, so
+    Any change to prev_hash, seq, timestamp, domain_tag (when specified), or any event field changes this hash, so
     ``verify_chain`` detects it. Recomputable from stored fields alone (deterministic).
     """
     body: dict[str, JsonValue] = {
@@ -131,6 +140,8 @@ def compute_row_hash(prev_hash: str, seq: int, timestamp: str, event: Event) -> 
         "kind": event.kind,
         "payload": dict(event.payload),
     }
+    if domain_tag is not None:
+        body["domain_tag"] = domain_tag
     return hashlib.sha256(_canonical(body)).hexdigest()
 
 
@@ -243,7 +254,7 @@ class Ledger:
         self._append_lock = threading.Lock()
         store.acquire_writer(writer_id)  # FR-5: refuses a competing writer here
 
-    def append(self, event: Event) -> int:
+    def append(self, event: Event, *, domain_tag: str | None = None) -> int:
         """Append ``event``; return its 1-based seq. Never mutates an existing row.
 
         Thread-safe: the whole read-head→derive-seq→commit sequence runs under `_append_lock`, so
@@ -254,13 +265,26 @@ class Ledger:
             prev_hash = prev.row_hash if prev is not None else GENESIS_HASH
             seq = (prev.seq if prev is not None else 0) + 1
             timestamp = _utcnow_iso()
-            row_hash = compute_row_hash(prev_hash, seq, timestamp, event)
+            if domain_tag is None and isinstance(event.payload, dict) and "domain_tag" in event.payload:
+                domain_tag = str(event.payload["domain_tag"])
+            tag = (domain_tag or "PRODUCTION").strip().upper()
+            valid_domains = {d.value for d in DomainTag}
+            if tag not in valid_domains:
+                raise ValueError(f"Invalid domain_tag {tag!r}; must be one of {sorted(valid_domains)}")
+            if tag == "PRODUCTION" and isinstance(event.payload, dict):
+                payload_str = json.dumps(event.payload).lower()
+                if any(kw in payload_str for kw in ("synthetic", "mock_id", "test_fixture", "fake_evidence", "synthetic_mock")):
+                    raise ValueError(
+                        "SYNTHETIC_STATE_CONTAMINATION_REJECTED: Event with synthetic/mock payload markers cannot be appended under PRODUCTION domain_tag"
+                    )
+            row_hash = compute_row_hash(prev_hash, seq, timestamp, event, domain_tag=tag)
             row = LedgerRow(
                 seq=seq,
                 timestamp=timestamp,
                 event=event,
                 prev_hash=prev_hash,
                 row_hash=row_hash,
+                domain_tag=tag,
             )
             self._store.append_row(row)  # atomic; ForkRejected if a racer took this seq
             return seq
@@ -279,10 +303,13 @@ class Ledger:
         return h.row_hash if h is not None else GENESIS_HASH
 
     def verify_chain(self) -> str:
-        """Walk the whole chain; raise ChainCorruption on any break. Return the head hash.
+        """Walk every committed row from seq 1 to head; assert link and hash invariants.
 
-        Detects: a tampered field (recomputed hash mismatch), a rewritten link (prev_hash
-        mismatch), and a gap or reorder (seq not dense from 1).
+        Catches any historical tampering: modifying a past payload breaks that row's
+        ``row_hash``; changing a ``row_hash`` breaks the next row's ``prev_hash``; deleting a
+        row leaves a seq gap. Returns the head hash on success.
+
+        Read-only; safe to run while other readers are attached (no lock).
         """
         prev_hash = GENESIS_HASH
         expected_seq = 1
@@ -295,7 +322,25 @@ class Ledger:
                 raise ChainCorruption(
                     f"broken link at seq {row.seq}: prev_hash does not match seq {row.seq - 1}"
                 )
-            recomputed = compute_row_hash(row.prev_hash, row.seq, row.timestamp, row.event)
+            domain = getattr(row, "domain_tag", None)
+            recomputed = compute_row_hash(
+                row.prev_hash,
+                row.seq,
+                row.timestamp,
+                row.event,
+                domain_tag=domain or "PRODUCTION",
+            )
+            if recomputed != row.row_hash and (domain is None or domain == "PRODUCTION"):
+                # Fallback for historical P1 rows recorded before domain_tag was bound into hash
+                legacy_hash = compute_row_hash(
+                    row.prev_hash,
+                    row.seq,
+                    row.timestamp,
+                    row.event,
+                    domain_tag=None,
+                )
+                if legacy_hash == row.row_hash:
+                    recomputed = legacy_hash
             if recomputed != row.row_hash:
                 raise ChainCorruption(
                     f"tampered row at seq {row.seq}: content hash mismatch"

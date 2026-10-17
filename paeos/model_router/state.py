@@ -14,6 +14,7 @@ from paeos.model_router.providers import (
     normalize_provider_key,
 )
 from paeos.model_router.types import (
+    FailureScope,
     ModelFamily,
     NormalizedErrorType,
     ProviderHealth,
@@ -22,6 +23,16 @@ from paeos.model_router.types import (
 )
 
 DEFAULT_DB_PATH = Path.home() / ".local" / "share" / "paeos" / "model-router" / "state.sqlite3"
+_HEALTH_STATES = frozenset(health.value for health in ProviderHealth)
+
+
+def _validate_scope_key(scope: FailureScope, scope_key: str) -> str:
+    if scope is FailureScope.PROVIDER or not isinstance(scope_key, str):
+        raise ValueError("invalid scoped-health key")
+    value = scope_key.strip()
+    if not value or len(value) > 256 or "\x00" in value:
+        raise ValueError("invalid scoped-health key")
+    return value
 
 
 class RouterStateDB:
@@ -92,17 +103,38 @@ class RouterStateDB:
                 prompt_tokens INTEGER DEFAULT 0,
                 completion_tokens INTEGER DEFAULT 0,
                 success INTEGER NOT NULL,
-                normalized_error TEXT
+                normalized_error TEXT,
+                failure_scope TEXT NOT NULL DEFAULT 'PROVIDER',
+                scope_key TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS scoped_health (
+                provider_id TEXT NOT NULL,
+                scope_kind TEXT NOT NULL,
+                scope_key TEXT NOT NULL,
+                health_status TEXT NOT NULL DEFAULT 'HEALTHY',
+                cooldown_until REAL,
+                last_error_type TEXT,
+                last_error_time REAL,
+                consecutive_healthy_since REAL,
+                PRIMARY KEY (provider_id, scope_kind, scope_key)
             );
 
             CREATE INDEX IF NOT EXISTS idx_obs_time ON routing_observations(timestamp);
             CREATE INDEX IF NOT EXISTS idx_obs_prov ON routing_observations(provider_id, success);
+            CREATE INDEX IF NOT EXISTS idx_scoped_health_provider ON scoped_health(provider_id, scope_kind, health_status);
             """)
+
+            columns = {row[1] for row in conn.execute("PRAGMA table_info(routing_observations)")}
+            if "failure_scope" not in columns:
+                conn.execute("ALTER TABLE routing_observations ADD COLUMN failure_scope TEXT NOT NULL DEFAULT 'PROVIDER'")
+            if "scope_key" not in columns:
+                conn.execute("ALTER TABLE routing_observations ADD COLUMN scope_key TEXT")
 
             # Existing state is authoritative but must still satisfy the provider-key grammar.
             # Refuse startup on malformed rows rather than silently aliasing them to a valid key.
             persisted_keys = set()
-            for table in ("providers", "provider_windows", "routing_observations"):
+            for table in ("providers", "provider_windows", "routing_observations", "scoped_health"):
                 rows = conn.execute(f"SELECT DISTINCT provider_id FROM {table}").fetchall()
                 persisted_keys.update(row[0] for row in rows)
             invalid_keys = []
@@ -116,6 +148,17 @@ class RouterStateDB:
                     "invalid provider identities in durable state; refusing startup: "
                     + ", ".join(sorted(invalid_keys))
                 )
+
+            valid_scopes = {scope.value for scope in FailureScope}
+            for row in conn.execute("SELECT provider_id, scope_kind, scope_key, health_status FROM scoped_health"):
+                if row[1] not in valid_scopes - {FailureScope.PROVIDER.value} or row[3] not in _HEALTH_STATES:
+                    raise ValueError("invalid scoped health row; refusing startup")
+                _validate_scope_key(FailureScope(row[1]), row[2])
+            for row in conn.execute("SELECT failure_scope, scope_key FROM routing_observations"):
+                if row[0] not in valid_scopes:
+                    raise ValueError("invalid observation scope; refusing startup")
+                if row[0] != FailureScope.PROVIDER.value:
+                    _validate_scope_key(FailureScope(row[0]), row[1])
 
             for descriptor in self.provider_registry.snapshot():
                 conn.execute("""
@@ -145,6 +188,69 @@ class RouterStateDB:
                 "total_requests_today": 0,
                 "total_tokens_today": 0,
             }
+
+    def get_scoped_health(
+        self,
+        provider_id: ProviderId | ProviderKey,
+        scope: FailureScope,
+        scope_key: str,
+    ) -> dict[str, Any]:
+        provider_key = self._provider_key(provider_id)
+        key = _validate_scope_key(scope, scope_key)
+        with self._get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM scoped_health WHERE provider_id = ? AND scope_kind = ? AND scope_key = ?",
+                (provider_key, scope.value, key),
+            ).fetchone()
+        if row:
+            return dict(row)
+        return {
+            "provider_id": provider_key,
+            "scope_kind": scope.value,
+            "scope_key": key,
+            "health_status": ProviderHealth.HEALTHY.value,
+            "cooldown_until": None,
+            "last_error_type": None,
+            "last_error_time": None,
+            "consecutive_healthy_since": time.time(),
+        }
+
+    def set_scoped_health(
+        self,
+        provider_id: ProviderId | ProviderKey,
+        scope: FailureScope,
+        scope_key: str,
+        health: ProviderHealth,
+        error_type: NormalizedErrorType | None = None,
+        cooldown_seconds: float | None = None,
+    ) -> None:
+        provider_key = self._provider_key(provider_id)
+        key = _validate_scope_key(scope, scope_key)
+        now = time.time()
+        cooldown_until = now + cooldown_seconds if cooldown_seconds else None
+        with self._get_connection() as conn:
+            conn.execute(
+                """INSERT INTO scoped_health (
+                    provider_id, scope_kind, scope_key, health_status, cooldown_until,
+                    last_error_type, last_error_time, consecutive_healthy_since
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(provider_id, scope_kind, scope_key) DO UPDATE SET
+                    health_status=excluded.health_status,
+                    cooldown_until=excluded.cooldown_until,
+                    last_error_type=COALESCE(excluded.last_error_type, scoped_health.last_error_type),
+                    last_error_time=COALESCE(excluded.last_error_time, scoped_health.last_error_time),
+                    consecutive_healthy_since=excluded.consecutive_healthy_since""",
+                (
+                    provider_key,
+                    scope.value,
+                    key,
+                    health.value,
+                    cooldown_until,
+                    error_type.value if error_type else None,
+                    now if error_type else None,
+                    now if health is ProviderHealth.HEALTHY else None,
+                ),
+            )
 
     def set_health(
         self,
@@ -303,14 +409,24 @@ class RouterStateDB:
         completion_tokens: int,
         success: bool,
         normalized_error: str | None = None,
+        failure_scope: FailureScope = FailureScope.PROVIDER,
+        scope_key: str | None = None,
     ) -> None:
         provider_key = self._provider_key(provider_id)
+        scoped_key = None
+        if failure_scope is not FailureScope.PROVIDER:
+            if scope_key is None:
+                raise ValueError("scoped observation requires scope_key")
+            scoped_key = _validate_scope_key(failure_scope, scope_key)
+        elif scope_key is not None:
+            raise ValueError("provider observation cannot carry scope_key")
         with self._get_connection() as conn:
             conn.execute("""
             INSERT INTO routing_observations (
                 timestamp, task_class, logical_model, model_id, provider_id, family,
-                latency_ms, prompt_tokens, completion_tokens, success, normalized_error
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                latency_ms, prompt_tokens, completion_tokens, success, normalized_error,
+                failure_scope, scope_key
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 time.time(),
                 task_class,
@@ -323,6 +439,8 @@ class RouterStateDB:
                 completion_tokens,
                 1 if success else 0,
                 normalized_error,
+                failure_scope.value,
+                scoped_key,
             ))
 
     def get_recent_metrics(self, provider_id: ProviderId | ProviderKey, window_seconds: float = 300.0) -> dict[str, Any]:

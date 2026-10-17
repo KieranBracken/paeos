@@ -72,6 +72,11 @@ Why is this worth exploring? What problem does it solve?
   * **[`PAEOS-RQ-REL-004`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-004-economy-of-reasoning-recovery-efficiency.md)**: Economy of Reasoning, Recovery & Engineering Efficiency (P1)
   * **[`PAEOS-RQ-REL-005`](file:///Users/bob/GitHub/paeos/backlog/research/PAEOS_RELIABILITY_ERROR_INTELLIGENCE_RB_v0.1/PAEOS-RQ-REL-005-learning-effectiveness-adaptive-routing.md)**: Learning Effectiveness & Adaptive Reliability Routing (P2)
 
+- **[`RB-0036-goal-aware-epistemic-robustness.md`](file:///Users/bob/GitHub/paeos/backlog/research/RB-0036-goal-aware-epistemic-robustness.md)** — **Goal-Aware Epistemic Robustness and Manipulation-Resistant Ingestion**:
+  reconciles Founder intent against KAE/Corpus, SAKG, Concept OS, PAEOS, Orca, and RB-0009;
+  preserves the truth/goal separation and defines the smallest future ontology, wiring, and
+  physical-test obligation without creating a runtime subsystem or new debt.
+  Status: **Deferred research obligation (no implementation authorised)**.
 
 
 

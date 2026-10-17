@@ -1,0 +1,2 @@
+{"id":"concept://demo/edge/00000000000000000000000003","namespace":"demo","family":"abstraction","relation":"abstracts_to","source_uri":"concept://demo/concept/00000000000000000000000000","target_uri":"concept://demo/concept/11111111111111111111111111","schema_version":1,"payload":{"abstraction_operator_uri":"concept://demo/transformation/33333333333333333333333333","preserved_features":["flow"],"lost_features":[]},"provenance_refs":["dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"],"recorded_at":"2026-09-04T21:03:00Z"}
+

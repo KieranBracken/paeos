@@ -147,12 +147,13 @@ class ReviewHarness:
             role=Role.ADVERSARY,
             session=session,
             objective=(
-                "Attack the sealed evidence bundle; file blocking dissents on what fails. "
+                "Attack the sealed evidence bundle materialized under context/; file blocking "
+                "dissents on what fails. "
                 f"End your report with exactly one line: '{VERDICT_PASS_MARKER}' if you could not "
                 f"break it, or '{VERDICT_BLOCK_MARKER}' if you found a blocking defect."
             ),
             write_scopes=(report_scope,),  # the adversary may write only its report
-            read_scopes=(bundle.bundle_hash,),  # and read only the sealed bundle
+            read_scopes=("context/",),  # the sealed bundle's physical materialization only
             mcp_servers=("constitution",),  # constitution only — NOT memory / builder context
             context_refs=adversary_context,
             budget=budget,

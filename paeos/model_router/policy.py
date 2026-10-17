@@ -3,13 +3,22 @@ PAEOS Model Router — Multi-Stage Constraint Pipeline & Economy of Reasoning Po
 """
 from __future__ import annotations
 
+import os
+
 from paeos.model_router.aimd import AIMDController
 from paeos.model_router.audit import select_heterogeneous_auditor
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
+from paeos.model_router.intelligence_tier import (
+    ADMITTED_FREE_WORKER_POOL,
+    catalogued_free_worker_pool,
+)
 from paeos.model_router.privacy import evaluate_privacy_eligibility
 from paeos.model_router.state import RouterStateDB
 from paeos.model_router.types import (
+    AdmissionState,
+    CostTier,
+    FailureScope,
     LogicalModel,
     ModelCatalogEntry,
     ModelFamily,
@@ -37,7 +46,8 @@ class RoutingPolicyEngine:
         Executes the ordered multi-stage constraint pipeline:
         1. Privacy Eligibility (Data Class vs Provider Policy)
         2. Explicit Physical Model Selection (if specified)
-        3. Operational Availability Gate (Fails closed)
+        3. Operational Availability & Admission Gate (Strict Fail-Closed)
+        3b. Paid-Provider Guardrail (Strict Fail-Closed)
         4. Required Capabilities (Tools, JSON)
         5. Context Size Compatibility
         6. Credential Availability
@@ -49,7 +59,11 @@ class RoutingPolicyEngine:
         candidates = []
         for model in self.catalog.list_models():
             policy = self.catalog.get_data_policy(model.provider_id)
-            if not evaluate_privacy_eligibility(request.data_class, policy):
+            try:
+                eligible = evaluate_privacy_eligibility(request.data_class, policy)
+            except ValueError:
+                eligible = False
+            if not eligible:
                 continue
             candidates.append(model)
 
@@ -59,10 +73,40 @@ class RoutingPolicyEngine:
             if not candidates:
                 return []
 
-        # Step 3: Operational Availability Gate (Strict Fail-Closed)
-        candidates = [m for m in candidates if m.available]
+        if request.free_worker_pool:
+            catalogued_free_ids = set(catalogued_free_worker_pool(self.catalog.list_models()))
+            governed_free_ids = catalogued_free_ids & set(ADMITTED_FREE_WORKER_POOL)
+            candidates = [
+                m for m in candidates
+                if m.model_id in governed_free_ids and m.cost_tier is CostTier.FREE
+            ]
+
+        # Step 3: Operational Availability & Admission Gate (Strict Fail-Closed)
+        candidates = [
+            m for m in candidates
+            if m.available
+            and m.admission_state == AdmissionState.ADMITTED
+            and (not request.free_worker_pool or m.live_verified)
+        ]
         if not candidates:
             return []
+
+        # Step 3b: Paid-Provider Guardrail (Strict Fail-Closed)
+        # Default autonomous routing strictly prefers FREE and SUBSCRIPTION_INCLUDED capacity.
+        # Any PAID / PAY_PER_TOKEN provider requires explicit configured paid-budget authorization.
+        paid_authorized = bool(
+            getattr(request, "allow_paid_usage", False)
+            or (request.metadata and request.metadata.get("paid_budget_authorized", False))
+            or os.getenv("PAEOS_ALLOW_PAID_ROUTING", "").lower() in ("true", "1", "yes")
+        )
+        if not paid_authorized:
+            candidates = [
+                m for m in candidates
+                if m.cost_tier in (CostTier.FREE, CostTier.SUBSCRIPTION_INCLUDED)
+            ]
+        if not candidates:
+            return []
+
 
         # Step 4: Filter by Required Capabilities
         if request.require_tools:
@@ -82,8 +126,20 @@ class RoutingPolicyEngine:
         for m in candidates:
             st = self.state_db.get_provider_state(m.provider_id)
             h = st["health_status"]
-            if h in (ProviderHealth.HEALTHY.value, ProviderHealth.THROTTLED.value, ProviderHealth.COOLDOWN.value):
-                healthy_candidates.append(m)
+            if h not in (
+                ProviderHealth.HEALTHY.value,
+                ProviderHealth.THROTTLED.value,
+                ProviderHealth.COOLDOWN.value,
+            ):
+                continue
+            scoped = self.state_db.get_scoped_health(m.provider_id, FailureScope.MODEL, m.model_id)
+            if scoped["health_status"] in {
+                ProviderHealth.EXHAUSTED.value,
+                ProviderHealth.QUARANTINED.value,
+                ProviderHealth.UNAVAILABLE.value,
+            }:
+                continue
+            healthy_candidates.append(m)
         candidates = healthy_candidates
 
         # Step 8: Apply Quota Reservation Gates
@@ -182,6 +238,7 @@ class RoutingPolicyEngine:
             task_fit = descriptor.task_fit.get(request.task_class, 1.0)
             quality = m.base_quality_score + descriptor.quality_bias
             latency_cost = 1.0 + descriptor.latency_bias
-            return (task_fit * quality * health_mult) / latency_cost
+            cost_mult = 1.0 if m.cost_tier in (CostTier.FREE, CostTier.SUBSCRIPTION_INCLUDED) else 0.5
+            return (task_fit * quality * health_mult * cost_mult) / latency_cost
 
         return sorted(candidates, key=calculate_score, reverse=True)

@@ -26,9 +26,11 @@ Canonical sets encoded here (EL L24-28 / WSM L60-68):
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 __all__ = [
     "TRACE_A_DISCHARGE",
@@ -38,9 +40,26 @@ __all__ = [
     "DischargeStub",
     "Layer",
     "Obligation",
+    "assert_canonical_lifecycle_bound",
     "ceremony_for",
     "discharged_layers_for",
 ]
+
+CANONICAL_LIFECYCLE_SHA256 = "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae"
+
+
+def assert_canonical_lifecycle_bound(canonical_path: Path | None = None) -> None:
+    """Fail closed if the ceremony would run against an unratified lifecycle source."""
+
+    path = canonical_path or Path(__file__).resolve().parents[1] / "operations" / "ENGINEERING_LIFECYCLE.md"
+    try:
+        content = path.read_bytes()
+    except OSError as exc:
+        raise RuntimeError("canonical lifecycle source is unavailable") from exc
+    if hashlib.sha256(content).hexdigest() != CANONICAL_LIFECYCLE_SHA256:
+        raise RuntimeError("canonical lifecycle source hash does not match Founder IP-0017")
+    if b"This is **v1.3**" not in content:
+        raise RuntimeError("canonical lifecycle source does not declare v1.3")
 
 
 class Layer(Enum):
@@ -216,6 +235,7 @@ def ceremony_for(trace: str | None) -> CeremonyContract:
     of "trace_b" is used for a missing/unknown depth so an ambiguous classification can never
     silently fast-path (T6; D1 §8 de-escalation-disallowed).
     """
+    assert_canonical_lifecycle_bound()
     if trace == "trace_a":
         discharge: frozenset[Layer] = TRACE_A_DISCHARGE
         execute: frozenset[Layer] = TRACE_A_EXECUTE_FULL

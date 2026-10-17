@@ -1,0 +1,2 @@
+{"id":"concept://demo/analogy/00000000000000000000000000","type":"Analogy","namespace":"demo","schema_version":1,"payload":{"source_roles":["a"],"target_roles":["b"],"correspondences":[],"preserved_relations":[],"known_breaks":[],"metric_snapshot":{},"heuristic_uri":"concept://demo/inspiration-heuristic/00000000000000000000000000"},"representations":[],"provenance_refs":["7777777777777777777777777777777777777777777777777777777777777777"],"recorded_at":"2026-09-04T20:09:00Z"}
+

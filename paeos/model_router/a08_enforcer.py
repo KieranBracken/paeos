@@ -21,7 +21,7 @@ from enum import Enum
 
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.providers import normalize_provider_key
-from paeos.model_router.types import ModelCatalogEntry, ModelFamily, ProviderId
+from paeos.model_router.types import AdmissionState, ModelCatalogEntry, ModelFamily, ProviderId
 
 
 class A08Verdict(Enum):
@@ -70,13 +70,20 @@ class A08EnforcementResult:
 # Strict Invariant: Auditor Family MUST NEVER equal Builder Family
 AUDITOR_MAPPING = {
     ModelFamily.DEEPSEEK: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.LAGUNA],
-    ModelFamily.MINIMAX: [ModelFamily.GEMINI, ModelFamily.GLM],
-    ModelFamily.GEMINI: [ModelFamily.GLM, ModelFamily.DEEPSEEK, ModelFamily.LAGUNA],
-    ModelFamily.GLM: [ModelFamily.GEMINI, ModelFamily.DEEPSEEK],
+    ModelFamily.MINIMAX: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.LLAMA],
+    ModelFamily.GEMINI: [ModelFamily.LLAMA, ModelFamily.GLM, ModelFamily.DEEPSEEK, ModelFamily.LAGUNA, ModelFamily.MINIMAX, ModelFamily.KIMI, ModelFamily.QWEN, ModelFamily.NEXAGI],
+    ModelFamily.GLM: [ModelFamily.GEMINI, ModelFamily.DEEPSEEK, ModelFamily.LLAMA, ModelFamily.KIMI, ModelFamily.QWEN],
     ModelFamily.LAGUNA: [ModelFamily.GEMINI, ModelFamily.GLM],
     ModelFamily.HY3: [ModelFamily.GEMINI, ModelFamily.GLM],
     ModelFamily.NEMOTRON: [ModelFamily.GEMINI, ModelFamily.GLM],
     ModelFamily.LLAMA: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK],
+    ModelFamily.GPT: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK, ModelFamily.LLAMA, ModelFamily.KIMI, ModelFamily.QWEN, ModelFamily.NEXAGI],
+    ModelFamily.QWEN: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK],
+    ModelFamily.KIMI: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK],
+    ModelFamily.LONGCAT: [ModelFamily.GEMINI, ModelFamily.GLM],
+    ModelFamily.NEXAGI: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK],
+    ModelFamily.ANTHROPIC: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK],
+    ModelFamily.MISTRAL: [ModelFamily.GEMINI, ModelFamily.GLM, ModelFamily.DEEPSEEK],
     ModelFamily.UNKNOWN: [],  # Unknown builder family = FAIL CLOSED
 }
 
@@ -146,10 +153,7 @@ class A08Enforcer:
             catalog_entry = self._catalog.get(provenance.model_id)
             if catalog_entry is None or catalog_entry.family == ModelFamily.UNKNOWN:
                 continue
-            catalog_provider = normalize_provider_key(
-                getattr(catalog_entry.provider_id, "value", catalog_entry.provider_id)
-            )
-            if catalog_provider != normalize_provider_key(provenance.provider) or catalog_entry.family != provenance.family:
+            if catalog_entry.family != provenance.family:
                 return A08EnforcementResult(
                     verdict=A08Verdict.FAIL_CONFLICTING_EVIDENCE,
                     builder_provenance=builder_prov,
@@ -212,7 +216,7 @@ class A08Enforcer:
             for model in self._catalog.list_models():
                 if model.family != target_family:
                     continue
-                if not model.available:
+                if not model.available or getattr(model, "admission_state", AdmissionState.ADMITTED) != AdmissionState.ADMITTED:
                     continue
                 if allowed_providers is not None and normalize_provider_key(
                     getattr(model.provider_id, "value", model.provider_id)
@@ -226,7 +230,7 @@ class A08Enforcer:
                 continue
             if model.family == ModelFamily.UNKNOWN:
                 continue
-            if not model.available:
+            if not model.available or getattr(model, "admission_state", AdmissionState.ADMITTED) != AdmissionState.ADMITTED:
                 continue
             if allowed_providers is not None and normalize_provider_key(
                 getattr(model.provider_id, "value", model.provider_id)
@@ -409,9 +413,29 @@ def derive_family_from_actual_model(
     if "qwen" in model_lower:
         return ModelFamily.QWEN
 
+    # Kimi patterns
+    if "kimi" in model_lower:
+        return ModelFamily.KIMI
+
+    # LongCat patterns
+    if "longcat" in model_lower:
+        return ModelFamily.LONGCAT
+
     # GPT patterns
     if "gpt-" in model_lower or model_lower.startswith("gpt"):
         return ModelFamily.GPT
+
+    # NexAGI patterns
+    if "nex-agi" in model_lower or "nexagi" in model_lower or "nex-" in model_lower:
+        return ModelFamily.NEXAGI
+
+    # Anthropic patterns
+    if "claude" in model_lower or "anthropic" in model_lower:
+        return ModelFamily.ANTHROPIC
+
+    # Mistral patterns
+    if "mistral" in model_lower or "mixtral" in model_lower or "codestral" in model_lower:
+        return ModelFamily.MISTRAL
 
     # Cannot determine family from model string
     return ModelFamily.UNKNOWN

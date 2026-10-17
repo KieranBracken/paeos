@@ -23,6 +23,8 @@ requires. That hardening is deferred and tracked; the reproduction *logic* here 
 
 from __future__ import annotations
 
+import hashlib
+import json
 import shlex
 import subprocess
 from collections.abc import Callable, Mapping
@@ -191,10 +193,23 @@ def _normalized_result(result: JsonValue) -> JsonValue:
     if not isinstance(result, Mapping):
         return result
     normalized = dict(result)
+    # Physical execution duration is captured for provenance but is not deterministic across two
+    # valid replays. It must never participate in the evidence identity or equality comparison.
+    normalized.pop("duration_ms", None)
     stdout = normalized.get("stdout")
     if isinstance(stdout, str):
         normalized["stdout"] = stdout.rstrip()
     return normalized
+
+
+def _identity_result(result: JsonValue) -> JsonValue:
+    """Return the stable portion of one physical result for evidence hashing."""
+
+    if not isinstance(result, Mapping):
+        return result
+    stable = dict(result)
+    stable.pop("duration_ms", None)
+    return stable
 
 
 def verify_deterministic(
@@ -208,6 +223,27 @@ def verify_deterministic(
     Raises StaleEvidence, NotReproducible, or ReproductionMismatch. This is the T2 gate."""
     verify_binding(evidence, artifact_under_review)
     fresh = reproduce(evidence, timeout_s=timeout_s, runner=runner)
+    if isinstance(fresh, Mapping) and "environment_fingerprint" in fresh:
+        if evidence.environment_hash != fresh.get("environment_fingerprint"):
+            raise ReproductionMismatch(
+                f"evidence {evidence.hash} used a different verifier environment"
+            )
+        expected_hash = hashlib.sha256(
+            json.dumps(
+                {
+                    "artifact_hash": evidence.artifact_hash,
+                    "claim_id": evidence.claim_id,
+                    "command": evidence.reproducible_command,
+                    "result": _identity_result(fresh),
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        if evidence.hash != expected_hash:
+            raise ReproductionMismatch(
+                f"evidence {evidence.hash} is not the verifier-derived evidence identity"
+            )
     if _normalized_result(fresh) != _normalized_result(evidence.result):
         raise ReproductionMismatch(
             f"evidence {evidence.hash} claimed {evidence.result!r} "

@@ -1,0 +1,417 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concept-os.local/schema/edge.schema.json",
+  "title": "Concept OS edge envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "namespace",
+    "family",
+    "relation",
+    "source_uri",
+    "target_uri",
+    "schema_version",
+    "payload",
+    "provenance_refs",
+    "recorded_at"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/edgeUri"
+    },
+    "namespace": {
+      "$ref": "#/$defs/namespace"
+    },
+    "family": {
+      "$ref": "#/$defs/edgeFamily"
+    },
+    "relation": {
+      "type": "string"
+    },
+    "source_uri": {
+      "$ref": "#/$defs/conceptUri"
+    },
+    "target_uri": {
+      "$ref": "#/$defs/conceptUri"
+    },
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "payload": {
+      "type": "object"
+    },
+    "provenance_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/ref"
+      }
+    },
+    "recorded_at": {
+      "$ref": "#/$defs/timestamp"
+    }
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "family": {
+              "const": "derivation"
+            },
+            "relation": {
+              "enum": [
+                "derived_from",
+                "supersedes",
+                "specializes_from"
+              ]
+            },
+            "payload": {
+              "$ref": "#/$defs/derivationPayload"
+            }
+          },
+          "required": [
+            "family",
+            "relation",
+            "payload"
+          ]
+        },
+        {
+          "properties": {
+            "family": {
+              "const": "analogy"
+            },
+            "relation": {
+              "enum": [
+                "has_source",
+                "has_target",
+                "refines"
+              ]
+            },
+            "payload": {
+              "$ref": "#/$defs/analogyPayload"
+            },
+            "source_uri": {
+              "pattern": "^concept://[a-z0-9][a-z0-9_-]{0,62}/analogy/[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+            },
+            "target_uri": {
+              "pattern": "^concept://[a-z0-9][a-z0-9_-]{0,62}/(concept|analogy)/[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+            }
+          },
+          "required": [
+            "target_uri",
+            "family",
+            "relation",
+            "payload",
+            "source_uri"
+          ]
+        },
+        {
+          "properties": {
+            "family": {
+              "const": "recombination"
+            },
+            "relation": {
+              "enum": [
+                "contributes_to",
+                "combined_as"
+              ]
+            },
+            "payload": {
+              "$ref": "#/$defs/recombinationPayload"
+            }
+          },
+          "required": [
+            "family",
+            "relation",
+            "payload"
+          ]
+        },
+        {
+          "properties": {
+            "family": {
+              "const": "abstraction"
+            },
+            "relation": {
+              "enum": [
+                "abstracts_to",
+                "generalizes_to"
+              ]
+            },
+            "payload": {
+              "$ref": "#/$defs/abstractionPayload"
+            }
+          },
+          "required": [
+            "family",
+            "relation",
+            "payload"
+          ]
+        },
+        {
+          "properties": {
+            "family": {
+              "const": "exemplification"
+            },
+            "relation": {
+              "enum": [
+                "exemplifies",
+                "counterexample_to"
+              ]
+            },
+            "payload": {
+              "$ref": "#/$defs/exemplificationPayload"
+            }
+          },
+          "required": [
+            "family",
+            "relation",
+            "payload"
+          ]
+        },
+        {
+          "properties": {
+            "family": {
+              "const": "neighborhood"
+            },
+            "relation": {
+              "const": "contains"
+            },
+            "payload": {
+              "$ref": "#/$defs/neighborhoodPayload"
+            }
+          },
+          "required": [
+            "family",
+            "relation",
+            "payload"
+          ]
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "namespace": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,62}$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "decimal": {
+      "type": "string",
+      "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$"
+    },
+    "conceptUri": {
+      "type": "string",
+      "pattern": "^concept://[a-z0-9][a-z0-9_-]{0,62}/[a-z0-9][a-z0-9-]{0,62}/[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "edgeUri": {
+      "type": "string",
+      "pattern": "^concept://[a-z0-9][a-z0-9_-]{0,62}/edge/[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "ref": {
+      "type": "string",
+      "pattern": "^(concept://[a-z0-9][a-z0-9_-]{0,62}/[a-z0-9][a-z0-9-]{0,62}/[0-7][0-9A-HJKMNP-TV-Z]{25}|[0-9a-f]{64})$"
+    },
+    "edgeFamily": {
+      "enum": [
+        "derivation",
+        "analogy",
+        "recombination",
+        "abstraction",
+        "exemplification",
+        "neighborhood"
+      ]
+    },
+    "strings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "derivationPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operator_uri",
+        "trace_uri",
+        "input_order"
+      ],
+      "properties": {
+        "operator_uri": {
+          "$ref": "#/$defs/conceptUri"
+        },
+        "trace_uri": {
+          "$ref": "#/$defs/conceptUri"
+        },
+        "input_order": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "analogyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role_name",
+        "correspondence_index"
+      ],
+      "properties": {
+        "role_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "correspondence_index": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "recombinationPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contribution_role",
+        "contribution_order",
+        "heuristic_trace_uri",
+        "source_uris"
+      ],
+      "properties": {
+        "contribution_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contribution_order": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "heuristic_trace_uri": {
+          "$ref": "#/$defs/conceptUri"
+        },
+        "source_uris": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/conceptUri"
+          }
+        }
+      }
+    },
+    "abstractionPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "abstraction_operator_uri",
+        "preserved_features",
+        "lost_features"
+      ],
+      "properties": {
+        "abstraction_operator_uri": {
+          "$ref": "#/$defs/conceptUri"
+        },
+        "preserved_features": {
+          "$ref": "#/$defs/strings"
+        },
+        "lost_features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "exemplificationPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "source_provenance_ref"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_provenance_ref": {
+          "$ref": "#/$defs/ref"
+        }
+      }
+    },
+    "pathStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uri",
+        "family",
+        "relation"
+      ],
+      "properties": {
+        "uri": {
+          "$ref": "#/$defs/conceptUri"
+        },
+        "family": {
+          "type": "string"
+        },
+        "relation": {
+          "type": "string"
+        }
+      }
+    },
+    "neighborhoodPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank",
+        "component_distances",
+        "aggregate_distance",
+        "why"
+      ],
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "component_distances": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/decimal"
+          }
+        },
+        "aggregate_distance": {
+          "$ref": "#/$defs/decimal"
+        },
+        "why": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pathStep"
+          }
+        }
+      }
+    }
+  },
+  "not": {
+    "properties": {
+      "source_uri": {
+        "const": "concept://demo/concept/00000000000000000000000000"
+      },
+      "target_uri": {
+        "const": "concept://demo/concept/00000000000000000000000000"
+      }
+    },
+    "required": [
+      "source_uri",
+      "target_uri"
+    ]
+  }
+}

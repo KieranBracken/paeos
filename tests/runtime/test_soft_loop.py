@@ -7,6 +7,9 @@ composed over the sealed Phase-0 kernel.
 
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
+
 from kernel.cas import CAS, InMemoryCasStore, content_hash
 from kernel.evidence import Determinism, Evidence, EvidenceKind, EvidenceProducer
 from kernel.ledger import InMemoryLedgerStore, Ledger
@@ -15,6 +18,10 @@ from nacl.signing import SigningKey
 from runtime.ceremony import Layer
 from runtime.claude_code import AgentWrite, RunOutput
 from runtime.court import VerdictOutcome
+from runtime.court.completeness_firewall import (
+    VerificationObligation,
+    create_authoritative_manifest,
+)
 from runtime.memory import ScarDraft, ScarStore
 from runtime.orchestrator import RunStatus, SoftLoop
 from runtime.sidecar_scorer import SidecarStageScorer
@@ -49,6 +56,8 @@ class ScriptedRuntime:
             evidence=(),
             trace=b"trace-" + package.stage.name.encode(),
             cost=Cost(tokens=self._cost_tokens, wallclock_s=1.0, model_ver="model-x"),
+            workspace_identity="scripted-worker-workspace",
+            environment_identity="scripted-worker-environment",
         )
 
 
@@ -137,6 +146,16 @@ def test_unattended_run_reaches_seal() -> None:
     assert runtime.packages[StageId.CRITIQUE].role is Role.CRITIC
     assert runtime.packages[StageId.IMPLEMENT].role is Role.BUILDER
     assert runtime.packages[StageId.ADVERSARIAL_REVIEW].role is Role.ADVERSARY
+    events = [row.event for row in loop._ledger.read()]
+    lifecycle_adversaries = [
+        event for event in events
+        if event.kind == "STAGE_COMPLETED"
+        and event.payload.get("stage") == StageId.ADVERSARIAL_REVIEW.name
+    ]
+    assert len(lifecycle_adversaries) == 1  # canonical L10 only
+    gate_events = [event for event in events if event.kind == "ADVERSARY_GATE_REVIEWED"]
+    assert len(gate_events) == 1
+    assert gate_events[0].payload["lifecycle_layer"] is None
     # Trace-B never discharges: no LAYER_DISCHARGED rows in the ledger
     assert not [r for r in loop._ledger.read() if r.event.kind == "layer_discharged"]
 
@@ -236,24 +255,45 @@ def test_no_submitted_evidence_remands() -> None:
 # ---- B2.O: vacuous (non-probative) evidence is remanded when verified --------
 
 
-def test_vacuous_evidence_remands_under_verification(tmp_path: object) -> None:
-    from pathlib import Path
-
-    from kernel.ledger import InMemoryLedgerStore, Ledger
-
-    # a verification repo whose file the builder "changes"; the echo evidence is non-discriminating
-    repo = Path(str(tmp_path)) / "repo"
+def test_vacuous_evidence_remands_under_verification(tmp_path: Path) -> None:
+    # A production-shaped verification repo whose verifier ignores the candidate change. The
+    # authoritative manifest supplies the obligation; the runtime must reject it before L14.
+    repo = tmp_path / "repo"
+    repo.mkdir()
     (repo / "runtime").mkdir(parents=True)
     (repo / "runtime" / "feature.py").write_text("old\n")
+    (repo / "verify.py").write_text("print('same result with or without the candidate')\n")
+    for args in (
+        ("init", "--quiet"),
+        ("config", "user.email", "p1-vacuity@example.invalid"),
+        ("config", "user.name", "P1 vacuity test"),
+        ("add", "runtime/feature.py", "verify.py"),
+        ("commit", "--quiet", "-m", "vacuity baseline"),
+    ):
+        completed = subprocess.run(
+            ["git", *args], cwd=repo, capture_output=True, text=True, check=False
+        )
+        assert completed.returncode == 0, completed.stderr
+
+    manifest = create_authoritative_manifest(
+        manifest_id="P1-VACUITY-PROBE",
+        milestone_id="P1-VACUITY-PROBE",
+        expected_capabilities=("CAP-VACUOUS-VERIFIER",),
+        verification_obligations=(
+            VerificationObligation("CAP-VACUOUS-VERIFIER", ("{python}", "verify.py")),
+        ),
+    )
     loop = SoftLoop(
-        ledger=Ledger(InMemoryLedgerStore()), signing_key=SigningKey.generate(),
+        ledger=Ledger(InMemoryLedgerStore()),
+        signing_key=SigningKey.generate(),
         cas=CAS(InMemoryCasStore()), agent_runtime=ScriptedRuntime(_writes()),
-        budget_by_class=_BUDGETS, repo_root=repo,
+        budget_by_class=_BUDGETS, repo_root=repo, state_dir=tmp_path / "state",
         sidecar_scorer=SidecarStageScorer(None),
     )
     outcome = loop.run(
         objective="x", changed_paths=("runtime/feature.py",),
-        plan_write_scopes=("runtime/feature.py",), builder_evidence=_GOOD_EVIDENCE,
+        plan_write_scopes=("runtime/feature.py",), builder_evidence=(),
+        verifiable=False, capability_manifest=manifest, run_id="p1-vacuity-probe",
     )
     assert outcome.status is RunStatus.REMANDED  # echo evidence proves nothing about the change
     assert "vacuous" in outcome.detail

@@ -1,0 +1,2 @@
+{"id":"concept://demo/inspiration-heuristic/00000000000000000000000000","type":"InspirationHeuristic","namespace":"demo","schema_version":1,"payload":{"name":"bounded analogy","version":"1","kind":"analogy","parameters_schema":{"type":"object"},"required_representations":["symbolic"],"score_components":["novelty"],"cost_class":"low","falsifier":"Remove known breaks."},"representations":[],"provenance_refs":["2222222222222222222222222222222222222222222222222222222222222222"],"recorded_at":"2026-09-04T20:04:00Z"}
+

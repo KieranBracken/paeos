@@ -33,6 +33,10 @@ whose ideal solution requires a constitutional change SHOULD also file a Proposa
 
 ## Index
 
+> **Integrity warning (2026-09-09):** DEBT-0105 proves that several historical identifiers no
+> longer match this index after partial-workspace autonomous allocation. Do not treat this index as
+> authoritative until the reconciliation in DEBT-0105 is complete. Existing files are preserved.
+
 - `DEBT-0001.md` — Provisional genesis parameters set without tournament evidence.
 - `DEBT-0002.md` — B0.0 Day-1 spawnability spike (RESOLVED).
 - `DEBT-0003.md` — Production persistence backend (SQLite built, Postgres deferred).
@@ -58,5 +62,30 @@ whose ideal solution requires a constitutional change SHOULD also file a Proposa
 - `DEBT-0023.md` — Fixed write-scope coupling in autonomous intake generation drops valid deliverable files (OPEN).
 - `DEBT-0024.md` — Traceability broken by uncommitted `PAEOS-9-execution-architecture.md` dependency in `SAEOS-1` (OPEN).
 - `DEBT-0025.md` — Parallel backlog format duplication (YAML DAG vs. JSON Intake list) (OPEN).
-
-
+- `DEBT-0105.md` — Debt-ledger identifiers reused and historical entries displaced (BLOCKING).
+- `DEBT-0106.md` — IP-0017 Founder hierarchy resolved; derived projection reconciliation remains OPEN.
+- `DEBT-0107.md` — Premature L11 freeze and competing acceptance mechanisms (BLOCKING).
+- `DEBT-0108.md` — Self-attested completeness and unenforced manifest fields (BLOCKING).
+- `DEBT-0109.md` — Candidate environment/restart identity gaps (BLOCKING).
+- `DEBT-0110.md` — Mutable/incomplete L14 scope and synthetic accounting (BLOCKING).
+- `DEBT-0111.md` — Corrupt taint metadata fails open (HIGH).
+- `DEBT-0112.md` — Test-only worker authority stack returns successful no-ops (BLOCKING BEFORE ACTIVATION).
+- `DEBT-0113.md` — Duplicate sandbox kernels leave Court on weaker implementation (BLOCKING).
+- `DEBT-0114.md` — Routing-policy bypass permits homogeneous review (BLOCKING).
+- `DEBT-0115.md` — Provider workers inherit host credentials and lack read confinement (CRITICAL).
+- `DEBT-0116.md` — Governed Codex Builder exhausted usage quota before candidate production (OPEN).
+- `DEBT-0117.md` — Autonomous Gap Adaptation and Delegated Self-Remediation capability not yet physically demonstrated (OPEN · NOT P1-BLOCKING).
+- `DEBT-0118.md` — Chat-Bridge compatibility response timeout before provider candidate production (OPEN / historical).
+- `DEBT-0119.md` — Governed planner handoff deadline exceeded before provider candidate production (OPEN / historical).
+- `DEBT-0120.md` — Isolated Builder identity repair could not affect parent runtime before L12 (OPEN / historical).
+- `DEBT-0121.md` — Parent runtime identity binding was absent before candidate collection (OPEN / historical).
+- `DEBT-0122.md` — Candidate archive rejected developer-only `.claude` symlink projection (REMEDIATED).
+- `DEBT-0123.md` — Provider prerequisite candidate correctly failed the unrelated full P1 manifest scope (OPEN / expected remand).
+- `DEBT-0124.md` — Host cannot launch the destination-scoped confined provider process (OPEN / provider prerequisite blocker).
+- `DEBT-0156.md` — Reasoning Economy, Failure Locality, and Execution Efficiency (HIGH / SYSTEMIC / NON-P1-BLOCKING).
+- `DEBT-0157.md` — Builder Produced No Artifact — Write-Scope or Agent Failure (OPEN / autonomous friction record).
+- `DEBT-0158.md` — Semantic Authority, Founder Escalation, and Convergence Classification (HIGH / SYSTEMIC / NON-P1-BLOCKING).
+- `DEBT-0249.md` — PAEOS Hardening — Soft Doctrine to Executable Law (HIGH / SYSTEMIC / POST_P2 / NON_P2_BLOCKING / OPEN / ACTIVE_PROGRAMME).
+- `DEBT-0250.md` — PAEOS Semantic Intent Preservation & Design Completeness (CRITICAL / SYSTEMIC / IMMEDIATE_POST_P2 / QUALIFIED & COURT_SEALED).
+- `DEBT-0261.md` — Dependency-Aware Admission and Goal-Isolated Concurrent Execution (HIGH / BLOCKING BEFORE UNQUALIFIED MULTI-GOAL CONCURRENCY ACTIVATION / OPEN / FORMALIZED, NOT IMPLEMENTED).
+- `DEBT-0262.md` — Founder `resolve` CLI verb is absent (MEDIUM / IMPLEMENTATION DEBT / NON-BLOCKING TO CURRENT DIRECT-INSTRUCTION PRECEDENT / OPEN).

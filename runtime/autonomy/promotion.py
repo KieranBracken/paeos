@@ -10,6 +10,7 @@ import threading
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from kernel.capability import CapabilityBroker, CapabilityError
 from kernel.cas import is_valid_hash
@@ -52,6 +53,7 @@ class PromotionController:
         bootstrap_manifest_hash: str | None = None,
         state_root: Path | None = None,
         git_binary: str = "/usr/bin/git",
+        cas: Any = None,
     ) -> None:
         if bootstrap_manifest_hash is not None and not is_valid_hash(bootstrap_manifest_hash):
             raise ValueError("bootstrap manifest hash must be a lowercase SHA-256")
@@ -59,6 +61,7 @@ class PromotionController:
         self._bootstrap_manifest_hash = bootstrap_manifest_hash
         self._state_root = state_root
         self._git_binary = git_binary
+        self._cas = cas
         self._consumed_tokens: set[str] = set()
         self._lock = threading.Lock()
 
@@ -71,9 +74,19 @@ class PromotionController:
         current_target_head: str,
         evidence: PromotionEvidence | None = None,
         repository_path: Path | None = None,
+        cas: Any = None,
+        candidate_files: Any = None,
+        candidate_base_dir: Path | str | None = None,
     ) -> PromotionReceipt:
         evidence = evidence or PromotionEvidence()
-        reasons = evaluate_promotion(intent, evidence)
+        effective_cas = cas if cas is not None else self._cas
+        reasons = evaluate_promotion(
+            intent,
+            evidence,
+            cas=effective_cas,
+            candidate_files=candidate_files,
+            candidate_base_dir=candidate_base_dir,
+        )
         if self._bootstrap_manifest_hash is None and "FOUNDER_BOOTSTRAP_REQUIRED" not in reasons:
             reasons = ("FOUNDER_BOOTSTRAP_REQUIRED", *reasons)
         if reasons:

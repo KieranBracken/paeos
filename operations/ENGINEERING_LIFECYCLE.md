@@ -33,9 +33,47 @@ from verifiability × reversibility:
 
 Founder · Planner · Researcher · Builder · Reviewer · Court · Adversary · Auditor ·
 Runtime. The **Runtime** orchestrates: it assigns states to agents, compiles their
-context, enforces gates, and selects the **model** per role (Opus/Sonnet/Gemini/local),
-honoring decorrelation (an Auditor/Adversary MUST differ in model family from the Builder
-it checks — kernel A-08).
+context, enforces gates, and selects a configured worker by role and lifecycle-stage
+capability, task authority, current health, privacy and confinement constraints, input/output
+capacity, and task-specific policy. Every invocation records the exact selected and observed
+provider, model, and family as provenance. The normative stage crosswalk in the ratified
+worker-pool amendment governs family eligibility. Only L09 Reviewer/CRITIC and L10 Adversary
+permit the prospective same-family conditions defined there; all existing family and
+decorrelation requirements remain unchanged for every other stage, including L07, L13-adversarial,
+L14, and L17/L18 wherever an Auditor restriction applies. L14 remains unequivocally
+`Auditor family != Builder family`.
+
+### Ratified worker-pool eligibility rule
+
+Worker-pool eligibility is capability-first and fail-closed. A qualification establishes that
+a configured worker implementation can satisfy a named capability class. It is not a permanent
+authorization for every task and does not make the provider/model identity a capability. Before
+each dispatch, the Runtime checks that the selected worker still has the required capability
+class and that the current provider/worker health, exact role and stage, task authority, data
+class, context and output limits, privacy policy, confinement, tool/write permissions, cost
+rules, and fallback policy satisfy the task contract. Switching among already-configured
+implementations with the same established capability class does not by itself require a new
+permanent Founder/model onboarding ceremony. A worker with no established capability class, an
+unverified data policy, or a failed current check is ineligible.
+
+Every invocation receipt binds the role; lifecycle stage; task and run identity; capability
+class; allowed read/write scopes; input/context and output ceilings; privacy/data class;
+confinement requirements; tool/write permissions; fallback policy; current health/readiness
+result; required cost authorization; selected and observed provider, model, and family; and
+request/response/evidence identities. The observed identity must equal the selected identity.
+Missing, stale, mismatched, substituted, or incomplete evidence fails closed.
+
+A provider/model/account/entitlement failure is scoped to the smallest level established by
+evidence: task, role/capability, entitlement/account, model, or provider. An unknown failure is
+scoped to the attempted task pending diagnosis. It must not disable the worker pool globally
+without provider-wide evidence. A newly selected worker is a separately evidenced dispatch
+under the same task contract, not hidden fallback within the failed invocation. A new attempt
+for the same logical task is prohibited while the prior attempt's effect is ambiguous. Before
+another worker is dispatched, Runtime must reconcile the prior attempt using authoritative
+attempt/receipt state and establish either that it had no effect or that the task has a declared,
+verified idempotent recovery contract. Otherwise the logical task remains held. Every attempt
+has a distinct attempt identity bound to the shared logical task identity; no implicit retry,
+duplicate send, or provider/model fallback is permitted.
 
 ---
 
@@ -122,8 +160,18 @@ produced.** Owning role and recommended model class in the header line.
 
 ### Phase III — Constitutional Review
 
-#### L09 — Multi-Perspective Critique · *Reviewer (7 perspectives) · model: Gemini/Opus (decorrelated)*
+#### L09 — Multi-Perspective Critique · *Reviewer (7 perspectives) · model: capability-qualified worker (family diversity preferred)*
 - **Purpose:** attack the design from every stance — Builder, Architect, Risk Officer, Performance, Security, Replay, Maintainer.
+For L09, family diversity is a preference. A same-family CRITIC is eligible only when the review
+uses a fresh independent worker/session and exact frozen artifact context; receives no hidden
+Builder reasoning, transcript, private context, or mutable Builder state; has no Builder write
+authority; cannot self-certify; records exact provider/model/family and the actual family match;
+and produces seven separately labeled perspective entries with each finding bound to concrete
+evidence and a severity/reasoned disposition. The report states which perspectives have no
+finding; it does not claim seven independent workers unless there were seven. The review context
+and provenance must be independently bound. Where family diversity is absent, the record must
+state the deficit and the Court/mechanical evidence specified in the ratified K3 augmentation.
+No family inequality claim may be made.
 - **Entry:** an architecture artifact from L08.
 - **Required artifacts:** finding register; required changes.
 - **Exit:** every perspective has reported; required changes are logged.
@@ -131,8 +179,16 @@ produced.** Owning role and recommended model class in the header line.
 - **Failure:** a perspective is skipped → the review is incomplete, cannot advance.
 - **Evidence produced:** per-perspective finding register.
 
-#### L10 — Adversarial Review · *Court + Adversary · model: Opus/Gemini (≠ Builder family)*
+#### L10 — Adversarial Review · *Court + Adversary · model: capability-qualified worker (family diversity preferred)*
 - **Purpose:** attempt to prove the design wrong — contradictions, hidden assumptions, circular reasoning, economic/security/scaling failures, emergent behaviour.
+For L10, family diversity is preferred but is not a hard eligibility gate after this amendment is
+ratified. A same-family Adversary is eligible only with a fresh independent worker/session,
+exact frozen L08/L09 context, no hidden Builder reasoning/transcript/private context/shared
+mutable Builder state, no Builder write authority, no self-certification, exact provider/model/
+family provenance, no hidden fallback, and explicit recording that the reviewer family matches
+the Builder family. The same-family route is ineligible until the K3 augmentation acceptance
+criteria pass on the exact review context and amendment. The normal L10 findings and a separate
+Court verdict remain mandatory. This rule does not alter L14.
 - **Entry:** L08 design + L09 findings.
 - **Required artifacts:** adversarial report; blocking amendments.
 - **Exit:** a verdict (RATIFY / RATIFY-WITH-AMENDMENTS / REJECT) with every finding carrying violated-principle · evidence · severity · smallest-amendment (the 3.5/5.5 court format).
@@ -220,8 +276,11 @@ produced.** Owning role and recommended model class in the header line.
 
 ### Phase VII — Evolution
 
-#### L19 — Constitutional Evolution · *Court + Founder · model: Opus (+ decorrelated Adversary)*
+#### L19 — Constitutional Evolution · *Court + Founder · model: admitted Court contract (family diversity preferred)*
 - **Purpose:** update PAEOS itself — did implementation reveal hidden assumptions? should policy/schema/lifecycle/routing change?
+The model annotation is preferred descriptive guidance only. It does not add an L09/L10
+prerequisite to L19 or confer a provider qualification; the exact Court assignment is governed by
+its admitted Court contract, role, provenance, and K3 evidence.
 - **Entry:** an incident, an L18 amendment candidate, or a kernel-surface finding.
 - **Required artifacts:** Incident; Amendment (`policy_delta` + motivation-scars + `falsifier_watch` + own evidence spec); policy evolution; kernel proposal (if warranted).
 - **Exit:** amendment reaches `provisional` (delta applied, falsifier armed) → `verified | reverted` (A-06); kernel-surface changes pass §14.5 ceremony + founder Decision.

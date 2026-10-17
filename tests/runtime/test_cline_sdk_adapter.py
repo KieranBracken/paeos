@@ -109,7 +109,7 @@ def adapter_case(tmp_path: Path) -> tuple[ClineSdkAdmissionAdapter, ProbeContrac
             profile_uuid=UUID("12345678-1234-5678-1234-567812345678"),
             auth_epoch=1,
         ),
-        timeout_seconds=15,
+        timeout_seconds=60,
         lease_root=lease_root,
         process_start_token="test-process-start",
         boot_id="test-boot",

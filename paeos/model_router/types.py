@@ -46,9 +46,17 @@ ProviderKey = str
 
 
 class CostTier(StrEnum):
-    FREE = "FREE"                                    # Zero monetary entitlement required
-    SUBSCRIPTION_INCLUDED = "SUBSCRIPTION_INCLUDED"  # Already-paid subscription ($0 marginal inference cost)
-    PAID_USAGE = "PAID_USAGE"                        # Consumes pay-as-you-go monetary credits
+    FREE = "FREE"                                    # Zero monetary entitlement required ($0.00 / token)
+    SUBSCRIPTION_INCLUDED = "SUBSCRIPTION_INCLUDED"  # Flat-rate subscription ($0 marginal inference cost)
+    PAID = "PAID"                                    # Consumes pay-as-you-go monetary credits
+    PAID_USAGE = "PAID"                              # Backward-compatibility alias
+
+
+class AdmissionState(StrEnum):
+    DISCOVERED = "DISCOVERED"          # Discovered in provider manifest or package closure
+    SDK_QUALIFIED = "SDK_QUALIFIED"    # Package closure and binary signatures verified
+    LIVE_PROBED = "LIVE_PROBED"        # Successfully completed live end-to-end operational probe
+    ADMITTED = "ADMITTED"              # Admitted into operational worker / routing mesh
 
 
 class ModelFamily(StrEnum):
@@ -62,6 +70,11 @@ class ModelFamily(StrEnum):
     NEMOTRON = "nemotron"
     GPT = "gpt"
     QWEN = "qwen"
+    KIMI = "kimi"
+    LONGCAT = "longcat"
+    NEXAGI = "nexagi"
+    ANTHROPIC = "anthropic"
+    MISTRAL = "mistral"
     UNKNOWN = "unknown"
 
 
@@ -76,6 +89,14 @@ class NormalizedErrorType(StrEnum):
     TIMEOUT = "TIMEOUT"
     MODEL_UNAVAILABLE = "MODEL_UNAVAILABLE"
     UNKNOWN = "UNKNOWN"
+
+
+class FailureScope(StrEnum):
+    """The narrowest durable scope that a provider observation can safely affect."""
+
+    PROVIDER = "PROVIDER"
+    MODEL = "MODEL"
+    ENTITLEMENT = "ENTITLEMENT"
 
 
 class RetryPolicy(StrEnum):
@@ -111,6 +132,7 @@ class ModelCatalogEntry:
     pricing_verified_free: bool = True      # Documented zero-cost or subscription-included pricing
     live_verified: bool = False             # Empirically verified via successful live probe
     available: bool = True                  # Admitted into operational routing
+    admission_state: AdmissionState = AdmissionState.ADMITTED  # Formal admission lifecycle state (defaults to ADMITTED for custom/test entries)
     context_window: int = 32_000
     supports_tools: bool = True
     supports_json: bool = True
@@ -137,6 +159,9 @@ class TaskRequest:
     metadata: dict[str, Any] = field(default_factory=dict)
     retry_policy: RetryPolicy = RetryPolicy.SINGLE_RATE_LIMIT
     allow_fallback: bool = True
+    allow_paid_usage: bool = False          # Strict fail-closed guardrail: requires explicit opt-in for paid routes
+    free_worker_pool: bool = False          # Explicit FREE-only pool mode; normal fallback remains automatic
+
 
 
 @dataclass
@@ -148,6 +173,8 @@ class NormalizedError(Exception):
     http_status: int | None = None
     retry_after: float | None = None
     raw_response: str | None = None
+    failure_scope: FailureScope = FailureScope.PROVIDER
+    scope_key: str | None = None
 
     def __str__(self) -> str:
         return f"[{self.error_type.value}] Provider={self.provider_id} HTTP={self.http_status} RetryAfter={self.retry_after}: {self.message}"
@@ -174,3 +201,6 @@ class RouterResponse:
     # backwards-compatible diagnostic responses, but required by Task 9A physical receipts.
     transport_request_sha256: str | None = None
     transport_response_sha256: str | None = None
+    host_turn_uuid: str | None = None
+    external_generation_id: str | None = None
+

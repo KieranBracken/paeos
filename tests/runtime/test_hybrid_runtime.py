@@ -8,6 +8,7 @@ from kernel.capability import CapabilityBroker
 from kernel.types import Role, StageId
 from runtime.claude_code import RunOutput, TaskStatus
 from runtime.integrations.hybrid import HybridRuntime
+from runtime.planner_transport import PlannerTransportNotReady
 from runtime.task_package import Budget, Permissions, TaskPackage
 
 
@@ -62,3 +63,59 @@ def test_hybrid_runtime_routing() -> None:
         pkg = _make_package(stage)
         res = router.run(pkg)
         assert res.trace == b"glm"
+
+    assert mock_codex.run.call_count == 5
+    assert mock_glm.run.call_count == 2
+
+
+def test_qualified_planner_critique_uses_luna_transport() -> None:
+    """A qualified planner CRITIQUE must not fall back to the legacy Cline adapter."""
+
+    mock_codex = MagicMock()
+    mock_glm = MagicMock()
+    mock_codex.run.return_value = RunOutput(
+        status=TaskStatus.COMPLETE, writes=(), evidence=(), trace=b"luna", cost=None
+    )
+    mock_glm.run.return_value = RunOutput(
+        status=TaskStatus.COMPLETE, writes=(), evidence=(), trace=b"glm", cost=None
+    )
+    readiness = MagicMock()
+    readiness.require.return_value = object()
+
+    router = HybridRuntime(
+        codex_runtime=mock_codex,
+        glm_runtime=mock_glm,
+        planner_transport=object(),
+        planner_readiness=readiness,
+    )
+
+    result = router.run(_make_package(StageId.CRITIQUE))
+
+    assert result.trace == b"luna"
+    readiness.require.assert_called_once_with("CRITIQUE")
+    mock_codex.run.assert_called_once()
+    mock_glm.run.assert_not_called()
+
+
+def test_unready_planner_critique_fails_closed_without_glm_fallback() -> None:
+    mock_codex = MagicMock()
+    mock_glm = MagicMock()
+    readiness = MagicMock()
+    readiness.require.side_effect = PlannerTransportNotReady("CRITIQUE is not qualified")
+    router = HybridRuntime(
+        codex_runtime=mock_codex,
+        glm_runtime=mock_glm,
+        planner_transport=object(),
+        planner_readiness=readiness,
+    )
+
+    try:
+        router.run(_make_package(StageId.CRITIQUE))
+    except PlannerTransportNotReady:
+        pass
+    else:
+        raise AssertionError("unready planner CRITIQUE did not fail closed")
+
+    readiness.require.assert_called_once_with("CRITIQUE")
+    mock_codex.run.assert_not_called()
+    mock_glm.run.assert_not_called()

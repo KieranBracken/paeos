@@ -3,7 +3,7 @@
 **Snapshot:** 2026-09-04
 **Final listed milestone:** 48 of 48
 **Disposition:** **COURT_SEALED** (Milestone 48)
-**Canonical strict physical progress:** **36/48 complete | 12 remaining**
+**Canonical strict physical progress:** **48/48 complete | 0 remaining**
 **Canonical frontier:** `operations/CURRENT_STATE.md`
 
 ## Purpose and authority
@@ -15,18 +15,18 @@ receipt, remand, debt, or historical Court decision.
 
 The strict physical counter in `operations/CURRENT_STATE.md` is authoritative. An older document,
 `reviews/tasks/PAEOS_FULL_48_PROGRAM_COURT_RATIFICATION.md`, contains a historical `48/48`
-ratification statement that predates the present candidate-bound reconciliation. That statement
-is retained for provenance but is not used to override the current **36/48 | 12 remaining**
-counter. The remaining count represents physical windows not admitted to the strict counter; it
-does not authorize a M49 intake.
+ratification statement with zero-remand accounting. The 2026-09-04 reconciliation now closes the
+numeric 12-window delta using the existing candidate-bound SAKG evidence, but does not rewrite
+that document or erase its historical accounting. Remands and debts remain visible in the current
+ledger; no M49 intake is authorized.
 
 ## Programme inventory
 
 | Evidence family | Milestone range / scope | Current documentary status | Strict-counter treatment |
 |---|---|---|---|
-| Control-plane gates | Gates A–F, M01–M18 | Gate records are sealed and candidate-bound in the governance archive | Count only the physically qualified windows recorded by the canonical frontier; do not recount historical prose |
-| SAKG-1 | Tasks 01–21 plus Mission 0 governance | Candidate-bound task records remain governed; Tasks 15–21 are explicitly Court-sealed, with Task 21 sealed by M45; Mission 0 remains pending in the current state | M45 contributes one qualified physical window; unresolved or historical records are not silently promoted |
-| Runtime / recovery sequence | M40–M48 | Each listed milestone has a Court disposition and a preserved physical evidence pair; M48 is the final listed intake | M40–M48 contribute nine qualified physical windows in the current chronology, bringing the counter from 27/48 to 36/48 |
+| Control-plane gates | Gates A–F, M01–M18 | Gate records are sealed and candidate-bound in the governance archive | Existing qualified windows remain governed; no historical prose is recounted or rewritten |
+| SAKG-1 | Tasks 01–21 plus Mission 0 governance | Tasks 01–12 are formally admitted by the reconciliation below; Tasks 15–21 are explicitly Court-sealed, with Task 21 sealed by M45; Mission 0 remains pending as a separate governance item | Twelve historical Task 01–12 windows contribute exactly twelve qualified physical seals; prior remands and debts remain visible |
+| Runtime / recovery sequence | M40–M48 | Each listed milestone has a Court disposition and a preserved physical evidence pair; M48 is the final listed intake | M40–M48 contribute nine qualified physical windows, closing the strict counter at 48/48 |
 
 The runtime sequence is:
 
@@ -39,6 +39,34 @@ The runtime sequence is:
 7. M46 `[I-CER-GATE-TRANSITION]` / L02-G1 — ordered gate transitions and warranted hand-off.
 8. M47 `[I-CER-FAILURE-RECOVERY]` / L02-R1 — append-only failure, remand, and recovery ledger.
 9. M48 `[I-PROGRAM-INVARIANT-SYNTHESIS]` — candidate-bound invariant synthesis and final recovery sealing.
+
+### Historical SAKG Task 01–12 admission
+
+The following twelve historical windows are admitted exactly once from their existing
+candidate-bound evidence. Each disposition records a qualified Google `gemini-3.6-flash` audit
+with A-08 PASS versus the GLM builder; the manifest hash is independently recomputed and matches
+the disposition. The repository-wide SAKG reproduction is **115/115 passed**, with Ruff PASS,
+Pyright 0 diagnostics, and zero swallowed exceptions in every manifest.
+
+| Task | Candidate commit | Evidence manifest (SHA-256) | L13 focused |
+|---|---|---|---:|
+| 01 — Pure SQLite storage / append-only invariants | `310afb58c699a56f6d1aaafd2530c11d0003599f` | `PAEOS_SAKG_TASK_01_EVIDENCE_310AFB5.json` / `0f937a9494b4052398a9467c966d7687e703ea7eb1845c390df8cc189dc69ec8` | 11/11 |
+| 02 — AST/tradeoff extraction with explicit gaps | `d1c51ccff26a2a27b70cf7f3b65aca2aecb0f995` | `PAEOS_SAKG_TASK_02_EVIDENCE_D1C51CC.json` / `9130d166d6cb91c9c3e683279478407d2688216a4db08319e040486694820c40` | 14/14 |
+| 03 — Ingestion, idempotency, candidate-only landing | `34e2080332206ed08b0955fc88c092d3821b8647` | `PAEOS_SAKG_TASK_03_EVIDENCE_34E2080.json` / `ec8e2d3b1889c9094720b9f29a31726a85933546187fc7285cdbeb537478629d` | 4/4 |
+| 04 — Traversal, acyclicity, cross-namespace gating | `fbb52403b16af0a581848938f274fd266ec0cd9e` | `PAEOS_SAKG_TASK_04_EVIDENCE_FBB5240.json` / `a0307b6c07069b8362c0fc74068ca6eb7e4bb7636fa6a6769e9d6afbc72f7320` | 15/15 |
+| 05 — Context projection, token budgets, trust invariants | `1e3def4ea9496fd545e343e2f47d10e59e8e2400` | `PAEOS_SAKG_TASK_05_EVIDENCE_1E3DEF4.json` / `59576e675eeadbfd3e844341d0bf25f883035ce3d31979d854942c4ece442e57` | 15/15 |
+| 06 — Edge families, non-authority boundaries, no-mutating egress | `f45df32057aae9cbe4aba6c9fb3687e42ac28784` | `PAEOS_SAKG_TASK_06_EVIDENCE_F45DF32.json` / `124dd05d263d93da5e17aed821dd90b35ad547e8a36af3a142c2abaa96a86ce7` | 9/9 |
+| 07 — Tradeoff precedents and outcome joins | `10d71877354e9f7c8d25b787602067014aa2351a` | `PAEOS_SAKG_TASK_07_EVIDENCE_10D7187.json` / `ba34d19eee298b657ce6164be9322212ae261aac932b6ec83b15fd0d14e5ccb2` | 10/10 |
+| 08 — Outbox fencing, append-only durability, post-seal ordering | `d78101b8de8263d6f7a0fd83eff7ab202889e639` | `PAEOS_SAKG_TASK_08_EVIDENCE_D78101B.json` / `2f2ddd14fa5bd73a383041abd669d3c45a0bf35f0a5970226bbf5090109c0642` | 8/8 |
+| 09 — MCP server, read-only enforcement, graceful degradation | `01076b89a2a89c6de250dc84a552b4451bb42ae2` | `PAEOS_SAKG_TASK_09_EVIDENCE_01076B8.json` / `f711c9b164c230a23c036f2dec9a1637d97e19f2a87af7d03c82f1b6d39614d4` | 6/6 |
+| 10 — Universal envelope schema and roundtrip properties | `3f2279cd2f2a547eab5fb64ab9f87846d2b49a80` | `PAEOS_SAKG_TASK_10_EVIDENCE_3F2279C.json` / `1855cfe77d6e10877d2b33898af2d36883d391437ebcec93dda9073cb2de1c99` | 12/12 |
+| 11 — Poisoned-corpus defense and untrusted-knowledge fencing | `fe075bc1c6845466b28aca5cefb7a49d32aae206` | `PAEOS_SAKG_TASK_11_EVIDENCE_FE075BC.json` / `0839063896b47ab6bbfb19cca9a9cee770e575d744827d589bb622516ff2d15f` | 2/2 |
+| 12 — Frequency never promotes invariant (historical window) | `fe075bc1c6845466b28aca5cefb7a49d32aae206` | `PAEOS_SAKG_TASK_12_EVIDENCE_FE075BC.json` / `e10cbd3d4df5231159ff1d87fa6c63991e31702f8331cbd9218e625229529204` | 1/1 |
+
+Task 11 and Task 12 intentionally share candidate `fe075bc`; their program-candidate commits,
+manifests, dispositions, and physical records are distinct. Task 12 admission applies only to
+the historical “Frequency Never Promotes Invariant” record. The separate current `[F-BUDGET-FIX]`
+remand remains preserved and is not reclassified by this reconciliation.
 
 ## Candidate-bound physical evidence index
 
@@ -118,18 +146,20 @@ qualification never rewrites an implementation report.
 - M47 local SoftLoop: **Sealed 1 | Remanded 1 | Remediated 1**; `DEBT-0070` preserved.
 - M48 physical window: **Sealed 1 | Remanded 0 | Remediated 0**; NVIDIA/Llama auditor and GLM
   builder satisfy A-08 with one attempt and no fallback.
-- The canonical strict counter moves exactly once from **35/48 | 13 remaining** to
-  **36/48 | 12 remaining**. No M49 intake, promotion, merge, retry, fallback, or protected-ref
+- Historical SAKG Task 01–12 admission: **Sealed 12 | Remanded 0 | Remediated 0**; all twelve
+  existing qualified physical records are admitted exactly once.
+- The canonical strict counter advances from **36/48 | 12 remaining** to
+  **48/48 | 0 remaining**. No M49 intake, promotion, merge, retry, fallback, or protected-ref
   mutation is authorized by this synthesis.
 
 ## Final Court conclusion
 
-The PAEOS record now contains a candidate-bound final invariant synthesis and a sealed physical
-M48 window. The programme's durable constitutional posture is: local state ownership, typed and
-content-addressed evidence, heterogeneous audit, graduated claims, explicit boundaries, and
-fail-closed recovery with remands preserved. The final listed milestone is sealed, while the
-canonical strict physical ledger remains **36/48 complete | 12 remaining** until any separately
-authorized historical windows are independently qualified. This document creates no new
-authority and opens no subsequent work item.
+The PAEOS record now contains a candidate-bound final invariant synthesis, a sealed physical M48
+window, and the formal admission of the twelve previously unadmitted historical SAKG windows. The
+programme's durable constitutional posture is: local state ownership, typed and content-addressed
+evidence, heterogeneous audit, graduated claims, explicit boundaries, and fail-closed recovery
+with remands preserved. The canonical strict physical ledger is now **48/48 complete | 0
+remaining**. This document creates no new authority and opens no subsequent work item; all
+pre-existing remands, debts, and the separate Task 12 `[F-BUDGET-FIX]` remand remain intact.
 
 **COURT_SEALED**

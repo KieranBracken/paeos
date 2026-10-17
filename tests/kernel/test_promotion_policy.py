@@ -90,8 +90,34 @@ def test_evaluate_promotion_rejects_correlated_risks() -> None:
     assert "RECONCILIATION_REQUIRED" in reasons
 
 
-def test_evaluate_promotion_accepts_complete_reversible_trace_a_evidence() -> None:
+def test_evaluate_promotion_accepts_complete_reversible_trace_a_evidence(tmp_path: Path) -> None:
+    import json
+    import hashlib
+    from kernel.cas import CAS, InMemoryCasStore
     from kernel.promotion import PromotionEvidence, evaluate_promotion
+
+    cand_file = tmp_path / "mod.py"
+    cand_file.write_text("print('hello')\n", encoding="utf-8")
+    tree = {cand_file.name: hashlib.sha256(cand_file.read_bytes()).hexdigest()}
+    computed_root = hashlib.sha256(json.dumps(tree, sort_keys=True).encode("utf-8")).hexdigest()
+
+    cas = CAS(InMemoryCasStore())
+    l11_hash = cas.put(json.dumps({"candidate_root": computed_root}).encode("utf-8"))
+    l13_hash = cas.put(json.dumps({"candidate_root": computed_root}).encode("utf-8"))
+    report_hash = cas.put(b"AUDIT_COMPLETE: true\nL14_STATUS: PASS\n")
+    l14_receipt_hash = cas.put(json.dumps({
+        "builder_family": "glm",
+        "auditor_family": "gemini",
+        "a08_verdict": "PASS",
+        "candidate_sha256": computed_root,
+        "evidence_bundle_sha256": l13_hash,
+        "report_sha256": report_hash,
+        "external_generation_id": "gen-test-12345678",
+        "host_turn_uuid": "d3b07384-d113-4e2a-9f5e-26f53ef58941",
+        "transport_request_sha256": "1" * 64,
+        "transport_response_sha256": "2" * 64,
+    }).encode("utf-8"))
+    l15_hash = cas.put(json.dumps({"candidate_root": computed_root}).encode("utf-8"))
 
     intent = PromotionIntent(
         repository_id="repo-003",
@@ -102,17 +128,19 @@ def test_evaluate_promotion_accepts_complete_reversible_trace_a_evidence() -> No
         rollback_commit="2" * 40,
         health_command_id="pytest-focused",
         expires_seq=100,
+        candidate_root_hash=computed_root,
     )
     evidence = PromotionEvidence(
         bootstrap_verified=True,
-        l11_contract_hash="1" * 64,
-        l13_evidence_hash="2" * 64,
-        l14_receipt_hash="3" * 64,
-        l15_document_hash="4" * 64,
+        l11_contract_hash=l11_hash,
+        l13_evidence_hash=l13_hash,
+        l14_receipt_hash=l14_receipt_hash,
+        l15_document_hash=l15_hash,
         builder_family="glm",
         auditor_family="gemini",
         rollback_verified=True,
         health_passed=True,
+        candidate_root_hash=computed_root,
     )
 
-    assert evaluate_promotion(intent, evidence) == ()
+    assert evaluate_promotion(intent, evidence, cas=cas, candidate_files=[cand_file], candidate_base_dir=tmp_path) == ()
