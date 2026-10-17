@@ -1,0 +1,45 @@
+{
+  "base": "codex/pre-p3-clean-recovery-20261017",
+  "branch": "codex/builder-qualification-bootstrap-20261017",
+  "checkpoint": "builder-source-runtime-root-binding",
+  "classification": "recovery checkpoint; not release, Court adjudication, or qualification",
+  "file_count": 7,
+  "files": [
+    {
+      "bytes": 1423986,
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "959e688bbb96427f4934d06d889fb0f81ed5c9e4cb2f9211aa3f416b14f95365"
+    },
+    {
+      "bytes": 642429,
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "a21f37356e5bb1ffd7a54da1f29f55721d71bf1794fd9188f70fd521560bcd79"
+    },
+    {
+      "bytes": 20020,
+      "path": "ops/install_trusted_codex_worker_supervisor.py",
+      "sha256": "77d02334ba5e42018f933b830ce76628da46b63ca75b7d38b73ec0279805a3af"
+    },
+    {
+      "bytes": 12339,
+      "path": "tests/ops/test_trusted_codex_installer_binding.py",
+      "sha256": "8829d72f89c628b646c8f53f92c06bde03fdbb05baef783026d4c9ffe2c985a9"
+    },
+    {
+      "bytes": 4934,
+      "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/REPORT.md",
+      "sha256": "01a591e06f9ae38ee2b6d2dfe12b0a706aa597ff5be0fd7f496ff3744957371c"
+    },
+    {
+      "bytes": 3344,
+      "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/focused-verification.json",
+      "sha256": "13f67734aa7b585d618b038eea282b571d5f708559f769350de8da3c21f6d7ea"
+    },
+    {
+      "bytes": 4700,
+      "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/secret-scan.json",
+      "sha256": "d6251f3c8d465966552acab7a91aa9449da7b3aa25f690510b269b798759dcce"
+    }
+  ],
+  "schema": "paeos.recovery-checkpoint-manifest/1"
+}

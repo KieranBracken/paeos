@@ -1,0 +1,66 @@
+{
+  "schema": "paeos.builder-root-binding-verification/1",
+  "branch": "codex/builder-qualification-bootstrap-20261017",
+  "base": "codex/pre-p3-clean-recovery-20261017",
+  "checks": [
+    {
+      "name": "installer-and-focused-tests",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync pytest -q tests/ops/test_trusted_codex_installer_binding.py tests/runtime/test_trusted_codex_worker_transport.py tests/runtime/test_builder_transport_readiness.py tests/runtime/test_trusted_codex_client.py",
+      "status": "PASS",
+      "result": "47 passed"
+    },
+    {
+      "name": "original-transport-readiness-client-set",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync pytest -q tests/runtime/test_trusted_codex_worker_transport.py tests/runtime/test_builder_transport_readiness.py tests/runtime/test_trusted_codex_client.py",
+      "status": "PASS",
+      "result": "43 passed"
+    },
+    {
+      "name": "ruff-lint",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync ruff check ops/install_trusted_codex_worker_supervisor.py tests/ops/test_trusted_codex_installer_binding.py tests/runtime/test_trusted_codex_worker_transport.py tests/runtime/test_builder_transport_readiness.py tests/runtime/test_trusted_codex_client.py",
+      "status": "PASS",
+      "result": "All checks passed"
+    },
+    {
+      "name": "ruff-format",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync ruff format --check ops/install_trusted_codex_worker_supervisor.py tests/ops/test_trusted_codex_installer_binding.py tests/runtime/test_trusted_codex_worker_transport.py tests/runtime/test_builder_transport_readiness.py tests/runtime/test_trusted_codex_client.py",
+      "status": "PASS",
+      "result": "5 files already formatted"
+    },
+    {
+      "name": "compile-and-whitespace",
+      "command": "/usr/bin/python3 -m compileall -q ops/install_trusted_codex_worker_supervisor.py tests/ops/test_trusted_codex_installer_binding.py && /usr/bin/git diff --check",
+      "status": "PASS",
+      "result": "No output; exit 0"
+    },
+    {
+      "name": "full-suite",
+      "command": "uv run pytest",
+      "status": "FAIL_COLLECTION",
+      "result": "One required run failed during collection with seven import errors for contracts.adapters: four contract collectors and three runtime transport collectors resolved through the shared host editable environment. Not rerun."
+    }
+  ],
+  "paeos_runs": [
+    {
+      "run_id": "r-440d04b7",
+      "status": "STOPPED_BEFORE_BUILDER",
+      "finding": "Ordered L08 design and L09 findings artifacts were unavailable at the L10 context-reference gate."
+    },
+    {
+      "run_id": "r-dec883cf",
+      "goal_id": "g-beaaedb6a190",
+      "status": "REMANDED_BEFORE_BUILDER",
+      "finding": "L10 sealed-context verification failed with CandidateIntegrityError because the ChatBridge compatibility identity did not satisfy the required signed physical-model envelope."
+    }
+  ],
+  "review": {
+    "selected": "Security Review",
+    "status": "PENDING",
+    "required_base": "codex/pre-p3-clean-recovery-20261017"
+  },
+  "host_install": "NOT_RUN",
+  "qualification_request": "NOT_SENT",
+  "provider_calls": 0,
+  "court_adjudication": "NONE",
+  "qualification": "EXPIRED"
+}

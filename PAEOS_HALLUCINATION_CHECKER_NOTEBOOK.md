@@ -13696,3 +13696,16 @@ ALLOWED_NOW: Finish the candidate review and publish a clearly labeled public re
 HELD: Install the immutable supervisor bundle, issue the single authorized gpt-5.6-sol qualification request, and admit a fresh PAEOS task. Wake only after the selected independent review is complete and the host queue/process preflight is still clear; an ambiguous request is terminal and must not be retried.
 
 AUTHORITY_OR_IMPLEMENTATION_GAP: The safe code path exists only in the isolated candidate branch; the host still runs the old bundle and its qualification is expired. Chat 1 remains the sole D0258 integrator. No new PAEOS admission, receiver start, Court adjudication, qualification, or P3 readiness is evidenced.
+
+
+### 2026-10-17 — PAEOS lifecycle attempt and source/runtime root binding
+
+Two fresh Trace-B production runs were preserved. Run `r-440d04b7` completed early lifecycle requests through CRITIQUE, then stopped before Builder because the required ordered L08 design and L09 findings artifacts were absent. Run `r-dec883cf` recorded stage completions through ADVERSARIAL_REVIEW, then was REMANDED at L10 with `CandidateIntegrityError`: ChatBridge reported only `chat-bridge-compatibility`, while the sealed-context gate requires the configured OpenAI model identity and signed envelope. Neither run started Builder, emitted a Builder response, reached Court, or qualified a task. These stage records are physical observations, not independent-family review, Court adjudication, or qualification. The exact private run state remains local and is not copied into the public checkpoint.
+
+The recovery-branch installer now accepts separate reviewed `source_root` and host `runtime_root` bindings. Focused tests exercise the full installer against temporary roots, verify reviewed-source bundle bytes and runtime-bound LaunchAgent paths, and confirm mismatched runtime files plus existing request/response identities remain unchanged. The final focused suite passed 47 tests; the original transport/readiness/client set passed 43. Ruff, formatting, compilation, and whitespace checks passed. One required full-suite run failed during collection with seven unrelated `contracts.adapters` import errors; it was not rerun. Security review is still pending. No installer was run on the host, no qualification/provider request occurred, and no qualification status changed.
+
+ALLOWED_NOW: Publish the sanitized source/root-binding recovery checkpoint and execute the single selected read-only Security Review against `codex/pre-p3-clean-recovery-20261017`.
+
+HELD: Host installation, the single authorized fresh-ID Builder qualification request, and all item-worker dispatches. Wake only after clean Security Review and a fresh queue/process/identity/bundle-hash preflight; do not retry an ambiguous request.
+
+AUTHORITY_OR_IMPLEMENTATION_GAP: PAEOS still lacks the accepted physical L10 sealed-context evidence path for the available ChatBridge runtime, and the signed Builder qualification is expired. Chat 1 remains the sole DEBT-0258 integrator. No admission, receiver start, Court adjudication, qualification, or P3 readiness is evidenced.

@@ -8,6 +8,7 @@ health result.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -16,6 +17,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from nacl.signing import SigningKey
@@ -38,6 +40,93 @@ REPO_PLANNER_QUALIFICATION = (
 )
 CODEX_AUTH_SOURCE = Path("/Users/bob/.codex/auth.json")
 PYTHON = REPO_ROOT / ".venv" / "bin" / "python3"
+
+
+def _resolved_directory(path: Path, *, label: str) -> Path:
+    if not path.is_absolute():
+        raise ValueError(f"{label} must be an absolute path")
+    try:
+        resolved = path.resolve(strict=True)
+    except OSError as exc:
+        raise RuntimeError(f"{label} is unavailable") from exc
+    if not resolved.is_dir():
+        raise RuntimeError(f"{label} is not a directory")
+    return resolved
+
+
+@dataclass(frozen=True, slots=True)
+class RootBindings:
+    """Resolved, immutable separation between bundle code and host runtime roots."""
+
+    source_root: Path
+    runtime_root: Path
+
+    @classmethod
+    def resolve(
+        cls,
+        *,
+        source_root: Path | None = None,
+        runtime_root: Path | None = None,
+    ) -> RootBindings:
+        default = _resolved_directory(REPO_ROOT, label="repository root")
+        return cls(
+            source_root=_resolved_directory(
+                default if source_root is None else source_root, label="source root"
+            ),
+            runtime_root=_resolved_directory(
+                default if runtime_root is None else runtime_root, label="runtime root"
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimePaths:
+    """Repository-local runtime paths derived only from the selected runtime root."""
+
+    root: Path
+
+    @classmethod
+    def from_root(cls, root: Path) -> RuntimePaths:
+        return cls(_resolved_directory(root, label="runtime root"))
+
+    @property
+    def python(self) -> Path:
+        return self.root / ".venv" / "bin" / "python3"
+
+    @property
+    def workspace_root(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "workspaces"
+
+    @property
+    def queue_root(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "queue"
+
+    @property
+    def request_key(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "request.key"
+
+    @property
+    def response_verify_key(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "response-verify.key"
+
+    @property
+    def qualification_verify_key(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "qualification-verify.key"
+
+    @property
+    def qualification_path(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "qualification.json"
+
+    @property
+    def planner_qualification_path(self) -> Path:
+        return self.root / "ops" / ".trusted-codex-worker" / "planner-qualification-v2.json"
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-root", type=Path)
+    parser.add_argument("--runtime-root", type=Path)
+    return parser.parse_args(argv)
 
 
 def _sha256(path: Path) -> str:
@@ -80,13 +169,16 @@ def _read_public_key(path: Path, *, label: str) -> bytes:
         raise RuntimeError(f"{label} is malformed") from exc
 
 
-def _existing_response_signing_key() -> SigningKey | None:
+def _existing_response_signing_key(
+    runtime_paths: RuntimePaths | None = None,
+) -> SigningKey | None:
     """Load the active supervisor identity for a versioned, key-stable upgrade."""
 
+    runtime_paths = runtime_paths or RuntimePaths.from_root(REPO_ROOT)
     identity_paths = (
         LAUNCH_AGENT,
-        REPO_RESPONSE_VERIFY_KEY,
-        REPO_QUALIFICATION_VERIFY_KEY,
+        runtime_paths.response_verify_key,
+        runtime_paths.qualification_verify_key,
     )
     present = tuple(path.exists() or path.is_symlink() for path in identity_paths)
     if not any(present):
@@ -123,20 +215,25 @@ def _existing_response_signing_key() -> SigningKey | None:
         raise RuntimeError("response signing key is malformed") from exc
     expected = bytes(response_key.verify_key)
     if (
-        _read_public_key(REPO_RESPONSE_VERIFY_KEY, label="response verification key") != expected
-        or _read_public_key(REPO_QUALIFICATION_VERIFY_KEY, label="qualification verification key")
+        _read_public_key(runtime_paths.response_verify_key, label="response verification key")
+        != expected
+        or _read_public_key(
+            runtime_paths.qualification_verify_key, label="qualification verification key"
+        )
         != expected
     ):
         raise RuntimeError("installed response identity mismatch")
     return response_key
 
 
-def _ensure_request_key() -> SigningKey:
-    REPO_REQUEST_KEY.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-    if REPO_REQUEST_KEY.exists() or REPO_REQUEST_KEY.is_symlink():
-        return _read_private_key(REPO_REQUEST_KEY)
+def _ensure_request_key(runtime_paths: RuntimePaths | None = None) -> SigningKey:
+    runtime_paths = runtime_paths or RuntimePaths.from_root(REPO_ROOT)
+    request_key_path = runtime_paths.request_key
+    request_key_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if request_key_path.exists() or request_key_path.is_symlink():
+        return _read_private_key(request_key_path)
     key = SigningKey.generate()
-    fd = os.open(REPO_REQUEST_KEY, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    fd = os.open(request_key_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     try:
         os.write(fd, (bytes(key).hex() + "\n").encode("ascii"))
         os.fsync(fd)
@@ -164,8 +261,16 @@ def _copy_source(source: Path, destination: Path) -> None:
     os.chmod(destination, 0o444)
 
 
-def _build_bundle(staging: Path, request_key: SigningKey) -> tuple[Path, Path, str]:
+def _build_bundle(
+    staging: Path,
+    request_key: SigningKey,
+    *,
+    source_root: Path | None = None,
+) -> tuple[Path, Path, str]:
     bundle = staging / "bundle"
+    source_root = _resolved_directory(
+        REPO_ROOT if source_root is None else source_root, label="source root"
+    )
     for relative in (
         "ops/trusted_codex_worker_supervisor.py",
         "runtime/integrations/process_supervisor.py",
@@ -177,7 +282,7 @@ def _build_bundle(staging: Path, request_key: SigningKey) -> tuple[Path, Path, s
         "kernel/sandbox.py",
         "kernel/ledger.py",
     ):
-        _copy_source(REPO_ROOT / relative, bundle / relative)
+        _copy_source(source_root / relative, bundle / relative)
     for package in ("ops", "runtime", "runtime/integrations", "kernel"):
         package_init = bundle / package / "__init__.py"
         if not package_init.exists():
@@ -216,22 +321,26 @@ def _write_plist(
     codex_home: Path,
     response_key: Path,
     planner_qualification: Path,
+    runtime_paths: RuntimePaths | None = None,
 ) -> None:
+    runtime_paths = runtime_paths or RuntimePaths.from_root(REPO_ROOT)
+    if planner_qualification != runtime_paths.planner_qualification_path:
+        raise ValueError("planner qualification path must belong to the runtime root")
     payload = {
         "Label": LABEL,
         "ProgramArguments": [
-            str(PYTHON),
+            str(runtime_paths.python),
             str(bundle / "ops" / "trusted_codex_worker_supervisor.py"),
             "--bundle-root",
             str(bundle),
             "--bundle-manifest",
             str(manifest),
             "--queue-root",
-            str(QUEUE_ROOT),
+            str(runtime_paths.queue_root),
             "--state-root",
             str(state),
             "--workspace-root",
-            str(WORKSPACE_ROOT),
+            str(runtime_paths.workspace_root),
             "--codex-home",
             str(codex_home),
             "--request-verify-key",
@@ -239,7 +348,7 @@ def _write_plist(
             "--response-signing-key",
             str(response_key),
             "--qualification-path",
-            str(REPO_ROOT / "ops" / ".trusted-codex-worker" / "qualification.json"),
+            str(runtime_paths.qualification_path),
             "--planner-qualification-path",
             str(planner_qualification),
         ],
@@ -299,16 +408,24 @@ def _activate_agent(domain: str) -> None:
     raise RuntimeError("trusted Codex supervisor start failed")
 
 
-def install() -> dict[str, str]:
-    if not PYTHON.is_file() or not os.access(PYTHON, os.X_OK):
-        raise RuntimeError("repository virtualenv interpreter is unavailable")
+def install(
+    *,
+    source_root: Path | None = None,
+    runtime_root: Path | None = None,
+) -> dict[str, str]:
+    roots = RootBindings.resolve(source_root=source_root, runtime_root=runtime_root)
+    runtime_paths = RuntimePaths.from_root(roots.runtime_root)
+    if not runtime_paths.python.is_file() or not os.access(runtime_paths.python, os.X_OK):
+        raise RuntimeError("runtime-root virtualenv interpreter is unavailable")
     _safe_regular(CODEX_AUTH_SOURCE, label="Codex auth state")
-    request_key = _ensure_request_key()
-    existing_response_key = _existing_response_signing_key()
+    request_key = _ensure_request_key(runtime_paths)
+    existing_response_key = _existing_response_signing_key(runtime_paths)
     INSTALL_BASE.mkdir(mode=0o700, parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="trusted-codex-install-", dir=INSTALL_BASE) as raw:
         staging = Path(raw)
-        bundle, manifest, version = _build_bundle(staging, request_key)
+        bundle, manifest, version = _build_bundle(
+            staging, request_key, source_root=roots.source_root
+        )
         final_root = INSTALL_BASE / f"supervisor-{version}"
         if final_root.exists() or final_root.is_symlink():
             raise RuntimeError("exact trusted Codex supervisor bundle already exists")
@@ -344,10 +461,11 @@ def install() -> dict[str, str]:
             logs=logs,
             codex_home=codex_home,
             response_key=response_key_path,
-            planner_qualification=REPO_PLANNER_QUALIFICATION,
+            planner_qualification=runtime_paths.planner_qualification_path,
+            runtime_paths=runtime_paths,
         )
-        response_public = REPO_RESPONSE_VERIFY_KEY
-        qualification_public = REPO_QUALIFICATION_VERIFY_KEY
+        response_public = runtime_paths.response_verify_key
+        qualification_public = runtime_paths.qualification_verify_key
         public_values = {
             response_public: bytes(response_key.verify_key).hex() + "\n",
             qualification_public: bytes(response_key.verify_key).hex() + "\n",
@@ -381,5 +499,12 @@ def install() -> dict[str, str]:
     raise RuntimeError("trusted Codex supervisor health identity was not published")
 
 
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    result = install(source_root=args.source_root, runtime_root=args.runtime_root)
+    print(json.dumps(result, sort_keys=True))
+    return 0
+
+
 if __name__ == "__main__":
-    print(json.dumps(install(), sort_keys=True))
+    raise SystemExit(main())
