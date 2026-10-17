@@ -13709,3 +13709,16 @@ ALLOWED_NOW: Publish the sanitized source/root-binding recovery checkpoint and e
 HELD: Host installation, the single authorized fresh-ID Builder qualification request, and all item-worker dispatches. Wake only after clean Security Review and a fresh queue/process/identity/bundle-hash preflight; do not retry an ambiguous request.
 
 AUTHORITY_OR_IMPLEMENTATION_GAP: PAEOS still lacks the accepted physical L10 sealed-context evidence path for the available ChatBridge runtime, and the signed Builder qualification is expired. Chat 1 remains the sole DEBT-0258 integrator. No admission, receiver start, Court adjudication, qualification, or P3 readiness is evidenced.
+
+
+### 2026-10-17 — Security Review blocks Builder bootstrap installation
+
+The single selected read-only Security Review examined recovery commit `fdf7b29e5a4ec19513d05c4c55775dcc084477fa` against `codex/pre-p3-clean-recovery-20261017`. It returned three actionable findings: P1, the bundle allowlist omits transitive imports including `kernel/capability.py`, `kernel/types.py`, and `runtime/task_package.py`, while the installer test mocks activation and does not establish live startup; P2, `_copy_source` does not reject symlinked ancestors that can resolve bundle source outside the reviewed root; P2, runtime-root-derived request-key paths can follow symlinked parents and read or create the key outside the selected root. Exact findings are in `reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/security-review.json`.
+
+No code correction, host install, or provider request followed the review. The one-time qualification request remains unused. Existing PAEOS L10 remand and expired qualification holds also remain.
+
+ALLOWED_NOW: Preserve and publish this review disposition. Owner: current recovery-checkpoint integrator.
+
+HELD: Review-driven code changes, host installation, the single authorized qualification request, and fresh PAEOS worker admissions. Wake only after the user directs continuation; then fix all three findings, run focused tests and required verification, and obtain any review required by the follow-up instructions before installation.
+
+AUTHORITY_OR_IMPLEMENTATION_GAP: Bundle closure/startup is not proven; source and runtime root containment are not enforced through derived paths. The available ChatBridge route also still lacks accepted L10 sealed-context evidence, and Builder qualification is expired. Chat 1 remains the sole DEBT-0258 integrator. No receiver start, Court adjudication, qualification, or P3 readiness is evidenced.

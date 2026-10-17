@@ -16,7 +16,7 @@ Two fresh production Trace-B runs were preserved. `r-440d04b7` completed early l
 
 The recorded stages are physical execution observations only. They do not prove independent-family review, Court adjudication, or qualification. The local PAEOS run directories and raw response files remain outside this public checkpoint.
 
-## Verification
+## Verification and Security Review
 
 - Installer tests: 4 passed.
 - Existing trusted transport/readiness/client tests: 43 passed.
@@ -24,10 +24,11 @@ The recorded stages are physical execution observations only. They do not prove 
 - Ruff lint, Ruff formatting, Python bytecode compilation, and `git diff --check`: passed.
 - The required full-suite attempt failed during collection with seven import errors for the unavailable `contracts.adapters` package. The failure affected four contract collectors and three runtime transport collectors loaded through the host’s shared editable environment. It was run once and not retried.
 - Secret scan: no high-confidence credential matches across the branch-diff files and explicit implementation/evidence payload; paths and content hashes are recorded in `secret-scan.json`. The receipt and final manifest are checked again after generation.
+- The single selected read-only Security Review ran against commit `fdf7b29e5a4ec19513d05c4c55775dcc084477fa` relative to `codex/pre-p3-clean-recovery-20261017`. It found three actionable issues, recorded in `security-review.json`: one P1 bundle-import/startup issue and two P2 symlink-containment issues. No review-driven code changes, host installation, or provider request followed.
 
 ## Gate disposition
 
-**DEBT-0258 — owner: Chat 1, sole integrator.** `ALLOWED_NOW`: source/runtime binding checkpoint and the selected read-only Security Review. `HELD`: host installation, the single already-authorized fresh-ID `gpt-5.6-sol` qualification request, and a fresh admitted PAEOS DEBT-0258 task. Wake only after clean Security Review plus a fresh empty-queue/no-active-supervisor/bundle-hash/existing-identity preflight. An ambiguous qualification request is terminal; do not retry it.
+**DEBT-0258 — owner: Chat 1, sole integrator.** `ALLOWED_NOW`: preserve the pushed recovery checkpoint and record the review findings. `HELD`: implementation changes addressing the Security Review, host installation, the single already-authorized fresh-ID `gpt-5.6-sol` qualification request, and a fresh admitted PAEOS DEBT-0258 task. Wake only after the user directs continuation, all three review findings are resolved and verified, and the required review/preflight gates are satisfied. An ambiguous qualification request is terminal; do not retry it.
 
 **DEBT-0249 — owner: its existing separate worker.** `ALLOWED_NOW`: preserve its candidate and continue provider-free eligible work under its existing scope. `HELD`: a different-family review and any review-dependent adjudication or integration. Wake only when an eligible free route passes the current privacy and quota gates. Do not transport-switch a refused or consumed operation.
 
@@ -37,4 +38,4 @@ The recorded stages are physical execution observations only. They do not prove 
 
 **P3 — owner: PAEOS governance/Court.** `ALLOWED_NOW`: none. `HELD`: promotion. Wake only after every required pre-P3 gate has sealed evidence and the distinct Court observation, Court adjudication, and qualification requirements are satisfied.
 
-The current authority/implementation gap is the missing accepted L10 sealed-context evidence path for the available ChatBridge runtime, together with the expired signed Builder qualification. This checkpoint changes no provider route, makes no provider call, installs no host bundle, and claims no Court disposition or P3 readiness.
+The current authority/implementation gaps are the three actionable Security Review findings, the missing accepted L10 sealed-context evidence path for the available ChatBridge runtime, and the expired signed Builder qualification. This checkpoint changes no provider route, makes no provider call, installs no host bundle, and claims no Court disposition or P3 readiness.

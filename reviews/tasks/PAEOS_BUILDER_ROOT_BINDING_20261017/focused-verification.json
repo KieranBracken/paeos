@@ -55,8 +55,11 @@
   ],
   "review": {
     "selected": "Security Review",
-    "status": "PENDING",
-    "required_base": "codex/pre-p3-clean-recovery-20261017"
+    "status": "ACTIONABLE_FINDINGS",
+    "reviewed_head": "fdf7b29e5a4ec19513d05c4c55775dcc084477fa",
+    "required_base": "codex/pre-p3-clean-recovery-20261017",
+    "finding_count": 3,
+    "evidence": "security-review.json"
   },
   "host_install": "NOT_RUN",
   "qualification_request": "NOT_SENT",

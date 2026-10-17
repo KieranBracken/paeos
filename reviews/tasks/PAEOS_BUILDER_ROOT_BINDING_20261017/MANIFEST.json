@@ -1,19 +1,19 @@
 {
   "base": "codex/pre-p3-clean-recovery-20261017",
   "branch": "codex/builder-qualification-bootstrap-20261017",
-  "checkpoint": "builder-source-runtime-root-binding",
+  "checkpoint": "builder-source-runtime-root-binding-security-review",
   "classification": "recovery checkpoint; not release, Court adjudication, or qualification",
-  "file_count": 7,
+  "file_count": 8,
   "files": [
     {
-      "bytes": 1423986,
+      "bytes": 1425855,
       "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
-      "sha256": "959e688bbb96427f4934d06d889fb0f81ed5c9e4cb2f9211aa3f416b14f95365"
+      "sha256": "771c1c0fca66c1e4467ebf312c52d7e05362e6731b52b099b1789a2f5b65f626"
     },
     {
-      "bytes": 642429,
+      "bytes": 643097,
       "path": "MessyChangesNeedsReview.md",
-      "sha256": "a21f37356e5bb1ffd7a54da1f29f55721d71bf1794fd9188f70fd521560bcd79"
+      "sha256": "46171f7879a1f144685a8ad352e9b1b359434fcaeb062aab0f92498a816fdd8c"
     },
     {
       "bytes": 20020,
@@ -26,20 +26,26 @@
       "sha256": "8829d72f89c628b646c8f53f92c06bde03fdbb05baef783026d4c9ffe2c985a9"
     },
     {
-      "bytes": 4934,
+      "bytes": 5458,
       "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/REPORT.md",
-      "sha256": "01a591e06f9ae38ee2b6d2dfe12b0a706aa597ff5be0fd7f496ff3744957371c"
+      "sha256": "15b364befb9c2a9b7257ecac12f64356c698e3b2dd9aff0d289ba2330c7eab2e"
     },
     {
-      "bytes": 3344,
+      "bytes": 3485,
       "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/focused-verification.json",
-      "sha256": "13f67734aa7b585d618b038eea282b571d5f708559f769350de8da3c21f6d7ea"
+      "sha256": "a5fa5c41a71dafbdd3982afc4327a0c2a011ff0b2e213cf5cebf7c932166a321"
     },
     {
-      "bytes": 4700,
+      "bytes": 2006,
+      "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/security-review.json",
+      "sha256": "6235d412d625b0e4bf4194d7ad21c9b43245bb2c85d960f752e2ec1ba7e5064b"
+    },
+    {
+      "bytes": 5305,
       "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/secret-scan.json",
-      "sha256": "d6251f3c8d465966552acab7a91aa9449da7b3aa25f690510b269b798759dcce"
+      "sha256": "062547a01c927be763b9d51eacd8865f304e02f436ab8e5f9a564d6c07110cea"
     }
   ],
+  "reviewed_head": "fdf7b29e5a4ec19513d05c4c55775dcc084477fa",
   "schema": "paeos.recovery-checkpoint-manifest/1"
 }

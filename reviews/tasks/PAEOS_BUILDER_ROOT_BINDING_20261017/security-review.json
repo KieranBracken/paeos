@@ -1,0 +1,38 @@
+{
+  "schema": "paeos.security-review-disposition/1",
+  "review": "Security Review",
+  "mode": "read-only",
+  "branch": "codex/builder-qualification-bootstrap-20261017",
+  "reviewed_head": "fdf7b29e5a4ec19513d05c4c55775dcc084477fa",
+  "base": "codex/pre-p3-clean-recovery-20261017",
+  "reviewer_family": "not disclosed by the review result",
+  "request_fingerprint": null,
+  "response_fingerprint": null,
+  "result": "ACTIONABLE_FINDINGS",
+  "findings": [
+    {
+      "severity": "P1",
+      "location": "ops/install_trusted_codex_worker_supervisor.py:274",
+      "finding": "The bundle allowlist omits transitive imports used by bundled modules, including kernel/capability.py, kernel/types.py, and runtime/task_package.py. With PYTHONPATH set to the bundle, the supervisor appears unable to import from its own bundle and start. The installer test mocks activation and writes a synthetic health identity, so it does not establish live startup.",
+      "disposition": "HOLD_INSTALL_AND_QUALIFICATION_REQUEST"
+    },
+    {
+      "severity": "P2",
+      "location": "ops/install_trusted_codex_worker_supervisor.py:285",
+      "finding": "_copy_source rejects a symlink at the final file path but does not reject symlinked ancestors. A member such as source_root/ops/... can resolve outside the selected reviewed source root and be copied into the bundle.",
+      "disposition": "HOLD_INSTALL_AND_QUALIFICATION_REQUEST"
+    },
+    {
+      "severity": "P2",
+      "location": "ops/install_trusted_codex_worker_supervisor.py:231",
+      "finding": "RuntimePaths validates the root directory but not containment of derived paths. Symlinked ancestors under runtime_root can redirect _ensure_request_key to read or create the private request key outside the selected runtime root.",
+      "disposition": "HOLD_INSTALL_AND_QUALIFICATION_REQUEST"
+    }
+  ],
+  "after_review": {
+    "implementation_modified": false,
+    "host_installed": false,
+    "provider_calls": 0,
+    "qualification_request_sent": false
+  }
+}
