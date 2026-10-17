@@ -1,0 +1,38 @@
+{
+  "allow_fallback": false,
+  "allow_paid_usage": false,
+  "assessment": "The exact INTERNAL request was submitted to the NVIDIA API endpoint and received HTTP 410 for retired model. The endpoint necessarily received the request bytes at its API edge; whether it stored or processed them is unknown. The request has no matches for the high-confidence key/token/private-key/local-state patterns above. Treat this attempt as a privacy-policy mismatch and do not repeat; no successful inference/review response was returned.",
+  "data_class": "INTERNAL",
+  "dispatch_sha256": "a364e2834f8e86b70a7eaf709508460e51a9ceec905b275cfec26e7e27d0fec2",
+  "dispatch_status": "FAILED",
+  "error_type": "NormalizedError",
+  "free_worker_pool": true,
+  "high_confidence_secret_pattern_findings": {
+    "absolute_user_path": false,
+    "api_token": false,
+    "local_state_path": false,
+    "private_key": false
+  },
+  "http_status": 410,
+  "kind": "prior-independent-review-provider-attempt-policy-audit",
+  "observed_at_utc": "2026-10-17T03:58:10Z",
+  "provider_attempt_path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/review-20261017T024236Z-b5510491/",
+  "provider_model": "meta/llama-3.1-8b-instruct",
+  "provider_response_fingerprint": null,
+  "provider_response_received": false,
+  "request_bytes": 9809,
+  "request_mentions_debt_item": true,
+  "request_sha256": "614d720f8c68e2577e9c155dfc3d6e6a59f448b02f9ba67639f8ee422065eec1",
+  "request_user_message_chars": 9021,
+  "retry_or_fallback": false,
+  "retry_policy": "none",
+  "review_completed": false,
+  "task_class": "CODE_REVIEW",
+  "terms_relevant_sections": {
+    "2.3_2.4": "content is not stored/used at session end except disclosed services and listed exceptions",
+    "2.6a": "prohibits confidential, controlled, or sensitive content",
+    "3.3": "User Content and Generated Content may be used to improve NVIDIA services including AI models"
+  },
+  "terms_source": "https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf",
+  "this_turn_additional_provider_calls": 0
+}

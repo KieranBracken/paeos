@@ -5418,3 +5418,10 @@ Evidence is under `reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/` and
 ## 2026-10-17 — host runtime DB accessibility correction
 
 The previous statement that the router DB was unreadable referred to the sanitized recovery checkout. A read-only host check at `~/.local/share/paeos/model-router/state.sqlite3` succeeded and `PRAGMA quick_check` returned `ok`; no rows or secrets were read and no writes occurred. The current PAEOS task-admission hold is the expired supervisor-signed Trusted Codex Builder qualification (maximum accepted age 24 hours), not router DB access. Preserve this distinction in follow-up reports.
+
+
+## 2026-10-17 — qualification renewal and NVIDIA review-attempt audit
+
+The host’s signed Builder qualification is expired. A local read-only audit found the only live qualification wrapper can perform a second request after a pending-restart response and deletes its workspace in `finally`; no safe single-dispatch renewal mode or documented command was found. It was not run. The action needed is a current supervisor-signed physical qualification with one request and ambiguity-preserving evidence.
+
+One earlier DEBT-0117 review request was sent to NVIDIA as `INTERNAL`, received HTTP 410 for an end-of-life model, and returned no review response. Its payload has no high-confidence credential/private-key/local-state pattern matches, but it included D0117 context. NVIDIA’s trial terms permit submitted content to improve its products/models, so do not repeat that request. Exact request/dispatch hashes and a privacy disposition are in `reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/d0117-review-attempt-policy-audit.json`. No provider call occurred during this turn.

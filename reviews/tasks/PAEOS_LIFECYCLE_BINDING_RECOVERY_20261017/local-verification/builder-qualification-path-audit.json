@@ -1,0 +1,50 @@
+{
+  "existing_local_scripts": {
+    "ops/probe_builder_transport_ready.py": {
+      "sha256": "e837ccffaddb0151efbe9d88f1dc9930bbbc00d41713eae316c334ea55284b3c",
+      "tracked_in_current_checkout": false
+    },
+    "ops/trusted_codex_worker_supervisor.py": {
+      "sha256": "78604df85744d68eaf3ae8f22ab6447a811ec5d78ada447a4a897e101f6a98a5",
+      "tracked_in_current_checkout": false
+    },
+    "ops/verify_builder_transport_ready.py": {
+      "sha256": "47fe280f3b8a7dc7362b170f4e874f4b0f4f49de9771c13ccce3d729b1a5bf48",
+      "tracked_in_current_checkout": false
+    }
+  },
+  "harness_run": false,
+  "keys_read_by_this_audit": false,
+  "kind": "builder-qualification-renewal-path-static-audit",
+  "markdown_documented_renewal_command_found": false,
+  "observed_at_utc": "2026-10-17T03:58:10Z",
+  "provider_calls": 0,
+  "qualification_path": "ops/.trusted-codex-worker/qualification.json",
+  "qualification_status": "NOT_READY: qualification is expired or stale; verifier max age 86400 seconds",
+  "required_action": "Use an existing legitimate supervisor-signed physical canary path that issues exactly one request, preserves workspace and receipts for ambiguous outcomes, and yields a current qualification; otherwise scope and test such a guarded renewal path under a valid PAEOS Builder admission. Do not run the current live wrapper as-is.",
+  "safe_renewal_command_found": false,
+  "source_edits": 0,
+  "static_findings": [
+    {
+      "file": "ops/verify_builder_transport_ready.py",
+      "finding": "The qualification harness can restart the trusted supervisor.",
+      "lines": "118-127"
+    },
+    {
+      "file": "ops/verify_builder_transport_ready.py",
+      "finding": "After a specific pending-restart error it sends another physical request with new task/goal/run identifiers.",
+      "lines": "167-194"
+    },
+    {
+      "file": "ops/verify_builder_transport_ready.py",
+      "finding": "The finally block deletes the qualification workspace even if the result was ambiguous.",
+      "lines": "241-245"
+    },
+    {
+      "file": "ops/probe_builder_transport_ready.py",
+      "finding": "The live command calls qualify(); exposed commands are host, capabilities, liveness, live, and negative. No single-dispatch/no-cleanup option was found.",
+      "lines": "320-349"
+    }
+  ],
+  "supervisor_identity_or_private_key_values_recorded": false
+}

@@ -176,14 +176,14 @@
     {
       "mode": "100644",
       "path": "MessyChangesNeedsReview.md",
-      "sha256": "171e7e78c2e674395465754b93da30b6e7d1d900e513d1e3f4cc4d6548d17169",
-      "size": 638704
+      "sha256": "6125f9fc71a5e11a67c1d3bbbb41f00d1c690abc1414d100a51fd4b30b7a5720",
+      "size": 639813
     },
     {
       "mode": "100644",
       "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
-      "sha256": "6b5f49452c5ea0ac20fa032aa8ee909cab0df24d04f0a3ed508bd97ef272a817",
-      "size": 1417065
+      "sha256": "388b767a727738e9257ade31bff3a97169122c0c0cab577e0e3f9c96eeab850d",
+      "size": 1418782
     },
     {
       "mode": "100644",
@@ -10984,6 +10984,18 @@
       "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/binding-gap.json",
       "sha256": "c3bcc191ea229711e2497ce5bb5f9bb2c643060113eae70dbe5bee7cdee0a3ac",
       "size": 3590
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/builder-qualification-path-audit.json",
+      "sha256": "4fc859b14732956bc9454260b237ba1cb560a9727595cf15f87a30d21a65019e",
+      "size": 2365
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/d0117-review-attempt-policy-audit.json",
+      "sha256": "c521c0b90cc376e23fb49a459a68adb67cf4d5fc29c3b4afb1944dde4e07a3a1",
+      "size": 2104
     },
     {
       "mode": "100644",
