@@ -1,0 +1,2 @@
+{"deferred_verification": {"qualification": false, "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF"}, "import_origins": {"kernel.cas": "kernel/cas.py", "kernel.ledger": "kernel/ledger.py", "kernel.ledger_sqlite": "kernel/ledger_sqlite.py", "kernel.types": "kernel/types.py", "runtime.autonomy.resume_engine": "runtime/autonomy/resume_engine.py"}, "mode": "SOURCE_CONSTRUCTION_ONLY", "network": "macOS sandbox-exec deny network"}
+...................................................                      [100%]

@@ -1,0 +1,11 @@
+{
+  "candidate_manifest.json": "1a7f5eec16824c8e601ebd0dd5426396bd649df16af9140aa46a8d8c0a53ec62",
+  "focused-test.argv.json": "63642b1dab2c0164c9832f8e82fed4effd15d91b70598ddaa96cb0bf5f8a126b",
+  "focused-test.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "focused-test.stdout.txt": "f49459bc887b231793b3be6b9b665504978623f07605cb4bfac2b4acc9ce9cd3",
+  "preparation_attempt.json": "5eee2aa3ee905d1fb6b34eb67aa9b396afa2a52891b61d591168a2a3e18ef42b",
+  "prepared_request_envelope.json": "b06df732ec4df21c61c56b782fc8014a4b2ae0395974ad841074cb139abbbae3",
+  "review_preparation.json": "f70c7d70608a8413a2c0cd37283f436ae41b87f3c754502481fd94d470ee5374",
+  "review_prompt.txt": "7fb5ceeebda80a8c9d63da15d4b7ee225b5e8e26faef857c7a5a294131ee51b4",
+  "verification.json": "4c70c4abe9c0033f5d805d1bfc66dfb3156bdb46f119d035addc8cc668da2269"
+}

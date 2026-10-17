@@ -1,0 +1,11 @@
+{
+  "PREPARED_NOT_SUBMITTED.txt": "1fd647836c1972e6ec72f72ffa2d3e88d84dd19e3ab33a0b393aacfa4debcc78",
+  "attachments/candidate.patch": "6e5caf7e75202c99b2adf1d0ee2ff0b578d845f904a59356c4e82e86a2b4b107",
+  "attachments/candidate/runtime/autonomy/resume_engine.py": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+  "attachments/candidate/tests/runtime/autonomy/test_resume_checkpoint_admission.py": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5",
+  "attachments/canonical/runtime/autonomy/resume_engine.py": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+  "attachments/verification/pytest-output.txt": "22e2178fbce3805a03ce225652b1caa7e0bb13c7cb9e88da30a7daabfd6024eb",
+  "attachments/verification/verification.json": "3d732849114918a550bb7fa11386d9bd78fef1f212eda4cfe5f863fea59d714b",
+  "latest-recovery-base.json": "89b1f3627dc549c1e7e2f7f10312c9899f867bd78553dda138ff841b24ed9e54",
+  "request.json": "d3fc1ff0212ade69dace3bcedd966df4b08189b15e0c989481fc4cd01428af9a"
+}

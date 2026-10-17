@@ -1,0 +1,119 @@
+{
+  "actions_not_taken": {
+    "branch_push": false,
+    "provider_dispatch": false,
+    "source_integration": false
+  },
+  "candidate_pins": {
+    "runtime/autonomy/resume_engine.py": {
+      "candidate_sha256": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+      "canonical_preimage_sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6"
+    },
+    "tests/runtime/autonomy/test_resume_checkpoint_admission.py": {
+      "candidate_sha256": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5",
+      "canonical_preimage": "ABSENT"
+    }
+  },
+  "files": [
+    {
+      "bytes": 1413,
+      "path": "PREPARED_NOT_SUBMITTED.txt",
+      "sha256": "1fd647836c1972e6ec72f72ffa2d3e88d84dd19e3ab33a0b393aacfa4debcc78"
+    },
+    {
+      "bytes": 898,
+      "path": "attachments/candidate.patch",
+      "sha256": "6e5caf7e75202c99b2adf1d0ee2ff0b578d845f904a59356c4e82e86a2b4b107"
+    },
+    {
+      "bytes": 10577,
+      "path": "attachments/candidate/runtime/autonomy/resume_engine.py",
+      "sha256": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7"
+    },
+    {
+      "bytes": 6368,
+      "path": "attachments/candidate/tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+      "sha256": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5"
+    },
+    {
+      "bytes": 10037,
+      "path": "attachments/canonical/runtime/autonomy/resume_engine.py",
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6"
+    },
+    {
+      "bytes": 505,
+      "path": "attachments/verification/pytest-output.txt",
+      "sha256": "22e2178fbce3805a03ce225652b1caa7e0bb13c7cb9e88da30a7daabfd6024eb"
+    },
+    {
+      "bytes": 1524,
+      "path": "attachments/verification/verification.json",
+      "sha256": "3d732849114918a550bb7fa11386d9bd78fef1f212eda4cfe5f863fea59d714b"
+    },
+    {
+      "bytes": 906,
+      "path": "latest-recovery-base.json",
+      "sha256": "89b1f3627dc549c1e7e2f7f10312c9899f867bd78553dda138ff841b24ed9e54"
+    },
+    {
+      "bytes": 3568,
+      "path": "request.json",
+      "sha256": "d3fc1ff0212ade69dace3bcedd966df4b08189b15e0c989481fc4cd01428af9a"
+    }
+  ],
+  "local_package_path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162",
+  "package_file_count": 9,
+  "package_manifest_path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/package.manifest.json",
+  "package_manifest_sha256": "cdbd838bc23878d784421b33a9262edb9efb883709c1ff4520a709603d14efd7",
+  "paeos_references": {
+    "mode": "SOURCE_CONSTRUCTION_ONLY",
+    "run_id": "sc-r-b8889bd7c5fe4a38b8dea65bfc854968",
+    "scope_sha256": "b6016e1f9ad1b42d735abcbcc16a528c971ec1f4e772711790e96db683c35f7b",
+    "task_id": "t-592130ac01f1"
+  },
+  "purpose": "Safe, manifest-scoped DEBT-0117 source revalidation and different-family review preparation; local artifact only.",
+  "qualification_and_physical_proof": {
+    "autonomy_qualification": false,
+    "candidate_integration": false,
+    "court_adjudication": false,
+    "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF behind DEBT-0258 then DEBT-0260"
+  },
+  "recovery_base": {
+    "candidate_integrated": false,
+    "commit": "5b1088a466dccdb8fe3799eb2e0df1d79d07d04e",
+    "recovery_manifest_entries_verified": "2279/2279"
+  },
+  "review": {
+    "builder_family": "gpt",
+    "dispatch": "HELD",
+    "provider_and_model": "unset pending free route owner confirmation of current INTERNAL eligibility",
+    "request_sha256": "d3fc1ff0212ade69dace3bcedd966df4b08189b15e0c989481fc4cd01428af9a",
+    "reviewer_family_constraint": "different from gpt",
+    "status": "PREPARED_NOT_SUBMITTED"
+  },
+  "safety_exclusions": {
+    "capability_values_included": false,
+    "cas_or_cas_blobs_included": false,
+    "databases_included": false,
+    "keys_or_credentials_included": false,
+    "package_scan_violations": 0,
+    "runtime_state_included": false,
+    "source_code_and_test_artifacts_only": true
+  },
+  "schema": "paeos.safe-checkpoint-export/1",
+  "status": "PREPARED_NOT_SUBMITTED",
+  "test_verification": {
+    "captured_output_path": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/verification/pytest-output.txt",
+    "captured_output_sha256": "22e2178fbce3805a03ce225652b1caa7e0bb13c7cb9e88da30a7daabfd6024eb",
+    "command": [
+      "/Users/bob/GitHub/paeos/.venv/bin/python",
+      "-I",
+      "-B",
+      "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/candidate/.source_construction_verify.py",
+      "tests/runtime/autonomy/test_resume_checkpoint_admission.py"
+    ],
+    "exit_code": 0,
+    "network": "denied by candidate verifier sandbox",
+    "test_scope": "38 focused checkpoint tests plus scenarios01-13 (13 selected regression tests); scenario14 not invoked"
+  }
+}

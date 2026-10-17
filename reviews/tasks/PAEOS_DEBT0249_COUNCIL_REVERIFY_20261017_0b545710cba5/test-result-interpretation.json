@@ -1,0 +1,16 @@
+{
+  "status": "VERIFICATION_INTERPRETATION_CORRECTED_FROM_EXACT_OUTPUT",
+  "prior_manifest_sha256": "401de74aa207971b75e8ced74c0f319ee8ac31acf52622b3508399e840d0987f",
+  "frozen_helper_exit_code": 0,
+  "focused_tests_passed": 51,
+  "pytest_progress_line": "...................................................                      [100%]",
+  "stdout_sha256": "f49459bc887b231793b3be6b9b665504978623f07605cb4bfac2b4acc9ce9cd3",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "51 successful pytest progress markers at 100%; frozen helper exit code 0. The outer receipt script exited 1 only because it required literal text \"51 passed\", which this quiet helper does not emit. No test failed.",
+  "candidate_unchanged": true,
+  "source_hashes": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  },
+  "review_submission": "NOT_SUBMITTED; waiting for free-route owner current INTERNAL eligibility report"
+}

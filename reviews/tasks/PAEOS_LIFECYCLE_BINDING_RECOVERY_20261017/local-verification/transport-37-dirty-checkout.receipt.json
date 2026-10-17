@@ -1,0 +1,35 @@
+{
+  "kind": "local-focused-verification",
+  "base_commit": "d02952a2a754a0df017fba4b3dbea8f06f703ef7",
+  "working_tree_dirty": true,
+  "command": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/runtime/test_bound_cline_transport.py",
+    "tests/runtime/test_trusted_codex_client.py",
+    "tests/runtime/test_trusted_codex_planner_transport.py",
+    "tests/runtime/test_builder_transport_gate.py",
+    "tests/runtime/test_builder_transport_readiness.py"
+  ],
+  "exit_code": 0,
+  "stdout_sha256": "498e6947c683cfc4d9d8dd6500f7bced1426c92501b2b6f938049aa6eb2024c6",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "source_and_test_sha256": {
+    "ops/autonomous_run.py": "87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280",
+    "runtime/builder_transport.py": "5d7735206d2b36dc776cb2745eaa6b89d3f85cc198f98dcfafd874e2d5d5efaa",
+    "runtime/integrations/bound_cline_transport.py": "d2d3198cefde15898b76f850eeaceed6b0940439005f1534c5dc53246afff2b0",
+    "runtime/integrations/trusted_codex_transport.py": "11fa1404eda7f4c5f53666c96e05f7d1014b55b919d3f4dde90083cadd6f50fe",
+    "runtime/integrations/trusted_codex_planner_transport.py": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d",
+    "tests/runtime/test_bound_cline_transport.py": "214a5782aa4f9ec0e0101da1d333a687f51f521b70eee3235c4d8cf0e25f7500",
+    "tests/runtime/test_trusted_codex_client.py": "ba1e48fdc0d5a34fcbb31dc3005e6bd075de8f9e86529597fc75a6e833406f1c",
+    "tests/runtime/test_trusted_codex_planner_transport.py": "201173e3e53d839e60a9b07a4333858c2b78460ea08297107d00c6e84e4dac4d",
+    "tests/runtime/test_builder_transport_gate.py": "efa280cab0f1617a5245ef8bf5260192ba15a5554182cf3b6fcd16359e746fe4",
+    "tests/runtime/test_builder_transport_readiness.py": "c1a2305c6fd2d898ca6485b615f27a6cc32d73e768c2744afbf8f52807d6c620"
+  },
+  "stdout_summary": ".....................................                                    [100%]"
+}

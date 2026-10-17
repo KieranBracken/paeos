@@ -1,0 +1,18 @@
+{
+  "dispatch": "HELD",
+  "excluded_e2ba_is_ancestor": false,
+  "free_pool_candidate_status": "preserved separately as source-construction-only; unintegrated and unqualified",
+  "latest_base": "5b1088a466dccdb8fe3799eb2e0df1d79d07d04e",
+  "parent": "3712088ad954fd84d14ca1fd7f38d0a54ade152b",
+  "qualification": false,
+  "recovery_manifest_bytes_sha256": "c91550cd6e1027565cb730a1f81df7e2648effae164d81f090a3ea32ea03987c",
+  "recovery_manifest_entries": 2279,
+  "recovery_manifest_mismatches": 0,
+  "recovery_manifest_verified_entries": 2279,
+  "request_sha256": "d3fc1ff0212ade69dace3bcedd966df4b08189b15e0c989481fc4cd01428af9a",
+  "reviewer_route_confirmed": false,
+  "sanitized_rootless_ancestor": "da3aa25bf731ba737cfa8c988c509c798b2a6fe3",
+  "sanitized_rootless_is_ancestor": true,
+  "scenario14": "DEFERRED_FULL_AUTONOMY_PROOF behind DEBT-0258 then DEBT-0260",
+  "status": "VERIFIED_RECOVERY_BASE"
+}

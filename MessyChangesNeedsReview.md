@@ -5404,3 +5404,12 @@ GitHub read-back confirms `codex/pre-p3-clean-recovery-20261017` at commit `da3a
 Captured (unintegrated) exact eight-file candidate from PAEOS run `sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30`, task `t-30fb8836a9bd`, scope `c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a`. The candidate removes the retired NVIDIA model and repairs reset parsing/cooldown. Focused provider-free tests passed 12/12; one physical Court source observation exists, with no adjudication or qualification; no provider calls were made.
 
 Lifecycle boundary: the PAEOS result is a completed source-construction capture, but initialization records `worker_dispatches: 0` and the current Codex thread supplied the Builder response. No distinct pool worker start is proven. No free different-family INTERNAL reviewer route is available. Independent review, integration, activation, qualification, debt closure and P3 remain held. Owner: worker-pool route thread `01a13075-533b-72a1-b8f8-8f109414f707`. Exact wake: authenticated receiver-start and response receipts plus an eligible free INTERNAL route from a different model family.
+
+
+## 2026-10-17 — lifecycle binding and provider privacy review
+
+Published evidence now separates a 17-test lifecycle code check and a 37-test transport check from actual receiver start. The free-pool PAEOS run has one physical Court observation but reports `worker_dispatches: 0`; no adjudication or qualification occurred. The ChatBridge `COMPLETE` path accepts a nonempty correlated file without signed receiver identity/start evidence. Chat 1 owns the authorized fresh D0258 task; until it emits a valid PAEOS admission and receiver-start receipt, lifecycle execution remains unproven.
+
+The current NVIDIA free GLM-5.3 API endpoint is technically available, but NVIDIA's API Trial Terms state that User Content may be used to improve NVIDIA products and models and prohibit confidential/sensitive inputs. This conflicts with the catalog’s current INTERNAL eligibility and no-training/no-retention flags. Route owner was asked through a fresh bounded PAEOS task to correct the metadata fail-closed and evaluate only a scrubbed PUBLIC route. No test request or provider call was sent. Paid routes and privacy relaxation remain excluded.
+
+Evidence is under `reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/` and the D0249/D0117 review-preparation packages. These checkpoint commits preserve recovery state; none is a release, Court adjudication, qualification, or P3 readiness claim.

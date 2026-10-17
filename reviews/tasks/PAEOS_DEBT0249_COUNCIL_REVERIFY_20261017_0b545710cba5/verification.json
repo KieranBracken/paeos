@@ -1,0 +1,36 @@
+{
+  "timestamp_utc": "2026-10-17T03:39:29.803400+00:00",
+  "mode": "CAPTURED_CANDIDATE_REVERIFICATION_ONLY",
+  "base_commit": "3712088ad954fd84d14ca1fd7f38d0a54ade152b",
+  "parent_commit": "da3aa25bf731ba737cfa8c988c509c798b2a6fe3",
+  "tracked_worktree_clean_before_run": true,
+  "prior_source_package_manifest_sha256": "256c3fe73af83ba7b3bba4b174e5a9d246c5748b69cba13ad86a4320500b31ee",
+  "prior_source_package_manifest_entries_recomputed": 48,
+  "candidate_manifest_entries": 11,
+  "candidate_manifest_canonical_json_sha256": "dd92e1c1bd777a9e99a996219e6ae7018c394d2c9f2019bff3b068643060f54d",
+  "candidate_bindings": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  },
+  "candidate_unchanged_during_test": true,
+  "test_argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_SOURCE_CONSTRUCTION_20261015_a8ea317d/candidate/.source_construction_verify.py",
+    "tests/runtime/test_debt0249_remand14.py"
+  ],
+  "test_cwd": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_SOURCE_CONSTRUCTION_20261015_a8ea317d/candidate",
+  "test_exit_code": 0,
+  "test_stdout_sha256": "f49459bc887b231793b3be6b9b665504978623f07605cb4bfac2b4acc9ce9cd3",
+  "test_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "test_summary": null,
+  "network": "frozen candidate helper self-reexecutes under sandbox-exec deny network*",
+  "review_status": "PREPARED_NOT_SUBMITTED_WAITING_FOR_FREE_ROUTE_OWNER",
+  "prepared_request_envelope_sha256": "b06df732ec4df21c61c56b782fc8014a4b2ae0395974ad841074cb139abbbae3",
+  "provider_calls": 0,
+  "provider_response_fingerprint": null,
+  "integration": false,
+  "court_action": false,
+  "qualification": false
+}

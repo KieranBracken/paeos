@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_SOURCE_CONSTRUCTION_20261015_a8ea317d/candidate/.source_construction_verify.py",
+    "tests/runtime/test_debt0249_remand14.py"
+  ],
+  "cwd": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_SOURCE_CONSTRUCTION_20261015_a8ea317d/candidate"
+}

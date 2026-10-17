@@ -1,0 +1,2 @@
+{"import_origins": {"kernel.cas": "kernel/cas.py", "runtime.critique": "runtime/critique.py"}, "mode": "SOURCE_CONSTRUCTION_ONLY", "network": "macOS sandbox-exec deny network"}
+...................................................                      [100%]

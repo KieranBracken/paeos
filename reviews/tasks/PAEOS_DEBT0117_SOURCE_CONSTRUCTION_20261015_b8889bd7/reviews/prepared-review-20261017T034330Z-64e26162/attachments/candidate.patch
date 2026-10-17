@@ -1,0 +1,18 @@
+--- canonical/runtime/autonomy/resume_engine.py
++++ candidate/runtime/autonomy/resume_engine.py
+@@ -203,6 +203,15 @@
+                 f"Cannot resume task {task_id}: {len(active_blockers)} active blockers remain",
+                 None,
+             )
++
++        if not task.checkpoint_ref:
++            return False, f"Task {task_id} has no checkpoint to resume", None
++        try:
++            checkpoint = self.restore_checkpoint(task.checkpoint_ref)
++        except (ValueError, TypeError, KeyError) as exc:
++            return False, f"Cannot resume task {task_id}: invalid checkpoint: {exc}", None
++        if checkpoint.task_id != task_id or checkpoint.root_mission_id != task.root_mission_id:
++            return False, f"Cannot resume task {task_id}: checkpoint task or root mismatch", None
+ 
+         try:
+             token = self.fencing.validate_and_advance(task_id, presented_token)

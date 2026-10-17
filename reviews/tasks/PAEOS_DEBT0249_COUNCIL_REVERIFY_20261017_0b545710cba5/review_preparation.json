@@ -1,0 +1,17 @@
+{
+  "candidate_bindings": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  },
+  "generation_id": null,
+  "paeos_request_created": false,
+  "paeos_request_fingerprint": null,
+  "prepared_envelope_only": true,
+  "prepared_operation_label": "paeos-debt0249-council-review-prepared-20261017-8f06b78e3ac04b33a5de0b545710cba5",
+  "prepared_request_envelope_sha256": "bf6c0ecb076f96bf4bc64402a7b089bbbc752f603c19d65c60b4042a3ef4ce19",
+  "provider_calls": 0,
+  "provider_response_fingerprint": null,
+  "route_owner_current_eligibility_report": null,
+  "status": "PREPARED_NOT_SUBMITTED_WAITING_FOR_FREE_ROUTE_OWNER",
+  "submission_permitted": false
+}

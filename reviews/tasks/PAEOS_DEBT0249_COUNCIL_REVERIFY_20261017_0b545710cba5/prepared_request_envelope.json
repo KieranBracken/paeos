@@ -1,0 +1,23 @@
+{
+  "allow_fallback": false,
+  "allow_paid_usage": false,
+  "builder_family": "GPT",
+  "candidate_bindings": {
+    "runtime/critique.py": "3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e",
+    "tests/runtime/test_debt0249_remand14.py": "54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013"
+  },
+  "data_class": "INTERNAL",
+  "explicit_model": null,
+  "free_worker_pool": true,
+  "logical_model": "PAEOS_AUDIT",
+  "max_tokens": 6000,
+  "note": "Static preparation envelope only; create no live PAEOS request until the free-route owner reports a currently eligible INTERNAL route. Allocate fresh live operation and request identifiers at that point.",
+  "paeos_request_created": false,
+  "prepared_operation_label": "paeos-debt0249-council-review-prepared-20261017-8f06b78e3ac04b33a5de0b545710cba5",
+  "purpose": "independent source review",
+  "retry_policy": "NONE",
+  "reviewer_family_constraint": "must differ from builder family GPT",
+  "submitted_to_router": false,
+  "task_class": "CODE_REVIEW",
+  "temperature": 0
+}

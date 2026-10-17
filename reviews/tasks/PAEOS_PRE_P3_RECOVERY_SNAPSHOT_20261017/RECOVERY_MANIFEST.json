@@ -176,14 +176,14 @@
     {
       "mode": "100644",
       "path": "MessyChangesNeedsReview.md",
-      "sha256": "266710639096b15b1dbcb7bf7ce1d920c855d81c41999f216d480d4bfa127e20",
-      "size": 636754
+      "sha256": "53c4cea0040f98bf0ec670bf443f6a2c8e91ba6ab0eeda694c20d9a11e498471",
+      "size": 638151
     },
     {
       "mode": "100644",
       "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
-      "sha256": "6f1a924536d2640136e905cb0bb12054a3ffcee6a38791e628db5b56e00a926a",
-      "size": 1413274
+      "sha256": "8c571c2dc5b2c244fed7e0b406a05e29d65d2a159ca3dcfcc5a8fbd5dcd4d732",
+      "size": 1416091
     },
     {
       "mode": "100644",
@@ -3877,6 +3877,72 @@
     },
     {
       "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/SAFE_CHECKPOINT_EXPORT_20261017.json",
+      "sha256": "ac9eaa3212fff2e2347a10275492318267947e5b249fd09338737d23a18a7a2f",
+      "size": 5059
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/PREPARED_NOT_SUBMITTED.txt",
+      "sha256": "1fd647836c1972e6ec72f72ffa2d3e88d84dd19e3ab33a0b393aacfa4debcc78",
+      "size": 1413
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/candidate.patch",
+      "sha256": "6e5caf7e75202c99b2adf1d0ee2ff0b578d845f904a59356c4e82e86a2b4b107",
+      "size": 898
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/candidate/runtime/autonomy/resume_engine.py",
+      "sha256": "cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7",
+      "size": 10577
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/candidate/tests/runtime/autonomy/test_resume_checkpoint_admission.py",
+      "sha256": "5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5",
+      "size": 6368
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/canonical/runtime/autonomy/resume_engine.py",
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+      "size": 10037
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/verification/pytest-output.txt",
+      "sha256": "22e2178fbce3805a03ce225652b1caa7e0bb13c7cb9e88da30a7daabfd6024eb",
+      "size": 505
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/attachments/verification/verification.json",
+      "sha256": "3d732849114918a550bb7fa11386d9bd78fef1f212eda4cfe5f863fea59d714b",
+      "size": 1524
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/latest-recovery-base.json",
+      "sha256": "89b1f3627dc549c1e7e2f7f10312c9899f867bd78553dda138ff841b24ed9e54",
+      "size": 906
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/package.manifest.json",
+      "sha256": "cdbd838bc23878d784421b33a9262edb9efb883709c1ff4520a709603d14efd7",
+      "size": 1033
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/prepared-review-20261017T034330Z-64e26162/request.json",
+      "sha256": "d3fc1ff0212ade69dace3bcedd966df4b08189b15e0c989481fc4cd01428af9a",
+      "size": 3568
+    },
+    {
+      "mode": "100644",
       "path": "reviews/tasks/PAEOS_DEBT0117_SOURCE_CONSTRUCTION_20261015_b8889bd7/reviews/reconciliation.json",
       "sha256": "fda6e665c752765c6f262e5c48815f2d0d63d9093629cd4119ede1801d90fd36",
       "size": 1882
@@ -4102,6 +4168,96 @@
       "path": "reviews/tasks/PAEOS_DEBT0249_COORDINATION_TIMEOUT_20261015_82a41855/verify_archive.py",
       "sha256": "03f5b00040879edc6d50f538659a085a433e56e70b182358715733e1ec640d06",
       "size": 1571
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/MANIFEST.initial.json",
+      "sha256": "401de74aa207971b75e8ced74c0f319ee8ac31acf52622b3508399e840d0987f",
+      "size": 871
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/MANIFEST.json",
+      "sha256": "1a1979f557d85db2d3db0bec72dbb5dc116e5761c306b13baa1c7c5d339664d6",
+      "size": 1384
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/candidate_manifest.json",
+      "sha256": "1a7f5eec16824c8e601ebd0dd5426396bd649df16af9140aa46a8d8c0a53ec62",
+      "size": 1052
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/focused-test-5b1088a.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/focused-test-5b1088a.stdout.txt",
+      "sha256": "f49459bc887b231793b3be6b9b665504978623f07605cb4bfac2b4acc9ce9cd3",
+      "size": 257
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/focused-test.argv.json",
+      "sha256": "63642b1dab2c0164c9832f8e82fed4effd15d91b70598ddaa96cb0bf5f8a126b",
+      "size": 402
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/focused-test.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/focused-test.stdout.txt",
+      "sha256": "f49459bc887b231793b3be6b9b665504978623f07605cb4bfac2b4acc9ce9cd3",
+      "size": 257
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/latest-base-verification.json",
+      "sha256": "90970110b8d9a09fe83079731c73156042f4c1bdbdd24cb1ddbbebd6ec794c3a",
+      "size": 3175
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/preparation_attempt.json",
+      "sha256": "5eee2aa3ee905d1fb6b34eb67aa9b396afa2a52891b61d591168a2a3e18ef42b",
+      "size": 386
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/prepared_request_envelope.json",
+      "sha256": "bf6c0ecb076f96bf4bc64402a7b089bbbc752f603c19d65c60b4042a3ef4ce19",
+      "size": 1051
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/review_preparation.json",
+      "sha256": "39be90873170f59eda708ff034ba0c82d559cdcfaf138ff2d42a5c4893853985",
+      "size": 807
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/review_prompt.txt",
+      "sha256": "7fb5ceeebda80a8c9d63da15d4b7ee225b5e8e26faef857c7a5a294131ee51b4",
+      "size": 20078
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/test-result-interpretation.json",
+      "sha256": "d84233b7bd62092eb2babd733bd5bc51d2bbf779a9d9dad163ac1c712a4de4d0",
+      "size": 1125
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_DEBT0249_COUNCIL_REVERIFY_20261017_0b545710cba5/verification.json",
+      "sha256": "4c70c4abe9c0033f5d805d1bfc66dfb3156bdb46f119d035addc8cc668da2269",
+      "size": 1928
     },
     {
       "mode": "100644",
@@ -10816,6 +10972,42 @@
       "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_MAINTENANCE_20261015_e5deb6dac71e4d8285e2efa42b66a480/source/tests/operations/test_lifecycle_projection_conformance.py",
       "sha256": "f8cad8e47df6b731697003061d4b9262736f25b0f77eea63e2bd330ab2856916",
       "size": 6331
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/README.md",
+      "sha256": "a3fb46ab6aa89036fd64c1b7a32cc94e813a9e1b24f2b3444d7a3c420b27a7bb",
+      "size": 889
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/binding-gap.json",
+      "sha256": "810cc37678f4b5dce864c99c5382d32cff46c388bbad004408d1bccf418e77f4",
+      "size": 2757
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/lifecycle-17-recovery-overlay.receipt.json",
+      "sha256": "538a61d80b202d196fb055274150fc6142b7390c778d7cff75c91aaaf4dad6b1",
+      "size": 2278
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/lifecycle-17.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/lifecycle-17.stdout.txt",
+      "sha256": "f44919a3367dc52929a8af8f8919d5f9536d2eb90b5c6c6d38b1e58904be21bc",
+      "size": 80
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/transport-37-dirty-checkout.receipt.json",
+      "sha256": "1164ae5eb61d46073b86e917f229c2eee91100817af698b452c01918cccb88fd",
+      "size": 2066
     },
     {
       "mode": "100644",

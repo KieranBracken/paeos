@@ -1,0 +1,403 @@
+Independent review of the exact DEBT-0249 Council candidate. Prepared operation: paeos-debt0249-council-review-prepared-20261017-8f06b78e3ac04b33a5de0b545710cba5.
+Builder family: OpenAI/GPT. Require an actual different model family. Review concrete defects, false positives, full dissent/CAS binding, malformed input behavior, whole-record hash integrity, API compatibility, and meaningful test coverage. Return READY or FINDINGS; for each finding give a failing input, file and line, impact, and minimal correction. Do not claim integration or qualification.
+
+runtime/critique.py SHA-256 3dafd096208d5a62144791a9504dddb189d2615eebbf47b3107463a7a9c9908e
+tests/runtime/test_debt0249_remand14.py SHA-256 54efec89f89bb85bea7d17eca0bb4b9a236468bf80d64c8bb923cb34cddaf013
+Canonical preimage SHA-256 1184886d6fa145324143a0d95f819de5c36f3a69fb4e54e0f57d6258df0c994f.
+
+PATCH:
+--- a/runtime/critique.py
++++ b/runtime/critique.py
+@@ -298,6 +298,60 @@
+     """Raised when Council deliberation violates constitutional dissension preservation or consensus invariants."""
+ 
+ 
++
++def _dissent_payload(vote: CouncilVote) -> dict[str, Any]:
++    return {
++        "voter_id": vote.voter_id,
++        "stance": vote.stance.value,
++        "argument": vote.argument,
++        "risks": list(vote.risks_identified),
++        "alternatives": list(vote.suggested_alternatives),
++    }
++
++
++def _valid_dissent_vote(vote: CouncilVote) -> bool:
++    return (
++        isinstance(vote.voter_id, str) and bool(vote.voter_id.strip())
++        and isinstance(vote.stance, CouncilVoteStance)
++        and isinstance(vote.argument, str) and bool(vote.argument.strip())
++        and all(isinstance(items, tuple)
++                and all(isinstance(item, str) and item.strip() for item in items)
++                for items in (vote.risks_identified, vote.suggested_alternatives))
++    )
++
++
++def _valid_dissent_payload(content: Any) -> bool:
++    return (
++        isinstance(content, dict)
++        and set(content) == {"voter_id", "stance", "argument", "risks", "alternatives"}
++        and all(isinstance(content[k], str) and content[k].strip()
++                for k in ("voter_id", "stance", "argument"))
++        and content["stance"] in ("DISSENT", "REJECT")
++        and all(isinstance(content[k], list)
++                and all(isinstance(item, str) and item.strip() for item in content[k])
++                for k in ("risks", "alternatives"))
++    )
++
++
++def _dissent_cas_violations(vote: CouncilVote, cas: Any) -> list[str]:
++    if not _valid_dissent_vote(vote):
++        return [f"DISSENT_CAS_PAYLOAD_CORRUPT: Invalid dissent fields for voter {vote.voter_id}"]
++    key = vote.dissent_cas_hash
++    if not isinstance(key, str) or not is_valid_hash(key):
++        return [f"DISSENT_CAS_HASH_MISSING: Voter {vote.voter_id} lacks valid durable CAS content hash"]
++    try:
++        if not cas.has(key):
++            return [f"DISSENT_CAS_NOT_FOUND: Dissent CAS hash {key} for voter {vote.voter_id} not found in CAS store"]
++        content = json.loads(cas.get(key))
++        if not _valid_dissent_payload(content):
++            return [f"DISSENT_CAS_PAYLOAD_CORRUPT: Invalid dissent payload for voter {vote.voter_id}"]
++        if content != _dissent_payload(vote):
++            return [f"DISSENT_CAS_CONTENT_MISMATCH: Stored CAS payload does not match voter {vote.voter_id} dissent"]
++    except Exception as exc:
++        return [f"DISSENT_CAS_PAYLOAD_CORRUPT: Failed to read dissent CAS payload for voter {vote.voter_id}: {exc}"]
++    return []
++
++
+ def record_council_deliberation(
+     vote_id: str,
+     proposal_id: str,
+@@ -319,6 +373,10 @@
+             "CONSENSUS_AS_EVIDENCE_FORBIDDEN: Adaptation Doctrine §7 strictly forbids substituting Council consensus for empirical test/verifier evidence"
+         )
+ 
++    voter_ids = [v.voter_id for v in votes]
++    if len(voter_ids) != len(set(voter_ids)):
++        raise CouncilDissensionViolationError("COUNCIL_DUPLICATE_VOTER: Council voter IDs must be unique")
++
+     processed_votes: list[CouncilVote] = []
+     dissenting_list: list[CouncilVote] = []
+ 
+@@ -329,19 +387,20 @@
+                 raise CouncilDissensionViolationError(
+                     "DISSENT_CAS_STORAGE_REQUIRED: CAS store is required to preserve dissenting opinions into durable CAS"
+                 )
++            if not _valid_dissent_vote(v):
++                raise CouncilDissensionViolationError("DISSENT_CAS_PAYLOAD_CORRUPT: Invalid dissent fields")
++            payload = _dissent_payload(v)
++            if not _valid_dissent_payload(payload):
++                raise CouncilDissensionViolationError(
++                    "DISSENT_CAS_PAYLOAD_CORRUPT: Dissent fields must have valid types and substantive content"
++                )
+             if not cas_hash:
+-                payload = json.dumps({
+-                    "voter_id": v.voter_id,
+-                    "stance": v.stance.value,
+-                    "argument": v.argument,
+-                    "risks": list(v.risks_identified),
+-                    "alternatives": list(v.suggested_alternatives),
+-                }, sort_keys=True).encode("utf-8")
+-                cas_hash = cas.put(payload)
++                cas_hash = cas.put(json.dumps(payload, sort_keys=True).encode("utf-8"))
+             else:
+-                if not cas.has(cas_hash):
++                errors = _dissent_cas_violations(v, cas)
++                if errors:
+                     raise CouncilDissensionViolationError(
+-                        f"DISSENT_CAS_UNGROUNDED: Pre-supplied dissent CAS hash '{cas_hash}' is not grounded in CAS store"
++                        "DISSENT_CAS_UNGROUNDED: Pre-supplied dissent hash is not bound to this vote; " + "; ".join(errors)
+                     )
+             vote_with_cas = CouncilVote(
+                 voter_id=v.voter_id,
+@@ -400,7 +459,7 @@
+       2. Dissension Completeness: All DISSENT / REJECT votes are captured in dissenting_opinions.
+       3. Anti-Suppression: Dissenting arguments cannot be empty strings.
+       4. Dissent CAS Invariant: Dissenting votes must have a valid durable CAS content hash.
+-      5. Dissent CAS Existence & Authenticity: When CAS is provided, stored dissent payloads must exist and match.
++      5. CAS Existence & Authenticity: A CAS store must ground complete dissent and record payloads.
+       6. Consensus Is Not Evidence: Cannot be flagged as substitute for empirical evidence.
+     """
+     violations: list[str] = []
+@@ -410,49 +469,52 @@
+             f"COUNCIL_QUORUM_VIOLATION: Council deliberation must have at least 3 votes, found {len(record.votes)}"
+         )
+ 
+-    # Check that any DISSENT/REJECT is in dissenting_opinions and has durable CAS hash
+-    dissent_voter_ids = {d.voter_id for d in record.dissenting_opinions}
+-    for v in record.votes:
+-        if v.stance in (CouncilVoteStance.DISSENT, CouncilVoteStance.REJECT):
+-            if v.voter_id not in dissent_voter_ids:
+-                violations.append(
+-                    f"DISSENT_SUPPRESSION_VIOLATION: Voter {v.voter_id} voted {v.stance.value} but was omitted from dissenting_opinions"
+-                )
+-            if not v.argument.strip():
+-                violations.append(
+-                    f"DISSENT_EMPTY_ARGUMENT: Voter {v.voter_id} registered dissent without substantive argument"
+-                )
+-            if not v.dissent_cas_hash or not is_valid_hash(v.dissent_cas_hash):
+-                violations.append(
+-                    f"DISSENT_CAS_HASH_MISSING: Dissenting vote from voter {v.voter_id} lacks valid durable CAS content hash"
+-                )
+-
+-    for d in record.dissenting_opinions:
+-        if not d.dissent_cas_hash or not is_valid_hash(d.dissent_cas_hash):
+-            violations.append(
+-                f"DISSENT_CAS_HASH_MISSING: Dissenting opinion from voter {d.voter_id} lacks valid durable CAS content hash"
+-            )
+-
+-    if cas is not None:
+-        for d in record.dissenting_opinions:
+-            if d.dissent_cas_hash and is_valid_hash(d.dissent_cas_hash):
+-                if not cas.has(d.dissent_cas_hash):
+-                    violations.append(
+-                        f"DISSENT_CAS_NOT_FOUND: Dissent CAS hash {d.dissent_cas_hash} for voter {d.voter_id} not found in CAS store"
+-                    )
++    voter_ids = [v.voter_id for v in record.votes]
++    if len(voter_ids) != len(set(voter_ids)):
++        violations.append("COUNCIL_DUPLICATE_VOTER: Council voter IDs must be unique")
++
++    expected_dissent = tuple(v for v in record.votes
++                             if v.stance in (CouncilVoteStance.DISSENT, CouncilVoteStance.REJECT))
++    dissent_ids = [d.voter_id for d in record.dissenting_opinions]
++    if len(dissent_ids) != len(set(dissent_ids)):
++        violations.append("DISSENT_DUPLICATE_ENTRY: Dissent entries must be unique")
++    # Compare the dataclasses themselves: the historic serialized dissent view
++    # intentionally omits risks and alternatives and cannot establish this binding.
++    if (len(record.dissenting_opinions) != len(expected_dissent)
++            or any(d not in expected_dissent for d in record.dissenting_opinions)
++            or any(v not in record.dissenting_opinions for v in expected_dissent)):
++        violations.append("DISSENT_SUPPRESSION_VIOLATION: Dissenting opinions must exactly match the complete DISSENT/REJECT vote view")
++
++    for v in expected_dissent:
++        if not isinstance(v.argument, str) or not v.argument.strip():
++            violations.append(f"DISSENT_EMPTY_ARGUMENT: Voter {v.voter_id} registered dissent without substantive argument")
++
++    # Validate both views, including when an inconsistent view is itself grounded.
++    for dissent in (*expected_dissent, *record.dissenting_opinions):
++        key = dissent.dissent_cas_hash
++        if not isinstance(key, str) or not is_valid_hash(key):
++            violations.append(f"DISSENT_CAS_HASH_MISSING: Voter {dissent.voter_id} lacks valid durable CAS content hash")
++        elif cas is not None:
++            violations.extend(_dissent_cas_violations(dissent, cas))
++
++    if cas is None:
++        violations.append("COUNCIL_CAS_STORAGE_REQUIRED: CAS store is required to verify grounded Council binding")
++    else:
++        key = record.vote_cas_hash
++        if not isinstance(key, str) or not is_valid_hash(key):
++            violations.append("VOTE_CAS_HASH_MISSING: Council record lacks valid durable CAS content hash")
++        else:
++            try:
++                if not cas.has(key):
++                    violations.append("VOTE_CAS_NOT_FOUND: Council record CAS payload is absent")
+                 else:
+-                    try:
+-                        raw = cas.get(d.dissent_cas_hash)
+-                        content = json.loads(raw.decode("utf-8")) if isinstance(raw, (bytes, bytearray)) else raw
+-                        if isinstance(content, dict):
+-                            if content.get("voter_id") != d.voter_id or content.get("argument") != d.argument:
+-                                violations.append(
+-                                    f"DISSENT_CAS_CONTENT_MISMATCH: Stored CAS payload does not match voter {d.voter_id} dissent"
+-                                )
+-                    except Exception as exc:
+-                        violations.append(
+-                            f"DISSENT_CAS_PAYLOAD_CORRUPT: Failed to parse dissent CAS payload for voter {d.voter_id}: {exc}"
+-                        )
++                    payload = record.to_dict()
++                    payload["vote_cas_hash"] = ""
++                    expected = json.dumps(payload, sort_keys=True).encode("utf-8")
++                    if cas.get(key) != expected:
++                        violations.append("VOTE_CAS_CONTENT_MISMATCH: Council record does not match canonical stored payload")
++            except Exception as exc:
++                violations.append(f"VOTE_CAS_PAYLOAD_CORRUPT: Failed to read Council record payload: {exc}")
+ 
+     if record.is_consensus_used_as_evidence:
+         violations.append(
+
+
+TESTS:
+"""Filesystem CAS regressions for the bounded Council integrity contract."""
+from dataclasses import replace
+import json
+
+import pytest
+
+from kernel.cas import CAS, FilesystemCasStore
+from runtime.critique import (
+    CouncilDissensionViolationError, CouncilVote, CouncilVoteStance,
+    record_council_deliberation, verify_council_deliberation_invariants,
+)
+
+
+@pytest.fixture
+def cas(tmp_path):
+    return CAS(FilesystemCasStore(tmp_path / "cas"))
+
+
+def votes():
+    return (
+        CouncilVote("a", CouncilVoteStance.APPROVE, "family-a", "Accept"),
+        CouncilVote("b", CouncilVoteStance.APPROVE, "family-b", "Accept"),
+        CouncilVote("c", CouncilVoteStance.DISSENT, "family-c", "Unsafe boundary", ("risk",), ("isolate",)),
+    )
+
+
+def make_record(cas, supplied=None):
+    return record_council_deliberation("vote", "proposal", "topic", supplied or votes(), cas)
+
+
+def rebind(cas, record):
+    payload = record.to_dict()
+    payload["vote_cas_hash"] = ""
+    return replace(record, vote_cas_hash=cas.put(json.dumps(payload, sort_keys=True).encode()))
+
+
+def dissent_payload(vote):
+    return {"voter_id": vote.voter_id, "stance": vote.stance.value, "argument": vote.argument,
+            "risks": list(vote.risks_identified), "alternatives": list(vote.suggested_alternatives)}
+
+
+def with_dissent(cas, record, dissent):
+    return rebind(cas, replace(record, votes=(*record.votes[:2], dissent), dissenting_opinions=(dissent,)))
+
+
+def assert_invalid(record, cas):
+    assert verify_council_deliberation_invariants(record, cas)
+
+
+def test_valid_record_and_filesystem_reopen(cas, tmp_path):
+    record = make_record(cas)
+    assert verify_council_deliberation_invariants(record, cas) == []
+    reopened = CAS(FilesystemCasStore(tmp_path / "cas"))
+    assert verify_council_deliberation_invariants(record, reopened) == []
+    payload = json.loads(reopened.get(record.vote_cas_hash))
+    assert payload["vote_cas_hash"] == ""
+    assert "risks_identified" not in payload["dissenting_opinions"][0]
+    supplied = make_record(reopened, record.votes)
+    assert verify_council_deliberation_invariants(supplied, reopened) == []
+
+
+@pytest.mark.parametrize("field,value", [
+    ("voter_id", "other"), ("stance", "REJECT"), ("argument", "other argument"),
+    ("risks", ["other risk"]), ("alternatives", ["other alternative"]),
+    ("voter_id", 3), ("stance", ["DISSENT"]), ("argument", None),
+    ("risks", "risk"), ("alternatives", [3]),
+    ("risks", [""]), ("alternatives", [" "]),
+])
+def test_each_payload_field_is_bound_and_typed(cas, field, value):
+    record = make_record(cas)
+    dissent = record.votes[-1]
+    payload = dissent_payload(dissent)
+    payload[field] = value
+    changed = replace(dissent, dissent_cas_hash=cas.put(json.dumps(payload).encode()))
+    assert_invalid(with_dissent(cas, record, changed), cas)
+    with pytest.raises(CouncilDissensionViolationError):
+        make_record(cas, (*record.votes[:2], changed))
+
+
+@pytest.mark.parametrize("raw", [b"[]", b"null", b"42", b'"text"', b"{", b"\xff", b"{}"])
+def test_nonobject_malformed_or_absent_fields_rejected(cas, raw):
+    record = make_record(cas)
+    changed = replace(record.votes[-1], dissent_cas_hash=cas.put(raw))
+    assert_invalid(with_dissent(cas, record, changed), cas)
+    with pytest.raises(CouncilDissensionViolationError):
+        make_record(cas, (*record.votes[:2], changed))
+
+
+def test_missing_dissent_blob_rejected(cas):
+    record = make_record(cas)
+    changed = replace(record.votes[-1], dissent_cas_hash="0" * 64)
+    assert_invalid(with_dissent(cas, record, changed), cas)
+    with pytest.raises(CouncilDissensionViolationError, match="DISSENT_CAS_UNGROUNDED"):
+        make_record(cas, (*record.votes[:2], changed))
+
+
+@pytest.mark.parametrize("field,value", [
+    ("vote_id", "altered"), ("proposal_id", "altered"), ("topic", "altered"),
+    ("consensus_reached", False), ("vote_cas_hash", ""), ("vote_cas_hash", "0" * 64),
+])
+def test_whole_record_hash_binds_content_and_must_exist(cas, field, value):
+    record = make_record(cas)
+    assert_invalid(replace(record, **{field: value}), cas)
+
+
+def test_existing_unrelated_whole_record_blob_rejected(cas):
+    record = make_record(cas)
+    assert_invalid(replace(record, vote_cas_hash=cas.put(b"{}")), cas)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("argument", "altered"), ("model_family", "altered"),
+    ("risks_identified", ("altered",)), ("suggested_alternatives", ("altered",)),
+    ("stance", CouncilVoteStance.REJECT), ("dissent_cas_hash", "0" * 64),
+])
+def test_dissent_view_compares_all_dataclass_fields(cas, field, value):
+    record = make_record(cas)
+    changed = replace(record.dissenting_opinions[0], **{field: value})
+    assert_invalid(rebind(cas, replace(record, dissenting_opinions=(changed,))), cas)
+
+
+@pytest.mark.parametrize("mode", ["omitted", "extra", "duplicate", "duplicate_voter"])
+def test_dissent_view_and_voter_uniqueness(cas, mode):
+    record = make_record(cas)
+    if mode == "omitted":
+        changed = replace(record, dissenting_opinions=())
+    elif mode == "extra":
+        changed = replace(record, dissenting_opinions=(*record.dissenting_opinions, record.votes[0]))
+    elif mode == "duplicate":
+        changed = replace(record, dissenting_opinions=record.dissenting_opinions * 2)
+    else:
+        changed = replace(record, votes=(record.votes[0], record.votes[0], record.votes[-1]))
+    assert_invalid(rebind(cas, changed), cas)
+
+
+def test_duplicate_voter_rejected_at_creation(cas):
+    original = votes()
+    with pytest.raises(CouncilDissensionViolationError):
+        make_record(cas, (original[0], original[0], original[-1]))
+
+
+def test_missing_cas_cannot_verify_grounding(cas):
+    assert_invalid(make_record(cas), None)
+    record = make_record(cas, tuple(replace(v, stance=CouncilVoteStance.APPROVE) for v in votes()))
+    assert_invalid(record, None)
+
+
+def test_original_constitutional_controls(cas):
+    record = make_record(cas)
+    assert any("COUNCIL_QUORUM_VIOLATION" in v for v in verify_council_deliberation_invariants(replace(record, votes=record.votes[:2]), cas))
+    empty = replace(record.votes[-1], argument=" ")
+    assert any("DISSENT_EMPTY_ARGUMENT" in v for v in verify_council_deliberation_invariants(with_dissent(cas, record, empty), cas))
+    assert any("CONSENSUS_AS_EVIDENCE_FORBIDDEN" in v for v in verify_council_deliberation_invariants(replace(record, is_consensus_used_as_evidence=True), cas))
+    with pytest.raises(CouncilDissensionViolationError, match="CONSENSUS_AS_EVIDENCE_FORBIDDEN"):
+        record_council_deliberation("v", "p", "t", votes(), cas, substitute_as_test_evidence=True)
+    with pytest.raises(CouncilDissensionViolationError, match="DISSENT_CAS_STORAGE_REQUIRED"):
+        record_council_deliberation("v", "p", "t", votes())
+
+
+@pytest.mark.parametrize("stance", [CouncilVoteStance.DISSENT, CouncilVoteStance.REJECT, CouncilVoteStance.APPROVE])
+def test_valid_empty_risk_lists_and_all_approve(cas, stance):
+    original = votes()
+    dissent = replace(original[-1], stance=stance, risks_identified=(), suggested_alternatives=())
+    record = make_record(cas, (*original[:2], dissent))
+    assert verify_council_deliberation_invariants(record, cas) == []
+
+
+@pytest.mark.parametrize("field,value", [("risks_identified", "risk"), ("suggested_alternatives", (3,)), ("argument", None)])
+def test_invalid_vote_field_types_rejected_at_creation(cas, field, value):
+    original = votes()
+    changed = replace(original[-1], **{field: value})
+    with pytest.raises(CouncilDissensionViolationError):
+        make_record(cas, (*original[:2], changed))
+
+
+@pytest.mark.parametrize("blob", ["dissent", "record"])
+def test_filesystem_corruption_fails_closed(cas, tmp_path, blob):
+    record = make_record(cas)
+    key = record.vote_cas_hash if blob == "record" else record.votes[-1].dissent_cas_hash
+    (tmp_path / "cas" / key[:2] / key[2:]).write_bytes(b"tampered")
+    reopened = CAS(FilesystemCasStore(tmp_path / "cas"))
+    assert_invalid(record, reopened)
+

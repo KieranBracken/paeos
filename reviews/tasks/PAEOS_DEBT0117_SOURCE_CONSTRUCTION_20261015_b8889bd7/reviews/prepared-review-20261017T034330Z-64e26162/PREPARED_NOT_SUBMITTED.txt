@@ -1,0 +1,16 @@
+DEBT-0117 different-family review package
+Status: PREPARED_NOT_SUBMITTED
+Request SHA-256: d3fc1ff0212ade69dace3bcedd966df4b08189b15e0c989481fc4cd01428af9a
+Builder family: GPT
+Reviewer constraint: different family; provider/model unset until route owner confirms current INTERNAL eligibility
+No provider call was made for this package.
+
+Latest recovery/integration base: 5b1088a466dccdb8fe3799eb2e0df1d79d07d04e
+The checkpoint is a descendant of the sanitized rootless recovery base da3aa25bf731ba737cfa8c988c509c798b2a6fe3; parent 3712088ad954fd84d14ca1fd7f38d0a54ade152b; excluded e2ba ancestry: absent. Its recovery manifest has 2,279 entries, all verified against the commit tree. The new checkpoint preserves separate free-pool source-construction evidence; that candidate remains unintegrated and unqualified.
+
+Tests ran against the isolated captured DEBT-0117 candidate bytes, not the sanitized recovery source tree. Evidence: 51 selected cases passed, exit 0; scenario14 not invoked.
+
+Canonical preimage: runtime/autonomy/resume_engine.py 54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6
+Candidate postimage: runtime/autonomy/resume_engine.py cd3edfbd4d9cbd96f30e46cb8ffa567c20cc8801db52b6242d4f2998088dfda7
+Candidate test: tests/runtime/autonomy/test_resume_checkpoint_admission.py 5d332af1352f9018a42811cb77a413446bbef57fa153ff28549694612eab82d5
+Qualification: false. Integration: false.

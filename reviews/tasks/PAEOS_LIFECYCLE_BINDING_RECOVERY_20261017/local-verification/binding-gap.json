@@ -1,0 +1,31 @@
+{
+  "authority_or_implementation_gap": "Current tests establish code-level behavior only. They do not establish actual independent worker dispatch, Court adjudication, or qualification.",
+  "authorized_next_action": "Start a fresh PAEOS-bound lifecycle-binding task and separately the user-authorized public atomic-ledger, canonical-contract, and public-key-only CapabilityVerifier scopes; do not reuse old task capabilities or report worker start without a receiving-turn receipt.",
+  "kind": "lifecycle-binding-gap-observation",
+  "observed_at_utc": "2026-10-17T03:51:47Z",
+  "owner": "Chat 1 \u2014 DEBT-0258 implementation recovery",
+  "paeos_source_construction_observation": {
+    "court_adjudications": 0,
+    "court_physical_observations": 1,
+    "evidence_package": "reviews/tasks/PAEOS_FREE_POOL_REPAIR_SOURCE_CONSTRUCTION_20261017",
+    "provider_calls": 0,
+    "provider_free_tests_passed": 12,
+    "qualifications": 0,
+    "result": "COMPLETE_SOURCE_CONSTRUCTION",
+    "run_id": "sc-r-2a1df5fd0cb440fdb0a1f6079f9f9a30",
+    "scope_sha256": "c77bb72e41bc810f697860b3d4fdbf22a4972cff16a48d5370f6a49eaf659d8a",
+    "task_id": "t-30fb8836a9bd",
+    "worker_dispatches_reported": 0
+  },
+  "recovery_base_commit": "5b1088a466dccdb8fe3799eb2e0df1d79d07d04e",
+  "runtime_observation": {
+    "behavior": "The bridge writes an immutable prompt, waits for the matching response file, validates strict UTF-8/non-whitespace, collects sandbox writes, then returns TaskStatus.COMPLETE. No authenticated receiver identity, signed worker-start receipt, or receiver-bound task/scope/session identity is checked before COMPLETE.",
+    "bridge_source": "runtime/integrations/chat_bridge.py:212-281",
+    "default_entrypoint": "ops/autonomous_run.py:843-846 maps chat-bridge to ChatBridgeRuntime",
+    "dispatch_started_receipt": "The preserved free-pool dispatch.started.json records spool setup; it does not prove a receiving worker turn started.",
+    "tests": "17 focused lifecycle tests passed on the 5b recovery checkout with six byte-pinned untracked import-support modules present; the checkout was therefore dirty. Exact hashes are in local-verification/lifecycle-17-recovery-overlay.receipt.json.",
+    "transport_tests": "37 focused tests passed in the active dirty checkout; four of the five test modules are untracked and absent from 5b, so this receipt is local evidence and is not reproducible from the published checkpoint as-is."
+  },
+  "status": "OPEN_IMPLEMENTATION_GAP",
+  "wake_condition": "A valid current Builder admission plus a receiver-start receipt cryptographically bound to the exact run, task, scope, workspace, and ChatBridge session; or a fresh PAEOS task that implements the missing binding and proves success/fail-closed tests."
+}
