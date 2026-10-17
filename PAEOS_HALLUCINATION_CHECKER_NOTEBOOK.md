@@ -13639,3 +13639,8 @@ Receipt package /Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_REV
 A forensic review found historical PAEOS state databases and Ed25519 state-sealing seed files already reachable from existing public GitHub refs, including the current main history and the prior pre-P3 recovery ancestry. The seed bytes were not copied or printed during this review. These are state-integrity keys, not verified provider credentials; their present operational use is unknown. Treat any still-active state signed by those exposed seeds as untrusted and rotate/re-seal it through the owning governance path if still in use. Existing public refs were not rewritten or force-updated.
 
 The new `codex/pre-p3-clean-recovery-20261017` checkpoint is constructed as a parentless sanitized snapshot so it inherits no contaminated history. Its explicit manifest contains tracked source plus only active DEBT-0258, DEBT-0249, DEBT-0117, DEBT-0260, lifecycle-binding, and recovery evidence. All `.state*` trees, state databases, key/certificate files, trusted-worker credentials, and runtime archives are excluded. The checkpoint is a recovery backup only; it does not assert review, Court adjudication, qualification, or P3 readiness.
+
+
+### 2026-10-17 — Initial recovery checkpoint published
+
+The sanitized parentless recovery snapshot was pushed to `codex/pre-p3-clean-recovery-20261017` and read back from GitHub at commit `da3aa25bf731ba737cfa8c988c509c798b2a6fe3`. Its manifest records 2,261 files; all 2,261 content hashes were read back and verified, with zero state/key/database paths. This is backup evidence only.

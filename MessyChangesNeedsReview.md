@@ -5392,3 +5392,8 @@ Receipt package /Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0249_COUNCIL_REV
 Historical PAEOS state databases and Ed25519 state-sealing seeds are already reachable from existing public GitHub refs. The seed bytes were neither copied nor printed. Their present operational use is unknown; any still-active state protected by those exposed seeds needs owner-led trust review and rotation/re-sealing if still in use. Existing refs remain untouched.
 
 A parentless, manifest-backed branch `codex/pre-p3-clean-recovery-20261017` is being prepared with tracked source and active pre-P3 task evidence only. It excludes runtime state, databases, key/certificate files, trusted-worker credentials, and runtime archives. This is a recovery checkpoint, not release or qualification evidence.
+
+
+## 2026-10-17 — Initial recovery checkpoint published
+
+GitHub read-back confirms `codex/pre-p3-clean-recovery-20261017` at commit `da3aa25bf731ba737cfa8c988c509c798b2a6fe3`. Its manifest records 2,261 files and all recorded content hashes verified; no state/key/database paths were included. This checkpoint is not a release or qualification claim.
