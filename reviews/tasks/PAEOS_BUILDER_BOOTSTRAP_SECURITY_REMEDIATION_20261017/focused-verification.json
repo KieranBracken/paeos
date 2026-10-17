@@ -1,0 +1,112 @@
+{
+  "schema": "paeos.builder-bootstrap-security-remediation-verification/1",
+  "branch": "codex/builder-qualification-bootstrap-20261017",
+  "parent_head": "03a166eb95c8059ff1a1a1013b43f3d141760bec",
+  "base_branch": "codex/pre-p3-clean-recovery-20261017",
+  "original_review": {
+    "reviewed_head": "fdf7b29e5a4ec19513d05c4c55775dcc084477fa",
+    "result": "ACTIONABLE_FINDINGS",
+    "finding_count": 3,
+    "security_review_sha256_before": "6235d412d625b0e4bf4194d7ad21c9b43245bb2c85d960f752e2ec1ba7e5064b",
+    "security_review_sha256_after": "6235d412d625b0e4bf4194d7ad21c9b43245bb2c85d960f752e2ec1ba7e5064b",
+    "report_sha256_before": "15b364befb9c2a9b7257ecac12f64356c698e3b2dd9aff0d289ba2330c7eab2e",
+    "report_sha256_after": "15b364befb9c2a9b7257ecac12f64356c698e3b2dd9aff0d289ba2330c7eab2e",
+    "original_findings_modified": false
+  },
+  "bundle_local_import_closure": [
+    "ops/trusted_codex_worker_supervisor.py",
+    "runtime/integrations/process_supervisor.py",
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "runtime/integrations/worker_confinement.py",
+    "runtime/builder_transport.py",
+    "runtime/planner_transport.py",
+    "runtime/task_package.py",
+    "kernel/sandbox_backend.py",
+    "kernel/sandbox.py",
+    "kernel/ledger.py",
+    "kernel/evidence.py",
+    "kernel/capability.py",
+    "kernel/types.py"
+  ],
+  "checks": [
+    {
+      "name": "pre-change-security-regressions",
+      "status": "EXPECTED_FAILURE_REPRODUCED",
+      "result": "Before implementation, the actual supervisor exited with ModuleNotFoundError for kernel.capability; a source ancestor symlink was copied; and a runtime ancestor symlink was followed. The final-key-symlink control already failed closed."
+    },
+    {
+      "name": "installer-and-trusted-transport-focused-tests",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync pytest -q tests/ops/test_trusted_codex_installer_binding.py tests/runtime/test_trusted_codex_worker_transport.py tests/runtime/test_builder_transport_readiness.py tests/runtime/test_trusted_codex_client.py",
+      "status": "PASS",
+      "result": "53 passed"
+    },
+    {
+      "name": "ruff-lint",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync ruff check ops/install_trusted_codex_worker_supervisor.py tests/ops/test_trusted_codex_installer_binding.py",
+      "status": "PASS",
+      "result": "All checks passed"
+    },
+    {
+      "name": "ruff-format",
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync ruff format --check ops/install_trusted_codex_worker_supervisor.py tests/ops/test_trusted_codex_installer_binding.py",
+      "status": "PASS",
+      "result": "2 files already formatted"
+    },
+    {
+      "name": "compile-and-whitespace",
+      "command": "/usr/bin/python3 -m compileall -q ops/install_trusted_codex_worker_supervisor.py tests/ops/test_trusted_codex_installer_binding.py && git diff --check",
+      "status": "PASS",
+      "result": "No output; exit 0"
+    },
+    {
+      "name": "full-suite",
+      "command": "uv run pytest",
+      "status": "FAIL_COLLECTION",
+      "duration_seconds": 9.42,
+      "exit_code": 2,
+      "collection_error_count": 22,
+      "missing_modules": [
+        "contracts.adapters",
+        "runtime.autonomy.authority",
+        "runtime.candidate_materialization",
+        "runtime.court.completeness_firewall"
+      ],
+      "erroring_test_modules": [
+        "tests/contracts/test_idea_graph_inspiration_adapter.py",
+        "tests/contracts/test_kae_lof_federation_adapter.py",
+        "tests/contracts/test_orca_mission_control_adapter.py",
+        "tests/contracts/test_sentium_shadow_conformance_harness.py",
+        "tests/ops/test_run_autonomy_canary.py",
+        "tests/runtime/test_architectural_assurance.py",
+        "tests/runtime/test_builder_transport_gate.py",
+        "tests/runtime/test_claude_cli_transport.py",
+        "tests/runtime/test_court_taint_index.py",
+        "tests/runtime/test_evolution.py",
+        "tests/runtime/test_evolution_ledger.py",
+        "tests/runtime/test_friction.py",
+        "tests/runtime/test_ledger_model_attribution.py",
+        "tests/runtime/test_mcp_transport.py",
+        "tests/runtime/test_memory_lifetime_boundary.py",
+        "tests/runtime/test_r4_full_chain_proof.py",
+        "tests/runtime/test_scheduler.py",
+        "tests/runtime/test_selfhost.py",
+        "tests/runtime/test_selfhost_cli.py",
+        "tests/runtime/test_soft_loop.py",
+        "tests/runtime/test_transport.py",
+        "tests/runtime/test_verification.py"
+      ],
+      "pre_existing_untracked_test_preserved": "tests/runtime/test_builder_transport_gate.py",
+      "retry_count": 0
+    }
+  ],
+  "lifecycle_and_external_effects": {
+    "security_review_status": "PENDING_FRESH_READ_ONLY_REVIEW",
+    "host_install": "NOT_RUN",
+    "provider_calls": 0,
+    "qualification_request": "NOT_SENT",
+    "paeos_admission": "NONE",
+    "receiver_start": "NONE",
+    "court_adjudication": "NONE",
+    "p3_promotion": "NONE"
+  }
+}

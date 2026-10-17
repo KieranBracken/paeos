@@ -5445,3 +5445,10 @@ Added separate installer roots so the reviewed recovery branch provides bundle c
 ## 2026-10-17 — Security Review findings recorded; deployment held
 
 The single read-only Security Review of `fdf7b29e5a4ec19513d05c4c55775dcc084477fa` found three actionable issues: P1, the bundle omits imported dependencies and mocked activation does not prove the supervisor starts; P2, source-root symlinked ancestors can escape containment; P2, runtime-root symlinked parents can redirect private request-key access. Findings are saved in `reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/security-review.json`. No code changes were made after review. Host installation and the single qualification request remain held pending user direction and remediation.
+
+
+## 2026-10-17 — Builder bootstrap security remediation; fresh review pending
+
+The installer now packages the 13-file local import closure and uses no-follow descriptor traversal for source copying and runtime key access. Runtime-derived queue, workspace, qualification, and key paths are checked for symlinked components. A real temporary supervisor subprocess published a verifiable signed identity and remained live; symlink escape tests and the missing-module negative control passed. The original Security Review JSON remains unchanged; the separate evidence package is `reviews/tasks/PAEOS_BUILDER_BOOTSTRAP_SECURITY_REMEDIATION_20261017/`.
+
+Verification: 53 focused installer/transport/readiness/client tests passed. Ruff lint/format, compilation, and whitespace checks passed. The single full-suite attempt failed during collection with 22 import errors for missing modules, including `contracts.adapters` and runtime autonomy/court modules; it was not repeated. No host install, provider call, qualification request, PAEOS admission, receiver start, Court adjudication, or P3 promotion occurred. Keep installation and the single qualification request held until the fresh read-only Security Review is clean and the exact preflight succeeds.

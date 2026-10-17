@@ -2,12 +2,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import plistlib
+import shutil
 import stat
+import subprocess
+import sys
+import time
 from pathlib import Path
 
 import pytest
-from nacl.signing import SigningKey
+from nacl.signing import SigningKey, VerifyKey
 
 from ops import install_trusted_codex_worker_supervisor as installer
 
@@ -21,6 +26,28 @@ BUNDLE_MEMBERS = (
     "kernel/sandbox_backend.py",
     "kernel/sandbox.py",
     "kernel/ledger.py",
+    "kernel/capability.py",
+    "kernel/evidence.py",
+    "kernel/types.py",
+    "runtime/task_package.py",
+)
+
+EXPECTED_BUNDLE_IMPORT_CLOSURE = frozenset(
+    {
+        "ops/trusted_codex_worker_supervisor.py",
+        "runtime/integrations/process_supervisor.py",
+        "runtime/integrations/task_scoped_responses_broker.py",
+        "runtime/integrations/worker_confinement.py",
+        "runtime/builder_transport.py",
+        "runtime/planner_transport.py",
+        "runtime/task_package.py",
+        "kernel/sandbox_backend.py",
+        "kernel/sandbox.py",
+        "kernel/ledger.py",
+        "kernel/evidence.py",
+        "kernel/capability.py",
+        "kernel/types.py",
+    }
 )
 
 
@@ -186,6 +213,188 @@ def test_explicit_root_arguments_fail_closed(tmp_path: Path) -> None:
         installer.RootBindings.resolve(source_root=tmp_path / "missing")
     with pytest.raises(RuntimeError, match="runtime root"):
         installer.RootBindings.resolve(runtime_root=not_a_directory)
+
+
+def test_built_bundle_starts_real_supervisor_and_signs_identity(tmp_path: Path) -> None:
+    staging = tmp_path / "staging"
+    staging.mkdir()
+    request_signer = SigningKey.generate()
+    bundle, manifest, _version = installer._build_bundle(
+        staging, request_signer, source_root=installer.REPO_ROOT
+    )
+    assert frozenset(BUNDLE_MEMBERS) == EXPECTED_BUNDLE_IMPORT_CLOSURE
+    manifest_payload = json.loads(manifest.read_text(encoding="utf-8"))
+    assert set(manifest_payload["files"]) >= EXPECTED_BUNDLE_IMPORT_CLOSURE
+    for path in bundle.rglob("*"):
+        if path.is_dir():
+            path.chmod(0o555)
+        else:
+            path.chmod(0o444)
+    bundle.chmod(0o555)
+
+    runtime = tmp_path / "runtime"
+    codex_home = runtime / "codex-home"
+    codex_home.mkdir(parents=True, mode=0o700)
+    response_signer = SigningKey.generate()
+    response_key_path = runtime / "response-signing.key"
+    _write(response_key_path, (bytes(response_signer).hex() + "\n").encode("ascii"))
+    queue_root = runtime / "queue"
+    state_root = runtime / "state"
+    workspace_root = runtime / "workspaces"
+    args = [
+        sys.executable,
+        str(bundle / "ops/trusted_codex_worker_supervisor.py"),
+        "--bundle-root",
+        str(bundle),
+        "--bundle-manifest",
+        str(manifest),
+        "--queue-root",
+        str(queue_root),
+        "--state-root",
+        str(state_root),
+        "--workspace-root",
+        str(workspace_root),
+        "--codex-home",
+        str(codex_home),
+        "--request-verify-key",
+        str(bundle / "request-verify.key"),
+        "--response-signing-key",
+        str(response_key_path),
+        "--qualification-path",
+        str(runtime / "qualification.json"),
+    ]
+    environment = {
+        "HOME": str(codex_home),
+        "LANG": "C.UTF-8",
+        "PATH": os.defpath,
+        "PYTHONPATH": str(bundle),
+    }
+    process = subprocess.Popen(
+        args,
+        cwd=tmp_path,
+        env=environment,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    identity_path = state_root / "identity.json"
+    try:
+        deadline = time.monotonic() + 10
+        while not identity_path.exists() and process.poll() is None and time.monotonic() < deadline:
+            time.sleep(0.05)
+        if process.poll() is not None:
+            stdout, stderr = process.communicate(timeout=2)
+            pytest.fail(
+                "supervisor exited before publishing identity; "
+                f"stdout={stdout.decode(errors='replace')} "
+                f"stderr={stderr.decode(errors='replace')}"
+            )
+        assert identity_path.is_file()
+        assert process.poll() is None
+        envelope = json.loads(identity_path.read_text(encoding="utf-8"))
+        signature = bytes.fromhex(envelope.pop("signature"))
+        canonical = (
+            json.dumps(envelope, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n"
+        ).encode("ascii")
+        VerifyKey(bytes(response_signer.verify_key)).verify(canonical, signature)
+        assert (
+            envelope["supervisor_identity_sha256"]
+            == hashlib.sha256(bytes(response_signer.verify_key)).hexdigest()
+        )
+        assert not list(queue_root.iterdir())
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            process.wait(timeout=5)
+        process.communicate(timeout=2)
+
+    incomplete_bundle = tmp_path / "incomplete-bundle"
+    shutil.copytree(bundle, incomplete_bundle)
+    (incomplete_bundle / "kernel").chmod(0o755)
+    (incomplete_bundle / "kernel/types.py").unlink()
+    negative_environment = {
+        "PATH": os.defpath,
+        "PYTHONPATH": str(incomplete_bundle),
+    }
+    negative = subprocess.run(
+        [sys.executable, "-c", "import ops.trusted_codex_worker_supervisor"],
+        cwd=tmp_path,
+        env=negative_environment,
+        capture_output=True,
+        check=False,
+        timeout=5,
+    )
+    assert negative.returncode != 0
+    assert b"kernel.types" in negative.stderr
+
+
+def test_bundle_rejects_symlinked_source_ancestor(tmp_path: Path) -> None:
+    source = tmp_path / "reviewed-source"
+    source.mkdir()
+    outside_ops = tmp_path / "outside" / "ops"
+    _write(outside_ops / "trusted_codex_worker_supervisor.py", b"outside bytes\n")
+    (source / "ops").symlink_to(outside_ops, target_is_directory=True)
+    for relative in BUNDLE_MEMBERS:
+        if relative.startswith("ops/"):
+            continue
+        _write(source / relative, f"reviewed:{relative}\n".encode())
+
+    staging = tmp_path / "staging"
+    staging.mkdir()
+    with pytest.raises(RuntimeError, match=r"symlink|source"):
+        installer._build_bundle(staging, SigningKey.generate(), source_root=source)
+    assert (outside_ops / "trusted_codex_worker_supervisor.py").read_bytes() == b"outside bytes\n"
+
+
+def test_runtime_paths_reject_symlinked_ancestors_without_reading_or_creating_outside(
+    tmp_path: Path,
+) -> None:
+    runtime = tmp_path / "runtime"
+    runtime.mkdir()
+    outside = tmp_path / "outside"
+    outside_key = outside / "ops/.trusted-codex-worker/request.key"
+    outside_signer = SigningKey.generate()
+    _write(outside_key, (bytes(outside_signer).hex() + "\n").encode("ascii"))
+    (runtime / "ops").symlink_to(outside / "ops", target_is_directory=True)
+    runtime_paths = installer.RuntimePaths.from_root(runtime)
+    original_key = outside_key.read_bytes()
+
+    with pytest.raises(RuntimeError, match=r"symlink|runtime path"):
+        installer._ensure_request_key(runtime_paths)
+    with pytest.raises(RuntimeError, match=r"symlink|response key"):
+        installer._read_public_key(runtime_paths.response_verify_key, label="response key")
+    assert outside_key.read_bytes() == original_key
+    assert not (outside / "ops/.trusted-codex-worker/response-verify.key").exists()
+
+
+def test_runtime_paths_reject_symlinked_final_key_file(tmp_path: Path) -> None:
+    runtime = tmp_path / "runtime"
+    external = tmp_path / "external.key"
+    runtime.mkdir()
+    signer = SigningKey.generate()
+    _write(external, (bytes(signer).hex() + "\n").encode("ascii"))
+    key_path = runtime / "ops/.trusted-codex-worker/request.key"
+    key_path.parent.mkdir(parents=True)
+    key_path.symlink_to(external)
+    runtime_paths = installer.RuntimePaths.from_root(runtime)
+
+    with pytest.raises(RuntimeError, match=r"symlink|request signing key"):
+        installer._ensure_request_key(runtime_paths)
+    assert external.read_bytes() == (bytes(signer).hex() + "\n").encode("ascii")
+
+
+@pytest.mark.parametrize("leaf", ["queue", "workspaces"])
+def test_runtime_paths_validate_rejects_symlinked_worker_directories(
+    tmp_path: Path, leaf: str
+) -> None:
+    runtime = tmp_path / "runtime"
+    parent = runtime / "ops/.trusted-codex-worker"
+    parent.mkdir(parents=True)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (parent / leaf).symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(RuntimeError, match="symlink"):
+        installer.RuntimePaths.from_root(runtime).validate()
 
 
 def test_install_uses_reviewed_source_and_preserves_runtime_root(

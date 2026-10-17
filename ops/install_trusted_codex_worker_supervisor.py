@@ -9,14 +9,17 @@ health result.
 from __future__ import annotations
 
 import argparse
+import errno
 import hashlib
 import json
 import os
 import plistlib
 import shutil
+import stat
 import subprocess
 import tempfile
 import time
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -41,6 +44,22 @@ REPO_PLANNER_QUALIFICATION = (
 CODEX_AUTH_SOURCE = Path("/Users/bob/.codex/auth.json")
 PYTHON = REPO_ROOT / ".venv" / "bin" / "python3"
 
+BUNDLE_MEMBERS = (
+    "ops/trusted_codex_worker_supervisor.py",
+    "runtime/integrations/process_supervisor.py",
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "runtime/integrations/worker_confinement.py",
+    "runtime/builder_transport.py",
+    "runtime/planner_transport.py",
+    "kernel/sandbox_backend.py",
+    "kernel/sandbox.py",
+    "kernel/ledger.py",
+    "kernel/capability.py",
+    "kernel/evidence.py",
+    "kernel/types.py",
+    "runtime/task_package.py",
+)
+
 
 def _resolved_directory(path: Path, *, label: str) -> Path:
     if not path.is_absolute():
@@ -52,6 +71,193 @@ def _resolved_directory(path: Path, *, label: str) -> Path:
     if not resolved.is_dir():
         raise RuntimeError(f"{label} is not a directory")
     return resolved
+
+
+def _directory_flags() -> int:
+    required = ("O_DIRECTORY", "O_NOFOLLOW")
+    if any(not hasattr(os, name) for name in required):
+        raise RuntimeError("platform lacks no-follow directory operations")
+    return os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+
+
+def _open_absolute_directory(path: Path, *, label: str) -> int:
+    """Open an absolute directory one component at a time without following symlinks."""
+
+    path = Path(path)
+    if not path.is_absolute() or ".." in path.parts:
+        raise ValueError(f"{label} must be an absolute canonical path")
+    try:
+        current_fd = os.open(path.anchor, _directory_flags())
+    except OSError as exc:
+        raise RuntimeError(f"{label} is unavailable") from exc
+    try:
+        for component in path.parts[1:]:
+            try:
+                next_fd = os.open(component, _directory_flags(), dir_fd=current_fd)
+            except OSError as exc:
+                raise RuntimeError(
+                    f"{label} contains a symlink or non-directory component"
+                ) from exc
+            os.close(current_fd)
+            current_fd = next_fd
+        return current_fd
+    except Exception:
+        os.close(current_fd)
+        raise
+
+
+def _relative_parts(relative: str, *, label: str) -> tuple[str, ...]:
+    if not isinstance(relative, str) or not relative or relative.startswith("/"):
+        raise ValueError(f"{label} must be a non-empty relative path")
+    parts = tuple(relative.split("/"))
+    if any(part in {"", ".", ".."} for part in parts):
+        raise ValueError(f"{label} contains an unsafe path component")
+    return parts
+
+
+def _open_beneath(
+    root: Path,
+    relative: str,
+    *,
+    flags: int,
+    mode: int = 0o600,
+    create_parents: bool = False,
+    label: str,
+) -> int:
+    """Open a root-relative file with descriptor-bound, no-follow traversal."""
+
+    parts = _relative_parts(relative, label=label)
+    current_fd = _open_absolute_directory(root, label=f"{label} root")
+    try:
+        for component in parts[:-1]:
+            try:
+                next_fd = os.open(component, _directory_flags(), dir_fd=current_fd)
+            except FileNotFoundError:
+                if not create_parents:
+                    raise RuntimeError(f"{label} parent path is unavailable") from None
+                with suppress(FileExistsError):
+                    os.mkdir(component, mode=0o700, dir_fd=current_fd)
+                try:
+                    next_fd = os.open(component, _directory_flags(), dir_fd=current_fd)
+                except OSError as exc:
+                    raise RuntimeError(
+                        f"{label} parent path contains a symlink or non-directory component"
+                    ) from exc
+            except OSError as exc:
+                raise RuntimeError(
+                    f"{label} parent path contains a symlink or non-directory component"
+                ) from exc
+            os.close(current_fd)
+            current_fd = next_fd
+        try:
+            return os.open(
+                parts[-1],
+                flags | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0),
+                mode,
+                dir_fd=current_fd,
+            )
+        except OSError as exc:
+            if exc.errno in {errno.ELOOP, errno.ENOTDIR}:
+                raise RuntimeError(f"{label} is a symlink or not a regular file") from exc
+            raise
+    finally:
+        os.close(current_fd)
+
+
+def _open_absolute_regular(path: Path, *, label: str) -> tuple[int, int]:
+    path = Path(path)
+    if not path.is_absolute() or path.name in {"", ".", ".."}:
+        raise RuntimeError(f"{label} is unavailable")
+    parent_fd = _open_absolute_directory(path.parent, label=f"{label} parent")
+    try:
+        try:
+            fd = os.open(
+                path.name,
+                os.O_RDONLY | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0),
+                dir_fd=parent_fd,
+            )
+        except OSError as exc:
+            if exc.errno in {errno.ELOOP, errno.ENOTDIR}:
+                raise RuntimeError(f"{label} is a symlink or not a regular file") from exc
+            raise RuntimeError(f"{label} is unavailable") from exc
+    finally:
+        os.close(parent_fd)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode):
+            raise RuntimeError(f"{label} is not a regular file")
+        return fd, stat.S_IMODE(info.st_mode)
+    except Exception:
+        os.close(fd)
+        raise
+
+
+def _read_fd(fd: int) -> bytes:
+    chunks: list[bytes] = []
+    while True:
+        chunk = os.read(fd, 64 * 1024)
+        if not chunk:
+            return b"".join(chunks)
+        chunks.append(chunk)
+
+
+def _read_regular(path: Path, *, label: str) -> tuple[bytes, int]:
+    fd, mode = _open_absolute_regular(path, label=label)
+    try:
+        return _read_fd(fd), mode
+    finally:
+        os.close(fd)
+
+
+def _validate_beneath(
+    root: Path,
+    relative: str,
+    *,
+    label: str,
+    expect_directory: bool = False,
+    allow_leaf_symlink: bool = False,
+) -> None:
+    """Reject symlinks in an existing root-relative path; absent suffixes are allowed."""
+
+    parts = _relative_parts(relative, label=label)
+    current_fd = _open_absolute_directory(root, label=f"{label} root")
+    try:
+        for index, component in enumerate(parts):
+            is_leaf = index == len(parts) - 1
+            try:
+                info = os.stat(component, dir_fd=current_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                return
+            if stat.S_ISLNK(info.st_mode):
+                if not (is_leaf and allow_leaf_symlink):
+                    raise RuntimeError(f"{label} contains a symlink")
+                candidate = root.joinpath(*parts)
+                try:
+                    resolved = candidate.resolve(strict=True)
+                except OSError as exc:
+                    raise RuntimeError(f"{label} is unavailable") from exc
+                if not resolved.is_file() or not os.access(resolved, os.X_OK):
+                    raise RuntimeError(f"{label} symlink target is not executable")
+                return
+            if is_leaf:
+                expected = (
+                    stat.S_ISDIR(info.st_mode) if expect_directory else stat.S_ISREG(info.st_mode)
+                )
+                if not expected:
+                    raise RuntimeError(f"{label} has an unexpected file type")
+                return
+            if not stat.S_ISDIR(info.st_mode):
+                raise RuntimeError(f"{label} contains a non-directory component")
+            try:
+                next_fd = os.open(component, _directory_flags(), dir_fd=current_fd)
+            except OSError as exc:
+                raise RuntimeError(
+                    f"{label} contains a symlink or non-directory component"
+                ) from exc
+            os.close(current_fd)
+            current_fd = next_fd
+    finally:
+        os.close(current_fd)
 
 
 @dataclass(frozen=True, slots=True)
@@ -88,6 +294,48 @@ class RuntimePaths:
     @classmethod
     def from_root(cls, root: Path) -> RuntimePaths:
         return cls(_resolved_directory(root, label="runtime root"))
+
+    def validate(self) -> None:
+        """Fail closed when any existing runtime-derived path crosses a symlink."""
+
+        paths = (
+            (".venv/bin/python3", "runtime interpreter", False, True),
+            ("ops/.trusted-codex-worker/queue", "runtime queue", True, False),
+            ("ops/.trusted-codex-worker/workspaces", "runtime workspace", True, False),
+            ("ops/.trusted-codex-worker/request.key", "request key", False, False),
+            (
+                "ops/.trusted-codex-worker/response-verify.key",
+                "response verification key",
+                False,
+                False,
+            ),
+            (
+                "ops/.trusted-codex-worker/qualification-verify.key",
+                "qualification verification key",
+                False,
+                False,
+            ),
+            (
+                "ops/.trusted-codex-worker/qualification.json",
+                "Builder qualification",
+                False,
+                False,
+            ),
+            (
+                "ops/.trusted-codex-worker/planner-qualification-v2.json",
+                "planner qualification",
+                False,
+                False,
+            ),
+        )
+        for relative, label, is_directory, allow_leaf_symlink in paths:
+            _validate_beneath(
+                self.root,
+                relative,
+                label=label,
+                expect_directory=is_directory,
+                allow_leaf_symlink=allow_leaf_symlink,
+            )
 
     @property
     def python(self) -> Path:
@@ -138,16 +386,18 @@ def _sha256(path: Path) -> str:
 
 
 def _safe_regular(path: Path, *, label: str) -> None:
-    if not path.is_absolute() or path.is_symlink() or not path.is_file():
-        raise RuntimeError(f"{label} is unavailable")
+    fd, _mode = _open_absolute_regular(path, label=label)
+    os.close(fd)
 
 
 def _read_private_key(path: Path) -> SigningKey:
-    _safe_regular(path, label="request signing key")
-    mode = path.stat().st_mode & 0o777
+    raw_bytes, mode = _read_regular(path, label="request signing key")
     if mode & 0o077:
         raise RuntimeError("request signing key permissions are too broad")
-    raw = path.read_text(encoding="ascii").strip()
+    try:
+        raw = raw_bytes.decode("ascii").strip()
+    except UnicodeDecodeError as exc:
+        raise RuntimeError("request signing key is malformed") from exc
     if len(raw) != 64:
         raise RuntimeError("request signing key is malformed")
     try:
@@ -157,10 +407,13 @@ def _read_private_key(path: Path) -> SigningKey:
 
 
 def _read_public_key(path: Path, *, label: str) -> bytes:
-    _safe_regular(path, label=label)
-    if path.stat().st_mode & 0o022:
+    raw_bytes, mode = _read_regular(path, label=label)
+    if mode & 0o022:
         raise RuntimeError(f"{label} permissions are too broad")
-    raw = path.read_text(encoding="ascii").strip()
+    try:
+        raw = raw_bytes.decode("ascii").strip()
+    except UnicodeDecodeError as exc:
+        raise RuntimeError(f"{label} is malformed") from exc
     if len(raw) != 64:
         raise RuntimeError(f"{label} is malformed")
     try:
@@ -228,36 +481,96 @@ def _existing_response_signing_key(
 
 def _ensure_request_key(runtime_paths: RuntimePaths | None = None) -> SigningKey:
     runtime_paths = runtime_paths or RuntimePaths.from_root(REPO_ROOT)
-    request_key_path = runtime_paths.request_key
-    request_key_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-    if request_key_path.exists() or request_key_path.is_symlink():
-        return _read_private_key(request_key_path)
-    key = SigningKey.generate()
-    fd = os.open(request_key_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    relative = "ops/.trusted-codex-worker/request.key"
     try:
-        os.write(fd, (bytes(key).hex() + "\n").encode("ascii"))
-        os.fsync(fd)
+        fd = _open_beneath(
+            runtime_paths.root,
+            relative,
+            flags=os.O_RDONLY,
+            create_parents=True,
+            label="request signing key",
+        )
+    except FileNotFoundError:
+        key = SigningKey.generate()
+        try:
+            fd = _open_beneath(
+                runtime_paths.root,
+                relative,
+                flags=os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                mode=0o600,
+                create_parents=True,
+                label="request signing key",
+            )
+        except FileExistsError:
+            return _read_private_key(runtime_paths.request_key)
+        try:
+            payload = (bytes(key).hex() + "\n").encode("ascii")
+            offset = 0
+            while offset < len(payload):
+                written = os.write(fd, payload[offset:])
+                if written <= 0:
+                    raise RuntimeError("request signing key write made no progress")
+                offset += written
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        return key
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode):
+            raise RuntimeError("request signing key is not a regular file")
+        if stat.S_IMODE(info.st_mode) & 0o077:
+            raise RuntimeError("request signing key permissions are too broad")
+        raw = _read_fd(fd).decode("ascii").strip()
     finally:
         os.close(fd)
-    return key
+    if len(raw) != 64:
+        raise RuntimeError("request signing key is malformed")
+    try:
+        return SigningKey(bytes.fromhex(raw))
+    except ValueError as exc:
+        raise RuntimeError("request signing key is malformed") from exc
 
 
 def _copy_auth_state(destination: Path) -> None:
-    _safe_regular(CODEX_AUTH_SOURCE, label="Codex auth state")
-    source_mode = CODEX_AUTH_SOURCE.stat().st_mode & 0o777
+    source_bytes, source_mode = _read_regular(CODEX_AUTH_SOURCE, label="Codex auth state")
     if source_mode & 0o077:
         raise RuntimeError("Codex auth state permissions are too broad")
     destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     if destination.exists() or destination.is_symlink():
         raise RuntimeError("dedicated Codex auth destination already exists")
-    shutil.copyfile(CODEX_AUTH_SOURCE, destination)
-    os.chmod(destination, 0o600)
+    fd = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        offset = 0
+        while offset < len(source_bytes):
+            written = os.write(fd, source_bytes[offset:])
+            if written <= 0:
+                raise RuntimeError("Codex auth copy made no progress")
+            offset += written
+        os.fsync(fd)
+    finally:
+        os.close(fd)
 
 
-def _copy_source(source: Path, destination: Path) -> None:
-    _safe_regular(source, label=f"supervisor source {source.name}")
+def _copy_source(source_root: Path, relative: str, destination: Path) -> None:
+    try:
+        fd = _open_beneath(
+            source_root,
+            relative,
+            flags=os.O_RDONLY,
+            label=f"supervisor source {relative}",
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(f"supervisor source {relative} is unavailable") from exc
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode):
+            raise RuntimeError(f"supervisor source {relative} is not a regular file")
+        source_bytes = _read_fd(fd)
+    finally:
+        os.close(fd)
     destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-    shutil.copyfile(source, destination)
+    destination.write_bytes(source_bytes)
     os.chmod(destination, 0o444)
 
 
@@ -271,18 +584,8 @@ def _build_bundle(
     source_root = _resolved_directory(
         REPO_ROOT if source_root is None else source_root, label="source root"
     )
-    for relative in (
-        "ops/trusted_codex_worker_supervisor.py",
-        "runtime/integrations/process_supervisor.py",
-        "runtime/integrations/task_scoped_responses_broker.py",
-        "runtime/integrations/worker_confinement.py",
-        "runtime/builder_transport.py",
-        "runtime/planner_transport.py",
-        "kernel/sandbox_backend.py",
-        "kernel/sandbox.py",
-        "kernel/ledger.py",
-    ):
-        _copy_source(source_root / relative, bundle / relative)
+    for relative in BUNDLE_MEMBERS:
+        _copy_source(source_root, relative, bundle / relative)
     for package in ("ops", "runtime", "runtime/integrations", "kernel"):
         package_init = bundle / package / "__init__.py"
         if not package_init.exists():
@@ -324,6 +627,7 @@ def _write_plist(
     runtime_paths: RuntimePaths | None = None,
 ) -> None:
     runtime_paths = runtime_paths or RuntimePaths.from_root(REPO_ROOT)
+    runtime_paths.validate()
     if planner_qualification != runtime_paths.planner_qualification_path:
         raise ValueError("planner qualification path must belong to the runtime root")
     payload = {
@@ -381,6 +685,74 @@ def _launchctl(args: list[str]) -> tuple[int, bytes, bytes]:
     return result.returncode, result.stdout, result.stderr
 
 
+def _ensure_runtime_public_key(
+    runtime_paths: RuntimePaths,
+    path: Path,
+    expected: bytes,
+    *,
+    label: str,
+) -> None:
+    try:
+        relative = path.relative_to(runtime_paths.root).as_posix()
+    except ValueError as exc:
+        raise RuntimeError(f"{label} is outside the runtime root") from exc
+    try:
+        fd = _open_beneath(
+            runtime_paths.root,
+            relative,
+            flags=os.O_RDONLY,
+            create_parents=True,
+            label=label,
+        )
+    except FileNotFoundError:
+        payload = expected.hex().encode("ascii") + b"\n"
+        try:
+            fd = _open_beneath(
+                runtime_paths.root,
+                relative,
+                flags=os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                mode=0o600,
+                create_parents=True,
+                label=label,
+            )
+        except FileExistsError:
+            actual = _read_public_key(path, label=label)
+            if actual != expected:
+                raise RuntimeError(f"identity path mismatch: {path.name}") from None
+            return
+        try:
+            offset = 0
+            while offset < len(payload):
+                written = os.write(fd, payload[offset:])
+                if written <= 0:
+                    raise RuntimeError(f"{label} write made no progress")
+                offset += written
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        return
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode):
+            raise RuntimeError(f"{label} is not a regular file")
+        if stat.S_IMODE(info.st_mode) & 0o022:
+            raise RuntimeError(f"{label} permissions are too broad")
+        try:
+            actual_text = _read_fd(fd).decode("ascii").strip()
+        except UnicodeDecodeError as exc:
+            raise RuntimeError(f"{label} is malformed") from exc
+        if len(actual_text) != 64:
+            raise RuntimeError(f"{label} is malformed")
+        try:
+            actual = bytes.fromhex(actual_text)
+        except ValueError as exc:
+            raise RuntimeError(f"{label} is malformed") from exc
+        if actual != expected:
+            raise RuntimeError(f"identity path mismatch: {path.name}")
+    finally:
+        os.close(fd)
+
+
 def _activate_agent(domain: str) -> None:
     existing, _stdout, _stderr = _launchctl(["print", f"{domain}/{LABEL}"])
     if existing == 0:
@@ -415,6 +787,7 @@ def install(
 ) -> dict[str, str]:
     roots = RootBindings.resolve(source_root=source_root, runtime_root=runtime_root)
     runtime_paths = RuntimePaths.from_root(roots.runtime_root)
+    runtime_paths.validate()
     if not runtime_paths.python.is_file() or not os.access(runtime_paths.python, os.X_OK):
         raise RuntimeError("runtime-root virtualenv interpreter is unavailable")
     _safe_regular(CODEX_AUTH_SOURCE, label="Codex auth state")
@@ -466,20 +839,13 @@ def install(
         )
         response_public = runtime_paths.response_verify_key
         qualification_public = runtime_paths.qualification_verify_key
-        public_values = {
-            response_public: bytes(response_key.verify_key).hex() + "\n",
-            qualification_public: bytes(response_key.verify_key).hex() + "\n",
-        }
-        for public_path, public_value in public_values.items():
-            if public_path.exists() or public_path.is_symlink():
-                if _read_public_key(public_path, label=public_path.name) != bytes(
-                    response_key.verify_key
-                ):
-                    raise RuntimeError(f"identity path mismatch: {public_path.name}")
-                continue
-            public_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-            public_path.write_text(public_value, encoding="ascii")
-            os.chmod(public_path, 0o600)
+        for public_path in (response_public, qualification_public):
+            _ensure_runtime_public_key(
+                runtime_paths,
+                public_path,
+                bytes(response_key.verify_key),
+                label=public_path.name,
+            )
     _activate_agent(f"gui/{os.getuid()}")
     identity_path = final_root / "state" / "identity.json"
     deadline = time.monotonic() + 10.0

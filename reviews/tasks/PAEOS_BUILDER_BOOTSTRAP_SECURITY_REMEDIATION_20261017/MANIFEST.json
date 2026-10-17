@@ -1,0 +1,54 @@
+{
+  "base_branch": "codex/pre-p3-clean-recovery-20261017",
+  "branch": "codex/builder-qualification-bootstrap-20261017",
+  "checkpoint": "builder-bootstrap-security-remediation",
+  "classification": "sanitized recovery checkpoint; not release, Court adjudication, or qualification",
+  "excluded_untracked": [
+    "tests/runtime/test_builder_transport_gate.py"
+  ],
+  "file_count": 7,
+  "files": [
+    {
+      "bytes": 644350,
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "d79644a49632e4c8e68440dec210fe0da3bfc4a64167b6f701ce67cacf39c7e1"
+    },
+    {
+      "bytes": 1428540,
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "5d2ae10a6bc6831af1f77d1292bb8530c7f5a46e79459d57ed4104659f66db5a"
+    },
+    {
+      "bytes": 32688,
+      "path": "ops/install_trusted_codex_worker_supervisor.py",
+      "sha256": "d8601b5e00ffbad546b1a90eebf66d66577750b85db8a4e53f9f300d26bb049a"
+    },
+    {
+      "bytes": 3677,
+      "path": "reviews/tasks/PAEOS_BUILDER_BOOTSTRAP_SECURITY_REMEDIATION_20261017/REPORT.md",
+      "sha256": "58e5ff03f47d24b303ecc8eb0e27bd1457d8c0344310dce5a711e48417007ca8"
+    },
+    {
+      "bytes": 5086,
+      "path": "reviews/tasks/PAEOS_BUILDER_BOOTSTRAP_SECURITY_REMEDIATION_20261017/focused-verification.json",
+      "sha256": "52e3fc01747d13552a174ccc8e419461d7ad2969a4cf2fbde1268bd2822fb2e6"
+    },
+    {
+      "bytes": 5692,
+      "path": "reviews/tasks/PAEOS_BUILDER_BOOTSTRAP_SECURITY_REMEDIATION_20261017/secret-scan.json",
+      "sha256": "caf8d872e62ebebfb78c1a90582ce6d714f2e88152bf2ced6939c63ce6d0039b"
+    },
+    {
+      "bytes": 20170,
+      "path": "tests/ops/test_trusted_codex_installer_binding.py",
+      "sha256": "9ffd8f96eee5d043955442fa8f72f4c836f6f1894a06e4277614fecec9196e50"
+    }
+  ],
+  "original_security_review": {
+    "modified": false,
+    "path": "reviews/tasks/PAEOS_BUILDER_ROOT_BINDING_20261017/security-review.json",
+    "sha256": "6235d412d625b0e4bf4194d7ad21c9b43245bb2c85d960f752e2ec1ba7e5064b"
+  },
+  "parent_head": "03a166eb95c8059ff1a1a1013b43f3d141760bec",
+  "schema": "paeos.recovery-checkpoint-manifest/1"
+}

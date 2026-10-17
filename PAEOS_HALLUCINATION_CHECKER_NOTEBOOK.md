@@ -13722,3 +13722,18 @@ ALLOWED_NOW: Preserve and publish this review disposition. Owner: current recove
 HELD: Review-driven code changes, host installation, the single authorized qualification request, and fresh PAEOS worker admissions. Wake only after the user directs continuation; then fix all three findings, run focused tests and required verification, and obtain any review required by the follow-up instructions before installation.
 
 AUTHORITY_OR_IMPLEMENTATION_GAP: Bundle closure/startup is not proven; source and runtime root containment are not enforced through derived paths. The available ChatBridge route also still lacks accepted L10 sealed-context evidence, and Builder qualification is expired. Chat 1 remains the sole DEBT-0258 integrator. No receiver start, Court adjudication, qualification, or P3 readiness is evidenced.
+
+
+### 2026-10-17 — Builder bootstrap security remediation checkpoint; fresh review pending
+
+On recovery branch `codex/builder-qualification-bootstrap-20261017`, the installer now packages the 13-file local import closure and uses no-follow descriptor traversal for source copies and runtime key access. `RuntimePaths.validate()` rejects symlinked derived queue, workspace, qualification, and key paths; it permits the expected final `.venv/bin/python3` executable symlink while rejecting symlinked parent directories. A real temporary supervisor subprocess published a valid signed identity and remained alive with an empty test queue; a negative control failed to import after removing `kernel/types.py`. Symlink tests confirmed source/runtime ancestor escapes fail closed and outside sentinels remain unchanged.
+
+The original Security Review result remains unchanged at SHA-256 `6235d412d625b0e4bf4194d7ad21c9b43245bb2c85d960f752e2ec1ba7e5064b`; remediation evidence is separate under `reviews/tasks/PAEOS_BUILDER_BOOTSTRAP_SECURITY_REMEDIATION_20261017/`. The installer and trusted transport/readiness/client tests passed 53/53; Ruff lint, formatting, Python compilation, and whitespace checks passed. The one full-suite run failed during collection with 22 missing-module import errors, including `contracts.adapters`, `runtime.autonomy.authority`, `runtime.candidate_materialization`, and `runtime.court.completeness_firewall`. No retry was made. The pre-existing untracked `tests/runtime/test_builder_transport_gate.py` was preserved and excluded from the recovery checkpoint.
+
+No source/runtime install, host-key operation, provider call, qualification request, fresh PAEOS admission, receiver start, Court adjudication, or P3 promotion occurred. The current `gpt-5.6-sol` qualification remains expired, and prior Trace-B runs stopped/remanded before Builder.
+
+ALLOWED_NOW: Push this sanitized remediation checkpoint and run the selected fresh read-only Security Review against `codex/pre-p3-clean-recovery-20261017`. Owner: current bootstrap integrator.
+
+HELD: Host installation, the single authorized fresh-ID qualification request, and Chat 1's fresh DEBT-0258 admission. Wake after a clean Security Review and fresh queue/process/identity/bundle-hash preflight. A new actionable review finding holds installation and qualification.
+
+AUTHORITY_OR_IMPLEMENTATION_GAP: The earlier review is preserved, but fresh independent disposition is pending. Builder qualification is expired; the available ChatBridge still lacks accepted physical L10 sealed-context evidence. No PAEOS admission, receiver-start receipt, Court adjudication, qualification, or P3 readiness is evidenced.
