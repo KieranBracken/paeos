@@ -1,0 +1,34 @@
+{
+  "kind": "READ_ONLY_CANDIDATE_BASE_PRIMITIVE_CHECK",
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-c",
+    "import sys,pathlib,json; root=pathlib.Path(sys.argv[1]); sys.path.insert(0,str(root)); import kernel.ledger,kernel.ledger_sqlite,kernel.capability; print(json.dumps({m.__name__:m.__file__ for m in (kernel.ledger,kernel.ledger_sqlite,kernel.capability)}),flush=True); import pytest; raise SystemExit(pytest.main(['-q','-p','no:cacheprovider','tests/kernel/test_ledger_transition_once.py','-k','single_use_transition_claim or distinct_transition_with_stale_expected_head_is_rejected']))",
+    "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate"
+  ],
+  "cwd": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate",
+  "started_unix": 1792083718.982413,
+  "ended_unix": 1792083719.339961,
+  "exit_code": 0,
+  "preimages": {
+    "kernel/ledger.py": "e85da318e532d3bc686e66342cf91318c227ad4698d438d7b02406a24d5f882f",
+    "kernel/ledger_sqlite.py": "109266b432f438986492b0eaf9a80ea961a70da902eced1966a277ede7a9634a",
+    "kernel/capability.py": "7f00bbef66ab7f028e431b3025254226c7f9f6b486e337d025dd88b637eb85bf",
+    "kernel/types.py": "f0892a76084a016b09dc9c971ffd8ac912328cfae7532865093e4037bff593f4",
+    "tests/kernel/test_ledger_transition_once.py": "eb66e212129258754b1dd1be3dc13dda508bbd8dedd693e4b5e62f8dc8d97ae5"
+  },
+  "postimages": {
+    "kernel/ledger.py": "e85da318e532d3bc686e66342cf91318c227ad4698d438d7b02406a24d5f882f",
+    "kernel/ledger_sqlite.py": "109266b432f438986492b0eaf9a80ea961a70da902eced1966a277ede7a9634a",
+    "kernel/capability.py": "7f00bbef66ab7f028e431b3025254226c7f9f6b486e337d025dd88b637eb85bf",
+    "kernel/types.py": "f0892a76084a016b09dc9c971ffd8ac912328cfae7532865093e4037bff593f4",
+    "tests/kernel/test_ledger_transition_once.py": "eb66e212129258754b1dd1be3dc13dda508bbd8dedd693e4b5e62f8dc8d97ae5"
+  },
+  "source_unchanged": true,
+  "new_scope_module_qualification": false
+}

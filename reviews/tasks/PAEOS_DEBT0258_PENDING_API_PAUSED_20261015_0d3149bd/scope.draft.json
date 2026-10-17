@@ -1,0 +1,66 @@
+{
+  "authority_reference": "Coordinator instruction for distinct successor SOURCE_CONSTRUCTION_ONLY task after original source construction terminal completion; same two captured component paths, existing preimages. No retry or relabel of previous consumed operation.",
+  "builder_family": "PENDING_PARENT_FREEZE",
+  "builder_session": "PENDING_PARENT_FREEZE",
+  "canonical_runtime_manifest_sha256": "48dea315a74f7c5403a5e23f1dc0f3ab152418290b2cdba12ef34076a2aa0876",
+  "claims": {
+    "activation": false,
+    "admission": false,
+    "authority_issuance": false,
+    "integration": false,
+    "production": false,
+    "qualification": false
+  },
+  "construction_kind": "READ_ONLY_PENDING_DENIAL_API_NO_ACTIVATION",
+  "excluded_from_declared_read_closure": {
+    ".source_construction_verify.py": "Prior operation apparatus helper preserved archivally; a newly pinned helper is supplied for this distinct task.",
+    "paeos/model_router/credentials.py": "Canonical seeder quarantines this file; unused by scoped kernel/contract tests. Preserved archivally, excluded from declared read closure; router imports are forbidden in this task."
+  },
+  "expected_preimages": {
+    "runtime/scope_supersession.py": "47a0ad002c18487f5acc6290959bf5d41e9f2617aedd08995c6ddc78a8092144",
+    "tests/runtime/test_scope_supersession.py": "fc5ac02fff3bd75f8acd8aa2266ff8c68ffe44696774d1d72a0519a2afc71e7c"
+  },
+  "heterogeneous_review": "PENDING_NOT_FOR_INTEGRATION",
+  "implementation_requirements": [
+    "Add a public read-only observation API to the existing ScopeSupersessionService. Return a frozen observation containing the observed ledger head and validated pending receipt(s) for an exact canonical contract ref. An optional denial helper raises SupersessionError when pending.",
+    "When no consumed pending supersession is observed, report only NO_CONSUMED_SUPERSESSION_OBSERVED. Never return ACTIVE, authorized, qualified, activated, or equivalent assertions.",
+    "Validate the actual ledger chain; require row transition_id scope-supersession:<tx>, row domain, request.expected_head_hash equal to row.prev_hash, canonical request bytes from CAS, exact request fields, and the exact signed public token evaluated at the historical row.seq. Token expiry at observation time must never release a pending denial.",
+    "Validate preserved output payload refs, predecessor/successor refs, required_requalifications, invalidated_evidence_refs, obligations and PENDING status against the canonical request and authenticated grant. Reuse existing validation without calling consume, ledger.append, CAS.put, or any authority issuance operation.",
+    "Fail closed for malformed, unknown or ambiguous pending state, forged grant, missing/corrupt CAS, mismatched status or obligations, and duplicate consumption lineage. Corrupt same-domain identity cannot silently be skipped.",
+    "A valid pending supersession denies BOTH its original predecessor contract and its unactivated successor, including after SQLite reopen. Define handling of valid unrelated contracts and other domains explicitly and test it.",
+    "Treat the observed head as a future consumer fencing input. Make no atomic check-and-use claim, implement no successor selection/activation/qualification, and change no production/admission checks.",
+    "Use focused real CAS, SQLite ledger and public capability broker TEST-domain controls. Preserve all 57 existing focused tests and existing consume behavior; add discriminating positive, negative, corruption, historical-expiry, reopen and no-mutation tests.",
+    "Only runtime/scope_supersession.py and tests/runtime/test_scope_supersession.py are mutable. Do not import contracts/ORCA or model-router modules, read production credentials, apply source outside the emitted workspace, call providers, reset limits, or retry/relabel the previous completed source operation."
+  ],
+  "input_manifest": "input_manifest.json",
+  "input_manifest_sha256": "6508989228de8d592a3266c56a019f91f0b9caa4a9b59026db678f524a25c7cc",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "objective": "Extend only the captured scope_supersession source and its focused tests with a validated read-only pending-state/contract-denial API for later real controller/Court consumers. Verify ledger/CAS receipt state; a valid pending consumption must deny both predecessor and unactivated successor; reject malformed or ambiguous state. Do not consume new supersession, activate, qualify, or issue authority. With no pending record, report only not invalidated here, never authenticated currentness. Preserve existing consume behavior and all existing focused tests. Do not import ORCA/contracts or model-router modules. Root will freeze complete API/error/receipt validation requirements before dispatch.",
+  "provider_attempts_permitted": false,
+  "python_executable": "/Users/bob/GitHub/paeos/.venv/bin/python",
+  "python_executable_sha256": "3e96a8b2f541b3d5ded271fb6e2bc83aea0557e863d0a4c472fd4679d1983fec",
+  "requirements_provenance": "Parent source-only behavior freeze in this delegated task; parent apparatus review and builder identity remain required before initialization.",
+  "review_reference": null,
+  "schema": 2,
+  "scope_id": "sc-pending-api-b2117061901749bead620497f6b5d1aa",
+  "status": "NOT_READY_REQUIREMENTS_REVIEW",
+  "timeout_seconds": 1800,
+  "verification": [
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        ".source_construction_verify.py",
+        "tests/runtime/test_scope_supersession.py"
+      ],
+      "artifact_path": "runtime/scope_supersession.py",
+      "claim_id": "pending-contract-read-only-denial"
+    }
+  ],
+  "verification_helper_sha256": "f2675a9ae01e21146e882494ea9ee8d70502fafbbeaa4df522ee79c38c538b80",
+  "write_files": [
+    "runtime/scope_supersession.py",
+    "tests/runtime/test_scope_supersession.py"
+  ]
+}

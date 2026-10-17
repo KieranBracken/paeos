@@ -1,0 +1,59 @@
+{
+  "builder": "codex-agent:/root/debt0258_current",
+  "candidate_import_origins_verified": true,
+  "candidate_root": "/private/tmp/paeos-source-construction-v4.J5rMbO/state/workspaces/paeos-t-c42817849cc7-bridge-zptqjx58",
+  "candidate_sha256": {
+    "runtime/scope_supersession.py": "47a0ad002c18487f5acc6290959bf5d41e9f2617aedd08995c6ddc78a8092144",
+    "tests/runtime/test_scope_supersession.py": "fc5ac02fff3bd75f8acd8aa2266ff8c68ffe44696774d1d72a0519a2afc71e7c"
+  },
+  "claims": {
+    "canonical_integration": false,
+    "court_adjudication": false,
+    "production_admission": false,
+    "qualification": false,
+    "sealed": false
+  },
+  "findings": [],
+  "frozen_helper_cases_passed": 57,
+  "frozen_helper_command": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    ".source_construction_verify.py",
+    "tests/runtime/test_scope_supersession.py"
+  ],
+  "frozen_helper_exit_code": 0,
+  "heterogeneous_review": false,
+  "independent_command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "/private/tmp/paeos-independent-supersession-20261015/verify.py"
+  ],
+  "independent_controls": {
+    "corrupt_historical_chain_no_cas_or_ledger_effect": "PASS",
+    "future_issued_capability_no_cas_or_ledger_effect": "PASS",
+    "reopened_same_transaction_refreshed_head_fresh_signature_denied": "PASS",
+    "separate_processes_separate_sqlite_and_filesystem_cas_one_consumption": "PASS"
+  },
+  "independent_exit_code": 0,
+  "independent_of_builder": true,
+  "independent_script_sha256": "53ea70fcf6af15c0061afb1e1b5012939f8fbf4356d7ee6a72087ed8abd389af",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "race_results": {
+    "consumed": 1,
+    "denied": 1,
+    "ledger_rows": 1
+  },
+  "read_only_dependencies": {
+    "changed": [],
+    "count": 403,
+    "missing": []
+  },
+  "verified_at_utc": "2026-10-15T17:12:36.426274+00:00",
+  "verifier": "codex-agent:/root/pre_p3_inventory",
+  "verifier_family": "openai"
+}

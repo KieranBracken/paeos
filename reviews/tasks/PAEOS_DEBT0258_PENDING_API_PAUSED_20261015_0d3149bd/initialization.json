@@ -1,0 +1,20 @@
+{
+  "approved_scope_sha256": "828f26966d1ede113e8c85bc6a1ed88fb6deb6b0f978f2a53f53a9c8a2e1c8ac",
+  "captured_source_root": "/Users/bob/GitHub/paeos/reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/candidate",
+  "claims": {
+    "full_lifecycle": false,
+    "production": false,
+    "qualification": false,
+    "sealed": false
+  },
+  "created_at": "2026-10-15T17:29:04.609062+00:00",
+  "goal_id": "sc-pending-g-1d1ded1c7a684f09812a06bbdcf93930",
+  "harness_sha256": "b2e96766ba2d72f1a2c5a54fee187f594063f8bf2b4af732fc865efcf9cf24be",
+  "key_public_hex": "ab700d0a28b72d7a78ab81489a3ef05c68e017fc1047829efb0b9f2f02dd2068",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "run_id": "sc-pending-r-0d3149bd05a94f58951b2b2afa72496e",
+  "schema": 2,
+  "source_root": "/Users/bob/GitHub/paeos",
+  "state_root": "/private/tmp/paeos-pending-contract-api.nfIb3R/state",
+  "worker_dispatches": 0
+}

@@ -1,0 +1,23 @@
+{
+  "integration_permitted": false,
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "result": {
+    "artifacts": [],
+    "cost": {
+      "model_ver": "chat-bridge-compatibility",
+      "skill_vers": [],
+      "tokens": 0,
+      "wallclock_s": 0.0
+    },
+    "environment_identity": "",
+    "evidence": [],
+    "failure_code": null,
+    "status": "ABANDONED",
+    "task_id": "t-9f92d769009d",
+    "trace_ref": "0bd2c2c3bfb4871e28b2b6dcce2b8df82ce811c5cddc5f51906fab614227994a",
+    "workspace_identity": "",
+    "written_paths": []
+  },
+  "scope_sha256": "090cff4b1a22bb231abac87d2dad8e504843801b42d8cc092d00e18421537726",
+  "status": "FAILED_OR_UNVERIFIED"
+}

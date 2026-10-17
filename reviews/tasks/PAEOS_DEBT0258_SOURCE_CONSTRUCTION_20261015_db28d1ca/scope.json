@@ -1,0 +1,75 @@
+{
+  "authority_reference": "Founder current instruction to construct source; reviews/governance/FOUNDER_A4_SCOPE_SUPERSESSION_RATIFICATION_20260922.md; spec/PAEOS-8-runtime-implementation-playbook.md \u00a75. Record indexes authority; no cryptographic Founder authentication claimed.",
+  "builder_family": "openai",
+  "builder_session": "codex-agent:/root/debt0258_current",
+  "mode": "SOURCE_CONSTRUCTION_ONLY",
+  "objective": "Build the governed scope-supersession source component and focused tests only. This is unpromoted manual source construction under Founder A4 minimum source authority and PAEOS-8 \u00a75. It grants no production activation, Builder expansion, promotion, qualification, or historical mission reuse.\n\nFrozen requirements:\n1. Frozen Request includes transaction_id, predecessor_contract_ref, successor_contract_ref, source_prestate_ref, defect_evidence_ref, independent_review_ref, indexed_authority_record_ref, policy_ref, expected_head_hash, goal_id/run_id/session/domain, expiry_seq. Canonical request digest includes every field.\n2. Policy is immutable CAS bytes installed by trusted composition: exact authorized paths, protected paths, acyclic baseline claim graph (claim id, source paths, depends_on ids, evidence refs). Reject missing references, corrupt hashes, malformed/duplicate/noncanonical JSON, unknown fields, wildcard/absolute/traversal/noncanonical paths, duplicate graph ids, dangling edges and cycles. Policy or indexed Founder record bytes alone never authenticate authority.\n3. Reuse candidate strict canonical_implementation_contract_bytes and implementation_contract_from_canonical_json. Decode predecessor and successor, require distinct id/hash/ref; same goal, run, ceremony, base_commit, required artifacts, acceptance commands, rollback and data class. Successor scope is a strict superset of predecessor and wholly within exact authorized paths. Only scope/context/derivation/id/hash may change. Source-prestate artifact names every successor allowed path exactly once with SHA256 or explicit ABSENT.\n4. Derive impacted claims from successor writable paths intersecting claim source paths, then transitive dependents. Protected overlap requires P1 present and impacted. All affected claims are pending requalification; record their old evidence as invalidated. Never accept caller-provided qualified flags or produce unearned P1/P2 claims.\n5. Authenticate externally supplied existing-kernel CapabilityToken using candidate public-key CapabilityVerifier: RATIFIER/PLAN, exact goal/run/session, operation scope.supersede:<requestdigest>, mission_execution_digest=requestdigest, actual ledger next sequence, expiry and domain bound through digest. Reject forged/foreign key/wrong role/goal/run/session/scope/expired token. Production component never creates a key or mints a token. TEST fixtures may use the real broker. No interpretation of authority-record bytes as Founder authentication.\n6. Verify ledger chain; authenticate before effects; call public Ledger.append_once_if_new with stable transaction_id and expected_head_hash. Unsupported port fails closed, with no ordinary append fallback or private store access. Event consumes exact grant, references immutable successor, invalidated evidence and affected baselines, and status PENDING_REQUALIFICATION_AND_ACTIVATION. Return ledger row receipt and impacted claims; no accepted Builder scope. Preserve predecessor/CAS/history. Unknown outcome after commit remains durably consumed, reopen/replay cannot grant again.\n7. After validation, store exact canonical request bytes and serialized supplied public capability token bytes in CAS and reference both hashes in the consumption event. This is existing kernel capability evidence, not a Founder signature. Hash checks prove immutable input binding, not physical source admission or baseline qualification.\n8. No source application, Builder token, dispatch, baseline qualification, installed production effect, protected activation adapter, broad authority adapter, or non-stdlib dependencies except existing nacl.\n\nRequired focused acceptance tests:\nSS-01 valid TEST-domain authority yields one append-only pending receipt, preserving old contract and historical rows.\nSS-02 forged/foreign key, BUILDER/PLANNER/VERIFIER/ADVERSARY role, wrong goal/run/session, modified request/policy/prestate/scope, and missing mission digest reject without append.\nSS-03 expiry, ambiguous/unknown authority and constitutional or sovereign escape fail closed; indexed Founder bytes alone never suffice.\nSS-04 malformed/corrupt CAS and frozen predecessor mutation rejected.\nSS-05 strict scope, unchanged acceptance obligations and exact PRESENT/ABSENT prestate enforced.\nSS-06 dependency closure includes only impacted P1 and transitive PRE-P2/P2, old evidence is stale and no qualified state emitted.\nSS-07 duplicate consumption fails, including reopen and two independent controllers racing same real SQLite ledger: one appended row and one success.\nSS-08 stale head and missing atomic port denied.\nSS-09 simulated post-commit response loss leaves real append durable and replay denied.\n\nUse real kernel CAS, capability and durable ledger components in tests. Tests are TEST-domain fixtures and never prove Founder admission, production readiness or installed effects. Name public API clearly. Preserve whole candidate files; no patch-only handoff. Dependencies are exact read-only Chat1 candidate files and explicit canonical documents in the manifest. Do not edit dependencies even if convenient; report incompatibility instead.\n",
+  "read_documents": [
+    "reviews/governance/FOUNDER_A4_SCOPE_SUPERSESSION_RATIFICATION_20260922.md",
+    "ledger/debt/DEBT-0258.md",
+    "reviews/architecture/DEBT_0258_TCB_BOOTSTRAP_HANDOFF_20260922.json",
+    "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+    "ops/manifests/p1_authoritative_completeness_manifest.json",
+    "spec/PAEOS-8-runtime-implementation-playbook.md"
+  ],
+  "read_overrides": [
+    {
+      "path": "kernel/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/kernel/__init__.py"
+    },
+    {
+      "path": "kernel/ledger.py",
+      "sha256": "e85da318e532d3bc686e66342cf91318c227ad4698d438d7b02406a24d5f882f",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/kernel/ledger.py"
+    },
+    {
+      "path": "kernel/ledger_sqlite.py",
+      "sha256": "109266b432f438986492b0eaf9a80ea961a70da902eced1966a277ede7a9634a",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/kernel/ledger_sqlite.py"
+    },
+    {
+      "path": "kernel/capability.py",
+      "sha256": "7f00bbef66ab7f028e431b3025254226c7f9f6b486e337d025dd88b637eb85bf",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/kernel/capability.py"
+    },
+    {
+      "path": "kernel/cas.py",
+      "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/kernel/cas.py"
+    },
+    {
+      "path": "kernel/types.py",
+      "sha256": "f0892a76084a016b09dc9c971ffd8ac912328cfae7532865093e4037bff593f4",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/kernel/types.py"
+    },
+    {
+      "path": "runtime/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/runtime/__init__.py"
+    },
+    {
+      "path": "runtime/implementation_contract.py",
+      "sha256": "cff3cd9fbeca702e6775553b18595007dd388b9cad6787c3e14e1c2cd3aff2d0",
+      "source": "/Users/bob/PAEOS-Workspaces/debt-0258-recovery/candidate/runtime/implementation_contract.py"
+    }
+  ],
+  "timeout_seconds": 1800,
+  "verification": [
+    {
+      "argv": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-I",
+        "-B",
+        ".source_construction_verify.py",
+        "tests/runtime/test_scope_supersession.py"
+      ],
+      "artifact_path": "tests/runtime/test_scope_supersession.py",
+      "claim_id": "SC-SS-FOCUSED"
+    }
+  ],
+  "write_files": [
+    "runtime/scope_supersession.py",
+    "tests/runtime/test_scope_supersession.py"
+  ]
+}

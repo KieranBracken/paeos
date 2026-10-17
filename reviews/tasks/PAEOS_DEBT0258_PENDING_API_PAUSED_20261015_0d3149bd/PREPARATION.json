@@ -1,0 +1,31 @@
+{
+  "archived_source_files": 405,
+  "capabilities_created": 0,
+  "declared_candidate_paths": 403,
+  "deferred_preparation": "/private/tmp/paeos-active-contract-wiring.xjLtDg",
+  "dispatches": 0,
+  "files": {
+    "README.md": "85f3ad36bec0bb512d260958245bb51f1547f54a76a2f82e8cd6d3ad3c3c3ebb",
+    "canonical_runtime_manifest.json": "48dea315a74f7c5403a5e23f1dc0f3ab152418290b2cdba12ef34076a2aa0876",
+    "handoff_status.json": "2ba13453198bddbf0d4940e0db2c98accc52e5cb3eefac4241687fe50c3950e2",
+    "harness.py": "b2e96766ba2d72f1a2c5a54fee187f594063f8bf2b4af732fc865efcf9cf24be",
+    "input_manifest.json": "6508989228de8d592a3266c56a019f91f0b9caa4a9b59026db678f524a25c7cc",
+    "reviewed_scope_check.receipt.json": "36f300a3a81471e30f494f58a9de3dfa4eef50688ee48330fd6026fe0a326ba9",
+    "scope.draft.json": "78c948bca3762a61cd764af562e87606d33b3f9da68b85ab2341b5330d8029eb",
+    "scope.reviewed.json": "828f26966d1ede113e8c85bc6a1ed88fb6deb6b0f978f2a53f53a9c8a2e1c8ac",
+    "self_check.receipt.json": "8aefa4945b9e635c4d575dedac51169fb43363e40013631c5c075c839a440880",
+    "verify_candidate.py": "f2675a9ae01e21146e882494ea9ee8d70502fafbbeaa4df522ee79c38c538b80"
+  },
+  "kernel_imports_during_self_check": 0,
+  "kernel_keys_created": 0,
+  "mutable_preimages": {
+    "runtime/scope_supersession.py": "47a0ad002c18487f5acc6290959bf5d41e9f2617aedd08995c6ddc78a8092144",
+    "tests/runtime/test_scope_supersession.py": "fc5ac02fff3bd75f8acd8aa2266ff8c68ffe44696774d1d72a0519a2afc71e7c"
+  },
+  "provider_calls": 0,
+  "readiness": "REVIEWED_SOURCE_CONSTRUCTION_ONLY_NOT_INITIALIZED",
+  "schema": 1,
+  "source_implementation_edits": 0,
+  "source_tests_run": false,
+  "status": "PREPARED_NOT_INITIALIZED_NOT_DISPATCHED"
+}

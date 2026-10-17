@@ -1,0 +1,210 @@
+{
+  "schema": "paeos.debt0258.tcb-bootstrap-handoff/1",
+  "handoff_id": "debt-0258-tcb-bootstrap-review-20260922",
+  "created_at_utc": "2026-09-22T21:03:23Z",
+  "integrity": {
+    "content_addressing": "Compute SHA-256 over the exact bytes of this file after creation. This handoff is evidence, not an authority token.",
+    "status": "HANDOFF_ONLY_NOT_AUTHORIZATION",
+    "immutable_use": "Receiving worker must verify this file hash and every referenced evidence hash before review. Do not edit or replace this handoff; append any response as a separate artifact."
+  },
+  "authoritative_programme_state": [
+    "P1_QUALIFIED",
+    "PRE_P2_AUTONOMY_QUALIFIED",
+    "P2_QUALIFIED",
+    "DEBT_0250_QUALIFIED",
+    "DEBT_0249_ACTIVE_UNQUALIFIED",
+    "P3_P9_BLOCKED",
+    "SENTIUM_FROZEN"
+  ],
+  "mission_boundary": {
+    "authorized_now": [
+      "Forensic derivation of the canonical TCB-bootstrap boundary",
+      "Independent review of the proposed minimum scope and bootstrap invariants",
+      "Preparation of this evidence handoff",
+      "Continue only an already-authorized canonical heterogeneous-role qualification attempt"
+    ],
+    "not_authorized_by_this_handoff": [
+      "Applying any protected source mutation",
+      "Treating this manifest as a Founder transaction token",
+      "Changing any existing frozen contract or P1 manifest in place",
+      "Issuing a capability or starting Builder",
+      "Claiming a Court verdict or role qualification",
+      "Reopening unaffected baselines, entering P2.5/P3, or touching Sentium"
+    ]
+  },
+  "repository_prestate_observation": {
+    "branch": "codex/control-plane-recovery-s1-clean-recovered",
+    "head_commit": "d02952a2a754a0df017fba4b3dbea8f06f703ef7",
+    "tracked_diff_from_head_sha256": "5523d9120da2a1cc865ccaf5a4adbc9326bcdeb41350e17999ebb62ddc04b050",
+    "porcelain_status_sha256": "b7c4afac760f59d4c6f5ef30587c2cb7db99a3748caf698279ea59bcafd5d282",
+    "tracked_diff_entries": 76,
+    "staged_entries": 0,
+    "untracked_files_excluding_standard_ignores": 80904,
+    "porcelain_entries": 1436,
+    "p1_manifest": {
+      "path": "ops/manifests/p1_authoritative_completeness_manifest.json",
+      "physical_sha256": "372e4b2f307074f1cf5e7483707505805db323a67cb0cf079580fd764494eea8",
+      "declared_manifest_sha256": "a0fe19d27519af43d870b25352198481fcab1d77f5333b58ae5377c592ac0800",
+      "sorted_source_and_support_path_digest": "2068591bbf52c5c1968dc8469e243b99b7172aa773de926cbadfbebc3f462c58"
+    },
+    "debt0258_attempt_root": ".state-debt0249-scope-supersession-a4-20260922-02",
+    "debt0258_ledger_head": "08e052f6685f3b45189c9933e3c7c6b1057712fdf82adae1acfb7332f41a7255",
+    "transaction_root_hash": null,
+    "transaction_root_hash_note": "This is a forensic handoff snapshot, not a complete Merkle root of the dirty checkout and its large preserved evidence trees. The authorized execution worker must create and verify a transaction-specific repository/root fingerprint, exact allowed-path hashes, and durable state-root hash immediately before any mutation. No source mutation occurred in this Codex turn."
+  },
+  "authority_assessment": {
+    "ordinary_l11_scope_authority": {
+      "state": "INSUFFICIENT_FOR_PROTECTED_OVERLAP",
+      "finding": "The existing frozen P1 L11 manifest is immutable. runtime/orchestrator/__init__.py correctly remands any Builder write scope overlapping its verification source/support sets. This rejection must remain in place for the old contract."
+    },
+    "tcb_amendment_authority": {
+      "state": "HARD_LOOP_REQUIRED",
+      "canonical_sources": [
+        "spec/PAEOS-4-v1.1.md §14.5",
+        "spec/PAEOS-7.6-runtime-interface-contracts.md §11",
+        "runtime/amendment.py",
+        "ops/ci/tcb_diff.py"
+      ],
+      "finding": "TCB-enforced contract changes require self-hosted lifecycle, independent adversarial attack, and human sign-off. Runtime amendment preparation halts at AWAITING_RATIFICATION and never applies changes; the CI gate blocks but does not execute or authorize a bootstrap."
+    },
+    "constitutional_amendment_authority": {
+      "state": "A4_FOUNDER_ONLY",
+      "finding": "PAEOS-4 §14.1 limits the Founder ABI to root Goals, decision resolutions, external evidence, taste artifacts, and amendment veto; §14.5 requires a major amendment and full Trace-B plus decision ceremony for kernel ABI changes. Court/adversary may recommend but cannot ratify."
+    },
+    "founder_bootstrap_authority": {
+      "state": "NO_GENERAL_EXECUTABLE_TCB_BOOTSTRAP_FOUND",
+      "finding": "No repository mechanism accepts a Founder A4 authorization and applies a path/hash/purpose-bound, single-use TCB transaction. runtime/autonomy/promotion.py contains a one-time promotion bootstrap, not TCB-amendment authority. No general bootstrap or break-glass mechanism was found."
+    },
+    "emergency_or_break_glass": {
+      "state": "NONE_FOUND",
+      "finding": "No canonical emergency route that bypasses the hard loop was found. Fail-closed behavior remains correct."
+    },
+    "existing_a4_ratification": {
+      "path": "reviews/governance/FOUNDER_A4_SCOPE_SUPERSESSION_RATIFICATION_20260922.md",
+      "sha256": "917958c87d8f08af38389cf1e297eea089a52b99be299439f5d3822eac9722a7",
+      "authority_form": "Indexed direct Founder task instruction; the file explicitly does not claim a cryptographic Founder signature or token.",
+      "covers": "Architectural principle and minimum implementation mission for governed scope supersession, including mandatory P1 requalification.",
+      "does_not_yet_bind": "An independently reviewed exact implementation diff, complete transaction pre-state/root hash, final exact file allowlist, one-time expiry/consumption record, or post-change hashes."
+    },
+    "authority_conclusion": "The existing A4 principle ratification is valid for the design objective, but this checkout has no executable bootstrap authority path. The active instruction authorizes investigation and conditional execution; it does not make the absent hard-loop/transaction mechanism appear or convert this handoff into a transaction token. Do not mutate protected files before an independent review and exact transaction-specific Founder disposition are recorded. No A5 decision is implicated by the proposed scope; Sentium/live capital/order execution are excluded."
+  },
+  "bootstrap_design_for_independent_review": {
+    "status": "DERIVED_MINIMUM_PROPOSAL_NOT_FINAL_SCOPE_OR_AUTHORITY",
+    "one_transaction_flow": [
+      "Verify the exact A4 ratification artifact and an independent adversarial/Court review bound to the proposed implementation diff.",
+      "Capture the exact current repository and durable root fingerprints plus SHA-256 for every allowed path; reject any mismatch.",
+      "Verify the Founder A4 transaction disposition names this ratification, exact diff/root hashes, exact file allowlist, exact purpose, and mandatory postconditions.",
+      "Verify the requested change is confined to installing scope supersession; reject extra scope, wildcard paths, constitutional/sovereign expansion, or ambiguity.",
+      "Atomically consume a transaction-specific authorization identifier before writes; reject expiry, replay, partial use, and recovery that would broaden the scope.",
+      "Preserve old contracts, manifests, candidate roots, audit records, Court records, and historical debt evidence byte-for-byte; append a supersession/invalidation event only after verified preconditions.",
+      "Freeze the new versioned acceptance contract and new P1 manifest; derive a new bounded capability cryptographically bound to contract identity, scope digest, task/run/role/stage, and expiry.",
+      "Mark evidence stale only for claims whose validity depends on superseded scope; require P1 requalification and compute PRE-P2/P2 impact from dependency closure.",
+      "Independently verify post-state hashes, one-use consumption, old-contract immutability, stale-evidence rejection, and required requalification gates; the bootstrap executor must be expired/disabled after this transaction."
+    ],
+    "proposed_existing_mutation_paths": [
+      {"path":"kernel/types.py","pre_change_sha256":"70f691b9d33157174b7b5c722e7196fa9bd2471c055c5909612d516add0b8b8c","reason":"Capability binding must represent immutable contract/scope identity for scoped tokens."},
+      {"path":"kernel/capability.py","pre_change_sha256":"f297064b1dbaffbbd10b1ab499fd1b94e0c5c40310cc279d1f2ce2924c205477","reason":"Kernel signature and verifier must cover the new binding and fail closed on scope mismatch."},
+      {"path":"runtime/claude_code.py","pre_change_sha256":"d19d8c68345e8d94d21a66aa8f523ed8c4fc9f92fd438ec36766d89874f54aa2","reason":"Dispatcher mints Builder capabilities and must pass the derived binding, not accept requester-supplied expansion."},
+      {"path":"runtime/agents/__init__.py","pre_change_sha256":"fad5c8fd6838a2c9794b9dbd37a87fc8e1cac1517f458701c2a62ac456ec8640","reason":"Stage playbook must propagate the orchestrator-derived contract/scope binding into the dispatcher."},
+      {"path":"runtime/task_package.py","pre_change_sha256":"b9376bd9996ebf8091bd0b47b1d891f237c14cb58c588a97313e377d0b091b4d","reason":"The package boundary must ensure signed scope binding and write permissions agree."},
+      {"path":"runtime/task_compiler.py","pre_change_sha256":"12eff7211040f12fc7e321fbc296c7983ca55f0f5a09adb02f02a9fea62fcaa3","reason":"The separate production compiler mints capabilities from frozen allowed_paths and must preserve the same binding invariant."},
+      {"path":"runtime/candidate_materialization.py","pre_change_sha256":"eaac6ad9ca43ba3d7af4762983cbb3bfc9e98d6e192836bccd74855b67dba886","reason":"L11 plan identity is bound into the materialized candidate; new contract identity and evidence invalidation must be represented without rewriting prior CAS artifacts."},
+      {"path":"runtime/court/completeness_firewall.py","pre_change_sha256":"c99c0e6b2074264557b601cdcea1cfbc45729c41308b83e632292dfe270cf28a","reason":"Acceptance manifest loading and promotion checks must enforce the new versioned scope and baseline-requalification obligations."},
+      {"path":"runtime/orchestrator/__init__.py","pre_change_sha256":"f56a0aac982e8fec7c47256391aa5467dc1bdd209b0fd4952726fd4f68995bff","reason":"Only the verified supersession chain may admit a new plan that overlaps the old verifier; the old-contract guard remains fail-closed."},
+      {"path":"ops/autonomous_run.py","pre_change_sha256":"87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280","reason":"The production composition root currently hard-codes the old P1 manifest; it must select only a verified immutable successor and launch its isolated Court worker. This is not permission to mutate the old manifest."}
+    ],
+    "proposed_new_paths_must_be_absent_at_prestate": [
+      "runtime/scope_supersession.py",
+      "ops/bootstrap_tcb_scope_supersession_once.py",
+      "ops/verify_scope_supersession_court.py",
+      "ops/manifests/p1_scope_supersession_bootstrap_20260922.json",
+      "tests/runtime/test_scope_supersession.py",
+      "tests/kernel/test_capability_scope_binding.py",
+      "tests/ops/test_tcb_scope_bootstrap.py",
+      "tests/ops/test_scope_supersession_court.py"
+    ],
+    "explicitly_preserve_unchanged": [
+      {"path":"kernel/evidence.py","sha256":"29a8ae8d7e7612903dd0a1567333895d1c86689011e37de64bbaaafbf9cd5235","reason":"Evidence already binds to candidate artifact hash; candidate carries L11 binding, so a new frozen contract produces a different candidate identity and existing verify_binding rejects replay. Add authentic negative coverage without altering this qualified kernel evidence primitive."},
+      {"path":"tests/runtime/test_completeness_firewall.py","sha256":"256851402d303a2aaebdadf270e3be80e93f4de94f579deefe3ab9a1c700cb2e","reason":"This file is in the immutable P1 verifier support set; add new tests instead of modifying the frozen verifier test."},
+      {"path":"ops/manifests/p1_authoritative_completeness_manifest.json","sha256":"372e4b2f307074f1cf5e7483707505805db323a67cb0cf079580fd764494eea8","reason":"Historical P1 scope remains immutable; a new versioned manifest is required."},
+      {"path":"runtime/amendment.py","sha256":"abe1174c0da1e5935a55c5b6af62df8757229a166a8cd97e4f1f4b23f793d5c2","reason":"It correctly prepares the hard-loop packet and halts at Founder ratification; do not weaken or make the ordinary path apply TCB changes."},
+      {"path":"ops/ci/tcb_diff.py","sha256":"4e30ebb44009b6a4621cc56ef6d323123acc663b705930a2cc6a5e10dcdf0935","reason":"It is a merge gate, not a bootstrap executor; keep HARD classification intact."},
+      {"path":"runtime/autonomy/promotion.py","sha256":"6a07a6ff9ad62e667b3750bc0dcb7344b26e8a781e3a920acffe7db933aa18d6","reason":"Its one-time bootstrap is specific to promotion and cannot be repurposed as TCB authority."}
+    ],
+    "scope_review_caveat": "This is the current dependency-derived minimum proposal, not a final exact execution allowlist. An independent reviewer must mechanically close all production callsites, tests, and import/runtime paths against the exact diff. If that review adds or removes any path, discard this proposed list for transaction purposes, create a new hashed envelope, and obtain the exact required Founder disposition before execution. Do not widen with directory globs."
+  },
+  "required_negative_controls": [
+    "Ordinary Builder cannot invoke or mint bootstrap authority.",
+    "Expired transaction authorization is rejected.",
+    "Wrong ratification reference, prestate hash, purpose, or transaction id is rejected.",
+    "Any path outside the exact manifest, including a new unlisted file, is rejected before writes.",
+    "Replay after atomic consumption is rejected, including crash/restart recovery.",
+    "Mutation of the old frozen contract or manifest is rejected and historical bytes remain equal.",
+    "Old candidate/audit/Court evidence cannot discharge claims against the successor candidate.",
+    "P1 Builder admission fails until P1 requalification is sealed against the successor manifest.",
+    "PRE-P2/P2 claims are dependency-closed individually; affected claims fail admission until requalified, unaffected claims remain preserved.",
+    "Constitutional/sovereign scope cannot be included under the one-time A4 envelope; existing A4/A5 path is required.",
+    "After the single transaction the bootstrap executor is inert/expired and cannot authorize a second transaction.",
+    "A valid independently evidenced REMAND plus scope insufficiency can create exactly one new immutable contract and bounded capability."
+  ],
+  "court_handoff": {
+    "classification": "AUTHORIZED_HANDOFF_REQUIRED",
+    "session_observation": "No Court/evidence-submission tool is exposed in this Codex parent session (tool inventory search returned no Court/evidence submit tool). PAEOS implements a Court MCP server and autonomous_run.py configures a per-run isolated Court worker, so the correct boundary is handoff to that authorized worker, not a fabricated parent submission.",
+    "server_source": {"path":"runtime/transports/mcp/court_server.py","sha256":"e7e860c417c2bc5ec2f3393de52cbe57a976f813ad65e96c313a0fc17cf34214"},
+    "transport_source": {"path":"runtime/transports/mcp/transport.py","sha256":"80d78e52f1df8f5c05a55f0d06d883c831b17cbd1c8bcaeda5b3216c9283ac6b"},
+    "composition_root": {"path":"ops/autonomous_run.py","sha256":"87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280"},
+    "invalid_substitute": {"path":"ops/submit_evidence.py","sha256":"f1a439e4b73a21c54e84534b8494341dfee6af14f83caddedc0f8261c31368b0","reason":"CLI accepts caller-provided observations and labels attestation pending kernel signature; it is not a genuine Court submission path and must not be used as one."},
+    "worker_request": "Independently verify all referenced hashes; review the derived authority matrix and exact proposed scope; identify any missing/overbroad dependency; do not submit a verdict until an exact implementation diff exists and canonical deterministic evidence can be replayed. Return signed, artifact-bound Court/Adversary records through the configured worker path."
+  },
+  "heterogeneous_role_state": {
+    "current_production_adversary_route": {
+      "provider": "google",
+      "model": "gemini-3.6-flash",
+      "family": "gemini",
+      "qualification_record": "ops/.trusted-codex-worker/adversary-qualification-v1.json",
+      "qualification_record_sha256": "f5f252298be9098314d94ed1c474ec9c9b835a40460825ad2f4265f702af2380",
+      "record_expiry_utc": "2026-09-18T10:56:37Z",
+      "state": "EXPIRED_DO_NOT_USE"
+    },
+    "critic_qualification": {"path":"ops/.trusted-codex-worker/critic-qualification-v1.json","state":"ABSENT"},
+    "luna_planner_v2_qualification": {"path":"ops/.trusted-codex-worker/planner-qualification-v2.json","state":"ABSENT"},
+    "latest_fresh_attempt": {
+      "model": "google:gemini-3.8-flash",
+      "role": "ADVERSARY",
+      "attempt_root": ".state-p1-gemini38-adversary-live-qualification-20260922-01",
+      "failure_artifact": ".state-p1-gemini38-adversary-live-qualification-20260922-01/failure.json",
+      "failure_artifact_sha256": "859ff1747645621e97668a69e8ab149fd0ecb9836e3fd25dede14e1bd60e3e1b",
+      "outcome": "PROVIDER_FAILURE_NO_QUALIFICATION_WRITTEN"
+    },
+    "other_routes": "Kilo Auto/Nemotron public probes are liveness only and have no role qualification or production selector admission; NVIDIA returned 410, Cline 403, OpenRouter empty content. No provider response was used as audit evidence.",
+    "conclusion": "No live, currently role-qualified heterogeneous production auditor is available. Preserve all expired/failed records. Do not downgrade A-08 or fabricate provenance. A new qualification attempt requires an authorized route accepted by the existing role policy and genuine role-specific evidence."
+  },
+  "evidence_index": [
+    {"path":"ledger/debt/DEBT-0258.md","sha256":"38bae4175dcb53feda02d26d2531a3fa97ae1869a383803065e5200c3babe431"},
+    {"path":"ledger/debt/DEBT-0253.md","sha256":"4047ce3e95bc214eedc5b02c85a48b10f72807b382c47f6f3d2384bc0cdff5f0"},
+    {"path":"ledger/debt/DEBT-0254.md","sha256":"336b97ac6bb4aaa6d58a68c0cceb9c84c5bfc8eb046769d5b5d42d4bfedb313b"},
+    {"path":"ledger/debt/DEBT-0255.md","sha256":"d0ce0179deb3faee5a47f9b26481afbaec03cd9df4d64520adce202660033d3a"},
+    {"path":"ledger/debt/DEBT-0256.md","sha256":"5aa0710b36daa82906a9093cd2e4bca8dda10c65aad45445064a211489a185ca"},
+    {"path":"ledger/debt/DEBT-0257.md","sha256":"6eca8f2dadf9e4c69827e68fcad9f1a8da98ab2d819608fc0e0a5f21f7197990"},
+    {"path":"reviews/architecture/DEBT_0249_A4_SCOPE_SUPERSESSION_EXECUTION_STATE_20260922.json","sha256":"23a0616a6b29b28caec78f4d3f5c33a09d81f1b41d5da26aba762502e1e2f9d6"},
+    {"path":"reviews/architecture/DEBT_0249_LAWFUL_SCOPE_SUPERSESSION_PROPOSAL_20260922.json","sha256":"493f8de4e01ffcc8f986bc68a3d7590ef8782ae248cafdd1a19e296c29868aca"},
+    {"path":"reviews/architecture/DEBT_0249_BLOCKER_DEPENDENCY_STATE_20260922.json","sha256":"18ea37079cd8c513eb384c6b39281bd4d36cfc2a8e75f2f2226378b84bbb0f57"},
+    {"path":"reviews/architecture/DEBT_0249_ACCEPTANCE_MANIFEST.json","sha256":"dc7f4f5ff998ea00ff63264cfc567f7c04c481f82c1d405ab2bad5d635e0b13e"},
+    {"path":"reviews/architecture/DEBT_0249_PROGRAMME_CONTRACT.md","sha256":"2bf215794b2d3be05226eca4c2d61284fa86d82b1d8c04683e62635bfc297606"},
+    {"path":"reviews/architecture/DEBT_0249_HETEROGENEOUS_ADVERSARIAL_AUDIT_PROVENANCE.json","sha256":"c18e90689671439c5914f168d44187989fceee693942e87e0dec8784d66f319a"},
+    {"path":"spec/PAEOS-4-v1.1.md","sha256":"8b4a48ee0c7180ebe96635eb305c337d36ce6f2fc5baa2b0216977466f8ee2c5"},
+    {"path":"spec/PAEOS-7.6-runtime-interface-contracts.md","sha256":"87c686eb45f37899e292efb0d31e20f0a276eae2000354f88aaa09e0ac804ab2"},
+    {"path":"operations/ENGINEERING_LIFECYCLE.md","sha256":"3c2d3e3710ef4fec4ec125e7df0cb4b904c967404fc3de38018c86fe564ffa64"},
+    {"path":"operations/ROLE_RESPONSIBILITIES.md","sha256":"5f427cc70b03a7dd9f8a7c69c0586bbd979a7aa7502b62077019ac4258483ec4"}
+  ],
+  "stop_boundary": {
+    "status": "STOP_BEFORE_TCB_MUTATION",
+    "blocking_dependencies": [
+      "No executable canonical one-shot TCB bootstrap mechanism exists.",
+      "This session cannot submit Court evidence; an authorized isolated Court/Adversary worker handoff is required.",
+      "No live role-qualified heterogeneous adversary route is available for the required hard-loop review.",
+      "No exact implementation diff, transaction-specific full root fingerprint, or final path-bound Founder disposition exists yet."
+    ],
+    "next_allowed_action": "Authorized worker independently reviews this package and derives the exact diff/closed path scope. Only after genuine adversarial/Court evidence and a transaction-specific Founder A4 disposition bound to the exact prestate, ratification, paths, purpose, and one-use expiry may the bootstrap transaction proceed. Then independently verify poststate, requalify P1, mechanically compute PRE-P2/P2 impact, and stop before Remand #14 implementation unless the resulting authority explicitly permits continuation."
+  }
+}
