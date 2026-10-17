@@ -12,7 +12,7 @@ The supervisor qualification writer requires the one-use identity claim, every r
 
 ## Verification
 
-The focused verification receipt records 43 passing tests across the trusted transport, Builder readiness, and trusted-client suites. Ruff lint and formatting checks passed for all 13 source/test files in this package. Bytecode compilation passed. The scan found zero matches for private-key PEMs, common GitHub/OpenAI/Anthropic/Google credentials, or AWS access keys across the 17 staged payload files. Exact commands, outputs, and per-file hashes are in `focused-verification.json` and `secret-scan.json`; `MANIFEST.json` binds this report, receipts, source files, and required notebook entries.
+The focused verification receipt records 43 passing tests across the trusted transport, Builder readiness, and trusted-client suites. A fresh public GitHub checkout matched all 18 manifest file hashes and reproduced the focused 43-test pass at commit `9fab3f318aa6c18ed9aaa42ef184bfee8016ab5b`. Ruff lint and formatting checks passed for all 13 source/test files in this package. Bytecode compilation passed. The scan found zero matches for private-key PEMs, common GitHub/OpenAI/Anthropic/Google credentials, or AWS access keys across the 17 staged payload files. Exact commands, outputs, and per-file hashes are in `focused-verification.json` and `secret-scan.json`; `MANIFEST.json` binds this report, receipts, source files, and required notebook entries.
 
 `tests/runtime/test_builder_transport_gate.py` is intentionally excluded from this checkpoint: in the sanitized recovery tree its collection fails because `runtime.autonomy.authority` is not present. That failure is unrelated to the bootstrap path and is not represented as a passing test.
 

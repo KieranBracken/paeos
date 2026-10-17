@@ -86,6 +86,15 @@
     }
   ],
   "focused_test_count": 43,
+  "fresh_checkout_readback": {
+    "branch": "codex/builder-qualification-bootstrap-20261017",
+    "commit_sha": "9fab3f318aa6c18ed9aaa42ef184bfee8016ab5b",
+    "focused_test_cases": 43,
+    "focused_test_exit_code": 0,
+    "manifest_files_verified": 18,
+    "manifest_hash_mismatches": [],
+    "result": "PASS"
+  },
   "result": "PASS",
   "schema": "paeos-builder-bootstrap-verification/1"
 }

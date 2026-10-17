@@ -1,7 +1,7 @@
 {
   "base_commit": "2dc2544ee2f46d2a240c4bff16ee1950a476e92e",
   "branch": "codex/builder-qualification-bootstrap-20261017",
-  "created_at_utc": "2026-10-17T04:19:28.760496+00:00",
+  "created_at_utc": "2026-10-17T04:20:12.710784+00:00",
   "files": [
     {
       "bytes": 15758,
@@ -79,19 +79,19 @@
       "sha256": "35cfbe9d1345bbe26616595c2ab8e83b72bc1c87058bddebe990bb7ad50edbe0"
     },
     {
-      "bytes": 3359,
+      "bytes": 3520,
       "path": "reviews/tasks/PAEOS_BUILDER_TRANSPORT_BOOTSTRAP_20261017/REPORT.md",
-      "sha256": "61c71d3b8c4e2397e7f9ff5f2043ff4dddf41cd65eee945ac910fc7f5da339c5"
+      "sha256": "bd50b327314878321433bef87e88cf72e06db49874f3796dc10bf214287f56fa"
     },
     {
-      "bytes": 3328,
+      "bytes": 3645,
       "path": "reviews/tasks/PAEOS_BUILDER_TRANSPORT_BOOTSTRAP_20261017/focused-verification.json",
-      "sha256": "6c784bcd0b3d4ffc84c38cd2176fce8a9d1ba5980b659806ca8a19a52c3cd6e6"
+      "sha256": "908cbce016a16955099796eef181e67ebb13e2c1cd075d82ef68bbd27a8d12fc"
     },
     {
       "bytes": 3915,
       "path": "reviews/tasks/PAEOS_BUILDER_TRANSPORT_BOOTSTRAP_20261017/secret-scan.json",
-      "sha256": "b7842b8ef3cf08f65733384944f895de4238d679f4a0dc8dd88417f847b4fccb"
+      "sha256": "ddbe356cdfcd85dd8426c9bfa23b9c0ef4147e14e858bb0eb30faac4564cb91c"
     }
   ],
   "schema": "paeos-recovery-checkpoint-manifest/1"
