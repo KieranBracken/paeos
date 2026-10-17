@@ -5413,3 +5413,8 @@ Published evidence now separates a 17-test lifecycle code check and a 37-test tr
 The current NVIDIA free GLM-5.3 API endpoint is technically available, but NVIDIA's API Trial Terms state that User Content may be used to improve NVIDIA products and models and prohibit confidential/sensitive inputs. This conflicts with the catalog’s current INTERNAL eligibility and no-training/no-retention flags. Route owner was asked through a fresh bounded PAEOS task to correct the metadata fail-closed and evaluate only a scrubbed PUBLIC route. No test request or provider call was sent. Paid routes and privacy relaxation remain excluded.
 
 Evidence is under `reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/` and the D0249/D0117 review-preparation packages. These checkpoint commits preserve recovery state; none is a release, Court adjudication, qualification, or P3 readiness claim.
+
+
+## 2026-10-17 — host runtime DB accessibility correction
+
+The previous statement that the router DB was unreadable referred to the sanitized recovery checkout. A read-only host check at `~/.local/share/paeos/model-router/state.sqlite3` succeeded and `PRAGMA quick_check` returned `ok`; no rows or secrets were read and no writes occurred. The current PAEOS task-admission hold is the expired supervisor-signed Trusted Codex Builder qualification (maximum accepted age 24 hours), not router DB access. Preserve this distinction in follow-up reports.

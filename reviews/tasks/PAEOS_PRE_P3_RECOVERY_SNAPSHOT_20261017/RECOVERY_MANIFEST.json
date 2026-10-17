@@ -176,14 +176,14 @@
     {
       "mode": "100644",
       "path": "MessyChangesNeedsReview.md",
-      "sha256": "53c4cea0040f98bf0ec670bf443f6a2c8e91ba6ab0eeda694c20d9a11e498471",
-      "size": 638151
+      "sha256": "171e7e78c2e674395465754b93da30b6e7d1d900e513d1e3f4cc4d6548d17169",
+      "size": 638704
     },
     {
       "mode": "100644",
       "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
-      "sha256": "8c571c2dc5b2c244fed7e0b406a05e29d65d2a159ca3dcfcc5a8fbd5dcd4d732",
-      "size": 1416091
+      "sha256": "6b5f49452c5ea0ac20fa032aa8ee909cab0df24d04f0a3ed508bd97ef272a817",
+      "size": 1417065
     },
     {
       "mode": "100644",
@@ -10976,14 +10976,20 @@
     {
       "mode": "100644",
       "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/README.md",
-      "sha256": "a3fb46ab6aa89036fd64c1b7a32cc94e813a9e1b24f2b3444d7a3c420b27a7bb",
-      "size": 889
+      "sha256": "e75a1c1346878c5f61f5273c691db7b24f6e8a9563c981d2966097d22ce83160",
+      "size": 1160
     },
     {
       "mode": "100644",
       "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/binding-gap.json",
-      "sha256": "810cc37678f4b5dce864c99c5382d32cff46c388bbad004408d1bccf418e77f4",
-      "size": 2757
+      "sha256": "c3bcc191ea229711e2497ce5bb5f9bb2c643060113eae70dbe5bee7cdee0a3ac",
+      "size": 3590
+    },
+    {
+      "mode": "100644",
+      "path": "reviews/tasks/PAEOS_LIFECYCLE_BINDING_RECOVERY_20261017/local-verification/host-runtime-state-readback.json",
+      "sha256": "3c6af1134fd4589cf44a554aa075a2e5d68d18c91c6367a61eeea9e22d0b2d86",
+      "size": 1156
     },
     {
       "mode": "100644",

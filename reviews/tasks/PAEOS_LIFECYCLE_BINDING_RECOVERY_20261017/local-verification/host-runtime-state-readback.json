@@ -1,0 +1,28 @@
+{
+  "interpretation": "The earlier unable-to-open result applies to the sanitized recovery tree, which excludes mutable host runtime state. The host router DB itself is accessible read-only and passes SQLite quick_check. The expired signed Builder qualification is the current task-admission blocker.",
+  "kind": "host-runtime-read-only-readiness-check",
+  "observed_at_utc": "2026-10-17T03:54:59Z",
+  "router_state": {
+    "opened_read_only": true,
+    "path": "~/.local/share/paeos/model-router/state.sqlite3",
+    "quick_check": "ok",
+    "row_data_read": false,
+    "tables": [
+      "provider_windows",
+      "providers",
+      "routing_observations",
+      "scoped_health",
+      "sqlite_sequence"
+    ],
+    "write_attempted": false
+  },
+  "trusted_builder_qualification": {
+    "max_age_seconds": 86400,
+    "path": "/Users/bob/GitHub/paeos/ops/.trusted-codex-worker/qualification.json",
+    "qualification_payload_or_signature_logged": false,
+    "reason": "qualification is expired or stale",
+    "status": "NOT_READY",
+    "verifier": "runtime/builder_transport.py::BuilderTransportReadiness.require",
+    "verify_key_value_logged": false
+  }
+}

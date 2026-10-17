@@ -1,8 +1,8 @@
 {
-  "authority_or_implementation_gap": "Current tests establish code-level behavior only. They do not establish actual independent worker dispatch, Court adjudication, or qualification.",
+  "authority_or_implementation_gap": "The live task is held by expired Builder qualification. The earlier database-open failure was environment-specific: host read-only open and SQLite quick_check succeeded. Current tests and source-construction receipts still do not establish a separate receiver start.",
   "authorized_next_action": "Start a fresh PAEOS-bound lifecycle-binding task and separately the user-authorized public atomic-ledger, canonical-contract, and public-key-only CapabilityVerifier scopes; do not reuse old task capabilities or report worker start without a receiving-turn receipt.",
   "kind": "lifecycle-binding-gap-observation",
-  "observed_at_utc": "2026-10-17T03:51:47Z",
+  "observed_at_utc": "2026-10-17T03:54:59Z",
   "owner": "Chat 1 \u2014 DEBT-0258 implementation recovery",
   "paeos_source_construction_observation": {
     "court_adjudications": 0,
@@ -26,6 +26,12 @@
     "tests": "17 focused lifecycle tests passed on the 5b recovery checkout with six byte-pinned untracked import-support modules present; the checkout was therefore dirty. Exact hashes are in local-verification/lifecycle-17-recovery-overlay.receipt.json.",
     "transport_tests": "37 focused tests passed in the active dirty checkout; four of the five test modules are untracked and absent from 5b, so this receipt is local evidence and is not reproducible from the published checkpoint as-is."
   },
+  "runtime_state_reconciliation": {
+    "current_admission_blocker": "Existing signed Trusted Codex Builder qualification fails the production verifier as expired or stale; verifier max age is 86400 seconds.",
+    "host_router_database": "Accessible read-only at ~/.local/share/paeos/model-router/state.sqlite3; PRAGMA quick_check=ok; schema names only, no row data read.",
+    "required_user_or_supervisor_action": "Renew through an existing legitimate supervisor-signed physical qualification process; do not create keys or fabricate/sign records.",
+    "sanitized_recovery_tree": "Runtime database intentionally absent from public recovery checkout."
+  },
   "status": "OPEN_IMPLEMENTATION_GAP",
-  "wake_condition": "A valid current Builder admission plus a receiver-start receipt cryptographically bound to the exact run, task, scope, workspace, and ChatBridge session; or a fresh PAEOS task that implements the missing binding and proves success/fail-closed tests."
+  "wake_condition": "A currently valid supervisor-signed Builder qualification (the existing verifier requires a maximum age of 86400 seconds), followed by fresh PAEOS admission and a receiver-start receipt cryptographically bound to exact run/task/scope/workspace/session; the host router DB is already readable read-only."
 }

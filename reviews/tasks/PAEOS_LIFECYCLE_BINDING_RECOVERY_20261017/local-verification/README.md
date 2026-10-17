@@ -4,4 +4,4 @@ This directory preserves exact local test receipts and the observed lifecycle ga
 
 The 17 focused lifecycle tests passed against recovery commit `5b1088a466dccdb8fe3799eb2e0df1d79d07d04e` with six byte-pinned, untracked import-support modules overlaid in the worktree; see the receipt for all source and support hashes. The 37 transport tests passed in the active dirty checkout, but four test files were untracked and are not included here. These are test results, not Court adjudication or qualification.
 
-`binding-gap.json` identifies the concrete code path and the owner’s exact wake condition.
+`binding-gap.json` identifies the concrete code path and the owner’s exact wake condition. A host-only read-only check confirmed the router-state SQLite database is accessible and passes `PRAGMA quick_check`; the published recovery tree omits that runtime database. The remaining current admission blocker is the expired supervisor-signed Builder qualification.
