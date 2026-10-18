@@ -5508,3 +5508,7 @@ The four-file offline package replaces shared mutable hash slots with bounded pe
 ### 2026-10-18 — process-output P2 remediation candidate
 
 The four-file offline candidate caps stdout/stderr capture at 1 MiB each, hashes retained bytes incrementally, records truncation and incomplete capture, and fails closed on overflow. Process-group cleanup now handles TERM-ignoring descendants after leader exit. The trusted transport accepts authentic negative signal return codes as failure evidence while keeping its schema unchanged. Final focused result: 73 passed; scoped lint, format, compilation and source diff checks pass. Baseline and sandbox-observation failures are preserved under `reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/`. Original reviews remain unchanged and formal review is still outstanding. No provider request, activation, qualification or debt integration occurred; the prior seven full-suite collection errors remain separate.
+
+### 2026-10-18 — observed-model contract investigation only
+
+No source or tests changed. The proposed terminal parser would confuse Cline `run_result` with Codex `exec --json`; exact observed model identity is not established by the inspected contract. The model-identity P2 remains open. The canonical finding and exact wake condition are appended to the hallucination notebook; supporting source hashes and limitations are under `reviews/tasks/PAEOS_MODEL_IDENTITY_CONTRACT_GAP_20261018/`. No fresh test result, formal review, provider operation or qualification is claimed.

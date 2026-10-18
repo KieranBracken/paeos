@@ -1,0 +1,107 @@
+{
+  "schema": "paeos.offline-contract-gap/1",
+  "base": "d786f3be06f1df0c2f7c7042250cd0cacaee99b5",
+  "recorded_at_utc": "2026-10-18T14:08:29.668468+00:00",
+  "result": "IMPLEMENTATION_EVIDENCE_GAP",
+  "finding": "Preserved P2 configured rather than observed model/family identity remains unresolved.",
+  "assignment": "offline-observed-model-identity-output-bound-d786f3be-v1",
+  "authority": "Existing bounded offline bootstrap investigation; stop if actual response contract does not establish exact model identity.",
+  "scope": "Read-only source and public CLI metadata inspection; evidence-only checkpoint. No source/test changes.",
+  "source_evidence": [
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "lines": [
+        272,
+        320
+      ],
+      "sha256": "2c67df1d8c85fd118437f716d76e6f1010eead5382d13940b63ff15c2a396ef8",
+      "observation": "Invokes codex exec --json; -m is requested route."
+    },
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "lines": [
+        980,
+        984
+      ],
+      "sha256": "2c67df1d8c85fd118437f716d76e6f1010eead5382d13940b63ff15c2a396ef8",
+      "observation": "Observation copies configured model_id and constant FAMILY."
+    },
+    {
+      "path": "runtime/integrations/hybrid.py",
+      "lines": [
+        345,
+        365
+      ],
+      "sha256": "e84c9c304629853dbe3114cbe6e86e8c29b1f20154eed3e07f764ec0457b4973",
+      "observation": "run_result/model.id belongs to explicitly documented Cline invocation."
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_client.py",
+      "lines": [
+        12,
+        28
+      ],
+      "sha256": "9a827ccd2df2249f3acfd4fbbcada3af5a269a48c5f77df9d334850afb5e12a0",
+      "observation": "Synthetic run_result fixture does not establish actual Codex output contract."
+    },
+    {
+      "path": "tests/runtime/test_p1_bootstrap_execution_substrate.py",
+      "lines": [
+        135,
+        155
+      ],
+      "sha256": "4423f9dbfc076cb5e3c74eccee953001ba3dd97bf9625d011b981ff47d582967",
+      "observation": "Synthetic terminal fixture is not provider evidence."
+    }
+  ],
+  "cli_package": {
+    "metadata": {
+      "layoutVersion": 1,
+      "version": "0.147.0",
+      "target": "aarch64-apple-darwin",
+      "variant": "codex",
+      "entrypoint": "bin/codex",
+      "resourcesDir": "codex-resources",
+      "pathDir": "codex-path"
+    },
+    "metadata_sha256": "60f3fa0b518399444c28b3a98c785315abd89c1e87b3c5a0e2b59d03ce5c32f5",
+    "limit": "Static installed metadata only; CLI was not invoked. Version metadata does not bind a verified output schema or upstream model."
+  },
+  "official_reference": {
+    "requested_url": "https://developers.openai.com/codex/noninteractive",
+    "resolved_url": "https://learn.chatgpt.com/docs/non-interactive-mode",
+    "section": "Make output machine-readable",
+    "retrieved_date": "2026-10-18",
+    "observed": "Documentation describes thread.started, turn.started, item.*, turn.completed, turn.failed and error. Terminal example includes usage, but no exact model identity. It does not establish a run_result.model.id contract for Codex exec.",
+    "limit": "A documentation example is not proof that no installed version can expose any additional field. No verified source/schema for this installed binary was found in the inspected local files."
+  },
+  "decision": "Do not implement Cline run_result parsing for Codex or relabel configured -m as observed identity. Stop this implementation package at its stated evidence gate.",
+  "next_gate": {
+    "owner": "PAEOS completion overseer routes a bounded follow-up; bootstrap owner retains integration.",
+    "wake": "Establish a documented actual response contract at the network-owning broker, and scope authenticated response-origin, per-request correlation and exact model validation before implementation. No provider probe is authorized by this finding.",
+    "candidate_direction": "Inspect the existing Responses response/SSE contract offline. If it exposes an attributable exact model, bind it to each immutable request receipt and require agreement across requests before successful provenance. This is a proposal, not an implemented or authorized runtime capability."
+  },
+  "checks": {
+    "source_changes": 0,
+    "tests_run": false,
+    "reason": "Evidence-only contract investigation; no implementation exists to verify. Previous 73 focused passes belong to d786f3be and are not new results.",
+    "full_suite": "Last measured candidate result remains seven collection errors; historical 22-error evidence preserved. No rerun or acceptance.",
+    "formal_review": "Not requested or performed. Read-only helper corroboration is not formal review or heterogeneous audit.",
+    "original_review_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+  },
+  "effects": {
+    "provider_requests": 0,
+    "cli_invocations": 0,
+    "installation": false,
+    "qualification": false,
+    "admission": false,
+    "host_credentials_or_keys_read": false,
+    "host_runtime_state_read": false,
+    "debt_integration": false
+  },
+  "gates": {
+    "ALLOWED_NOW": "Save sanitized evidence and return one material blocker to the current overseer; eligible unrelated offline work may continue under its own scope.",
+    "HELD": "Model-identity implementation under the proposed terminal parser; production installation, qualification, debt activation and P3 remain held.",
+    "AUTHORITY_OR_IMPLEMENTATION_GAP": "Exact observed model identity is not established by the inspected Codex terminal contract; both fixed routes remain unproven. P1 disclosure and producer authentication remain open."
+  }
+}

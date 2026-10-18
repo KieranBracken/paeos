@@ -1,0 +1,13 @@
+{
+  "type": "evidence-only",
+  "json_parse": "PASS",
+  "source_diff_check_exit": 0,
+  "secret_scan": {
+    "method": "Bounded private-key/credential pattern scan of new evidence and appended note diffs; supplementary only.",
+    "findings": []
+  },
+  "source_test_edits": 0,
+  "tests_run": false,
+  "lint_format_compile": "Not applicable: no executable files changed.",
+  "original_review_unchanged": true
+}
