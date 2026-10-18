@@ -1,0 +1,50 @@
+{
+  "lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "--no-cache",
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "2 files already formatted\n",
+    "stderr": ""
+  },
+  "diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compile": {
+    "paths": [
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/run_verification.py"
+    ],
+    "passed": true,
+    "bytecode_written": false
+  },
+  "candidate_base": "cf45a26128595618c906ef2db6d6e9a9ff81217c",
+  "production_source_changes": [],
+  "tracked_changes": [
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md"
+  ],
+  "test_source_changes": []
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "paeos.offline-verification-result/1",
+  "scope_id": "PAEOS_SCHEDULER_READINESS_CF45A261_20261018",
+  "candidate_base": "cf45a26128595618c906ef2db6d6e9a9ff81217c",
+  "result": "PASS_BOUNDED_OFFLINE_VERIFICATION_ONLY",
+  "production_source_changes": [],
+  "test_source_changes": [],
+  "final_focused_result": {
+    "passed": 10,
+    "failed": 0,
+    "exit_code": 0,
+    "summary": "10 passed in 0.74s",
+    "test_file": "tests/ops/test_offline_scheduler_readiness.py",
+    "runner": "run_verification.py",
+    "captured_outputs": [
+      "final.command.json",
+      "final.stdout.txt",
+      "final.stderr.txt"
+    ]
+  },
+  "acceptance_observations": [
+    "Actual build_scheduler composition used temporary state, workspace and registry roots, with the host transport and Planner loaders replaced by fixtures that return None.",
+    "The empty scheduler source run created no registry or task state and observed zero worker calls and zero run registrations.",
+    "Trace-B missing-loader, missing-qualification-file and validly signed expired synthetic qualification cases were remanded before worker invocation, run registration, task graph creation or ledger append.",
+    "The captured authoritative manifest and lifecycle digest bindings passed; missing and tampered manifest/lifecycle resources rejected.",
+    "The separate Court-server stdio test exited on EOF, observed 105 candidate-local project modules, and confirmed LiteLLM was not imported."
+  ],
+  "isolation": {
+    "python_flags": [
+      "-I",
+      "-B",
+      "-S"
+    ],
+    "network": "sandbox denied network access",
+    "host_home_contents": "denied in test subprocess; metadata only allowed",
+    "writes": "sandboxed subprocess writes confined to generated temporary scratch and /dev/null; synthetic pytest state/workspace/registry roots",
+    "environment": "clean allowlisted environment with dotenv disabled and plugin autoload disabled",
+    "candidate_imports": "local import fence asserted all loaded project modules resolve beneath candidate base",
+    "provider_calls": 0,
+    "litellm_imported": false
+  },
+  "static_checks": "ruff lint, Ruff format check, source compilation without bytecode, diff check and bounded secret-pattern scan passed; see static-checks.json and secret-scan.json.",
+  "limits": [
+    "No genuine PAEOS run/admission, Builder execution, production qualification, provider dispatch, installation, Court evidence submission/adjudication or debt integration occurred.",
+    "Synthetic expired qualification is a negative fixture only; no production authority was minted or reused.",
+    "This does not establish a positive qualified dispatch, current P1 disclosure authority, general worker capability or autonomous lifecycle completion.",
+    "No full-suite run; the latest recorded full-suite result remains seven collection errors.",
+    "No formal Security Review was run for this evidence-only package."
+  ],
+  "ALLOWED_NOW": {
+    "owner": "Root bootstrap integrator",
+    "action": "Commit and publish the sanitized evidence-only checkpoint; return its exact SHA and results to the completion overseer."
+  },
+  "HELD": {
+    "owner": "Root and existing debt-item owners",
+    "action": "Production transport activation, Builder qualification/admission, DEBT-0258 execution and dependent work, Court qualification, and P3."
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": {
+    "action": "This verifies temporary scheduler composition and refusal behavior only. The separate P1 positive-disclosure authority gap remains open.",
+    "wake_condition": "Existing trusted disclosure authority, current stage qualification and fresh PAEOS admission are independently established; this evidence alone wakes no production work."
+  }
+}

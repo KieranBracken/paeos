@@ -1,0 +1,64 @@
+{
+  "schema": "paeos.offline-verification-scope/1",
+  "scope_id": "PAEOS_SCHEDULER_READINESS_CF45A261_20261018",
+  "candidate_base": "cf45a26128595618c906ef2db6d6e9a9ff81217c",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "authority_basis": "Human-approved bounded offline bootstrap continuation in reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/CONTINUATION.json; this is not PAEOS admission or runtime authority.",
+  "owner": "Root bootstrap integrator; Chat 1 retains exclusive DEBT-0258 integration ownership.",
+  "source_changes": false,
+  "test_changes": false,
+  "frozen_test": {
+    "path": "tests/ops/test_offline_scheduler_readiness.py",
+    "sha256": "4a269b6e6de35d5199b4f4ab13a9a628b79c341b63785062f42c80eb2291a39a",
+    "case_count": 10,
+    "acceptance": [
+      "Actual build_scheduler constructs only temporary state, workspace and registry using synthetic host loader fixtures; empty scheduler run makes zero worker calls and registrations.",
+      "Trace-B missing-loader, missing-qualification-file and validly signed expired synthetic qualification deny before worker invocation, registration, task graph creation or ledger append.",
+      "Captured lifecycle and authoritative manifest digest binding pass; missing and tampered resource controls reject.",
+      "Separate offline Court-server stdio root exits on EOF; every imported local project module resolves within the candidate, with no LiteLLM import."
+    ]
+  },
+  "frozen_runner": {
+    "source_path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py",
+    "destination_path": "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/run_verification.py",
+    "sha256": "6e4a5f0080a1eb4925195d6d9cb35587790fd52836eea66903898f6a48420912",
+    "purpose": "Run only the frozen test file with candidate-local imports, network denied and file writes restricted to generated temporary scratch."
+  },
+  "source_hashes_sha256": {
+    "ops/autonomous_run.py": "87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280",
+    "runtime/builder_transport.py": "5d7735206d2b36dc776cb2745eaa6b89d3f85cc198f98dcfafd874e2d5d5efaa",
+    "runtime/ceremony.py": "1a0624676ceb5a9fbb3a78e11a11f00c41e84191fec5f3d5e0af1b691b28e17e",
+    "runtime/court/completeness_firewall.py": "c99c0e6b2074264557b601cdcea1cfbc45729c41308b83e632292dfe270cf28a",
+    "runtime/lifecycle_projection.py": "d646da7bf7ca7003c998e05a27d276a187ee2fc2838291870eb1a9a6d665576e",
+    "runtime/orchestrator/__init__.py": "f56a0aac982e8fec7c47256391aa5467dc1bdd209b0fd4952726fd4f68995bff",
+    "runtime/run_state_registry.py": "01052d5bfc79430cbb58a049271011dc7288792ce9a467f26e28e9af28f755fe",
+    "runtime/scheduler.py": "7d224317b36956f19c35c353166a60ce1598299ebdfa867a6392c4cc5a14d206",
+    "runtime/scar_store.py": "015438346178e1411bbb6376ca45926b09fa7872a4d02aea32671753e3e4c088",
+    "runtime/transports/mcp/court_server.py": "e7e860c417c2bc5ec2f3393de52cbe57a976f813ad65e96c313a0fc17cf34214",
+    "runtime/transports/mcp/transport.py": "80d78e52f1df8f5c05a55f0d06d883c831b17cbd1c8bcaeda5b3216c9283ac6b",
+    "ops/manifests/p1_authoritative_completeness_manifest.json": "372e4b2f307074f1cf5e7483707505805db323a67cb0cf079580fd764494eea8",
+    "operations/ENGINEERING_LIFECYCLE.md": "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae"
+  },
+  "exact_evidence_paths": [
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/SCOPE.json",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/run_verification.py",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/final.command.json",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/final.stdout.txt",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/final.stderr.txt",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/static-checks.json",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/secret-scan.json",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/RESULT.json",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/explicit-files.txt",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/CHECKPOINT_MANIFEST.json",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md"
+  ],
+  "temporary_writes": "The frozen runner creates a random /private/tmp scratch root and pytest subtree, with sandboxed writes limited to that root and /dev/null; it redirects synthetic workspace, state and registry roots into pytest tmp_path.",
+  "forbidden": [
+    "host credentials, private keys, or runtime state reads",
+    "provider requests or network access",
+    "installation, qualification minting, production admission, or runtime activation",
+    "debt integration, broad test-suite execution, or formal Security Review",
+    "changes to production source or test source"
+  ],
+  "failure_rule": "Preserve failed output. Stop if the frozen harness requires broader source, test, authority or host access. Do not infer production readiness or qualification from this offline result."
+}

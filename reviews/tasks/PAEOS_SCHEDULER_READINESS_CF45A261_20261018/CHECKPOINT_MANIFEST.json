@@ -1,0 +1,19 @@
+{
+  "schema": "paeos.recovery-checkpoint-manifest/1",
+  "candidate_base": "cf45a26128595618c906ef2db6d6e9a9ff81217c",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "files": {
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": "6ba21471182a66e47ac14d09f81dab0ffccfc5b58abf298952031d807beaaa58",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/RESULT.json": "86436ed7319a06638198fb85572b4eb10cdbf7ac9d7e5b7305f4d828f5995c82",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/SCOPE.json": "836d53ca82b6c19df751ab7a421b4237c5ca795c8ee64516cbdebc8c53197dbe",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/explicit-files.txt": "ee25ac36f722628e93f334631827aa113690f8fa5d5d51932915af9e777761e7",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/final.command.json": "ed239855464ca8b0daf7b0c9e90b99b78c30653ec3cc1aa040100a2de7cdf8ba",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/final.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/final.stdout.txt": "35b479abe329b9e7feedab48ca8d948c434488afc393a02bdc9930e9d946c217",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/run_verification.py": "6e4a5f0080a1eb4925195d6d9cb35587790fd52836eea66903898f6a48420912",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/secret-scan.json": "65ad996ca8e41a53caabda44ef4bf5fb9f6b1062f7c920fd31f8aa1a706ed356",
+    "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/static-checks.json": "7fbd6fcf0a314ad5f6b82c6431fa9d1360971146a5164fb2630206029e0894bf"
+  },
+  "self_hash_excluded": "reviews/tasks/PAEOS_SCHEDULER_READINESS_CF45A261_20261018/CHECKPOINT_MANIFEST.json",
+  "limitation": "Evidence-only checkpoint; no production source change, PAEOS admission, qualification, activation, or release claim."
+}
