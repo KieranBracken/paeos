@@ -1,0 +1,126 @@
+{
+  "schema": "paeos.read-only-response-contract/1",
+  "source_checkpoint": "857dbc366a4660b28becb38a8aacbacd1af6a2e8",
+  "result": "NOT_ESTABLISHED",
+  "date": "2026-10-18",
+  "source_files": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "lines": [
+        [
+          45,
+          59
+        ],
+        [
+          182,
+          217
+        ],
+        [
+          219,
+          251
+        ],
+        [
+          263,
+          287
+        ],
+        [
+          289,
+          324
+        ]
+      ],
+      "sha256": "b36f6294cb2b1cd0ae68bee50867d5c38f5e9f19c170ed18290305169131d17d"
+    },
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "lines": [
+        [
+          154,
+          209
+        ],
+        [
+          900,
+          949
+        ],
+        [
+          980,
+          1014
+        ]
+      ],
+      "sha256": "2c67df1d8c85fd118437f716d76e6f1010eead5382d13940b63ff15c2a396ef8"
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_request_limit.py",
+      "lines": [
+        [
+          114,
+          179
+        ],
+        [
+          182,
+          219
+        ]
+      ],
+      "sha256": "01b1cdaf162d11c55703a4b690edccc7e532dfa7f966b95d6ea0c43f369d60d7"
+    }
+  ],
+  "endpoint": {
+    "method": "POST",
+    "url": "https://chatgpt.com/backend-api/codex/responses",
+    "headers_from_source": [
+      "Content-Type: application/json",
+      "Accept: text/event-stream",
+      "OpenAI-Beta: responses=experimental"
+    ],
+    "classification": "ChatGPT backend endpoint officially documented for gateway proxying; exact response model-identity schema was not established by inspected documentation. Do not label the entire endpoint undocumented."
+  },
+  "source_trace": [
+    "Supervisor configures one fixed model per broker. Handler accepts only request JSON whose model equals that configured value; accepted raw bytes are forwarded unchanged.",
+    "A broker-local monotonic integer receipt ID and raw request SHA-256 are reserved under lock before upstream forwarding. Each handler retains its own immutable receipt; completion replaces only the matching list slot under lock.",
+    "Default upstream uses a dedicated HTTPSConnection to chatgpt.com for the request, receives status/content-type and bounded raw response bytes, then closes. No network call was made in this investigation.",
+    "Response SHA-256 covers raw body bytes, including SSE framing if present. It does not cover content-type, other headers, provider response ID or parsed model identity. Content-type is forwarded but not validated or included in receipt evidence.",
+    "Evidence exports ordered per-request hashes/outcomes/status. Top-level model_id is configured _model_id. The supervisor validates structural receipt completeness and later copies configured model_id and constant family into its observation.",
+    "Receipt completeness accepts statuses100-599 as received HTTP responses; it is not itself a successful-inference assertion. The synthetic test deliberately records429 as received.",
+    "Concurrency tests use synthetic_response A/B bodies, proving controlled pairing and snapshot behavior only. They do not establish any real provider response schema or model identity."
+  ],
+  "published_evidence": [
+    {
+      "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "section": "How to set it up; caveats",
+      "retrieved": "2026-10-18",
+      "established": "Official instructions identify /models and /responses proxying to the ChatGPT Codex backend.",
+      "not_established": "No exact response/SSE model-identity field, authority semantics or alias-to-observed-model relation for either fixed route is specified on this page."
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/enterprise/gateway-compatibility",
+      "section": "Opening scope; streaming; model routing and metadata",
+      "retrieved": "2026-10-18",
+      "established": "This page scopes its requirements to API/provider credentials and points ChatGPT workspace proxying to the separate page. It describes SSE response.completed and route verification in gateway records.",
+      "not_established": "It does not establish that an API response.model schema applies unchanged to this ChatGPT backend. No such equivalence is assumed."
+    }
+  ],
+  "concurrency_conclusion": "A future established response field can be bound to the correct existing local receipt in that handler before replacement. Feasible local byte correlation does not prove the field exists or that its value establishes exact upstream model identity.",
+  "precise_blocker": "No inspected authoritative schema or attributable captured sample establishes exact response-origin model identity for this endpoint and these fixed routes. Private responses/runtime state were not inspected and no provider probe was authorized.",
+  "wake_condition": "Provide or establish a version-bound endpoint contract or lawfully captured attributable sanitized evidence specifying response model identity, semantics, terminal completion and error/duplicate handling. Then freeze a narrow parser/receipt/supervisor-consumer scope. Until then, do not stamp requested identity as observed. Route changes and provider probes require their own applicable authority.",
+  "checks": {
+    "source_test_changes": 0,
+    "tests_rerun": false,
+    "formal_review": false,
+    "original_review_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+    "prior_results": "73 focused passes belong to d786f3be; last measured full suite has seven collection errors. Neither was rerun."
+  },
+  "effects": {
+    "provider_requests": 0,
+    "cli_invocations": 0,
+    "credentials_or_keys_read": false,
+    "runtime_state_read": false,
+    "installation": false,
+    "qualification": false,
+    "admission": false,
+    "debt_integration": false
+  },
+  "gates": {
+    "ALLOWED_NOW": "Root checkpoints this diagnostic and callbacks the overseer; other existing authorized offline work may continue.",
+    "HELD": "Model identity implementation based on an unestablished schema; production installation, qualification, dependent debt activation and P3.",
+    "AUTHORITY_OR_IMPLEMENTATION_GAP": "Observed-model response contract remains unestablished. P1 disclosure and producer authentication, independent review and trusted authority/current qualification remain separate gaps."
+  }
+}

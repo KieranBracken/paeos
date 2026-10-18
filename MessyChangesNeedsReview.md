@@ -5512,3 +5512,7 @@ The four-file offline candidate caps stdout/stderr capture at 1 MiB each, hashes
 ### 2026-10-18 — observed-model contract investigation only
 
 No source or tests changed. The proposed terminal parser would confuse Cline `run_result` with Codex `exec --json`; exact observed model identity is not established by the inspected contract. The model-identity P2 remains open. The canonical finding and exact wake condition are appended to the hallucination notebook; supporting source hashes and limitations are under `reviews/tasks/PAEOS_MODEL_IDENTITY_CONTRACT_GAP_20261018/`. No fresh test result, formal review, provider operation or qualification is claimed.
+
+### 2026-10-18 — read-only response identity trace
+
+Evidence-only package: concurrency binds raw request/response bytes, while exact upstream model identity remains NOT_ESTABLISHED. The endpoint is officially documented for ChatGPT gateway proxying; its exact identity schema was not found in the inspected applicable sources. Canonical findings and wake conditions are in the notebook, with hashes under `reviews/tasks/PAEOS_RESPONSE_IDENTITY_TRACE_20261018/`. No source/test change, test rerun, provider call, formal review or activation.

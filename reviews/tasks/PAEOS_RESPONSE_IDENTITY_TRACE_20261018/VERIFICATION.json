@@ -1,0 +1,10 @@
+{
+  "type": "read-only source investigation; evidence-only files",
+  "json_parse": "PASS",
+  "supplementary_secret_pattern_scan": "PASS; new evidence and appended notes only",
+  "diff_check": "PASS",
+  "source_test_edits": 0,
+  "tests_run": false,
+  "formal_review": false,
+  "original_review_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+}
