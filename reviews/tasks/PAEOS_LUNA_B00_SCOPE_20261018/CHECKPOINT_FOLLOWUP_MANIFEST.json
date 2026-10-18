@@ -1,0 +1,25 @@
+{
+  "files": [
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "cef54ea01bf1c051299e8771543b8981810178f8a69af7bc80e6612bcb0b53fe"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "0d3380838e7909c6fc4268a1355be821119d15f69bd881ff93b702f83ab6efbe"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/OWNER_GAP_FOLLOWUP_20261019.md",
+      "sha256": "147fe42c276fc7b62e18124179ff10c851d227c147b13f3f073ef28ec44d81be"
+    }
+  ],
+  "manifest_self_hash_excluded": true,
+  "parent_checkpoint": "5b5c8b22ed13b55afeaf2f03970d1300441ef7c0",
+  "pinned_source_candidate": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "provider_or_runtime_effects": false,
+  "review_claim": "none",
+  "schema": "paeos.evidence-checkpoint/1",
+  "scope": "B00 owner-gap evidence only",
+  "source_code_changed": false,
+  "tests_run": false
+}
