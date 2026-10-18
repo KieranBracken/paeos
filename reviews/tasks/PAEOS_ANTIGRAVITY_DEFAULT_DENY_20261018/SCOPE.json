@@ -1,0 +1,34 @@
+{
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "candidate_base": "3ff8b15a38fcf7772248f7e0d97a765db2ad53f4",
+  "coordinator_thread": "01a14f33-dc16-7281-9da8-a241ef9a8b0e",
+  "date": "2026-10-18",
+  "effects_forbidden": [
+    "provider calls",
+    "external network requests other than GitHub checkpoint operations",
+    "credential/key/runtime-state reads",
+    "installation",
+    "qualification or admission",
+    "Court/debt integration",
+    "P3 activation",
+    "formal review before aggregate readiness"
+  ],
+  "human_authorization_reference": {
+    "message_id": "msg_01a14f2a-967f-7a93-8267-b87dab40196a",
+    "text_sha256": "fde262a233566db811e59c05f774953ab90f8f818a3355a953eb5024d323554d"
+  },
+  "package": "bounded offline Antigravity callable-path containment",
+  "pinned_paths": {
+    "runtime/integrations/antigravity.py": {
+      "change": "content-free fail-closed guard at AntigravityRuntime.run and returned _invoke entrypoints",
+      "postimage_sha256": "7e45dba978a1f5b55022a284784313ab4778cd7a5ea2c7be69e8fd1908473442",
+      "preimage_sha256": "bba2e400c567d2ce2d3325280f7c107d4d452932b21175f63d1bb3f2fbb8dcb2"
+    },
+    "tests/runtime/test_antigravity_disclosure_denial.py": {
+      "change": "synthetic tests for runtime setup, prompt/MCP access, bootstrap writes, subprocess denial and non-echo",
+      "postimage_sha256": "d78fd5406e2d3d51dd2282e6161a49f4648edb4924477f2dea4fb2ea98b1eab1",
+      "preimage": "ABSENT"
+    }
+  },
+  "scope_limit": "The callable Antigravity SDK path only; the preserved inventory says the autonomous entrypoint does not select it, so this is not production-route closure or P1 completion."
+}

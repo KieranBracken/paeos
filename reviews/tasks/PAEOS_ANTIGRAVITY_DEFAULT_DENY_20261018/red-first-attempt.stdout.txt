@@ -1,0 +1,219 @@
+NETWORK_DENIAL_CONTROL=PASS
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_cli_invoker_denies_before_prompt_access_or_bootstrap_write ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x102629a70>
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-antigravity-denial-f_com0ft/pytest/test_cli_invoker_denies_before0')
+
+    def test_cli_invoker_denies_before_prompt_access_or_bootstrap_write(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        writes: list[str] = []
+        launches: list[str] = []
+        monkeypatch.setattr(
+            antigravity.Path,
+            "write_text",
+            lambda _path, *_args, **_kwargs: writes.append("bootstrap"),
+        )
+        monkeypatch.setattr(
+            antigravity.subprocess,
+            "run",
+            lambda *_args, **_kwargs: launches.append("subprocess"),
+        )
+        spec = SimpleNamespace(workspace=tmp_path, prompt=_PromptAccessBomb())
+        invoker = antigravity.antigravity_cli_invoker(_Opaque())
+
+>       _deny_without_sensitive_echo(lambda: invoker(spec))
+
+tests/runtime/test_antigravity_disclosure_denial.py:60:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/runtime/test_antigravity_disclosure_denial.py:37: in _deny_without_sensitive_echo
+    invoke()
+tests/runtime/test_antigravity_disclosure_denial.py:60: in <lambda>
+    _deny_without_sensitive_echo(lambda: invoker(spec))
+                                         ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+spec = namespace(workspace=PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-antigravity-denial-f_com...er_denies_before0'), prompt=<tests.runtime.test_antigravity_disclosure_denial._PromptAccessBomb object at 0x1010a6e40>)
+
+        def _invoke(spec: SessionSpec) -> str:
+            # We write a tiny async script into the workspace that uses the SDK.
+            # This guarantees that the Antigravity agent's CWD is the workspace.
+            bootstrap_path = spec.workspace / ".agy_bootstrap.py"
+
+            mcp_servers_code = "[]"
+            if mcp_config_path is not None and mcp_config_path.exists():
+                cfg = json.loads(mcp_config_path.read_text(encoding="utf-8"))
+                mcp_servers = []
+                for name, server in cfg.get("mcpServers", {}).items():
+                    cmd = server.get("command")
+                    args = server.get("args", [])
+                    mcp_servers.append(f"""
+        types.McpStdioServer(
+            name={name!r},
+            command={cmd!r},
+            args={args!r},
+        )""")
+                if mcp_servers:
+                    mcp_servers_code = "[" + ",".join(mcp_servers) + "]"
+
+            script_content = f"""
+    import asyncio
+    import json
+    import sys
+    import os
+    import logging
+    from pathlib import Path
+
+    from google.antigravity import Agent, LocalAgentConfig, CapabilitiesConfig, types
+    from google.antigravity.hooks import policy
+
+    async def main():
+        mcp_servers = {mcp_servers_code}
+
+        # We are in an ephemeral sandbox. Allow all tools including run_command.
+        # PAEOS filters out writes outside of write_scopes afterward.
+        config = LocalAgentConfig(
+            system_instructions="You are a scoped PAEOS worker session.",
+            model="gemini-2.5-flash",
+            capabilities=CapabilitiesConfig(),
+            policies=[policy.allow_all()],
+            mcp_servers=mcp_servers,
+        )
+
+        prompt = {spec.prompt!r}
+
+        try:
+            async with Agent(config) as agent:
+                response = await agent.chat(prompt)
+                # We just print the text, which is captured as the transcript.
+                print(await response.text())
+        except Exception as e:
+            logging.exception("Error during agent execution: %s", e)
+            sys.exit(1)
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    """
+
+            bootstrap_path.write_text(script_content, encoding="utf-8")
+
+            cmd = ["python", bootstrap_path.name]
+            proc = subprocess.run(
+                cmd,
+                cwd=str(spec.workspace),
+                capture_output=True,
+                text=True,
+>               timeout=spec.timeout_s,
+                        ^^^^^^^^^^^^^^
+                check=False,
+            )
+E           AttributeError: 'types.SimpleNamespace' object has no attribute 'timeout_s'
+
+runtime/integrations/antigravity.py:110: AttributeError
+_________ test_cli_invoker_denies_before_mcp_config_read_or_subprocess _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x102628c30>
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-antigravity-denial-f_com0ft/pytest/test_cli_invoker_denies_before1')
+
+    def test_cli_invoker_denies_before_mcp_config_read_or_subprocess(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        writes: list[str] = []
+        launches: list[str] = []
+        monkeypatch.setattr(
+            antigravity.Path,
+            "write_text",
+            lambda _path, *_args, **_kwargs: writes.append("bootstrap"),
+        )
+        monkeypatch.setattr(
+            antigravity.subprocess,
+            "run",
+            lambda *_args, **_kwargs: launches.append("subprocess"),
+        )
+        spec = SimpleNamespace(workspace=tmp_path, prompt=_PROMPT_MARKER)
+        invoker = antigravity.antigravity_cli_invoker(
+            _Opaque(), mcp_config_path=_ConfigAccessBomb()
+        )
+
+>       _deny_without_sensitive_echo(lambda: invoker(spec))
+
+tests/runtime/test_antigravity_disclosure_denial.py:86:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/runtime/test_antigravity_disclosure_denial.py:37: in _deny_without_sensitive_echo
+    invoke()
+tests/runtime/test_antigravity_disclosure_denial.py:86: in <lambda>
+    _deny_without_sensitive_echo(lambda: invoker(spec))
+                                         ^^^^^^^^^^^^^
+runtime/integrations/antigravity.py:48: in _invoke
+    if mcp_config_path is not None and mcp_config_path.exists():
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tests.runtime.test_antigravity_disclosure_denial._ConfigAccessBomb object at 0x1011d5400>
+
+    def exists(self) -> bool:
+>       raise AssertionError("MCP configuration was inspected before local denial")
+E       AssertionError: MCP configuration was inspected before local denial
+
+tests/runtime/test_antigravity_disclosure_denial.py:24: AssertionError
+____________ test_runtime_denies_before_workspace_or_context_setup _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1011dac30>
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-antigravity-denial-f_com0ft/pytest/test_runtime_denies_before_wor0')
+
+    def test_runtime_denies_before_workspace_or_context_setup(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        effects: list[str] = []
+        monkeypatch.setattr(
+            antigravity.tempfile,
+            "mkdtemp",
+            lambda *_args, **_kwargs: effects.append("workspace"),
+        )
+        monkeypatch.setattr(
+            antigravity,
+            "_seed_workspace",
+            lambda *_args, **_kwargs: effects.append("seed_workspace"),
+        )
+        monkeypatch.setattr(
+            antigravity,
+            "_seed_constitution",
+            lambda *_args, **_kwargs: effects.append("seed_constitution"),
+        )
+        monkeypatch.setattr(
+            antigravity,
+            "_materialize_context",
+            lambda *_args, **_kwargs: effects.append("materialize_context"),
+        )
+        runtime = antigravity.AntigravityRuntime(workspace_root=tmp_path)
+
+>       _deny_without_sensitive_echo(lambda: runtime.run(_Opaque()))
+
+tests/runtime/test_antigravity_disclosure_denial.py:118:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/runtime/test_antigravity_disclosure_denial.py:37: in _deny_without_sensitive_echo
+    invoke()
+tests/runtime/test_antigravity_disclosure_denial.py:118: in <lambda>
+    _deny_without_sensitive_echo(lambda: runtime.run(_Opaque()))
+                                         ^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/antigravity.py:140: in run
+    tempfile.mkdtemp(prefix=f"paeos-{package.task_id}-", dir=self._workspace_root)
+                                     ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tests.runtime.test_antigravity_disclosure_denial._Opaque object at 0x1026a0cd0>
+name = 'task_id'
+
+    def __getattr__(self, name: str) -> object:
+>       raise AssertionError(f"object attribute {name!r} was inspected before local denial")
+E       AssertionError: object attribute 'task_id' was inspected before local denial
+
+tests/runtime/test_antigravity_disclosure_denial.py:32: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_antigravity_disclosure_denial.py::test_cli_invoker_denies_before_prompt_access_or_bootstrap_write
+FAILED tests/runtime/test_antigravity_disclosure_denial.py::test_cli_invoker_denies_before_mcp_config_read_or_subprocess
+FAILED tests/runtime/test_antigravity_disclosure_denial.py::test_runtime_denies_before_workspace_or_context_setup
+3 failed in 0.06s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.types": "kernel/types.py", "runtime": "runtime/__init__.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.antigravity": "runtime/integrations/antigravity.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.task_package": "runtime/task_package.py", "tests": "tests/__init__.py", "tests.runtime": "tests/runtime/__init__.py", "tests.runtime.test_antigravity_disclosure_denial": "tests/runtime/test_antigravity_disclosure_denial.py"}

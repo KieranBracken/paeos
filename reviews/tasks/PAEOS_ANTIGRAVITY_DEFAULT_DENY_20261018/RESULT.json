@@ -1,0 +1,25 @@
+{
+  "authority_and_effects": "Offline synthetic verification only. No provider call, external provider request, host key/credential/runtime-state access, installation, qualification/admission, Court/debt integration or P3 activation.",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "candidate_base": "3ff8b15a38fcf7772248f7e0d97a765db2ad53f4",
+  "limitations": [
+    "This change denies only the AntigravityRuntime and antigravity_cli_invoker callable paths.",
+    "It does not establish trusted positive disclosure authority, enable non-SECRET egress, or close other provider/client/UI routes.",
+    "The autonomous entrypoint route was not changed or activated.",
+    "No formal independent Security Review was run; the coordinator deferred it until aggregate candidate readiness.",
+    "The full suite was not rerun. The coordinator assignment reports seven prior collection errors as the last measured result; this package did not independently remeasure them."
+  ],
+  "outcome": "P1_REMAINS",
+  "package_status": "bounded candidate checkpoint pending coordinator validation",
+  "source_change": [
+    "Added a content-free TrustedTransportFailure with code disclosure_authority_unavailable.",
+    "AntigravityRuntime.run denies before task metadata access, workspace creation, context materialization, prompt construction or invoker selection.",
+    "The returned antigravity_cli_invoker denies before spec prompt access, MCP config inspection/read, bootstrap write, SDK subprocess launch or result forwarding."
+  ],
+  "verification": {
+    "green": "3 passed; network-denial, SDK-import and candidate-import-origin controls passed.",
+    "pinned_base_red": "3 expected behavior failures: prompt access, MCP exists check, and task_id read occurred before denial; see red.stdout.txt and red.stderr.txt.",
+    "preliminary_red_attempts": "Two early test-harness revisions are preserved as red-first-attempt.* and red-second-attempt.*; they are excluded from acceptance because they exposed fixture mistakes, not product findings.",
+    "regression": "4 passed including test_live_adapter.py::test_live_invoker_denies_before_provider_launch."
+  }
+}

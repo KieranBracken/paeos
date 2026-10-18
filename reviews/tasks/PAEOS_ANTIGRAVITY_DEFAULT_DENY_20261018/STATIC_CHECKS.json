@@ -1,0 +1,13 @@
+{
+  "candidate_base": "3ff8b15a38fcf7772248f7e0d97a765db2ad53f4",
+  "candidate_import_origins": "PASS; local kernel/runtime/tests imports resolved under this recovery worktree.",
+  "diff_check": "PASS; /usr/bin/git diff --cached --check passed over the explicit staged manifest.",
+  "full_suite": "NOT_RUN; seven prior collection errors are reported by the coordinator and were not remeasured in this package.",
+  "google_sdk_import": "PASS; google.antigravity was absent from test process imports and subprocess spies were not called.",
+  "network_denial": "PASS; OS sandbox rejected loopback bind during focused test executions.",
+  "ruff_check": "PASS on antigravity.py, focused test and verification runner.",
+  "ruff_format": "PASS on antigravity.py, focused test and verification runner.",
+  "secret_scan": "PASS; targeted scan covered every manifest artifact plus the manifest, decoded raw test-output artifacts, found zero matches across six credential-pattern classes, and verified raw output hashes.",
+  "syntax_compile": "PASS using compile() on all three Python files without bytecode output.",
+  "whole_file_whitespace_scan": "Three trailing-whitespace lines in antigravity.py were present in the pinned base and remain unchanged; staged diff check is the acceptance check."
+}

@@ -14,6 +14,7 @@ import subprocess
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
+from typing import NoReturn
 
 from kernel.types import Hash, Role
 
@@ -22,6 +23,7 @@ from runtime.task_package import Cost, TaskPackage, TaskStatus
 
 from . import (
     SessionSpec,
+    TrustedTransportFailure,
     _collect_writes,
     _materialize_context,
     _seed_constitution,
@@ -32,6 +34,14 @@ from . import (
 __all__ = ["AntigravityRuntime"]
 
 
+def _require_antigravity_disclosure_authority() -> NoReturn:
+    """Deny Antigravity egress until trusted disclosure authority is integrated."""
+    raise TrustedTransportFailure(
+        "disclosure_authority_unavailable",
+        "trusted disclosure authority is unavailable",
+    )
+
+
 def antigravity_cli_invoker(
     package: TaskPackage, *, mcp_config_path: Path | None = None
 ) -> Callable[[SessionSpec], str]:
@@ -40,6 +50,8 @@ def antigravity_cli_invoker(
     """
 
     def _invoke(spec: SessionSpec) -> str:
+        _require_antigravity_disclosure_authority()
+
         # We write a tiny async script into the workspace that uses the SDK.
         # This guarantees that the Antigravity agent's CWD is the workspace.
         bootstrap_path = spec.workspace / ".agy_bootstrap.py"
@@ -136,6 +148,8 @@ class AntigravityRuntime:
         self._artifact_resolver = artifact_resolver
 
     def run(self, package: TaskPackage) -> RunOutput:
+        _require_antigravity_disclosure_authority()
+
         workspace = Path(
             tempfile.mkdtemp(prefix=f"paeos-{package.task_id}-", dir=self._workspace_root)
         )

@@ -1,0 +1,162 @@
+{
+  "artifacts": [
+    {
+      "bytes": 6673,
+      "path": "runtime/integrations/antigravity.py",
+      "sha256": "7e45dba978a1f5b55022a284784313ab4778cd7a5ea2c7be69e8fd1908473442"
+    },
+    {
+      "bytes": 3817,
+      "path": "tests/runtime/test_antigravity_disclosure_denial.py",
+      "sha256": "d78fd5406e2d3d51dd2282e6161a49f4648edb4924477f2dea4fb2ea98b1eab1"
+    },
+    {
+      "bytes": 2162,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/RESULT.json",
+      "sha256": "7aac48e585eb47ee8b4778a08bbd488d85ba5ef9b7197b8eabcb4c0b8e4d3d01"
+    },
+    {
+      "bytes": 1664,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/SCOPE.json",
+      "sha256": "fb9120ec01b3b8c0796a3f748a565054b0959537d8fa4a3ef743e15c973b1c82"
+    },
+    {
+      "bytes": 1290,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/STATIC_CHECKS.json",
+      "sha256": "9a941bf3458235fd9f7eb9821678444cd7ba4e32b6d0343b5de5c996fb7809fd"
+    },
+    {
+      "bytes": 3887,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/green.command.json",
+      "sha256": "f62905f601bfd2f9c632e6ee3be01b71d507da98e401036c2f1b2a634f60d22e"
+    },
+    {
+      "bytes": 1,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/green.raw.stderr.b64",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 1365,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/green.raw.stdout.b64",
+      "sha256": "55932896fdb1ab49b7c8c0ee8d5efbad7d99411de300d82b7036213e12ea3006"
+    },
+    {
+      "bytes": 0,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1021,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/green.stdout.txt",
+      "sha256": "1d58b7e4094bfd0bf22a0a40e5febc6ca06b4634f6e4369ba9b55b854081c6c2"
+    },
+    {
+      "bytes": 3735,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-first-attempt.command.json",
+      "sha256": "5c1ca35a42d84d641092b20d246a5e3e6843b224a013431b872fde988d6421cb"
+    },
+    {
+      "bytes": 1,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-first-attempt.raw.stderr.b64",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 14213,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-first-attempt.raw.stdout.b64",
+      "sha256": "4d080680c7f18e5d90dce7142b29572ad8185334bb5afe1fa5240d5d86e3ee31"
+    },
+    {
+      "bytes": 0,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-first-attempt.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 10598,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-first-attempt.stdout.txt",
+      "sha256": "7072c2a4b236a965dffe8a03c333fa2b32ffeb20fc8aa9e9e7a07b59fdc92ba7"
+    },
+    {
+      "bytes": 3735,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-second-attempt.command.json",
+      "sha256": "fb927deaa14783d6ad914c72e62575cc638158160ad8e45c83c19535a575f194"
+    },
+    {
+      "bytes": 1,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-second-attempt.raw.stderr.b64",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 9305,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-second-attempt.raw.stdout.b64",
+      "sha256": "d416e07de9f39e51623d3f9f65fdf60d8b1d0382696a8ec5671a5127751b1e48"
+    },
+    {
+      "bytes": 0,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-second-attempt.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 6964,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red-second-attempt.stdout.txt",
+      "sha256": "28deef0c102e62c7ee4714742b0b1a82648885c726a1c0b934133951206ef1d6"
+    },
+    {
+      "bytes": 3735,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red.command.json",
+      "sha256": "cd9f3b67f51c42a4679b38602e30d49735f4a54148580a2d56bc95699aaf016e"
+    },
+    {
+      "bytes": 1,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red.raw.stderr.b64",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 10893,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red.raw.stdout.b64",
+      "sha256": "ce35ac3a9ced1c176ddc70039d53c873ebd1f0c0aaa4d16bda0adee10b7845d2"
+    },
+    {
+      "bytes": 0,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 8147,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/red.stdout.txt",
+      "sha256": "a41a6d24007df5bf227ed22c3237c332f05f3e4d50df670e789ebbefb66ca5fa"
+    },
+    {
+      "bytes": 3978,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/regression.command.json",
+      "sha256": "55e7b50ca5ac6e260cebaa8f6509d0c6bce68dc2da8e7c549396c3b477123d0e"
+    },
+    {
+      "bytes": 1,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/regression.raw.stderr.b64",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 1525,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/regression.raw.stdout.b64",
+      "sha256": "2bfc5bd52e24a94f86e9bbd27f203638ff22a4e5170649dbdc9be41f4e681055"
+    },
+    {
+      "bytes": 0,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/regression.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1142,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/regression.stdout.txt",
+      "sha256": "86cc92d5afbd1b4cc1fae06f9898fcb7f415b93ff56975d9e4f83707c5328097"
+    },
+    {
+      "bytes": 5461,
+      "path": "reviews/tasks/PAEOS_ANTIGRAVITY_DEFAULT_DENY_20261018/run_verification.py",
+      "sha256": "3f8c1b70ec0e4ccae1c764d1b5b5f723689d525d80667f0e0f045a96f71e850e"
+    }
+  ],
+  "candidate_base": "3ff8b15a38fcf7772248f7e0d97a765db2ad53f4",
+  "schema_version": 1,
+  "scope": "exact scoped source, test and sanitized evidence artifacts; manifest self-hash intentionally omitted"
+}
