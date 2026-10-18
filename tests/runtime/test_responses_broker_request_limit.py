@@ -1,4 +1,8 @@
-"""Synthetic loopback tests: no provider calls or host credential access."""
+"""Receipt-only loopback tests with the disclosure gate explicitly bypassed in test code.
+
+These do not establish authorized egress. Unpatched denial is tested separately in
+test_responses_broker_disclosure_denial.py. No providers or host credentials are used.
+"""
 
 import hashlib
 from concurrent.futures import ThreadPoolExecutor
@@ -31,6 +35,11 @@ def _post(broker, body=b'{"model":"gpt-5.6-sol","input":"synthetic","max_request
 
 
 def _broker(monkeypatch, upstream, limit=1):
+    # Isolate the existing receipt machinery; this is not a production permit interface.
+    monkeypatch.setattr(
+        "runtime.integrations.task_scoped_responses_broker._require_disclosure_authority",
+        lambda: None,
+    )
     broker = ParentOwnedResponsesBroker(
         auth_path=Path("/unused-synthetic-auth"), upstream=upstream, max_requests=limit
     )

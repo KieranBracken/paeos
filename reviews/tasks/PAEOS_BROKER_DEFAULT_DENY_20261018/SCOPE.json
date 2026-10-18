@@ -1,0 +1,63 @@
+{
+  "schema": "paeos.offline-bootstrap-scope/1",
+  "base": "7babae0462c843acb22140dd4027c22b7ff1526a",
+  "authority": "Human-approved E0-E3 bounded offline repair. Coordinator explicitly permits default-deny only when existing trusted authority is absent. No runtime authority inferred.",
+  "owner": "Root bootstrap integrator; Chat1 D0258 ownership unchanged.",
+  "files": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "preimage_sha256": "b36f6294cb2b1cd0ae68bee50867d5c38f5e9f19c170ed18290305169131d17d"
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_request_limit.py",
+      "preimage_sha256": "01b1cdaf162d11c55703a4b690edccc7e532dfa7f966b95d6ea0c43f369d60d7"
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_disclosure_denial.py",
+      "preimage_sha256": null
+    }
+  ],
+  "source_authority_pins": [
+    {
+      "path": "architecture/PAEOS_DISCLOSURE_CLASS_AUTHORIZATION_SPEC_v1.md",
+      "sha256": "519828a5425e7a99a3431f727d6af4f4c90ddcd6b8adbee395966571a2329c1c",
+      "origin": "dirty-main exact pinned document bytes; read only, not imported or restored"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-11-paeos-disclosure-class-authorization.md",
+      "sha256": "689932b3c63d6109c93c562e80d43d5f80d719263786aaf8d8ca58b7cba3f4be",
+      "origin": "dirty-main exact pinned document bytes; read only, not imported or restored"
+    },
+    {
+      "path": "ops/backlogs/intake-disclosure-class-authorization.json",
+      "sha256": "f8e24e1272886c53aa5ad55f924ed2792da01fa38810d993f5a4849308f86ea0",
+      "origin": "dirty-main exact pinned document bytes; read only, not imported or restored"
+    }
+  ],
+  "design": [
+    "Existing pure verifier does not establish trusted currentness, enrollment, full-payload composition or atomic attempts; it is not a permit. Candidate lacks their consumers.",
+    "A content-free always-denying guard with no positive input or callback runs in handler before upstream reservation and in direct forwarding helper before HTTPS connection. It blocks all payloads on this path until a separately reviewed trusted consumer is implemented.",
+    "Denied calls increment existing local rejection accounting; they do not reserve an upstream attempt or fabricate a receipt. Existing evidence schema and supervisor remain unchanged.",
+    "Existing lower-level receipt tests explicitly bypass only this guard in their test utility, with no production allow switch; new denial tests never patch it."
+  ],
+  "completion_claim": "Default-deny protection for this one broker egress and its direct helper, not positive disclosure authorization or complete P1 resolution.",
+  "remaining_gap": "Trusted policy enrollment/currentness/revocation, actual payload composition, exact route and durable attempt authority are not implemented by the pure verifier; v1 fixed FREE/artifact policy does not establish this subscription Codex route or dynamic tools. No successful permit can be fabricated.",
+  "tests": [
+    "Unclassified/PUBLIC/INTERNAL/SECRET/unknown worker labels all deny with zero upstream calls.",
+    "Attachments, tool results, workspace references, history and forged/stale/revoked/wrong-body/wrong-route/reused-attempt claims cannot authorize egress. These are untrusted claims, not tests of an implemented revocation authority.",
+    "Concurrent and repeated denials produce local rejections with zero request receipts; content does not enter evidence or local responses.",
+    "Direct forwarding rejects before connection; existing isolated receipt/transport/readiness regressions remain separate."
+  ],
+  "forbidden": [
+    "providers",
+    "host keys/credentials/runtime state",
+    "installation",
+    "qualification/admission",
+    "new authority",
+    "debt integration",
+    "original review edits",
+    "formal review"
+  ],
+  "evidence_root": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018",
+  "full_suite": "Focused scope only; seven prior full-suite collection errors remain last measured result."
+}

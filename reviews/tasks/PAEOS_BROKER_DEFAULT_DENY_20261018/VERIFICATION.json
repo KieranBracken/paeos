@@ -1,0 +1,30 @@
+{
+  "base": "7babae0462c843acb22140dd4027c22b7ff1526a",
+  "result": "DEFAULT_DENY_CANDIDATE_VERIFIED_P1_REMAINS",
+  "red": {
+    "failed": 34,
+    "passed": 202,
+    "seconds": 23.01
+  },
+  "green": {
+    "passed": 236,
+    "seconds": 22.78
+  },
+  "source_test_manifest": [
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "tests/runtime/test_responses_broker_request_limit.py",
+    "tests/runtime/test_responses_broker_disclosure_denial.py"
+  ],
+  "positive_authorization": "NOT_IMPLEMENTED: trusted currentness/classification/composition/route/attempt chain absent; no new authority invented.",
+  "checks": "Scoped lint/format/compile PASS; exact command/stdout/stderr preserved.",
+  "scope_limits": [
+    "one broker handler and direct helper only",
+    "receipt tests explicitly override denial to isolate lower transport behavior",
+    "new denial tests do not override the guard",
+    "untrusted stale/revoked claims do not test a policy-store implementation",
+    "full suite not rerun; prior7 collection errors remain",
+    "no provider/host state/activation/qualification/admission/Court/debt integration",
+    "formal Security Review remains outstanding"
+  ],
+  "original_review_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+}

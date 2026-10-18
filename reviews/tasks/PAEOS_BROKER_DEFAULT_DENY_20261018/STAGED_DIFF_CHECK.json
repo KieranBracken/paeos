@@ -1,0 +1,10 @@
+{
+  "full_exit": 2,
+  "full_stdout": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt:1249: trailing whitespace.\n+E             \nreviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt:1260: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt:1264: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt:1274: trailing whitespace.\n+E         \n",
+  "full_stderr": "",
+  "failed_paths": [
+    "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt"
+  ],
+  "scoped_exit": 0,
+  "scope": "Exclude preserved raw baseline failure stdout only. Raw failures remain unchanged; no full staged pass is claimed if full_exit is nonzero."
+}

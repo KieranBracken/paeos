@@ -1,0 +1,90 @@
+{
+  "base": "7babae0462c843acb22140dd4027c22b7ff1526a",
+  "files": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "sha256": "4e242abc4cb8c7f137e922eb979cbf37c293eff66812f8d9bcf25c6ed5d06a13",
+      "bytes": 15923
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_request_limit.py",
+      "sha256": "967878f0c035f3607613a7776252d7058d79ab1e11365b8d64b73393c3abc54f",
+      "bytes": 10488
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_disclosure_denial.py",
+      "sha256": "301285f2b3374766cc21fd1f8931a511ff39a257caf62bad3623481d500540f3",
+      "bytes": 4624
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/SCOPE.json",
+      "sha256": "3f5cb998286d23cb5f910dddb6541a76c921113be9a297fff4a07fc118954c2b",
+      "bytes": 4041
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/STATIC_CHECKS.json",
+      "sha256": "ccd36b8d39a9142ee7f2fd66995b06723fc0d2fb638a3a97ab90232815eb5c64",
+      "bytes": 1269
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/VERIFICATION.json",
+      "sha256": "97cb0e7597c65aedc41d2e2899faff191d4309d0a2e5e3f663e1a0f86ddd2361",
+      "bytes": 1282
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.command.json",
+      "sha256": "2995218adf7d03d6a5fbc2f3e47315b74aff51947566fe80e9221cb1a2d006a1",
+      "bytes": 3557
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt",
+      "sha256": "5c75102d31fbff9e26a29f66ebd8dba1fca1ea7d4fd5ff9e65d6d36f25c92b62",
+      "bytes": 72379
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/focused-green.command.json",
+      "sha256": "13a912b7af99898e3e62669b9b7de0df9c313edc88811e73298beae4ca92d3e0",
+      "bytes": 3557
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/focused-green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/focused-green.stdout.txt",
+      "sha256": "24d49a0442326e49064e27a9352d9eb28abbce1aa12cb8e5f4e072ad630191f9",
+      "bytes": 3235
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/run_verification.py",
+      "sha256": "d1562f35b58ae14b317f28e340307f2770ab4c04ed604e6f323c461e6cb32852",
+      "bytes": 3996
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "db1bf39645cef74dfb63df3edc9fddc92d8ab4cfe1ab0e8f53745b6f9dce2068",
+      "bytes": 1464346
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "3026d0add5e2056c22a45e9cf3b855fcd668a63b75f12b1c5bc2ae0183a1d331",
+      "bytes": 656151
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/SECRET_SCAN.json",
+      "sha256": "aefb76b06899cdb1913e773073eca3fc492da098383804ba53c65c6679992c8d",
+      "bytes": 1225
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/STAGED_DIFF_CHECK.json",
+      "sha256": "ad7e355f786b5b631938b40b007496c804634db023d1967a159e0c03edec8bb4",
+      "bytes": 788
+    }
+  ]
+}

@@ -1,0 +1,1315 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...................................... [ 30%]
+........................................................................ [ 61%]
+........................................................................ [ 91%]
+....................                                                     [100%]
+=================================== FAILURES ===================================
+___ test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10770b100>
+model = 'gpt-5.6-sol', claims = {}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105b496e0>
+model = 'gpt-5.6-luna', claims = {}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107812570>
+model = 'gpt-5.6-sol', claims = {'data_class': 'PUBLIC'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105a8bac0>
+model = 'gpt-5.6-luna', claims = {'data_class': 'PUBLIC'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10773f460>
+model = 'gpt-5.6-sol', claims = {'data_class': 'INTERNAL'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1077f3a50>
+model = 'gpt-5.6-luna', claims = {'data_class': 'INTERNAL'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1077f2d50>
+model = 'gpt-5.6-sol', claims = {'data_class': 'SECRET'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1078d9d60>
+model = 'gpt-5.6-luna', claims = {'data_class': 'SECRET'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1078d95e0>
+model = 'gpt-5.6-sol', claims = {'data_class': 'unknown'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d3c590>
+model = 'gpt-5.6-luna', claims = {'data_class': 'unknown'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d3d710>
+model = 'gpt-5.6-sol', claims = {'data_class': None}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d52dd0>
+model = 'gpt-5.6-luna', claims = {'data_class': None}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10785c650>
+model = 'gpt-5.6-sol'
+claims = {'attachments': [{'file_data': 'synthetic-excluded-sentinel'}]}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10785cc50>
+model = 'gpt-5.6-luna'
+claims = {'attachments': [{'file_data': 'synthetic-excluded-sentinel'}]}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10789f330>
+model = 'gpt-5.6-sol'
+claims = {'tool_results': [{'output': 'synthetic-excluded-sentinel'}]}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10789f6a0>
+model = 'gpt-5.6-luna'
+claims = {'tool_results': [{'output': 'synthetic-excluded-sentinel'}]}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107804050>
+model = 'gpt-5.6-sol'
+claims = {'workspace': '/synthetic/excluded', 'file_url': 'file:///synthetic/excluded'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107804550>
+model = 'gpt-5.6-luna'
+claims = {'workspace': '/synthetic/excluded', 'file_url': 'file:///synthetic/excluded'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-sol] ____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d140e0>
+model = 'gpt-5.6-sol'
+claims = {'history': [{'content': 'synthetic-excluded-sentinel'}]}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d352d0>
+model = 'gpt-5.6-luna'
+claims = {'history': [{'content': 'synthetic-excluded-sentinel'}]}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-sol] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d351d0>
+model = 'gpt-5.6-sol'
+claims = {'disclosure_permit': {'status': 'ACTIVE', 'signature': 'synthetic-forgery'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__ test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d11be0>
+model = 'gpt-5.6-luna'
+claims = {'disclosure_permit': {'status': 'ACTIVE', 'signature': 'synthetic-forgery'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-sol] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d134d0>
+model = 'gpt-5.6-sol', claims = {'disclosure_permit': {'status': 'REVOKED'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__ test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d602f0>
+model = 'gpt-5.6-luna', claims = {'disclosure_permit': {'status': 'REVOKED'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-sol] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107cff230>
+model = 'gpt-5.6-sol'
+claims = {'disclosure_permit': {'expires_at': '2000-01-01T00:00:00Z'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__ test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d60ad0>
+model = 'gpt-5.6-luna'
+claims = {'disclosure_permit': {'expires_at': '2000-01-01T00:00:00Z'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-sol] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d134d0>
+model = 'gpt-5.6-sol'
+claims = {'disclosure_permit': {'payload_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 'route': 'unrelated'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__ test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d60590>
+model = 'gpt-5.6-luna'
+claims = {'disclosure_permit': {'payload_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 'route': 'unrelated'}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-sol] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d601a0>
+model = 'gpt-5.6-sol'
+claims = {'disclosure_permit': {'attempt_id': 'reused-synthetic-attempt', 'used': True}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__ test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d61780>
+model = 'gpt-5.6-luna'
+claims = {'disclosure_permit': {'attempt_id': 'reused-synthetic-attempt', 'used': True}}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+___ test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-sol] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d61b70>
+model = 'gpt-5.6-sol', claims = {'disclosure_permit': 'malformed'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__ test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-luna] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d134d0>
+model = 'gpt-5.6-luna', claims = {'disclosure_permit': 'malformed'}
+
+    @pytest.mark.parametrize("model", ["gpt-5.6-sol", "gpt-5.6-luna"])
+    @pytest.mark.parametrize(
+        "claims",
+        [
+            {},
+            {"data_class": "PUBLIC"},
+            {"data_class": "INTERNAL"},
+            {"data_class": "SECRET"},
+            {"data_class": "unknown"},
+            {"data_class": None},
+            {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+            {"tool_results": [{"output": "synthetic-excluded-sentinel"}]},
+            {"workspace": "/synthetic/excluded", "file_url": "file:///synthetic/excluded"},
+            {"history": [{"content": "synthetic-excluded-sentinel"}]},
+            {"disclosure_permit": {"status": "ACTIVE", "signature": "synthetic-forgery"}},
+            {"disclosure_permit": {"status": "REVOKED"}},
+            {"disclosure_permit": {"expires_at": "2000-01-01T00:00:00Z"}},
+            {"disclosure_permit": {"payload_sha256": "0" * 64, "route": "unrelated"}},
+            {"disclosure_permit": {"attempt_id": "reused-synthetic-attempt", "used": True}},
+            {"disclosure_permit": "malformed"},
+        ],
+    )
+    def test_untrusted_payload_claims_cannot_enable_egress(monkeypatch, model, claims):
+        # Removing the handler guard or trusting any worker claim causes an actual mock-upstream call.
+        broker, forwarded = _denial_broker(monkeypatch, model)
+        payload = {"model": model, "input": "synthetic-excluded-sentinel", **claims}
+        body = json.dumps(payload).encode()
+        with broker:
+            status, response = _post(broker, body)
+>           assert status == 403
+E           assert 200 == 403
+
+tests/runtime/test_responses_broker_disclosure_denial.py:73: AssertionError
+__________ test_concurrent_repeated_denials_never_reserve_or_forward ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d60590>
+
+    def test_concurrent_repeated_denials_never_reserve_or_forward(monkeypatch):
+        broker, forwarded = _denial_broker(monkeypatch, "gpt-5.6-sol")
+        body = b'{"model":"gpt-5.6-sol","attempt_id":"same-synthetic-attempt"}'
+        with broker, ThreadPoolExecutor(max_workers=4) as pool:
+            futures = [pool.submit(_post, broker, body) for _ in range(8)]
+>           assert [future.result(timeout=5)[0] for future in futures] == [403] * 8
+E           assert [200, 200, 20...200, 200, ...] == [403, 403, 40...403, 403, ...]
+E             
+E             At index 0 diff: 200 != 403
+E             Use -v to get more diff
+
+tests/runtime/test_responses_broker_disclosure_denial.py:92: AssertionError
+_____________ test_direct_forwarding_cannot_bypass_authority_guard _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107d61d30>
+
+    def test_direct_forwarding_cannot_bypass_authority_guard(monkeypatch):
+        connections = []
+    
+        def forbidden_connection(*args, **kwargs):
+            connections.append((args, kwargs))
+            raise RuntimeError("network-constructor-reached")
+    
+        monkeypatch.setattr(module.http.client, "HTTPSConnection", forbidden_connection)
+        with pytest.raises(RuntimeError):
+            module.ParentOwnedResponsesBroker._forward_to_chatgpt(
+                b'{"model":"gpt-5.6-sol","input":"synthetic"}',
+                "synthetic-token",
+                "synthetic-account",
+            )
+>       assert connections == []
+E       AssertionError: assert [(('chatgpt.c...meout': 300})] == []
+E         
+E         Left contains one more item: (('chatgpt.com', 443), {'timeout': 300})
+E         Use -v to get more diff
+
+tests/runtime/test_responses_broker_disclosure_denial.py:114: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_concurrent_repeated_denials_never_reserve_or_forward
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_direct_forwarding_cannot_bypass_authority_guard
+34 failed, 202 passed in 23.01s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "ops": "ops/__init__.py", "ops.trusted_codex_worker_supervisor": "ops/trusted_codex_worker_supervisor.py", "ops.verify_builder_transport_ready": "ops/verify_builder_transport_ready.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.disclosure_policy": "paeos/model_router/disclosure_policy.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py", "runtime": "runtime/__init__.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.task_package": "runtime/task_package.py"}

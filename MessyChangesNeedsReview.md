@@ -5516,3 +5516,7 @@ No source or tests changed. The proposed terminal parser would confuse Cline `ru
 ### 2026-10-18 — read-only response identity trace
 
 Evidence-only package: concurrency binds raw request/response bytes, while exact upstream model identity remains NOT_ESTABLISHED. The endpoint is officially documented for ChatGPT gateway proxying; its exact identity schema was not found in the inspected applicable sources. Canonical findings and wake conditions are in the notebook, with hashes under `reviews/tasks/PAEOS_RESPONSE_IDENTITY_TRACE_20261018/`. No source/test change, test rerun, provider call, formal review or activation.
+
+### 2026-10-18 — single-broker default-deny candidate
+
+Three scoped source/test files add an always-denying guard in the request handler and direct forwarding helper, with no production enable bypass. Trusted positive disclosure authority remains absent. Baseline34 failures/202 passes became236 focused passes; lint/format/compile passed. Existing receipt-only tests explicitly bypass the guard in test code and do not establish disclosure eligibility. Raw evidence is preserved under `reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/`. No fresh formal review or activation; P1 remains open and the last full-suite measurement still has seven collection errors.

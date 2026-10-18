@@ -3,7 +3,8 @@
 The worker receives only an ephemeral local bearer capability. Long-lived ChatGPT OAuth state is
 read and used by this parent-owned broker, never copied into the worker filesystem or environment.
 The broker exposes one fixed model and one endpoint, records hashes rather than payloads, and
-becomes unreachable when the task ends.
+becomes unreachable when the task ends. Egress is disabled until trusted disclosure authority
+is integrated; a local bearer or a signed launch request is not disclosure permission.
 """
 
 from __future__ import annotations
@@ -64,6 +65,20 @@ Upstream = Callable[[bytes, str, str], BrokerReply]
 
 def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+class DisclosureAuthorityUnavailable(RuntimeError):
+    """The broker has no trusted current disclosure authorization path."""
+
+
+def _require_disclosure_authority() -> None:
+    """Deny until enrollment, currentness, payload/route binding and attempts are enforced.
+
+    The dormant policy verifier proves only a signature. No worker field, callback,
+    flag or transport credential can supply the missing authority. This intentionally
+    has no allow path; a future consumer requires a separately reviewed integration.
+    """
+    raise DisclosureAuthorityUnavailable("trusted disclosure authority is unavailable")
 
 
 class ParentOwnedResponsesBroker:
@@ -206,6 +221,14 @@ class ParentOwnedResponsesBroker:
                 if not isinstance(request, dict) or request.get("model") != broker._model_id:
                     self._send(403, b'{"error":{"type":"model_not_authorized"}}')
                     return
+                try:
+                    _require_disclosure_authority()
+                except DisclosureAuthorityUnavailable:
+                    with broker._lock:
+                        broker._local_rejection_count += 1
+                        broker._local_error_class = "disclosure_authority_unavailable"
+                    self._send(403, b'{"error":{"type":"disclosure_authority_unavailable"}}')
+                    return
                 with broker._lock:
                     if broker._request_count >= broker._max_requests:
                         broker._local_rejection_count += 1
@@ -262,6 +285,8 @@ class ParentOwnedResponsesBroker:
 
     @staticmethod
     def _forward_to_chatgpt(body: bytes, access_token: str, account_id: str) -> BrokerReply:
+        # The network owner must also reject direct calls that bypass the HTTP handler.
+        _require_disclosure_authority()
         headers = {
             "Authorization": f"Bearer {access_token}",
             "ChatGPT-Account-Id": account_id,

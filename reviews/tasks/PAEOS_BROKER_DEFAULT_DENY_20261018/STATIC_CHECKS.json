@@ -1,0 +1,39 @@
+[
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "tests/runtime/test_responses_broker_request_limit.py",
+      "tests/runtime/test_responses_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "tests/runtime/test_responses_broker_request_limit.py",
+      "tests/runtime/test_responses_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "4 files already formatted\n",
+    "stderr": ""
+  },
+  {
+    "check": "compile source without bytecode write",
+    "files": [
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "tests/runtime/test_responses_broker_request_limit.py",
+      "tests/runtime/test_responses_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0
+  }
+]
