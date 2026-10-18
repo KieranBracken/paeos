@@ -1,0 +1,142 @@
+{
+  "schema": "paeos.sanitized-recovery-manifest/1",
+  "base": "b104b0ce9640dc264420ad70c0556bc5daae3ad3",
+  "scope": "One parent provider-handoff denial candidate; not review/qualification acceptance",
+  "files": [
+    {
+      "path": "runtime/integrations/provider_broker.py",
+      "bytes": 30140,
+      "sha256": "c797ee91b4d726e9d61aa6789ba1201a2f27373c8b63536e7f2d55c98658f192"
+    },
+    {
+      "path": "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "bytes": 7171,
+      "sha256": "3fa0cf9e91f811ed3a37ca379474ac2b1da3c492c84de168de6801c3e64f0679"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1470281,
+      "sha256": "cc87d7c559570b9a9b52bc3223caec93c4bcc88f30680c951a8de7f159440235"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 657357,
+      "sha256": "9fed2d58828a4e7784e24a634229a67241656baf4caabc206ba1c8f02bf6832d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/SCOPE.json",
+      "bytes": 1785,
+      "sha256": "0a8ff90674d387650b429bd043905b02dcf3a6a06b4dcd279c4f72d8b924ea11"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/STATIC_CHECKS.json",
+      "bytes": 1411,
+      "sha256": "b0f4121dd2a39983516db9be6226eaef2449d48f6593a8076467816f7139b05d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/STATIC_INITIAL.json",
+      "bytes": 2981,
+      "sha256": "659da453dc4f000af1eb543f7d08752e4a53e61bd9f498b0da62ac8e32d576c9"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/VERIFICATION.json",
+      "bytes": 1874,
+      "sha256": "221e5073780186babfc666af626dbbf6a13c9270fb81c4b5c05489607d5a9cad"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/baseline-consumer-red.command.json",
+      "bytes": 3877,
+      "sha256": "8f9adc075417fdde0b6b09adaf566bd71508774dfcc7622a51d759dea967dfe0"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/baseline-consumer-red.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/baseline-consumer-red.stdout.txt",
+      "bytes": 91677,
+      "sha256": "aee38c6afddbc97086def95e5712a6e7fda0b3d60da251c89f4fc2bfa09be1e7"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/baseline-red.command.json",
+      "bytes": 3712,
+      "sha256": "1beecd0ecfffc7aa2654862c769f145354db7a680dd8e2f7c6e30f5e685615a7"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/baseline-red.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/baseline-red.stdout.txt",
+      "bytes": 86605,
+      "sha256": "f1ec3e7503d519ce4c98721be044cff21e9bd829d46b95dd0c65c934d918c264"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/focused-green.command.json",
+      "bytes": 3877,
+      "sha256": "d78e765e8264b6b98d6473af761e34f5b53f73a220c726731245165b840d75a1"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/focused-green.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/focused-green.stdout.txt",
+      "bytes": 1570,
+      "sha256": "c9de57f3820b5f78a365e2fb0bc3d1e1a87e74af03469bdc8c730ef4b443e3e1"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/prior-inventory/INVENTORY.json",
+      "bytes": 12239,
+      "sha256": "a0b1b857abc30079b2c8ad114aefd43cc192f34c6748f9a79dea4d3f3c89626d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/prior-inventory/MANIFEST.json",
+      "bytes": 644,
+      "sha256": "74ad3d45887aaa7c5a269730a6fa53b0a2bf3eea2fe8ae9635cc655880a695cf"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/prior-inventory/SOURCE_HASHES.json",
+      "bytes": 31485,
+      "sha256": "22b88f0b19c1fa371f07bdefa269322871dd98f4f100375a3079627623e7a07a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/prior-inventory/TEST_HASHES.json",
+      "bytes": 4559,
+      "sha256": "2e5e2976e5e7f8e66a565736e9515f5208223777e2a80b765c102bc60745ecd6"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py",
+      "bytes": 4251,
+      "sha256": "c06b22089cc2c6f0fb34b6738aed431670ef8e11ceae42709f1be60ec7f1fe11"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/verified-final.command.json",
+      "bytes": 3877,
+      "sha256": "0f3fdc82441b9d7ab15961000d45ee672cc6e49f0576755e3ffee59cbeccc377"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/verified-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/verified-final.stdout.txt",
+      "bytes": 1570,
+      "sha256": "3900a0ca04bc31c8a14c3c9478a99b844abc3554943ddf64d592ae4b88eaaa35"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/SECRET_SCAN.json",
+      "bytes": 2627,
+      "sha256": "fe27d7e4b785f39f6084a23716d6f991e25321ddc7444d839311f53e78925eca"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/STAGED_DIFF_CHECK.json",
+      "bytes": 26278,
+      "sha256": "b1ea7b3e50e50dc9ec711fd656ed0e35b944c586d04be35e12081f1aba4284d4"
+    }
+  ]
+}

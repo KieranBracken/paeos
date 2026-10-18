@@ -1,0 +1,241 @@
+{
+  "schema": "paeos.readonly-inference-egress-inventory/1",
+  "event_id": "readonly-egress-inventory-b104b0ce-v1",
+  "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "observed_head": "b104b0ce9640dc264420ad70c0556bc5daae3ad3",
+  "method": "Filesystem-only source inspection; no source import, process launch, test execution, provider/network call, host credential or runtime-state inspection. Native chat APIs only for coordination.",
+  "scope": [
+    "paeos/",
+    "runtime/",
+    "ops/",
+    "kernel/"
+  ],
+  "source_hash_file": "SOURCE_HASHES.json",
+  "source_file_count": 203,
+  "test_hash_file": "TEST_HASHES.json",
+  "dependent_test_file_count": 27,
+  "source_binding_limit": "HEAD ref and exact worktree bytes were read. Previous fresh remote readback is sparse: provider_transports.py matches, other 202 source files were absent from that readback. No new complete Git tree or remote verification was performed.",
+  "routes": [
+    {
+      "id": "builtin-router",
+      "kind": "guarded_direct_http",
+      "chain": [
+        "paeos/model_router/server.py:185",
+        "paeos/model_router/router.py:51,150",
+        "paeos/model_router/transport.py:58",
+        "paeos/model_router/provider_transports.py:142,182,237,256"
+      ],
+      "exposure": "Task messages, tools, tool choice and model parameters; server accepts caller data_class at148 and unknown maps INTERNAL at152.",
+      "guard": "Both built-in dispatch methods deny before wire; direct lazy LiteLLM loader also denies at59. Five provider bindings. Outer selection/credential reads can precede denial.",
+      "tests": [
+        "tests/model_router/test_provider_transports.py",
+        "tests/model_router/test_gateway_server.py",
+        "tests/model_router/test_auditor_receipt.py",
+        "tests/model_router/test_routing_policy.py",
+        "tests/model_router/test_a08_integration.py"
+      ]
+    },
+    {
+      "id": "trusted-builder-planner",
+      "kind": "signed_queue_and_confined_subprocess",
+      "chain": [
+        "runtime/integrations/trusted_codex_transport.py:250,271,281",
+        "runtime/integrations/trusted_codex_planner_transport.py:36,49",
+        "ops/trusted_codex_worker_supervisor.py:915,924,942",
+        "runtime/integrations/task_scoped_responses_broker.py"
+      ],
+      "exposure": "Builder/Planner prompts signed before trusted disclosure authority; supervisor forms fixed Codex broker invocation.",
+      "guard": "Responses broker forwarding default-denied downstream; pre-signing trusted classification and legitimate positive path remain absent.",
+      "tests": [
+        "tests/runtime/test_trusted_codex_client.py",
+        "tests/runtime/test_trusted_codex_worker_transport.py",
+        "tests/runtime/test_responses_broker_disclosure_denial.py"
+      ]
+    },
+    {
+      "id": "claude-cli",
+      "kind": "production_subprocess",
+      "chain": [
+        "ops/autonomous_run.py:858",
+        "runtime/integrations/__init__.py:300,243,267,136"
+      ],
+      "exposure": "Prompt argv plus approved Read/Write/Edit and conditional Bash/MCP; inherited runtime/workspace capability is not classification authority.",
+      "guard": "Recent adapter/broker deny guards do not cover CLI-owned egress.",
+      "tests": [
+        "tests/runtime/test_live_adapter.py"
+      ]
+    },
+    {
+      "id": "glm-cline-cli",
+      "kind": "production_subprocess",
+      "chain": [
+        "ops/autonomous_run.py:829,836",
+        "runtime/integrations/hybrid.py:653,680,390,429,79"
+      ],
+      "exposure": "Noncritic task prompt, workspace and tool capabilities.",
+      "guard": "Recent guards do not cover Cline CLI egress.",
+      "tests": [
+        "tests/runtime/test_glm_cline_invoker.py"
+      ]
+    },
+    {
+      "id": "cline-sdk",
+      "kind": "production_subprocess_and_direct_fetch",
+      "chain": [
+        "runtime/integrations/cline_sdk.py:250",
+        "runtime/integrations/bound_cline_transport.py:945",
+        "runtime/integrations/cline_sdk_host.mjs:247,361,368,420,428,455"
+      ],
+      "exposure": "Prompt, provider/model, parent tool results and workspace-derived content enter SDK; fetch is actual network owner.",
+      "guard": "Tool mediation and profiles do not prove trusted disclosure. Recent guards do not cover this network owner.",
+      "tests": [
+        "tests/runtime/test_cline_sdk_adapter.py",
+        "tests/runtime/test_cline_sdk_adversarial.py",
+        "tests/runtime/test_cline_sdk_mutations.py",
+        "tests/runtime/test_cline_sdk_protocol.py",
+        "tests/runtime/test_cline_sdk_qualification.py",
+        "tests/runtime/test_bound_cline_transport.py",
+        "tests/runtime/test_bound_cline_transport_policy.py",
+        "tests/runtime/test_bound_cline_transport_persistence.py",
+        "tests/ops/test_bound_cline_worker.py"
+      ],
+      "ownership": "Bound-worker/SDK/custody edits require exact Chat 1 scope reconciliation before write; no such edits proposed."
+    },
+    {
+      "id": "parent-provider-broker",
+      "kind": "production_queue_handoff_plus_callable_client",
+      "chain": [
+        "runtime/integrations/hybrid.py:731",
+        "runtime/integrations/provider_broker.py:301,305,316,329,352",
+        "runtime/integrations/provider_broker.py:511,526,530,533,558"
+      ],
+      "exposure": "Critic prompt is issued/redeemed/signed/queued. Callable HostConfinedProviderClient labels arbitrary accepted prompt PUBLIC then signs/queues. No in-scope production constructor for HostConfinedProviderClient found.",
+      "guard": "No trusted disclosure guard before these effects. Queue publication is source-reachable; remote execution/receipts were not observed.",
+      "tests": [],
+      "test_gap": "No candidate test directly referencing provider_broker, HostClineCriticTransport or HostConfinedProviderClient found."
+    },
+    {
+      "id": "gemini-parent",
+      "kind": "production_ipc_handoff",
+      "chain": [
+        "ops/autonomous_run.py:322,323,576,577,794,796",
+        "runtime/integrations/gemini36_critic_route.py:552,579",
+        "runtime/integrations/gemini36_adversary_route.py:262,306"
+      ],
+      "exposure": "Canonical critic request via Unix socket; adversary prompt via queue.",
+      "guard": "Independent overridden handoffs not closed by guarding the base class run alone. No remote receiver observed.",
+      "tests": [],
+      "test_gap": "No dedicated candidate Gemini parent-route test found."
+    },
+    {
+      "id": "legacy-codex-cline",
+      "kind": "callable_legacy_or_diagnostic_subprocess",
+      "chain": [
+        "runtime/integrations/hybrid.py:246,294",
+        "runtime/integrations/cline_worker.py:471,485,488,540"
+      ],
+      "exposure": "Direct Codex prompt and Cline diagnostic task.",
+      "guard": "Production CodexRuntime does not choose legacy codex invoker. Normal Cline run_probe refuses before launch; diagnostic method remains callable.",
+      "tests": [
+        "tests/runtime/test_cline_worker_transport.py"
+      ]
+    },
+    {
+      "id": "antigravity-sdk",
+      "kind": "callable_subprocess_not_selected_by_autonomous_entrypoint",
+      "chain": [
+        "runtime/integrations/antigravity.py:71,91,105",
+        "ops/autonomous_run.py:843,851"
+      ],
+      "exposure": "Generated bootstrap grants policy.allow_all and calls agent.chat with task.",
+      "guard": "Autonomous antigravity selection uses ChatBridge instead. No recent guard on callable SDK class.",
+      "tests": [],
+      "test_gap": "No dedicated candidate Antigravity test found."
+    },
+    {
+      "id": "chat-ui-handoff",
+      "kind": "file_or_ui_handoff",
+      "chain": [
+        "runtime/integrations/chat_bridge.py:181,213",
+        "ops/chatgpt_bridge/upload_evidence.py:27,71",
+        "ops/codex_auth_relay.py:56,74,83,98"
+      ],
+      "exposure": "ChatBridge writes objective/session/workspace for external consumption; UI helper can submit text. Relay sends authorization-shaped text which is not human authority.",
+      "guard": "Upload main does not call submit; files_to_attach unused. UI receiver/execution not inspected.",
+      "tests": [
+        "tests/runtime/test_chat_bridge_fail_closed.py"
+      ]
+    }
+  ],
+  "extensions": {
+    "sites": [
+      "paeos/model_router/provider_transports.py:363,368,377",
+      "paeos/model_router/transport.py:36",
+      "paeos/model_router/router.py:44"
+    ],
+    "result": "No custom production ProviderTransport registration/bind caller found in four source directories; built-in factory only. Custom injection remains extension point, not demonstrated deployment. Gemini register_candidate is route metadata."
+  },
+  "generic_execution": {
+    "sites": [
+      "kernel/evidence.py:174",
+      "kernel/sandbox.py:272",
+      "kernel/sandbox_backend.py:1253",
+      "runtime/court/__init__.py:53,96",
+      "runtime/transports/mcp/court_server.py:112",
+      "runtime/verification.py:150,171",
+      "runtime/integrations/bound_cline_transport.py:560"
+    ],
+    "qualification": "Command execution primitives, not independently proven inference clients. Basic sandbox lacks OS network isolation; backend enforcement depends on negotiated profile. Do not infer zero egress from shell=False.",
+    "tests": [
+      "tests/kernel/test_evidence.py",
+      "tests/kernel/test_sandbox.py",
+      "tests/kernel/test_sandbox_confinement.py"
+    ]
+  },
+  "ownership_evidence": {
+    "reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/scope.json": {
+      "sha256": "88912b96dc0c9b4bdc59016befc1afd421291da3e049fc563bc6351732da5207",
+      "write_files": [
+        "runtime/scope_supersession.py",
+        "tests/runtime/test_scope_supersession.py"
+      ]
+    },
+    "reviews/tasks/PAEOS_DEBT0258_PENDING_API_PAUSED_20261015_0d3149bd/scope.json": {
+      "sha256": "090cff4b1a22bb231abac87d2dad8e504843801b42d8cc092d00e18421537726",
+      "write_files": [
+        "runtime/scope_supersession.py",
+        "tests/runtime/test_scope_supersession.py"
+      ]
+    }
+  },
+  "next_scope": {
+    "owner_title": "Assign PAEOS pre-P3 workers",
+    "owner_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "source": [
+      "runtime/integrations/provider_broker.py"
+    ],
+    "tests_add": [
+      "tests/runtime/test_provider_broker_disclosure_denial.py"
+    ],
+    "source_preimage_sha256": "206e3ca94b4bc1b7a76edee6d9bb727efe00b4159fed1a5970a4b037cf8c907a",
+    "objective": "Content-free unconditional denial at HostClineCriticTransport.run and HostConfinedProviderClient._capability/request before capability issue/redemption/signing and queue effects. No positive permit, worker label, callback or enable switch.",
+    "verification": "Synthetic direct and public-entry tests prove zero signer/issuer/redeemer/queue/downstream calls and no sensitive prompt echo. Freeze test preimage as absent. Preserve unrelated receipt/response semantics. Run offline focused checks only under separate bounded assignment.",
+    "ownership": "The two inspected D0258 historical write scopes own scope_supersession.py and its tests, not provider_broker.py. Current user keeps Chat 1 exclusive D0258 integration; no debt/custody API changes proposed. No claim this historical check proves every current lease.",
+    "status": "PROPOSED_NEXT_BOUNDED_OFFLINE_PACKAGE; not implemented by inventory"
+  },
+  "gates": {
+    "ALLOWED_NOW": "Bootstrap owner may return this static inventory and scope for the next bounded offline repair under the approved E0-E3 exception.",
+    "HELD": "Install, qualification, provider dispatch, PAEOS admission, positive egress and D0258 integration remain held; wake only with exact policy/review/authority/qualification/admission evidence.",
+    "AUTHORITY_OR_IMPLEMENTATION_GAP": "Trusted positive disclosure authority still absent; CLI/SDK/IPC/UI paths remain. Parent broker denial is one containment package, not P1 closure."
+  },
+  "verification": {
+    "tests_run": 0,
+    "formal_review": false,
+    "new_commit": false,
+    "pushed": false,
+    "repository_edits": false,
+    "source_execution": false,
+    "network": false,
+    "historical_full_suite": "Latest recorded full suite: 7 collection errors. Historical 22-error evidence preserved. Neither rerun in this inventory."
+  }
+}

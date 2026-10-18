@@ -1,0 +1,22 @@
+{
+  "schema": "paeos.inventory-evidence-manifest/1",
+  "event_id": "readonly-egress-inventory-b104b0ce-v1",
+  "observed_head": "b104b0ce9640dc264420ad70c0556bc5daae3ad3",
+  "files": [
+    {
+      "path": "INVENTORY.json",
+      "bytes": 12239,
+      "sha256": "a0b1b857abc30079b2c8ad114aefd43cc192f34c6748f9a79dea4d3f3c89626d"
+    },
+    {
+      "path": "SOURCE_HASHES.json",
+      "bytes": 31485,
+      "sha256": "22b88f0b19c1fa371f07bdefa269322871dd98f4f100375a3079627623e7a07a"
+    },
+    {
+      "path": "TEST_HASHES.json",
+      "bytes": 4559,
+      "sha256": "2e5e2976e5e7f8e66a565736e9515f5208223777e2a80b765c102bc60745ecd6"
+    }
+  ]
+}

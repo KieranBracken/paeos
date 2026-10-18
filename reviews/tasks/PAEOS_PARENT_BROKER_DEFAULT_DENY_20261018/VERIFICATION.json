@@ -1,0 +1,22 @@
+{
+  "base": "b104b0ce9640dc264420ad70c0556bc5daae3ad3",
+  "baseline": "22 failed,21 passed in0.24s; first forbidden effects reached.",
+  "expanded_baseline": "23 failed,24 passed in0.30s including consumer; failed output preserved.",
+  "focused_green": "47 passed in0.13s",
+  "verified_final": "47 passed in0.14s after test import sorting/formatting",
+  "os_network_denial_control": "PASS (synthetic loopback bind denied)",
+  "candidate_import_origins": "Required provider_broker, hybrid and kernel.keystore origins verified inside candidate; all imported local modules fenced. LiteLLM not imported.",
+  "synthetic_identity": "Consumer regression creates only a fixed synthetic in-memory signing key; no host identity/credential/ledger access.",
+  "static_checks": "lint, formatting, in-memory compilation and source diff checks pass",
+  "source_effect": "Three pre-effect guards in one source file; no positive allow path. Existing ProviderBrokerError preserves structured critic FAILED result without fallback.",
+  "remaining": "Independent Gemini overrides, CLI/SDK/UI paths, trusted positive disclosure, producer authentication and observed model identity remain; P1 not closed.",
+  "review_original_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+  "formal_review": false,
+  "full_suite": "Not rerun; last measured7 collection errors; historical22-error record retained.",
+  "forbidden_effects_performed": [],
+  "artifact_test_hashes": {
+    "runtime/integrations/provider_broker.py": "c797ee91b4d726e9d61aa6789ba1201a2f27373c8b63536e7f2d55c98658f192",
+    "tests/runtime/test_provider_broker_disclosure_denial.py": "3fa0cf9e91f811ed3a37ca379474ac2b1da3c492c84de168de6801c3e64f0679",
+    "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py": "c06b22089cc2c6f0fb34b6738aed431670ef8e11ceae42709f1be60ec7f1fe11"
+  }
+}

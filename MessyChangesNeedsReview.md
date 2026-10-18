@@ -5524,3 +5524,7 @@ Three scoped source/test files add an always-denying guard in the request handle
 ### 2026-10-18 — built-in adapter default-deny candidate
 
 One production file and two test files implement local denial across both built-in adapter classes and the shared cached/uncached LiteLLM loader. All five built-in bindings are covered; custom policy is unchanged. Baseline36fail/36pass became72pass; OS network-denial control, source origins, lint/format/compile pass. Lower-wire/fingerprint tests explicitly isolate the gate and do not claim permitted egress. Raw evidence is in `reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/`. P1 remains open; no formal review/activation or full-suite pass is claimed.
+
+### 2026-10-18 — parent broker default-deny checkpoint
+
+Offline candidate only: `provider_broker.py` refuses critic run and provider capability/request before signing or queue effects. New focused denial/consumer tests plus existing adapter/hybrid regressions: final47 passed, OS network denial and candidate imports verified. Prior red logs and static inventory preserved in `reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/`. No formal review/activation/qualification. P1 stays open across other paths; original findings unchanged. Chat1 D0258 ownership retained.

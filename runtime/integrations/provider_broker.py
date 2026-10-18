@@ -1,7 +1,7 @@
 """Client for the trusted host-side provider worker supervisor.
 
-The client is deliberately not a launcher. It can request only one bounded PUBLIC provider
-operation from the installed host service. The service, not this caller, constructs the child
+The client is deliberately not a launcher. Its parent handoffs are disabled until trusted
+disclosure authority is integrated. The installed service, not this caller, constructs the child
 environment, filesystem policy, process argv, and Seatbelt profile.
 """
 
@@ -300,6 +300,7 @@ class HostClineCriticTransport:
 
     def run(self, spec: Any) -> Any:
         """Dispatch one signed task-bound request through the trusted parent queue."""
+        _require_disclosure_authority()
         if spec.stage != "CRITIQUE":
             raise ProviderBrokerError("critic capability stage is not CRITIQUE")
         capability = self.issue_task_capability(
@@ -428,6 +429,11 @@ class ProviderBrokerError(RuntimeError):
     """A provider boundary violation or unavailable trusted service."""
 
 
+def _require_disclosure_authority() -> None:
+    """Deny locally until a reviewed trusted disclosure consumer exists."""
+    raise ProviderBrokerError("trusted disclosure authority is unavailable")
+
+
 @dataclass(frozen=True, slots=True)
 class ConfinedProviderObservation:
     provider_id: str
@@ -509,6 +515,7 @@ class HostConfinedProviderClient:
         return self._signing_key
 
     def _capability(self, prompt: str) -> dict[str, object]:
+        _require_disclosure_authority()
         if not isinstance(prompt, str) or not prompt.strip():
             raise ProviderBrokerError("provider prompt is empty")
         if len(prompt.encode("utf-8")) > _MAX_PROMPT_BYTES or "\x00" in prompt:
@@ -531,6 +538,7 @@ class HostConfinedProviderClient:
         return {**payload, "signature": signature}
 
     def request(self, prompt: str) -> ConfinedProviderObservation:
+        _require_disclosure_authority()
         capability = self._capability(prompt)
         frame = (_canonical_bytes(capability)).decode("utf-8")
         if len(frame.encode("utf-8")) > _MAX_FRAME_BYTES:

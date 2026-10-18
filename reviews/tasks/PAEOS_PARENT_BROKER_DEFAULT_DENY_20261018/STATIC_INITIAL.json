@@ -1,0 +1,50 @@
+[
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 1,
+    "stdout": "I001 [*] Import block is un-sorted or un-formatted\n  --> tests/runtime/test_provider_broker_disclosure_denial.py:3:1\n   |\n 1 |   \"\"\"Parent handoffs must deny before signing or publishing unclassified data.\"\"\"\n 2 |\n 3 | / from __future__ import annotations\n 4 | |\n 5 | | import json\n 6 | | from pathlib import Path\n 7 | | from types import SimpleNamespace\n 8 | |\n 9 | | import pytest\n10 | |\n11 | | from runtime.integrations import provider_broker as broker\n   | |__________________________________________________________^\n   |\nhelp: Organize imports\n\nI001 [*] Import block is un-sorted or un-formatted\n  --> tests/runtime/test_provider_broker_disclosure_denial.py:85:5\n   |\n83 |   def test_real_critic_consumer_reports_denial_without_fallback(tmp_path, monkeypatch):\n84 |       \"\"\"Repeated local denial cannot become success, evidence or a legacy CLI attempt.\"\"\"\n85 | /     from kernel.capability import CapabilityBroker\n86 | |     from kernel.types import Role, StageId\n87 | |     from nacl.signing import SigningKey\n88 | |\n89 | |     from runtime.integrations import hybrid\n90 | |     from runtime.task_package import Budget, Permissions, TaskPackage, TaskStatus\n   | |_________________________________________________________________________________^\n91 |\n92 |       # Fixed synthetic identity in memory only; no host key loader or ledger is involved.\n   |\nhelp: Organize imports\n\nFound 2 errors.\n[*] 2 fixable with the `--fix` option.\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 1,
+    "stdout": "Would reformat: tests/runtime/test_provider_broker_disclosure_denial.py\n1 file would be reformatted, 2 files already formatted\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check",
+      "--",
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "check": "in-memory compilation without bytecode",
+    "files": [
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0
+  }
+]

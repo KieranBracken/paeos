@@ -1,0 +1,1542 @@
+NETWORK_DENIAL_CONTROL=PASS
+FFFFFFFFFFFFFFFFFFFFFF.....................                              [100%]
+=================================== FAILURES ===================================
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-PUBLIC-critic] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103dd8e90>
+capsys = <_pytest.capture.CaptureFixture object at 0x1039e5be0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103b3e510>
+entry = 'critic', claimed_class = 'PUBLIC', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:59: in <lambda>
+    invoke = lambda: client.run(spec)
+                     ^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:305: in run
+    capability = self.issue_task_capability(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ()
+kwargs = {'task_id': 'synthetic-task', 'role': <Role.CRITIC: 'CRITIC'>, 'operation': 'critic'}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: issue
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-PUBLIC-capability] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103a3c710>
+capsys = <_pytest.capture.CaptureFixture object at 0x103d25bd0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103d25d10>
+entry = 'capability', claimed_class = 'PUBLIC', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^
+runtime/integrations/provider_broker.py:508: in _key
+    self._signing_key = load_or_create_signing_key()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (), kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: key-load
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-PUBLIC-request] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103d9c5a0>
+capsys = <_pytest.capture.CaptureFixture object at 0x103d25e50>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103d26490>
+entry = 'request', claimed_class = 'PUBLIC', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:534: in request
+    capability = self._capability(prompt)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^
+runtime/integrations/provider_broker.py:508: in _key
+    self._signing_key = load_or_create_signing_key()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (), kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: key-load
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-SECRET-critic] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103d52e50>
+capsys = <_pytest.capture.CaptureFixture object at 0x103dda060>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103dda190>
+entry = 'critic', claimed_class = 'SECRET', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:59: in <lambda>
+    invoke = lambda: client.run(spec)
+                     ^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:305: in run
+    capability = self.issue_task_capability(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ()
+kwargs = {'task_id': 'synthetic-task', 'role': <Role.CRITIC: 'CRITIC'>, 'operation': 'critic'}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: issue
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-SECRET-capability] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105281f40>
+capsys = <_pytest.capture.CaptureFixture object at 0x103dda3f0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103dda780>
+entry = 'capability', claimed_class = 'SECRET', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^
+runtime/integrations/provider_broker.py:508: in _key
+    self._signing_key = load_or_create_signing_key()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (), kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: key-load
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-SECRET-request] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103dd7d90>
+capsys = <_pytest.capture.CaptureFixture object at 0x103a3c830>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103a3f9b0>
+entry = 'request', claimed_class = 'SECRET', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:534: in request
+    capability = self._capability(prompt)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^
+runtime/integrations/provider_broker.py:508: in _key
+    self._signing_key = load_or_create_signing_key()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (), kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: key-load
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-unknown-critic] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103dd25d0>
+capsys = <_pytest.capture.CaptureFixture object at 0x103d9d260>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103d9d370>
+entry = 'critic', claimed_class = 'unknown', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:59: in <lambda>
+    invoke = lambda: client.run(spec)
+                     ^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:305: in run
+    capability = self.issue_task_capability(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ()
+kwargs = {'task_id': 'synthetic-task', 'role': <Role.CRITIC: 'CRITIC'>, 'operation': 'critic'}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: issue
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-unknown-capability] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103d63070>
+capsys = <_pytest.capture.CaptureFixture object at 0x103d9d590>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103d9d8c0>
+entry = 'capability', claimed_class = 'unknown', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^
+runtime/integrations/provider_broker.py:508: in _key
+    self._signing_key = load_or_create_signing_key()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (), kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: key-load
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[False-unknown-request] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103d88870>
+capsys = <_pytest.capture.CaptureFixture object at 0x10525c050>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x10525c150>
+entry = 'request', claimed_class = 'unknown', supplied_key = False
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:534: in request
+    capability = self._capability(prompt)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^
+runtime/integrations/provider_broker.py:508: in _key
+    self._signing_key = load_or_create_signing_key()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (), kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: key-load
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-PUBLIC-critic] __
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1052bb650>
+capsys = <_pytest.capture.CaptureFixture object at 0x10525c750>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x10525c850>
+entry = 'critic', claimed_class = 'PUBLIC', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:59: in <lambda>
+    invoke = lambda: client.run(spec)
+                     ^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:305: in run
+    capability = self.issue_task_capability(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ()
+kwargs = {'task_id': 'synthetic-task', 'role': <Role.CRITIC: 'CRITIC'>, 'operation': 'critic'}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: issue
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-PUBLIC-capability] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103e710d0>
+capsys = <_pytest.capture.CaptureFixture object at 0x105283890>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x105283200>
+entry = 'capability', claimed_class = 'PUBLIC', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (b'{"capability_id":"65f12eaa85c040c7a0f1f2efd60b2dc8","data_class":"PUBLIC","expires_at":1792334238.576309,"issued_at...not-forward\\"}]}","provider_id":"openrouter","schema":"paeos.trusted-worker-capability/1","task_class":"ROUTINE"}\n',)
+kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: sign
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-PUBLIC-request] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1052b1320>
+capsys = <_pytest.capture.CaptureFixture object at 0x105282b70>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x105282a80>
+entry = 'request', claimed_class = 'PUBLIC', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:534: in request
+    capability = self._capability(prompt)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (b'{"capability_id":"7aac28322bb54431b8c0477b6d689672","data_class":"PUBLIC","expires_at":1792334238.582845,"issued_at...not-forward\\"}]}","provider_id":"openrouter","schema":"paeos.trusted-worker-capability/1","task_class":"ROUTINE"}\n',)
+kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: sign
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-SECRET-critic] __
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_12')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1052b2270>
+capsys = <_pytest.capture.CaptureFixture object at 0x105240c90>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x1052412b0>
+entry = 'critic', claimed_class = 'SECRET', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:59: in <lambda>
+    invoke = lambda: client.run(spec)
+                     ^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:305: in run
+    capability = self.issue_task_capability(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ()
+kwargs = {'task_id': 'synthetic-task', 'role': <Role.CRITIC: 'CRITIC'>, 'operation': 'critic'}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: issue
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-SECRET-capability] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_13')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1052b3150>
+capsys = <_pytest.capture.CaptureFixture object at 0x1052404b0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103dd6f90>
+entry = 'capability', claimed_class = 'SECRET', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (b'{"capability_id":"88901c6523bd48b0b5cc91c9ce88d905","data_class":"PUBLIC","expires_at":1792334238.596415,"issued_at...not-forward\\"}]}","provider_id":"openrouter","schema":"paeos.trusted-worker-capability/1","task_class":"ROUTINE"}\n',)
+kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: sign
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-SECRET-request] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_14')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103d87bd0>
+capsys = <_pytest.capture.CaptureFixture object at 0x105287e10>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x105287110>
+entry = 'request', claimed_class = 'SECRET', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:534: in request
+    capability = self._capability(prompt)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (b'{"capability_id":"496f8bd2e9604817bc5e86087ce9d277","data_class":"PUBLIC","expires_at":1792334238.602347,"issued_at...not-forward\\"}]}","provider_id":"openrouter","schema":"paeos.trusted-worker-capability/1","task_class":"ROUTINE"}\n',)
+kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: sign
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-unknown-critic] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_15')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1052033f0>
+capsys = <_pytest.capture.CaptureFixture object at 0x103dd2bd0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103dd2510>
+entry = 'critic', claimed_class = 'unknown', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:59: in <lambda>
+    invoke = lambda: client.run(spec)
+                     ^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:305: in run
+    capability = self.issue_task_capability(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ()
+kwargs = {'task_id': 'synthetic-task', 'role': <Role.CRITIC: 'CRITIC'>, 'operation': 'critic'}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: issue
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-unknown-capability] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_16')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105203c40>
+capsys = <_pytest.capture.CaptureFixture object at 0x103dd2990>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x103dd2390>
+entry = 'capability', claimed_class = 'unknown', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (b'{"capability_id":"eb49e582b2204965945baefae5c88b79","data_class":"PUBLIC","expires_at":1792334238.615767,"issued_at...not-forward\\"}]}","provider_id":"openrouter","schema":"paeos.trusted-worker-capability/1","task_class":"ROUTINE"}\n',)
+kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: sign
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+_ test_untrusted_payload_denied_before_signing_or_handoff[True-unknown-request] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_untrusted_payload_denied_17')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105200750>
+capsys = <_pytest.capture.CaptureFixture object at 0x1051f8890>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x1051f87e0>
+entry = 'request', claimed_class = 'unknown', supplied_key = True
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    @pytest.mark.parametrize("claimed_class", ["PUBLIC", "SECRET", "unknown"])
+    @pytest.mark.parametrize("supplied_key", [False, True])
+    def test_untrusted_payload_denied_before_signing_or_handoff(
+        tmp_path, monkeypatch, capsys, caplog, entry, claimed_class, supplied_key
+    ):
+        """Removing any entry guard exposes the first forbidden effect on the baseline."""
+        calls: list[str] = []
+        key = SimpleNamespace(sign=_stop(calls, "sign")) if supplied_key else None
+        queue = tmp_path / "never-created-queue"
+        prompt = json.dumps(
+            {
+                "content": SYNTHETIC_MARKER,
+                "data_class": claimed_class,
+                "classification_authority": "worker-asserted",
+                "disclosure_permit": {"approved": True, "signature": "forged"},
+                "attachments": [{"content": SYNTHETIC_MARKER}],
+                "tool_results": [{"content": SYNTHETIC_MARKER}],
+                "history": [{"content": SYNTHETIC_MARKER}],
+            }
+        )
+        if entry == "critic":
+            client = broker.HostClineCriticTransport(queue_root=queue, request_signing_key=key)
+            spec = SimpleNamespace(
+                task_id="synthetic-task",
+                goal_id="synthetic-goal",
+                run_id="synthetic-run",
+                stage="CRITIQUE",
+                prompt=prompt,
+                data_class=claimed_class,
+            )
+            monkeypatch.setattr(client, "issue_task_capability", _stop(calls, "issue"))
+            monkeypatch.setattr(client, "redeem_task_capability", _stop(calls, "redeem"))
+            monkeypatch.setattr(client, "validate_supervisor_observation", _stop(calls, "receipt"))
+            invoke = lambda: client.run(spec)
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue, signing_key=key)
+            monkeypatch.setattr(client, "_validate_observation", _stop(calls, "receipt"))
+            invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+                prompt
+            )
+        with monkeypatch.context() as boundary:
+            boundary.setattr(broker, "load_or_create_signing_key", _stop(calls, "key-load"))
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            for name in ("open", "write", "replace"):
+                boundary.setattr(broker.os, name, _stop(calls, f"queue-{name}"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority") as denied:
+>               invoke()
+
+tests/runtime/test_provider_broker_disclosure_denial.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/runtime/test_provider_broker_disclosure_denial.py:63: in <lambda>
+    invoke = lambda: getattr(client, "_capability" if entry == "capability" else "request")(
+runtime/integrations/provider_broker.py:534: in request
+    capability = self._capability(prompt)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/provider_broker.py:530: in _capability
+    signature = self._key().sign(_canonical_bytes(payload)).signature.hex()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (b'{"capability_id":"dc6636afd25141e49b356146bfd6f0e2","data_class":"PUBLIC","expires_at":1792334238.622166,"issued_at...not-forward\\"}]}","provider_id":"openrouter","schema":"paeos.trusted-worker-capability/1","task_class":"ROUTINE"}\n',)
+kwargs = {}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: sign
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+______ test_request_denies_even_when_capability_composition_is_overridden ______
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_request_denies_even_when_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105201400>
+
+    def test_request_denies_even_when_capability_composition_is_overridden(tmp_path, monkeypatch):
+        """A subclass/caller cannot bypass the request guard with a prebuilt capability."""
+        calls: list[str] = []
+    
+        class PrebuiltClient(broker.HostConfinedProviderClient):
+            def _capability(self, prompt):
+                calls.append("prebuilt-capability")
+                return {"capability_id": "0" * 32, "data_class": "PUBLIC", "prompt": prompt}
+    
+        queue = tmp_path / "never-created-queue"
+        client = PrebuiltClient(queue_root=queue)
+        with monkeypatch.context() as boundary:
+            boundary.setattr(Path, "mkdir", _stop(calls, "queue-mkdir"))
+            with pytest.raises(broker.ProviderBrokerError, match="disclosure authority"):
+>               client.request(SYNTHETIC_MARKER)
+
+tests/runtime/test_provider_broker_disclosure_denial.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/provider_broker.py:538: in request
+    self._queue_root.mkdir(mode=0o700, parents=True, exist_ok=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_request_denies_even_when_0/never-created-queue'),)
+kwargs = {'mode': 448, 'parents': True, 'exist_ok': True}
+
+    def stopped(*args, **kwargs):
+        calls.append(effect)
+>       raise AssertionError(f"Unexpected boundary effect: {effect}")
+E       AssertionError: Unexpected boundary effect: queue-mkdir
+
+tests/runtime/test_provider_broker_disclosure_denial.py:20: AssertionError
+__________ test_denial_does_not_inspect_an_untrusted_payload[critic] ___________
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_denial_does_not_inspect_a0')
+entry = 'critic'
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    def test_denial_does_not_inspect_an_untrusted_payload(tmp_path, entry):
+        """Reject opaque/malformed input without executing its property/string hooks."""
+    
+        class Opaque:
+            def __getattr__(self, name):
+                raise AssertionError("untrusted property evaluated")
+    
+            def __str__(self):
+                raise AssertionError("untrusted string conversion evaluated")
+    
+        queue = tmp_path / "never-created-queue"
+        if entry == "critic":
+            method = broker.HostClineCriticTransport(queue_root=queue).run
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue)
+            method = client._capability if entry == "capability" else client.request
+        with pytest.raises(broker.ProviderBrokerError, match="disclosure authority"):
+>           method(Opaque())
+
+tests/runtime/test_provider_broker_disclosure_denial.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/provider_broker.py:303: in run
+    if spec.stage != "CRITIQUE":
+       ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.runtime.test_provider_broker_disclosure_denial.test_denial_does_not_inspect_an_untrusted_payload.<locals>.Opaque object at 0x103b3e660>
+name = 'stage'
+
+    def __getattr__(self, name):
+>       raise AssertionError("untrusted property evaluated")
+E       AssertionError: untrusted property evaluated
+
+tests/runtime/test_provider_broker_disclosure_denial.py:108: AssertionError
+________ test_denial_does_not_inspect_an_untrusted_payload[capability] _________
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_denial_does_not_inspect_a1')
+entry = 'capability'
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    def test_denial_does_not_inspect_an_untrusted_payload(tmp_path, entry):
+        """Reject opaque/malformed input without executing its property/string hooks."""
+    
+        class Opaque:
+            def __getattr__(self, name):
+                raise AssertionError("untrusted property evaluated")
+    
+            def __str__(self):
+                raise AssertionError("untrusted string conversion evaluated")
+    
+        queue = tmp_path / "never-created-queue"
+        if entry == "critic":
+            method = broker.HostClineCriticTransport(queue_root=queue).run
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue)
+            method = client._capability if entry == "capability" else client.request
+>       with pytest.raises(broker.ProviderBrokerError, match="disclosure authority"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'disclosure authority'
+E         Actual message: 'provider prompt is empty'
+
+tests/runtime/test_provider_broker_disclosure_denial.py:119: AssertionError
+__________ test_denial_does_not_inspect_an_untrusted_payload[request] __________
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-parent-broker-denial-2igvtckg/pytest/test_denial_does_not_inspect_a2')
+entry = 'request'
+
+    @pytest.mark.parametrize("entry", ["critic", "capability", "request"])
+    def test_denial_does_not_inspect_an_untrusted_payload(tmp_path, entry):
+        """Reject opaque/malformed input without executing its property/string hooks."""
+    
+        class Opaque:
+            def __getattr__(self, name):
+                raise AssertionError("untrusted property evaluated")
+    
+            def __str__(self):
+                raise AssertionError("untrusted string conversion evaluated")
+    
+        queue = tmp_path / "never-created-queue"
+        if entry == "critic":
+            method = broker.HostClineCriticTransport(queue_root=queue).run
+        else:
+            client = broker.HostConfinedProviderClient(queue_root=queue)
+            method = client._capability if entry == "capability" else client.request
+>       with pytest.raises(broker.ProviderBrokerError, match="disclosure authority"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'disclosure authority'
+E         Actual message: 'provider prompt is empty'
+
+tests/runtime/test_provider_broker_disclosure_denial.py:119: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-PUBLIC-critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-PUBLIC-capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-PUBLIC-request]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-SECRET-critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-SECRET-capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-SECRET-request]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-unknown-critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-unknown-capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[False-unknown-request]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-PUBLIC-critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-PUBLIC-capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-PUBLIC-request]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-SECRET-critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-SECRET-capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-SECRET-request]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-unknown-critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-unknown-capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff[True-unknown-request]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_request_denies_even_when_capability_composition_is_overridden
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_denial_does_not_inspect_an_untrusted_payload[critic]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_denial_does_not_inspect_an_untrusted_payload[capability]
+FAILED tests/runtime/test_provider_broker_disclosure_denial.py::test_denial_does_not_inspect_an_untrusted_payload[request]
+22 failed, 21 passed in 0.24s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "runtime": "runtime/__init__.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.review": "runtime/review/__init__.py", "runtime.task_package": "runtime/task_package.py"}

@@ -1,0 +1,38 @@
+{
+  "schema": "paeos.offline-bootstrap-scope/1",
+  "base": "b104b0ce9640dc264420ad70c0556bc5daae3ad3",
+  "authority": "Existing human-approved E0-E3 offline bootstrap exception; epoch2 overseer bounded assignment. No PAEOS admission or runtime authority.",
+  "owner": "Root bootstrap integrator; Chat 1 retains D0258 integration.",
+  "files": [
+    {
+      "path": "runtime/integrations/provider_broker.py",
+      "preimage_sha256": "206e3ca94b4bc1b7a76edee6d9bb727efe00b4159fed1a5970a4b037cf8c907a"
+    },
+    {
+      "path": "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "preimage": "ABSENT"
+    }
+  ],
+  "design": [
+    "Unconditional content-free local ProviderBrokerError at critic run before issue/redeem/sign/queue.",
+    "Separate guards at provider _capability and request so direct signing and overridden capability composition cannot reach publication.",
+    "No positive authority, label, callback or environment switch. Existing observation/receipt code stays intact."
+  ],
+  "verification": [
+    "Synthetic cases only; no signer/loader/issuer/redeemer/queue/downstream effects.",
+    "Payload claims, attachments, tool results, history and forged grants cannot authorize egress.",
+    "Candidate-origin import fence and OS network-denial control."
+  ],
+  "forbidden": [
+    "provider calls",
+    "host keys/credentials/runtime state",
+    "installation",
+    "qualification/admission",
+    "Court/debt integration",
+    "original review changes",
+    "formal review",
+    "D0258 custody/scope_supersession changes"
+  ],
+  "completion": "One parent-handoff containment candidate, not P1 closure. Independent Gemini overrides and CLI/SDK/UI paths remain.",
+  "full_suite": "Do not rerun; last measured seven collection errors; historical22 retained."
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "path": "tests/kernel/test_evidence.py",
+    "bytes": 6326,
+    "sha256": "b8c32724a0e5329c167ece7a86c27b2c97654d28274c1f3dc589705f42113691"
+  },
+  {
+    "path": "tests/kernel/test_sandbox.py",
+    "bytes": 1610,
+    "sha256": "f147c956d2ff22316f2102b69ac6a5c0543c6e6490c4e8b812483c4b618cfb73"
+  },
+  {
+    "path": "tests/kernel/test_sandbox_confinement.py",
+    "bytes": 32674,
+    "sha256": "5795e6614c61fd3065730664d99ed25183c4385c9bf8afb8e74aa051671e54fc"
+  },
+  {
+    "path": "tests/model_router/test_a08_integration.py",
+    "bytes": 13080,
+    "sha256": "4bf42f3d16a24f0ea812054f8c21eb515daced995a246cfed562bfe51dd486dc"
+  },
+  {
+    "path": "tests/model_router/test_auditor_receipt.py",
+    "bytes": 18687,
+    "sha256": "deb1b12f846dc6947e53f50f0fc0e2fac92fdc93b326cc503bf1ba61698d5308"
+  },
+  {
+    "path": "tests/model_router/test_gateway_server.py",
+    "bytes": 4573,
+    "sha256": "58625a0a08916a0d61310b6e21430f3eb479519e5f4c6409465af84901cb3755"
+  },
+  {
+    "path": "tests/model_router/test_provider_state_migration.py",
+    "bytes": 5251,
+    "sha256": "10134e4917d05de79fd6db0b4b2ec464bbcda901ba7e9b079b67b8cbfaef8870"
+  },
+  {
+    "path": "tests/model_router/test_provider_transports.py",
+    "bytes": 18347,
+    "sha256": "0a8d63176ee452890a2001f331ad182608e8485e0389ab544ffe45572cde376d"
+  },
+  {
+    "path": "tests/model_router/test_routing_policy.py",
+    "bytes": 11359,
+    "sha256": "a7edee6f658988a5e9e3b90206990bf37b5302fb245d5f55ed1a17f418b27838"
+  },
+  {
+    "path": "tests/ops/test_bound_cline_worker.py",
+    "bytes": 450,
+    "sha256": "c75a77bf2c74951766fb87f1c88edb71c73c1db4083701a424a14c788fcc4566"
+  },
+  {
+    "path": "tests/ops/test_trusted_codex_installer_binding.py",
+    "bytes": 20170,
+    "sha256": "9ffd8f96eee5d043955442fa8f72f4c836f6f1894a06e4277614fecec9196e50"
+  },
+  {
+    "path": "tests/runtime/test_bound_cline_transport.py",
+    "bytes": 12887,
+    "sha256": "214a5782aa4f9ec0e0101da1d333a687f51f521b70eee3235c4d8cf0e25f7500"
+  },
+  {
+    "path": "tests/runtime/test_bound_cline_transport_persistence.py",
+    "bytes": 3413,
+    "sha256": "8d091a82400f43a0aaab13dbd28987f8381c6f0ce387796d71f19ebdb84b0b1f"
+  },
+  {
+    "path": "tests/runtime/test_bound_cline_transport_policy.py",
+    "bytes": 2603,
+    "sha256": "cf61d9c1acdfeaf18df17e4fe0d80b349693345c97b654061f54748544156dc1"
+  },
+  {
+    "path": "tests/runtime/test_chat_bridge_fail_closed.py",
+    "bytes": 11888,
+    "sha256": "0c2043575e0a3cad4c56ab6c3efdeec5496839b6796dc2fb55cdcd04775d96a0"
+  },
+  {
+    "path": "tests/runtime/test_cline_sdk_adapter.py",
+    "bytes": 17743,
+    "sha256": "ca8480534764b242e167064f64c62a8aeee647f3a300c9ec31513b59afa5a7c9"
+  },
+  {
+    "path": "tests/runtime/test_cline_sdk_adversarial.py",
+    "bytes": 10795,
+    "sha256": "6e8abd6c037598daa06c20ab73479debba67d9ab232324107d51ae3228e6113b"
+  },
+  {
+    "path": "tests/runtime/test_cline_sdk_mutations.py",
+    "bytes": 6698,
+    "sha256": "2da8004b257ed22fccf635cbe5d0aeaa69c02614feadc067f0449722fbc18adc"
+  },
+  {
+    "path": "tests/runtime/test_cline_sdk_protocol.py",
+    "bytes": 21522,
+    "sha256": "d884704c83a4d54f6cddacf86403e445211a303ea5536a50bf1249a152b48952"
+  },
+  {
+    "path": "tests/runtime/test_cline_sdk_qualification.py",
+    "bytes": 10530,
+    "sha256": "4f22f95e48f83a8482a906824442cbc87f4d42e769aa5d1eba209e7f08f303e3"
+  },
+  {
+    "path": "tests/runtime/test_cline_worker_transport.py",
+    "bytes": 14541,
+    "sha256": "37e21cdf754b5a38d58c4b69e177ee3f9ec822aff6bd5192ba2c81f6f5f51c6d"
+  },
+  {
+    "path": "tests/runtime/test_glm_cline_invoker.py",
+    "bytes": 6731,
+    "sha256": "da8ef160b687f6ebead1aa4f1650ff32d04965b2e10b38464425fb833ee48fb0"
+  },
+  {
+    "path": "tests/runtime/test_live_adapter.py",
+    "bytes": 18752,
+    "sha256": "dac66cc87e9ebc7ce5224eaf2ea251a043793e5a9ace23a6ed21306afa045857"
+  },
+  {
+    "path": "tests/runtime/test_responses_broker_disclosure_denial.py",
+    "bytes": 4624,
+    "sha256": "301285f2b3374766cc21fd1f8931a511ff39a257caf62bad3623481d500540f3"
+  },
+  {
+    "path": "tests/runtime/test_responses_broker_request_limit.py",
+    "bytes": 10488,
+    "sha256": "967878f0c035f3607613a7776252d7058d79ab1e11365b8d64b73393c3abc54f"
+  },
+  {
+    "path": "tests/runtime/test_trusted_codex_client.py",
+    "bytes": 10038,
+    "sha256": "9a827ccd2df2249f3acfd4fbbcada3af5a269a48c5f77df9d334850afb5e12a0"
+  },
+  {
+    "path": "tests/runtime/test_trusted_codex_worker_transport.py",
+    "bytes": 42947,
+    "sha256": "a4da7760b0980e2c1d5a64f024090a8386da528c17b88225f9b81b1188a89c0c"
+  }
+]

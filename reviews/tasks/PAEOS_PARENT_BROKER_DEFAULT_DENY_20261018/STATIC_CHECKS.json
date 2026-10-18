@@ -1,0 +1,50 @@
+[
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "3 files already formatted\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check",
+      "--",
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "check": "in-memory compilation without bytecode",
+    "files": [
+      "runtime/integrations/provider_broker.py",
+      "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0
+  }
+]
