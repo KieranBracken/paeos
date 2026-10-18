@@ -1,0 +1,207 @@
+...........FFFFFF......................................                  [100%]
+=================================== FAILURES ===================================
+_____ test_concurrent_receipts_pair_each_request_with_its_own_response[A] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106e10380>
+first_response = 'A'
+
+    @pytest.mark.parametrize("first_response", ["A", "B"])
+    def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch, first_response):
+        bodies = {
+            "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
+            "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
+        }
+        replies = {"A": b'{"synthetic_response":"A"}', "B": b'{"synthetic_response":"B"}'}
+        entered = {key: Event() for key in bodies}
+        release = {key: Event() for key in bodies}
+    
+        def upstream(body, _token, _account):
+            key = next(key for key, value in bodies.items() if value == body)
+            entered[key].set()
+            assert release[key].wait(3)
+            return BrokerReply(200, "application/json", replies[key])
+    
+        with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
+            futures = {}
+            try:
+                for key in ("A", "B"):
+                    futures[key] = pool.submit(_post, broker, bodies[key])
+                    assert entered[key].wait(2)
+                pending = broker.evidence()
+                release[first_response].set()
+                assert futures[first_response].result(timeout=2) == 200
+                other = "B" if first_response == "A" else "A"
+                release[other].set()
+                assert futures[other].result(timeout=2) == 200
+            finally:
+                for event in release.values():
+                    event.set()
+            final = broker.evidence()
+            # The baseline's A -> B -> response B -> response A race produces this false pair.
+            assert (final["request_sha256"], final["response_sha256"]) != (
+                hashlib.sha256(bodies["B"]).hexdigest(),
+                hashlib.sha256(replies["A"]).hexdigest(),
+            )
+>           assert final["schema"] == "paeos.task-scoped-responses-broker/2"
+E           AssertionError: assert 'paeos.task-s...nses-broker/1' == 'paeos.task-s...nses-broker/2'
+E             
+E             - paeos.task-scoped-responses-broker/2
+E             ?                                    ^
+E             + paeos.task-scoped-responses-broker/1
+E             ?                                    ^
+
+tests/runtime/test_responses_broker_request_limit.py:151: AssertionError
+_____ test_concurrent_receipts_pair_each_request_with_its_own_response[B] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106d7e750>
+first_response = 'B'
+
+    @pytest.mark.parametrize("first_response", ["A", "B"])
+    def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch, first_response):
+        bodies = {
+            "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
+            "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
+        }
+        replies = {"A": b'{"synthetic_response":"A"}', "B": b'{"synthetic_response":"B"}'}
+        entered = {key: Event() for key in bodies}
+        release = {key: Event() for key in bodies}
+    
+        def upstream(body, _token, _account):
+            key = next(key for key, value in bodies.items() if value == body)
+            entered[key].set()
+            assert release[key].wait(3)
+            return BrokerReply(200, "application/json", replies[key])
+    
+        with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
+            futures = {}
+            try:
+                for key in ("A", "B"):
+                    futures[key] = pool.submit(_post, broker, bodies[key])
+                    assert entered[key].wait(2)
+                pending = broker.evidence()
+                release[first_response].set()
+                assert futures[first_response].result(timeout=2) == 200
+                other = "B" if first_response == "A" else "A"
+                release[other].set()
+                assert futures[other].result(timeout=2) == 200
+            finally:
+                for event in release.values():
+                    event.set()
+            final = broker.evidence()
+            # The baseline's A -> B -> response B -> response A race produces this false pair.
+>           assert (final["request_sha256"], final["response_sha256"]) != (
+                hashlib.sha256(bodies["B"]).hexdigest(),
+                hashlib.sha256(replies["A"]).hexdigest(),
+            )
+E           AssertionError: assert ('07ebec6196b722b66437d63fd17d8191525c7c41ade56e2f25acde22d3667334', '1e210bccf1b4385c8aef1c49fe7cab21de9749b94583df9ca04c99e96e47058e') != ('07ebec6196b722b66437d63fd17d8191525c7c41ade56e2f25acde22d3667334', '1e210bccf1b4385c8aef1c49fe7cab21de9749b94583df9ca04c99e96e47058e')
+
+tests/runtime/test_responses_broker_request_limit.py:147: AssertionError
+_ test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[timeout] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106d7ee50>
+failure = 'timeout'
+
+    @pytest.mark.parametrize("failure", ["timeout", "invalid", "oversize"])
+    def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+        monkeypatch, failure
+    ):
+        failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+        success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+    
+        def upstream(body, _token, _account):
+            if body == success_body:
+                return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+            if failure == "timeout":
+                raise TimeoutError("synthetic timeout")
+            if failure == "oversize":
+                return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+            return None
+    
+        with _broker(monkeypatch, upstream, 2) as broker:
+            assert _post(broker, failed_body) == 502
+            assert _post(broker, success_body) == 429
+            evidence = broker.evidence()
+>           assert evidence["transport_outcome"] != "response_received"
+E           AssertionError: assert 'response_received' != 'response_received'
+
+tests/runtime/test_responses_broker_request_limit.py:194: AssertionError
+_ test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[invalid] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106e016d0>
+failure = 'invalid'
+
+    @pytest.mark.parametrize("failure", ["timeout", "invalid", "oversize"])
+    def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+        monkeypatch, failure
+    ):
+        failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+        success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+    
+        def upstream(body, _token, _account):
+            if body == success_body:
+                return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+            if failure == "timeout":
+                raise TimeoutError("synthetic timeout")
+            if failure == "oversize":
+                return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+            return None
+    
+        with _broker(monkeypatch, upstream, 2) as broker:
+            assert _post(broker, failed_body) == 502
+            assert _post(broker, success_body) == 429
+            evidence = broker.evidence()
+>           assert evidence["transport_outcome"] != "response_received"
+E           AssertionError: assert 'response_received' != 'response_received'
+
+tests/runtime/test_responses_broker_request_limit.py:194: AssertionError
+_ test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[oversize] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106e01c70>
+failure = 'oversize'
+
+    @pytest.mark.parametrize("failure", ["timeout", "invalid", "oversize"])
+    def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+        monkeypatch, failure
+    ):
+        failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+        success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+    
+        def upstream(body, _token, _account):
+            if body == success_body:
+                return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+            if failure == "timeout":
+                raise TimeoutError("synthetic timeout")
+            if failure == "oversize":
+                return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+            return None
+    
+        with _broker(monkeypatch, upstream, 2) as broker:
+            assert _post(broker, failed_body) == 502
+            assert _post(broker, success_body) == 429
+            evidence = broker.evidence()
+>           assert evidence["transport_outcome"] != "response_received"
+E           AssertionError: assert 'response_received' != 'response_received'
+
+tests/runtime/test_responses_broker_request_limit.py:194: AssertionError
+______ test_single_call_scalar_evidence_is_exactly_its_immutable_receipt _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106e05b70>
+
+    def test_single_call_scalar_evidence_is_exactly_its_immutable_receipt(monkeypatch):
+        with _broker(
+            monkeypatch, lambda *_: BrokerReply(200, "application/json", b'{"synthetic":true}')
+        ) as broker:
+>           assert broker.evidence()["request_receipts"] == []
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'request_receipts'
+
+tests/runtime/test_responses_broker_request_limit.py:219: KeyError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_concurrent_receipts_pair_each_request_with_its_own_response[A]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_concurrent_receipts_pair_each_request_with_its_own_response[B]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[timeout]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[invalid]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[oversize]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_single_call_scalar_evidence_is_exactly_its_immutable_receipt
+6 failed, 49 passed in 5.47s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "ops": "ops/__init__.py", "ops.trusted_codex_worker_supervisor": "ops/trusted_codex_worker_supervisor.py", "ops.verify_builder_transport_ready": "ops/verify_builder_transport_ready.py", "runtime": "runtime/__init__.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.task_package": "runtime/task_package.py"}

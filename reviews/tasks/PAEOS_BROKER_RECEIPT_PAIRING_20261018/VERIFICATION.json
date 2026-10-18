@@ -1,0 +1,70 @@
+{
+  "schema": "paeos.offline-remediation-result/1",
+  "source_base": "c88528a3b8f505e2b879e6f25773c55a534ecd80",
+  "finding": "P2 concurrent broker request/response evidence pairing",
+  "status": "REMEDIATED_CANDIDATE_PENDING_INDEPENDENT_REVIEW",
+  "final_focused": {
+    "passed": 77,
+    "elapsed_seconds": 5.92,
+    "exit_code": 0,
+    "command": "final-focused.command.json",
+    "stdout": "final-focused.stdout.txt"
+  },
+  "history": [
+    {
+      "label": "baseline-red",
+      "failed": 6,
+      "passed": 49,
+      "meaning": "Observed actual B request/A response mismatch, plus lost failures and absent per-request receipts."
+    },
+    {
+      "label": "consumer-red",
+      "failed": 7,
+      "passed": 49,
+      "meaning": "Original supervisor also rejects truthful multi-call representation, proving dependent consumer edit needed."
+    },
+    {
+      "label": "first-green",
+      "passed": 76,
+      "meaning": "Before final invalid-status and real-consumer assertions."
+    }
+  ],
+  "static": "STATIC_CHECKS.json",
+  "full_suite": "Not rerun for this focused package; prior candidate measurement remains seven collection errors. Historical22 errors preserved. No full-suite acceptance.",
+  "formal_review": "Not requested or performed for this bounded package. Original finding/report unchanged; final candidate independent review remains a gate.",
+  "consumer_analysis": {
+    "agent": "/root/startup_candidate_audit",
+    "kind": "Read-only direct-consumer trace, not formal Security Review or heterogeneous audit",
+    "result": "Supervisor sole live consumer; existing evidence digest/count observation schema unchanged; no other consumer edits required.",
+    "model_family_attestation": null
+  },
+  "boundaries": {
+    "provider_calls": 0,
+    "production_install": false,
+    "qualification": false,
+    "PAEOS_admission": false,
+    "Court_adjudication": false,
+    "debt_integration": false
+  },
+  "ALLOWED_NOW": {
+    "owner": "Root bootstrap integrator and epoch2 completion overseer",
+    "action": "Save checkpoint and route next eligible bounded offline repair."
+  },
+  "HELD": {
+    "owner": "Existing bootstrap and debt owners",
+    "action": "Production activation, qualification, Chat1 D0258 and dependent gates.",
+    "wake": "Complete applicable boundary controls, exact review, trusted authority and current qualification/fresh admission."
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": {
+    "owner": "Existing bootstrap owners",
+    "remaining": [
+      "P1 disclosure",
+      "P1 producer authentication",
+      "observed model identity",
+      "process output bounds",
+      "final independent review",
+      "authority and qualification"
+    ],
+    "this_package": "One P2 candidate only; no whole-branch acceptance."
+  }
+}

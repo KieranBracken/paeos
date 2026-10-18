@@ -1,0 +1,50 @@
+{
+  "schema": "paeos.offline-bootstrap-scope/1",
+  "base": "c88528a3b8f505e2b879e6f25773c55a534ecd80",
+  "authority": "Existing human-approved E0-E3 bounded offline repair; coordinator assignment is routing only, not new authority.",
+  "finding": "Original P2 concurrent broker request/response hash pairing; original report unchanged.",
+  "owner": "Root bootstrap integrator; Chat 1 retains exclusive D0258 ownership.",
+  "files": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "preimage_sha256": "e2271dae4e78d4e7464fb2bc8d0a7aea78c5697434fa848293fb8653ac384153"
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_request_limit.py",
+      "preimage_sha256": "b5f8b622ef5fd4c24977b919eb2683b3eb8aad1452d5417dcb7cec4daef10f95"
+    },
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "preimage_sha256": "b79f7e2a32aa228f187fca722794f9786cf360846e45e3ad6b43b52587c51737"
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_worker_transport.py",
+      "preimage_sha256": "999ee8bf8e94305efb7ea074fcc27d6172fd4edf37aba5d49527cfbc0b69d268"
+    }
+  ],
+  "reason_for_consumer_scope": "Supervisor currently requires a single scalar hash pair even for multiple requests. Versioned per-request evidence needs exact consumer validation to preserve legitimate multiple-call tasks without ambiguous scalar provenance.",
+  "design": [
+    "Bounded ordered immutable per-call records; identity allocated atomically before upstream effect and retained for pending, terminal failure and response outcomes.",
+    "Version2 evidence; legacy scalar pair preserved for exactly one call, absent as empty strings for multiple calls.",
+    "Supervisor validates all call records, contiguous unique identities, counts, hashes and terminal outcomes before accepting broker evidence.",
+    "Local rejections do not alter completed receipt records and still hold success."
+  ],
+  "acceptance": [
+    "Deterministic A/B response interleavings with distinct synthetic payloads reproduce baseline defect and preserve exact pairs after repair.",
+    "Pending snapshot and exported-record mutation cannot alter internal final evidence.",
+    "Timeout, invalid/oversize response and request limit denial retain bounded receipt identity and consumed allocation.",
+    "Existing one-call/transport/readiness checks pass."
+  ],
+  "forbidden": [
+    "provider calls",
+    "host credential/key/state access",
+    "production install or qualification",
+    "new admission or disclosure authority",
+    "original review modification",
+    "debt integration",
+    "whole-branch/P1 resolution claims",
+    "formal Security Review in this package"
+  ],
+  "evidence_root": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018",
+  "full_suite": "Focused package only per bounded assignment; seven prior collection errors remain, no full-suite acceptance."
+}

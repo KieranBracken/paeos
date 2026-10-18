@@ -1,0 +1,392 @@
+...........FFFFFF......F................................                 [100%]
+=================================== FAILURES ===================================
+_____ test_concurrent_receipts_pair_each_request_with_its_own_response[A] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1051ec380>
+first_response = 'A'
+
+    @pytest.mark.parametrize("first_response", ["A", "B"])
+    def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch, first_response):
+        bodies = {
+            "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
+            "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
+        }
+        replies = {"A": b'{"synthetic_response":"A"}', "B": b'{"synthetic_response":"B"}'}
+        entered = {key: Event() for key in bodies}
+        release = {key: Event() for key in bodies}
+    
+        def upstream(body, _token, _account):
+            key = next(key for key, value in bodies.items() if value == body)
+            entered[key].set()
+            assert release[key].wait(3)
+            return BrokerReply(200, "application/json", replies[key])
+    
+        with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
+            futures = {}
+            try:
+                for key in ("A", "B"):
+                    futures[key] = pool.submit(_post, broker, bodies[key])
+                    assert entered[key].wait(2)
+                pending = broker.evidence()
+                release[first_response].set()
+                assert futures[first_response].result(timeout=2) == 200
+                other = "B" if first_response == "A" else "A"
+                release[other].set()
+                assert futures[other].result(timeout=2) == 200
+            finally:
+                for event in release.values():
+                    event.set()
+            final = broker.evidence()
+            # The baseline's A -> B -> response B -> response A race produces this false pair.
+            assert (final["request_sha256"], final["response_sha256"]) != (
+                hashlib.sha256(bodies["B"]).hexdigest(),
+                hashlib.sha256(replies["A"]).hexdigest(),
+            )
+>           assert final["schema"] == "paeos.task-scoped-responses-broker/2"
+E           AssertionError: assert 'paeos.task-s...nses-broker/1' == 'paeos.task-s...nses-broker/2'
+E             
+E             - paeos.task-scoped-responses-broker/2
+E             ?                                    ^
+E             + paeos.task-scoped-responses-broker/1
+E             ?                                    ^
+
+tests/runtime/test_responses_broker_request_limit.py:151: AssertionError
+_____ test_concurrent_receipts_pair_each_request_with_its_own_response[B] ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105142850>
+first_response = 'B'
+
+    @pytest.mark.parametrize("first_response", ["A", "B"])
+    def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch, first_response):
+        bodies = {
+            "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
+            "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
+        }
+        replies = {"A": b'{"synthetic_response":"A"}', "B": b'{"synthetic_response":"B"}'}
+        entered = {key: Event() for key in bodies}
+        release = {key: Event() for key in bodies}
+    
+        def upstream(body, _token, _account):
+            key = next(key for key, value in bodies.items() if value == body)
+            entered[key].set()
+            assert release[key].wait(3)
+            return BrokerReply(200, "application/json", replies[key])
+    
+        with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
+            futures = {}
+            try:
+                for key in ("A", "B"):
+                    futures[key] = pool.submit(_post, broker, bodies[key])
+                    assert entered[key].wait(2)
+                pending = broker.evidence()
+                release[first_response].set()
+                assert futures[first_response].result(timeout=2) == 200
+                other = "B" if first_response == "A" else "A"
+                release[other].set()
+                assert futures[other].result(timeout=2) == 200
+            finally:
+                for event in release.values():
+                    event.set()
+            final = broker.evidence()
+            # The baseline's A -> B -> response B -> response A race produces this false pair.
+>           assert (final["request_sha256"], final["response_sha256"]) != (
+                hashlib.sha256(bodies["B"]).hexdigest(),
+                hashlib.sha256(replies["A"]).hexdigest(),
+            )
+E           AssertionError: assert ('07ebec6196b722b66437d63fd17d8191525c7c41ade56e2f25acde22d3667334', '1e210bccf1b4385c8aef1c49fe7cab21de9749b94583df9ca04c99e96e47058e') != ('07ebec6196b722b66437d63fd17d8191525c7c41ade56e2f25acde22d3667334', '1e210bccf1b4385c8aef1c49fe7cab21de9749b94583df9ca04c99e96e47058e')
+
+tests/runtime/test_responses_broker_request_limit.py:147: AssertionError
+_ test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[timeout] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105142f50>
+failure = 'timeout'
+
+    @pytest.mark.parametrize("failure", ["timeout", "invalid", "oversize"])
+    def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+        monkeypatch, failure
+    ):
+        failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+        success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+    
+        def upstream(body, _token, _account):
+            if body == success_body:
+                return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+            if failure == "timeout":
+                raise TimeoutError("synthetic timeout")
+            if failure == "oversize":
+                return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+            return None
+    
+        with _broker(monkeypatch, upstream, 2) as broker:
+            assert _post(broker, failed_body) == 502
+            assert _post(broker, success_body) == 429
+            evidence = broker.evidence()
+>           assert evidence["transport_outcome"] != "response_received"
+E           AssertionError: assert 'response_received' != 'response_received'
+
+tests/runtime/test_responses_broker_request_limit.py:194: AssertionError
+_ test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[invalid] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1051c15e0>
+failure = 'invalid'
+
+    @pytest.mark.parametrize("failure", ["timeout", "invalid", "oversize"])
+    def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+        monkeypatch, failure
+    ):
+        failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+        success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+    
+        def upstream(body, _token, _account):
+            if body == success_body:
+                return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+            if failure == "timeout":
+                raise TimeoutError("synthetic timeout")
+            if failure == "oversize":
+                return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+            return None
+    
+        with _broker(monkeypatch, upstream, 2) as broker:
+            assert _post(broker, failed_body) == 502
+            assert _post(broker, success_body) == 429
+            evidence = broker.evidence()
+>           assert evidence["transport_outcome"] != "response_received"
+E           AssertionError: assert 'response_received' != 'response_received'
+
+tests/runtime/test_responses_broker_request_limit.py:194: AssertionError
+_ test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[oversize] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1051c1b80>
+failure = 'oversize'
+
+    @pytest.mark.parametrize("failure", ["timeout", "invalid", "oversize"])
+    def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+        monkeypatch, failure
+    ):
+        failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+        success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+    
+        def upstream(body, _token, _account):
+            if body == success_body:
+                return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+            if failure == "timeout":
+                raise TimeoutError("synthetic timeout")
+            if failure == "oversize":
+                return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+            return None
+    
+        with _broker(monkeypatch, upstream, 2) as broker:
+            assert _post(broker, failed_body) == 502
+            assert _post(broker, success_body) == 429
+            evidence = broker.evidence()
+>           assert evidence["transport_outcome"] != "response_received"
+E           AssertionError: assert 'response_received' != 'response_received'
+
+tests/runtime/test_responses_broker_request_limit.py:194: AssertionError
+______ test_single_call_scalar_evidence_is_exactly_its_immutable_receipt _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1051a1d30>
+
+    def test_single_call_scalar_evidence_is_exactly_its_immutable_receipt(monkeypatch):
+        with _broker(
+            monkeypatch, lambda *_: BrokerReply(200, "application/json", b'{"synthetic":true}')
+        ) as broker:
+>           assert broker.evidence()["request_receipts"] == []
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'request_receipts'
+
+tests/runtime/test_responses_broker_request_limit.py:219: KeyError
+_ test_supervisor_builder_deadline_is_longer_than_failed_p1_window_but_bounded[2] _
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-broker-pairing-53bmjbpc/pytest/test_supervisor_builder_deadli1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10554e2d0>
+broker_calls = 2
+
+    @pytest.mark.parametrize("broker_calls", [1, 2])
+    def test_supervisor_builder_deadline_is_longer_than_failed_p1_window_but_bounded(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, broker_calls: int
+    ) -> None:
+        """A slow but live Builder must not be cut off by the old fixed 300-second deadline."""
+        import ops.trusted_codex_worker_supervisor as supervisor
+    
+        key = SigningKey.generate()
+        service = _service(tmp_path, key)
+        workspace = service.workspace_root / "ws-transport"
+        workspace.mkdir(mode=0o700)
+        captured: dict[str, float] = {}
+    
+        class _Broker:
+            loopback_port = 4000
+            base_url = "http://127.0.0.1:4000"
+            task_token = "task-scoped"
+    
+            def __enter__(self):
+                return self
+    
+            def __exit__(self, *_args: object) -> None:
+                return None
+    
+            def evidence(self) -> dict[str, object]:
+                return _broker_evidence(broker_calls)
+    
+        class _Policy:
+            seatbelt_profile = "test-profile"
+    
+            def wrap_argv(self, argv: tuple[str, ...]) -> tuple[str, ...]:
+                return argv
+    
+        def _fake_run(
+            argv: tuple[str, ...],
+            *,
+            cwd: Path,
+            environment: dict[str, str],
+            start_timeout_s: float,
+            execution_timeout_s: float,
+            state_path: Path,
+        ):
+            del cwd, environment, start_timeout_s
+            captured["execution_timeout_s"] = execution_timeout_s
+            state_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            state_path.write_text('{"heartbeat_count": 1}\n', encoding="utf-8")
+            from runtime.integrations.process_supervisor import (
+                ProcessLifecycleState,
+                ProcessObservation,
+            )
+    
+            return ProcessObservation(
+                argv=argv,
+                executable="/bin/sh",
+                executable_version="sha256:" + "c" * 64,
+                cwd=str(workspace),
+                environment_fingerprint="d" * 64,
+                stdout=b"bounded builder response\n",
+                stderr=b"",
+                exit_code=0,
+                duration_ms=1,
+                lifecycle_state=ProcessLifecycleState.RETURNED,
+            )
+    
+        monkeypatch.setattr(supervisor, "ParentOwnedResponsesBroker", lambda **_kwargs: _Broker())
+        monkeypatch.setattr(service, "_validate_codex_home", lambda: None)
+        monkeypatch.setattr(
+            service,
+            "_policy",
+            lambda _workspace, loopback_port, broker_token: (_Policy(), {"PATH": "/bin"}, "/bin/sh"),
+        )
+        monkeypatch.setattr(service, "_run_canaries", lambda *_args: {"canary": "PASS"})
+        monkeypatch.setattr(supervisor, "_codex_argv", lambda *_args, **_kwargs: ("/bin/sh",))
+        monkeypatch.setattr(supervisor, "run_bounded_process", _fake_run)
+    
+        validated, request_id = service._validate_request(_request(key))
+        validated["workspace_id"] = workspace.name
+>       observation = service._run_request(validated, request_id)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/runtime/test_trusted_codex_worker_transport.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ops.trusted_codex_worker_supervisor.TrustedCodexWorkerSupervisor object at 0x1051edbf0>
+request = {'schema': 'paeos.trusted-codex-launch/1', 'request_id': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'task_id': 't-transport', 'goal_id': 'g-transport', ...}
+request_id = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', model_id = 'gpt-5.6-sol'
+
+    def _run_request(
+        self,
+        request: dict[str, object],
+        request_id: str,
+        *,
+        model_id: str = MODEL_ID,
+    ) -> dict[str, object]:
+        if model_id not in {MODEL_ID, PLANNER_MODEL_ID}:
+            raise SupervisorFailure(
+                "capability_failure", "Codex model is not an authorized fixed route"
+            )
+        workspace = self._workspace_for(request)
+        request_state = self.state_root / request_id
+        if request_state.exists() or request_state.is_symlink():
+            raise SupervisorFailure("replay_failure", "launch request identity was already used")
+        request_state.mkdir(mode=0o700)
+        try:
+            self._claim_qualification_identity(request, request_id)
+            self._validate_codex_home()
+            _write_atomic(request_state / "request.json", _canonical_bytes(request))
+            _write_atomic(
+                request_state / "lifecycle.json",
+                _canonical_bytes(
+                    {"request_id": request_id, "state": "STARTING", "observed_at": self._clock()}
+                ),
+            )
+            with ParentOwnedResponsesBroker(
+                auth_path=self.codex_home / "auth.json",
+                model_id=model_id,
+                max_requests=(
+                    1
+                    if _qualification_nonce(
+                        request.get("task_id"),
+                        request.get("goal_id"),
+                        request.get("run_id"),
+                        request.get("stage"),
+                    )
+                    is not None
+                    else MAX_TASK_REQUESTS
+                ),
+            ) as broker:
+                policy, environment, codex_executable = self._policy(
+                    workspace,
+                    loopback_port=broker.loopback_port,
+                    broker_token=broker.task_token,
+                )
+                canary_state = request_state / "canary"
+                canary_state.mkdir(mode=0o700)
+                canaries = self._run_canaries(workspace, policy, environment, canary_state)
+                prompt = request["prompt"]
+                assert isinstance(prompt, str)
+                argv = _codex_argv(
+                    codex_executable,
+                    prompt=prompt,
+                    workspace=workspace,
+                    broker_base_url=broker.base_url,
+                    model_id=model_id,
+                )
+                bound = policy.wrap_argv(argv)
+                process = run_bounded_process(
+                    bound,
+                    cwd=workspace,
+                    environment=environment,
+                    start_timeout_s=30.0,
+                    execution_timeout_s=BUILDER_EXECUTION_TIMEOUT_S,
+                    state_path=request_state / "process.json",
+                )
+                broker_evidence = broker.evidence()
+                _write_atomic(
+                    request_state / "broker-evidence.json",
+                    _canonical_bytes(broker_evidence),
+                )
+            if (
+                broker_evidence.get("binding") != "127.0.0.1"
+                or broker_evidence.get("model_id") != model_id
+                or broker_evidence.get("transport_outcome") != "response_received"
+                or not isinstance(broker_evidence.get("upstream_status"), int)
+                or not isinstance(broker_evidence.get("request_count"), int)
+                or not 1 <= broker_evidence["request_count"] <= MAX_TASK_REQUESTS
+                or broker_evidence.get("local_rejection_count") != 0
+                or broker_evidence.get("local_error_class") is not None
+                or any(
+                    not isinstance(broker_evidence.get(field), str)
+                    or len(broker_evidence[field]) != 64
+                    for field in ("request_sha256", "response_sha256")
+                )
+            ):
+>               raise SupervisorFailure("broker_failure", "task broker evidence is incomplete")
+E               ops.trusted_codex_worker_supervisor.SupervisorFailure: task broker evidence is incomplete
+
+ops/trusted_codex_worker_supervisor.py:904: SupervisorFailure
+=========================== short test summary info ============================
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_concurrent_receipts_pair_each_request_with_its_own_response[A]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_concurrent_receipts_pair_each_request_with_its_own_response[B]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[timeout]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[invalid]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success[oversize]
+FAILED tests/runtime/test_responses_broker_request_limit.py::test_single_call_scalar_evidence_is_exactly_its_immutable_receipt
+FAILED tests/runtime/test_trusted_codex_worker_transport.py::test_supervisor_builder_deadline_is_longer_than_failed_p1_window_but_bounded[2]
+7 failed, 49 passed in 5.47s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "ops": "ops/__init__.py", "ops.trusted_codex_worker_supervisor": "ops/trusted_codex_worker_supervisor.py", "ops.verify_builder_transport_ready": "ops/verify_builder_transport_ready.py", "runtime": "runtime/__init__.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.task_package": "runtime/task_package.py"}

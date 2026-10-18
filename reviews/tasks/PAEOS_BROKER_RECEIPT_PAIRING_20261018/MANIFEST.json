@@ -1,0 +1,121 @@
+{
+  "base": "c88528a3b8f505e2b879e6f25773c55a534ecd80",
+  "files": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "sha256": "b36f6294cb2b1cd0ae68bee50867d5c38f5e9f19c170ed18290305169131d17d",
+      "bytes": 14600
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_request_limit.py",
+      "sha256": "01b1cdaf162d11c55703a4b690edccc7e532dfa7f966b95d6ea0c43f369d60d7",
+      "bytes": 10067
+    },
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "sha256": "2c67df1d8c85fd118437f716d76e6f1010eead5382d13940b63ff15c2a396ef8",
+      "bytes": 62877
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_worker_transport.py",
+      "sha256": "a4da7760b0980e2c1d5a64f024090a8386da528c17b88225f9b81b1188a89c0c",
+      "bytes": 42947
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/SCOPE.json",
+      "sha256": "fec03efa25d4017e4ccc95e9b708f8e13975285dec4c373f5576f6a093ad2306",
+      "bytes": 2890
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/run_verification.py",
+      "sha256": "db67b565a1bb0ad2d60a1020537705669a47e8ff1ff8b9fc93dcd7bda80c3d8c",
+      "bytes": 3889
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/STATIC_CHECKS.json",
+      "sha256": "5c16c3c4628717f5e3297ba3aac94fe182ae371940851732c88dd580405f6d33",
+      "bytes": 2421
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/VERIFICATION.json",
+      "sha256": "29dfbc4ee560dae82517d6caeebaaf25ab2329783f4246c9fe77dccd951e444e",
+      "bytes": 2761
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.command.json",
+      "sha256": "78e8973a3971161e9bc5433d217e7e561ac9d12cd1839aabec99c02eb7fb31bd",
+      "bytes": 3453
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt",
+      "sha256": "82c4e0b31256ad930fad77a7b82cb923e4a91e37515635a65ce021ca8e162dfb",
+      "bytes": 12245
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.command.json",
+      "sha256": "d44be03877600b671c53ec104dfbee90dead06407f74af3d794d6ef6b08c9993",
+      "bytes": 3453
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt",
+      "sha256": "2e6905d73123e0b6c93cb75ac55d38262b4986f3c00a5f75054cd5d543be8bf5",
+      "bytes": 20613
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/first-green.command.json",
+      "sha256": "6799236c2f4712282c60f37c28984d9cd297e0a018003f88f05c283f8dd0affe",
+      "bytes": 3453
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/first-green.stdout.txt",
+      "sha256": "83f55f210bef7e06a2eb2e417e6fd0c3b651396109d6d44e2c3a98722a9e11b6",
+      "bytes": 1580
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/first-green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/final-focused.command.json",
+      "sha256": "560384aa259cc9696ce1659480215495fc45b0da6ccb1a8d493f05e2612e269c",
+      "bytes": 3453
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/final-focused.stdout.txt",
+      "sha256": "548cad672e5152570a0b02428e428b149b17cb3a5ed5809d9096c88d2266a9f1",
+      "bytes": 1580
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/final-focused.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "5012680f9acf5dc6136e0dae349bffb501de8f56b7a5c3fb0033c542f1b04630",
+      "bytes": 1452711
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "b053f92ce799e975ced32f7033c767288887c628e350b4308cddca30f6feaa10",
+      "bytes": 653487
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/SECRET_SCAN.json",
+      "sha256": "78c012d99160b0ab6c2883a1f1d03cdfa2037c0ced8bd5b64ebf218907cc8846",
+      "bytes": 1795
+    }
+  ],
+  "self": "Excluded to avoid recursive hashing; included in commit."
+}

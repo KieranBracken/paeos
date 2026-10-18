@@ -1,5 +1,6 @@
 """Synthetic loopback tests: no provider calls or host credential access."""
 
+import hashlib
 from concurrent.futures import ThreadPoolExecutor
 from http.client import HTTPConnection
 from pathlib import Path
@@ -13,13 +14,13 @@ from runtime.integrations.task_scoped_responses_broker import (
 )
 
 
-def _post(broker):
+def _post(broker, body=b'{"model":"gpt-5.6-sol","input":"synthetic","max_requests":32}'):
     connection = HTTPConnection("127.0.0.1", broker.loopback_port, timeout=3)
     try:
         connection.request(
             "POST",
             "/v1/responses",
-            body=b'{"model":"gpt-5.6-sol","input":"synthetic","max_requests":32}',
+            body=body,
             headers={"Authorization": f"Bearer {broker.task_token}"},
         )
         response = connection.getresponse()
@@ -108,3 +109,140 @@ def test_existing_general_task_ceiling_remains_available(monkeypatch):
         assert _post(broker) == 200
         assert len(calls) == 2
         assert broker.evidence()["request_limit"] == MAX_TASK_REQUESTS
+
+
+@pytest.mark.parametrize("first_response", ["A", "B"])
+def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch, first_response):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    bodies = {
+        "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
+        "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
+    }
+    replies = {"A": b'{"synthetic_response":"A"}', "B": b'{"synthetic_response":"B"}'}
+    entered = {key: Event() for key in bodies}
+    release = {key: Event() for key in bodies}
+
+    def upstream(body, _token, _account):
+        key = next(key for key, value in bodies.items() if value == body)
+        entered[key].set()
+        assert release[key].wait(3)
+        return BrokerReply(200, "application/json", replies[key])
+
+    with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
+        futures = {}
+        try:
+            for key in ("A", "B"):
+                futures[key] = pool.submit(_post, broker, bodies[key])
+                assert entered[key].wait(2)
+            pending = broker.evidence()
+            release[first_response].set()
+            assert futures[first_response].result(timeout=2) == 200
+            partial = broker.evidence()
+            other = "B" if first_response == "A" else "A"
+            release[other].set()
+            assert futures[other].result(timeout=2) == 200
+        finally:
+            for event in release.values():
+                event.set()
+        final = broker.evidence()
+        # The baseline's A -> B -> response B -> response A race produces this false pair.
+        assert (final["request_sha256"], final["response_sha256"]) != (
+            hashlib.sha256(bodies["B"]).hexdigest(),
+            hashlib.sha256(replies["A"]).hexdigest(),
+        )
+        assert final["schema"] == "paeos.task-scoped-responses-broker/2"
+        assert final["request_sha256"] == final["response_sha256"] == ""
+        assert final["upstream_status"] is None
+        assert final["transport_outcome"] == "response_received"
+        assert _broker_evidence_complete(final, "gpt-5.6-sol")
+        assert partial["transport_outcome"] == "upstream_started"
+        assert not _broker_evidence_complete(partial, "gpt-5.6-sol")
+        for sequence, key in enumerate(("A", "B"), 1):
+            record = final["request_receipts"][sequence - 1]
+            assert record == {
+                "request_id": sequence,
+                "request_sha256": hashlib.sha256(bodies[key]).hexdigest(),
+                "response_sha256": hashlib.sha256(replies[key]).hexdigest(),
+                "transport_outcome": "response_received",
+                "upstream_status": 200,
+                "upstream_error_class": None,
+            }
+        assert [row["transport_outcome"] for row in pending["request_receipts"]] == [
+            "upstream_started",
+            "upstream_started",
+        ]
+        final["request_receipts"][0]["request_sha256"] = "mutated public snapshot"
+        assert (
+            broker.evidence()["request_receipts"][0]["request_sha256"]
+            == hashlib.sha256(bodies["A"]).hexdigest()
+        )
+
+
+@pytest.mark.parametrize("failure", ["timeout", "invalid", "invalid_status", "oversize"])
+def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_success(
+    monkeypatch, failure
+):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    failed_body = b'{"model":"gpt-5.6-sol","input":"synthetic failure"}'
+    success_body = b'{"model":"gpt-5.6-sol","input":"synthetic success"}'
+
+    def upstream(body, _token, _account):
+        if body == success_body:
+            return BrokerReply(429, "application/json", b'{"synthetic":"upstream refusal"}')
+        if failure == "timeout":
+            raise TimeoutError("synthetic timeout")
+        if failure == "oversize":
+            return BrokerReply(200, "application/json", b"x" * (8 * 1024 * 1024 + 1))
+        if failure == "invalid_status":
+            return BrokerReply("200", "application/json", b"{}")
+        return None
+
+    with _broker(monkeypatch, upstream, 2) as broker:
+        assert _post(broker, failed_body) == 502
+        assert _post(broker, success_body) == 429
+        evidence = broker.evidence()
+        assert evidence["transport_outcome"] != "response_received"
+        assert not _broker_evidence_complete(evidence, "gpt-5.6-sol")
+        failed, returned = evidence["request_receipts"]
+        assert failed["request_id"] == 1
+        assert failed["request_sha256"] == hashlib.sha256(failed_body).hexdigest()
+        assert failed["response_sha256"] == ""
+        assert failed["upstream_status"] is None
+        assert failed["transport_outcome"] == (
+            "upstream_failure" if failure == "timeout" else "invalid_upstream_response"
+        )
+        assert failed["upstream_error_class"] == ("timeout" if failure == "timeout" else None)
+        assert returned["request_id"] == 2
+        assert returned["request_sha256"] == hashlib.sha256(success_body).hexdigest()
+        assert returned["upstream_status"] == 429  # Receipt is not an HTTP-success claim.
+        assert returned["transport_outcome"] == "response_received"
+        assert _post(broker, success_body) == 429
+        denied = broker.evidence()
+        assert denied["request_receipts"] == evidence["request_receipts"]
+        assert denied["request_count"] == 2
+        assert denied["local_rejection_count"] == 1
+
+
+def test_single_call_scalar_evidence_is_exactly_its_immutable_receipt(monkeypatch):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    with _broker(
+        monkeypatch, lambda *_: BrokerReply(200, "application/json", b'{"synthetic":true}')
+    ) as broker:
+        assert broker.evidence()["request_receipts"] == []
+        assert _post(broker) == 200
+        evidence = broker.evidence()
+        assert _broker_evidence_complete(evidence, "gpt-5.6-sol")
+        record = evidence["request_receipts"][0]
+        assert record["request_id"] == 1
+        for field in (
+            "request_sha256",
+            "response_sha256",
+            "upstream_status",
+            "upstream_error_class",
+        ):
+            assert evidence[field] == record[field]
+        assert _post(broker) == 429
+        assert broker.evidence()["request_receipts"] == [record]

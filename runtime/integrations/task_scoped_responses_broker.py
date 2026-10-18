@@ -19,7 +19,7 @@ import stat
 import threading
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, replace
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -47,6 +47,16 @@ class BrokerReply:
     status: int
     content_type: str
     body: bytes
+
+
+@dataclass(frozen=True, slots=True)
+class _RequestReceipt:
+    request_id: int
+    request_sha256: str
+    response_sha256: str = ""
+    transport_outcome: str = "upstream_started"
+    upstream_status: int | None = None
+    upstream_error_class: str | None = None
 
 
 Upstream = Callable[[bytes, str, str], BrokerReply]
@@ -84,11 +94,7 @@ class ParentOwnedResponsesBroker:
         self._account_id: str | None = None
         self._expires_at = 0.0
         self._request_count = 0
-        self._request_sha256 = ""
-        self._response_sha256 = ""
-        self._transport_outcome = "not_contacted"
-        self._upstream_status: int | None = None
-        self._upstream_error_class: str | None = None
+        self._request_receipts: list[_RequestReceipt] = []
         self._local_rejection_count = 0
         self._local_error_class: str | None = None
         self._lock = threading.Lock()
@@ -204,39 +210,44 @@ class ParentOwnedResponsesBroker:
                     if broker._request_count >= broker._max_requests:
                         broker._local_rejection_count += 1
                         broker._local_error_class = "task_request_limit_reached"
-                        broker._transport_outcome = "local_rejection"
                         self._send(429, b'{"error":{"type":"task_limit_reached"}}')
                         return
                     broker._request_count += 1
-                    broker._request_sha256 = _sha256(body)
-                    broker._response_sha256 = ""
-                    broker._transport_outcome = "upstream_started"
-                    broker._upstream_status = None
-                    broker._upstream_error_class = None
+                    receipt = _RequestReceipt(broker._request_count, _sha256(body))
+                    broker._request_receipts.append(receipt)
                 try:
                     assert broker._access_token is not None
                     assert broker._account_id is not None
                     reply = broker._upstream(body, broker._access_token, broker._account_id)
                 except Exception as exc:
                     with broker._lock:
-                        broker._transport_outcome = "upstream_failure"
-                        broker._upstream_error_class = broker._classify_upstream_exception(exc)
+                        broker._request_receipts[receipt.request_id - 1] = replace(
+                            receipt,
+                            transport_outcome="upstream_failure",
+                            upstream_error_class=broker._classify_upstream_exception(exc),
+                        )
                     self._send(502, b'{"error":{"type":"upstream_unavailable"}}')
                     return
                 if (
                     not isinstance(reply, BrokerReply)
+                    or type(reply.status) is not int
                     or not 100 <= reply.status <= 599
                     or not isinstance(reply.body, bytes)
                     or len(reply.body) > _MAX_RESPONSE_BYTES
                 ):
                     with broker._lock:
-                        broker._transport_outcome = "invalid_upstream_response"
+                        broker._request_receipts[receipt.request_id - 1] = replace(
+                            receipt, transport_outcome="invalid_upstream_response"
+                        )
                     self._send(502, b'{"error":{"type":"upstream_invalid"}}')
                     return
                 with broker._lock:
-                    broker._response_sha256 = _sha256(reply.body)
-                    broker._transport_outcome = "response_received"
-                    broker._upstream_status = reply.status
+                    broker._request_receipts[receipt.request_id - 1] = replace(
+                        receipt,
+                        response_sha256=_sha256(reply.body),
+                        transport_outcome="response_received",
+                        upstream_status=reply.status,
+                    )
                 self._send(reply.status, reply.body, reply.content_type)
 
         server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
@@ -276,17 +287,36 @@ class ParentOwnedResponsesBroker:
 
     def evidence(self) -> dict[str, object]:
         with self._lock:
+            # Immutable records are replaced only for their own reserved identity. Export
+            # fresh dictionaries so neither later completions nor callers mutate a snapshot.
+            receipts = [asdict(receipt) for receipt in self._request_receipts]
+            single = self._request_receipts[0] if len(receipts) == 1 else None
+            outcome = "not_contacted"
+            if receipts:
+                outcome = next(
+                    (
+                        receipt.transport_outcome
+                        for receipt in self._request_receipts
+                        if receipt.transport_outcome != "response_received"
+                    ),
+                    "response_received",
+                )
+            if self._local_rejection_count:
+                outcome = "local_rejection"
             return {
-                "schema": "paeos.task-scoped-responses-broker/1",
+                "schema": "paeos.task-scoped-responses-broker/2",
                 "binding": "127.0.0.1",
                 "model_id": self._model_id,
                 "request_count": self._request_count,
                 "request_limit": self._max_requests,
-                "request_sha256": self._request_sha256,
-                "response_sha256": self._response_sha256,
-                "transport_outcome": self._transport_outcome,
-                "upstream_status": self._upstream_status,
-                "upstream_error_class": self._upstream_error_class,
+                # Scalar provenance describes one call only; multiple calls have no
+                # truthful single request/response pair or upstream status.
+                "request_sha256": single.request_sha256 if single else "",
+                "response_sha256": single.response_sha256 if single else "",
+                "transport_outcome": outcome,
+                "upstream_status": single.upstream_status if single else None,
+                "upstream_error_class": single.upstream_error_class if single else None,
+                "request_receipts": receipts,
                 "local_rejection_count": self._local_rejection_count,
                 "local_error_class": self._local_error_class,
                 "capability_expires_at": self._expires_at,

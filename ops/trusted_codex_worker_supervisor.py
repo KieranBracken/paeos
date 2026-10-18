@@ -151,6 +151,64 @@ class SupervisorFailure(RuntimeError):
         super().__init__(message)
 
 
+def _broker_evidence_complete(evidence: dict[str, object], model_id: str) -> bool:
+    """Require a paired terminal receipt for every reserved upstream attempt."""
+    count = evidence.get("request_count")
+    limit = evidence.get("request_limit")
+    receipts = evidence.get("request_receipts")
+    if (
+        evidence.get("schema") != "paeos.task-scoped-responses-broker/2"
+        or evidence.get("binding") != "127.0.0.1"
+        or evidence.get("model_id") != model_id
+        or evidence.get("transport_outcome") != "response_received"
+        or type(count) is not int
+        or type(limit) is not int
+        or not 1 <= count <= limit <= MAX_TASK_REQUESTS
+        or type(evidence.get("local_rejection_count")) is not int
+        or evidence.get("local_rejection_count") != 0
+        or evidence.get("local_error_class") is not None
+        or not isinstance(receipts, list)
+        or len(receipts) != count
+    ):
+        return False
+    fields = {
+        "request_id",
+        "request_sha256",
+        "response_sha256",
+        "transport_outcome",
+        "upstream_status",
+        "upstream_error_class",
+    }
+    for index, receipt in enumerate(receipts, 1):
+        if (
+            not isinstance(receipt, dict)
+            or set(receipt) != fields
+            or type(receipt.get("request_id")) is not int
+            or receipt["request_id"] != index
+            or receipt["transport_outcome"] != "response_received"
+            or type(receipt["upstream_status"]) is not int
+            or not 100 <= receipt["upstream_status"] <= 599
+            or receipt["upstream_error_class"] is not None
+            or any(
+                not isinstance(receipt[field], str)
+                or re.fullmatch(r"[0-9a-f]{64}", receipt[field]) is None
+                for field in ("request_sha256", "response_sha256")
+            )
+        ):
+            return False
+    # Keep single-call legacy projections truthful; never invent one pair for many calls.
+    for field, empty in (
+        ("request_sha256", ""),
+        ("response_sha256", ""),
+        ("upstream_status", None),
+        ("upstream_error_class", None),
+    ):
+        expected = receipts[0][field] if count == 1 else empty
+        if field not in evidence or evidence[field] != expected:
+            return False
+    return True
+
+
 def _canonical_bytes(value: object) -> bytes:
     return (
         json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
@@ -886,21 +944,7 @@ class TrustedCodexWorkerSupervisor:
                     request_state / "broker-evidence.json",
                     _canonical_bytes(broker_evidence),
                 )
-            if (
-                broker_evidence.get("binding") != "127.0.0.1"
-                or broker_evidence.get("model_id") != model_id
-                or broker_evidence.get("transport_outcome") != "response_received"
-                or not isinstance(broker_evidence.get("upstream_status"), int)
-                or not isinstance(broker_evidence.get("request_count"), int)
-                or not 1 <= broker_evidence["request_count"] <= MAX_TASK_REQUESTS
-                or broker_evidence.get("local_rejection_count") != 0
-                or broker_evidence.get("local_error_class") is not None
-                or any(
-                    not isinstance(broker_evidence.get(field), str)
-                    or len(broker_evidence[field]) != 64
-                    for field in ("request_sha256", "response_sha256")
-                )
-            ):
+            if not _broker_evidence_complete(broker_evidence, model_id):
                 raise SupervisorFailure("broker_failure", "task broker evidence is incomplete")
             canaries["broker_capability_task_scoped"] = "PASS"
             broker_evidence_sha256 = _sha256(_canonical_bytes(broker_evidence))

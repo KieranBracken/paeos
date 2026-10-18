@@ -8,6 +8,35 @@ import pytest
 from nacl.signing import SigningKey
 
 
+def _broker_evidence(count=1):
+    receipts = [
+        {
+            "request_id": index,
+            "request_sha256": str(index) * 64,
+            "response_sha256": "b" * 64,
+            "transport_outcome": "response_received",
+            "upstream_status": 200,
+            "upstream_error_class": None,
+        }
+        for index in range(1, count + 1)
+    ]
+    return {
+        "schema": "paeos.task-scoped-responses-broker/2",
+        "binding": "127.0.0.1",
+        "model_id": "gpt-5.6-sol",
+        "transport_outcome": "response_received",
+        "upstream_status": 200 if count == 1 else None,
+        "upstream_error_class": None,
+        "request_count": count,
+        "request_limit": 32,
+        "local_rejection_count": 0,
+        "local_error_class": None,
+        "request_sha256": "1" * 64 if count == 1 else "",
+        "response_sha256": "b" * 64 if count == 1 else "",
+        "request_receipts": receipts,
+    }
+
+
 def _request(key: SigningKey, **overrides: object) -> dict[str, object]:
     from ops.trusted_codex_worker_supervisor import _canonical_bytes
 
@@ -33,6 +62,91 @@ def _request(key: SigningKey, **overrides: object) -> dict[str, object]:
         **payload,
         "signature": key.sign(_canonical_bytes(payload)).signature.hex(),
     }
+
+
+@pytest.mark.parametrize("count", [1, 2])
+def test_broker_receipt_validator_accepts_complete_pairs_without_claiming_http_success(count):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    evidence = _broker_evidence(count)
+    evidence["request_receipts"][0]["upstream_status"] = 429
+    if count == 1:
+        evidence["upstream_status"] = 429
+    assert _broker_evidence_complete(evidence, "gpt-5.6-sol")
+
+
+@pytest.mark.parametrize(
+    "defect",
+    [
+        "legacy",
+        "missing",
+        "duplicate",
+        "bool_id",
+        "pending",
+        "failure",
+        "missing_hash",
+        "invalid_hash",
+        "invalid_status",
+        "extra_field",
+        "wrong_model",
+        "false_count",
+        "count_mismatch",
+        "limit",
+        "local_rejection",
+        "ambiguous_scalar",
+        "missing_scalar",
+    ],
+)
+def test_broker_receipt_validator_rejects_incomplete_or_ambiguous_task_evidence(defect):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    evidence = _broker_evidence(2)
+    first = evidence["request_receipts"][0]
+    if defect == "legacy":
+        evidence["schema"] = "paeos.task-scoped-responses-broker/1"
+    elif defect == "missing":
+        evidence.pop("request_receipts")
+    elif defect == "duplicate":
+        evidence["request_receipts"][1]["request_id"] = 1
+    elif defect == "bool_id":
+        first["request_id"] = True
+    elif defect == "pending":
+        first["transport_outcome"] = "upstream_started"
+    elif defect == "failure":
+        first["transport_outcome"] = "upstream_failure"
+        first["upstream_error_class"] = "timeout"
+    elif defect == "missing_hash":
+        first.pop("response_sha256")
+    elif defect == "invalid_hash":
+        first["response_sha256"] = "z" * 64
+    elif defect == "invalid_status":
+        first["upstream_status"] = True
+    elif defect == "extra_field":
+        first["opaque"] = "unverified"
+    elif defect == "wrong_model":
+        evidence["model_id"] = "different-model"
+    elif defect == "false_count":
+        evidence["request_count"] = True
+    elif defect == "count_mismatch":
+        evidence["request_count"] = 1
+    elif defect == "limit":
+        evidence["request_limit"] = 1
+    elif defect == "local_rejection":
+        evidence["local_rejection_count"] = 1
+    elif defect == "ambiguous_scalar":
+        evidence["request_sha256"] = "a" * 64
+        evidence["response_sha256"] = "b" * 64
+    elif defect == "missing_scalar":
+        evidence.pop("upstream_status")
+    assert not _broker_evidence_complete(evidence, "gpt-5.6-sol")
+
+
+def test_broker_receipt_validator_rejects_single_call_scalar_mismatch():
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    evidence = _broker_evidence()
+    evidence["response_sha256"] = "c" * 64
+    assert not _broker_evidence_complete(evidence, "gpt-5.6-sol")
 
 
 def _service(
@@ -132,8 +246,9 @@ def test_supervisor_signed_failure_response_contains_no_worker_output(tmp_path: 
     assert isinstance(response["signature"], str)
 
 
+@pytest.mark.parametrize("broker_calls", [1, 2])
 def test_supervisor_builder_deadline_is_longer_than_failed_p1_window_but_bounded(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, broker_calls: int
 ) -> None:
     """A slow but live Builder must not be cut off by the old fixed 300-second deadline."""
     import ops.trusted_codex_worker_supervisor as supervisor
@@ -156,17 +271,7 @@ def test_supervisor_builder_deadline_is_longer_than_failed_p1_window_but_bounded
             return None
 
         def evidence(self) -> dict[str, object]:
-            return {
-                "binding": "127.0.0.1",
-                "model_id": "gpt-5.6-sol",
-                "transport_outcome": "response_received",
-                "upstream_status": 200,
-                "request_count": 1,
-                "local_rejection_count": 0,
-                "local_error_class": None,
-                "request_sha256": "a" * 64,
-                "response_sha256": "b" * 64,
-            }
+            return _broker_evidence(broker_calls)
 
     class _Policy:
         seatbelt_profile = "test-profile"
@@ -647,17 +752,7 @@ def test_post_response_process_failure_records_its_boundary_before_capture(
             return None
 
         def evidence(self) -> dict[str, object]:
-            return {
-                "binding": "127.0.0.1",
-                "model_id": "gpt-5.6-sol",
-                "transport_outcome": "response_received",
-                "upstream_status": 200,
-                "request_count": 1,
-                "local_rejection_count": 0,
-                "local_error_class": None,
-                "request_sha256": "a" * 64,
-                "response_sha256": "b" * 64,
-            }
+            return _broker_evidence()
 
     class _Policy:
         seatbelt_profile = "test-profile"

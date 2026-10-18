@@ -1,0 +1,64 @@
+{
+  "lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "--no-cache",
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "tests/runtime/test_responses_broker_request_limit.py",
+      "ops/trusted_codex_worker_supervisor.py",
+      "tests/runtime/test_trusted_codex_worker_transport.py",
+      "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "tests/runtime/test_responses_broker_request_limit.py",
+      "ops/trusted_codex_worker_supervisor.py",
+      "tests/runtime/test_trusted_codex_worker_transport.py",
+      "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "5 files already formatted\n",
+    "stderr": ""
+  },
+  "diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compile": {
+    "passed": true,
+    "method": "compile(source, filename, exec); no bytecode",
+    "paths": [
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "tests/runtime/test_responses_broker_request_limit.py",
+      "ops/trusted_codex_worker_supervisor.py",
+      "tests/runtime/test_trusted_codex_worker_transport.py",
+      "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/run_verification.py"
+    ]
+  },
+  "original_review_unchanged": {
+    "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+    "passed": true
+  },
+  "source_hashes": {
+    "runtime/integrations/task_scoped_responses_broker.py": "b36f6294cb2b1cd0ae68bee50867d5c38f5e9f19c170ed18290305169131d17d",
+    "tests/runtime/test_responses_broker_request_limit.py": "01b1cdaf162d11c55703a4b690edccc7e532dfa7f966b95d6ea0c43f369d60d7",
+    "ops/trusted_codex_worker_supervisor.py": "2c67df1d8c85fd118437f716d76e6f1010eead5382d13940b63ff15c2a396ef8",
+    "tests/runtime/test_trusted_codex_worker_transport.py": "a4da7760b0980e2c1d5a64f024090a8386da528c17b88225f9b81b1188a89c0c",
+    "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/run_verification.py": "db67b565a1bb0ad2d60a1020537705669a47e8ff1ff8b9fc93dcd7bda80c3d8c"
+  }
+}
