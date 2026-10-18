@@ -1,0 +1,67 @@
+{
+  "schema": "paeos.explicit-recovery-manifest/1",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "base_sha": "3684f2e04818b9ee7eff55a43ed8c0eeab67cfe2",
+  "artifacts": [
+    {
+      "path": "runtime/integrations/__init__.py",
+      "sha256": "38443401008daec2997c61a81d948c56b9fab667a80da6cfcff2dd242d689222"
+    },
+    {
+      "path": "tests/runtime/test_live_adapter.py",
+      "sha256": "f0e9ba02576b9fa5a9e5f0025ec96cc088563c9b1756cfab2408e46e1f5f0f75"
+    },
+    {
+      "path": "tests/runtime/test_claude_cli_disclosure_denial.py",
+      "sha256": "9be1802ba8639f4fca30bd4dbe38e059615d3cb38b0d075faa54dfa04b103502"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/SCOPE.json",
+      "sha256": "50fb3bf590451477a58656391bd7072422088385982a9663af87f129d2094d1f"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/RESULT.json",
+      "sha256": "43d92c878e766ea94ce783cb12abca8440ab4d80f6d264a7694db1f7abedeea7"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/run_verification.py",
+      "sha256": "a6888ec70c7ddb94ec3a081c28e447ada4f87027939bc3fd8d5d622d44e87e21"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/red.stdout.txt",
+      "sha256": "c8d7c8eca675dd883a323b926112213da76661b9ee8185fe67f083249d9f37c2"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/red.command.json",
+      "sha256": "a430e49d12b317aa9d9f5960a213ef3dc9bc36860d175d99c784e20f6ecc23ce"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/green.stdout.txt",
+      "sha256": "7d03f93dfe33a3497d3eb9550439ebcd1d37b1e342e945c1d71111bad56667bf"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/green.command.json",
+      "sha256": "a36d9bb7838bb57042d785dcb10e51ae41f25cae5ac7a86862e3c7a5bd2879f2"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/regression.stdout.txt",
+      "sha256": "0cf3efb845593740065b9062746314db5397852d0bdc735e011297302a61e683"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/regression.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018/regression.command.json",
+      "sha256": "4a0fcb667769d9e440ef76eb027c6dbe420d15bb9b187bce4ca35ba5e15f6f7f"
+    }
+  ]
+}

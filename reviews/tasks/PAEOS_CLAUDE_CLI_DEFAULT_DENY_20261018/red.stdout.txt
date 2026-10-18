@@ -1,0 +1,123 @@
+NETWORK_DENIAL_CONTROL=PASS
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+__________ test_public_claude_cli_invoker_denies_locally_without_echo __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x101258d60>
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-claude-denial-bwhxz8mg/pytest/test_public_claude_cli_invoker0')
+
+    def test_public_claude_cli_invoker_denies_locally_without_echo(monkeypatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
+        from runtime.integrations import claude_cli_invoker
+
+        invoker = claude_cli_invoker(_package(), mcp_config_path=tmp_path / "synthetic-mcp.json")
+>       _assert_denied_without_launch(monkeypatch, lambda: invoker(_spec(tmp_path)))
+
+tests/runtime/test_claude_cli_disclosure_denial.py:97:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/runtime/test_claude_cli_disclosure_denial.py:73: in _assert_denied_without_launch
+    invoke()  # type: ignore[operator]
+    ^^^^^^^^
+tests/runtime/test_claude_cli_disclosure_denial.py:97: in <lambda>
+    _assert_denied_without_launch(monkeypatch, lambda: invoker(_spec(tmp_path)))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/__init__.py:267: in _invoke
+    return _bounded_session_result(spec, cmd, provider="claude")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/__init__.py:136: in _bounded_session_result
+    observation: ProcessObservation = run_bounded_process(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = (('claude', '-p', 'SYNTHETIC_SECRET_MARKER_MUST_NOT_BE_ECHOED', '--output-format', 'json', '--allowedTools', ...),)
+kwargs = {'cwd': PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-claude-denial-bwhxz8mg/pytest/test_public_claude_cli_invoker0'), 'environment': {}, 'start_timeout_s': 30.0, 'execution_timeout_s': 30.0, ...}
+
+    def _run(*args: object, **kwargs: object) -> object:
+        calls.append("run_bounded_process")
+>       raise AssertionError("provider process boundary was reached")
+E       AssertionError: provider process boundary was reached
+
+tests/runtime/test_claude_cli_disclosure_denial.py:56: AssertionError
+________ test_direct_bounded_session_helper_denies_locally_without_echo ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x101258180>
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-claude-denial-bwhxz8mg/pytest/test_direct_bounded_session_he0')
+
+    def test_direct_bounded_session_helper_denies_locally_without_echo(monkeypatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
+        from runtime.integrations import _bounded_session_result
+
+>       _assert_denied_without_launch(
+            monkeypatch,
+            lambda: _bounded_session_result(
+                _spec(tmp_path),
+                ["claude", "-p", _SYNTHETIC_PROMPT],
+                provider="claude",
+            ),
+        )
+
+tests/runtime/test_claude_cli_disclosure_denial.py:103:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/runtime/test_claude_cli_disclosure_denial.py:73: in _assert_denied_without_launch
+    invoke()  # type: ignore[operator]
+    ^^^^^^^^
+tests/runtime/test_claude_cli_disclosure_denial.py:105: in <lambda>
+    lambda: _bounded_session_result(
+runtime/integrations/__init__.py:136: in _bounded_session_result
+    observation: ProcessObservation = run_bounded_process(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = (('claude', '-p', 'SYNTHETIC_SECRET_MARKER_MUST_NOT_BE_ECHOED'),)
+kwargs = {'cwd': PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-claude-denial-bwhxz8mg/pytest/test_direct_bounded_session_he0'), 'environment': {}, 'start_timeout_s': 30.0, 'execution_timeout_s': 30.0, ...}
+
+    def _run(*args: object, **kwargs: object) -> object:
+        calls.append("run_bounded_process")
+>       raise AssertionError("provider process boundary was reached")
+E       AssertionError: provider process boundary was reached
+
+tests/runtime/test_claude_cli_disclosure_denial.py:56: AssertionError
+_______________ test_live_invoker_denies_before_provider_launch ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1013617f0>
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-claude-denial-bwhxz8mg/pytest/test_live_invoker_denies_befor0')
+
+    def test_live_invoker_denies_before_provider_launch(monkeypatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
+        import runtime.integrations as integ
+
+        calls: list[str] = []
+
+        def _prepare(*args, **kwargs):  # type: ignore[no-untyped-def]
+            calls.append("prepare_provider_launch")
+            return args[0], {}, None
+
+        def _run(*args, **kwargs):  # type: ignore[no-untyped-def]
+            calls.append("run_bounded_process")
+            raise AssertionError("provider process boundary was reached")
+
+        monkeypatch.setattr(integ, "prepare_provider_launch", _prepare)
+        monkeypatch.setattr(integ, "run_bounded_process", _run)
+        invoker = integ.claude_cli_invoker(_package())
+        try:
+>           invoker(SessionSpec(tmp_path, "p", ("Write",), (), 60))
+
+tests/runtime/test_live_adapter.py:303:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+runtime/integrations/__init__.py:267: in _invoke
+    return _bounded_session_result(spec, cmd, provider="claude")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/__init__.py:136: in _bounded_session_result
+    observation: ProcessObservation = run_bounded_process(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = (('claude', '-p', 'p', '--output-format', 'json', '--allowedTools', ...),)
+kwargs = {'cwd': PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-claude-denial-bwhxz8mg/pytest/test_live_invoker_denies_befor0'), 'environment': {}, 'start_timeout_s': 30.0, 'execution_timeout_s': 60.0, ...}
+
+    def _run(*args, **kwargs):  # type: ignore[no-untyped-def]
+        calls.append("run_bounded_process")
+>       raise AssertionError("provider process boundary was reached")
+E       AssertionError: provider process boundary was reached
+
+tests/runtime/test_live_adapter.py:297: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_claude_cli_disclosure_denial.py::test_public_claude_cli_invoker_denies_locally_without_echo
+FAILED tests/runtime/test_claude_cli_disclosure_denial.py::test_direct_bounded_session_helper_denies_locally_without_echo
+FAILED tests/runtime/test_live_adapter.py::test_live_invoker_denies_before_provider_launch
+3 failed in 0.09s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "runtime": "runtime/__init__.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.review": "runtime/review/__init__.py", "runtime.task_package": "runtime/task_package.py", "tests": "tests/__init__.py", "tests.runtime": "tests/runtime/__init__.py", "tests.runtime.test_claude_cli_disclosure_denial": "tests/runtime/test_claude_cli_disclosure_denial.py", "tests.runtime.test_live_adapter": "tests/runtime/test_live_adapter.py"}

@@ -1,0 +1,23 @@
+{
+  "task": "PAEOS_CLAUDE_CLI_DEFAULT_DENY_20261018",
+  "classification": "bounded offline P1 default-deny repair",
+  "base_sha": "3684f2e04818b9ee7eff55a43ed8c0eeab67cfe2",
+  "allowed_source_paths": [
+    "runtime/integrations/__init__.py",
+    "tests/runtime/test_live_adapter.py",
+    "tests/runtime/test_claude_cli_disclosure_denial.py"
+  ],
+  "preimages": {
+    "runtime/integrations/__init__.py": "aaab1276c075998155f4b26ae2f52a3d898edcc8db67589622ce5da95e323410",
+    "tests/runtime/test_live_adapter.py": "dac66cc87e9ebc7ce5224eaf2ea251a043793e5a9ace23a6ed21306afa045857",
+    "tests/runtime/test_claude_cli_disclosure_denial.py": "ABSENT"
+  },
+  "constraints": [
+    "deny Claude CLI egress locally before provider preparation or process launch",
+    "no positive permit, worker-supplied label, callback, environment switch, or alternate allow path",
+    "synthetic test data only",
+    "no provider calls, installation, admission, qualification, Court or debt integration, or formal review",
+    "do not modify other production or test paths"
+  ],
+  "status": "VERIFIED"
+}

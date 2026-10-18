@@ -18,7 +18,6 @@ from kernel.types import ArtifactRef, Role, StageId
 from nacl.signing import SigningKey
 from runtime.claude_code import AgentDispatcher
 from runtime.integrations import ClaudeCodeRuntime, SessionResult, SessionSpec, build_prompt
-from runtime.integrations.process_supervisor import ProcessLifecycleState, ProcessObservation
 from runtime.review import InformationBarrierManager, ReviewHarness
 from runtime.task_package import (
     Budget,
@@ -284,30 +283,29 @@ def test_planner_allow_list_omits_bash_least_privilege() -> None:
     assert {"Read", "Write", "Edit"} <= set(allowed)  # still gets the scoped non-exec tools
 
 
-def test_live_invoker_passes_dangerously_skip_permissions(monkeypatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
+def test_live_invoker_denies_before_provider_launch(monkeypatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
     import runtime.integrations as integ
 
-    captured: dict[str, list[str]] = {}
+    calls: list[str] = []
 
-    def _fake_run(cmd, **kwargs):  # type: ignore[no-untyped-def]
-        captured["cmd"] = cmd
-        return ProcessObservation(
-            argv=tuple(cmd),
-            executable="/usr/local/bin/claude",
-            executable_version="sha256:test",
-            cwd=str(kwargs["cwd"]),
-            environment_fingerprint="e" * 64,
-            stdout=_TRANSCRIPT.encode(),
-            stderr=b"",
-            exit_code=0,
-            duration_ms=1,
-            lifecycle_state=ProcessLifecycleState.RETURNED,
-        )
+    def _prepare(*args, **kwargs):  # type: ignore[no-untyped-def]
+        calls.append("prepare_provider_launch")
+        return args[0], {}, None
 
-    monkeypatch.setattr(integ, "run_bounded_process", _fake_run)
+    def _run(*args, **kwargs):  # type: ignore[no-untyped-def]
+        calls.append("run_bounded_process")
+        raise AssertionError("provider process boundary was reached")
+
+    monkeypatch.setattr(integ, "prepare_provider_launch", _prepare, raising=False)
+    monkeypatch.setattr(integ, "run_bounded_process", _run, raising=False)
     invoker = integ.claude_cli_invoker(_package())
-    invoker(SessionSpec(tmp_path, "p", ("Write",), (), 60))
-    assert "--dangerously-skip-permissions" in captured["cmd"]
+    try:
+        invoker(SessionSpec(tmp_path, "p", ("Write",), (), 60))
+    except integ.TrustedTransportFailure as exc:
+        assert exc.code == "disclosure_authority_unavailable"
+    else:
+        raise AssertionError("Claude CLI invocation did not fail closed")
+    assert calls == []
 
 
 # ---- B2.J: workspace context (constitution + materialized refs) -----------

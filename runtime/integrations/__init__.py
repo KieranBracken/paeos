@@ -27,17 +27,12 @@ import tempfile
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import NoReturn
 
 from kernel.cas import CasMiss
 from kernel.types import ArtifactRef, Hash, Role
 
 from runtime.claude_code import AgentWrite, RunOutput, within_scopes
-from runtime.integrations.process_supervisor import (
-    ProcessLifecycleState,
-    ProcessObservation,
-    run_bounded_process,
-)
-from runtime.integrations.worker_confinement import prepare_provider_launch
 from runtime.task_package import Cost, TaskPackage, TaskStatus
 
 __all__ = [
@@ -76,6 +71,14 @@ class TrustedTransportFailure(RuntimeError):
     def __init__(self, code: str = "transport_protocol_failure", message: str | None = None) -> None:
         self.code = code
         super().__init__(message or code)
+
+
+def _require_claude_cli_disclosure_authority() -> NoReturn:
+    """Deny Claude CLI egress until trusted disclosure authority is integrated."""
+    raise TrustedTransportFailure(
+        "disclosure_authority_unavailable",
+        "trusted disclosure authority is unavailable",
+    )
 
 
 class ContextMaterializationFailure(RuntimeError):
@@ -123,49 +126,8 @@ def _bounded_session_result(
     *,
     provider: str,
 ) -> SessionResult:
-    """Launch a provider through the durable process boundary.
-
-    The process supervisor owns all observations. This adapter may validate the provider's
-    transcript, but it cannot supply exit codes, output, or artifact hashes itself.
-    """
-
-    effective_timeout = min(spec.timeout_s or 1800, 1800)
-    confined_argv, environment, _policy = prepare_provider_launch(
-        tuple(argv), workspace=spec.workspace, parent_environment=os.environ
-    )
-    observation: ProcessObservation = run_bounded_process(
-        confined_argv,
-        cwd=spec.workspace,
-        environment=environment,
-        start_timeout_s=min(30.0, max(1.0, float(effective_timeout))),
-        execution_timeout_s=float(effective_timeout),
-        state_path=spec.lifecycle_state_path or spec.workspace / ".paeos-provider-lifecycle.json",
-    )
-    if (
-        observation.lifecycle_state is not ProcessLifecycleState.RETURNED
-        or observation.exit_code != 0
-        or not observation.stdout.strip()
-    ):
-        raise RuntimeError(
-            f"{provider} CLI did not produce a completed transcript "
-            f"(state={observation.lifecycle_state.value}, exit={observation.exit_code}, "
-            f"stdout_sha256={hashlib.sha256(observation.stdout).hexdigest()}, "
-            f"stderr_sha256={hashlib.sha256(observation.stderr).hexdigest()})"
-        )
-    try:
-        transcript = observation.stdout.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise RuntimeError(f"{provider} CLI produced a non-UTF-8 transcript") from exc
-    return SessionResult(
-        transcript=transcript,
-        stderr=observation.stderr,
-        lifecycle_state=observation.lifecycle_state.value,
-        executable=observation.executable,
-        executable_version=observation.executable_version,
-        cwd=observation.cwd,
-        environment_fingerprint=observation.environment_fingerprint,
-        exit_code=observation.exit_code,
-    )
+    """Fail closed before inspecting or preparing any Claude CLI payload."""
+    _require_claude_cli_disclosure_authority()
 
 
 def build_prompt(package: TaskPackage) -> str:
@@ -241,30 +203,14 @@ def _allowed_tools(package: TaskPackage) -> tuple[str, ...]:
 
 
 def claude_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = None) -> CliInvoker:
-    """The real invoker: run the `claude` CLI headless in the workspace. Needs auth + the target env
-    (so it is not exercised by unit tests). Kept as a factory so the model/flags can be tuned. When
-    `mcp_config_path` is given, the session gets `--mcp-config` so it can call the court MCP tool
-    (autonomous evidence submission, R5.3)."""
+    """Return a locally denied Claude invoker until trusted disclosure authority exists.
+
+    The factory signature remains stable for callers, but neither the package nor prompt is
+    inspected and `mcp_config_path` cannot enable an egress exception.
+    """
 
     def _invoke(spec: SessionSpec) -> SessionResult:
-        allowed = list(spec.allowed_tools)
-        if mcp_config_path is not None:
-            allowed.append("mcp__paeos-court__submit_evidence")  # autonomous evidence tool (R5.3)
-        cmd = [
-            "claude",
-            "-p",
-            spec.prompt,
-            "--output-format",
-            "json",
-            "--allowedTools",
-            ",".join(allowed),
-            # Headless sessions in isolated temp sandboxes cannot answer prompts.
-            # `--dangerously-skip-permissions` allows Bash and MCP calls to run.
-            "--dangerously-skip-permissions",
-        ]
-        if mcp_config_path is not None:
-            cmd += ["--mcp-config", str(mcp_config_path)]
-        return _bounded_session_result(spec, cmd, provider="claude")
+        _require_claude_cli_disclosure_authority()
 
     return _invoke
 
