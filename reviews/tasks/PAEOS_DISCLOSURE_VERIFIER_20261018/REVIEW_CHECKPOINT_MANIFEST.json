@@ -1,0 +1,78 @@
+{
+  "schema": "paeos.review-checkpoint-manifest/1",
+  "reviewed_source_commit": "ab7c47d72b6c5b0dabbfce8cd5ad8a7d70b89a91",
+  "source_changed_after_review": false,
+  "prior_manifest_binding": "MANIFEST.json is bound to ab7c47d7; append-only logs gained review entries afterward. This manifest binds the current evidence checkpoint.",
+  "files": [
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "d107825db7ad53ed054f2b6f645c6b33998cde3f7a87ab7526c872c5c8a5cb68",
+      "bytes": 648054
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "be4db865c3931ca898cc95a25a6351ee0ec79aa6b597f8153410d14dc5cbcc1e",
+      "bytes": 1432244
+    },
+    {
+      "path": "paeos/model_router/disclosure_policy.py",
+      "sha256": "5c58f90c321a7f6bfadeddef912372baa1f814219c2f78bcf347fb833167a3c6",
+      "bytes": 15696
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/MANIFEST.json",
+      "sha256": "0cce3d7feaa1ad5a570fa46a691430c4703adb329d04857afa5a7d028736cfac",
+      "bytes": 1876
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/REPORT.md",
+      "sha256": "a30cb1a39d151bcf9f8d2af8a781b2cdc2357a3deeec3699df2988e6180f36b4",
+      "bytes": 4997
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/SCOPE.json",
+      "sha256": "99c83b5e0cb3c32fb572185ed057256a467b8ee5b4c364ec8b5d6cb56c045b37",
+      "bytes": 2386
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/preservation.json",
+      "sha256": "3a968c18c7d490ef219a9b8adf4e1120e0d02d096857572cf824b70e1d9e7b61",
+      "bytes": 583
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/remote-readback.json",
+      "sha256": "28d7c3ab41b71a95841211dfeb5f4bebc05f3e57f96b48be52e4e7becaf75be0",
+      "bytes": 779
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/review-secret-scan.json",
+      "sha256": "a720610076e85c63313d521dccc94b627e9e776b77784702bf46baba41b648d0",
+      "bytes": 525
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/secret-scan.json",
+      "sha256": "7ba642981d47927b0c766eea29b6d5ea47da2a020da32417c38ef1597e1c5bf9",
+      "bytes": 773
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-disposition.json",
+      "sha256": "03cfc527ce4be953d58ed1df18331a0929f4a7edd7acfd56be7bc16f8621bbac",
+      "bytes": 1050
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+      "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+      "bytes": 4228
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/verification.json",
+      "sha256": "2071b2c4fe85cb221b0011e5640d5656d543a441cbd56be2c6a17b3062f5caa3",
+      "bytes": 3472
+    },
+    {
+      "path": "tests/model_router/test_disclosure_policy.py",
+      "sha256": "85c7772687993d8f3028267eba4fd419c0201d4f7f34fd333adc1d1acfd829ed",
+      "bytes": 14674
+    }
+  ]
+}

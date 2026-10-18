@@ -1,0 +1,28 @@
+{
+  "schema": "paeos.readonly-review-disposition/1",
+  "reviewed_head": "ab7c47d72b6c5b0dabbfce8cd5ad8a7d70b89a91",
+  "base_branch": "codex/pre-p3-clean-recovery-20261017",
+  "merge_base": "2dc2544ee2f46d2a240c4bff16ee1950a476e92e",
+  "reviewer": "/root/disclosure_checkpoint_security_review",
+  "context": "fresh, no Builder transcript supplied",
+  "reviewer_model": null,
+  "reviewer_family": null,
+  "provider_request_fingerprint": null,
+  "provider_response_fingerprint": null,
+  "local_report_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+  "review_count": 1,
+  "pure_verifier_result": "NO_ACTIONABLE_FINDINGS_WITHIN_DECLARED_SCOPE",
+  "branch_result": "ACTIONABLE_FINDINGS",
+  "branch_findings": {
+    "P1": 2,
+    "P2": 3
+  },
+  "heterogeneous_l14_eligibility": "NOT_ESTABLISHED",
+  "court_disposition": "NONE",
+  "qualification": "NONE",
+  "after_review_source_modified": false,
+  "host_installed": false,
+  "qualification_request_sent": false,
+  "provider_calls_by_this_execution": 0,
+  "gate": "P1_REMAINS"
+}

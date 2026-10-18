@@ -13748,3 +13748,14 @@ P1_REMAINS: no production transport consumer, current-policy/revocation check, t
 ALLOWED_NOW: capture/review/push this inactive source package and prepare its bounded dependent contracts. Owner: this bootstrap coordinator.
 HELD: activation and Chat 1's fresh D0258 codec dispatch; wake only after complete boundary enforcement, exact clean review, actual authority enrollment, stage qualification and fresh admission. P3 remains held.
 AUTHORITY_OR_IMPLEMENTATION_GAP: absent enrolled Founder public authority; v1 policy does not encode selected expanded operation; encrypted off-device runtime recovery/custody and consistency remain unproven.
+
+
+### 2026-10-18 — exact disclosure checkpoint reviewed; branch remains held
+
+Checkpoint `ab7c47d72b6c5b0dabbfce8cd5ad8a7d70b89a91` was pushed, read back from GitHub, and reproduced from a fresh clone: all nine manifest hashes matched and 125 policy tests passed. One fresh-context read-only Security Review found no actionable defect within the inactive verifier's declared scope. Its whole-branch result remains actionable: two P1 and three P2 findings, including unauthenticated provider replies, request/response evidence races, configured rather than observed identity, and unbounded process output. The complete report is preserved unchanged in `reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md`. No reviewer family attestation or provider fingerprint was available; this is not L14 or Court acceptance. No review-driven source changes followed this report.
+
+A read-only dependency check corrected a possible bootstrap cycle: the one supervised canary may use the existing durable supervisor claim without D0258's general atomic-ledger API. It still needs stable exact authorization/bundle binding and a pre-forward one-call limit; the current claim is nonce-bound and the broker permits 32 calls before its later qualification check. General policy currentness stays behind canonical ledger integration owned by Chat 1.
+
+ALLOWED_NOW: Preserve/push the exact findings and prepare the bounded next enforcement package. Owner: bootstrap coordinator.
+HELD: Installation, the single qualification request, Chat 1 admission and P3. Wake requires exact trusted disclosure authority, enforced full-frame/closure controls, corrected receipt/provenance boundaries, clean review and current host/stage checks.
+AUTHORITY_OR_IMPLEMENTATION_GAP: Pure verification is implemented, but production authority/enforcement and independent recovery-key custody are not established. No old backup tree is proven disposable.

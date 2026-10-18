@@ -1,0 +1,13 @@
+{
+  "schema": "paeos.remote-recovery-readback/1",
+  "remote": "https://github.com/KieranBracken/paeos",
+  "branch": "codex/builder-qualification-bootstrap-20261017",
+  "readback_commit": "ab7c47d72b6c5b0dabbfce8cd5ad8a7d70b89a91",
+  "fresh_clone": "/private/tmp/paeos-disclosure-readback-ab7c47d7",
+  "manifest_hashes_verified": 9,
+  "focused_reproduction": "125 passed",
+  "output_sha256": "8b69339a98a6dbef7b54d00fb9bc76801b4e130c0c1c282e5cb9a44ab21a9aaf",
+  "environment": "Fresh source checkout; shared existing dependency virtualenv; candidate import-origin assertion passes.",
+  "initial_probe_error": "Attempt from /private/tmp outside project did not locate pytest. Re-run in the fresh checkout succeeded; not counted as a code test failure.",
+  "qualification": false
+}
