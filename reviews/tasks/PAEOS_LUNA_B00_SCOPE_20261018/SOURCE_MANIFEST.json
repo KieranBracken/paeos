@@ -1,0 +1,128 @@
+{
+  "base_commit": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "root": "candidate-relative repository root",
+  "schema": "paeos.source-scope-manifest/1",
+  "source_files": [
+    {
+      "path": "paeos/model_router/state.py",
+      "preimage": "EXISTING",
+      "preimage_sha256": "836d018ae3d64e3c560c9f5b8e1cacde4d297dde29689756c6e84bbc773fe640",
+      "write": "yes"
+    },
+    {
+      "path": "paeos/model_router/disclosure_authority.py",
+      "preimage": "MUST_NOT_EXIST",
+      "preimage_sha256": null,
+      "write": "yes"
+    },
+    {
+      "path": "tests/model_router/test_disclosure_authority.py",
+      "preimage": "MUST_NOT_EXIST",
+      "preimage_sha256": null,
+      "write": "yes"
+    },
+    {
+      "path": "tests/model_router/test_disclosure_attempts.py",
+      "preimage": "MUST_NOT_EXIST",
+      "preimage_sha256": null,
+      "write": "yes"
+    },
+    {
+      "bytes": 15696,
+      "path": "paeos/model_router/disclosure_policy.py",
+      "sha256": "5c58f90c321a7f6bfadeddef912372baa1f814219c2f78bcf347fb833167a3c6",
+      "write": "no"
+    },
+    {
+      "bytes": 6373,
+      "path": "paeos/model_router/disclosure_store.py",
+      "sha256": "2307d0707c5fedf595e705f82f0a0e7c39ee07d302ca79943edf36261f1f6a26",
+      "write": "no"
+    },
+    {
+      "bytes": 18689,
+      "path": "runtime/worker_admission.py",
+      "sha256": "766665fb19e363fbb05c3cc8ab91674dd891e138f46f0e303adf230982329298",
+      "write": "no"
+    },
+    {
+      "bytes": 6327,
+      "path": "runtime/supervisors/admission.py",
+      "sha256": "f5b85a8767ec547587899ee42750d78fd7330af6ddbfc97cfbc3c1b495454631",
+      "write": "no"
+    },
+    {
+      "bytes": 11053,
+      "path": "runtime/supervisors/protocol.py",
+      "sha256": "d807554e151cb14a87a5a19f60cc7a1f01bb960557385ff289b524663d4bc8d1",
+      "write": "no"
+    },
+    {
+      "bytes": 7091,
+      "path": "runtime/autonomy/authority.py",
+      "sha256": "ef1aaa769217f8c5a564e37fa515256afcd35a335e82ba4b2591a524582c42d8",
+      "write": "no"
+    },
+    {
+      "bytes": 21508,
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "sha256": "4351b8b90d5f393d1236a59af735eeb4947be4d701798e0b0052308bbc515b04",
+      "write": "no"
+    },
+    {
+      "bytes": 2405,
+      "path": "runtime/integrations/trusted_codex_planner_transport.py",
+      "sha256": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d",
+      "write": "no"
+    },
+    {
+      "bytes": 21606,
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "sha256": "ea8e6f59a1e0b7f09afba80dbf00d5d5924237a388d101e3b75d1e5bb7c11b48",
+      "write": "no"
+    },
+    {
+      "bytes": 35454,
+      "path": "runtime/integrations/provider_broker.py",
+      "sha256": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1",
+      "write": "no"
+    },
+    {
+      "bytes": 10965,
+      "path": "runtime/integrations/worker_confinement.py",
+      "sha256": "f13640b8b76815259671bb2334fb09f02c917ba8cabf0e4e0b40930b779978b1",
+      "write": "no"
+    },
+    {
+      "bytes": 14914,
+      "path": "runtime/integrations/process_supervisor.py",
+      "sha256": "26df7cdb28521e1358d6eff83ac82669c9ec4fea30482bb647b6ade82fa98d13",
+      "write": "no"
+    },
+    {
+      "bytes": 157022,
+      "path": "ops/trusted_worker_launcher_service.py",
+      "sha256": "24afb555e97b0d8199005fea85791598be0a5f0dfee5afa88c1abd78e53c7dff",
+      "write": "no"
+    },
+    {
+      "bytes": 63244,
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "sha256": "fb7ba611bc8cba8e18e65f69f11e6e053a5e89bec9a1ea9103215a71dad74e0a",
+      "write": "no"
+    },
+    {
+      "bytes": 14674,
+      "path": "tests/model_router/test_disclosure_policy.py",
+      "sha256": "85c7772687993d8f3028267eba4fd419c0201d4f7f34fd333adc1d1acfd829ed",
+      "write": "no"
+    },
+    {
+      "bytes": 8385,
+      "path": "tests/model_router/test_disclosure_store.py",
+      "sha256": "8b01f7b390cc80240c41ba786530c6f44b47642bf145ee6ac8c991f06a79b46f",
+      "write": "no"
+    }
+  ],
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018"
+}

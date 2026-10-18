@@ -1,0 +1,103 @@
+{
+  "base_commit": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "baseline_reconciliation": {
+    "entries": 49,
+    "expected_append_only_differences": [
+      "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "MessyChangesNeedsReview.md"
+    ],
+    "path": "reviews/tasks/PAEOS_SERVER_MODEL_IDENTITY_20261018/FILE_MANIFEST.json",
+    "sha256": "44d3d8f9d6d59e02368ebd896c356997bef88e399cce90aeacdb3e7bfae60ab5",
+    "unchanged_entries": 47
+  },
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "coordination": {
+    "chat3_owner_response_received": false,
+    "completion_overseer_callback_sent_this_turn": false,
+    "debt_workers_woken": false,
+    "quota_used_percent": 84,
+    "reserve_percent": 20
+  },
+  "egress_inventory": {
+    "missing_test_references": 0,
+    "negative_test_references": 25,
+    "path_count": 13,
+    "unguarded_or_manual_paths": 5
+  },
+  "file_count": 9,
+  "files": [
+    {
+      "bytes": 1487151,
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "45276a62502cfb76e09c98ba4d22c61b50b77a63437ee21ce89cf59335f55901"
+    },
+    {
+      "bytes": 663984,
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "4c2bb2dbe041972e117c1212193a16bfff494ef0e5ccc5bd3619cbe20afcc282"
+    },
+    {
+      "bytes": 5941,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/ADMISSION_FENCE_CONTRACT.md",
+      "sha256": "e187f919b284f80e92f93dab44f0e35811b62d480902262565bf19be9c5c7135"
+    },
+    {
+      "bytes": 24097,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/EGRESS_INVENTORY.json",
+      "sha256": "b7e77f5977321ac4fa3303e51a29ca8afded7fad0b7b7bb28e87d02490e02c2d"
+    },
+    {
+      "bytes": 4833,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/FENCE_FINDINGS.json",
+      "sha256": "f807479383d9834cbb10c269428058ccc0d4b41dc319b6f3f8203df1dad83bbe"
+    },
+    {
+      "bytes": 4441,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/REPORT.md",
+      "sha256": "06817cd4aacd179d9fbca88159631c6f0c5e21fd915c1ae70f077eb56537b635"
+    },
+    {
+      "bytes": 4756,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SCOPE.json",
+      "sha256": "24d5d8c0a8c5c839cb6d763ef5c20f282147242e4c89c14530c1f31ed673af4e"
+    },
+    {
+      "bytes": 682,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SECRET_SCAN.json",
+      "sha256": "4f78d1a78a8d58615de93c214b1b94178a3a1072075b26373739a2059b47f643"
+    },
+    {
+      "bytes": 4062,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+      "sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a"
+    }
+  ],
+  "files_payload_sha256": "b615ef3793934dc271fe49ef19049a42813226bd7cda2f8d1c1e152e9f13f93d",
+  "limitations": [
+    "No source-code tests or full suite were run for this documentation-only B00 capture.",
+    "The source-level admission/send fence is not evidenced; B01 remains held.",
+    "Five provider-bound paths are unguarded or manually reachable and must enter a future exact scope or be proven unavailable."
+  ],
+  "manifest_self_binding": "The commit object binds this manifest; the manifest does not hash itself.",
+  "original_security_review": {
+    "disposition_path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-disposition.json",
+    "disposition_sha256": "03cfc527ce4be953d58ed1df18331a0929f4a7edd7acfd56be7bc16f8621bbac",
+    "modified": false,
+    "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+    "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+  },
+  "schema": "paeos.offline-checkpoint-manifest/1",
+  "source_scope": {
+    "entries": 20,
+    "manifest": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+    "preimage_mismatches": 0
+  },
+  "task_id": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "verification": {
+    "git_diff_check": "pass before final manifest generation; rerun before commit",
+    "production_or_provider_effects": false,
+    "secret_pattern_scan": "0 findings; external scanners unavailable",
+    "source_and_test_code_changed": false,
+    "tests_run": false
+  }
+}

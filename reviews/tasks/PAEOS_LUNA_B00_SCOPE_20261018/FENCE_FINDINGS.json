@@ -1,0 +1,56 @@
+{
+  "baseline_reconciliation": {
+    "entries": 49,
+    "expected_append_only_differences": [
+      "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "MessyChangesNeedsReview.md"
+    ],
+    "manifest": "reviews/tasks/PAEOS_SERVER_MODEL_IDENTITY_20261018/FILE_MANIFEST.json",
+    "manifest_sha256": "44d3d8f9d6d59e02368ebd896c356997bef88e399cce90aeacdb3e7bfae60ab5",
+    "unchanged_entries": 47
+  },
+  "candidate": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "conclusion": "No existing durable admission/revocation/send fence is evidenced in the inspected candidate. Current direct source evidence supports denial, not positive dispatch. The current thread inventory lists Manager, the completion overseer, and Chat3 on the local host; Manager latest read-only evidence confirms the source gap but is not the authority owner, and Chat3 has no new B00 owner response. No fresh checkpoint callback was sent in this execution turn because shared quota usage is 84%, above the guide reserve. Do not authorize a provider send from worker-supplied labels or profile admission data. Obtain an actual owner response identifying canonical currentness state and the atomic revocation/send boundary before any positive B01 path.",
+  "coordination": {
+    "callback_gate": "84% shared quota usage is above the saved 20% reserve. Send one exact checkpoint after verified reset; do not retry an ambiguous send.",
+    "chat3_admission_owner": "Existing local thread, not loaded; no B00-specific owner response received.",
+    "completion_overseer": "Existing local thread, idle; exact B00 callback not sent in this execution turn.",
+    "current_thread_inventory_date": "2026-10-19",
+    "debt_workers": "Not woken.",
+    "manager": "Existing local thread, idle; latest read-only result confirms the source-level fence gap; not authority owner."
+  },
+  "effects": "read-only source inspection only; no tests, providers, private state, key, installation, task dispatch or production effect",
+  "egress_scope_gap": {
+    "default_denied_or_disabled": 8,
+    "inventory_paths": 13,
+    "positive_egress": "None; no path was invoked.",
+    "required_before_positive_disclosure": "Add each path to an exact future scope with source-bound denial evidence, or prove it unavailable. The frozen B02 file list does not currently include these paths.",
+    "unguarded_or_manual_paths": [
+      "bound-cline-compatibility",
+      "cline-sdk-admission-probe",
+      "cline-worker-diagnostic",
+      "direct-codex-task-script",
+      "legacy-codex-cli-invoker"
+    ]
+  },
+  "original_review": {
+    "disposition_path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-disposition.json",
+    "disposition_sha256": "03cfc527ce4be953d58ed1df18331a0929f4a7edd7acfd56be7bc16f8621bbac",
+    "original_findings_modified": false,
+    "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+    "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+  },
+  "schema": "paeos.admission-send-fence-readiness/1",
+  "search": "Targeted rg over runtime, kernel, ops, tests and model-router for acquire_send_lease, send_lease, admission_epoch, dispatch_lease, current_admission, revocation, and related APIs; no authoritative implementation found.",
+  "source_manifest_sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a",
+  "verified_paths": {
+    "ops/trusted_worker_launcher_service.py": "Provider-response signer remains separated from disclosure authority; producer refuses before provider branches.",
+    "paeos/model_router/state.py": "RouterStateDB is router health/routing state; initialization creates schema/default provider rows and uses synchronous=NORMAL. It is not an enrolled authority store or admission ledger.",
+    "runtime/autonomy/authority.py": "AuthorityClassifier, root-envelope and Founder-stop rules. No persisted send lease or admission revocation ordering.",
+    "runtime/integrations/provider_broker.py": "ProviderBrokerError is unconditionally raised at its disclosure authority guard and forwarding seams.",
+    "runtime/integrations/task_scoped_responses_broker.py": "DisclosureAuthorityUnavailable unconditionally raised; HTTP handler and direct _forward_to_chatgpt both call it.",
+    "runtime/integrations/trusted_codex_transport.py": "Fails before request/session reads or signing because no trusted disclosure consumer is bound.",
+    "runtime/supervisors/admission.py": "decide_supervisor_admission(profile, observation, task_class, committed_trace, now) is a pure profile comparison. Profile hash/TTL are not a durable lease or revocation fence.",
+    "runtime/worker_admission.py": "WorkerBinding and AdmissionResult validate disposable physical probe evidence. No durable lease/current admission epoch/revocation/send-claim API found."
+  }
+}

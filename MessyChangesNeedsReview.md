@@ -5569,3 +5569,13 @@ ALLOWED_NOW: sanitized checkpoint and remaining bounded implementation within ac
 ### 2026-10-18 — Luna programme guide checkpoint
 
 Docs/evidence only; no production source or runtime changes. See docs/superpowers/plans/2026-10-18-luna-p1-p9-execution-guide.md and the matching notebook entry. The guide maps24 cards/32DAG obligations/6P5 claims/16D0249 domains, preserves current owners and separates planning from admission/qualification. Planning critique corrections are incorporated; no formal Security Review consumed. Historical tests were not rerun. Public manifest/hash/link/DAG/secret/diff checks are required before push.
+
+
+### 2026-10-18 — B00 fence remains unresolved
+
+B00 found no existing durable admission/revocation/send fence in the candidate. See `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/`. Chat3 host is unavailable; Manager delivery/readback is UNKNOWN. B01 code remains behind the guide prerequisite; no positive egress or runtime effects.
+
+
+### 2026-10-19 — Luna B00 checkpoint correction
+
+Corrected the B00 scope and coordination record for current thread reachability, removed machine-local root and conversation identifiers from the public evidence, and recorded the exact manifest and egress findings. This is documentation/evidence only. No source or test code changed, no test suite was run, no provider or key was accessed, and no PAEOS admission, worker start, Court action, qualification, or debt state changed. The B00 callback remains deferred while shared quota usage is above the saved 20% reserve.

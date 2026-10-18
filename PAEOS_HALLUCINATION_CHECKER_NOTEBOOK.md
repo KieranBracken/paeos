@@ -13999,3 +13999,17 @@ Original findings remain unchanged. Same-account USB signing is proposed through
 ALLOWED_NOW: checkpoint/hand off the guide; B00 bounded offline contract and fence reconciliation under applicable authority. HELD: install, production disclosure, single canary and debt wakes until their exact prerequisites; P3 until sealed pre-P3 evidence. AUTHORITY_OR_IMPLEMENTATION_GAP: actual operational authority/currentness/fence, full frame/derived-history binding, mediated tool/input confinement, reviewed human signer/enrollment, qualified stages and free heterogeneous review. Owner: bootstrap integrator; wake: current model/budget and exact B00 scope, then next card predicates.
 
 Plan-quality follow-up corrected four further execution gaps: explicit authoritative Home metrics/persisted cockpit events; physical SAKG journey outcome query/provenance/restart; stable programme lineage distinct from consumed phase jobs; and a reserved approval proof separate from STOP. These corrections are planning-only, not runtime verification.
+
+
+### 2026-10-18 — Luna B00 admission/send fence reconciliation
+
+Current execution candidate `082a59ce163d15fc0d40141c1c6cc74e7522d063`. B00 scope freeze is `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/`; exact mutable/read-only manifest and source hashes are recorded. Inspection finds no durable admission/revocation/send lease in the current candidate: worker admission records and supervisor profile checks are observations/pure predicates; existing Codex/provider network owners unconditionally deny. RouterStateDB is health/routing state with NORMAL sync/schema initialization, not enrolled disclosure authority. No positive path was enabled.
+
+Chat3 lives on unavailable host `durable`; its read-only coordination request failed. A single Manager message call returned an identifier, but readback could not resolve the conversation, so delivery/result are UNKNOWN and no duplicate was sent. Completion overseer received a material B00 callback; response pending. No local source-owner confirmation is claimed.
+
+ALLOWED_NOW: push the B00 scope/evidence and continue read-only owner reconciliation. HELD: B01 implementation and all disclosure/qualification/debt gates until a verifiable current admission-owner fence or bounded authorized owner implementation scope. AUTHORITY_OR_IMPLEMENTATION_GAP: canonical currentness state, atomic ordering of revocation against actual send claim, and durable crash/restart behavior are absent/unverified. Exact wake: one source-bound owner response establishing those facts or authorizing the bounded repair. No implementation tests were run; source/test/runtime state unchanged.
+
+
+### 2026-10-19 — B00 current coordination reconciliation
+
+The earlier B00 notes describe a failed readback when the owner threads appeared on the durable host. The current thread inventory now lists Manager and the completion overseer on the local host and Chat3 on the local host; those earlier failed readbacks remain historical and are not current reachability. Manager's latest read-only result confirms the source-level admission/send-fence gap but Manager is not the authority owner. Chat3 has no new B00 owner response. No fresh B00 callback was sent in this execution turn. Shared Codex usage is 84%, above the guide's 20% reserve, so no new model-backed worker admission was made. The corrected B00 checkpoint is reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/; B01, disclosure, qualification, debt activation and P3 remain held.

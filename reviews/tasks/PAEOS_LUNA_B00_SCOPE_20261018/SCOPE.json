@@ -1,0 +1,65 @@
+{
+  "allowed_effects": [
+    "Read public source and sanitized prior evidence in pinned recovery candidate",
+    "Write the B00 scope/evidence record and B01 synthetic-only source/tests if and only if the B00 fence prerequisite is evidenced",
+    "Run named focused tests in temporary state with host credentials and egress unavailable",
+    "Commit/push explicit sanitized source/evidence manifest to existing recovery branch"
+  ],
+  "allowed_paths": [
+    "paeos/model_router/state.py",
+    "paeos/model_router/disclosure_authority.py",
+    "tests/model_router/test_disclosure_authority.py",
+    "tests/model_router/test_disclosure_attempts.py"
+  ],
+  "authority_basis": "The human instructed this chat to resume at B00 and follow the saved P1-P9 guide. This package freezes public source scope and records source-level evidence only. It does not create runtime admission, disclosure permission, or authority to alter production state.",
+  "b01_exit_predicates": [
+    "B00 establishes exact current admission-owner interface and fence, or records an explicit owner-approved implementation scope for the existing authority owner",
+    "Synthetic policy signature and protected enrollment/epoch inputs verify; absent, changed, seeded-default or symlinked store refuses without creation",
+    "Atomic single-use logical attempt and full identity/frame/route digest persistence pass cross-process race, reopen and crash-boundary controls",
+    "Production denial paths remain byte-identical and no send/sign effect occurs in tests"
+  ],
+  "coordination": {
+    "chat3_admission_owner": "Existing local thread, not loaded; no new B00 owner response or binding confirmation.",
+    "completion_overseer": "Existing local thread, idle; no fresh B00 callback sent in this execution turn.",
+    "debt_workers": "Not woken.",
+    "manager": "Existing local thread, idle; latest read-only response confirms the source-level fence gap; not the authority owner.",
+    "next_action": "After the verified quota reset, send one exact B00 checkpoint to the existing completion overseer and request a source-bound response from the current admission owner; do not duplicate or wake debt workers.",
+    "quota": "84% used at the 2026-10-19 read; the saved guide preserves a 20% reserve, so no new model-backed worker admission is made in this window."
+  },
+  "evidence_manifest_sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a",
+  "forbidden_effects": [
+    "Create/load/use Founder or provider keys",
+    "Mount or read USB key volume",
+    "Use host provider credentials or make external provider request",
+    "Enable positive production egress or change any denial gate",
+    "Install/activate supervisor or launch agent",
+    "Read/write main dirty checkout, production stores, private databases, archives, .env, keychain or raw responses",
+    "Change kernel ledger/capability APIs or debt modules in B01",
+    "Create a PAEOS task root, reuse an abandoned operation, claim admission, worker start, Court or qualification",
+    "Modify original review findings or widen reviewer/privacy policy"
+  ],
+  "owner": "current bootstrap integrator",
+  "parent_checkpoint": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "purpose": "Freeze the exact synthetic-only B01 scope and prove whether an existing authoritative admission/revocation/send fence can bind it. This record is not runtime admission.",
+  "read_only_paths": [
+    "paeos/model_router/disclosure_policy.py",
+    "paeos/model_router/disclosure_store.py",
+    "runtime/worker_admission.py",
+    "runtime/supervisors/admission.py",
+    "runtime/supervisors/protocol.py",
+    "runtime/autonomy/authority.py",
+    "runtime/integrations/trusted_codex_transport.py",
+    "runtime/integrations/trusted_codex_planner_transport.py",
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "runtime/integrations/provider_broker.py",
+    "runtime/integrations/worker_confinement.py",
+    "runtime/integrations/process_supervisor.py",
+    "ops/trusted_worker_launcher_service.py",
+    "ops/trusted_codex_worker_supervisor.py",
+    "tests/model_router/test_disclosure_policy.py",
+    "tests/model_router/test_disclosure_store.py"
+  ],
+  "schema": "paeos.offline-repair-scope/1",
+  "task_id": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "unresolved_authority_or_implementation_gap": "No durable admission/revocation/send fence is evidenced in the inspected candidate. The existing Chat3 owner thread is currently listed on the local host but has no new B00 response. Manager latest read-only evidence confirms the source-level gap but Manager is not the authority owner. No source-bound owner confirmation or implementation authorization has been received. Positive dispatch remains unauthorized."
+}

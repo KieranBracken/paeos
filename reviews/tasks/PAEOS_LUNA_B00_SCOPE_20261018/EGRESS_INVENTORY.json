@@ -1,0 +1,447 @@
+{
+  "candidate": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "conclusion": {
+    "default_deny": "Several principal egress routes have source-level unconditional denial with targeted negatives.",
+    "gate": "No positive disclosure or B01 positive path until every active, compatibility, diagnostic and manual provider-bound path is disabled or has source-bound denial tests and authority. B02 must add the direct bound-Cline and Cline SDK routes; the diagnostic Cline method, legacy Codex invoker and standalone Codex bypass script must be fenced or explicitly retired.",
+    "plan_correction": "The saved B02 exact source list omits runtime/integrations/bound_cline_transport.py, runtime/integrations/chat_bridge.py, ops/bound_cline_worker.py, runtime/integrations/cline_sdk.py, runtime/integrations/cline_sdk_host.mjs, runtime/integrations/cline_worker.py, ops/worker_admission_probe.py, runtime/integrations/hybrid.py legacy codex_cli_invoker, and ops/run_task02_codex.sh. Add narrow denial/retirement controls or prove these paths unavailable before B02 acceptance. This B00 record does not edit source or the guide.",
+    "unclosed_paths": [
+      "bound-cline-compatibility",
+      "cline-sdk-admission-probe",
+      "cline-worker-diagnostic",
+      "legacy-codex-cli-invoker",
+      "direct-codex-task-script"
+    ]
+  },
+  "file_hashes": [
+    {
+      "path": "ops/backlogs/prompt-concept-os-task02.txt",
+      "sha256": "7f9ff17691acf5b543029a616b8851d1edbcb9b33d126d9b386d00b9f587ba2a"
+    },
+    {
+      "path": "ops/bound_cline_worker.py",
+      "sha256": "2b91e7e284a395ea6dd199dfc39b43ab7e43f7c49c610e27688e75bd1a48e0f3"
+    },
+    {
+      "path": "ops/chatgpt_bridge/upload_evidence.py",
+      "sha256": "0db8358d3f29b3629ef449b1f5db54ca8c6c1bd788d502ff719066232341c253"
+    },
+    {
+      "path": "ops/codex_auth_relay.py",
+      "sha256": "2322a2d1f53dabaf1ea75415298ca97800f598904c709302bdc829fd024e0fd1"
+    },
+    {
+      "path": "ops/run_task02_codex.sh",
+      "sha256": "b46eb957d45f6d7b94162795dce1664692d94aa22f916d7c937b61b86be66bea"
+    },
+    {
+      "path": "ops/trusted_worker_launcher_service.py",
+      "sha256": "24afb555e97b0d8199005fea85791598be0a5f0dfee5afa88c1abd78e53c7dff"
+    },
+    {
+      "path": "ops/worker_admission_probe.py",
+      "sha256": "7e7ba0f8c400ceb1af138a6d9f834b32feaac9e8b69565c7170c1823bc3101a9"
+    },
+    {
+      "path": "paeos/model_router/provider_transports.py",
+      "sha256": "ebd0dae361ce617dd88fc50c2928648d77ea0b5df7fd07230df44c7538850043"
+    },
+    {
+      "path": "paeos/model_router/server.py",
+      "sha256": "c505fc60d13f8ee4403b4d05d52fa77ca6fcfae0d2f87bb4d4f79b4730a45955"
+    },
+    {
+      "path": "paeos/model_router/transport.py",
+      "sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-disposition.json",
+      "sha256": "03cfc527ce4be953d58ed1df18331a0929f4a7edd7acfd56be7bc16f8621bbac"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+      "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+    },
+    {
+      "path": "runtime/integrations/__init__.py",
+      "sha256": "38443401008daec2997c61a81d948c56b9fab667a80da6cfcff2dd242d689222"
+    },
+    {
+      "path": "runtime/integrations/antigravity.py",
+      "sha256": "7e45dba978a1f5b55022a284784313ab4778cd7a5ea2c7be69e8fd1908473442"
+    },
+    {
+      "path": "runtime/integrations/bound_cline_transport.py",
+      "sha256": "d2d3198cefde15898b76f850eeaceed6b0940439005f1534c5dc53246afff2b0"
+    },
+    {
+      "path": "runtime/integrations/chat_bridge.py",
+      "sha256": "1b77af40b05d4ec54723386c8366d66546c260cfc1db7402583252a609daac38"
+    },
+    {
+      "path": "runtime/integrations/cline_sdk.py",
+      "sha256": "aa282bc61275ecef04938b07d8d238472fa61bbd9e626edf27b81c7fa3c9061c"
+    },
+    {
+      "path": "runtime/integrations/cline_sdk_host.mjs",
+      "sha256": "f83e6df0a0e4a38550fe322f9cc518594420c3deab5ffa827a6b11d8f7f2712e"
+    },
+    {
+      "path": "runtime/integrations/cline_worker.py",
+      "sha256": "4393b52a011d7f59752d5cfaebc21edc65238620241fab617e4275161275671a"
+    },
+    {
+      "path": "runtime/integrations/gemini36_adversary_route.py",
+      "sha256": "da5c94ed4bdcb11b5e5c2aa889b516d8db0b43908d790e351069abe432e867ee"
+    },
+    {
+      "path": "runtime/integrations/gemini36_critic_route.py",
+      "sha256": "ef80513c8b62c324b1c6c6fa1fc030e55218fcbf1c58a2f91982aab99349d226"
+    },
+    {
+      "path": "runtime/integrations/hybrid.py",
+      "sha256": "1ae464b7595964972659b7386d23cb26b9974ee6e1e76436ed50af1fea8c18d6"
+    },
+    {
+      "path": "runtime/integrations/provider_broker.py",
+      "sha256": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1"
+    },
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "sha256": "ea8e6f59a1e0b7f09afba80dbf00d5d5924237a388d101e3b75d1e5bb7c11b48"
+    },
+    {
+      "path": "runtime/integrations/trusted_codex_planner_transport.py",
+      "sha256": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d"
+    },
+    {
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "sha256": "4351b8b90d5f393d1236a59af735eeb4947be4d701798e0b0052308bbc515b04"
+    },
+    {
+      "path": "tests/model_router/test_provider_transports.py",
+      "sha256": "0a8d63176ee452890a2001f331ad182608e8485e0389ab544ffe45572cde376d"
+    },
+    {
+      "path": "tests/ops/test_bound_cline_worker.py",
+      "sha256": "c75a77bf2c74951766fb87f1c88edb71c73c1db4083701a424a14c788fcc4566"
+    },
+    {
+      "path": "tests/ops/test_trusted_worker_launcher_response_auth.py",
+      "sha256": "693f4f0e26d1cda9f9ba5aed7aa1ae2201ec4745294ceec8f13edff4781287f7"
+    },
+    {
+      "path": "tests/ops/test_ui_disclosure_helpers_denial.py",
+      "sha256": "0ac39b1982711df0cfa46a0dc67e88a0df96712b172adf0c5fa354b46b147d4a"
+    },
+    {
+      "path": "tests/ops/test_worker_admission_probe.py",
+      "sha256": "87bfe594d3b1f6bcd35733a1d3ad1e16416821f4de4cdf5e72cad3dc0b910893"
+    },
+    {
+      "path": "tests/ops/test_worker_admission_probe_sdk.py",
+      "sha256": "aad17ecfb265587201591c05ab3fb0e732091668d9cc3aaff013d2bb05481564"
+    },
+    {
+      "path": "tests/runtime/test_antigravity_disclosure_denial.py",
+      "sha256": "d78fd5406e2d3d51dd2282e6161a49f4648edb4924477f2dea4fb2ea98b1eab1"
+    },
+    {
+      "path": "tests/runtime/test_bound_cline_transport.py",
+      "sha256": "214a5782aa4f9ec0e0101da1d333a687f51f521b70eee3235c4d8cf0e25f7500"
+    },
+    {
+      "path": "tests/runtime/test_bound_cline_transport_persistence.py",
+      "sha256": "8d091a82400f43a0aaab13dbd28987f8381c6f0ce387796d71f19ebdb84b0b1f"
+    },
+    {
+      "path": "tests/runtime/test_bound_cline_transport_policy.py",
+      "sha256": "cf61d9c1acdfeaf18df17e4fe0d80b349693345c97b654061f54748544156dc1"
+    },
+    {
+      "path": "tests/runtime/test_chat_bridge_fail_closed.py",
+      "sha256": "0c2043575e0a3cad4c56ab6c3efdeec5496839b6796dc2fb55cdcd04775d96a0"
+    },
+    {
+      "path": "tests/runtime/test_claude_cli_disclosure_denial.py",
+      "sha256": "9be1802ba8639f4fca30bd4dbe38e059615d3cb38b0d075faa54dfa04b103502"
+    },
+    {
+      "path": "tests/runtime/test_cline_sdk_adapter.py",
+      "sha256": "ca8480534764b242e167064f64c62a8aeee647f3a300c9ec31513b59afa5a7c9"
+    },
+    {
+      "path": "tests/runtime/test_cline_sdk_adversarial.py",
+      "sha256": "6e8abd6c037598daa06c20ab73479debba67d9ab232324107d51ae3228e6113b"
+    },
+    {
+      "path": "tests/runtime/test_cline_sdk_protocol.py",
+      "sha256": "d884704c83a4d54f6cddacf86403e445211a303ea5536a50bf1249a152b48952"
+    },
+    {
+      "path": "tests/runtime/test_cline_sdk_qualification.py",
+      "sha256": "4f22f95e48f83a8482a906824442cbc87f4d42e769aa5d1eba209e7f08f303e3"
+    },
+    {
+      "path": "tests/runtime/test_cline_worker_transport.py",
+      "sha256": "37e21cdf754b5a38d58c4b69e177ee3f9ec822aff6bd5192ba2c81f6f5f51c6d"
+    },
+    {
+      "path": "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "sha256": "c6b28ea147e838a3d8c549651b5feda9facd9389055540a6a944d6d92d67efa5"
+    },
+    {
+      "path": "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "sha256": "18483c812df0124a63e0ca1f04150278090d5bdec61a553cbe91bffe7e9d12eb"
+    },
+    {
+      "path": "tests/runtime/test_glm_cline_invoker.py",
+      "sha256": "355e03157450e6a22490c8b43579fd3226b9fafa8f7f3e636359299ee729240c"
+    },
+    {
+      "path": "tests/runtime/test_provider_broker_disclosure_denial.py",
+      "sha256": "3fa0cf9e91f811ed3a37ca379474ac2b1da3c492c84de168de6801c3e64f0679"
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_disclosure_denial.py",
+      "sha256": "301285f2b3374766cc21fd1f8931a511ff39a257caf62bad3623481d500540f3"
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_client.py",
+      "sha256": "a14eae14badb251a934a8ac82b2bd3c5c605a2da9955da90567e5ec1dc76eeba"
+    }
+  ],
+  "original_review": {
+    "disposition_path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-disposition.json",
+    "disposition_sha256": "03cfc527ce4be953d58ed1df18331a0929f4a7edd7acfd56be7bc16f8621bbac",
+    "original_findings_modified": false,
+    "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+    "review_verdict": "P1_REMAINS; original report identifies two P1 and three P2 branch findings; no Court disposition or qualification.",
+    "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+  },
+  "paths": [
+    {
+      "enforcement": "Provider adapters and the lazy LiteLLM loader call _require_disclosure_authority before loading or invoking the wire. The production guard raises unconditionally.",
+      "id": "router-provider-transports",
+      "kind": "direct remote HTTP / LiteLLM provider adapter",
+      "negative_tests": [
+        "tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt",
+        "tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch"
+      ],
+      "route": "OpenAI-compatible requests.post and lazy LiteLLM completion dispatch",
+      "source": [
+        "paeos/model_router/provider_transports.py",
+        "paeos/model_router/server.py",
+        "paeos/model_router/transport.py"
+      ],
+      "status": "DENIED_BEFORE_WIRE_BY_DEFAULT",
+      "test_limit": "Other lower-wire unit tests monkeypatch the guard to exercise synthetic response normalization; those overrides do not prove or enable production permission."
+    },
+    {
+      "enforcement": "HTTP handler and direct _forward_to_chatgpt path each require disclosure authority before forwarding; the guard raises unconditionally.",
+      "id": "task-scoped-responses-broker",
+      "kind": "direct remote HTTPS",
+      "negative_tests": [
+        "tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress",
+        "tests/runtime/test_responses_broker_disclosure_denial.py::test_concurrent_repeated_denials_never_reserve_or_forward",
+        "tests/runtime/test_responses_broker_disclosure_denial.py::test_direct_forwarding_cannot_bypass_authority_guard"
+      ],
+      "route": "HTTPSConnection to chatgpt.com:443",
+      "source": [
+        "runtime/integrations/task_scoped_responses_broker.py"
+      ],
+      "status": "DENIED_BEFORE_WIRE_BY_DEFAULT"
+    },
+    {
+      "enforcement": "Disclosure guard refuses before request signing or provider handoff; response authentication is independent of disclosure authority.",
+      "id": "provider-broker",
+      "kind": "local broker / provider result handoff",
+      "negative_tests": [
+        "tests/runtime/test_provider_broker_disclosure_denial.py::test_untrusted_payload_denied_before_signing_or_handoff",
+        "tests/runtime/test_provider_broker_disclosure_denial.py::test_real_critic_consumer_reports_denial_without_fallback",
+        "tests/runtime/test_provider_broker_disclosure_denial.py::test_request_denies_even_when_capability_composition_is_overridden",
+        "tests/runtime/test_provider_broker_disclosure_denial.py::test_denial_does_not_inspect_an_untrusted_payload"
+      ],
+      "route": "Task-scoped local IPC/queue and provider handoff seams; not itself the external HTTP owner",
+      "source": [
+        "runtime/integrations/provider_broker.py"
+      ],
+      "status": "DENIED_BEFORE_SIGN_OR_HANDOFF_BY_DEFAULT"
+    },
+    {
+      "enforcement": "Base transport raises disclosure_authority_unavailable before session payload inspection, signing or broker call; planner inherits that guard.",
+      "id": "trusted-codex-builder-and-planner",
+      "kind": "provider-bound signed request transport",
+      "negative_tests": [
+        "tests/runtime/test_trusted_codex_client.py::test_client_denies_run_without_trusted_disclosure_authority"
+      ],
+      "route": "Fixed Codex broker route; planner subclasses the same base transport",
+      "source": [
+        "runtime/integrations/trusted_codex_transport.py",
+        "runtime/integrations/trusted_codex_planner_transport.py"
+      ],
+      "status": "DENIED_BEFORE_SESSION_READ_OR_SIGN_BY_DEFAULT"
+    },
+    {
+      "enforcement": "Both runtime entrypoints fail closed before prompt access, workspace/bootstrap setup or provider subprocess.",
+      "id": "claude-code-runtime",
+      "kind": "provider-bound subprocess",
+      "negative_tests": [
+        "tests/runtime/test_claude_cli_disclosure_denial.py::test_public_claude_cli_invoker_denies_locally_without_echo",
+        "tests/runtime/test_claude_cli_disclosure_denial.py::test_direct_bounded_session_helper_denies_locally_without_echo",
+        "tests/runtime/test_claude_cli_disclosure_denial.py::test_runtime_records_bounded_denial_without_writes",
+        "tests/runtime/test_antigravity_disclosure_denial.py::test_cli_invoker_denies_before_mcp_config_read_or_subprocess",
+        "tests/runtime/test_antigravity_disclosure_denial.py::test_runtime_denies_before_workspace_or_context_setup"
+      ],
+      "route": "Claude CLI bounded subprocess and Antigravity/Gemini Agent runtime",
+      "source": [
+        "runtime/integrations/__init__.py",
+        "runtime/integrations/antigravity.py"
+      ],
+      "status": "DENIED_BEFORE_PROMPT_OR_PROCESS_START_BY_DEFAULT"
+    },
+    {
+      "enforcement": "Route entrypoints deny before reading/signing opaque request content; producer handle returns a signed refusal, not a provider attempt.",
+      "id": "gemini-critic-adversary",
+      "kind": "local IPC to trusted provider service",
+      "negative_tests": [
+        "tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_entrypoints_deny_before_reading_or_signing",
+        "tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_direct_parent_helper_denies_before_socket",
+        "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_entrypoints_deny_before_reading_or_signing",
+        "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_direct_parent_helper_denies_before_queue",
+        "tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch",
+        "tests/ops/test_trusted_worker_launcher_response_auth.py::test_process_queue_publishes_nested_signed_refusal_for_same_request"
+      ],
+      "route": "Critic/adversary queue or Unix socket to the launcher service; launcher handler refuses before provider branches",
+      "source": [
+        "runtime/integrations/gemini36_critic_route.py",
+        "runtime/integrations/gemini36_adversary_route.py",
+        "ops/trusted_worker_launcher_service.py"
+      ],
+      "status": "DENIED_BEFORE_SOCKET_QUEUE_OR_PROVIDER_BRANCH_BY_DEFAULT"
+    },
+    {
+      "enforcement": "Helpers unconditionally deny before serialization, text construction, prompt/cache reads, file writes or AppleScript. This route remains unused per user direction to leave ChatBridge out.",
+      "id": "legacy-ui-disclosure-helpers",
+      "kind": "browser UI submission helpers",
+      "negative_tests": [
+        "tests/ops/test_ui_disclosure_helpers_denial.py::test_submit_payload_denies_before_serializing_writing_or_sending",
+        "tests/ops/test_ui_disclosure_helpers_denial.py::test_send_approval_denies_before_message_construction_or_ui_effects",
+        "tests/ops/test_ui_disclosure_helpers_denial.py::test_check_and_authorize_denies_before_reading_prompts_or_cached_state"
+      ],
+      "route": "Legacy ChatGPT UI submission and approval/auth relay helper",
+      "source": [
+        "ops/chatgpt_bridge/upload_evidence.py",
+        "ops/codex_auth_relay.py"
+      ],
+      "status": "DISABLED_BEFORE_PAYLOAD_ACCESS_OR_APPLESCRIPT"
+    },
+    {
+      "enforcement": "No trusted disclosure-authority guard is present before prompt read or subprocess start in the inspected dispatch path. User-directed ChatBridge non-use does not disable the standalone ops entrypoint.",
+      "id": "bound-cline-compatibility",
+      "kind": "provider-bound host subprocess / compatibility transport",
+      "negative_tests": [],
+      "related_tests_not_egress_denial": [
+        "tests/runtime/test_bound_cline_transport.py",
+        "tests/runtime/test_bound_cline_transport_policy.py",
+        "tests/runtime/test_bound_cline_transport_persistence.py",
+        "tests/ops/test_bound_cline_worker.py"
+      ],
+      "required_followup": "Add exact fail-closed egress denial coverage or establish this compatibility path is unreachable/disabled in the target runtime before any positive disclosure; add these exact paths to the B02 source scope. The direct ops/bound_cline_worker.py CLI remains callable even though ChatBridge is excluded by user direction.",
+      "route": "dispatch_once loads prompt and sends a start frame to a Node host module; reachable through the standalone worker and ChatBridge adapter",
+      "source": [
+        "runtime/integrations/bound_cline_transport.py",
+        "runtime/integrations/chat_bridge.py",
+        "ops/bound_cline_worker.py"
+      ],
+      "status": "EXPOSED_UNGUARDED"
+    },
+    {
+      "enforcement": "Qualification/profile leases constrain the worker identity, but the inspected prompt path has no trusted disclosure authorization check before subprocess start. Qualification is not disclosure authority.",
+      "id": "cline-sdk-admission-probe",
+      "kind": "provider-bound host subprocess / worker qualification probe",
+      "negative_tests": [],
+      "related_tests_not_egress_denial": [
+        "tests/runtime/test_cline_sdk_adapter.py",
+        "tests/runtime/test_cline_sdk_adversarial.py",
+        "tests/runtime/test_cline_sdk_protocol.py",
+        "tests/runtime/test_cline_sdk_qualification.py",
+        "tests/ops/test_worker_admission_probe_sdk.py"
+      ],
+      "required_followup": "Add exact fail-closed disclosure denial before any provider-bound probe prompt, or establish and test that the path is unavailable under the target runtime. Include these paths in B02.",
+      "route": "The explicit --transport cline-sdk branch starts the configured Node host and sends a PAEOS_SDK_PROBE prompt after qualification/profile checks.",
+      "source": [
+        "runtime/integrations/cline_sdk.py",
+        "runtime/integrations/cline_sdk_host.mjs",
+        "ops/worker_admission_probe.py"
+      ],
+      "status": "QUALIFICATION_GATED_BUT_DISCLOSURE_UNGUARDED"
+    },
+    {
+      "enforcement": "The public run_probe method returns ADAPTER_VERSION_UNQUALIFIED without launch. A separately callable diagnostic method starts Cline and has no trusted disclosure authority guard. Static caller search found no in-repository call to run_diagnostic_probe.",
+      "id": "cline-worker-diagnostic",
+      "kind": "legacy provider-bound diagnostic subprocess",
+      "negative_tests": [],
+      "related_tests_not_egress_denial": [
+        "tests/runtime/test_cline_worker_transport.py",
+        "tests/ops/test_worker_admission_probe.py"
+      ],
+      "required_followup": "Keep the diagnostic method unreachable/disabled or add a separate synthetic, fail-closed disclosure gate and exact negative before any use; record its explicit diagnostic-only authority.",
+      "route": "ClineWorkerTransport.run_diagnostic_probe builds a prompt and invokes the external cline CLI with provider/model arguments; ordinary run_probe fails closed as unqualified.",
+      "source": [
+        "runtime/integrations/cline_worker.py",
+        "ops/worker_admission_probe.py"
+      ],
+      "status": "DIRECT_DIAGNOSTIC_METHOD_UNGUARDED; NO_NORMAL_CALLER_FOUND"
+    },
+    {
+      "enforcement": "No PAEOS disclosure/admission guard is present in the script. It is outside canonical runtime dispatch but is an in-repository provider bypass if run.",
+      "id": "direct-codex-task-script",
+      "kind": "out-of-band direct Codex CLI provider invocation",
+      "negative_tests": [],
+      "required_followup": "Do not execute for this programme. Before claiming all alternate paths disabled, either disable/remove this legacy entrypoint under its owner scope or prove it cannot receive PAEOS data and document that boundary.",
+      "route": "Standalone script runs codex exec with a repository prompt, sets gpt-5.6-luna/xhigh, and passes --dangerously-bypass-approvals-and-sandbox.",
+      "source": [
+        "ops/run_task02_codex.sh",
+        "ops/backlogs/prompt-concept-os-task02.txt"
+      ],
+      "status": "MANUAL_SCRIPT_UNGUARDED; NOT_USED_IN_THIS_RUN"
+    },
+    {
+      "enforcement": "The returned closure calls _require_glm_cli_disclosure_authority before reading prompt or building argv.",
+      "id": "glm-cli-invoker",
+      "kind": "provider-bound Cline/GLM CLI invoker",
+      "negative_tests": [
+        "tests/runtime/test_glm_cline_invoker.py::test_invoker_denies_before_prompt_or_argv_construction"
+      ],
+      "route": "Historical GLM/Cline CLI closure would construct a provider command and prompt.",
+      "source": [
+        "runtime/integrations/hybrid.py"
+      ],
+      "status": "DENIED_BEFORE_PROMPT_OR_ARGV_BY_DEFAULT",
+      "test_limit": "Provider fallback test alone does not prove egress denial; the named local denial test does."
+    },
+    {
+      "enforcement": "Source comment says production CodexRuntime does not call this helper and requires the trusted host supervisor. The helper itself has no disclosure guard; a direct caller can invoke it.",
+      "id": "legacy-codex-cli-invoker",
+      "kind": "legacy direct Codex CLI provider helper",
+      "negative_tests": [],
+      "related_tests_not_egress_denial": [
+        "tests/runtime/test_chat_bridge_fail_closed.py"
+      ],
+      "required_followup": "Remove or make this legacy helper fail closed, or provide call-graph evidence and a test proving it cannot be selected by the target runtime. Never use it for PAEOS work.",
+      "route": "codex_cli_invoker places the session prompt in the codex exec argv and sets --dangerously-bypass-approvals-and-sandbox.",
+      "source": [
+        "runtime/integrations/hybrid.py"
+      ],
+      "status": "DIRECT_HELPER_UNGUARDED; NO_PRODUCTION_CALLER_FOUND"
+    }
+  ],
+  "schema": "paeos.egress-path-inventory/1",
+  "scope": "Static B00 inventory only. No code execution/provider calls. User has directed no ChatBridge use.",
+  "searches": [
+    "rg -n \"urlopen|HTTPSConnection|httpx|requests|urllib.request|create_connection|client.post|responses.create|osascript|AppleScript\" runtime ops paeos/model_router --glob *.py",
+    "rg -n \"http.client|requests.post|urllib|urlopen|socket|websocket|osascript|subprocess.run\" runtime ops paeos --glob *.py",
+    "rg -n \"dispatch_once|BoundWorkerConfig|ClineSDKAdapter|run_probe\" runtime ops --glob *.py",
+    "rg -n \"codex exec|subprocess.(run|Popen)|run_diagnostic_probe|ClineSDKAdmissionAdapter\" runtime ops --glob *.py --glob *.sh"
+  ]
+}
