@@ -1,0 +1,18 @@
+{
+  "schema": "paeos.offline-integrated-verification/1",
+  "source_base": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "integration_parent": "761f09c4a727a39366b8ddaf0daa1767ffc9e372",
+  "worker_patch_sha256": "106f92c083c57481008af03e62468538c369629009acb34505425f2f6f1a5886",
+  "result": "10 passed in 0.74s",
+  "exit_code": 0,
+  "worker_bytes_preserved": true,
+  "production_source_changes": [],
+  "review": "No new formal Security Review; this is bounded verification, not qualification.",
+  "full_suite": "Not rerun for test-only package; last candidate result remains seven collection errors.",
+  "gates": {
+    "ALLOWED_NOW": "Capture checkpoint and return material completion; prepare next bounded offline boundary repair. Owner: bootstrap integrator.",
+    "HELD": "Production install, Builder qualification, Chat 1 admission and dependent debt work.",
+    "AUTHORITY_OR_IMPLEMENTATION_GAP": "Trusted disclosure and dispatch-time egress, original review findings, authority and qualification remain; this verification does not supply these."
+  },
+  "coordinator_thread": "01a14f33-dc16-7281-9da8-a241ef9a8b0e"
+}

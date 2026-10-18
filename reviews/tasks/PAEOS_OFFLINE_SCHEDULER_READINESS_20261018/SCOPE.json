@@ -1,0 +1,19 @@
+{
+  "schema": "paeos.offline-verification-scope/1",
+  "scope_id": "PAEOS_OFFLINE_SCHEDULER_READINESS_20261018",
+  "base_commit": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "authority_basis": "Human-approved corrected P1-P9 plan E0-E3 bounded offline bootstrap exception; parent assignment bound to CONTINUATION.json at the base commit. This is not PAEOS admission.",
+  "owner": "startup_candidate_audit native worker; root is sole bootstrap integrator; Chat 1 retains D0258 integration ownership",
+  "allowed_test_paths": ["tests/ops/test_offline_scheduler_readiness.py"],
+  "allowed_evidence_root": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/",
+  "production_source_changes": false,
+  "checks": [
+    "Actual build_scheduler with temporary state, workspace and registry; synthetic identities and host loader fixtures",
+    "Real missing and stale Trace-B readiness deny before registration, worker invocation and task admission",
+    "Exact captured lifecycle and manifest with missing and tampered negative controls",
+    "Separate offline Court-server execution root with candidate-local import origins"
+  ],
+  "forbidden": ["host keys or credentials or runtime state reads", "provider requests", "installation", "production qualification minting", "authority expansion", "debt integration", "full suite rerun", "formal Security Review"],
+  "verification_environment": "Python -I -B -S, explicit candidate plus existing venv dependencies without editable .pth, clean environment, no external network, writes limited to synthetic temporary state and this evidence directory",
+  "failure_rule": "Preserve failed evidence; stop at any required production change; do not claim qualification or real worker execution."
+}

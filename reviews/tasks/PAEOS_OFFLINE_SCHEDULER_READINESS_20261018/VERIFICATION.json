@@ -1,0 +1,80 @@
+{
+  "schema": "paeos.offline-verification-result/1",
+  "scope_id": "PAEOS_OFFLINE_SCHEDULER_READINESS_20261018",
+  "base_commit": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "result": "PASS_BOUNDED_OFFLINE_VERIFICATION_ONLY",
+  "production_source_changes": [],
+  "final_focused_result": {
+    "passed": 10,
+    "failed": 0,
+    "elapsed_seconds": 0.78,
+    "exit_code": 0,
+    "stdout": "final.stdout.txt",
+    "command": "final.command.json"
+  },
+  "checks": [
+    "Actual build_scheduler and scheduler empty-source run construct temporary stores, synthetic seal key, workspace and Court configuration.",
+    "Actual Trace-B loop readiness rejects absent loader, missing qualification file and validly signed expired synthetic qualification before registry.register, worker.run, task creation or ledger append.",
+    "Exact candidate manifest and lifecycle digests bind to real consumers. Missing/tampered manifest and lifecycle resources reject.",
+    "Real Court stdio execution root terminates on empty stdin EOF under inherited sandbox; local module origins remain inside candidate; no LiteLLM import.",
+    "Final scoped lint, format, source compilation, tracked-diff/whitespace checks and bounded pattern secret scan pass."
+  ],
+  "failure_history": [
+    {
+      "evidence": "first.stdout.txt",
+      "result": "COLLECTION_ERROR",
+      "cause": "Pytest ancestor directory stat denied by sandbox home-read restriction. No tests ran.",
+      "correction": "Allow file-read-metadata only; retain home-content denial, explicit config and confcutdir."
+    },
+    {
+      "evidence": "metadata-fix.stdout.txt",
+      "result": "10 passed in 1.08s"
+    },
+    {
+      "evidence": "lint-initial.json",
+      "result": "One I001 import ordering failure, corrected with scoped ruff fix."
+    },
+    {
+      "evidence": "format-initial.txt",
+      "result": "Two Python files needed formatting, formatted before final test run."
+    }
+  ],
+  "isolation": {
+    "python_flags": [
+      "-I",
+      "-B",
+      "-S"
+    ],
+    "source": "Candidate-only import fence for kernel/runtime/paeos/ops/contracts",
+    "dependencies": "Existing main venv site-packages read-only, appended without .pth processing",
+    "network": "Seatbelt deny network*",
+    "writes": "Temporary synthetic scratch and /dev/null only inside test subprocess",
+    "home": "Home contents denied except candidate source, Python tool runtime and dependency environment; metadata permitted for pytest discovery",
+    "host_loader_fixtures": "Transport and planner loader return None; readiness injected synthetic or absent; registry/workspace redirected temporary"
+  },
+  "limits": [
+    "No genuine PAEOS admission, production qualification, Builder execution, provider dispatch, installation, Court evidence submission/adjudication or debt integration occurred.",
+    "Expired synthetic qualification is a negative fixture only; no eligible production authority was minted or reused.",
+    "No positive qualified dispatch, complete egress/confinement qualification or autonomous lifecycle completion is claimed.",
+    "No full-suite rerun; previously reported full-suite collection failures remain separate and are neither resolved nor accepted by these tests.",
+    "Known absent later-stage obligation test/resources and governance authority remain later execution gates.",
+    "Sandbox policy is a macOS offline verification harness; it is not a claim that production transport has this containment."
+  ],
+  "ALLOWED_NOW": {
+    "owner": "root bootstrap integrator",
+    "action": "Integrate exact test/evidence package, reproduce scoped tests and publish sanitized checkpoint."
+  },
+  "HELD": {
+    "owner": "root and Chat 1 according to existing ownership",
+    "action": "Production activation and D0258 execution remain gated by existing authority, qualification and admission requirements."
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": {
+    "scope": "No production change required for this offline package. It does not provide missing production authority or later-stage resources.",
+    "wake_condition": "Existing programme gates satisfied with actual bound evidence; this result alone does not wake production."
+  },
+  "core_hashes": {
+    "tests/ops/test_offline_scheduler_readiness.py": "4a269b6e6de35d5199b4f4ab13a9a628b79c341b63785062f42c80eb2291a39a",
+    "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/SCOPE.json": "c3a9059ed6edba5aa23acd5848c19ecb26c304ff5c41ae804aa450c1063d1fb9",
+    "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py": "6e4a5f0080a1eb4925195d6d9cb35587790fd52836eea66903898f6a48420912"
+  }
+}

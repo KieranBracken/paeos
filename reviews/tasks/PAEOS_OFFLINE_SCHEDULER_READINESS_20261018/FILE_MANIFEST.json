@@ -1,0 +1,86 @@
+{
+  "base_commit": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "files": [
+    {
+      "path": "tests/ops/test_offline_scheduler_readiness.py",
+      "sha256": "4a269b6e6de35d5199b4f4ab13a9a628b79c341b63785062f42c80eb2291a39a",
+      "bytes": 12683
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/SCOPE.json",
+      "sha256": "c3a9059ed6edba5aa23acd5848c19ecb26c304ff5c41ae804aa450c1063d1fb9",
+      "bytes": 1737
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/VERIFICATION.json",
+      "sha256": "b4602f14cd21ff6312ec2c78feb35fac78a4f99778ea45405edab22b890b2e4b",
+      "bytes": 4637
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final-static-checks.json",
+      "sha256": "4e613826ac9f1f256f0486ee558f0df5d05177849d211b37394e998730c1e1ff",
+      "bytes": 2789
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final.command.json",
+      "sha256": "7fa7c8dac0ec8c85a840c9a0e3180eb7ae35c433188118ee6459419f37428c4b",
+      "bytes": 3303
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final.stdout.txt",
+      "sha256": "92c1f805636a33056f95ea503b77727a8511d9231c96f78ba7368211512a54bb",
+      "bytes": 6829
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/first.command.json",
+      "sha256": "03b3cf6533517c37a9d420850fea883ec2a0bb870ec7b1338a3e3181ecec8854",
+      "bytes": 3208
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/first.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/first.stdout.txt",
+      "sha256": "01a1539ce26e5516336737ceb12e3d048faec8f177100dfe35582eb1515106d0",
+      "bytes": 1028
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/format-initial.txt",
+      "sha256": "fd3af1f5d5966e8f99a2933b31bcbb496fde04dabcd5e529ba90f60097e35806",
+      "bytes": 184
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/lint-initial.json",
+      "sha256": "cf5574657b451c56550911a21d1485c5eb54a3eed5ce85f8f0bef4cd0ff84e4a",
+      "bytes": 1579
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/metadata-fix.command.json",
+      "sha256": "c1df5b3ee2938984c0de23a2fd8843ee88f086346b03239f8cea2800a4db4d68",
+      "bytes": 3303
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/metadata-fix.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/metadata-fix.stdout.txt",
+      "sha256": "d3b27dd8512d7697587b5f7ac648325e258b82f31e746c4b5fd3f121a67be801",
+      "bytes": 6829
+    },
+    {
+      "path": "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py",
+      "sha256": "6e4a5f0080a1eb4925195d6d9cb35587790fd52836eea66903898f6a48420912",
+      "bytes": 3718
+    }
+  ],
+  "self_hash": "Excluded to avoid self-reference; export.patch and EXPORT.json are transfer metadata, not package inputs."
+}

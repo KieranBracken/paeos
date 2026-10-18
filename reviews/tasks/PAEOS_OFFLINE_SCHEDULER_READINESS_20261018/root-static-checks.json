@@ -1,0 +1,45 @@
+{
+  "lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "--no-cache",
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "2 files already formatted\n",
+    "stderr": ""
+  },
+  "diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compile": {
+    "method": "compile(source, filename, exec), no bytecode written",
+    "files": [
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "passed": true
+  },
+  "base_head": "761f09c4a727a39366b8ddaf0daa1767ffc9e372"
+}

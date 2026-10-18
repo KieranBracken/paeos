@@ -1,0 +1,37 @@
+[
+  {
+    "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 41,
+      "row": 29
+    },
+    "filename": "/Users/bob/.codex/worktrees/offline-scheduler-readiness/paeos/tests/ops/test_offline_scheduler_readiness.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from __future__ import annotations\n\nimport hashlib\nimport json\nimport subprocess\nimport sys\nfrom pathlib import Path\nfrom types import SimpleNamespace\n\nimport pytest\nfrom nacl.signing import SigningKey\nfrom runtime.builder_transport import BuilderTransportReadiness, canonical_qualification_bytes\nfrom runtime.ceremony import assert_canonical_lifecycle_bound\nfrom runtime.court.completeness_firewall import (\n    CompletenessFirewallError,\n    load_authoritative_manifest,\n)\nfrom runtime.lifecycle_projection import assert_lifecycle_projection_conformant\nfrom runtime.orchestrator import RunStatus\nfrom runtime.scheduler import GlobalBudget, StopReason\nfrom runtime.triage import Trace, triage\n\nfrom ops import autonomous_run\n\n",
+          "end_location": {
+            "column": 1,
+            "row": 31
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 7
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "name": "unsorted-imports",
+    "noqa_row": 7,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  }
+]

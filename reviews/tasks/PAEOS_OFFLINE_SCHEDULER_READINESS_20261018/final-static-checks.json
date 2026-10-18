@@ -1,0 +1,84 @@
+{
+  "lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "--no-cache",
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "2 files already formatted\n",
+    "stderr": ""
+  },
+  "diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "tracked_diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "base": {
+    "argv": [
+      "/usr/bin/git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "38fd3e0dc153788bbdd5f542bddf81b0ca433703\n",
+    "stderr": ""
+  },
+  "compile": {
+    "paths": [
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "method": "compile(source, filename, exec); no bytecode written",
+    "passed": true
+  },
+  "secret_scan": {
+    "method": "Bounded pattern scan of explicit test/evidence paths; supplementary, not data-classification authority",
+    "paths": [
+      "tests/ops/test_offline_scheduler_readiness.py",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/SCOPE.json",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final.command.json",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final.stderr.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/final.stdout.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/first.command.json",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/first.stderr.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/first.stdout.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/format-initial.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/lint-initial.json",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/metadata-fix.command.json",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/metadata-fix.stderr.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/metadata-fix.stdout.txt",
+      "reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py"
+    ],
+    "findings": []
+  }
+}

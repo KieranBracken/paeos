@@ -1,0 +1,15 @@
+
+==================================== ERRORS ====================================
+________________________ ERROR collecting test session _________________________
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/pathlib/_abc.py:482: in is_file
+    return S_ISREG(self.stat(follow_symlinks=follow_symlinks).st_mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/pathlib/_local.py:515: in stat
+    return os.stat(self, follow_symlinks=follow_symlinks)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/Users/bob/.codex/worktrees/offline-scheduler-readiness'
+=========================== short test summary info ============================
+ERROR  - PermissionError: [Errno 1] Operation not permitted: '/Users/bob/.cod...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.05s
+LOCAL_ORIGINS={}

@@ -1,0 +1,3 @@
+Would reformat: reviews/tasks/PAEOS_OFFLINE_SCHEDULER_READINESS_20261018/run_verification.py
+Would reformat: tests/ops/test_offline_scheduler_readiness.py
+2 files would be reformatted
