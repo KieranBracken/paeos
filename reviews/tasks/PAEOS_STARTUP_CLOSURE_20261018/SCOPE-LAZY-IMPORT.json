@@ -1,0 +1,46 @@
+{
+  "schema": "paeos.offline-repair-scope/1",
+  "scope_id": "offline-startup-lazy-import-1bb63c7740f8404082457d7d085c193d",
+  "authority": "Human-approved PAEOS P1-P9 corrected execution plan E0-E3 and explicit autonomous coordination request. Fresh bounded offline bootstrap assignment; not an extension or reuse of prior PAEOS source scope/capability.",
+  "base_commit": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+  "owner_thread": "01a13075-533b-72a1-b8f8-8f109414f707",
+  "integration_owner_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "source_manifest": [
+    {
+      "path": "paeos/model_router/provider_transports.py",
+      "sha256": "d45b832cad35b324c562ac82f1404a5686573053e9804c71228b2b1debd36e3f"
+    },
+    {
+      "path": "paeos/model_router/transport.py",
+      "sha256": "ff16ab96ed826026dca17b9023d548e44d28ac2f38e65984cc6487ab4bc2263f"
+    },
+    {
+      "path": "tests/model_router/test_provider_transports.py",
+      "sha256": "5056b1474816e0441a70c9f9ec2c4e2d386db1fa2d47a98eb98b4228fdc2ce40"
+    }
+  ],
+  "workspace": "Fresh isolated owner worktree from base commit; main and root candidate forbidden to worker edits.",
+  "allowed_effects": [
+    "source edits to the three named files in owner worktree",
+    "synthetic offline tests",
+    "nonsecret evidence/package capture"
+  ],
+  "forbidden": [
+    "provider calls",
+    "host keys and runtime state",
+    "runtime installation",
+    "qualification request",
+    "claim of PAEOS admission",
+    "reuse of prior capability",
+    "dependency upgrade"
+  ],
+  "acceptance": [
+    "No import of LiteLLM/tiktoken/dotenv or HTTP request merely importing provider adapters/dispatcher",
+    "Preserve shared litellm completion/acompletion patch points and dispatch behavior",
+    "Keep retry count zero and telemetry disabled at actual library loading boundary",
+    "Synthetic dispatch tests and fresh subprocess negative/positive import controls",
+    "No claim that deferred initialization closes the dispatch egress/privacy gap"
+  ],
+  "review": "Root integrates exact preimage-bound returned patch then requests final applicable independent review after combined local checks. No extra review invocation by worker.",
+  "completion_boundary": "One captured offline source package for root integration; no production effects."
+}

@@ -1,0 +1,704 @@
+F401 [*] `datetime.timezone` imported but unused
+  --> ops/p1_l14_resume.py:16:32
+   |
+14 | import sqlite3
+15 | from dataclasses import asdict, dataclass
+16 | from datetime import datetime, timezone
+   |                                ^^^^^^^^
+17 | from pathlib import Path
+   |
+help: Remove unused import: `datetime.timezone`
+
+SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+   --> ops/p1_l14_resume.py:484:13
+    |
+482 |               or str(current_head["row_hash"]) != proof.current_head_sha256
+483 |           ):
+484 | /             try:
+485 | |                 os.rmdir(attempt)
+486 | |             except OSError:
+487 | |                 pass
+    | |____________________^
+488 |               raise ContinuationError("ledger head has advanced since proof was generated")
+    |
+help: Replace `try`-`except`-`pass` with `with contextlib.suppress(OSError): ...`
+
+UP035 [*] Import from `collections.abc` instead: `Mapping`
+  --> paeos/semantic/delta_engine.py:13:1
+   |
+11 | from __future__ import annotations
+12 |
+13 | from typing import Mapping
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+14 |
+15 | from paeos.semantic.types import (
+   |
+help: Import from `collections.abc`
+
+UP035 [*] Import from `collections.abc` instead: `Mapping`
+  --> paeos/semantic/freeze_guard.py:10:1
+   |
+ 8 | from __future__ import annotations
+ 9 |
+10 | from typing import Any, Mapping
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+11 |
+12 | from paeos.semantic.types import (
+   |
+help: Import from `collections.abc`
+
+F401 [*] `typing.Any` imported but unused
+  --> paeos/semantic/freeze_guard.py:10:20
+   |
+ 8 | from __future__ import annotations
+ 9 |
+10 | from typing import Any, Mapping
+   |                    ^^^
+11 |
+12 | from paeos.semantic.types import (
+   |
+help: Remove unused import
+
+F401 [*] `typing.Mapping` imported but unused
+  --> paeos/semantic/freeze_guard.py:10:25
+   |
+ 8 | from __future__ import annotations
+ 9 |
+10 | from typing import Any, Mapping
+   |                         ^^^^^^^
+11 |
+12 | from paeos.semantic.types import (
+   |
+help: Remove unused import
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+  --> paeos/semantic/freeze_guard.py:76:13
+   |
+74 |                       )
+75 |
+76 | /             elif disp.disposition == SemanticDispositionKind.AUTHORIZED_DEFERMENT:
+77 | |                 # Deferred obligations MUST be bound in deferred_debt
+78 | |                 if not disp.debt_id or disp.debt_id not in deferred_debt_set:
+   | |_____________________________________________________________________________^
+79 |                       raise L11FreezeDeniedError(
+80 |                           f"L11_FREEZE_DENIED: Deferred obligation '{ob.obligation_id}' has debt '{disp.debt_id}' "
+   |
+help: Combine `if` statements using `and`
+
+UP035 [*] Import from `collections.abc` instead: `Mapping`
+  --> paeos/semantic/lineage.py:9:1
+   |
+ 7 | from __future__ import annotations
+ 8 |
+ 9 | from typing import Mapping
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 |
+11 | from paeos.semantic.types import (
+   |
+help: Import from `collections.abc`
+
+F401 [*] `typing.Mapping` imported but unused
+  --> paeos/semantic/lineage.py:9:20
+   |
+ 7 | from __future__ import annotations
+ 8 |
+ 9 | from typing import Mapping
+   |                    ^^^^^^^
+10 |
+11 | from paeos.semantic.types import (
+   |
+help: Remove unused import: `typing.Mapping`
+
+F401 [*] `json` imported but unused
+  --> paeos/semantic/types.py:11:8
+   |
+10 | import hashlib
+11 | import json
+   |        ^^^^
+12 | from dataclasses import dataclass, field
+13 | from enum import StrEnum
+   |
+help: Remove unused import: `json`
+
+F401 [*] `dataclasses.field` imported but unused
+  --> paeos/semantic/types.py:12:36
+   |
+10 | import hashlib
+11 | import json
+12 | from dataclasses import dataclass, field
+   |                                    ^^^^^
+13 | from enum import StrEnum
+14 | from typing import Any
+   |
+help: Remove unused import: `dataclasses.field`
+
+F401 [*] `typing.Any` imported but unused
+  --> paeos/semantic/types.py:14:20
+   |
+12 | from dataclasses import dataclass, field
+13 | from enum import StrEnum
+14 | from typing import Any
+   |                    ^^^
+   |
+help: Remove unused import: `typing.Any`
+
+UP012 [*] Unnecessary UTF-8 `encoding` argument to `encode`
+   --> paeos/semantic/types.py:98:17
+    |
+ 96 | …not self.intent_hash:
+ 97 | … h = hashlib.sha256(
+ 98 | …     f"{self.obligation_id}:{self.subsystem_id}:{self.description}:{self.source_tier.value}:{self.source_reference}".encode("utf-8")
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 99 | … ).hexdigest()
+100 | … object.__setattr__(self, "intent_hash", h)
+    |
+help: Remove unnecessary `encoding` argument
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/verify_entrypoint.py:3:1
+   |
+ 1 |   """No-input entrypoint probe: no site hooks, host reads, writes, or network."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import importlib.machinery
+ 6 | | import json
+ 7 | | import os
+ 8 | | from pathlib import Path
+ 9 | | import runpy
+10 | | import sys
+   | |__________^
+   |
+help: Organize imports
+
+RUF059 Unpacked variable `mode` is never used
+  --> reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/verify_entrypoint.py:58:15
+   |
+56 |     global blocked_socket_binds
+57 |     if event == "open":
+58 |         path, mode, flags = args
+   |               ^^^^
+59 |         if isinstance(path, int):
+60 |             return
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+RUF002 Docstring contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+ --> runtime/autonomy/authority.py:1:20
+  |
+1 | """Deterministic A0–A5 authority classifier, Root-Envelope resolver, and Founder-stop predicate."""
+  |                    ^
+2 |
+3 | from __future__ import annotations
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/autonomy/authority.py:3:1
+   |
+ 1 |   """Deterministic A0–A5 authority classifier, Root-Envelope resolver, and Founder-stop predicate."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import hashlib
+ 6 | | import json
+ 7 | | from dataclasses import asdict, dataclass
+ 8 | | from enum import StrEnum
+ 9 | | from typing import Any
+10 | |
+11 | |
+12 | | from kernel.types import (
+13 | |     ActionPermission,
+14 | |     AuthorityEnvelope,
+15 | |     AuthorityExpansionForbiddenError,
+16 | |     AuthorityTier,
+17 | | )
+   | |_^
+   |
+help: Organize imports
+
+F401 [*] `hashlib` imported but unused
+ --> runtime/autonomy/authority.py:5:8
+  |
+3 | from __future__ import annotations
+4 |
+5 | import hashlib
+  |        ^^^^^^^
+6 | import json
+7 | from dataclasses import asdict, dataclass
+  |
+help: Remove unused import: `hashlib`
+
+F401 [*] `json` imported but unused
+ --> runtime/autonomy/authority.py:6:8
+  |
+5 | import hashlib
+6 | import json
+  |        ^^^^
+7 | from dataclasses import asdict, dataclass
+8 | from enum import StrEnum
+  |
+help: Remove unused import: `json`
+
+RUF002 Docstring contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+  --> runtime/autonomy/authority.py:57:56
+   |
+56 | class AuthorityClassifier:
+57 |     """Deterministic classifier assigning finding to A0–A5 tier."""
+   |                                                        ^
+58 |
+59 |     @staticmethod
+   |
+
+RUF005 Consider `[*list(existing_edges), proposed_edge]` instead of concatenation
+  --> runtime/autonomy/cycle_detector.py:60:17
+   |
+58 |     """Check if adding proposed_edge (src, dst) would introduce a cycle."""
+59 |     all_nodes = set(nodes) | {proposed_edge[0], proposed_edge[1]}
+60 |     all_edges = list(existing_edges) + [proposed_edge]
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+61 |     try:
+62 |         topological_sort(all_nodes, all_edges)
+   |
+help: Replace with `[*list(existing_edges), proposed_edge]`
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> runtime/autonomy/cycle_detector.py:97:9
+    |
+ 95 |               return True
+ 96 |           # 3. Detect A -> B -> C -> A -> B -> C 3-cycles
+ 97 | /         if len(self.history) >= 6:
+ 98 | |             if (
+ 99 | |                 self.history[-6] == self.history[-3]
+100 | |                 and self.history[-5] == self.history[-2]
+101 | |                 and self.history[-4] == self.history[-1]
+102 | |             ):
+    | |______________^
+103 |                   return True
+104 |           return False
+    |
+help: Combine `if` statements using `and`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/autonomy/mdg.py:3:1
+   |
+ 1 |   """Mission Dependency Graph (MDG) core data model and lineage ledger projection."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import datetime
+ 6 | | from dataclasses import asdict, dataclass, field
+ 7 | | from enum import StrEnum
+ 8 | | from typing import Any
+ 9 | |
+10 | | from runtime.autonomy.authority import FindingClass
+11 | | from runtime.autonomy.cycle_detector import CycleDetectedError, would_cause_cycle
+12 | | from paeos.semantic.lineage import SemanticLineageDAG
+13 | | from paeos.semantic.types import SemanticObligation, SemanticObligationDisposition
+   | |__________________________________________________________________________________^
+   |
+help: Organize imports
+
+UP017 [*] Use `datetime.UTC` alias
+   --> runtime/autonomy/mdg.py:182:50
+    |
+180 |             signature=signature,
+181 |             status=BlockerStatus.ACTIVE,
+182 |             created_at_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    |                                                  ^^^^^^^^^^^^^^^^^^^^^
+183 |         )
+184 |         self._blockers[blocker_id] = blocker
+    |
+help: Convert to `datetime.UTC` alias
+
+RUF005 Consider `[*existing_blocks, (source_id, target_id)]` instead of concatenation
+   --> runtime/autonomy/mdg.py:198:26
+    |
+196 |                 if e.edge_type in {EdgeType.BLOCKS, EdgeType.DEPENDS_ON}
+197 |             ]
+198 |             all_blocks = existing_blocks + [(source_id, target_id)]
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+199 |             nodes = set()
+200 |             for u, v in all_blocks:
+    |
+help: Replace with `[*existing_blocks, (source_id, target_id)]`
+
+UP017 [*] Use `datetime.UTC` alias
+   --> runtime/autonomy/mdg.py:212:50
+    |
+210 |             source_id=source_id,
+211 |             target_id=target_id,
+212 |             created_at_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    |                                                  ^^^^^^^^^^^^^^^^^^^^^
+213 |         )
+214 |         self._edges.append(edge)
+    |
+help: Convert to `datetime.UTC` alias
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/autonomy/mission_controller.py:3:1
+   |
+ 1 |   """Persistent Mission Controller — native PAEOS mission autonomy and crash recovery."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import time
+ 6 | | from dataclasses import asdict
+ 7 | | from typing import Any
+ 8 | |
+ 9 | | from kernel.cas import CAS
+10 | | from kernel.ledger import Event, Ledger
+11 | | from runtime.autonomy.authority import (
+12 | |     AuthorityEnvelope,
+13 | |     AuthorityTier,
+14 | |     FindingClass,
+15 | |     RootEnvelopeAuthorityResolver,
+16 | | )
+17 | | from runtime.autonomy.weakness_finder import ContinuousWeaknessFinder
+18 | | from runtime.autonomy.weakness_finder.types import SensorFinding
+19 | | from runtime.autonomy.mdg import (
+20 | |     BlockerNode,
+21 | |     CeremonyTrace,
+22 | |     EdgeType,
+23 | |     MissionDependencyGraph,
+24 | |     TaskNode,
+25 | |     TaskStatus,
+26 | | )
+27 | | from runtime.autonomy.recovery_controller import (
+28 | |     CircuitBreakerPolicy,
+29 | |     RecoveryController,
+30 | | )
+31 | | from runtime.autonomy.cycle_detector import CycleDetector
+32 | | from runtime.autonomy.resume_engine import ResumeEngine, TaskCheckpoint
+   | |_______________________________________________________________________^
+   |
+help: Organize imports
+
+F401 [*] `runtime.autonomy.mdg.BlockerNode` imported but unused
+  --> runtime/autonomy/mission_controller.py:20:5
+   |
+18 | from runtime.autonomy.weakness_finder.types import SensorFinding
+19 | from runtime.autonomy.mdg import (
+20 |     BlockerNode,
+   |     ^^^^^^^^^^^
+21 |     CeremonyTrace,
+22 |     EdgeType,
+   |
+help: Remove unused import
+
+F401 [*] `runtime.autonomy.mdg.TaskStatus` imported but unused
+  --> runtime/autonomy/mission_controller.py:25:5
+   |
+23 |     MissionDependencyGraph,
+24 |     TaskNode,
+25 |     TaskStatus,
+   |     ^^^^^^^^^^
+26 | )
+27 | from runtime.autonomy.recovery_controller import (
+   |
+help: Remove unused import
+
+F401 [*] `runtime.autonomy.resume_engine.TaskCheckpoint` imported but unused
+  --> runtime/autonomy/mission_controller.py:32:58
+   |
+30 | )
+31 | from runtime.autonomy.cycle_detector import CycleDetector
+32 | from runtime.autonomy.resume_engine import ResumeEngine, TaskCheckpoint
+   |                                                          ^^^^^^^^^^^^^^
+   |
+help: Remove unused import: `runtime.autonomy.resume_engine.TaskCheckpoint`
+
+RUF059 Unpacked variable `msg` is never used
+   --> runtime/autonomy/mission_controller.py:218:22
+    |
+216 |                     f"EXECUTION_CYCLE_EXCEEDED: Unwind cycle limit reached at task {curr_task_id}"
+217 |                 )
+218 |             success, msg, resumed_parent = self.qualify_child_and_unwind(curr_task_id, curr_blocker_id)
+    |                      ^^^
+219 |             unwound_sequence.append(curr_task_id)
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+B007 Loop control variable `tok` not used within loop body
+   --> runtime/autonomy/mission_controller.py:278:23
+    |
+276 |         reclaimed: list[str] = []
+277 |         current_time = now if now is not None else time.time()
+278 |         for task_id, (tok, expire_at) in list(self.resume_engine._task_leases.items()):
+    |                       ^^^
+279 |             if current_time >= expire_at:
+280 |                 success, _msg, _node = self.resume_engine.recover_interrupted_resume(
+    |
+help: Rename unused `tok` to `_tok`
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> runtime/autonomy/orca_lineage.py:3:1
+  |
+1 |   """Orca Mission Control read-only lineage projection adapter."""
+2 |
+3 | / from __future__ import annotations
+4 | |
+5 | | from dataclasses import asdict
+6 | | from typing import Any
+7 | |
+8 | | from kernel.ledger import Ledger
+9 | | from runtime.autonomy.mdg import EdgeType, MissionDependencyGraph, TaskStatus
+  | |_____________________________________________________________________________^
+  |
+help: Organize imports
+
+F401 [*] `runtime.autonomy.mdg.EdgeType` imported but unused
+ --> runtime/autonomy/orca_lineage.py:9:34
+  |
+8 | from kernel.ledger import Ledger
+9 | from runtime.autonomy.mdg import EdgeType, MissionDependencyGraph, TaskStatus
+  |                                  ^^^^^^^^
+  |
+help: Remove unused import: `runtime.autonomy.mdg.EdgeType`
+
+F401 [*] `typing.Any` imported but unused
+ --> runtime/autonomy/recovery_controller.py:6:20
+  |
+5 | from dataclasses import dataclass
+6 | from typing import Any
+  |                    ^^^
+7 |
+8 | from runtime.autonomy.authority import (
+  |
+help: Remove unused import: `typing.Any`
+
+RUF059 Unpacked variable `is_stop` is never used
+   --> runtime/autonomy/recovery_controller.py:106:13
+    |
+104 |         if is_sentium_or_sovereign or is_constitutional:
+105 |             tier = AuthorityTier.A5_SOVEREIGN if is_sentium_or_sovereign else AuthorityTier.A4_CONSTITUTIONAL
+106 |             is_stop, packet = FounderStopPredicate.evaluate(
+    |             ^^^^^^^
+107 |                 tier=tier,
+108 |                 description=f"Circuit breaker tripped on reserved boundary: {blocker_signature}",
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+RUF059 Unpacked variable `token` is never used
+   --> runtime/autonomy/resume_engine.py:231:13
+    |
+229 |         now = time.time()
+230 |         if lease is not None:
+231 |             token, expire_at = lease
+    |             ^^^^^
+232 |             if now < expire_at:
+233 |                 return False, "Active lease has not yet expired", None
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+UP035 [*] Import from `collections.abc` instead: `Mapping`, `Sequence`
+  --> runtime/autonomy/schemas/architect_cognition.py:16:1
+   |
+14 | from dataclasses import dataclass, field
+15 | from enum import Enum
+16 | from typing import Any, Mapping, Sequence
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: Import from `collections.abc`
+
+UP042 Class RootCauseCategory inherits from both `str` and `enum.Enum`
+  --> runtime/autonomy/schemas/architect_cognition.py:19:7
+   |
+19 | class RootCauseCategory(str, Enum):
+   |       ^^^^^^^^^^^^^^^^^
+20 |     """Categorization of root cause defects."""
+21 |     STRUCTURAL_INVARIANT_VIOLATION = "STRUCTURAL_INVARIANT_VIOLATION"
+   |
+help: Inherit from `enum.StrEnum`
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> runtime/autonomy/schemas/architect_cognition.py:337:17
+    |
+335 |   …             f"PARETO_TRADEOFF_VECTOR_MISSING: Candidate {ev.candidate_id} tradeoff_vector is missing criterion '{crit}'"
+336 |   …         )
+337 | / …     elif crit in exp_ev.tradeoff_vector:
+338 | | …         if abs(ev.tradeoff_vector[crit] - exp_ev.tradeoff_vector[crit]) > 1e-6:
+    | |_________________________________________________________________________________^
+339 |   …             violations.append(
+340 |   …                 f"PARETO_TRADEOFF_VECTOR_MISMATCH: Candidate {ev.candidate_id} tradeoff_vector[{crit}] does not match expected scor…
+    |
+help: Combine `if` statements using `and`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/autonomy/schemas/frontier_research.py:7:1
+   |
+ 5 |   """
+ 6 |
+ 7 | / from __future__ import annotations
+ 8 | |
+ 9 | | from dataclasses import dataclass
+10 | | from paeos.semantic.types import AuthoritativeSourceTier
+   | |________________________________________________________^
+   |
+help: Organize imports
+
+UP035 [*] Import from `collections.abc` instead: `Sequence`
+  --> runtime/autonomy/weakness_finder/coordinator.py:10:1
+   |
+ 8 | from __future__ import annotations
+ 9 |
+10 | from typing import Any, Sequence
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+11 |
+12 | from runtime.autonomy.weakness_finder.sensor_pack_drift import ArchitectureDriftSensorPack
+   |
+help: Import from `collections.abc`
+
+F401 [*] `runtime.autonomy.weakness_finder.types.WeaknessCategory` imported but unused
+  --> runtime/autonomy/weakness_finder/coordinator.py:20:5
+   |
+18 |     SensorFinding,
+19 |     SensorPack,
+20 |     WeaknessCategory,
+   |     ^^^^^^^^^^^^^^^^
+21 | )
+   |
+help: Remove unused import: `runtime.autonomy.weakness_finder.types.WeaknessCategory`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/autonomy/weakness_finder/sensor_pack_semantic.py:3:1
+   |
+ 1 |   """Sensor Pack 2: Semantic Scope and Lineage Integrity Probes."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from paeos.semantic.lineage import SemanticLineageDAG
+ 6 | | from runtime.autonomy.mdg import MissionDependencyGraph
+ 7 | | from runtime.autonomy.weakness_finder.types import (
+ 8 | |     FindingSeverity,
+ 9 | |     SensorFinding,
+10 | |     WeaknessCategory,
+11 | | )
+   | |_^
+   |
+help: Organize imports
+
+F401 [*] `paeos.semantic.lineage.SemanticLineageDAG` imported but unused
+ --> runtime/autonomy/weakness_finder/sensor_pack_semantic.py:5:36
+  |
+3 | from __future__ import annotations
+4 |
+5 | from paeos.semantic.lineage import SemanticLineageDAG
+  |                                    ^^^^^^^^^^^^^^^^^^
+6 | from runtime.autonomy.mdg import MissionDependencyGraph
+7 | from runtime.autonomy.weakness_finder.types import (
+  |
+help: Remove unused import: `paeos.semantic.lineage.SemanticLineageDAG`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/autonomy/weakness_finder/sensor_pack_structural.py:7:1
+   |
+ 5 |   """
+ 6 |
+ 7 | / from __future__ import annotations
+ 8 | |
+ 9 | | import re
+10 | | from typing import Any
+11 | |
+12 | | from runtime.autonomy.weakness_finder.types import (
+13 | |     FindingSeverity,
+14 | |     SensorFinding,
+15 | |     WeaknessCategory,
+16 | | )
+17 | |
+18 | |
+19 | | from pathlib import Path
+   | |________________________^
+20 |
+21 |   def _extract_text(context: Any) -> str | None:
+   |
+help: Organize imports
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+  --> runtime/autonomy/weakness_finder/sensor_pack_structural.py:29:5
+   |
+27 |           except Exception:
+28 |               return None
+29 | /     if isinstance(context, dict):
+30 | |         if "source_code" in context and isinstance(context["source_code"], str):
+   | |________________________________________________________________________________^
+31 |               return context["source_code"]
+32 |       return None
+   |
+help: Combine `if` statements using `and`
+
+F401 [*] `dataclasses.field` imported but unused
+  --> runtime/autonomy/weakness_finder/types.py:13:36
+   |
+12 | import hashlib
+13 | from dataclasses import dataclass, field
+   |                                    ^^^^^
+14 | from enum import StrEnum
+15 | from typing import Any, Protocol
+   |
+help: Remove unused import: `dataclasses.field`
+
+UP012 [*] Unnecessary UTF-8 `encoding` argument to `encode`
+  --> runtime/autonomy/weakness_finder/types.py:56:17
+   |
+54 |         if not self.dedup_signature:
+55 |             sig = hashlib.sha256(
+56 |                 f"{self.category.value}:{self.title}:{sorted(self.affected_nodes)}".encode("utf-8")
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+57 |             ).hexdigest()[:16]
+58 |             object.__setattr__(self, "dedup_signature", sig)
+   |
+help: Remove unnecessary `encoding` argument
+
+F401 [*] `runtime.autonomy.mdg.BlockerStatus` imported but unused
+  --> runtime/autonomy/weakness_finder_probes.py:11:34
+   |
+ 9 | from runtime.autonomy.authority import FindingClass
+10 | from runtime.autonomy.cycle_detector import would_cause_cycle
+11 | from runtime.autonomy.mdg import BlockerStatus, EdgeType, MissionDependencyGraph, TaskStatus
+   |                                  ^^^^^^^^^^^^^
+   |
+help: Remove unused import: `runtime.autonomy.mdg.BlockerStatus`
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> runtime/autonomy/weakness_finder_probes.py:101:17
+    |
+ 99 |               if task.status is TaskStatus.TERMINAL_SUCCESS and task.parent_task_id:
+100 |                   parent = self.graph.tasks.get(task.parent_task_id)
+101 | /                 if parent and parent.status is TaskStatus.SUSPENDED:
+102 | |                     # If all blockers for parent are extinguished, this child is a zombie completed child
+103 | |                     if self.graph.can_resume_task(parent.task_id):
+    | |__________________________________________________________________^
+104 |                           findings.append(
+105 |                               ProbeFinding(
+    |
+help: Combine `if` statements using `and`
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> runtime/integrations/gemini36_adversary_route.py:3:1
+   |
+ 1 |   """Role-scoped parent-owned Google Gemini 3.6 adversary route."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import hashlib
+ 6 | | import json
+ 7 | | import math
+ 8 | | import os
+ 9 | | import stat
+10 | | import time
+11 | | import uuid
+12 | | from collections.abc import Callable, Mapping
+13 | | from dataclasses import dataclass
+14 | | from pathlib import Path
+15 | | from typing import Any, NoReturn
+16 | |
+17 | | from kernel.types import Role, StageId
+18 | | from runtime.integrations.provider_broker import HostClineCriticTransport
+   | |_________________________________________________________________________^
+19 |
+20 |   PROVIDER = "google"
+   |
+help: Organize imports
+
+Found 52 errors.
+[*] 36 fixable with the `--fix` option (10 hidden fixes can be enabled with the `--unsafe-fixes` option).

@@ -1,0 +1,241 @@
+{
+  "restored_base_files": 6,
+  "added_missing_files": 27,
+  "source_entries": [
+    {
+      "path": "runtime/integrations/process_supervisor.py",
+      "action": "restore_pinned_preimage",
+      "origin": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+      "sha256": "bf41d7190c82ce92b609ff2e0bfcdf4b5905e70433c9a5b9de6b5b64bc591ecc",
+      "before_sha256": "4b50c71f7ef41794f7eeb31ca7b41b3471aff856e1883ae5eac0e1d53d142f40"
+    },
+    {
+      "path": "runtime/integrations/provider_broker.py",
+      "action": "restore_pinned_preimage",
+      "origin": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+      "sha256": "206e3ca94b4bc1b7a76edee6d9bb727efe00b4159fed1a5970a4b037cf8c907a",
+      "before_sha256": "79ee45a77d57816202f4baea4fa989d5f2b9d06996c8d61faf40aeab3c05e9c6"
+    },
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "action": "restore_pinned_preimage",
+      "origin": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+      "sha256": "e2271dae4e78d4e7464fb2bc8d0a7aea78c5697434fa848293fb8653ac384153",
+      "before_sha256": "cd050d76335d1ab65e03485c49accff0f93b6bc8f5e26c69d9acf0043a1de83b"
+    },
+    {
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "action": "restore_pinned_preimage",
+      "origin": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+      "sha256": "96f5b9c2d0c5c3fce6e99b9d5fee25e30b99eadab01b2d98f50e44550c5ebfc0",
+      "before_sha256": "11fa1404eda7f4c5f53666c96e05f7d1014b55b919d3f4dde90083cadd6f50fe"
+    },
+    {
+      "path": "runtime/integrations/worker_confinement.py",
+      "action": "restore_pinned_preimage",
+      "origin": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+      "sha256": "f13640b8b76815259671bb2334fb09f02c917ba8cabf0e4e0b40930b779978b1",
+      "before_sha256": "b356bd546ffc593babf153302d57c18799c5605b033d3ba854874113dd97acd7"
+    },
+    {
+      "path": "runtime/planner_transport.py",
+      "action": "restore_pinned_preimage",
+      "origin": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+      "sha256": "0fdafda96daf293b5b9301a7e7d5891e0b5ea63c7f2a1eab804581cae897a8fc",
+      "before_sha256": "37a93e19324da03182757961020474d9823f42e8755d8cda442c8bae96b3112e"
+    },
+    {
+      "path": "ops/p1_l14_resume.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "59c357e175006ce65bd8e28250629216d404e37c0d2b68ef7a4749ccd40add5e",
+      "before_sha256": null
+    },
+    {
+      "path": "paeos/semantic/__init__.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "cb7710c169113ec08efd24fd17b5e68edfc0da10ced00e35ac15fbe05cdfbafd",
+      "before_sha256": null
+    },
+    {
+      "path": "paeos/semantic/delta_engine.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "229a536bc39ee000e95c2d43a323524763d424265b0bf4807821e93e29ec4f13",
+      "before_sha256": null
+    },
+    {
+      "path": "paeos/semantic/freeze_guard.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "97dc7b21e39a10e3b9fe5852d9e01a44701c883dc8002ccd1bd16923b9b6cb48",
+      "before_sha256": null
+    },
+    {
+      "path": "paeos/semantic/lineage.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "57c50213f279f48ab9161a433b97a3524e72c36c3b862ec84fdea66d7512de95",
+      "before_sha256": null
+    },
+    {
+      "path": "paeos/semantic/types.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "5646f98c7d361668ee483eb32c0a56474e56c6139e1d933346015a3fe6dc1540",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/authority.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "ef1aaa769217f8c5a564e37fa515256afcd35a335e82ba4b2591a524582c42d8",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/cycle_detector.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "d75ef3b4c523849bef7918f0211e6f49a1594670e403fee773b053fa8d64b193",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/mdg.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "2c29ec9afd6c1349062a82f864fd3ea224849a2c13c7f865302f22e7131394be",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/mission_controller.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "1e604eb2d03dd9c6db178ff0021f6a72dd135c1940116fd863e36dd1ccb86dbe",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/orca_lineage.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "c09f9fa5c15cd98c6e58b496a095fcf1d88f1ee1cae7f8e0c6f7befed06b932d",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/recovery_controller.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "43092d239662f7ea2643edc796062d59cf6dadaeee39cc2b9e408662893d8a78",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/resume_engine.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/schemas/__init__.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "b299493c1110f4fc71a27ac7d8037eb83c74554a86890004ac4059871368d49d",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/schemas/architect_cognition.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "61780185a86d4c5b27693da7959faa077e5ed0f746286e917e0157f2c2427a6f",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/schemas/frontier_research.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "f9be9e6cca47bb9b6f677814708593f07fe38e9e0e3bfa2f74e13a02a430e64b",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/schemas/tradeoff_analysis.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "fa4fa2caef6fba04e91ddb8fa501edbe37ba8842bc6685ca548e9de98de62bfb",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/__init__.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "74ce8d342ccdd0e8f61c5ff253392ccb8acdcd911405bef74d58380653bd3beb",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/coordinator.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "7952e2e318703648005edbc5247023109e6fc205e6086361df9e7b2fdf63be43",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "3053e5459bafc2e975d336e47c4161af5ec18a458fecc47a659e273f752579be",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "495dd655cd92f82b24a15ec18a9759ea95929c3f265d3b5294466f37c1970321",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "19a99aea02ce5bbf3520aa200a6c59f7a98c47eedb8935f582a570d91da9f68b",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "1e10075c584c7401bc0413eaeea4c672f400b6da08b2ad15599f7a98e2e661d3",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder/types.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "5d5523a549337e79d5356ef0e774b44d713fe3bb1f2137d6002b36d94cc23634",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/autonomy/weakness_finder_probes.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "407b3773ec609d2a0aa93c43b06bf8ba9f4ff71d562203bcb600a4f5122931ac",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/integrations/gemini36_adversary_route.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "5926c4b6f64f231db9d0629b345836c6f27e28ab4a4d6ca7e4217afc29ad52fb",
+      "before_sha256": null
+    },
+    {
+      "path": "runtime/integrations/gemini36_critic_route.py",
+      "action": "candidate_missing_source",
+      "origin": "48a8e50f9669f6e47f22a9f9e9dd2b575c420950",
+      "sha256": "3b3cc8e6d0de300cc3df34b4442fd003e21f58929f89b4200d1b409e8971dd14",
+      "before_sha256": null
+    }
+  ],
+  "rejected_projection_sha256": "17ab4ab76b9c2c17eb8978ecc099fd68bc8204dcee210f9e8d03263f191c6bbf",
+  "provider_calls": 0,
+  "paeos_runs": 0,
+  "qualification": false
+}

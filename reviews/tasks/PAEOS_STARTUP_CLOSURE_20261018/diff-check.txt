@@ -1,0 +1,84 @@
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:6: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:7: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:13: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:14: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:17: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:18: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:26: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:30: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:119: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:152: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:397: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:401: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:432: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:439: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:440: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:449: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:450: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:475: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:476: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:500: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:530: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:592: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:759: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:775: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:807: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:853: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:854: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:864: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:865: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:868: trailing whitespace.
++ 
+reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/rejected-projection.patch:875: trailing whitespace.
++ 
+runtime/autonomy/authority.py:117: trailing whitespace.
++        
+runtime/autonomy/cycle_detector.py:41: trailing whitespace.
++        
+runtime/autonomy/schemas/architect_cognition.py:124: trailing whitespace.
++    
+runtime/autonomy/schemas/architect_cognition.py:130: trailing whitespace.
++    
+runtime/autonomy/schemas/architect_cognition.py:141: trailing whitespace.
++        
+runtime/autonomy/schemas/architect_cognition.py:146: trailing whitespace.
++            
+runtime/autonomy/schemas/architect_cognition.py:150: trailing whitespace.
++            
+runtime/autonomy/schemas/architect_cognition.py:162: trailing whitespace.
++                    
+runtime/autonomy/schemas/architect_cognition.py:165: trailing whitespace.
++                
+runtime/autonomy/schemas/architect_cognition.py:174: trailing whitespace.
++        
+runtime/autonomy/schemas/architect_cognition.py:184: trailing whitespace.
++    

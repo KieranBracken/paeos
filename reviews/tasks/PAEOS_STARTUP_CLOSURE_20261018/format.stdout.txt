@@ -1,0 +1,25 @@
+Would reformat: ops/p1_l14_resume.py
+Would reformat: paeos/semantic/delta_engine.py
+Would reformat: paeos/semantic/freeze_guard.py
+Would reformat: paeos/semantic/lineage.py
+Would reformat: paeos/semantic/types.py
+Would reformat: runtime/autonomy/authority.py
+Would reformat: runtime/autonomy/cycle_detector.py
+Would reformat: runtime/autonomy/mdg.py
+Would reformat: runtime/autonomy/mission_controller.py
+Would reformat: runtime/autonomy/orca_lineage.py
+Would reformat: runtime/autonomy/recovery_controller.py
+Would reformat: runtime/autonomy/resume_engine.py
+Would reformat: runtime/autonomy/schemas/architect_cognition.py
+Would reformat: runtime/autonomy/schemas/frontier_research.py
+Would reformat: runtime/autonomy/schemas/tradeoff_analysis.py
+Would reformat: runtime/autonomy/weakness_finder/coordinator.py
+Would reformat: runtime/autonomy/weakness_finder/sensor_pack_drift.py
+Would reformat: runtime/autonomy/weakness_finder/sensor_pack_mdg.py
+Would reformat: runtime/autonomy/weakness_finder/sensor_pack_semantic.py
+Would reformat: runtime/autonomy/weakness_finder/sensor_pack_structural.py
+Would reformat: runtime/autonomy/weakness_finder/types.py
+Would reformat: runtime/autonomy/weakness_finder_probes.py
+Would reformat: runtime/integrations/gemini36_adversary_route.py
+Would reformat: runtime/integrations/gemini36_critic_route.py
+24 files would be reformatted, 10 files already formatted

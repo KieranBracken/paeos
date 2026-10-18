@@ -1,0 +1,5 @@
+{
+  "exit_code": 2,
+  "trailing_whitespace_reports": 42,
+  "disposition": "Recorded failure in exact recovered source and preserved rejected-patch artifact. Bytes retained as unqualified recovery evidence; no passing diff-check claim."
+}

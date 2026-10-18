@@ -1,0 +1,934 @@
+diff --git a/runtime/integrations/process_supervisor.py b/runtime/integrations/process_supervisor.py
+index 8a383e71..06ae1a24 100644
+--- a/runtime/integrations/process_supervisor.py
++++ b/runtime/integrations/process_supervisor.py
+@@ -59,9 +59,7 @@ class ProcessObservation:
+ 
+ 
+ def _canonical(value: object) -> bytes:
+-    return (
+-        json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n"
+-    ).encode()
++    return (json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True) + "\n").encode()
+ 
+ 
+ def _sha(value: bytes) -> str:
+@@ -69,9 +67,7 @@ def _sha(value: bytes) -> str:
+ 
+ 
+ def _environment_fingerprint(environment: Mapping[str, str]) -> str:
+-    if any(
+-        not isinstance(key, str) or not isinstance(value, str) for key, value in environment.items()
+-    ):
++    if any(not isinstance(key, str) or not isinstance(value, str) for key, value in environment.items()):
+         raise ProcessSupervisorError("environment must contain only string keys and values")
+     return _sha(_canonical(dict(sorted(environment.items()))))
+ 
+@@ -232,9 +228,7 @@ def run_bounded_process(
+             if late_process is not None and hasattr(late_process, "pid"):
+                 _terminate(late_process)  # type: ignore[arg-type]
+ 
+-        threading.Thread(
+-            target=terminate_late_launch, name="paeos-late-launch-cleanup", daemon=True
+-        ).start()
++        threading.Thread(target=terminate_late_launch, name="paeos-late-launch-cleanup", daemon=True).start()
+         return ProcessObservation(
+             argv=argv,
+             executable=str(executable),
+@@ -284,11 +278,7 @@ def run_bounded_process(
+                 terminal = ProcessLifecycleState.TIMED_OUT
+                 record(terminal, reason="execution deadline exceeded", pid=process.pid)
+                 break
+-            events = (
+-                selector.select(timeout=min(0.5, max(0.0, deadline - now)))
+-                if selector.get_map()
+-                else []
+-            )
++            events = selector.select(timeout=min(0.5, max(0.0, deadline - now))) if selector.get_map() else []
+             if not events:
+                 state["heartbeat_count"] = int(state["heartbeat_count"]) + 1
+                 state["last_heartbeat_elapsed_ms"] = int((time.monotonic() - started_at) * 1000)
+@@ -320,11 +310,7 @@ def run_bounded_process(
+                 _terminate(process)
+                 terminal = ProcessLifecycleState.TIMED_OUT
+             else:
+-                terminal = (
+-                    ProcessLifecycleState.RETURNED
+-                    if exit_code == 0
+-                    else ProcessLifecycleState.FAILED
+-                )
++                terminal = ProcessLifecycleState.RETURNED if exit_code == 0 else ProcessLifecycleState.FAILED
+             record(terminal, reason="process exited", pid=process.pid)
+     finally:
+         with suppress(Exception):
+diff --git a/runtime/integrations/provider_broker.py b/runtime/integrations/provider_broker.py
+index 4518e9f8..d49cb51a 100644
+--- a/runtime/integrations/provider_broker.py
++++ b/runtime/integrations/provider_broker.py
+@@ -49,39 +49,17 @@ class HostClineCriticTransport:
+     capability_ttl_s = 45.0
+     child_receives_parent_credentials = False
+     allowed_environment = (
+-        "HOME",
+-        "LANG",
+-        "LC_ALL",
+-        "PATH",
+-        "TMPDIR",
+-        "PAEOS_TASK_BEARER",
+-        "PAEOS_TASK_BROKER_URL",
++        "HOME", "LANG", "LC_ALL", "PATH", "TMPDIR",
++        "PAEOS_TASK_BEARER", "PAEOS_TASK_BROKER_URL",
+     )
+     required_observation_fields = frozenset(
+         {
+-            "capability_id",
+-            "operation",
+-            "provider_id",
+-            "model_id",
+-            "model_family",
+-            "actual_provider",
+-            "actual_model",
+-            "actual_family",
+-            "fallback_used",
+-            "lifecycle_state",
+-            "exit_code",
+-            "response_content",
+-            "stdout_sha256",
+-            "stderr_sha256",
+-            "stdout_bytes",
+-            "stderr_bytes",
+-            "executable",
+-            "executable_version",
+-            "environment_fingerprint",
+-            "argv",
+-            "profile_sha256",
+-            "workspace",
+-            "confinement_canaries",
++            "capability_id", "operation", "provider_id", "model_id", "model_family",
++            "actual_provider", "actual_model", "actual_family", "fallback_used",
++            "lifecycle_state", "exit_code", "response_content",
++            "stdout_sha256", "stderr_sha256", "stdout_bytes", "stderr_bytes",
++            "executable", "executable_version", "environment_fingerprint", "argv",
++            "profile_sha256", "workspace", "confinement_canaries",
+         }
+     )
+     rejects_unknown_response_fields = True
+@@ -91,13 +69,7 @@ class HostClineCriticTransport:
+     rejects_identity_substitution = True
+     rejects_hidden_fallback = True
+ 
+-    def __init__(
+-        self,
+-        *,
+-        queue_root: Path = Path("/Users/bob/GitHub/paeos/ops/.trusted-worker/queue"),
+-        request_signing_key: Any | None = None,
+-        timeout_s: float = 180.0,
+-    ) -> None:
++    def __init__(self, *, queue_root: Path = Path("/Users/bob/GitHub/paeos/ops/.trusted-worker/queue"), request_signing_key: Any | None = None, timeout_s: float = 180.0) -> None:
+         if not queue_root.is_absolute() or queue_root.is_symlink():
+             raise ProviderBrokerError("trusted launcher queue must be absolute and non-symlinked")
+         if isinstance(timeout_s, bool) or not 0 < timeout_s <= 180:
+@@ -121,26 +93,14 @@ class HostClineCriticTransport:
+         issued = time.time() if now is None else now
+         if isinstance(issued, bool) or not isinstance(issued, (int, float)):
+             raise ProviderBrokerError("critic capability time is malformed")
+-        return {
+-            "schema": "paeos.trusted-cline-critic-capability/1",
+-            "operation": operation,
+-            "capability_id": uuid.uuid4().hex,
+-            "task_id": task_id,
+-            "issued_at": float(issued),
+-            "expires_at": float(issued) + self.capability_ttl_s,
+-            "provider_id": self.provider_id,
+-            "model_id": self.model_id,
+-            "model_family": self.model_family,
+-            "role": role.value,
+-        }
++        return {"schema": "paeos.trusted-cline-critic-capability/1", "operation": operation,
++                "capability_id": uuid.uuid4().hex, "task_id": task_id,
++                "issued_at": float(issued), "expires_at": float(issued) + self.capability_ttl_s,
++                "provider_id": self.provider_id, "model_id": self.model_id,
++                "model_family": self.model_family, "role": role.value}
+ 
+     def redeem_task_capability(
+-        self,
+-        *,
+-        bearer: object,
+-        task_id: str,
+-        role: Role,
+-        operation: str,
++        self, *, bearer: object, task_id: str, role: Role, operation: str,
+         now: float | None = None,
+     ) -> str:
+         self._check_route(role, operation)
+@@ -236,7 +196,9 @@ class HostClineCriticTransport:
+             or Path(str(workspace)).is_symlink()
+             or argv[:2] != ["/usr/bin/sandbox-exec", "-p"]
+             or len(argv) != 6
+-            or argv[3:] != ["/usr/bin/curl", "--config", str(Path(str(workspace)) / "curl.conf")]
++            or argv[3:] != [
++                "/usr/bin/curl", "--config", str(Path(str(workspace)) / "curl.conf")
++            ]
+             or observation.get("executable") != "/usr/bin/sandbox-exec"
+             or _sha256(str(argv[2]).encode("utf-8")) != observation.get("profile_sha256")
+             or not cls._valid_canaries(canaries)
+@@ -247,40 +209,24 @@ class HostClineCriticTransport:
+     @staticmethod
+     def _valid_canaries(value: object) -> bool:
+         expected = {
+-            "parent_secret_or_provider_credential",
+-            "approved_read",
+-            "approved_write",
+-            "forbidden_file_read",
+-            "forbidden_directory_list",
+-            "forbidden_write",
+-            "symlink_escape",
+-            "traversal_escape",
+-            "subprocess_inheritance",
++            "parent_secret_or_provider_credential", "approved_read", "approved_write",
++            "forbidden_file_read", "forbidden_directory_list", "forbidden_write",
++            "symlink_escape", "traversal_escape", "subprocess_inheritance",
+         }
+         if not isinstance(value, dict) or set(value) != {"results", "process"}:
+             return False
+         results, process = value.get("results"), value.get("process")
+         process_hashes = (
+-            "stdout_sha256",
+-            "stderr_sha256",
+-            "environment_fingerprint",
+-            "profile_sha256",
++            "stdout_sha256", "stderr_sha256", "environment_fingerprint", "profile_sha256"
+         )
+         return (
+             isinstance(results, dict)
+             and set(results) == expected
+             and all(result == "PASS" for result in results.values())
+             and isinstance(process, dict)
+-            and set(process)
+-            == {
+-                "exit_code",
+-                "lifecycle_state",
+-                "stdout_bytes",
+-                "stdout_sha256",
+-                "stderr_bytes",
+-                "stderr_sha256",
+-                "environment_fingerprint",
+-                "profile_sha256",
++            and set(process) == {
++                "exit_code", "lifecycle_state", "stdout_bytes", "stdout_sha256",
++                "stderr_bytes", "stderr_sha256", "environment_fingerprint", "profile_sha256",
+             }
+             and process.get("exit_code") == 0
+             and process.get("lifecycle_state") == "RETURNED"
+@@ -305,18 +251,10 @@ class HostClineCriticTransport:
+         capability = self.issue_task_capability(
+             task_id=spec.task_id, role=Role.CRITIC, operation=self.allowed_operation
+         )
+-        capability.update(
+-            {
+-                "goal_id": spec.goal_id,
+-                "run_id": spec.run_id,
+-                "stage": spec.stage,
+-                "prompt": spec.prompt,
+-            }
+-        )
++        capability.update({"goal_id": spec.goal_id, "run_id": spec.run_id,
++                           "stage": spec.stage, "prompt": spec.prompt})
+         capability_id = self.redeem_task_capability(
+-            bearer=capability,
+-            task_id=spec.task_id,
+-            role=Role.CRITIC,
++            bearer=capability, task_id=spec.task_id, role=Role.CRITIC,
+             operation=self.allowed_operation,
+         )
+         if len(spec.prompt.encode("utf-8")) > _MAX_PROMPT_BYTES or "\x00" in spec.prompt:
+@@ -324,18 +262,13 @@ class HostClineCriticTransport:
+         key = self._request_signing_key
+         if key is None:
+             key = self._request_signing_key = load_or_create_signing_key()
+-        envelope = {
+-            **capability,
+-            "signature": key.sign(_canonical_bytes(capability)).signature.hex(),
+-        }
++        envelope = {**capability, "signature": key.sign(_canonical_bytes(capability)).signature.hex()}
+         payload = _canonical_bytes(envelope)
+         self._queue_root.mkdir(mode=0o700, parents=True, exist_ok=True)
+         request_path = self._queue_root / f"{capability_id}.request.json"
+         response_path = self._queue_root / f"{capability_id}.response.json"
+         temporary_path = self._queue_root / f".{capability_id}.request.tmp"
+-        if len(payload) > _MAX_FRAME_BYTES or any(
+-            p.exists() for p in (request_path, response_path, temporary_path)
+-        ):
++        if len(payload) > _MAX_FRAME_BYTES or any(p.exists() for p in (request_path, response_path, temporary_path)):
+             raise ProviderBrokerError("critic capability frame or paths are invalid")
+         try:
+             fd = os.open(temporary_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+@@ -371,9 +304,7 @@ class HostClineCriticTransport:
+         if not isinstance(response, dict) or response.get("capability_id") != capability_id:
+             raise ProviderBrokerError("critic supervisor response attribution mismatch")
+         if response.get("ok") is not True:
+-            raise ProviderBrokerError(
+-                f"critic supervisor rejected capability: {response.get('error_code', 'unknown')}"
+-            )
++            raise ProviderBrokerError(f"critic supervisor rejected capability: {response.get('error_code', 'unknown')}")
+         observation = response.get("observation")
+         qualified = self.validate_supervisor_observation(
+             observation=observation, capability_id=capability_id
+@@ -381,7 +312,6 @@ class HostClineCriticTransport:
+         self.last_observation = dict(qualified)
+         # Import lazily to avoid the integrations package initialization cycle.
+         from runtime.integrations import SessionResult
+-
+         return SessionResult(
+             transcript=str(qualified["response_content"]),
+             lifecycle_state=str(qualified["lifecycle_state"]),
+@@ -493,7 +423,9 @@ class HostConfinedProviderClient:
+         signing_key: Any | None = None,
+         timeout_s: float = 75.0,
+     ) -> None:
+-        if socket_path is not None and (not socket_path.is_absolute() or socket_path.is_symlink()):
++        if socket_path is not None and (
++            not socket_path.is_absolute() or socket_path.is_symlink()
++        ):
+             raise ProviderBrokerError("legacy socket parameter is invalid")
+         if not queue_root.is_absolute() or queue_root.is_symlink():
+             raise ProviderBrokerError("trusted launcher queue must be an absolute non-symlink path")
+@@ -563,9 +495,7 @@ class HostConfinedProviderClient:
+                     response_path.unlink()
+                     request_path.unlink(missing_ok=True)
+                     if len(raw_response) > _MAX_FRAME_BYTES:
+-                        raise ProviderBrokerError(
+-                            "trusted launcher response exceeds the bounded IPC size"
+-                        )
++                        raise ProviderBrokerError("trusted launcher response exceeds the bounded IPC size")
+                     break
+                 time.sleep(0.05)
+             else:
+@@ -598,25 +528,10 @@ class HostConfinedProviderClient:
+         observation: dict[str, object], capability_id: str
+     ) -> ConfinedProviderObservation:
+         required = {
+-            "provider_id",
+-            "model_id",
+-            "model_family",
+-            "actual_model",
+-            "actual_family",
+-            "response_content",
+-            "stdout_sha256",
+-            "stderr_sha256",
+-            "stdout_bytes",
+-            "stderr_bytes",
+-            "exit_code",
+-            "lifecycle_state",
+-            "executable",
+-            "executable_version",
+-            "environment_fingerprint",
+-            "argv",
+-            "profile_sha256",
+-            "workspace",
+-            "confinement_canaries",
++            "provider_id", "model_id", "model_family", "actual_model", "actual_family", "response_content", "stdout_sha256",
++            "stderr_sha256", "stdout_bytes", "stderr_bytes", "exit_code", "lifecycle_state",
++            "executable", "executable_version", "environment_fingerprint", "argv",
++            "profile_sha256", "workspace", "confinement_canaries",
+         }
+         if set(observation) != required:
+             raise ProviderBrokerError("trusted launcher observation fields are not exact")
+@@ -640,14 +555,9 @@ class HostConfinedProviderClient:
+             or not isinstance(argv, list)
+             or any(not isinstance(item, str) for item in argv)
+         ):
+-            raise ProviderBrokerError(
+-                "trusted launcher returned an unqualified provider observation"
+-            )
++            raise ProviderBrokerError("trusted launcher returned an unqualified provider observation")
+         typed_ints = ("stdout_bytes", "stderr_bytes", "exit_code")
+-        if any(
+-            isinstance(observation[name], bool) or not isinstance(observation[name], int)
+-            for name in typed_ints
+-        ):
++        if any(isinstance(observation[name], bool) or not isinstance(observation[name], int) for name in typed_ints):
+             raise ProviderBrokerError("trusted launcher byte or exit fields are malformed")
+         canaries = observation["confinement_canaries"]
+         expected_canaries = {
+@@ -670,8 +580,7 @@ class HostConfinedProviderClient:
+             or set(results) != expected_canaries
+             or any(value != "PASS" for value in results.values())
+             or not isinstance(process, dict)
+-            or set(process)
+-            != {
++            or set(process) != {
+                 "exit_code",
+                 "lifecycle_state",
+                 "stdout_bytes",
+diff --git a/runtime/integrations/task_scoped_responses_broker.py b/runtime/integrations/task_scoped_responses_broker.py
+index 4a9d4909..8bf8fb6f 100644
+--- a/runtime/integrations/task_scoped_responses_broker.py
++++ b/runtime/integrations/task_scoped_responses_broker.py
+@@ -66,15 +66,11 @@ class ParentOwnedResponsesBroker:
+         model_id: str = _DEFAULT_MODEL_ID,
+         upstream: Upstream | None = None,
+         clock: Callable[[], float] | None = None,
+-        max_requests: int = MAX_TASK_REQUESTS,
+     ) -> None:
+         if model_id not in AUTHORIZED_MODEL_IDS:
+             raise ValueError("parent broker model is not an authorized fixed Codex route")
+-        if type(max_requests) is not int or not 1 <= max_requests <= MAX_TASK_REQUESTS:
+-            raise ValueError("parent broker request limit is outside the bounded range")
+         self._auth_path = Path(auth_path)
+         self._model_id = model_id
+-        self._max_requests = max_requests
+         self._upstream = upstream or self._forward_to_chatgpt
+         self._clock = clock or time.time
+         self._server: ThreadingHTTPServer | None = None
+@@ -141,12 +137,7 @@ class ParentOwnedResponsesBroker:
+         tokens = document.get("tokens") if isinstance(document, dict) else None
+         access_token = tokens.get("access_token") if isinstance(tokens, dict) else None
+         account_id = tokens.get("account_id") if isinstance(tokens, dict) else None
+-        if (
+-            not isinstance(access_token, str)
+-            or not access_token
+-            or not isinstance(account_id, str)
+-            or not account_id
+-        ):
++        if not isinstance(access_token, str) or not access_token or not isinstance(account_id, str) or not account_id:
+             raise RuntimeError("parent Codex auth state lacks required identity")
+         return access_token, account_id
+ 
+@@ -161,9 +152,7 @@ class ParentOwnedResponsesBroker:
+             def log_message(self, _format: str, *args: object) -> None:
+                 return
+ 
+-            def _send(
+-                self, status: int, body: bytes, content_type: str = "application/json"
+-            ) -> None:
++            def _send(self, status: int, body: bytes, content_type: str = "application/json") -> None:
+                 self.send_response(status)
+                 self.send_header("Content-Type", content_type)
+                 self.send_header("Content-Length", str(len(body)))
+@@ -201,7 +190,7 @@ class ParentOwnedResponsesBroker:
+                     self._send(403, b'{"error":{"type":"model_not_authorized"}}')
+                     return
+                 with broker._lock:
+-                    if broker._request_count >= broker._max_requests:
++                    if broker._request_count >= MAX_TASK_REQUESTS:
+                         broker._local_rejection_count += 1
+                         broker._local_error_class = "task_request_limit_reached"
+                         broker._transport_outcome = "local_rejection"
+@@ -281,7 +270,6 @@ class ParentOwnedResponsesBroker:
+                 "binding": "127.0.0.1",
+                 "model_id": self._model_id,
+                 "request_count": self._request_count,
+-                "request_limit": self._max_requests,
+                 "request_sha256": self._request_sha256,
+                 "response_sha256": self._response_sha256,
+                 "transport_outcome": self._transport_outcome,
+diff --git a/runtime/integrations/trusted_codex_transport.py b/runtime/integrations/trusted_codex_transport.py
+index 8956bd09..7e5ed565 100644
+--- a/runtime/integrations/trusted_codex_transport.py
++++ b/runtime/integrations/trusted_codex_transport.py
+@@ -22,6 +22,7 @@ from runtime.integrations import SessionResult, SessionSpec, TrustedTransportFai
+ from runtime.integrations.task_scoped_responses_broker import MAX_TASK_REQUESTS
+ 
+ __all__ = [
++
+     "DEFAULT_BUILDER_TRANSPORT_QUALIFICATION",
+     "DEFAULT_BUILDER_TRANSPORT_VERIFY_KEY",
+     "DEFAULT_CODEX_QUEUE",
+@@ -92,10 +93,8 @@ class TrustedCodexTransportError(TrustedTransportFailure):
+ 
+ 
+ def _is_sha256(value: object) -> bool:
+-    return (
+-        isinstance(value, str)
+-        and len(value) == 64
+-        and all(character in "0123456789abcdef" for character in value)
++    return isinstance(value, str) and len(value) == 64 and all(
++        character in "0123456789abcdef" for character in value
+     )
+ 
+ 
+@@ -103,9 +102,7 @@ def _validate_failure_observation(value: object) -> dict[str, object] | None:
+     if value is None:
+         return None
+     if not isinstance(value, dict) or set(value) != _FAILURE_OBSERVATION_FIELDS:
+-        raise TrustedCodexTransportError(
+-            "trusted supervisor failure observation fields are not exact"
+-        )
++        raise TrustedCodexTransportError("trusted supervisor failure observation fields are not exact")
+     if value["lifecycle_state"] not in _FAILURE_LIFECYCLE_STATES:
+         raise TrustedCodexTransportError("trusted supervisor failure lifecycle is invalid")
+     exit_code = value["exit_code"]
+@@ -146,9 +143,7 @@ def _write_atomic(path: Path, payload: bytes) -> None:
+         while offset < len(payload):
+             written = os.write(fd, payload[offset:])
+             if written <= 0:
+-                raise TrustedCodexTransportError(
+-                    "trusted supervisor request write made no progress"
+-                )
++                raise TrustedCodexTransportError("trusted supervisor request write made no progress")
+             offset += written
+         os.fsync(fd)
+     finally:
+@@ -156,27 +151,6 @@ def _write_atomic(path: Path, payload: bytes) -> None:
+     os.replace(temporary, path)
+ 
+ 
+-def _write_receipt_once(path: Path, payload: bytes) -> None:
+-    if not path.is_absolute() or path.is_symlink():
+-        raise TrustedCodexTransportError("trusted supervisor receipt path is unsafe")
+-    try:
+-        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+-    except FileExistsError as exc:
+-        raise TrustedCodexTransportError("trusted supervisor receipt already exists") from exc
+-    try:
+-        offset = 0
+-        while offset < len(payload):
+-            written = os.write(descriptor, payload[offset:])
+-            if written <= 0:
+-                raise TrustedCodexTransportError(
+-                    "trusted supervisor receipt write made no progress"
+-                )
+-            offset += written
+-        os.fsync(descriptor)
+-    finally:
+-        os.close(descriptor)
+-
+-
+ class HostCodexWorkerTransport:
+     """Signed queue client for one fixed, host-supervised Codex Builder route."""
+ 
+@@ -194,25 +168,15 @@ class HostCodexWorkerTransport:
+         request_signing_key: SigningKey,
+         response_verify_key: VerifyKey,
+         timeout_s: float = DEFAULT_RESPONSE_TIMEOUT_S,
+-        evidence_root: Path | None = None,
+     ) -> None:
+         if not queue_root.is_absolute() or queue_root.is_symlink():
+-            raise TrustedCodexTransportError(
+-                "trusted supervisor queue must be absolute and non-symlinked"
+-            )
++            raise TrustedCodexTransportError("trusted supervisor queue must be absolute and non-symlinked")
+         if not workspace_root.is_absolute() or workspace_root.is_symlink():
+             raise TrustedCodexTransportError("trusted supervisor workspace root is unsafe")
+         if timeout_s <= 0 or timeout_s > MAX_RESPONSE_TIMEOUT_S:
+-            raise TrustedCodexTransportError(
+-                "trusted supervisor timeout is outside the bounded range"
+-            )
+-        if evidence_root is not None and (
+-            not evidence_root.is_absolute() or evidence_root.is_symlink()
+-        ):
+-            raise TrustedCodexTransportError("trusted supervisor evidence root is unsafe")
++            raise TrustedCodexTransportError("trusted supervisor timeout is outside the bounded range")
+         self.queue_root = queue_root
+         self.workspace_root = workspace_root.resolve()
+-        self.evidence_root = evidence_root
+         self._request_signing_key = request_signing_key
+         self._response_verify_key = response_verify_key
+         self._timeout_s = timeout_s
+@@ -231,13 +195,8 @@ class HostCodexWorkerTransport:
+ 
+     def _request_payload(self, spec: SessionSpec) -> dict[str, object]:
+         if not self._workspace_is_approved(spec.workspace):
+-            raise TrustedCodexTransportError(
+-                "session workspace is outside the fixed supervisor root"
+-            )
+-        if not all(
+-            isinstance(value, str) and value
+-            for value in (spec.task_id, spec.goal_id, spec.run_id, spec.stage)
+-        ):
++            raise TrustedCodexTransportError("session workspace is outside the fixed supervisor root")
++        if not all(isinstance(value, str) and value for value in (spec.task_id, spec.goal_id, spec.run_id, spec.stage)):
+             raise TrustedCodexTransportError("session identity is incomplete")
+         if "\x00" in spec.prompt or not spec.prompt.strip():
+             raise TrustedCodexTransportError("session prompt is malformed")
+@@ -277,37 +236,15 @@ class HostCodexWorkerTransport:
+             raise TrustedCodexTransportError("trusted supervisor request exceeds bounded size")
+         self.last_request_sha256 = _sha256(encoded)
+         try:
+-            if self.evidence_root is not None:
+-                try:
+-                    evidence_root = self.evidence_root.resolve(strict=True)
+-                except OSError as exc:
+-                    raise TrustedCodexTransportError(
+-                        "trusted supervisor evidence root is unavailable"
+-                    ) from exc
+-                if (
+-                    self.evidence_root.is_symlink()
+-                    or not self.evidence_root.is_dir()
+-                    or evidence_root != self.evidence_root
+-                    or self.evidence_root.parent != spec.workspace
+-                    or not evidence_root.is_relative_to(spec.workspace)
+-                ):
+-                    raise TrustedCodexTransportError(
+-                        "trusted supervisor evidence root is outside the workspace"
+-                    )
+-                _write_receipt_once(self.evidence_root / "request-envelope.json", encoded)
+             _write_atomic(request_path, encoded)
+             deadline = time.monotonic() + self._timeout_s
+             while time.monotonic() < deadline:
+                 if response_path.is_file() and not response_path.is_symlink():
+                     raw = response_path.read_bytes()
+-                    if self.evidence_root is not None:
+-                        _write_receipt_once(self.evidence_root / "response-envelope.json", raw)
+                     response_path.unlink()
+                     request_path.unlink(missing_ok=True)
+                     if len(raw) > _MAX_RESPONSE_BYTES:
+-                        raise TrustedCodexTransportError(
+-                            "trusted supervisor response exceeds bounded size"
+-                        )
++                        raise TrustedCodexTransportError("trusted supervisor response exceeds bounded size")
+                     self.last_response_sha256 = _sha256(raw)
+                     response = json.loads(raw.decode("utf-8"))
+                     return self._validate_response(response, request_id=request_id, spec=spec)
+@@ -317,9 +254,7 @@ class HostCodexWorkerTransport:
+         except TrustedCodexTransportError:
+             raise
+         except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+-            raise TrustedCodexTransportError(
+-                "trusted supervisor is unavailable or malformed"
+-            ) from exc
++            raise TrustedCodexTransportError("trusted supervisor is unavailable or malformed") from exc
+ 
+     def _validate_response(
+         self,
+@@ -337,9 +272,7 @@ class HostCodexWorkerTransport:
+         try:
+             self._response_verify_key.verify(_canonical_bytes(payload), bytes.fromhex(signature))
+         except (BadSignatureError, ValueError) as exc:
+-            raise TrustedCodexTransportError(
+-                "trusted supervisor response signature is invalid"
+-            ) from exc
++            raise TrustedCodexTransportError("trusted supervisor response signature is invalid") from exc
+         if payload.get("schema") != _SCHEMA or payload.get("request_id") != request_id:
+             raise TrustedCodexTransportError("trusted supervisor response fields are not exact")
+         if payload.get("ok") is False:
+@@ -348,16 +281,18 @@ class HostCodexWorkerTransport:
+                 raise TrustedCodexTransportError("trusted supervisor failure fields are not exact")
+             error_code = payload.get("error_code")
+             if error_code not in _FAILURE_CODES or payload.get("error") != _FAILURE_ERROR:
+-                raise TrustedCodexTransportError(
+-                    "trusted supervisor failure classification is invalid"
+-                )
++                raise TrustedCodexTransportError("trusted supervisor failure classification is invalid")
+             failure_observation = _validate_failure_observation(payload.get("failure_observation"))
+             lifecycle_state = (
+                 str(failure_observation["lifecycle_state"])
+                 if failure_observation is not None
+                 else "STRUCTURED_FAILURE"
+             )
+-            exit_code = failure_observation["exit_code"] if failure_observation is not None else 1
++            exit_code = (
++                failure_observation["exit_code"]
++                if failure_observation is not None
++                else 1
++            )
+             self.last_observation = failure_observation
+             return SessionResult(
+                 transcript=f"trusted_worker_failure:{error_code}",
+@@ -368,46 +303,18 @@ class HostCodexWorkerTransport:
+                 exit_code=exit_code if isinstance(exit_code, int) else 1,
+                 failure_code=str(error_code),
+             )
+-        if (
+-            set(payload) != {"schema", "ok", "request_id", "observation"}
+-            or payload.get("ok") is not True
+-        ):
++        if set(payload) != {"schema", "ok", "request_id", "observation"} or payload.get("ok") is not True:
+             raise TrustedCodexTransportError("trusted supervisor rejected the launch")
+         observation = payload.get("observation")
+         if not isinstance(observation, dict):
+             raise TrustedCodexTransportError("trusted supervisor observation is missing")
+         required = {
+-            "provider_id",
+-            "model_id",
+-            "family",
+-            "request_id",
+-            "task_id",
+-            "goal_id",
+-            "run_id",
+-            "stage",
+-            "workspace_id",
+-            "workspace",
+-            "transcript",
+-            "stdout_sha256",
+-            "stderr_sha256",
+-            "stdout_bytes",
+-            "stderr_bytes",
+-            "exit_code",
+-            "process_state",
+-            "lifecycle",
+-            "heartbeat_count",
+-            "executable",
+-            "executable_version",
+-            "environment_fingerprint",
+-            "profile_sha256",
+-            "supervisor_identity_sha256",
+-            "broker_evidence_sha256",
+-            "broker_request_count",
+-            "artifact_sha256",
+-            "boot_id",
+-            "canaries",
+-            "fallback_used",
+-            "manual_chat_bridge",
++            "provider_id", "model_id", "family", "request_id", "task_id", "goal_id", "run_id", "stage",
++            "workspace_id", "workspace", "transcript", "stdout_sha256", "stderr_sha256", "stdout_bytes",
++            "stderr_bytes", "exit_code", "process_state", "lifecycle", "heartbeat_count", "executable",
++            "executable_version", "environment_fingerprint", "profile_sha256", "supervisor_identity_sha256",
++            "broker_evidence_sha256", "broker_request_count", "artifact_sha256", "boot_id", "canaries",
++            "fallback_used", "manual_chat_bridge",
+         }
+         if set(observation) != required:
+             raise TrustedCodexTransportError("trusted supervisor observation fields are not exact")
+@@ -446,37 +353,22 @@ class HostCodexWorkerTransport:
+             or observation["supervisor_identity_sha256"]
+             != _sha256(bytes(self._response_verify_key))
+         ):
+-            raise TrustedCodexTransportError(
+-                "trusted supervisor returned an unqualified observation"
+-            )
++            raise TrustedCodexTransportError("trusted supervisor returned an unqualified observation")
+         if observation["canaries"].get("supervisor_restart_no_fallback") == "UNPROVEN":
+             raise TrustedCodexTransportError("supervisor restart qualification is pending")
+         if not isinstance(observation["boot_id"], str) or not observation["boot_id"]:
+             raise TrustedCodexTransportError("trusted supervisor boot identity is missing")
+         for field in (
+-            "stdout_sha256",
+-            "stderr_sha256",
+-            "environment_fingerprint",
+-            "profile_sha256",
+-            "broker_evidence_sha256",
+-            "supervisor_identity_sha256",
+-            "artifact_sha256",
++            "stdout_sha256", "stderr_sha256", "environment_fingerprint", "profile_sha256",
++            "broker_evidence_sha256", "supervisor_identity_sha256", "artifact_sha256",
+         ):
+             value = observation[field]
+-            if (
+-                not isinstance(value, str)
+-                or len(value) != 64
+-                or any(c not in "0123456789abcdef" for c in value)
+-            ):
+-                raise TrustedCodexTransportError(
+-                    f"trusted supervisor observation hash is invalid: {field}"
+-                )
++            if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
++                raise TrustedCodexTransportError(f"trusted supervisor observation hash is invalid: {field}")
+         for field in ("stdout_bytes", "stderr_bytes", "exit_code", "heartbeat_count"):
+             value = observation[field]
+             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+-                raise TrustedCodexTransportError(
+-                    f"trusted supervisor observation integer is invalid: {field}"
+-                )
++                raise TrustedCodexTransportError(f"trusted supervisor observation integer is invalid: {field}")
+         self.last_observation = dict(observation)
+         return SessionResult(
+             transcript=transcript,
+diff --git a/runtime/integrations/worker_confinement.py b/runtime/integrations/worker_confinement.py
+index 98da153f..355c2e79 100644
+--- a/runtime/integrations/worker_confinement.py
++++ b/runtime/integrations/worker_confinement.py
+@@ -182,9 +182,7 @@ def policy_for_worker(
+         raise WorkerConfinementError(
+             "unscoped network authority is forbidden; provider endpoint allowlisting is required"
+         )
+-    if not isinstance(network_hosts, tuple) or any(
+-        not isinstance(host, str) for host in network_hosts
+-    ):
++    if not isinstance(network_hosts, tuple) or any(not isinstance(host, str) for host in network_hosts):
+         raise WorkerConfinementError("network_hosts must be a tuple of host names")
+     if not isinstance(preference_domains, tuple) or any(
+         not isinstance(domain, str) for domain in preference_domains
+@@ -221,7 +219,9 @@ def policy_for_worker(
+     effective_reads = tuple(
+         dict.fromkeys((*_SYSTEM_READ_ROOTS, *canonical_reads, canonical_home, canonical_temp))
+     )
+-    effective_writes = tuple(dict.fromkeys((*canonical_writes, canonical_home, canonical_temp)))
++    effective_writes = tuple(
++        dict.fromkeys((*canonical_writes, canonical_home, canonical_temp))
++    )
+     return WorkerConfinementPolicy(
+         workspace=canonical_workspace,
+         read_roots=effective_reads,
+diff --git a/runtime/planner_transport.py b/runtime/planner_transport.py
+index a976d9df..171dd1fd 100644
+--- a/runtime/planner_transport.py
++++ b/runtime/planner_transport.py
+@@ -23,9 +23,10 @@ from runtime.builder_transport import REQUIRED_CANARIES, REQUIRED_LIFECYCLE
+ from runtime.task_package import TaskPackage
+ 
+ __all__ = [
++    "PLANNER_STAGES",
+     "L10_FAMILY_AMENDMENT_ID",
+     "L10_FAMILY_AMENDMENT_NORMATIVE",
+-    "PLANNER_STAGES",
++    "l10_amendment_definition_hash",
+     "LunaAdversaryBinding",
+     "LunaAdversaryBindingNotReady",
+     "LunaCriticBinding",
+@@ -35,7 +36,6 @@ __all__ = [
+     "PlannerTransportReadiness",
+     "canonical_planner_qualification_bytes",
+     "contract_markers_for",
+-    "l10_amendment_definition_hash",
+ ]
+ 
+ SCHEMA = "paeos-planner-transport-qualification/2"
+@@ -63,9 +63,7 @@ PLANNER_CONTRACT_MARKERS = {
+     "PLAN": ("work units", "rollback"),
+ }
+ _COMMON_CONTRACT_MARKERS = ("requirements", "boundaries", "assumptions", "risks", "next action")
+-_HASH_FIELDS = frozenset(
+-    {"request_sha256", "response_sha256", "artifact_sha256", "evidence_sha256"}
+-)
++_HASH_FIELDS = frozenset({"request_sha256", "response_sha256", "artifact_sha256", "evidence_sha256"})
+ _BINDING_FIELDS = frozenset({*_HASH_FIELDS, "contract_markers"})
+ _PAYLOAD_FIELDS = frozenset(
+     {
+@@ -198,9 +196,7 @@ class LunaAdversaryBinding:
+             ) from exc
+         binding = qualification.probe_bindings.get("ADVERSARIAL_REVIEW")
+         if not isinstance(binding, dict) or not all(field in binding for field in _HASH_FIELDS):
+-            raise LunaAdversaryBindingNotReady(
+-                "physical ADVERSARIAL_REVIEW probe binding is absent"
+-            )
++            raise LunaAdversaryBindingNotReady("physical ADVERSARIAL_REVIEW probe binding is absent")
+         if (
+             qualification.provider != "codex"
+             or qualification.model != "gpt-5.6-luna"
+@@ -231,43 +227,26 @@ class LunaAdversaryBinding:
+         if not isinstance(values, tuple) or len(values) != len(set(values)):
+             raise LunaAdversaryBindingNotReady(f"adversary task {description} are malformed")
+         if any(not isinstance(value, str) or not value.startswith(prefix) for value in values):
+-            raise LunaAdversaryBindingNotReady(
+-                f"adversary task {description} exceed the role contract"
+-            )
++            raise LunaAdversaryBindingNotReady(f"adversary task {description} exceed the role contract")
+ 
+     def authorize_task(self, package: TaskPackage) -> dict[str, object]:
+         if not isinstance(package, TaskPackage):
+             raise LunaAdversaryBindingNotReady("adversary authorization requires a task package")
+         if package.role is not Role.ADVERSARY or package.stage is not StageId.ADVERSARIAL_REVIEW:
+             raise LunaAdversaryBindingNotReady("Luna adversary binding is role and stage scoped")
+-        if not package.context_refs or len({ref.hash for ref in package.context_refs}) != len(
+-            package.context_refs
+-        ):
+-            raise LunaAdversaryBindingNotReady(
+-                "fresh sealed adversary context is missing or duplicated"
+-            )
++        if not package.context_refs or len({ref.hash for ref in package.context_refs}) != len(package.context_refs):
++            raise LunaAdversaryBindingNotReady("fresh sealed adversary context is missing or duplicated")
+         self._scoped(package.permissions.read_scopes, prefix="", description="read scopes")
+         allowed_reads = frozenset({"context/", "constitution/", "design/", "plan/", "review/"})
+         if not set(package.permissions.read_scopes).issubset(allowed_reads):
+-            raise LunaAdversaryBindingNotReady(
+-                "adversary read authority exceeds the amended contract"
+-            )
++            raise LunaAdversaryBindingNotReady("adversary read authority exceeds the amended contract")
+         self._scoped(package.permissions.write_scopes, prefix="review/", description="write scopes")
+-        allowed_ops = frozenset(
+-            {
+-                "mcp:constitution",
+-                "mcp:artifacts",
+-                "mcp:court",
+-                "mcp:memory:read",
+-            }
+-        )
++        allowed_ops = frozenset({
++            "mcp:constitution", "mcp:artifacts", "mcp:court", "mcp:memory:read",
++        })
+         operations = getattr(package.capability, "operations", None)
+-        if not isinstance(operations, (tuple, frozenset)) or not set(operations).issubset(
+-            allowed_ops
+-        ):
+-            raise LunaAdversaryBindingNotReady(
+-                "adversary capability operations exceed the amended contract"
+-            )
++        if not isinstance(operations, (tuple, frozenset)) or not set(operations).issubset(allowed_ops):
++            raise LunaAdversaryBindingNotReady("adversary capability operations exceed the amended contract")
+         bound_to = getattr(package.capability, "bound_to", None)
+         if (
+             getattr(bound_to, "goal_id", None) != package.goal_id
+@@ -327,20 +306,15 @@ def _strict_json(raw: bytes) -> dict[str, object]:
+ 
+ 
+ def _hash(value: object) -> bool:
+-    return (
+-        isinstance(value, str)
+-        and len(value) == 64
+-        and value == value.casefold()
+-        and all(character in "0123456789abcdef" for character in value)
++    return isinstance(value, str) and len(value) == 64 and value == value.casefold() and all(
++        character in "0123456789abcdef" for character in value
+     )
+ 
+ 
+ def contract_markers_for(stage: str, transcript: str) -> dict[str, bool]:
+     """Derive required stage markers from the captured response, never from caller claims."""
+ 
+-    normalized = "".join(
+-        character if character.isalnum() else " " for character in transcript.casefold()
+-    )
++    normalized = "".join(character if character.isalnum() else " " for character in transcript.casefold())
+     expected = (*_COMMON_CONTRACT_MARKERS, *PLANNER_CONTRACT_MARKERS[stage])
+     return {marker: marker in normalized for marker in expected}
+ 
+@@ -372,9 +346,7 @@ class PlannerTransportReadiness:
+             document = _strict_json(path.read_bytes())
+         except OSError as exc:
+             raise PlannerTransportNotReady("planner qualification file cannot be read") from exc
+-        if set(document) != {"payload", "signature"} or not isinstance(
+-            document.get("payload"), dict
+-        ):
++        if set(document) != {"payload", "signature"} or not isinstance(document.get("payload"), dict):
+             raise PlannerTransportNotReady("planner qualification envelope is not exact")
+         payload = document["payload"]
+         assert isinstance(payload, dict)
+@@ -391,10 +363,7 @@ class PlannerTransportReadiness:
+         now = self._clock()
+         if qualification.observed_at > now + 5:
+             raise PlannerTransportNotReady("planner qualification timestamp is in the future")
+-        if (
+-            qualification.expires_at <= now
+-            or qualification.expires_at - qualification.observed_at > self._max_age_s
+-        ):
++        if qualification.expires_at <= now or qualification.expires_at - qualification.observed_at > self._max_age_s:
+             raise PlannerTransportNotReady("planner qualification is expired or stale")
+         if now - qualification.observed_at > self._max_age_s:
+             raise PlannerTransportNotReady("planner qualification is stale")
+@@ -409,21 +378,11 @@ class PlannerTransportReadiness:
+     def _validate_payload(payload: Mapping[str, object]) -> PlannerTransportQualification:
+         if set(payload) != _PAYLOAD_FIELDS:
+             raise PlannerTransportNotReady("planner qualification payload fields are not exact")
+-        if (
+-            payload.get("schema") != SCHEMA
+-            or payload.get("qualification_scope") != "standalone-planner-probe"
+-        ):
++        if payload.get("schema") != SCHEMA or payload.get("qualification_scope") != "standalone-planner-probe":
+             raise PlannerTransportNotReady("planner qualification scope is invalid")
+-        if (
+-            payload.get("provider") != "codex"
+-            or payload.get("model") != "gpt-5.6-luna"
+-            or payload.get("family") != "gpt"
+-        ):
++        if payload.get("provider") != "codex" or payload.get("model") != "gpt-5.6-luna" or payload.get("family") != "gpt":
+             raise PlannerTransportNotReady("planner qualification is not for Luna")
+-        if (
+-            payload.get("fallback_used") is not False
+-            or payload.get("manual_chat_bridge") is not False
+-        ):
++        if payload.get("fallback_used") is not False or payload.get("manual_chat_bridge") is not False:
+             raise PlannerTransportNotReady("planner qualification used an unauthorized fallback")
+         for field in ("qualification_id", "supervisor_identity_sha256"):
+             if not isinstance(payload.get(field), str) or not payload[field]:
+@@ -450,9 +409,7 @@ class PlannerTransportReadiness:
+         if (
+             not isinstance(stages, list)
+             or not stages
+-            or any(
+-                not isinstance(stage, str) or stage not in _PLANNER_STAGE_SET for stage in stages
+-            )
++            or any(not isinstance(stage, str) or stage not in _PLANNER_STAGE_SET for stage in stages)
+             or stages != sorted(set(stages))
+         ):
+             raise PlannerTransportNotReady("planner qualified stage set is invalid")
