@@ -1,0 +1,17 @@
+{
+  "schema": "paeos.native-coordination-checkpoint/1",
+  "base_commit": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "scope": "Sanitized native coordination configuration and observed feedback; no production source/runtime change.",
+  "verification": {
+    "json_parse": "PASS",
+    "supplementary_secret_scan_matches": 0,
+    "end_to_end": "worker completion triggered fresh coordinator, which returned held disposition and next bootstrap instruction; root observed instruction",
+    "retired_duplicate": "late old-coordinator continuation rejected; no duplicate verification started"
+  },
+  "files": {
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": "97e50bb61b222c27bbaab8f642c9b9f90f82b969ae738d25dc243d8f897f0416",
+    "MessyChangesNeedsReview.md": "3f481af994c849c9ad45af92ebb5967ae5cd719a5ec534d1d40e7468e9fcdb9e",
+    "reviews/tasks/PAEOS_COMPLETION_COORDINATION_20261018/CONFIGURATION.json": "50ebec6f92f9a08eccc3b6802d7d54d802b2b015f698b863159402fb06fb7a75",
+    "reviews/tasks/PAEOS_COMPLETION_COORDINATION_20261018/coordinator-observation.json": "1ea699771db9c09c1b08b7718929bec522e736739a33271f9d606db9128c179b"
+  }
+}

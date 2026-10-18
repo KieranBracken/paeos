@@ -1,0 +1,71 @@
+{
+  "schema": "paeos.native-coordination-observation/1",
+  "observed_cache": {
+    "schema": "paeos.native-coordination-cache/1",
+    "canonical_authority": false,
+    "coordination_epoch": 2,
+    "processed_events": {
+      "route-terms-01a14f22-02f0-7a71-8313-715f12120256-v1": {
+        "state": "DISPOSITION_SENT",
+        "origin_thread": "01a13075-533b-72a1-b8f8-8f109414f707",
+        "source_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+        "source_turn": "01a14f22-02f0-7a71-8313-715f12120256",
+        "event_status": "same completed route result forwarded during coordinator rollover",
+        "evidence": "native handoff message and originating thread receipt inspected; conditional Google candidate only; policy/account gates unresolved",
+        "human_authorization_message": "msg_01a14f2a-967f-7a93-8267-b87dab40196a",
+        "human_authorization_text_sha256": "fde262a233566db811e59c05f774953ab90f8f818a3355a953eb5024d323554d",
+        "route_disposition": "HELD until policy-retention reconciliation and intended-project exact-model zero-charge verification",
+        "bootstrap_assignment": "SENT"
+      }
+    },
+    "assignments": {
+      "route-terms-01a14f22-02f0-7a71-8313-715f12120256-v1:route-held": {
+        "state": "SENT",
+        "owner_thread": "01a13075-533b-72a1-b8f8-8f109414f707",
+        "kind": "HELD",
+        "source_event": "route-terms-01a14f22-02f0-7a71-8313-715f12120256-v1",
+        "tool_result": "send_message_to_thread returned destination threadId 01a13075-533b-72a1-b8f8-8f109414f707"
+      },
+      "startup-closure-continuation-38fd3e0-route-terms-01a14f22-02f0-7a71-8313-715f12120256-v1": {
+        "state": "SENT",
+        "owner_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+        "kind": "OFFLINE_CONTINUATION",
+        "source_event": "route-terms-01a14f22-02f0-7a71-8313-715f12120256-v1",
+        "tool_result": "send_message_to_thread returned destination threadId 01a1403f-1034-74c2-95ce-bd0f705dbaef"
+      }
+    },
+    "owner": "PAEOS completion overseer"
+  },
+  "cache_is_authority": false,
+  "initial_receiver": {
+    "thread_id": "01a121c4-864e-7e12-93e0-bfde0ca7a32b",
+    "actual_event_turn": "01a14f2e-caf3-7f23-a3e0-78abe4f27098",
+    "status": "Started but drifted to historical October15 Hermes request; retirement requested; no successful feedback claim."
+  },
+  "fresh_receiver": {
+    "thread_id": "01a14f33-dc16-7281-9da8-a241ef9a8b0e",
+    "setup_turn": "01a14f33-df65-7082-af5c-5ef453de5074",
+    "event_turn": "01a14f34-c089-7452-afc9-224569a31fc2",
+    "status": "COMPLETED",
+    "started_unix": 1792330219,
+    "completed_unix": 1792330257,
+    "returned_messages": [
+      "route owner HELD with exact policy/account conditions",
+      "bootstrap owner approved offline verification continuation"
+    ],
+    "bootstrap_message_received_in_active_root_turn": true
+  },
+  "limits": [
+    "Native model-driven callbacks are not an exactly-once durable runtime queue.",
+    "No PAEOS admission, provider call, qualification or Court outcome is established.",
+    "Hourly fallback remains for crash, missed notification or stalled owner.",
+    "Old coordinator send retirement is an instruction; future messages require current coordinator identity validation."
+  ],
+  "late_predecessor_callback": {
+    "origin_thread": "01a121c4-864e-7e12-93e0-bfde0ca7a32b",
+    "received_after_epoch2_dispatch": true,
+    "disposition": "REJECTED_RETIRED_COORDINATOR_DUPLICATE",
+    "additional_verifiers_started": 0,
+    "retirement_completion_observed": false
+  }
+}

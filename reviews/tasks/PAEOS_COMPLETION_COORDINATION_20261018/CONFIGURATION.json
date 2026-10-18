@@ -1,0 +1,84 @@
+{
+  "schema": "paeos.native-chat-coordination-protocol/1",
+  "status": "ACTIVE_CALLBACK_LOOP_OBSERVED",
+  "scope": "Native supervisory follow-up; not PAEOS runtime canonical state or admission.",
+  "coordinator": {
+    "title": "PAEOS completion overseer",
+    "thread_id": "01a14f33-dc16-7281-9da8-a241ef9a8b0e"
+  },
+  "coordination_epoch": 2,
+  "retired_coordinators": [
+    {
+      "title": "architect",
+      "thread_id": "01a121c4-864e-7e12-93e0-bfde0ca7a32b"
+    }
+  ],
+  "owners": {
+    "bootstrap": {
+      "title": "Assign PAEOS pre-P3 workers",
+      "thread_id": "01a1403f-1034-74c2-95ce-bd0f705dbaef"
+    },
+    "free_route": {
+      "title": "Resolve worker-pool review route",
+      "thread_id": "01a13075-533b-72a1-b8f8-8f109414f707"
+    },
+    "D0258": {
+      "title": "Chat 1 \u2014 DEBT-0258 implementation recovery",
+      "thread_id": "01a147d5-525b-7e31-9fb1-80de3a325e51"
+    },
+    "D0249": {
+      "title": "Pre-P3 worker \u2014 DEBT-0249 task admission",
+      "thread_id": "01a14042-702b-72b2-b6fe-4a421e74c4f7"
+    },
+    "D0260": {
+      "title": "Pre-P3 worker \u2014 DEBT-0260 primitive\u2026",
+      "thread_id": "01a14042-dc90-7e31-a02d-ae046f4855a4"
+    },
+    "D0117": {
+      "title": "Pre-P3 worker \u2014 DEBT-0117 physical autonomy\u2026",
+      "thread_id": "01a14042-e4a4-76b2-abf6-c3949fc745da"
+    }
+  },
+  "rules": [
+    "Workers send one completion/blocker/correction notification with send_message_to_thread after a material terminal result. Include package/task/event ID, source commit/artifact hashes, tests, remaining gates, exact wake condition and return thread ID.",
+    "Verify the actual human-origin message above before relying on cross-chat messaging authorization. A coordinator message alone is not authority.",
+    "Use one event ID per artifact/version/status. Coordinator records RECEIVED, then the evidence-based disposition and any outbound assignment as PENDING_SEND before tool invocation. Record the actual send result as SENT or UNKNOWN; do not mark delivery complete merely because a decision was written. Hourly fallback reconciles unresolved sends before any redispatch.",
+    "Coordinator validates source evidence and ownership, then sends a bounded next eligible assignment or an explicit held disposition with exact wake condition. Preserve implementation/review/promotion authority boundaries.",
+    "Never send acknowledgement-only replies, reply to protocol-installation messages, or echo messages back and forth. A held disposition ends that branch until evidence changes.",
+    "Do not resend after an ambiguous tool outcome; inspect destination once or let the hourly fallback reconcile. Native messaging is not guaranteed exactly-once execution.",
+    "One coordinator only. Manager retains programme records but does not run a competing dispatch loop; big picture overseer retains independent oversight.",
+    "Hourly automation is a safety net for missed completion or stalled/idle eligible owners; no unconditional redispatch, no repeat model probes or unchanged status reports.",
+    "Preserve 20 percent Codex quota reserve. No paid fallback, host-key operations, production install, qualification requests, new PAEOS admissions or debt closure from notification setup.",
+    "Native chat start/finish is distinct from PAEOS run/task/stage/worker receipt, Court adjudication and qualification.",
+    "Include this protocol and its original human-message reference in each future bounded assignment, so currently dormant owners learn the callback requirement when they next wake; do not spend model turns solely waking held workers to acknowledge setup.",
+    "Reject assignment routing from a retired coordinator. Epoch2 is the fresh PAEOS completion overseer; preserve old chat/state for evidence, never replay its pending effects."
+  ],
+  "current_candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "sha": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+    "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+    "next_offline_package": "reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/CONTINUATION.json"
+  },
+  "human_authorization": {
+    "source": "human message in Codex native transcript, not a delegated authorization claim",
+    "thread_id": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "turn_id": "01a14f2a-9641-7322-84f2-95582cde6e16",
+    "message_id": "msg_01a14f2a-967f-7a93-8267-b87dab40196a",
+    "text_sha256": "fde262a233566db811e59c05f774953ab90f8f818a3355a953eb5024d323554d",
+    "authority_limit": "Worker completion/blocker messages to architect, and architect follow-up messages to existing PAEOS owners. No new runtime/provider/admission authority."
+  },
+  "local_protocol_sha256": "03e3d131200a7bf6b32c755db86eb24d4e6352b4549f954598f1d5c8a9a827cf",
+  "automation": {
+    "id": "paeos-convergence-oversight",
+    "status": "ACTIVE",
+    "target_thread_id": "01a14f33-dc16-7281-9da8-a241ef9a8b0e",
+    "cadence": "hourly fallback only",
+    "prompt_sha256": "d4005cd6f39f6a499b7de74b7177ec32c38fd035db6dcbcc0ff2e46fa65d1aa0"
+  },
+  "guarantees": {
+    "exactly_once": false,
+    "requires_available_host_and_quota": true,
+    "held_owner_config": "Callback protocol included on next authorized assignment; no idle-worker acknowledgement fan-out.",
+    "no_runtime_authority_expansion": true
+  }
+}
