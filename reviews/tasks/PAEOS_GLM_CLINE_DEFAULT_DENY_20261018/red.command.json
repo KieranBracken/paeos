@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)(deny file-read* (subpath \"/Users/bob\"))(allow file-read-metadata)(allow file-read* (subpath \"/private/tmp/paeos-glm-cline-baseline.uCuhPW\") (subpath \"/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages\") (subpath \"/Users/bob/.local/share/uv/python\") (literal \"/Users/bob/GitHub/paeos/.venv/pyvenv.cfg\") (subpath \"/Users/bob/GitHub/paeos/.venv/bin\"))(deny file-write*)(allow file-write* (subpath \"/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-glm-cline-denial-znkcszvf\") (literal \"/dev/null\"))",
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-S",
+    "-c",
+    "\nimport importlib.machinery, json, sys\nfrom pathlib import Path\nroot, dependencies, scratch = map(Path, sys.argv[1:4])\nnodes = sys.argv[4:]\nsys.path[:0] = [str(root), str(dependencies)]\nlocal_names = {\"kernel\", \"runtime\", \"paeos\", \"ops\", \"contracts\", \"tests\"}\nclass Fence:\n    def find_spec(self, fullname, path=None, target=None):\n        if fullname.split(\".\")[0] not in local_names:\n            return None\n        spec = importlib.machinery.PathFinder.find_spec(fullname, path)\n        if spec is None:\n            raise ModuleNotFoundError(fullname)\n        for location in ([spec.origin] if spec.origin else []) + list(spec.submodule_search_locations or []):\n            assert Path(location).resolve().is_relative_to(root), fullname\n        return spec\nsys.meta_path.insert(0, Fence())\nimport socket\nwith socket.socket() as probe:\n    try:\n        probe.bind((\"127.0.0.1\", 0))\n    except PermissionError:\n        print(\"NETWORK_DENIAL_CONTROL=PASS\")\n    else:\n        raise AssertionError(\"network-denial profile did not block loopback bind\")\nimport pytest\ncode = pytest.main([\"-c\", str(root / \"pyproject.toml\"), \"--confcutdir\", str(root), \"-o\", \"addopts=\", \"-q\", \"-p\", \"no:cacheprovider\", \"--basetemp\", str(scratch / \"pytest\"), *nodes])\norigins = {}\nfor name, module in tuple(sys.modules.items()):\n    path = getattr(module, \"__file__\", None)\n    if path is None:\n        continue\n    resolved = Path(path).resolve()\n    if name.split(\".\")[0] in local_names or name.startswith(\"test_\"):\n        assert resolved.is_relative_to(root), name\n        origins[name] = str(resolved.relative_to(root))\nassert any(path.endswith(\"runtime/integrations/hybrid.py\") for path in origins.values())\nassert any(path.endswith(\"tests/runtime/test_glm_cline_invoker.py\") for path in origins.values())\nassert \"litellm\" not in sys.modules\nprint(\"LOCAL_ORIGINS=\" + json.dumps(origins, sort_keys=True))\nraise SystemExit(code)\n",
+    "/private/tmp/paeos-glm-cline-baseline.uCuhPW",
+    "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages",
+    "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-glm-cline-denial-znkcszvf",
+    "tests/runtime/test_glm_cline_invoker.py"
+  ],
+  "environment_keys": [
+    "HOME",
+    "PATH",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD",
+    "PYTHONDONTWRITEBYTECODE",
+    "PYTHON_DOTENV_DISABLED",
+    "TEMP",
+    "TMP",
+    "TMPDIR",
+    "XDG_CACHE_HOME"
+  ],
+  "exit_code": 1,
+  "scratch_preserved": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-glm-cline-denial-znkcszvf"
+}

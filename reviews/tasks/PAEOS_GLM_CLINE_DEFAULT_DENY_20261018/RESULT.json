@@ -1,0 +1,45 @@
+{
+  "task": "PAEOS_GLM_CLINE_DEFAULT_DENY_20261018",
+  "base_sha": "ef46875dc0b6068e0257fe2632603dda7835d97b",
+  "candidate_paths": {
+    "runtime/integrations/hybrid.py": "1ae464b7595964972659b7386d23cb26b9974ee6e1e76436ed50af1fea8c18d6",
+    "tests/runtime/test_glm_cline_invoker.py": "355e03157450e6a22490c8b43579fd3226b9fafa8f7f3e636359299ee729240c"
+  },
+  "implementation": "glm_cli_invoker's returned _invoke closure now raises a fixed disclosure_authority_unavailable error before reading spec.prompt, constructing argv or calling _run_provider_process. The shared _run_provider_process helper and Codex path are unchanged. No positive permit, classification label, environment switch or test-only successful provider path exists.",
+  "verification": {
+    "red_baseline": "7 failed, 3 passed against the pinned original source with the updated tests overlaid; OS network denial and candidate-local import controls passed. Red stdout was trailing-whitespace-normalized; exact raw SHA-256 was c73799e39a19070f879f08c3af62d9d98d84b408644db742611094fff5ba9db8.",
+    "focused_green": "10 passed; OS network denial and candidate-local import controls passed",
+    "adapter_regression": "14 passed across the invoker tests, hybrid runtime tests, and no-Cline-fallback test; OS network denial and candidate-local import controls passed",
+    "provider_spies": "The Cline helper and run_bounded_process test doubles raise if called; both remained untouched on every denied invocation",
+    "lint_format_compile_diff_secret": "Scoped lint excluding the one baseline SIM102 passed; edited ranges and new runner formatting passed; compilation, staged diff check and final secret scan passed. Whole-file format and unfiltered lint failures match pre-existing base findings."
+  },
+  "review": {
+    "status": "NOT_RUN",
+    "reason": "Coordinator directed formal review to wait until the aggregate candidate is ready.",
+    "reviewer_provenance": null,
+    "request_fingerprint": null,
+    "response_fingerprint": null
+  },
+  "effects": {
+    "provider_requests": 0,
+    "network_access": "denied by the test profile; no provider request attempted",
+    "credentials_or_host_runtime_state": "not read",
+    "installation": false,
+    "qualification_or_admission": false,
+    "court_or_debt_integration": false
+  },
+  "disposition": {
+    "status": "P1_REMAINS",
+    "ALLOWED_NOW": "Only this offline GLM/Cline CLI default-deny repair and its recovery checkpoint.",
+    "HELD": "Positive egress, installation, qualification/admission, Court/debt integration, P3 and formal review before aggregate readiness.",
+    "AUTHORITY_OR_IMPLEMENTATION_GAP": "Cline SDK, other CLI/SDK/UI paths, trusted positive disclosure authority, producer authentication and broad egress coverage remain unresolved.",
+    "next_gate": "Aggregate the authorized privacy-boundary work, then request exactly one fresh independent read-only Security Review on that exact candidate SHA. Installation/qualification require separate applicable authority.",
+    "ownership": "Chat 1 remains the sole DEBT-0258 integrator; no debt ownership or dependency changed."
+  },
+  "human_authorization": {
+    "thread_id": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "turn_id": "01a14f2a-9641-7322-84f2-95582cde6e16",
+    "message_id": "msg_01a14f2a-967f-7a93-8267-b87dab40196a",
+    "text_sha256": "fde262a233566db811e59c05f774953ab90f8f818a3355a953eb5024d323554d"
+  }
+}

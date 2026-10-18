@@ -1,0 +1,17 @@
+{
+  "candidate_base": "ef46875dc0b6068e0257fe2632603dda7835d97b",
+  "checks": {
+    "ruff_scoped": "PASS with the pre-existing SIM102 finding excluded; no other scoped lint findings",
+    "ruff_unfiltered": "One pre-existing SIM102 in GlmRuntime.run; the same finding is present in the base file outside this scope",
+    "formatting": "PASS for all edited source/test ranges and the new runner; whole-file formatting flags the two legacy files and also flags both base versions",
+    "compile": "PASS for hybrid.py, test_glm_cline_invoker.py, and run_verification.py",
+    "diff_check": "PASS for the staged explicit manifest",
+    "secret_scan": "PASS on all scoped source and evidence files, including the manifest"
+  },
+  "test_commands": {
+    "red": "run_verification.py red against detached base source with only the updated test file overlaid",
+    "green": "run_verification.py green",
+    "regression": "run_verification.py regression"
+  },
+  "review": "NOT_RUN; coordinator deferred formal review until the aggregate candidate is ready"
+}

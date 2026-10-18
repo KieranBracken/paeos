@@ -1,0 +1,23 @@
+{
+  "task": "PAEOS_GLM_CLINE_DEFAULT_DENY_20261018",
+  "classification": "bounded offline P1 default-deny repair",
+  "base_sha": "ef46875dc0b6068e0257fe2632603dda7835d97b",
+  "allowed_source_paths": [
+    "runtime/integrations/hybrid.py",
+    "tests/runtime/test_glm_cline_invoker.py"
+  ],
+  "preimages": {
+    "runtime/integrations/hybrid.py": "e84c9c304629853dbe3114cbe6e86e8c29b1f20154eed3e07f764ec0457b4973",
+    "tests/runtime/test_glm_cline_invoker.py": "da8ef160b687f6ebead1aa4f1650ff32d04965b2e10b38464425fb833ee48fb0"
+  },
+  "constraints": [
+    "deny GLM/Cline CLI invocation at the start of the returned _invoke closure",
+    "do not read spec.prompt, build argv, or call _run_provider_process before denial",
+    "do not edit the shared _run_provider_process helper or Codex route",
+    "no positive permit, worker-supplied label, callback, environment switch, or alternate allow path",
+    "synthetic test data only",
+    "no provider requests, installation, admission, qualification, Court or debt integration, or formal review",
+    "do not modify other production or test paths"
+  ],
+  "status": "VERIFIED"
+}

@@ -1,0 +1,67 @@
+{
+  "schema": "paeos.explicit-recovery-manifest/1",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "base_sha": "ef46875dc0b6068e0257fe2632603dda7835d97b",
+  "artifacts": [
+    {
+      "path": "runtime/integrations/hybrid.py",
+      "sha256": "1ae464b7595964972659b7386d23cb26b9974ee6e1e76436ed50af1fea8c18d6"
+    },
+    {
+      "path": "tests/runtime/test_glm_cline_invoker.py",
+      "sha256": "355e03157450e6a22490c8b43579fd3226b9fafa8f7f3e636359299ee729240c"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/SCOPE.json",
+      "sha256": "c3e626f8dc707572e2581f9870397395d7527bdc593682e328b64a400a1686c3"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/RESULT.json",
+      "sha256": "1813189c4cd687b594bc1310c18db06b0afba0cc2a0b1cb89b11a83dd7c2133c"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/STATIC_CHECKS.json",
+      "sha256": "62944ab488a211979ec7fe4bc9891fa79b56f4257acd393651f55c332d52ffd7"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/run_verification.py",
+      "sha256": "a21efcebd6af2017721d7f8ccf6334748b1d26be69b92f9977a3b6b015103621"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/red.stdout.txt",
+      "sha256": "975249f49753228e7ab9d8d0b07ea51eb11f469b41bc299156c3848995729fa6"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/red.command.json",
+      "sha256": "c28e2a59cc0d7b0db209300fea2cf25382b6801f053d9a094d88a7267f45751f"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/green.stdout.txt",
+      "sha256": "bc6d574c5304206efac9d8946f679558f39bcceb39d8abaaefbe1179be56d9a5"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/green.command.json",
+      "sha256": "fe6e12435ac7bea9e8e1a19b3140367b8f508f6873e1344bcc96813c77b7f5d7"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/regression.stdout.txt",
+      "sha256": "e8daae086d2175be108d0a69333b7b748b7deee0bb625ca8bc9b819a022c480d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/regression.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GLM_CLINE_DEFAULT_DENY_20261018/regression.command.json",
+      "sha256": "5c1c894d94798cb642e4fd9bf10f0368337058e01ae184148fe2cd751aa3c112"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import os
 from collections.abc import Callable, Mapping
 from dataclasses import replace
 from pathlib import Path
+from typing import NoReturn
 
 from kernel.types import Hash, Role, StageId
 
@@ -342,26 +343,20 @@ def _court_pool_dir(mcp_config_path: Path | None) -> Path | None:
     return None
 
 
+def _require_glm_cli_disclosure_authority() -> NoReturn:
+    """Deny GLM/Cline CLI egress until trusted disclosure authority is integrated."""
+    raise TrustedTransportFailure(
+        "disclosure_authority_unavailable",
+        "trusted disclosure authority is unavailable",
+    )
+
+
 def glm_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = None) -> CliInvoker:
-    """Invoker for GLM-5.3 heterogeneous audit via the Cline CLI (ClinePass subscription).
+    """Create the GLM/Cline invoker, currently denied before payload access.
 
-    Cline-native contract (verified empirically against `cline --help` + a live probe,
-    2026-08-18, hallucination notebook Entry 142):
-
-        cline -P cline-pass -m cline-pass/glm-5.3 --json --auto-approve true \\
-              -t <timeout_s> -c <workspace> "<prompt>"
-
-    emits an NDJSON message stream whose final ``run_result`` line carries ``usage``,
-    ``durationMs``, ``text`` and ``model`` attribution. The previous invocation passed
-    Claude-Code flags the Cline CLI rejects (``--output-format json``, ``--allowedTools``,
-    ``--dangerously-skip-permissions``, ``--mcp-config``); every session died at argv parsing
-    and was recorded as a zero-cost success (CRITICAL-002).
-
-    Hard guarantees:
-    1. **Model attribution enforced** — a ``run_result`` whose ``model.id`` is not the GLM
-       model fails loudly (audit-chain homogenisation is forbidden, CANARY-0002).
-    2. **Real completion required** — the stream must end in ``run_result`` with
-       ``finishReason == "completed"``; anything else raises.
+    The historical Cline argv and result validation below remain unavailable until trusted
+    disclosure authority is integrated. Every returned closure rejects before reading the prompt,
+    constructing argv, or calling the shared process helper.
     """
     import shutil
 
@@ -388,6 +383,8 @@ def glm_cli_invoker(package: TaskPackage, *, mcp_config_path: Path | None = None
         )
 
     def _invoke(spec: SessionSpec) -> SessionResult:
+        _require_glm_cli_disclosure_authority()
+
         prompt = spec.prompt
 
         effective_timeout = min(spec.timeout_s or 1800, 1800)
