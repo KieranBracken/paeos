@@ -1,0 +1,29 @@
+{
+  "full_diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit_code": 2,
+    "stdout": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:55: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:60: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:66: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:69: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:104: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:109: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:114: trailing whitespace.\n+E         \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:156: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:183: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:187: trailing whitespace.\n+tests/runtime/test_trusted_codex_client.py:234: \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:188: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:192: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:221: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:248: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:252: trailing whitespace.\n+tests/runtime/test_trusted_codex_client.py:234: \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:253: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt:257: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:35: trailing whitespace.\n+tests/runtime/test_process_output_bounds.py:160: \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:36: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:42: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:62: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:72: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:80: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:83: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:85: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:106: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:108: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:126: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:160: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:164: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:176: trailing whitespace.\n+    \nreviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt:186: trailing whitespace.\n+    \n",
+    "stderr": ""
+  },
+  "excluding_immutable_failure_logs": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":(exclude)reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt",
+      ":(exclude)reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "disposition": "Full whitespace check fails only on preserved raw failed-test output. Source and remaining package pass; logs retained unchanged."
+}

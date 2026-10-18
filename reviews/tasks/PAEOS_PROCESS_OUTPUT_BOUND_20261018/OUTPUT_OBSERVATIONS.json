@@ -1,0 +1,201 @@
+{
+  "source": "Synthetic temporary tests only; no host runtime state. Raw output and argv omitted.",
+  "observations": [
+    {
+      "test": "test_exact_limit_is_complete_a0",
+      "observation": {
+        "terminal_state": "RETURNED",
+        "exit_code": 0,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [],
+        "capture_complete": true,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 1048576,
+        "stdout_observed_bytes": 1048576,
+        "stderr_observed_bytes": 1048576,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "stdout_sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+        "stderr_sha256": "34bc6ad8178071438d388d4680bc6c236abeb0c88be1cee99a16f921d7d84999"
+      },
+      "last_event": {
+        "elapsed_ms": 22,
+        "reason": "process exited",
+        "state": "RETURNED"
+      }
+    },
+    {
+      "test": "test_overflow_is_failure_even_0",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": 0,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [
+          "stdout"
+        ],
+        "capture_complete": false,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 0,
+        "stdout_observed_bytes": 1048577,
+        "stderr_observed_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "stdout_sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "last_event": {
+        "elapsed_ms": 18,
+        "reason": "stdout output limit exceeded; captured prefix only",
+        "state": "FAILED"
+      }
+    },
+    {
+      "test": "test_overflow_kills_term_ignor0",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": -15,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [
+          "stdout"
+        ],
+        "capture_complete": false,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 0,
+        "stdout_observed_bytes": 1048577,
+        "stderr_observed_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "stdout_sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "last_event": {
+        "elapsed_ms": 51,
+        "reason": "stdout output limit exceeded; captured prefix only",
+        "state": "FAILED"
+      }
+    },
+    {
+      "test": "test_overflow_retains_bounded_0",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": -15,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [
+          "stdout"
+        ],
+        "capture_complete": false,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 0,
+        "stdout_observed_bytes": 1114112,
+        "stderr_observed_bytes": 0,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "stdout_sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "last_event": {
+        "elapsed_ms": 22,
+        "reason": "stdout output limit exceeded; captured prefix only",
+        "state": "FAILED"
+      }
+    },
+    {
+      "test": "test_overflow_retains_bounded_1",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": -15,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [
+          "stderr"
+        ],
+        "capture_complete": false,
+        "stdout_bytes": 0,
+        "stderr_bytes": 1048576,
+        "stdout_observed_bytes": 0,
+        "stderr_observed_bytes": 1114112,
+        "stdout_truncated": false,
+        "stderr_truncated": true,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "34bc6ad8178071438d388d4680bc6c236abeb0c88be1cee99a16f921d7d84999"
+      },
+      "last_event": {
+        "elapsed_ms": 20,
+        "reason": "stderr output limit exceeded; captured prefix only",
+        "state": "FAILED"
+      }
+    },
+    {
+      "test": "test_overflow_retains_bounded_2",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": -15,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [
+          "stdout"
+        ],
+        "capture_complete": false,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 983040,
+        "stdout_observed_bytes": 1114112,
+        "stderr_observed_bytes": 983040,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "stdout_sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+        "stderr_sha256": "f71ad2bc6296d920f98873e14eddf1242db58061f8c401dd24ac0fb63e49fdd8"
+      },
+      "last_event": {
+        "elapsed_ms": 22,
+        "reason": "stdout output limit exceeded; captured prefix only",
+        "state": "FAILED"
+      }
+    },
+    {
+      "test": "test_read_failure_is_incomplet0",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": -15,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [],
+        "capture_complete": false,
+        "stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "stdout_observed_bytes": 0,
+        "stderr_observed_bytes": 0,
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "last_event": {
+        "elapsed_ms": 13,
+        "reason": "output read failed",
+        "state": "FAILED"
+      }
+    },
+    {
+      "test": "test_simultaneous_large_writer0",
+      "observation": {
+        "terminal_state": "FAILED",
+        "exit_code": -15,
+        "output_limit_bytes": 1048576,
+        "output_overflow_streams": [
+          "stdout"
+        ],
+        "capture_complete": false,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 983040,
+        "stdout_observed_bytes": 1114112,
+        "stderr_observed_bytes": 983040,
+        "stdout_truncated": true,
+        "stderr_truncated": false,
+        "stdout_sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b",
+        "stderr_sha256": "f71ad2bc6296d920f98873e14eddf1242db58061f8c401dd24ac0fb63e49fdd8"
+      },
+      "last_event": {
+        "elapsed_ms": 27,
+        "reason": "stdout output limit exceeded; captured prefix only",
+        "state": "FAILED"
+      }
+    }
+  ]
+}

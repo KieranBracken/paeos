@@ -200,7 +200,8 @@ def test_client_rejects_response_with_fallback_or_wrong_workspace(tmp_path: Path
         )
 
 
-def test_client_accepts_signed_bounded_worker_failure(tmp_path: Path) -> None:
+@pytest.mark.parametrize("exit_code", [17, -15, -9])
+def test_client_accepts_signed_bounded_worker_failure(tmp_path: Path, exit_code: int) -> None:
     from runtime.integrations.trusted_codex_transport import HostCodexWorkerTransport
 
     request_key = SigningKey.generate()
@@ -221,7 +222,7 @@ def test_client_accepts_signed_bounded_worker_failure(tmp_path: Path) -> None:
             response_key,
             failure_observation={
                 "lifecycle_state": "FAILED",
-                "exit_code": 17,
+                "exit_code": exit_code,
                 "stdout_bytes": 0,
                 "stdout_sha256": "a" * 64,
                 "stderr_bytes": 0,
@@ -234,7 +235,7 @@ def test_client_accepts_signed_bounded_worker_failure(tmp_path: Path) -> None:
 
     assert result.failure_code == "provider_execution_failure"
     assert result.lifecycle_state == "FAILED"
-    assert result.exit_code == 17
+    assert result.exit_code == exit_code
     assert result.transcript == "trusted_worker_failure:provider_execution_failure"
     assert client.last_observation == response["payload"]["failure_observation"]
 

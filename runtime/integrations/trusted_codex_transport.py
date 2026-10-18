@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import signal
 import time
 import uuid
 from pathlib import Path
@@ -110,7 +111,14 @@ def _validate_failure_observation(value: object) -> dict[str, object] | None:
         raise TrustedCodexTransportError("trusted supervisor failure lifecycle is invalid")
     exit_code = value["exit_code"]
     if exit_code is not None and (
-        not isinstance(exit_code, int) or isinstance(exit_code, bool) or exit_code < 0
+        type(exit_code) is not int
+        or (
+            exit_code < 0
+            and (
+                -exit_code not in signal.valid_signals()
+                or value["lifecycle_state"] not in {"FAILED", "TIMED_OUT"}
+            )
+        )
     ):
         raise TrustedCodexTransportError("trusted supervisor failure exit code is invalid")
     for field in ("stdout_bytes", "stderr_bytes"):

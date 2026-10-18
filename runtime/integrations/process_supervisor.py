@@ -28,6 +28,12 @@ __all__ = [
     "run_bounded_process",
 ]
 
+# One MiB of UTF-8 stdout expands to at most six MiB in the trusted eight-MiB
+# ASCII-JSON response envelope. Stderr is represented there by counts and hashes.
+# Keep the final envelope-size check; this is a capture bound, not delivery authority.
+_MAX_CAPTURE_BYTES_PER_STREAM = 1024 * 1024
+_READ_CHUNK_BYTES = 65536
+
 
 class ProcessSupervisorError(ValueError):
     """A process configuration or persistence invariant failed before execution."""
@@ -137,11 +143,10 @@ def _terminate(process: subprocess.Popen[bytes]) -> None:
 
     with suppress(ProcessLookupError, OSError):
         os.killpg(process.pid, signal.SIGTERM)
-    try:
+    with suppress(subprocess.TimeoutExpired):
         process.wait(timeout=0.5)
-        return
-    except subprocess.TimeoutExpired:
-        pass
+    # The leader may exit while descendants ignore TERM and retain output pipes.
+    # Always escalate the launched group, even after observing the leader's exit.
     with suppress(ProcessLookupError, OSError):
         os.killpg(process.pid, signal.SIGKILL)
     with suppress(subprocess.TimeoutExpired, OSError):
@@ -183,6 +188,13 @@ def run_bounded_process(
         "exit_code": None,
         "stdout_sha256": _sha(b""),
         "stderr_sha256": _sha(b""),
+        "output_limit_bytes": _MAX_CAPTURE_BYTES_PER_STREAM,
+        "output_overflow_streams": [],
+        "capture_complete": False,
+        "stdout_observed_bytes": 0,
+        "stderr_observed_bytes": 0,
+        "stdout_truncated": False,
+        "stderr_truncated": False,
     }
 
     def record(event_state: ProcessLifecycleState, *, reason: str, pid: int | None = None) -> None:
@@ -265,6 +277,8 @@ def run_bounded_process(
     selector.register(process.stderr, selectors.EVENT_READ, "stderr")
     stdout = bytearray()
     stderr = bytearray()
+    captures = {"stdout": stdout, "stderr": stderr}
+    digests = {name: hashlib.sha256() for name in captures}
     execution_deadline = time.monotonic() + execution_timeout_s
     terminal: ProcessLifecycleState | None = None
     state["heartbeat_count"] = 0
@@ -296,30 +310,50 @@ def run_bounded_process(
                 continue
             for key, _mask in events:
                 try:
-                    chunk = os.read(key.fileobj.fileno(), 65536)
+                    chunk = os.read(key.fileobj.fileno(), _READ_CHUNK_BYTES)
                 except OSError:
-                    chunk = b""
+                    _terminate(process)
+                    terminal = ProcessLifecycleState.FAILED
+                    record(terminal, reason="output read failed", pid=process.pid)
+                    break
                 if not chunk:
                     with suppress(KeyError):
                         selector.unregister(key.fileobj)
                     continue
-                if key.data == "stdout":
-                    stdout.extend(chunk)
-                    state["stdout_bytes"] = len(stdout)
-                else:
-                    stderr.extend(chunk)
-                    state["stderr_bytes"] = len(stderr)
+                stream = key.data
+                capture = captures[stream]
+                available = _MAX_CAPTURE_BYTES_PER_STREAM - len(capture)
+                retained = chunk[:available]
+                capture.extend(retained)
+                digests[stream].update(retained)
+                state[f"{stream}_bytes"] = len(capture)
+                state[f"{stream}_observed_bytes"] = int(state[f"{stream}_observed_bytes"]) + len(
+                    chunk
+                )
                 state["heartbeat_count"] = int(state["heartbeat_count"]) + 1
                 state["last_heartbeat_elapsed_ms"] = int((time.monotonic() - started_at) * 1000)
-                state["stdout_sha256"] = _sha(bytes(stdout))
-                state["stderr_sha256"] = _sha(bytes(stderr))
+                state[f"{stream}_sha256"] = digests[stream].hexdigest()
+                if len(chunk) > available:
+                    state[f"{stream}_truncated"] = True
+                    state["output_overflow_streams"] = [stream]
+                    _terminate(process)
+                    terminal = ProcessLifecycleState.FAILED
+                    record(
+                        terminal,
+                        reason=f"{stream} output limit exceeded; captured prefix only",
+                        pid=process.pid,
+                    )
+                    break
                 _write_state(state_path, state)
+            if terminal is not None:
+                break
         if terminal is None:
             exit_code = process.poll()
             if exit_code is None:
                 _terminate(process)
                 terminal = ProcessLifecycleState.TIMED_OUT
             else:
+                state["capture_complete"] = not selector.get_map()
                 terminal = (
                     ProcessLifecycleState.RETURNED
                     if exit_code == 0
@@ -336,8 +370,8 @@ def run_bounded_process(
 
     exit_code = process.poll()
     state["exit_code"] = exit_code
-    state["stdout_sha256"] = _sha(bytes(stdout))
-    state["stderr_sha256"] = _sha(bytes(stderr))
+    state["stdout_sha256"] = digests["stdout"].hexdigest()
+    state["stderr_sha256"] = digests["stderr"].hexdigest()
     _write_state(state_path, state)
     assert terminal is not None
     return ProcessObservation(

@@ -1,0 +1,55 @@
+{
+  "schema": "paeos.offline-bootstrap-scope/1",
+  "base": "e24ae5e84d2d768273ad31a72b956db9d6a23153",
+  "authority": "Existing human-approved corrected-plan E0-E3 offline repair; epoch2 coordinator routing does not grant new authority.",
+  "finding": "Original P2 unbounded process stdout/stderr capture and repeated complete-buffer rehash",
+  "owner": "Root bootstrap integrator; debt ownership unchanged.",
+  "files": [
+    {
+      "path": "runtime/integrations/process_supervisor.py",
+      "preimage_sha256": "bf41d7190c82ce92b609ff2e0bfcdf4b5905e70433c9a5b9de6b5b64bc591ecc"
+    },
+    {
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "preimage_sha256": "96f5b9c2d0c5c3fce6e99b9d5fee25e30b99eadab01b2d98f50e44550c5ebfc0"
+    },
+    {
+      "path": "tests/runtime/test_process_output_bounds.py",
+      "preimage_sha256": null
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_client.py",
+      "preimage_sha256": "f37c6b949d281440989943c9bc0f0592934b2d9e1f81a3797aabbd5e2489447d"
+    }
+  ],
+  "cap": {
+    "per_stream_bytes": 1048576,
+    "derivation": "Existing trusted response envelope8MiB; stdout transcript is included once with ASCII JSON escaping up to6bytes per input byte.1MiB stdout contributes at most6MiB, leaving2MiB for bounded metadata. Stderr raw text is not included. Existing final8MiB check remains. Both captured streams total at most2MiB, before bounded conversion copies/read chunks. Smaller downstream content limits remain unchanged.",
+    "qualification": "Conservative bootstrap operating limit; no general throughput guarantee."
+  },
+  "design": [
+    "Preserve ProcessObservation fields and return existing FAILED on any overflow, retaining actual exit code even if already0.",
+    "Bound bytearray append before allocation; incremental per-stream hashes cover retained prefixes only.",
+    "Durable lifecycle records retained and observed byte counts, observed truncation, incomplete capture and overflow stream; do not claim hash of unread output.",
+    "Terminate the launched process group; leader exit does not skip escalation for surviving descendants.",
+    "Accept authentic valid negative signal codes in signed FAILED/TIMED_OUT failure observations, without expanding observation fields."
+  ],
+  "tests": [
+    "Synthetic real processes overflow stdout, stderr and both concurrently; retained bytes/hash/memory bounded, FAILED despite early0 exit.",
+    "Exact-limit success and incremental hash processing; timeout/launch/heartbeat/nonzero regressions.",
+    "TERM-ignoring descendant cleanup after leader exit.",
+    "Existing signed transport failure regression plus invalid negative signal controls."
+  ],
+  "forbidden": [
+    "provider calls",
+    "host credentials/keys/runtime state",
+    "installation",
+    "qualification/admission",
+    "new authority",
+    "debt integration",
+    "original review edits",
+    "formal Security Review"
+  ],
+  "evidence_root": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018",
+  "full_suite": "Focused package only; prior7 collection errors remain, no full-suite acceptance."
+}

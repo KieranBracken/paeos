@@ -1,0 +1,131 @@
+{
+  "base": "e24ae5e84d2d768273ad31a72b956db9d6a23153",
+  "files": [
+    {
+      "path": "runtime/integrations/process_supervisor.py",
+      "sha256": "26df7cdb28521e1358d6eff83ac82669c9ec4fea30482bb647b6ade82fa98d13",
+      "bytes": 14914
+    },
+    {
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "sha256": "26f2672f81c069088c4ede42f8171bb2950a1e7acf1785ccbc9af69593dd7438",
+      "bytes": 21165
+    },
+    {
+      "path": "tests/runtime/test_process_output_bounds.py",
+      "sha256": "56ec582ffa46db7923be6ef2fa3418e725830f4bf0ead6c89f94bdb7355d2e30",
+      "bytes": 9222
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_client.py",
+      "sha256": "9a827ccd2df2249f3acfd4fbbcada3af5a269a48c5f77df9d334850afb5e12a0",
+      "bytes": 10038
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/SCOPE.json",
+      "sha256": "05603f2a875b004aadf5f90fbb94680323e17aa70bf90a88da9dc6a136fb8365",
+      "bytes": 3102
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/run_verification.py",
+      "sha256": "275ce4366c2db1bf05708156f6486b919298eae94966ae2c981250138780ef9a",
+      "bytes": 4285
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/STATIC_CHECKS.json",
+      "sha256": "1623308a7628bac3dda24b45e317a6db2e3befdb3d75d12358f88d31c28fad2a",
+      "bytes": 2339
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/OUTPUT_OBSERVATIONS.json",
+      "sha256": "c7d4fb43a0dd6dfee040f3dc36275d2fb7dcddf60293c3038c2630bf49484433",
+      "bytes": 6767
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/VERIFICATION.json",
+      "sha256": "595b73c80af9d06ee1cd294aab8407465a6fe161d78724fc7f9fe0af61e833d9",
+      "bytes": 2922
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.command.json",
+      "sha256": "f0b569e0a01cb53ee5b871129070aa7dc4396e5644882222f4e69f1bd4362d30",
+      "bytes": 3841
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stdout.txt",
+      "sha256": "f8bd414850f343ef80fc8672ca2970221fa3c3778f824a93ea47d237439c1e68",
+      "bytes": 23026
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/baseline-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.command.json",
+      "sha256": "ef8eca545a22d3cd0220d54c724cf11519c9f11cf75053baa261436e9f456994",
+      "bytes": 3841
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stdout.txt",
+      "sha256": "1802c08ae144d459efe286fefe70ddd96b3e0ad6153bc7ea118f404d7612e238",
+      "bytes": 16339
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/first-green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/final-focused.command.json",
+      "sha256": "716221c5256fd430bf3d44d8a5ea9259422a1d25d0cd10d3c961ba8c53223b80",
+      "bytes": 3841
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/final-focused.stdout.txt",
+      "sha256": "e017e2cbbdae3bd2228acb3c34fa8e88bad3014bba1e6336d5e5d869b06ea3d5",
+      "bytes": 6333
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/final-focused.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/verified-final.command.json",
+      "sha256": "04e06e6413adc196acee8af489695d877904c82223267305a5eb49c7f69f0c06",
+      "bytes": 3841
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/verified-final.stdout.txt",
+      "sha256": "06d48a270ee57eb6fc79e7768e7cc1b9f4ce5f9c725b45423ba1a11f34d2c851",
+      "bytes": 6413
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/verified-final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "73ebd295efd714d1ef24f852468268724037ce2e438ac8f7a094086265d80671",
+      "bytes": 1456242
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "b1ebe47556b51fda4cd43dd1455d945c2198febee0d0f4bbc207008400ecd67b",
+      "bytes": 654360
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/STAGED_DIFF_CHECK.json",
+      "sha256": "cb974d9dbf692c0f8d4ff349a61cf67346d5c7e6276db21a04c76e691f61aba8",
+      "bytes": 4744
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/SECRET_SCAN.json",
+      "sha256": "338ecdd0cdff8e7d0e34826bf6bf26188628c1c66777194eea4fd9f862dfbe62",
+      "bytes": 1917
+    }
+  ],
+  "self": "Excluded from recursive hashing; included in commit."
+}

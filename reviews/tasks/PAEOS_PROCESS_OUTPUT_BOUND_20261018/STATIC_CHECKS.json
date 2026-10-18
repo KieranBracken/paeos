@@ -1,0 +1,64 @@
+{
+  "lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "--no-cache",
+      "runtime/integrations/process_supervisor.py",
+      "runtime/integrations/trusted_codex_transport.py",
+      "tests/runtime/test_process_output_bounds.py",
+      "tests/runtime/test_trusted_codex_client.py",
+      "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "runtime/integrations/process_supervisor.py",
+      "runtime/integrations/trusted_codex_transport.py",
+      "tests/runtime/test_process_output_bounds.py",
+      "tests/runtime/test_trusted_codex_client.py",
+      "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "5 files already formatted\n",
+    "stderr": ""
+  },
+  "source_diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compile": {
+    "passed": true,
+    "method": "In-memory compile(source,filename,exec); no bytecode",
+    "paths": [
+      "runtime/integrations/process_supervisor.py",
+      "runtime/integrations/trusted_codex_transport.py",
+      "tests/runtime/test_process_output_bounds.py",
+      "tests/runtime/test_trusted_codex_client.py",
+      "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/run_verification.py"
+    ]
+  },
+  "review_unchanged": {
+    "passed": true,
+    "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+  },
+  "source_hashes": {
+    "runtime/integrations/process_supervisor.py": "26df7cdb28521e1358d6eff83ac82669c9ec4fea30482bb647b6ade82fa98d13",
+    "runtime/integrations/trusted_codex_transport.py": "26f2672f81c069088c4ede42f8171bb2950a1e7acf1785ccbc9af69593dd7438",
+    "tests/runtime/test_process_output_bounds.py": "56ec582ffa46db7923be6ef2fa3418e725830f4bf0ead6c89f94bdb7355d2e30",
+    "tests/runtime/test_trusted_codex_client.py": "9a827ccd2df2249f3acfd4fbbcada3af5a269a48c5f77df9d334850afb5e12a0",
+    "reviews/tasks/PAEOS_PROCESS_OUTPUT_BOUND_20261018/run_verification.py": "275ce4366c2db1bf05708156f6486b919298eae94966ae2c981250138780ef9a"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema": "paeos.offline-remediation-result/1",
+  "source_base": "e24ae5e84d2d768273ad31a72b956db9d6a23153",
+  "finding": "P2 process output resource bound",
+  "status": "REMEDIATED_CANDIDATE_PENDING_INDEPENDENT_REVIEW",
+  "final_focused": {
+    "passed": 73,
+    "elapsed_seconds": 2.07,
+    "exit_code": 0,
+    "command": "verified-final.command.json",
+    "stdout": "verified-final.stdout.txt"
+  },
+  "history": [
+    {
+      "label": "baseline-red",
+      "failed": 9,
+      "passed": 62,
+      "meaning": "Observed unbounded successful captures, repeated hashing and rejection of signed signal failures."
+    },
+    {
+      "label": "first-green",
+      "failed": 1,
+      "passed": 70,
+      "meaning": "Sandbox denied test-only /bin/ps; replaced observation with signal-zero check of the test-created PID, without changing sandbox."
+    },
+    {
+      "label": "final-focused",
+      "passed": 71,
+      "meaning": "Before two final read-failure and contradictory-signal controls."
+    }
+  ],
+  "cap_bytes_per_stream": 1048576,
+  "cap_derivation": "SCOPE.json",
+  "observations": "OUTPUT_OBSERVATIONS.json",
+  "memory_check": "Simultaneous4MiB-per-stream writers: retained captures <=1MiB each; traced supervisor allocation peak asserted below8MiB. This is a bounded synthetic check, not a general memory/RSS guarantee.",
+  "hash_check": "Exact-limit two-stream run processes each captured byte once through the incremental stream digest.",
+  "consumer_analysis": "One read-only native worker trace; no formal review or model-family attestation. Existing FAILED consumers retained; signal-return-code validation corrected within frozen scope.",
+  "full_suite": "Not rerun under focused package; last candidate result remains seven collection errors. Historical22-error evidence unchanged.",
+  "formal_review": "Outstanding; original report unchanged. No P1/whole-branch/qualification acceptance.",
+  "boundaries": {
+    "provider_calls": 0,
+    "host_credentials_or_keys": false,
+    "production_install": false,
+    "qualification": false,
+    "PAEOS_admission": false,
+    "Court_action": false,
+    "debt_integration": false
+  },
+  "ALLOWED_NOW": {
+    "owner": "Root bootstrap integrator and epoch2 overseer",
+    "action": "Checkpoint candidate; route next eligible bounded offline repair."
+  },
+  "HELD": {
+    "owner": "Existing bootstrap and debt owners",
+    "action": "Installation, qualification, Chat1 admission, dependent debts and P3.",
+    "wake": "Complete applicable boundary controls, exact review, trusted authority and valid qualification/fresh admission."
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": {
+    "remaining": [
+      "P1 disclosure",
+      "P1 producer authentication",
+      "observed model identity",
+      "final independent review",
+      "authority and qualification"
+    ],
+    "scope_limit": "Launched process group termination is not complete production confinement."
+  }
+}

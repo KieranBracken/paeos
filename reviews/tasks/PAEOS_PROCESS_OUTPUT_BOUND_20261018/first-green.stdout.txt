@@ -1,0 +1,223 @@
+......F................................................................  [100%]
+=================================== FAILURES ===================================
+________ test_overflow_kills_term_ignoring_descendant_after_leader_exit ________
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-output-bound-as2lg043/pytest/test_overflow_kills_term_ignor0')
+
+    def test_overflow_kills_term_ignoring_descendant_after_leader_exit(tmp_path):
+        child = (
+            "import os,signal,time; from pathlib import Path; "
+            "signal.signal(signal.SIGTERM, signal.SIG_IGN); "
+            "Path('child-ready').write_text(str(os.getpid())); time.sleep(10)"
+        )
+        code = f"""
+    import os, subprocess, sys, time
+    from pathlib import Path
+    subprocess.Popen([sys.executable, '-I', '-B', '-S', '-c', {child!r}])
+    while not Path('child-ready').exists(): time.sleep(0.01)
+    value = b'x' * {CAP + 1}
+    while value: value = value[os.write(1, value):]
+    time.sleep(10)
+    """
+        child_pid = None
+        try:
+            observation = _run(tmp_path, code, deadline=3.0)
+            child_pid = int((tmp_path / "child-ready").read_text())
+            assert observation.lifecycle_state is ProcessLifecycleState.FAILED
+            deadline = time.monotonic() + 1.0
+            status = ""
+            while time.monotonic() < deadline:
+>               status = subprocess.run(
+                    ["/bin/ps", "-o", "stat=", "-p", str(child_pid)],
+                    capture_output=True, text=True, check=False,
+                ).stdout.strip()
+
+tests/runtime/test_process_output_bounds.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/subprocess.py:554: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/subprocess.py:1039: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: 255 args: ['/bin/ps', '-o', 'stat=', '-p', '78412']>
+args = ['/bin/ps', '-o', 'stat=', '-p', '78412'], executable = b'/bin/ps'
+preexec_fn = None, close_fds = True, pass_fds = (), cwd = None, env = None
+startupinfo = None, creationflags = 0, shell = False, p2cread = -1
+p2cwrite = -1, c2pread = 12, c2pwrite = 13, errread = 14, errwrite = 15
+restore_signals = True, gid = None, gids = None, uid = None, umask = -1
+start_new_session = False, process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session, process_group):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and (not close_fds or _HAVE_POSIX_SPAWN_CLOSEFROM)
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread > 2)
+                and (c2pwrite == -1 or c2pwrite > 2)
+                and (errwrite == -1 or errwrite > 2)
+                and not start_new_session
+                and process_group == -1
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask < 0):
+            self._posix_spawn(args, executable, env, restore_signals, close_fds,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write < 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+                self.pid = _fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        process_group, gid, gids, uid, umask,
+                        preexec_fn, _USE_VFORK)
+                self._child_created = True
+            finally:
+                # be sure the FD is closed no matter what
+                os.close(errpipe_write)
+    
+            self._close_pipe_fds(p2cread, p2cwrite,
+                                 c2pread, c2pwrite,
+                                 errread, errwrite)
+    
+            # Wait for exec to fail or succeed; possibly raising an
+            # exception (limited in size)
+            errpipe_data = bytearray()
+            while True:
+                part = os.read(errpipe_read, 50000)
+                errpipe_data += part
+                if not part or len(errpipe_data) > 50000:
+                    break
+        finally:
+            # be sure the FD is closed no matter what
+            os.close(errpipe_read)
+    
+        if errpipe_data:
+            try:
+                pid, sts = os.waitpid(self.pid, 0)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                else:
+                    self.returncode = sys.maxsize
+            except ChildProcessError:
+                pass
+    
+            try:
+                exception_name, hex_errno, err_msg = (
+                        errpipe_data.split(b':', 2))
+                # The encoding here should match the encoding
+                # written in by the subprocess implementations
+                # like _posixsubprocess
+                err_msg = err_msg.decode()
+            except ValueError:
+                exception_name = b'SubprocessError'
+                hex_errno = b'0'
+                err_msg = 'Bad exception data from child: {!r}'.format(
+                              bytes(errpipe_data))
+            child_exception_type = getattr(
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
+            if issubclass(child_exception_type, OSError) and hex_errno:
+                errno_num = int(hex_errno, 16)
+                if err_msg == "noexec:chdir":
+                    err_msg = ""
+                    # The error must be from chdir(cwd).
+                    err_filename = cwd
+                elif err_msg == "noexec":
+                    err_msg = ""
+                    err_filename = None
+                else:
+                    err_filename = orig_executable
+                if errno_num != 0:
+                    err_msg = os.strerror(errno_num)
+                if err_filename is not None:
+>                   raise child_exception_type(errno_num, err_msg, err_filename)
+E                   PermissionError: [Errno 1] Operation not permitted: '/bin/ps'
+
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/subprocess.py:1972: PermissionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_process_output_bounds.py::test_overflow_kills_term_ignoring_descendant_after_leader_exit
+1 failed, 70 passed in 2.20s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.classifier": "kernel/classifier.py", "kernel.evidence": "kernel/evidence.py", "kernel.gates": "kernel/gates.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.lifecycle": "kernel/lifecycle.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.seal": "kernel/seal.py", "kernel.types": "kernel/types.py", "ops": "ops/__init__.py", "ops.trusted_codex_worker_supervisor": "ops/trusted_codex_worker_supervisor.py", "ops.verify_builder_transport_ready": "ops/verify_builder_transport_ready.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py", "paeos.semantic": "paeos/semantic/__init__.py", "paeos.semantic.delta_engine": "paeos/semantic/delta_engine.py", "paeos.semantic.freeze_guard": "paeos/semantic/freeze_guard.py", "paeos.semantic.lineage": "paeos/semantic/lineage.py", "paeos.semantic.types": "paeos/semantic/types.py", "runtime": "runtime/__init__.py", "runtime.agents": "runtime/agents/__init__.py", "runtime.autonomy": "runtime/autonomy/__init__.py", "runtime.autonomy.authority": "runtime/autonomy/authority.py", "runtime.autonomy.cycle_detector": "runtime/autonomy/cycle_detector.py", "runtime.autonomy.mdg": "runtime/autonomy/mdg.py", "runtime.autonomy.mission_controller": "runtime/autonomy/mission_controller.py", "runtime.autonomy.orca_lineage": "runtime/autonomy/orca_lineage.py", "runtime.autonomy.recovery_controller": "runtime/autonomy/recovery_controller.py", "runtime.autonomy.resume_engine": "runtime/autonomy/resume_engine.py", "runtime.autonomy.schemas": "runtime/autonomy/schemas/__init__.py", "runtime.autonomy.schemas.architect_cognition": "runtime/autonomy/schemas/architect_cognition.py", "runtime.autonomy.schemas.frontier_research": "runtime/autonomy/schemas/frontier_research.py", "runtime.autonomy.schemas.tradeoff_analysis": "runtime/autonomy/schemas/tradeoff_analysis.py", "runtime.autonomy.weakness_finder": "runtime/autonomy/weakness_finder/__init__.py", "runtime.autonomy.weakness_finder.coordinator": "runtime/autonomy/weakness_finder/coordinator.py", "runtime.autonomy.weakness_finder.sensor_pack_drift": "runtime/autonomy/weakness_finder/sensor_pack_drift.py", "runtime.autonomy.weakness_finder.sensor_pack_mdg": "runtime/autonomy/weakness_finder/sensor_pack_mdg.py", "runtime.autonomy.weakness_finder.sensor_pack_semantic": "runtime/autonomy/weakness_finder/sensor_pack_semantic.py", "runtime.autonomy.weakness_finder.sensor_pack_structural": "runtime/autonomy/weakness_finder/sensor_pack_structural.py", "runtime.autonomy.weakness_finder.types": "runtime/autonomy/weakness_finder/types.py", "runtime.autonomy.weakness_finder_probes": "runtime/autonomy/weakness_finder_probes.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.candidate_materialization": "runtime/candidate_materialization.py", "runtime.ceremony": "runtime/ceremony.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.court": "runtime/court/__init__.py", "runtime.court.completeness_firewall": "runtime/court/completeness_firewall.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.hybrid": "runtime/integrations/hybrid.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_planner_transport": "runtime/integrations/trusted_codex_planner_transport.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.lifecycle_projection": "runtime/lifecycle_projection.py", "runtime.memory": "runtime/memory/__init__.py", "runtime.orchestrator": "runtime/orchestrator/__init__.py", "runtime.p1_discrimination": "runtime/p1_discrimination.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.retrospective": "runtime/retrospective.py", "runtime.review": "runtime/review/__init__.py", "runtime.run_state_registry": "runtime/run_state_registry.py", "runtime.scar_store": "runtime/scar_store.py", "runtime.sidecar_scorer": "runtime/sidecar_scorer.py", "runtime.task_package": "runtime/task_package.py", "runtime.transports": "runtime/transports/__init__.py", "runtime.transports.mcp": "runtime/transports/mcp/__init__.py", "runtime.transports.mcp.court_server": "runtime/transports/mcp/court_server.py", "runtime.triage": "runtime/triage.py", "runtime.verification": "runtime/verification.py"}
