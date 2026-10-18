@@ -5532,3 +5532,7 @@ Offline candidate only: `provider_broker.py` refuses critic run and provider cap
 ### 2026-10-18 — Gemini parent handoff denial checkpoint
 
 Two Gemini route source files and two synthetic test files: fail-closed guards at host facades, route run methods, direct issue methods and parent IPC helpers. Final10 focused tests pass with OS network denial. See `reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/`. P1 remains open; original review unchanged; no runtime activation.
+
+### 2026-10-18 — local UI disclosure helpers default-deny candidate
+
+Offline scoped candidate: the uploader rejects before processing text or attachments, and the auth relay rejects before inspecting cached prompts/hashes or constructing an authorization-shaped message. Focused synthetic tests: 3 passed. Scoped lint, changed-range formatting, compilation, diff checks and high-confidence secret scan are recorded in `reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/`. Full-file lint/format still has pre-existing findings on the pinned helper preimages; no unrelated cleanup was made. P1 remains open; no UI/provider, PAEOS admission, qualification, Court action, debt integration or independent review occurred.

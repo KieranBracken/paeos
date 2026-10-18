@@ -1,0 +1,88 @@
+{
+  "schema": "paeos.offline-helper-denial-verification/1",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "base_commit": "9241febef77028d638ed0da1444d029b73d998b7",
+  "runtime_or_provider_execution": false,
+  "verification": [
+    {
+      "name": "focused_synthetic_tests",
+      "argv": [
+        "env",
+        "PYTHONPATH=<candidate-worktree>",
+        "<project-python-3.13.5>",
+        "-m",
+        "pytest",
+        "tests/ops/test_ui_disclosure_helpers_denial.py",
+        "-q"
+      ],
+      "result": "PASS",
+      "summary": "3 passed"
+    },
+    {
+      "name": "new_test_ruff_lint",
+      "result": "PASS"
+    },
+    {
+      "name": "new_test_ruff_format",
+      "result": "PASS"
+    },
+    {
+      "name": "changed_source_ruff_lint",
+      "result": "PASS_WITH_BASELINE_RULES_EXCLUDED",
+      "excluded_baseline_rules": ["I001", "F401", "SIM105"]
+    },
+    {
+      "name": "changed_source_ruff_format_ranges",
+      "result": "PASS"
+    },
+    {
+      "name": "full_file_ruff_lint",
+      "result": "BASELINE_FINDINGS_REPRODUCED",
+      "findings": [
+        "upload_evidence.py: I001, unused os, unused sys",
+        "codex_auth_relay.py: SIM105"
+      ]
+    },
+    {
+      "name": "full_file_ruff_format",
+      "result": "BASELINE_FORMAT_DRIFT_REPRODUCED",
+      "files": [
+        "ops/chatgpt_bridge/upload_evidence.py",
+        "ops/codex_auth_relay.py"
+      ]
+    },
+    {
+      "name": "py_compile",
+      "result": "PASS",
+      "files": [
+        "ops/chatgpt_bridge/upload_evidence.py",
+        "ops/codex_auth_relay.py",
+        "tests/ops/test_ui_disclosure_helpers_denial.py"
+      ]
+    },
+    {
+      "name": "git_diff_check",
+      "result": "SCOPED_PASS_PRESERVED_INVENTORY_WHITESPACE_REMAINS",
+      "scoped_check": "PASS",
+      "full_staged_check": "EXIT_2_ONLY_FOR_FOUR_PREEXISTING_TRAILING_SPACES_IN_BYTE_PRESERVED_INVENTORY"
+    },
+    {
+      "name": "scoped_secret_pattern_scan",
+      "result": "PASS_WITH_LIMITED_PATTERN_COVERAGE",
+      "files_scanned": 11
+    },
+    {
+      "name": "full_suite",
+      "result": "NOT_RUN_BY_SCOPE",
+      "last_measured_candidate_result": "7 collection errors"
+    },
+    {
+      "name": "formal_independent_review",
+      "result": "DEFERRED_UNTIL_AGGREGATE_CANDIDATE_READY"
+    }
+  ],
+  "tools": {
+    "python": "3.13.5",
+    "ruff": "0.15.22"
+  }
+}

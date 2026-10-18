@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Autonomous Codex Authorization Relay for PAEOS L14/L17 Audits.
-
-Monitors /private/tmp/paeos-l14-l17-prompt*.md for new Evidence Bundle SHA-256 hashes
-and automatically authorizes them in the active desktop ChatGPT/Codex session via AppleScript.
-"""
+"""Retired UI authorization relay; it refuses before inspecting prompts or cached hashes."""
 
 from __future__ import annotations
 
@@ -17,6 +13,14 @@ from pathlib import Path
 
 HASH_REGEX = re.compile(r"Evidence Bundle SHA-256:\s*([0-9a-f]{64})", re.IGNORECASE)
 STATE_FILE = Path("/tmp/paeos_codex_last_approved_hash.txt")
+
+
+class LocalDisclosureDenied(RuntimeError):
+    """The legacy authorization-shaped UI relay is disabled."""
+
+
+def _deny_local_disclosure() -> None:
+    raise LocalDisclosureDenied("local UI disclosure helper disabled; no content was sent")
 
 
 def get_latest_hash() -> tuple[str | None, Path | None]:
@@ -54,6 +58,8 @@ def set_last_approved_hash(h: str) -> None:
 
 
 def send_approval_to_chatgpt(bundle_hash: str, max_tokens: int = 4096) -> bool:
+    _deny_local_disclosure()
+
     approval_text = (
         f"I authorize one one-shot transmission of the PAEOS evidence bundle with SHA-256 {bundle_hash} "
         f"to Google Gemini (gemini-3.6-flash) for the L14/L17 audit using max_tokens={max_tokens}, "
@@ -81,6 +87,8 @@ def send_approval_to_chatgpt(bundle_hash: str, max_tokens: int = 4096) -> bool:
 
 
 def check_and_authorize() -> bool:
+    _deny_local_disclosure()
+
     latest_hash, prompt_path = get_latest_hash()
     last_hash = get_last_approved_hash()
     if latest_hash and latest_hash != last_hash:

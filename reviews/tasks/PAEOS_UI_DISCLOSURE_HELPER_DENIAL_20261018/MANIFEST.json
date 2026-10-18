@@ -1,0 +1,96 @@
+{
+  "schema": "paeos.sanitized-source-checkpoint-manifest/1",
+  "status": "HELPER_PATHS_DENIED_CANDIDATE",
+  "base_commit": "9241febef77028d638ed0da1444d029b73d998b7",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "scope": {
+    "source_and_test_write_paths": [
+      "ops/chatgpt_bridge/upload_evidence.py",
+      "ops/codex_auth_relay.py",
+      "tests/ops/test_ui_disclosure_helpers_denial.py"
+    ],
+    "evidence_and_audit_paths": [
+      "reviews/tasks/PAEOS_CHATBRIDGE_HANDOFF_INVENTORY_20261018/INVENTORY.md",
+      "reviews/tasks/PAEOS_CHATBRIDGE_HANDOFF_INVENTORY_20261018/MANIFEST.json",
+      "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/RESULT.md",
+      "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/HARNESS_HISTORY.md",
+      "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/SECRET_SCAN.json",
+      "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/VERIFICATION.json",
+      "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "MessyChangesNeedsReview.md"
+    ],
+    "manifest_is_not_self_hashed": true
+  },
+  "verified_source_preimages": [
+    {
+      "path": "ops/chatgpt_bridge/upload_evidence.py",
+      "sha256": "ad9a2a24477ee8e117585d502c100248623b8aaf60d47148a825876e93159194"
+    },
+    {
+      "path": "ops/codex_auth_relay.py",
+      "sha256": "053a92cae02ca3afd278b94f629a82283a860531d190d2b1bf48f548f3ba6edd"
+    },
+    {
+      "path": "tests/ops/test_ui_disclosure_helpers_denial.py",
+      "state": "ABSENT_AT_BASE"
+    },
+    {
+      "path": "runtime/integrations/chat_bridge.py",
+      "sha256": "1b77af40b05d4ec54723386c8366d66546c260cfc1db7402583252a609daac38",
+      "role": "read-only D0258 dependency; unchanged"
+    }
+  ],
+  "checkpoint_files": [
+    {
+      "path": "ops/chatgpt_bridge/upload_evidence.py",
+      "sha256": "0db8358d3f29b3629ef449b1f5db54ca8c6c1bd788d502ff719066232341c253"
+    },
+    {
+      "path": "ops/codex_auth_relay.py",
+      "sha256": "2322a2d1f53dabaf1ea75415298ca97800f598904c709302bdc829fd024e0fd1"
+    },
+    {
+      "path": "tests/ops/test_ui_disclosure_helpers_denial.py",
+      "sha256": "0ac39b1982711df0cfa46a0dc67e88a0df96712b172adf0c5fa354b46b147d4a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CHATBRIDGE_HANDOFF_INVENTORY_20261018/INVENTORY.md",
+      "sha256": "3d9b4652b8ceb85410aa7d998638de722e7e556548ab2f14e61c56c2fa7e7349"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CHATBRIDGE_HANDOFF_INVENTORY_20261018/MANIFEST.json",
+      "sha256": "daa33729ac223757fbeed817e003f9611a507a31af65fb4123240e9d364de9c4"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/RESULT.md",
+      "sha256": "6df374eec08ed9589f8204f6b46983e591d0b9de88f055e58b529bf34436aabd"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/HARNESS_HISTORY.md",
+      "sha256": "25fa08f67ae2221c44f63151913dde9e39e78ca5297d4f0ca4b8912805da1b6d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/SECRET_SCAN.json",
+      "sha256": "03ddb6acaf1265a8c8ea53abda5ce432e036d9119419841b21f56d5e3aa08469"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/VERIFICATION.json",
+      "sha256": "cd8a0251ce089b53ee9cead8936309129861289d5bc4d85af2ba239decf23507"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "96b1bfdb3e3fecec5cc8fcee0c4ea6fcfa583e39a4e5d100890ff5217b7ab20c"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "655c9a3b3577c59d7db9803a4f3c806bce866b75915b0ffc6cd639fc93bc2828"
+    }
+  ],
+  "verification_record": "reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/VERIFICATION.json",
+  "limitations": [
+    "No positive UI/provider route is enabled or authorized.",
+    "Source-bound ChatBridge response producer remains unestablished.",
+    "This does not resolve P1, qualify a worker, integrate debt, or enable P3.",
+    "Formal independent review is deferred until the aggregate candidate is ready."
+  ]
+}

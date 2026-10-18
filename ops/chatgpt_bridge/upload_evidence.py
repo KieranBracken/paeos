@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-ChatGPT Bridge Evidence & Document Uploader
-Attaches newly generated evidence files and submits verbatim terminal output to ChatGPT in Chrome.
-"""
+"""Retired UI disclosure helper; outbound submission is disabled before payload handling."""
 import os
 import sys
 import json
@@ -11,6 +8,15 @@ import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path("/Users/bob/GitHub/paeos")
+
+
+class LocalDisclosureDenied(RuntimeError):
+    """The legacy UI disclosure path is disabled before inspecting its payload."""
+
+
+def _deny_local_disclosure() -> None:
+    raise LocalDisclosureDenied("local UI disclosure helper disabled; no content was sent")
+
 
 def get_latest_evidence_files():
     """Find any freshly generated markdown/evidence files in docs/, .paeos_state/, ops/."""
@@ -25,7 +31,9 @@ def get_latest_evidence_files():
     return sorted(candidates, key=lambda p: p.stat().st_mtime, reverse=True)
 
 def submit_payload_to_chatgpt(text_content: str, files_to_attach=None):
-    """Submits text and optionally attaches files to ChatGPT via DOM/AppleScript."""
+    """Refuse the unbound legacy UI route before reading or serializing its payload."""
+    _deny_local_disclosure()
+
     js_text = json.dumps(text_content)
     
     insert_js = f"""(() => {{

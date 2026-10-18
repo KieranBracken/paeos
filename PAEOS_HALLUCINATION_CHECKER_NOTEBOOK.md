@@ -13938,3 +13938,7 @@ Evidence and the prior inventory link are in `reviews/tasks/PAEOS_GEMINI_PARENT_
 ALLOWED_NOW: Checkpoint this tested candidate and notify the epoch2 completion overseer for the next bounded eligible offline package. Chat1 remains the sole D0258 integrator.
 HELD: Positive egress, installation, qualification/admission, Court/debt integration, dependent debts and P3.
 AUTHORITY_OR_IMPLEMENTATION_GAP: This closes only the two Gemini parent handoffs. Other CLI/SDK/UI paths, trusted positive disclosure authority, producer authentication and exact observed-model evidence remain unresolved; P1 remains open.
+
+### 2026-10-18 — local UI disclosure helpers default-deny candidate
+
+The bounded offline repair disables `submit_payload_to_chatgpt`, `send_approval_to_chatgpt`, and `check_and_authorize` before payload serialization, authorization-text construction, prompt/hash reads, file writes, or AppleScript/UI effects. Three synthetic focused tests pass; changed source ranges pass formatting checks and compilation. Full-file lint/format findings were reproduced on the exact base and left unchanged. Evidence is in `reviews/tasks/PAEOS_UI_DISCLOSURE_HELPER_DENIAL_20261018/`. This closes only the two local helper call paths. The source-bound ChatBridge response producer remains unestablished; no PAEOS admission, activation, qualification, Court action, D0258 integration, formal independent review, or full-suite pass is claimed. P1 remains open; the last full-suite measurement remains seven collection errors.

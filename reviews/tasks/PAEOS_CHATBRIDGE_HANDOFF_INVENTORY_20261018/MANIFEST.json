@@ -1,0 +1,113 @@
+{
+  "schema": "paeos.read-only-source-inventory/1",
+  "status": "SOURCE_TRACE_COMPLETE_HANDOFF_NOT_ESTABLISHED",
+  "repository": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "base_commit": "9241febef77028d638ed0da1444d029b73d998b7",
+  "inventory": {
+    "path": "reviews/tasks/PAEOS_CHATBRIDGE_HANDOFF_INVENTORY_20261018/INVENTORY.md",
+    "sha256": "3d9b4652b8ceb85410aa7d998638de722e7e556548ab2f14e61c56c2fa7e7349"
+  },
+  "pinned_inputs": [
+    {
+      "path": "runtime/integrations/chat_bridge.py",
+      "sha256": "1b77af40b05d4ec54723386c8366d66546c260cfc1db7402583252a609daac38",
+      "role": "ChatBridge request/response runtime"
+    },
+    {
+      "path": "ops/chatgpt_bridge/upload_evidence.py",
+      "sha256": "ad9a2a24477ee8e117585d502c100248623b8aaf60d47148a825876e93159194",
+      "role": "separate native UI uploader"
+    },
+    {
+      "path": "ops/codex_auth_relay.py",
+      "sha256": "053a92cae02ca3afd278b94f629a82283a860531d190d2b1bf48f548f3ba6edd",
+      "role": "authorization-shaped UI relay"
+    },
+    {
+      "path": "ops/autonomous_run.py",
+      "sha256": "87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280",
+      "role": "runtime selection and default"
+    },
+    {
+      "path": "tests/runtime/test_chat_bridge_fail_closed.py",
+      "sha256": "0c2043575e0a3cad4c56ab6c3efdeec5496839b6796dc2fb55cdcd04775d96a0",
+      "role": "local synthetic file-protocol tests"
+    }
+  ],
+  "supporting_inputs": [
+    {
+      "path": "runtime/integrations/bridge_protocol.py",
+      "sha256": "a98e7eb6492961663e16682f6096811e27f0bbae2980476b58efb0d3e71b5ab9"
+    },
+    {
+      "path": "ops/chatgpt_bridge/bridge.py",
+      "sha256": "30435e52abb976359d85a4260cad995e4a0af7d53078d057c1fc4c3b3f6e5355"
+    },
+    {
+      "path": "ops/chatgpt_bridge/watchdog.py",
+      "sha256": "d5e84bd160205f1326923b169dabd6d121a290f6489f8e05471ba05bc3f15364"
+    },
+    {
+      "path": "ops/control_plane_watchdog.py",
+      "sha256": "6889a2ee5f0bab8174971f9c89ea9acd9ccab2763a060d2e28b6c5e2a622eabd"
+    },
+    {
+      "path": "ops/chatgpt_bridge/monitor_loop.py",
+      "sha256": "fd4175fd74eb088ad59ade86027299083740c6204b05918e13f1ba7bfc73b2dd"
+    },
+    {
+      "path": "ops/chatgpt_bridge/cron_bridge.sh",
+      "sha256": "2d3256b85bab91c0fb931d6b0e240937fe1029bcfd1943f52746124720c093fc"
+    },
+    {
+      "path": "ops/chatgpt_bridge/launch_chrome_debug.sh",
+      "sha256": "9057af68265481b770217df81bba190c52f634b33fc647c43c5b7453edbbf315"
+    },
+    {
+      "path": "ops/chatgpt_bridge/watchdog_cron.sh",
+      "sha256": "8d65d9d5ec86bc776e6673b4064b31a71306fc82695079b031c2281805794880"
+    },
+    {
+      "path": "ops/chatgpt_bridge/README.md",
+      "sha256": "cbfcac184e50bcd217f9eab8426b82d3e521b533cd9ae22ab62ed566be4cd52b"
+    },
+    {
+      "path": "tests/ops/test_control_plane_watchdog_cli.py",
+      "sha256": "9a720ed88cd863780bafbeba8c8d129bccded36ad0f017e934f81a23c6f18c26"
+    },
+    {
+      "path": "tests/chatgpt_bridge/test_watchdog_observer.py",
+      "sha256": "b0c8ecd57c3c72ba3e25c7424b17b49832a6d5b4e8606b60f77d8c5bfa218f04"
+    },
+    {
+      "path": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/protocol.json",
+      "sha256": "03e3d131200a7bf6b32c755db86eb24d4e6352b4549f954598f1d5c8a9a827cf",
+      "role": "native-chat coordination procedure"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/scope.json",
+      "sha256": "88912b96dc0c9b4bdc59016befc1afd421291da3e049fc563bc6351732da5207",
+      "role": "D0258 current source-construction scope"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/STATUS.json",
+      "sha256": "2ba13453198bddbf0d4940e0db2c98accc52e5cb3eefac4241687fe50c3950e2",
+      "role": "D0258 status and gates"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DEBT0258_SOURCE_CONSTRUCTION_20261015_db28d1ca/MANIFEST.json",
+      "sha256": "64df9ccfb44a4a2614d39c3e76edcb8f376bb9e4d7eba3b2b10195a73a83e15a",
+      "role": "D0258 candidate and read-only dependency manifest"
+    }
+  ],
+  "verification": {
+    "pinned_hashes_match": true,
+    "worktree_clean_before_inventory_write": true,
+    "tests_run": false,
+    "source_executed": false,
+    "ui_or_provider_used": false,
+    "credential_or_runtime_state_read": false,
+    "source_or_test_files_modified": false
+  }
+}
