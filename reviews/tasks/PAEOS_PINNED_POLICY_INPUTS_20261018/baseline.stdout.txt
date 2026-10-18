@@ -1,0 +1,1337 @@
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE........................................ [ 37%]
+........................................................................ [ 75%]
+.............FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.                          [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_loads_exact_signed_policy_without_granting_authority __
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_wrong_independent_pin_rejected[expected_public_key_sha256] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_wrong_independent_pin_rejected[expected_policy_sha256] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_key_id-worker-substituted-root] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_key_id-None] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_public_key_sha256-None] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_policy_sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[now-None] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[now-value5] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[private] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[duplicate] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[encoding] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[size] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[algorithm] _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_______ ERROR at setup of test_relative_path_escape_rejected[../outside] _______
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+________ ERROR at setup of test_relative_path_escape_rejected[/outside] ________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+___ ERROR at setup of test_relative_path_escape_rejected[public/../key.json] ___
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+____ ERROR at setup of test_relative_path_escape_rejected[public//key.json] ____
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_____ ERROR at setup of test_relative_path_escape_rejected[./policy.json] ______
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+____________ ERROR at setup of test_relative_path_escape_rejected[] ____________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+____________ ERROR at setup of test_symlinks_are_not_followed[root] ____________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+__________ ERROR at setup of test_symlinks_are_not_followed[ancestor] __________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+___________ ERROR at setup of test_symlinks_are_not_followed[public] ___________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+___________ ERROR at setup of test_symlinks_are_not_followed[policy] ___________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_________ ERROR at setup of test_policy_file_bounds_and_type[missing] __________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+________ ERROR at setup of test_policy_file_bounds_and_type[directory] _________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+___________ ERROR at setup of test_policy_file_bounds_and_type[fifo] ___________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_________ ERROR at setup of test_policy_file_bounds_and_type[oversize] _________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+_ ERROR at setup of test_invalid_signature_rejected_even_when_policy_pin_updated _
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+________________ ERROR at setup of test_expired_policy_rejected ________________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+__ ERROR at setup of test_descriptor_binding_survives_parent_path_replacement __
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+__________ ERROR at setup of test_no_writes_or_ambient_key_generation __________
+tests/model_router/test_disclosure_store.py:18: in loader
+    return importlib.import_module("paeos.model_router.disclosure_store")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1322: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:1262: in _find_spec
+    ???
+<string>:13: in find_spec
+    ???
+E   ModuleNotFoundError: paeos.model_router.disclosure_store
+
+During handling of the above exception, another exception occurred:
+tests/model_router/test_disclosure_store.py:20: in loader
+    pytest.fail("pinned public-policy input loader is not implemented")
+E   Failed: pinned public-policy input loader is not implemented
+=================================== FAILURES ===================================
+___ test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-sol] ____
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-sol] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__ test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-sol] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__ test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-sol] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__ test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-sol] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__ test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-sol] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__ test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+___ test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-sol] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__ test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-luna] ___
+tests/runtime/test_responses_broker_disclosure_denial.py:71: in test_untrusted_payload_claims_cannot_enable_egress
+    with broker:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+__________ test_concurrent_repeated_denials_never_reserve_or_forward ___________
+tests/runtime/test_responses_broker_disclosure_denial.py:90: in test_concurrent_repeated_denials_never_reserve_or_forward
+    with broker, ThreadPoolExecutor(max_workers=4) as pool:
+         ^^^^^^
+runtime/integrations/task_scoped_responses_broker.py:366: in __enter__
+    self.start()
+runtime/integrations/task_scoped_responses_broker.py:276: in start
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:457: in __init__
+    self.server_bind()
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/http/server.py:136: in server_bind
+    socketserver.TCPServer.server_bind(self)
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/socketserver.py:478: in server_bind
+    self.socket.bind(self.server_address)
+E   PermissionError: [Errno 1] Operation not permitted
+=========================== short test summary info ============================
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims0-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims1-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims2-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims3-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims4-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims5-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims6-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims7-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims8-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims9-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims10-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims11-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims12-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims13-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims14-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-sol]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_untrusted_payload_claims_cannot_enable_egress[claims15-gpt-5.6-luna]
+FAILED tests/runtime/test_responses_broker_disclosure_denial.py::test_concurrent_repeated_denials_never_reserve_or_forward
+ERROR tests/model_router/test_disclosure_store.py::test_loads_exact_signed_policy_without_granting_authority
+ERROR tests/model_router/test_disclosure_store.py::test_wrong_independent_pin_rejected[expected_public_key_sha256]
+ERROR tests/model_router/test_disclosure_store.py::test_wrong_independent_pin_rejected[expected_policy_sha256]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_key_id-worker-substituted-root]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_key_id-None]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_public_key_sha256-None]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_policy_sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[now-None]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[now-value5]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[private]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[duplicate]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[encoding]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[size]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[algorithm]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[../outside]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[/outside]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[public/../key.json]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[public//key.json]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[./policy.json]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[root]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[ancestor]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[public]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[policy]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[missing]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[directory]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[fifo]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[oversize]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_signature_rejected_even_when_policy_pin_updated
+ERROR tests/model_router/test_disclosure_store.py::test_expired_policy_rejected
+ERROR tests/model_router/test_disclosure_store.py::test_descriptor_binding_survives_parent_path_replacement
+ERROR tests/model_router/test_disclosure_store.py::test_no_writes_or_ambient_key_generation
+33 failed, 126 passed, 32 errors in 1.49s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.types": "kernel/types.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.disclosure_policy": "paeos/model_router/disclosure_policy.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py", "runtime": "runtime/__init__.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.task_package": "runtime/task_package.py"}

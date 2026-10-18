@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import http.client
 import json
+import re
 import secrets
 import socket
 import ssl
@@ -41,6 +42,7 @@ _MAX_RESPONSE_BYTES = 8 * 1024 * 1024
 # old eight-call ceiling into a provider-execution failure for otherwise bounded work.
 MAX_TASK_REQUESTS = 32
 _TTL_SECONDS = 660.0
+MODEL_IDENTITY_CONTRACT = "codex-0.147.0:be6e8eac029b183056b7e4402879f15d2c85f61b"
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +50,7 @@ class BrokerReply:
     status: int
     content_type: str
     body: bytes
+    upstream_headers: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,6 +61,9 @@ class _RequestReceipt:
     transport_outcome: str = "upstream_started"
     upstream_status: int | None = None
     upstream_error_class: str | None = None
+    observed_model_id: str | None = None
+    model_identity_contract: str | None = None
+    model_identity_error: str | None = None
 
 
 Upstream = Callable[[bytes, str, str], BrokerReply]
@@ -65,6 +71,127 @@ Upstream = Callable[[bytes, str, str], BrokerReply]
 
 def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+class ModelIdentityError(ValueError):
+    """Missing or ambiguous provider-reported model; no response content exposed."""
+
+
+def validate_server_model(reply: BrokerReply, expected_model: str) -> str:
+    """Parse the pinned Codex HTTP/SSE ServerModel contract, never response.model.
+
+    This is a provider assertion received through the upstream TLS boundary, not an
+    attestation of backend weights. A complete successful SSE response and one exact
+    model across all declarations are required. WebSocket top-level header metadata
+    is deliberately unsupported on this HTTP route.
+    """
+
+    def reject():
+        raise ModelIdentityError("unverified_server_model")
+
+    def unique(pairs):
+        result = {}
+        for name, value in pairs:
+            if name in result:
+                reject()
+            result[name] = value
+        return result
+
+    models: set[str] = set()
+
+    def record(value):
+        if type(value) is not str or not re.fullmatch(r"[a-z0-9][a-z0-9_.:/-]{0,255}", value):
+            reject()
+        models.add(value)
+        if len(models) != 1:
+            reject()
+
+    try:
+        if (
+            not isinstance(reply, BrokerReply)
+            or type(reply.status) is not int
+            or not 200 <= reply.status < 300
+            or type(reply.content_type) is not str
+            or reply.content_type.split(";", 1)[0].strip().lower() != "text/event-stream"
+            or type(reply.body) is not bytes
+            or not 0 < len(reply.body) <= _MAX_RESPONSE_BYTES
+            or type(reply.upstream_headers) is not tuple
+            or type(expected_model) is not str
+            or not re.fullmatch(r"[a-z0-9][a-z0-9_.:/-]{0,255}", expected_model)
+        ):
+            reject()
+        for header in reply.upstream_headers:
+            if (
+                type(header) is not tuple
+                or len(header) != 2
+                or any(type(v) is not str for v in header)
+            ):
+                reject()
+            if header[0].lower() == "openai-model":
+                record(header[1])
+        text = reply.body.decode("utf-8").replace("\r\n", "\n")
+        if "\r" in text or not text.endswith("\n\n"):
+            reject()
+        completed = False
+        done = False
+        for frame in text.split("\n\n"):
+            data = []
+            event_type = None
+            for line in frame.split("\n"):
+                if not line or line.startswith(":"):
+                    continue
+                field, _, value = line.partition(":")
+                value = value.removeprefix(" ")
+                if field == "data":
+                    data.append(value)
+                elif field == "event":
+                    if event_type is not None:
+                        reject()
+                    event_type = value
+                elif field not in {"id", "retry"}:
+                    reject()
+            if not data:
+                continue
+            payload = "\n".join(data)
+            if payload == "[DONE]":
+                if not completed or done:
+                    reject()
+                done = True
+                continue
+            if completed or done:
+                reject()
+            event = json.loads(payload, object_pairs_hook=unique, parse_constant=lambda _: reject())
+            if type(event) is not dict or type(event.get("type")) is not str:
+                reject()
+            kind = event["type"]
+            if event_type is not None and event_type != kind:
+                reject()
+            if kind in {"error", "response.failed", "response.incomplete"}:
+                reject()
+            response = event.get("response")
+            if response is not None and type(response) is not dict:
+                reject()
+            if response is not None and "headers" in response:
+                headers = response["headers"]
+                if type(headers) is not dict:
+                    reject()
+                for name, value in headers.items():
+                    if name.lower() in {"openai-model", "x-openai-model"}:
+                        record(value)
+            if kind == "response.completed":
+                if (
+                    type(response) is not dict
+                    or type(response.get("id")) is not str
+                    or not response["id"]
+                    or response.get("status") != "completed"
+                ):
+                    reject()
+                completed = True
+        if not completed or models != {expected_model}:
+            reject()
+        return next(iter(models))
+    except (ValueError, UnicodeError, RecursionError, TypeError):
+        raise ModelIdentityError("unverified_server_model") from None
 
 
 class DisclosureAuthorityUnavailable(RuntimeError):
@@ -264,12 +391,21 @@ class ParentOwnedResponsesBroker:
                         )
                     self._send(502, b'{"error":{"type":"upstream_invalid"}}')
                     return
+                observed_model = None
+                identity_error = None
+                try:
+                    observed_model = validate_server_model(reply, broker._model_id)
+                except ModelIdentityError:
+                    identity_error = "unverified_server_model"
                 with broker._lock:
                     broker._request_receipts[receipt.request_id - 1] = replace(
                         receipt,
                         response_sha256=_sha256(reply.body),
                         transport_outcome="response_received",
                         upstream_status=reply.status,
+                        observed_model_id=observed_model,
+                        model_identity_contract=MODEL_IDENTITY_CONTRACT if observed_model else None,
+                        model_identity_error=identity_error,
                     )
                 self._send(reply.status, reply.body, reply.content_type)
 
@@ -306,6 +442,11 @@ class ParentOwnedResponsesBroker:
                 response.status,
                 response.getheader("Content-Type", "application/octet-stream"),
                 response_body,
+                tuple(
+                    (name, value)
+                    for name, value in response.getheaders()
+                    if name.lower() == "openai-model"
+                ),
             )
         finally:
             connection.close()
@@ -329,7 +470,7 @@ class ParentOwnedResponsesBroker:
             if self._local_rejection_count:
                 outcome = "local_rejection"
             return {
-                "schema": "paeos.task-scoped-responses-broker/2",
+                "schema": "paeos.task-scoped-responses-broker/3",
                 "binding": "127.0.0.1",
                 "model_id": self._model_id,
                 "request_count": self._request_count,

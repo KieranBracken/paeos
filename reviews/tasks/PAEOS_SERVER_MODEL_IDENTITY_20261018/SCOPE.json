@@ -1,0 +1,26 @@
+{
+  "base": "8bc28d6feded86672d96816f845e178f99538a74",
+  "owner": "Root bootstrap integrator",
+  "authority": "Human instruction2026-10-18 continue model identity fixes; offline exception",
+  "paths": {
+    "runtime/integrations/task_scoped_responses_broker.py": "4e242abc4cb8c7f137e922eb979cbf37c293eff66812f8d9bcf25c6ed5d06a13",
+    "ops/trusted_codex_worker_supervisor.py": "2c67df1d8c85fd118437f716d76e6f1010eead5382d13940b63ff15c2a396ef8",
+    "tests/runtime/test_responses_broker_model_identity.py": null,
+    "tests/runtime/test_responses_broker_request_limit.py": "967878f0c035f3607613a7776252d7058d79ab1e11365b8d64b73393c3abc54f",
+    "tests/runtime/test_trusted_codex_worker_transport.py": "2c8a519567d1b7c6da83a71689f51ea12a2d3c04423f9ff1eaea30b47becfe11"
+  },
+  "contract": {
+    "upstream": "openai/codex",
+    "version": "0.147.0",
+    "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+    "sse_source_sha256": "4995c9c692dd9e3ebf8dcccc3e0f458d1d0f4c21fa60d75042594d00ba961fca",
+    "source_url": "https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/codex-api/src/sse/responses.rs",
+    "meaning": "Provider-reported model over configured TLS, not backend weights attestation or binary reproducibility"
+  },
+  "limits": [
+    "Preserve disclosure denial",
+    "No host key or provider call",
+    "No qualification/admission",
+    "No formal review before combined candidate ready"
+  ]
+}

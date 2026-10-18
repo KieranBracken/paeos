@@ -1,0 +1,25 @@
+{
+  "base": "8bc28d6feded86672d96816f845e178f99538a74",
+  "authority": "Human current instruction: continue signing/disclosure and model identity fixes; guided Founder-only steps. Existing E0-E3 offline repair exception.",
+  "owner": "Root bootstrap integrator",
+  "source_test_manifest": [
+    "paeos/model_router/disclosure_store.py",
+    "tests/model_router/test_disclosure_store.py"
+  ],
+  "preimages": {
+    "paeos/model_router/disclosure_store.py": null,
+    "tests/model_router/test_disclosure_store.py": null
+  },
+  "read_only_dependency": {
+    "paeos/model_router/disclosure_policy.py": "5c58f90c321a7f6bfadeddef912372baa1f814219c2f78bcf347fb833167a3c6"
+  },
+  "objective": "Read exact independently pinned public identity and signed policy using descriptor-relative nofollow access; return immutable validated inputs, never an egress permit.",
+  "limits": [
+    "No operational key generation/loading/enrollment",
+    "No production consumer/activation",
+    "No assertion of currentness/revocation from caller pins",
+    "No host runtime or provider access",
+    "No new ledger or debt integration",
+    "Original review unchanged"
+  ]
+}

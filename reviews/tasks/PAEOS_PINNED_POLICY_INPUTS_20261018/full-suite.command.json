@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)(deny file-read* (subpath \"/Users/bob\"))(allow file-read-metadata)(allow file-read* (subpath \"/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos\") (subpath \"/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages\") (subpath \"/Users/bob/.local/share/uv/python\") (literal \"/Users/bob/GitHub/paeos/.venv/pyvenv.cfg\") (subpath \"/Users/bob/GitHub/paeos/.venv/bin\"))(allow file-read* (literal \"/Users/bob/.local/bin/uv\"))(deny file-write*)(allow file-write* (subpath \"/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47\") (literal \"/dev/null\"))",
+    "/Users/bob/.local/bin/uv",
+    "run",
+    "--offline",
+    "--no-sync",
+    "python",
+    "-I",
+    "-B",
+    "-S",
+    "-c",
+    "\nimport importlib.machinery, json, sys\nfrom pathlib import Path\nroot, dependencies, scratch = map(Path, sys.argv[1:])\nsys.path[:0] = [str(root), str(dependencies)]\nlocal_names = {\"kernel\", \"runtime\", \"paeos\", \"ops\", \"contracts\"}\nclass Fence:\n    def find_spec(self, fullname, path=None, target=None):\n        if fullname.split(\".\")[0] not in local_names:\n            return None\n        spec = importlib.machinery.PathFinder.find_spec(fullname, path)\n        if spec is None:\n            raise ModuleNotFoundError(fullname)\n        for location in ([spec.origin] if spec.origin else []) + list(spec.submodule_search_locations or []):\n            assert Path(location).resolve().is_relative_to(root), fullname\n        return spec\nsys.meta_path.insert(0, Fence())\nimport pytest\ncode = pytest.main([\"-c\", str(root / \"pyproject.toml\"), \"--confcutdir\", str(root), \"-o\", \"addopts=\", \"-q\", \"-p\", \"no:cacheprovider\", \"--basetemp\", str(scratch / \"pytest\")])\norigins = {}\nfor name, module in tuple(sys.modules.items()):\n    if name.split(\".\")[0] in local_names and getattr(module, \"__file__\", None):\n        path = Path(module.__file__).resolve()\n        assert path.is_relative_to(root), name\n        origins[name] = str(path.relative_to(root))\n# Full collection may load LiteLLM; all outbound network remains denied.\nprint(\"LOCAL_ORIGINS=\" + json.dumps(origins, sort_keys=True))\nraise SystemExit(code)\n",
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+    "/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages",
+    "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47"
+  ],
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47",
+    "TMPDIR": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47",
+    "TMP": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47",
+    "TEMP": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47",
+    "XDG_CACHE_HOME": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47/cache",
+    "PYTHON_DOTENV_DISABLED": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "UV_PROJECT_ENVIRONMENT": "/Users/bob/GitHub/paeos/.venv",
+    "UV_CACHE_DIR": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47/uv-cache"
+  },
+  "exit_code": 2,
+  "scratch_preserved": "/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-offline-readiness-18k5vg47"
+}

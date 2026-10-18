@@ -36,6 +36,7 @@ from runtime.integrations.process_supervisor import (
 )
 from runtime.integrations.task_scoped_responses_broker import (
     MAX_TASK_REQUESTS,
+    MODEL_IDENTITY_CONTRACT,
     ParentOwnedResponsesBroker,
 )
 from runtime.integrations.worker_confinement import (
@@ -157,7 +158,7 @@ def _broker_evidence_complete(evidence: dict[str, object], model_id: str) -> boo
     limit = evidence.get("request_limit")
     receipts = evidence.get("request_receipts")
     if (
-        evidence.get("schema") != "paeos.task-scoped-responses-broker/2"
+        evidence.get("schema") != "paeos.task-scoped-responses-broker/3"
         or evidence.get("binding") != "127.0.0.1"
         or evidence.get("model_id") != model_id
         or evidence.get("transport_outcome") != "response_received"
@@ -178,6 +179,9 @@ def _broker_evidence_complete(evidence: dict[str, object], model_id: str) -> boo
         "transport_outcome",
         "upstream_status",
         "upstream_error_class",
+        "observed_model_id",
+        "model_identity_contract",
+        "model_identity_error",
     }
     for index, receipt in enumerate(receipts, 1):
         if (
@@ -187,8 +191,11 @@ def _broker_evidence_complete(evidence: dict[str, object], model_id: str) -> boo
             or receipt["request_id"] != index
             or receipt["transport_outcome"] != "response_received"
             or type(receipt["upstream_status"]) is not int
-            or not 100 <= receipt["upstream_status"] <= 599
+            or not 200 <= receipt["upstream_status"] < 300
             or receipt["upstream_error_class"] is not None
+            or receipt["observed_model_id"] != model_id
+            or receipt["model_identity_contract"] != MODEL_IDENTITY_CONTRACT
+            or receipt["model_identity_error"] is not None
             or any(
                 not isinstance(receipt[field], str)
                 or re.fullmatch(r"[0-9a-f]{64}", receipt[field]) is None
@@ -979,7 +986,7 @@ class TrustedCodexWorkerSupervisor:
             lifecycle = ["STARTING", "RUNNING", "PROGRESS", "COMPLETED"]
             observation = {
                 "provider_id": PROVIDER_ID,
-                "model_id": model_id,
+                "model_id": broker_evidence["request_receipts"][0]["observed_model_id"],
                 "family": FAMILY,
                 "request_id": request_id,
                 "task_id": request["task_id"],

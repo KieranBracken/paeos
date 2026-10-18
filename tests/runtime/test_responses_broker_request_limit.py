@@ -5,6 +5,7 @@ test_responses_broker_disclosure_denial.py. No providers or host credentials are
 """
 
 import hashlib
+import json
 from concurrent.futures import ThreadPoolExecutor
 from http.client import HTTPConnection
 from pathlib import Path
@@ -16,6 +17,25 @@ from runtime.integrations.task_scoped_responses_broker import (
     BrokerReply,
     ParentOwnedResponsesBroker,
 )
+
+MODEL_IDENTITY_CONTRACT = "codex-0.147.0:be6e8eac029b183056b7e4402879f15d2c85f61b"
+
+
+def _response_body(marker="synthetic"):
+    event = {
+        "type": "response.completed",
+        "response": {"id": marker, "status": "completed"},
+    }
+    return b"data: " + json.dumps(event).encode() + b"\n\n"
+
+
+def _response(body=None, model="gpt-5.6-sol"):
+    return BrokerReply(
+        200,
+        "text/event-stream",
+        _response_body() if body is None else body,
+        upstream_headers=(("openai-model", model),),
+    )
 
 
 def _post(broker, body=b'{"model":"gpt-5.6-sol","input":"synthetic","max_requests":32}'):
@@ -60,7 +80,7 @@ def test_one_call_ceiling_is_enforced_before_second_upstream_effect(monkeypatch)
 
     def upstream(body, _token, _account):
         calls.append(body)
-        return BrokerReply(200, "application/json", b'{"synthetic":true}')
+        return _response()
 
     with _broker(monkeypatch, upstream) as broker:
         assert _post(broker) == 200
@@ -78,7 +98,7 @@ def test_concurrent_attempts_cannot_exceed_one_call(monkeypatch):
         calls.append(body)
         entered.set()
         assert release.wait(3)
-        return BrokerReply(200, "application/json", b'{"synthetic":true}')
+        return _response()
 
     with _broker(monkeypatch, upstream) as broker, ThreadPoolExecutor(max_workers=5) as pool:
         first = pool.submit(_post, broker)
@@ -111,7 +131,7 @@ def test_existing_general_task_ceiling_remains_available(monkeypatch):
 
     def upstream(body, _token, _account):
         calls.append(body)
-        return BrokerReply(200, "application/json", b"{}")
+        return _response()
 
     with _broker(monkeypatch, upstream, MAX_TASK_REQUESTS) as broker:
         assert _post(broker) == 200
@@ -128,7 +148,7 @@ def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch
         "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
         "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
     }
-    replies = {"A": b'{"synthetic_response":"A"}', "B": b'{"synthetic_response":"B"}'}
+    replies = {key: _response_body(key) for key in bodies}
     entered = {key: Event() for key in bodies}
     release = {key: Event() for key in bodies}
 
@@ -136,7 +156,7 @@ def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch
         key = next(key for key, value in bodies.items() if value == body)
         entered[key].set()
         assert release[key].wait(3)
-        return BrokerReply(200, "application/json", replies[key])
+        return _response(replies[key])
 
     with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
         futures = {}
@@ -160,7 +180,7 @@ def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch
             hashlib.sha256(bodies["B"]).hexdigest(),
             hashlib.sha256(replies["A"]).hexdigest(),
         )
-        assert final["schema"] == "paeos.task-scoped-responses-broker/2"
+        assert final["schema"] == "paeos.task-scoped-responses-broker/3"
         assert final["request_sha256"] == final["response_sha256"] == ""
         assert final["upstream_status"] is None
         assert final["transport_outcome"] == "response_received"
@@ -176,6 +196,9 @@ def test_concurrent_receipts_pair_each_request_with_its_own_response(monkeypatch
                 "transport_outcome": "response_received",
                 "upstream_status": 200,
                 "upstream_error_class": None,
+                "observed_model_id": "gpt-5.6-sol",
+                "model_identity_contract": MODEL_IDENTITY_CONTRACT,
+                "model_identity_error": None,
             }
         assert [row["transport_outcome"] for row in pending["request_receipts"]] == [
             "upstream_started",
@@ -227,6 +250,9 @@ def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_succ
         assert returned["request_sha256"] == hashlib.sha256(success_body).hexdigest()
         assert returned["upstream_status"] == 429  # Receipt is not an HTTP-success claim.
         assert returned["transport_outcome"] == "response_received"
+        assert returned["observed_model_id"] is None
+        assert returned["model_identity_contract"] is None
+        assert returned["model_identity_error"] == "unverified_server_model"
         assert _post(broker, success_body) == 429
         denied = broker.evidence()
         assert denied["request_receipts"] == evidence["request_receipts"]
@@ -237,9 +263,7 @@ def test_failed_call_and_later_success_keep_distinct_receipts_and_deny_task_succ
 def test_single_call_scalar_evidence_is_exactly_its_immutable_receipt(monkeypatch):
     from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
 
-    with _broker(
-        monkeypatch, lambda *_: BrokerReply(200, "application/json", b'{"synthetic":true}')
-    ) as broker:
+    with _broker(monkeypatch, lambda *_: _response()) as broker:
         assert broker.evidence()["request_receipts"] == []
         assert _post(broker) == 200
         evidence = broker.evidence()
@@ -255,3 +279,44 @@ def test_single_call_scalar_evidence_is_exactly_its_immutable_receipt(monkeypatc
             assert evidence[field] == record[field]
         assert _post(broker) == 429
         assert broker.evidence()["request_receipts"] == [record]
+
+
+def test_reverse_completion_keeps_model_identity_failure_on_its_own_request(monkeypatch):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    bodies = {
+        "A": b'{"model":"gpt-5.6-sol","input":"synthetic A"}',
+        "B": b'{"model":"gpt-5.6-sol","input":"synthetic B"}',
+    }
+    entered = {key: Event() for key in bodies}
+    release = {key: Event() for key in bodies}
+
+    def upstream(body, _token, _account):
+        key = next(key for key, value in bodies.items() if value == body)
+        entered[key].set()
+        assert release[key].wait(3)
+        return _response(_response_body(key), "gpt-5.6-sol" if key == "A" else "gpt-5.6-luna")
+
+    with _broker(monkeypatch, upstream, 2) as broker, ThreadPoolExecutor(2) as pool:
+        futures = {}
+        try:
+            for key in ("A", "B"):
+                futures[key] = pool.submit(_post, broker, bodies[key])
+                assert entered[key].wait(2)
+            for key in ("B", "A"):
+                release[key].set()
+                assert futures[key].result(timeout=2) == 200
+        finally:
+            for event in release.values():
+                event.set()
+        evidence = broker.evidence()
+        first, second = evidence["request_receipts"]
+        assert first["request_sha256"] == hashlib.sha256(bodies["A"]).hexdigest()
+        assert first["observed_model_id"] == "gpt-5.6-sol"
+        assert first["model_identity_error"] is None
+        assert second["request_sha256"] == hashlib.sha256(bodies["B"]).hexdigest()
+        assert second["observed_model_id"] is None
+        assert second["model_identity_contract"] is None
+        assert second["model_identity_error"] == "unverified_server_model"
+        assert evidence["transport_outcome"] == "response_received"
+        assert not _broker_evidence_complete(evidence, "gpt-5.6-sol")

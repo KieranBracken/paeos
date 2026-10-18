@@ -18,11 +18,14 @@ def _broker_evidence(count=1):
             "transport_outcome": "response_received",
             "upstream_status": 200,
             "upstream_error_class": None,
+            "observed_model_id": "gpt-5.6-sol",
+            "model_identity_contract": ("codex-0.147.0:be6e8eac029b183056b7e4402879f15d2c85f61b"),
+            "model_identity_error": None,
         }
         for index in range(1, count + 1)
     ]
     return {
-        "schema": "paeos.task-scoped-responses-broker/2",
+        "schema": "paeos.task-scoped-responses-broker/3",
         "binding": "127.0.0.1",
         "model_id": "gpt-5.6-sol",
         "transport_outcome": "response_received",
@@ -144,14 +147,21 @@ def _assert_disclosure_denial_has_no_effects(
 
 
 @pytest.mark.parametrize("count", [1, 2])
-def test_broker_receipt_validator_accepts_complete_pairs_without_claiming_http_success(count):
+def test_broker_receipt_validator_rejects_upstream_http_refusal(count):
     from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
 
     evidence = _broker_evidence(count)
     evidence["request_receipts"][0]["upstream_status"] = 429
     if count == 1:
         evidence["upstream_status"] = 429
-    assert _broker_evidence_complete(evidence, "gpt-5.6-sol")
+    assert not _broker_evidence_complete(evidence, "gpt-5.6-sol")
+
+
+@pytest.mark.parametrize("count", [1, 2])
+def test_broker_receipt_validator_accepts_matching_server_identity(count):
+    from ops.trusted_codex_worker_supervisor import _broker_evidence_complete
+
+    assert _broker_evidence_complete(_broker_evidence(count), "gpt-5.6-sol")
 
 
 @pytest.mark.parametrize(
@@ -168,6 +178,11 @@ def test_broker_receipt_validator_accepts_complete_pairs_without_claiming_http_s
         "invalid_status",
         "extra_field",
         "wrong_model",
+        "missing_observed_model",
+        "wrong_observed_model",
+        "missing_identity_field",
+        "wrong_identity_contract",
+        "identity_error",
         "false_count",
         "count_mismatch",
         "limit",
@@ -204,6 +219,16 @@ def test_broker_receipt_validator_rejects_incomplete_or_ambiguous_task_evidence(
         first["opaque"] = "unverified"
     elif defect == "wrong_model":
         evidence["model_id"] = "different-model"
+    elif defect == "missing_observed_model":
+        first["observed_model_id"] = None
+    elif defect == "wrong_observed_model":
+        first["observed_model_id"] = "gpt-5.6-luna"
+    elif defect == "missing_identity_field":
+        first.pop("observed_model_id")
+    elif defect == "wrong_identity_contract":
+        first["model_identity_contract"] = "unverified-contract"
+    elif defect == "identity_error":
+        first["model_identity_error"] = "unverified_server_model"
     elif defect == "false_count":
         evidence["request_count"] = True
     elif defect == "count_mismatch":

@@ -1,0 +1,496 @@
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE........................................ [ 40%]
+........................................................................ [ 80%]
+....................................                                     [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_loads_exact_signed_policy_without_granting_authority __
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 56
+  def test_loads_exact_signed_policy_without_granting_authority(loader, inputs):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_wrong_independent_pin_rejected[expected_public_key_sha256] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 66
+  @pytest.mark.parametrize("field", ["expected_public_key_sha256", "expected_policy_sha256"])
+  def test_wrong_independent_pin_rejected(loader, inputs, field):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_wrong_independent_pin_rejected[expected_policy_sha256] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 66
+  @pytest.mark.parametrize("field", ["expected_public_key_sha256", "expected_policy_sha256"])
+  def test_wrong_independent_pin_rejected(loader, inputs, field):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_key_id-worker-substituted-root] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 73
+  @pytest.mark.parametrize(
+      "field,value",
+      [
+          ("expected_key_id", "worker-substituted-root"),
+          ("expected_key_id", None),
+          ("expected_public_key_sha256", None),
+          ("expected_policy_sha256", "A" * 64),
+          ("now", None),
+          ("now", datetime(2026, 10, 18)),
+      ],
+  )
+  def test_invalid_independent_inputs_reject_before_read(loader, inputs, field, value, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_key_id-None] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 73
+  @pytest.mark.parametrize(
+      "field,value",
+      [
+          ("expected_key_id", "worker-substituted-root"),
+          ("expected_key_id", None),
+          ("expected_public_key_sha256", None),
+          ("expected_policy_sha256", "A" * 64),
+          ("now", None),
+          ("now", datetime(2026, 10, 18)),
+      ],
+  )
+  def test_invalid_independent_inputs_reject_before_read(loader, inputs, field, value, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_public_key_sha256-None] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 73
+  @pytest.mark.parametrize(
+      "field,value",
+      [
+          ("expected_key_id", "worker-substituted-root"),
+          ("expected_key_id", None),
+          ("expected_public_key_sha256", None),
+          ("expected_policy_sha256", "A" * 64),
+          ("now", None),
+          ("now", datetime(2026, 10, 18)),
+      ],
+  )
+  def test_invalid_independent_inputs_reject_before_read(loader, inputs, field, value, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[expected_policy_sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 73
+  @pytest.mark.parametrize(
+      "field,value",
+      [
+          ("expected_key_id", "worker-substituted-root"),
+          ("expected_key_id", None),
+          ("expected_public_key_sha256", None),
+          ("expected_policy_sha256", "A" * 64),
+          ("now", None),
+          ("now", datetime(2026, 10, 18)),
+      ],
+  )
+  def test_invalid_independent_inputs_reject_before_read(loader, inputs, field, value, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[now-None] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 73
+  @pytest.mark.parametrize(
+      "field,value",
+      [
+          ("expected_key_id", "worker-substituted-root"),
+          ("expected_key_id", None),
+          ("expected_public_key_sha256", None),
+          ("expected_policy_sha256", "A" * 64),
+          ("now", None),
+          ("now", datetime(2026, 10, 18)),
+      ],
+  )
+  def test_invalid_independent_inputs_reject_before_read(loader, inputs, field, value, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_independent_inputs_reject_before_read[now-value5] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 73
+  @pytest.mark.parametrize(
+      "field,value",
+      [
+          ("expected_key_id", "worker-substituted-root"),
+          ("expected_key_id", None),
+          ("expected_public_key_sha256", None),
+          ("expected_policy_sha256", "A" * 64),
+          ("now", None),
+          ("now", datetime(2026, 10, 18)),
+      ],
+  )
+  def test_invalid_independent_inputs_reject_before_read(loader, inputs, field, value, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[private] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 99
+  @pytest.mark.parametrize("mutation", ["private", "duplicate", "encoding", "size", "algorithm"])
+  def test_public_document_rejects_nonpublic_or_ambiguous_fields(loader, inputs, mutation):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[duplicate] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 99
+  @pytest.mark.parametrize("mutation", ["private", "duplicate", "encoding", "size", "algorithm"])
+  def test_public_document_rejects_nonpublic_or_ambiguous_fields(loader, inputs, mutation):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[encoding] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 99
+  @pytest.mark.parametrize("mutation", ["private", "duplicate", "encoding", "size", "algorithm"])
+  def test_public_document_rejects_nonpublic_or_ambiguous_fields(loader, inputs, mutation):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[size] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 99
+  @pytest.mark.parametrize("mutation", ["private", "duplicate", "encoding", "size", "algorithm"])
+  def test_public_document_rejects_nonpublic_or_ambiguous_fields(loader, inputs, mutation):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_public_document_rejects_nonpublic_or_ambiguous_fields[algorithm] _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 99
+  @pytest.mark.parametrize("mutation", ["private", "duplicate", "encoding", "size", "algorithm"])
+  def test_public_document_rejects_nonpublic_or_ambiguous_fields(loader, inputs, mutation):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_______ ERROR at setup of test_relative_path_escape_rejected[../outside] _______
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 121
+  @pytest.mark.parametrize(
+      "path",
+      ["../outside", "/outside", "public/../key.json", "public//key.json", "./policy.json", ""],
+  )
+  def test_relative_path_escape_rejected(loader, inputs, path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+________ ERROR at setup of test_relative_path_escape_rejected[/outside] ________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 121
+  @pytest.mark.parametrize(
+      "path",
+      ["../outside", "/outside", "public/../key.json", "public//key.json", "./policy.json", ""],
+  )
+  def test_relative_path_escape_rejected(loader, inputs, path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+___ ERROR at setup of test_relative_path_escape_rejected[public/../key.json] ___
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 121
+  @pytest.mark.parametrize(
+      "path",
+      ["../outside", "/outside", "public/../key.json", "public//key.json", "./policy.json", ""],
+  )
+  def test_relative_path_escape_rejected(loader, inputs, path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+____ ERROR at setup of test_relative_path_escape_rejected[public//key.json] ____
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 121
+  @pytest.mark.parametrize(
+      "path",
+      ["../outside", "/outside", "public/../key.json", "public//key.json", "./policy.json", ""],
+  )
+  def test_relative_path_escape_rejected(loader, inputs, path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_____ ERROR at setup of test_relative_path_escape_rejected[./policy.json] ______
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 121
+  @pytest.mark.parametrize(
+      "path",
+      ["../outside", "/outside", "public/../key.json", "public//key.json", "./policy.json", ""],
+  )
+  def test_relative_path_escape_rejected(loader, inputs, path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+____________ ERROR at setup of test_relative_path_escape_rejected[] ____________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 121
+  @pytest.mark.parametrize(
+      "path",
+      ["../outside", "/outside", "public/../key.json", "public//key.json", "./policy.json", ""],
+  )
+  def test_relative_path_escape_rejected(loader, inputs, path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+____________ ERROR at setup of test_symlinks_are_not_followed[root] ____________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 131
+  @pytest.mark.parametrize("location", ["root", "ancestor", "public", "policy"])
+  def test_symlinks_are_not_followed(loader, inputs, tmp_path, location):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+__________ ERROR at setup of test_symlinks_are_not_followed[ancestor] __________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 131
+  @pytest.mark.parametrize("location", ["root", "ancestor", "public", "policy"])
+  def test_symlinks_are_not_followed(loader, inputs, tmp_path, location):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+___________ ERROR at setup of test_symlinks_are_not_followed[public] ___________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 131
+  @pytest.mark.parametrize("location", ["root", "ancestor", "public", "policy"])
+  def test_symlinks_are_not_followed(loader, inputs, tmp_path, location):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+___________ ERROR at setup of test_symlinks_are_not_followed[policy] ___________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 131
+  @pytest.mark.parametrize("location", ["root", "ancestor", "public", "policy"])
+  def test_symlinks_are_not_followed(loader, inputs, tmp_path, location):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_________ ERROR at setup of test_policy_file_bounds_and_type[missing] __________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 154
+  @pytest.mark.parametrize("kind", ["missing", "directory", "fifo", "oversize"])
+  def test_policy_file_bounds_and_type(loader, inputs, kind):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+________ ERROR at setup of test_policy_file_bounds_and_type[directory] _________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 154
+  @pytest.mark.parametrize("kind", ["missing", "directory", "fifo", "oversize"])
+  def test_policy_file_bounds_and_type(loader, inputs, kind):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+___________ ERROR at setup of test_policy_file_bounds_and_type[fifo] ___________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 154
+  @pytest.mark.parametrize("kind", ["missing", "directory", "fifo", "oversize"])
+  def test_policy_file_bounds_and_type(loader, inputs, kind):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_________ ERROR at setup of test_policy_file_bounds_and_type[oversize] _________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 154
+  @pytest.mark.parametrize("kind", ["missing", "directory", "fifo", "oversize"])
+  def test_policy_file_bounds_and_type(loader, inputs, kind):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+_ ERROR at setup of test_invalid_signature_rejected_even_when_policy_pin_updated _
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 168
+  def test_invalid_signature_rejected_even_when_policy_pin_updated(loader, inputs):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+________________ ERROR at setup of test_expired_policy_rejected ________________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 179
+  def test_expired_policy_rejected(loader, inputs):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+__ ERROR at setup of test_descriptor_binding_survives_parent_path_replacement __
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 185
+  def test_descriptor_binding_survives_parent_path_replacement(loader, inputs, monkeypatch, tmp_path):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+__________ ERROR at setup of test_no_writes_or_ambient_key_generation __________
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 207
+  def test_no_writes_or_ambient_key_generation(loader, inputs, monkeypatch):
+file /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py, line 27
+  @pytest.fixture
+  def inputs(tmp_path, synthetic_key, synthetic_policy):
+E       fixture 'synthetic_key' not found
+>       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, inputs, loader, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/model_router/test_disclosure_store.py:27
+=========================== short test summary info ============================
+ERROR tests/model_router/test_disclosure_store.py::test_loads_exact_signed_policy_without_granting_authority
+ERROR tests/model_router/test_disclosure_store.py::test_wrong_independent_pin_rejected[expected_public_key_sha256]
+ERROR tests/model_router/test_disclosure_store.py::test_wrong_independent_pin_rejected[expected_policy_sha256]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_key_id-worker-substituted-root]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_key_id-None]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_public_key_sha256-None]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[expected_policy_sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[now-None]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_independent_inputs_reject_before_read[now-value5]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[private]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[duplicate]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[encoding]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[size]
+ERROR tests/model_router/test_disclosure_store.py::test_public_document_rejects_nonpublic_or_ambiguous_fields[algorithm]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[../outside]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[/outside]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[public/../key.json]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[public//key.json]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[./policy.json]
+ERROR tests/model_router/test_disclosure_store.py::test_relative_path_escape_rejected[]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[root]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[ancestor]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[public]
+ERROR tests/model_router/test_disclosure_store.py::test_symlinks_are_not_followed[policy]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[missing]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[directory]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[fifo]
+ERROR tests/model_router/test_disclosure_store.py::test_policy_file_bounds_and_type[oversize]
+ERROR tests/model_router/test_disclosure_store.py::test_invalid_signature_rejected_even_when_policy_pin_updated
+ERROR tests/model_router/test_disclosure_store.py::test_expired_policy_rejected
+ERROR tests/model_router/test_disclosure_store.py::test_descriptor_binding_survives_parent_path_replacement
+ERROR tests/model_router/test_disclosure_store.py::test_no_writes_or_ambient_key_generation
+148 passed, 32 errors in 0.82s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.disclosure_policy": "paeos/model_router/disclosure_policy.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py", "runtime": "runtime/__init__.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.hybrid": "runtime/integrations/hybrid.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_planner_transport": "runtime/integrations/trusted_codex_planner_transport.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.task_package": "runtime/task_package.py"}

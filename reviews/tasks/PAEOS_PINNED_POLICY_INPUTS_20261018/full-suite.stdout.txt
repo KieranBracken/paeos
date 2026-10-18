@@ -1,0 +1,102 @@
+
+==================================== ERRORS ====================================
+___ ERROR collecting tests/contracts/test_idea_graph_inspiration_adapter.py ____
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/contracts/test_idea_graph_inspiration_adapter.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contracts/test_idea_graph_inspiration_adapter.py:21: in <module>
+    from contracts.idea_graph_inspiration_adapter import (
+contracts/__init__.py:3: in <module>
+    from contracts.adapters import (
+E   ModuleNotFoundError: contracts.adapters
+_____ ERROR collecting tests/contracts/test_kae_lof_federation_adapter.py ______
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/contracts/test_kae_lof_federation_adapter.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contracts/test_kae_lof_federation_adapter.py:19: in <module>
+    from contracts.envelopes import ArtifactRef, DomainOwner, EvidenceRef, TrustLabel
+contracts/__init__.py:3: in <module>
+    from contracts.adapters import (
+E   ModuleNotFoundError: contracts.adapters
+____ ERROR collecting tests/contracts/test_orca_mission_control_adapter.py _____
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/contracts/test_orca_mission_control_adapter.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contracts/test_orca_mission_control_adapter.py:16: in <module>
+    from contracts.envelopes import (
+contracts/__init__.py:3: in <module>
+    from contracts.adapters import (
+E   ModuleNotFoundError: contracts.adapters
+_ ERROR collecting tests/contracts/test_sentium_shadow_conformance_harness.py __
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/contracts/test_sentium_shadow_conformance_harness.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contracts/test_sentium_shadow_conformance_harness.py:19: in <module>
+    from contracts.adapters import LofSentiumContextAdapter
+contracts/__init__.py:3: in <module>
+    from contracts.adapters import (
+E   ModuleNotFoundError: contracts.adapters
+_________ ERROR collecting tests/runtime/test_claude_cli_transport.py __________
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/runtime/test_claude_cli_transport.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_claude_cli_transport.py:20: in <module>
+    from runtime.transport import WorkerTransport
+E   ModuleNotFoundError: runtime.transport
+_____________ ERROR collecting tests/runtime/test_mcp_transport.py _____________
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/runtime/test_mcp_transport.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_mcp_transport.py:23: in <module>
+    from runtime.transport import WorkerTransport
+E   ModuleNotFoundError: runtime.transport
+____ ERROR collecting tests/runtime/test_responses_broker_model_identity.py ____
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/runtime/test_responses_broker_model_identity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_responses_broker_model_identity.py:7: in <module>
+    from runtime.integrations.task_scoped_responses_broker import (
+E   ImportError: cannot import name 'MODEL_IDENTITY_CONTRACT' from 'runtime.integrations.task_scoped_responses_broker' (/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/runtime/integrations/task_scoped_responses_broker.py)
+_______________ ERROR collecting tests/runtime/test_transport.py _______________
+ImportError while importing test module '/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/tests/runtime/test_transport.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_transport.py:20: in <module>
+    from runtime.transport import FileWorkerTransport, WorkerTransport
+E   ModuleNotFoundError: runtime.transport
+=========================== short test summary info ============================
+ERROR tests/contracts/test_idea_graph_inspiration_adapter.py
+ERROR tests/contracts/test_kae_lof_federation_adapter.py
+ERROR tests/contracts/test_orca_mission_control_adapter.py
+ERROR tests/contracts/test_sentium_shadow_conformance_harness.py
+ERROR tests/runtime/test_claude_cli_transport.py
+ERROR tests/runtime/test_mcp_transport.py
+ERROR tests/runtime/test_responses_broker_model_identity.py
+ERROR tests/runtime/test_transport.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 8 errors during collection !!!!!!!!!!!!!!!!!!!!
+8 errors in 3.58s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.canary": "kernel/canary.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.classifier": "kernel/classifier.py", "kernel.constitution": "kernel/constitution.py", "kernel.evidence": "kernel/evidence.py", "kernel.gates": "kernel/gates.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.ledger_sqlite": "kernel/ledger_sqlite.py", "kernel.lifecycle": "kernel/lifecycle.py", "kernel.observability": "kernel/observability.py", "kernel.projections": "kernel/projections.py", "kernel.promotion": "kernel/promotion.py", "kernel.rcl": "kernel/rcl.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.seal": "kernel/seal.py", "kernel.state": "kernel/state.py", "kernel.types": "kernel/types.py", "ops": "ops/__init__.py", "ops.auditor_receipt_capture": "ops/auditor_receipt_capture.py", "ops.autonomous_run": "ops/autonomous_run.py", "ops.bound_cline_worker": "ops/bound_cline_worker.py", "ops.chatgpt_bridge.upload_evidence": "ops/chatgpt_bridge/upload_evidence.py", "ops.chatgpt_bridge.watchdog": "ops/chatgpt_bridge/watchdog.py", "ops.cline_sdk_inspect": "ops/cline_sdk_inspect.py", "ops.codex_auth_relay": "ops/codex_auth_relay.py", "ops.install_trusted_codex_worker_supervisor": "ops/install_trusted_codex_worker_supervisor.py", "ops.p1_l14_resume": "ops/p1_l14_resume.py", "ops.p1_runtime_l14_audit": "ops/p1_runtime_l14_audit.py", "ops.revalidate_paeos_lifecycle": "ops/revalidate_paeos_lifecycle.py", "ops.run_autonomy_canary": "ops/run_autonomy_canary.py", "ops.runtime_state_migration": "ops/runtime_state_migration.py", "ops.trusted_worker_launcher_service": "ops/trusted_worker_launcher_service.py", "ops.worker_admission_probe": "ops/worker_admission_probe.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.disclosure_policy": "paeos/model_router/disclosure_policy.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.probe_harness": "paeos/model_router/probe_harness.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py", "paeos.semantic": "paeos/semantic/__init__.py", "paeos.semantic.delta_engine": "paeos/semantic/delta_engine.py", "paeos.semantic.freeze_guard": "paeos/semantic/freeze_guard.py", "paeos.semantic.lineage": "paeos/semantic/lineage.py", "paeos.semantic.types": "paeos/semantic/types.py", "runtime": "runtime/__init__.py", "runtime.adversary": "runtime/adversary.py", "runtime.agents": "runtime/agents/__init__.py", "runtime.amendment": "runtime/amendment.py", "runtime.arch_verifier": "runtime/arch_verifier.py", "runtime.ast_linter": "runtime/ast_linter.py", "runtime.autonomy": "runtime/autonomy/__init__.py", "runtime.autonomy.authority": "runtime/autonomy/authority.py", "runtime.autonomy.canary": "runtime/autonomy/canary.py", "runtime.autonomy.cycle_detector": "runtime/autonomy/cycle_detector.py", "runtime.autonomy.mdg": "runtime/autonomy/mdg.py", "runtime.autonomy.mission_controller": "runtime/autonomy/mission_controller.py", "runtime.autonomy.orca_lineage": "runtime/autonomy/orca_lineage.py", "runtime.autonomy.recovery_controller": "runtime/autonomy/recovery_controller.py", "runtime.autonomy.resume_engine": "runtime/autonomy/resume_engine.py", "runtime.autonomy.schemas": "runtime/autonomy/schemas/__init__.py", "runtime.autonomy.schemas.architect_cognition": "runtime/autonomy/schemas/architect_cognition.py", "runtime.autonomy.schemas.frontier_research": "runtime/autonomy/schemas/frontier_research.py", "runtime.autonomy.schemas.tradeoff_analysis": "runtime/autonomy/schemas/tradeoff_analysis.py", "runtime.autonomy.weakness_finder": "runtime/autonomy/weakness_finder/__init__.py", "runtime.autonomy.weakness_finder.coordinator": "runtime/autonomy/weakness_finder/coordinator.py", "runtime.autonomy.weakness_finder.sensor_pack_drift": "runtime/autonomy/weakness_finder/sensor_pack_drift.py", "runtime.autonomy.weakness_finder.sensor_pack_mdg": "runtime/autonomy/weakness_finder/sensor_pack_mdg.py", "runtime.autonomy.weakness_finder.sensor_pack_semantic": "runtime/autonomy/weakness_finder/sensor_pack_semantic.py", "runtime.autonomy.weakness_finder.sensor_pack_structural": "runtime/autonomy/weakness_finder/sensor_pack_structural.py", "runtime.autonomy.weakness_finder.types": "runtime/autonomy/weakness_finder/types.py", "runtime.autonomy.weakness_finder_probes": "runtime/autonomy/weakness_finder_probes.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.calibration": "runtime/calibration.py", "runtime.candidate_materialization": "runtime/candidate_materialization.py", "runtime.ceremony": "runtime/ceremony.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.control_plane": "runtime/control_plane/__init__.py", "runtime.control_plane.coordinator": "runtime/control_plane/coordinator.py", "runtime.control_plane.events": "runtime/control_plane/events.py", "runtime.control_plane.liveness": "runtime/control_plane/liveness.py", "runtime.control_plane.projection": "runtime/control_plane/projection.py", "runtime.control_plane.recovery": "runtime/control_plane/recovery.py", "runtime.control_plane.sqlite_projection": "runtime/control_plane/sqlite_projection.py", "runtime.control_plane.storage_policy": "runtime/control_plane/storage_policy.py", "runtime.control_plane.watchdog": "runtime/control_plane/watchdog.py", "runtime.court": "runtime/court/__init__.py", "runtime.court.completeness_firewall": "runtime/court/completeness_firewall.py", "runtime.court_reconciliation": "runtime/court_reconciliation.py", "runtime.critique": "runtime/critique.py", "runtime.data_policy": "runtime/data_policy.py", "runtime.emission": "runtime/emission/__init__.py", "runtime.emission.outbox": "runtime/emission/outbox.py", "runtime.evolution": "runtime/evolution.py", "runtime.friction": "runtime/friction.py", "runtime.hello": "runtime/hello.py", "runtime.implementation_contract": "runtime/implementation_contract.py", "runtime.independent_audit": "runtime/independent_audit.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.antigravity": "runtime/integrations/antigravity.py", "runtime.integrations.bound_cline_transport": "runtime/integrations/bound_cline_transport.py", "runtime.integrations.bridge_protocol": "runtime/integrations/bridge_protocol.py", "runtime.integrations.chat_bridge": "runtime/integrations/chat_bridge.py", "runtime.integrations.cline_sdk": "runtime/integrations/cline_sdk.py", "runtime.integrations.cline_sdk_protocol": "runtime/integrations/cline_sdk_protocol.py", "runtime.integrations.cline_sdk_qualification": "runtime/integrations/cline_sdk_qualification.py", "runtime.integrations.cline_worker": "runtime/integrations/cline_worker.py", "runtime.integrations.gemini36_adversary_route": "runtime/integrations/gemini36_adversary_route.py", "runtime.integrations.gemini36_critic_route": "runtime/integrations/gemini36_critic_route.py", "runtime.integrations.hybrid": "runtime/integrations/hybrid.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_planner_transport": "runtime/integrations/trusted_codex_planner_transport.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.lifecycle_audit": "runtime/lifecycle_audit.py", "runtime.lifecycle_projection": "runtime/lifecycle_projection.py", "runtime.lifetime": "runtime/lifetime.py", "runtime.memory": "runtime/memory/__init__.py", "runtime.memory.sqlite_store": "runtime/memory/sqlite_store.py", "runtime.mitigation": "runtime/mitigation.py", "runtime.orchestrator": "runtime/orchestrator/__init__.py", "runtime.p1_discrimination": "runtime/p1_discrimination.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.retrospective": "runtime/retrospective.py", "runtime.review": "runtime/review/__init__.py", "runtime.run_state_registry": "runtime/run_state_registry.py", "runtime.scar_store": "runtime/scar_store.py", "runtime.scheduler": "runtime/scheduler.py", "runtime.selfhost": "runtime/selfhost.py", "runtime.sidecar_scorer": "runtime/sidecar_scorer.py", "runtime.supervisors": "runtime/supervisors/__init__.py", "runtime.supervisors.admission": "runtime/supervisors/admission.py", "runtime.supervisors.antigravity": "runtime/supervisors/antigravity.py", "runtime.supervisors.checkpoint": "runtime/supervisors/checkpoint.py", "runtime.supervisors.codex": "runtime/supervisors/codex.py", "runtime.supervisors.coordinator": "runtime/supervisors/coordinator.py", "runtime.supervisors.headless": "runtime/supervisors/headless.py", "runtime.supervisors.protocol": "runtime/supervisors/protocol.py", "runtime.supervisors.registry": "runtime/supervisors/registry.py", "runtime.task_compiler": "runtime/task_compiler.py", "runtime.task_package": "runtime/task_package.py", "runtime.transports": "runtime/transports/__init__.py", "runtime.transports.mcp": "runtime/transports/mcp/__init__.py", "runtime.transports.mcp.court_server": "runtime/transports/mcp/court_server.py", "runtime.transports.mcp.servers": "runtime/transports/mcp/servers.py", "runtime.transports.mcp.transport": "runtime/transports/mcp/transport.py", "runtime.triage": "runtime/triage.py", "runtime.verification": "runtime/verification.py", "runtime.worker_adapter": "runtime/worker_adapter.py", "runtime.worker_admission": "runtime/worker_admission.py", "runtime.worker_broker": "runtime/worker_broker.py", "runtime.worker_evidence": "runtime/worker_evidence.py", "runtime.worker_profile": "runtime/worker_profile.py"}

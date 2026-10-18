@@ -1,0 +1,17 @@
+{
+  "repository": "openai/codex",
+  "version": "0.147.0",
+  "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+  "tag_object": "3ed6f04f6bf8b7c46299d1cb1ff99c74ce21a51d",
+  "tag_signed": false,
+  "source_hashes": {
+    "codex-rs/codex-api/src/sse/responses.rs": "4995c9c692dd9e3ebf8dcccc3e0f458d1d0f4c21fa60d75042594d00ba961fca",
+    "codex-rs/codex-api/src/common.rs": "c3e2c948454455772ac039c783b4566db5fcfd90cbdc646df50b727d8dbbd62a",
+    "codex-rs/codex-api/src/endpoint/responses.rs": "02f92d9a71f81f5567464aea1b3347e06ea455553d2480dd253371753e76fbb1"
+  },
+  "source_url": "https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/codex-api/src/sse/responses.rs",
+  "installed_package_metadata_sha256": "60f3fa0b518399444c28b3a98c785315abd89c1e87b3c5a0e2b59d03ce5c32f5",
+  "installed_binary_path": "/opt/homebrew/Caskroom/codex/0.147.0/bin/codex",
+  "source_research": "Read-only delegated investigation; no provider/worker invocation. Exact upstream HTTP and SSE contract, including response.model negative test.",
+  "limits": "Version/source correspondence only; no reproducible binary or live-response claim."
+}

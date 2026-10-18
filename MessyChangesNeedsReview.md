@@ -5558,3 +5558,9 @@ Review and activation remain held. See `reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SEL
 ### 2026-10-18 — provider response authentication candidate
 
 Four-file bounded source/test package plus evidence at `reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/REPORT.md`. Final90focused tests pass; full-suite collection still fails with7errors. Producer source restored from pinned main bytes, with no installer restoration. All provider dispatch remains denied. Synthetic verification is not operational key enrollment, review acceptance, qualification or debt closure.
+
+### 2026-10-18 — pinned policy inputs and server model identity
+
+At8bc28d6f Root implemented a dormant public-only pinned policy loader and version-bound provider-reported model identity in the Codex broker/supervisor. Final focused results: policy180passed; model138passed. Seven source/test files pass lint/format/in-memory compilation/diff checks. Final full suite stops at7collection errors; preserved earlier8-error collection included an in-progress parser import, and fixture/runner failures remain recorded. Evidence: reviews/tasks/PAEOS_PINNED_POLICY_INPUTS_20261018 and PAEOS_SERVER_MODEL_IDENTITY_20261018. No formal review, provider/host-key activity, install, admission, qualification or Court/debt effect. Original findings unchanged.
+
+ALLOWED_NOW: sanitized checkpoint and remaining bounded implementation within account reserve. HELD: positive disclosure, activation, final aggregate review, qualification/Chat1 admission and dependent debts/P3. AUTHORITY_OR_IMPLEMENTATION_GAP: enrollment/currentness/revocation, outbound frame/closure binding and durable attempt admission remain. Upstream model contract is source-bound and enforced synthetically, not physically qualified. Founder signing key remains uncreated; USB backup key is distinct.

@@ -1,0 +1,17 @@
+{
+  "lint": {
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "exit_code": 0,
+    "stdout": "7 files already formatted\n",
+    "stderr": ""
+  },
+  "compilation": "PASS in memory",
+  "diff_check": {
+    "exit_code": 0,
+    "output": ""
+  }
+}
