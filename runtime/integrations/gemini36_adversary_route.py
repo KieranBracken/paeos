@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 from kernel.types import Role, StageId
+
 from runtime.integrations.provider_broker import HostClineCriticTransport
 
 PROVIDER = "google"
@@ -93,6 +94,14 @@ class Gemini36AdversaryRouteError(RuntimeError):
         super().__init__(f"{code}: {message}")
 
 
+def _require_disclosure_authority() -> NoReturn:
+    """Deny Gemini adversary disclosure until trusted authority is integrated."""
+    raise Gemini36AdversaryRouteError(
+        "disclosure_authority_unavailable",
+        "trusted disclosure authority is unavailable",
+    )
+
+
 class Gemini36AdversaryRoute:
     provider_id = PROVIDER
     model_id = MODEL
@@ -153,6 +162,7 @@ class Gemini36AdversaryRoute:
             raise Gemini36AdversaryRouteError("malformed_spec", "task specification is incomplete") from exc
 
     def issue_task_capability(self, task_id: str, goal_id: str, run_id: str, stage: str, role: Role, operation: str, prompt: str, builder_family: str | None = None, tools: None = None, allow_writes: bool = False, allow_fallback: bool = False, require_confinement: bool = True, now: float | None = None) -> dict[str, object]:
+        _require_disclosure_authority()
         if role is not Role.ADVERSARY or operation != OPERATION or stage != StageId.ADVERSARIAL_REVIEW.name:
             self._fail("route_mismatch", "only Role.ADVERSARY at ADVERSARIAL_REVIEW is authorized")
         if tools is not None or allow_writes is not False or allow_fallback is not False or require_confinement is not True:
@@ -243,6 +253,7 @@ class Gemini36AdversaryRoute:
         raise Gemini36AdversaryRouteError("provider_failure", "trusted Google Gemini provider request failed", failure_observation=value, error_code=error_code)
 
     def run(self, spec: object) -> Gemini36AdversaryResult:
+        _require_disclosure_authority()
         values = {name: self._value(spec, name) for name in ("task_id", "goal_id", "run_id", "stage", "role", "operation", "prompt")}
         builder_family = self._value(spec, "builder_family") if (isinstance(spec, Mapping) and "builder_family" in spec) or hasattr(spec, "builder_family") else self.builder_family
         capability = self.issue_task_capability(**values, builder_family=builder_family)  # type: ignore[arg-type]
@@ -260,6 +271,7 @@ class Gemini36AdversaryRoute:
 
 
 def parent_gemini36_adversary_exchange(*, request: object, environment: Mapping[str, str], timeout_s: float) -> dict[str, object]:
+    _require_disclosure_authority()
     if not isinstance(request, dict) or set(request) != Gemini36AdversaryRoute._capability_fields:
         raise Gemini36AdversaryRouteError("malformed_request", "signed adversary capability fields are not exact")
     if request.get("schema") != CAPABILITY_SCHEMA or request.get("operation") != OPERATION or request.get("role") != Role.ADVERSARY.name or request.get("provider_id") != PROVIDER or request.get("model_id") != MODEL or request.get("model_family") != FAMILY or request.get("adversary_family") != FAMILY or request.get("builder_family") == FAMILY or request.get("read_only") is not True or request.get("allow_tools") is not False or request.get("allow_fallback") is not False or request.get("require_confinement") is not True:
@@ -370,6 +382,7 @@ class HostGemini36AdversaryTransport(HostClineCriticTransport):
         self.last_observation: dict[str, object] | None = None
 
     def run(self, spec: object) -> object:
+        _require_disclosure_authority()
         result = self._route.run(spec)
         self.last_observation = self._route.last_observation
         return result

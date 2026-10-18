@@ -160,6 +160,14 @@ class Gemini36CriticRouteError(RuntimeError):
         super().__init__(f"{code}: {message}")
 
 
+def _require_disclosure_authority() -> NoReturn:
+    """Deny Gemini critic disclosure until trusted authority is integrated."""
+    raise Gemini36CriticRouteError(
+        "disclosure_authority_unavailable",
+        "trusted disclosure authority is unavailable",
+    )
+
+
 class Gemini36CriticCapabilityAdapter(HostClineCriticTransport):
     """Issue and redeem one exact parent-signed Gemini 3.6 critic capability."""
 
@@ -283,6 +291,7 @@ class Gemini36CriticCapabilityAdapter(HostClineCriticTransport):
     ) -> dict[str, object]:
         """Create a short-lived capability bound to the exact critic task and route."""
 
+        _require_disclosure_authority()
         if role is not Role.CRITIC or operation != "critic":
             self._fail(
                 "route_mismatch", "only Role.CRITIC critic operation is authorized"
@@ -498,6 +507,7 @@ class Gemini36CriticCapabilityAdapter(HostClineCriticTransport):
     def run(self, spec: object) -> Gemini36CriticResult:
         """Execute one signed CRITIC exchange through the trusted parent."""
 
+        _require_disclosure_authority()
         names = (
             "task_id",
             "goal_id",
@@ -553,6 +563,7 @@ def parent_gemini36_exchange(
     *, request: object, environment: Mapping[str, str], timeout_s: float
 ) -> dict[str, object]:
     """Send the signed grant to the local service; never contact Google here."""
+    _require_disclosure_authority()
     if (
         not isinstance(request, dict)
         or set(request) != Gemini36CriticCapabilityAdapter._fields
@@ -720,6 +731,7 @@ class HostGemini36CriticTransport(HostClineCriticTransport):
     def run(self, spec: object) -> Any:
         """Run one critic task and expose only its validated response content."""
 
+        _require_disclosure_authority()
         from runtime.integrations import SessionResult
 
         package = {

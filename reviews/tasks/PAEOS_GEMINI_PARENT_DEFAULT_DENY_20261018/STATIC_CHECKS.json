@@ -1,0 +1,56 @@
+[
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "runtime/integrations/gemini36_critic_route.py",
+      "runtime/integrations/gemini36_adversary_route.py",
+      "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "3 files already formatted\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check",
+      "--",
+      "runtime/integrations/gemini36_critic_route.py",
+      "runtime/integrations/gemini36_adversary_route.py",
+      "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "check": "in-memory compilation without bytecode",
+    "files": [
+      "runtime/integrations/gemini36_critic_route.py",
+      "runtime/integrations/gemini36_adversary_route.py",
+      "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/run_verification.py"
+    ],
+    "exit_code": 0
+  }
+]

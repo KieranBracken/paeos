@@ -1,0 +1,54 @@
+{
+  "schema": "paeos.offline-bootstrap-scope/1",
+  "base": "6ab9263908d955173c52544fba4d56e693538d81",
+  "authority": "Existing user-approved E0-E3 bounded offline repair; epoch2 completion assignment. No PAEOS admission or production authority.",
+  "owner": "Root bootstrap integrator; Chat 1 remains sole DEBT-0258 integrator.",
+  "files": [
+    {
+      "path": "runtime/integrations/gemini36_critic_route.py",
+      "preimage_sha256": "3b3cc8e6d0de300cc3df34b4442fd003e21f58929f89b4200d1b409e8971dd14"
+    },
+    {
+      "path": "runtime/integrations/gemini36_adversary_route.py",
+      "preimage_sha256": "5926c4b6f64f231db9d0629b345836c6f27e28ab4a4d6ca7e4217afc29ad52fb"
+    },
+    {
+      "path": "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "preimage": "ABSENT"
+    },
+    {
+      "path": "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "preimage": "ABSENT"
+    }
+  ],
+  "design": [
+    "Unconditional content-free denial in each Gemini host transport run and its underlying route run before reading task payloads.",
+    "Denial in both direct capability issue methods before signing.",
+    "Denial at both direct parent IPC helpers before socket/queue validation or effects.",
+    "Use existing route-specific error types. No positive permit, label, callback or enable switch.",
+    "Preserve all response/receipt schemas and observation logic."
+  ],
+  "verification": [
+    "Synthetic tests call both host transports and underlying route entry points.",
+    "Direct capability issue calls are denied before signer use.",
+    "Direct parent exchange helpers receive structurally valid synthetic frames and deny before socket/queue effects.",
+    "Opaque input and payload-marker checks show no inspection or echo.",
+    "Candidate-local import fence and OS network-denial control."
+  ],
+  "forbidden": [
+    "provider/network requests",
+    "host credentials, keys, environment or runtime-state reads",
+    "installation or qualification/admission",
+    "Court or debt integration",
+    "original review edits",
+    "formal review",
+    "edits outside the four frozen files"
+  ],
+  "completion": "Only Gemini critic/adversary parent handoff containment. P1 remains open.",
+  "evidence_root": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018",
+  "prior_inventory": {
+    "checkpoint": "6ab9263908d955173c52544fba4d56e693538d81",
+    "manifest_sha256": "74ad3d45887aaa7c5a269730a6fa53b0a2bf3eea2fe8ae9635cc655880a695cf",
+    "local_path": "reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/prior-inventory/"
+  }
+}

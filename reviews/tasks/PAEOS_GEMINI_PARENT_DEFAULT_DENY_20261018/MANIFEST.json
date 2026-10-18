@@ -1,0 +1,112 @@
+{
+  "schema": "paeos.sanitized-recovery-manifest/1",
+  "base": "6ab9263908d955173c52544fba4d56e693538d81",
+  "scope": "Gemini critic and adversary default-deny parent handoffs; no positive permission or P1 closure",
+  "files": [
+    {
+      "path": "runtime/integrations/gemini36_critic_route.py",
+      "bytes": 25315,
+      "sha256": "ef80513c8b62c324b1c6c6fa1fc030e55218fcbf1c58a2f91982aab99349d226"
+    },
+    {
+      "path": "runtime/integrations/gemini36_adversary_route.py",
+      "bytes": 24814,
+      "sha256": "da5c94ed4bdcb11b5e5c2aa889b516d8db0b43908d790e351069abe432e867ee"
+    },
+    {
+      "path": "tests/runtime/test_gemini36_critic_route_disclosure_denial.py",
+      "bytes": 4984,
+      "sha256": "18483c812df0124a63e0ca1f04150278090d5bdec61a553cbe91bffe7e9d12eb"
+    },
+    {
+      "path": "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py",
+      "bytes": 6024,
+      "sha256": "c6b28ea147e838a3d8c549651b5feda9facd9389055540a6a944d6d92d67efa5"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1472445,
+      "sha256": "1d8383ce47a610a340cfac429fd454b4f9b76215b3b6136b20fd82188e967a23"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 657760,
+      "sha256": "1f01eceb71e96520b4095dd1bf44fcd5ad43fdb3640af6e039c02bde2eadc3b9"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/SCOPE.json",
+      "bytes": 2586,
+      "sha256": "dd7c9a16cfe9729a5294fc20720ced6311361eb3738395d60b45cfd0e6ed3e76"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/STATIC_CHECKS.json",
+      "bytes": 1874,
+      "sha256": "b32bbaa8db309d25ef1a80f20a568491f4a84636df4041e138f83bc5e2f6614e"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/VERIFICATION.json",
+      "bytes": 2516,
+      "sha256": "060fa2c8d2458a560d5dd4a8af411a6d0c9a9838395a75904a1dafe210f1123c"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/baseline-final-red.command.json",
+      "bytes": 3850,
+      "sha256": "a8b27a492f75cd6cf00f581cd818d39e6be637840e7e30f0fabda099d8df790c"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/baseline-final-red.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/baseline-final-red.stdout.txt",
+      "bytes": 21624,
+      "sha256": "3d607285e7b743a86b0323a19c4ec70fdbcf4a4e9e597420256d458e9057759b"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/focused-green.command.json",
+      "bytes": 3850,
+      "sha256": "5018d375691350640522519e7c3bac7543c3a8c736bd0bf9356db09775e226ef"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/focused-green.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/focused-green.stdout.txt",
+      "bytes": 1544,
+      "sha256": "92cd88c9750b20c25ee9c9d6c1caaa52c7673f339712d6f28748444a429b5324"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/run_verification.py",
+      "bytes": 4273,
+      "sha256": "6c9685ffb9847a1ff8335437d6e33a7561b54a6188663e1d62326fdcf67a41ca"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/verified-final.command.json",
+      "bytes": 3850,
+      "sha256": "7e272becdfc9f06ff31fcc266a959c6d83eb5263a3869e7bfa76ba28763cbde3"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/verified-final.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/verified-final.stdout.txt",
+      "bytes": 1544,
+      "sha256": "411bb1ae41502ce1d6d4e426020f11e88d15de9046e761c6a4de474488c53c97"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/SECRET_SCAN.json",
+      "bytes": 2034,
+      "sha256": "8e151d98c9a36e9e9ce7b090a6a363db8b50eebb2ab2c9e6ee1c6423f001f59c"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/STAGED_DIFF_CHECK.json",
+      "bytes": 5786,
+      "sha256": "317dca3685a2d436f0b6126fe805692d350b7e59019cb7cd5c5d997c7c82d499"
+    }
+  ]
+}

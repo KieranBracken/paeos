@@ -1,0 +1,31 @@
+{
+  "base": "6ab9263908d955173c52544fba4d56e693538d81",
+  "source_preimages": {
+    "runtime/integrations/gemini36_critic_route.py": "ef80513c8b62c324b1c6c6fa1fc030e55218fcbf1c58a2f91982aab99349d226",
+    "runtime/integrations/gemini36_adversary_route.py": "da5c94ed4bdcb11b5e5c2aa889b516d8db0b43908d790e351069abe432e867ee"
+  },
+  "baseline_final_tests": "10 failed in 0.09s against both frozen source preimages; all failures show missing disclosure guards (opaque prompt inspection, signer, socket, queue-open, or missing denial code). Output and command are preserved.",
+  "focused_green": "10 passed in 0.06s; OS synthetic loopback network-denial control PASS.",
+  "verified_final": "10 passed in 0.05s; OS synthetic loopback network-denial control PASS.",
+  "test_coverage": [
+    "Both HostGemini36 transport facades deny opaque task objects before access.",
+    "Both underlying route run methods deny before task inspection.",
+    "Both direct issue_task_capability methods deny before signer use.",
+    "Both parent IPC helpers deny structurally valid synthetic frames before socket or queue operations; opaque frames are rejected before inspection.",
+    "Synthetic prompt embeds forged PUBLIC classification, worker-asserted authority, forged permit, attachments, tool results and history; error messages do not reveal its marker.",
+    "No response/receipt schema or observation validation was modified."
+  ],
+  "network": "No provider requests. OS sandbox denies all network; loopback denial control passed.",
+  "imports": "Candidate root import fence passed; critic/adversary modules and kernel.keystore came from candidate; no host imports or credentials accessed.",
+  "static_checks": "Ruff checks pass on frozen source+tests+runner; formatting check pass on the two new tests and runner; in-memory compilation and scoped git diff check pass.",
+  "secret_scan": "0 findings in explicit source, tests and package evidence manifest.",
+  "review_original_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+  "formal_review": false,
+  "full_suite": "Not rerun; latest measured7 collection errors; historical22 errors remain preserved.",
+  "authority": "Offline E0-E3 bounded candidate only; no installation, qualification, PAEOS admission, Court/debt integration or positive permit.",
+  "known_remaining": [
+    "P1 remains open overall.",
+    "Other CLI, SDK, UI routes remain.",
+    "Separate trusted positive disclosure architecture and producer authentication remain."
+  ]
+}

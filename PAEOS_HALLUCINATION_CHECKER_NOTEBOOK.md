@@ -13926,3 +13926,15 @@ Evidence: `reviews/tasks/PAEOS_PARENT_BROKER_DEFAULT_DENY_20261018/`, including 
 ALLOWED_NOW: Root checkpoints the tested candidate and sends one material completion to the epoch2 overseer. Chat1 retains exclusive D0258 integration.
 HELD: Positive egress, installation, qualification, D0258 admission and dependent debts/P3. Wake requires the applicable boundary controls, exact review, trusted authority and current qualification/fresh admission.
 AUTHORITY_OR_IMPLEMENTATION_GAP: This is one parent-handoff containment package. Other CLI/SDK/Gemini IPC/UI paths, trusted classification/currentness/composition/route/attempt authorization, producer authentication and exact observed-model evidence remain unresolved.
+
+### 2026-10-18 — Gemini parent-handoff default-deny candidate
+
+At `6ab9263908d955173c52544fba4d56e693538d81`, Root froze both Gemini route sources and added one focused test file per route under the existing offline E0–E3 exception. Critic and adversary transport facades, underlying run methods, direct capability issuance, and parent IPC helpers now reject before task inspection, signing or socket/queue transmission. Denial is content-free and uses the route-specific error type. Existing observation/receipt schemas were not edited. No positive classification, permit, callback or environment switch was added.
+
+The final synthetic suite embeds worker-asserted PUBLIC labels, forged grants, attachments, tool results and history. Against the frozen source preimages, **10 tests failed in0.09s** at missing guards and forbidden signer/socket/queue entry; output is preserved. After the repair, **10 passed in0.06s**, then the final recorded run passed **10 in0.05s**. Both runs passed the OS loopback-denial control. Candidate import fencing, scoped lint, test formatting, compilation and diff checks pass. No provider/network request, host credential/environment/runtime-state read, install, qualification, PAEOS admission, Court event or debt integration occurred.
+
+Evidence and the prior inventory link are in `reviews/tasks/PAEOS_GEMINI_PARENT_DEFAULT_DENY_20261018/`. Original Security Review remains SHA256 `9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa`; no formal review was run. Full suite was not rerun; its last measured result remains7 collection errors, with historical22-error reports preserved.
+
+ALLOWED_NOW: Checkpoint this tested candidate and notify the epoch2 completion overseer for the next bounded eligible offline package. Chat1 remains the sole D0258 integrator.
+HELD: Positive egress, installation, qualification/admission, Court/debt integration, dependent debts and P3.
+AUTHORITY_OR_IMPLEMENTATION_GAP: This closes only the two Gemini parent handoffs. Other CLI/SDK/UI paths, trusted positive disclosure authority, producer authentication and exact observed-model evidence remain unresolved; P1 remains open.

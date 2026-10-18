@@ -1,0 +1,444 @@
+NETWORK_DENIAL_CONTROL=PASS
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_________ test_critic_entrypoints_deny_before_reading_or_signing[host] _________
+
+entry = 'host'
+
+    @pytest.mark.parametrize("entry", ["host", "route", "issue"])
+    def test_critic_entrypoints_deny_before_reading_or_signing(entry):
+        """A valid route or forged PUBLIC claim cannot invoke the Gemini signer."""
+        signer = Spy()
+        exchanges = []
+    
+        def exchange(**_kwargs):
+            exchanges.append("exchange")
+            raise AssertionError("parent exchange was called")
+    
+        route = _route(signer, exchange)
+        if entry == "host":
+            target = critic.HostGemini36CriticTransport(
+                request_signing_key=signer,
+                parent_exchange=exchange,
+                builder_family="synthetic-builder",
+            ).run
+            value = Opaque()
+        elif entry == "route":
+            target = route.run
+            value = Opaque()
+        else:
+            target = route.issue_task_capability
+            value = {
+                "task_id": "synthetic-task",
+                "goal_id": "synthetic-goal",
+                "run_id": "synthetic-run",
+                "stage": "CRITIQUE",
+                "role": Role.CRITIC,
+                "operation": "critic",
+                "prompt": PROMPT,
+                "builder_family": "synthetic-builder",
+            }
+        with pytest.raises(critic.Gemini36CriticRouteError) as denied:
+>           target(**value) if entry == "issue" else target(value)
+                                                     ^^^^^^^^^^^^^
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/gemini36_critic_route.py:726: in run
+    "task_id": spec.task_id,
+               ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.runtime.test_gemini36_critic_route_disclosure_denial.Opaque object at 0x1059e6a50>
+_name = 'task_id'
+
+    def __getattr__(self, _name):
+>       raise AssertionError("task object was inspected")
+E       AssertionError: task object was inspected
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:44: AssertionError
+________ test_critic_entrypoints_deny_before_reading_or_signing[route] _________
+
+entry = 'route'
+
+    @pytest.mark.parametrize("entry", ["host", "route", "issue"])
+    def test_critic_entrypoints_deny_before_reading_or_signing(entry):
+        """A valid route or forged PUBLIC claim cannot invoke the Gemini signer."""
+        signer = Spy()
+        exchanges = []
+    
+        def exchange(**_kwargs):
+            exchanges.append("exchange")
+            raise AssertionError("parent exchange was called")
+    
+        route = _route(signer, exchange)
+        if entry == "host":
+            target = critic.HostGemini36CriticTransport(
+                request_signing_key=signer,
+                parent_exchange=exchange,
+                builder_family="synthetic-builder",
+            ).run
+            value = Opaque()
+        elif entry == "route":
+            target = route.run
+            value = Opaque()
+        else:
+            target = route.issue_task_capability
+            value = {
+                "task_id": "synthetic-task",
+                "goal_id": "synthetic-goal",
+                "run_id": "synthetic-run",
+                "stage": "CRITIQUE",
+                "role": Role.CRITIC,
+                "operation": "critic",
+                "prompt": PROMPT,
+                "builder_family": "synthetic-builder",
+            }
+        with pytest.raises(critic.Gemini36CriticRouteError) as denied:
+>           target(**value) if entry == "issue" else target(value)
+                                                     ^^^^^^^^^^^^^
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/gemini36_critic_route.py:511: in run
+    values = {name: self._spec_value(spec, name) for name in names}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/gemini36_critic_route.py:492: in _spec_value
+    return getattr(spec, name)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.runtime.test_gemini36_critic_route_disclosure_denial.Opaque object at 0x105c11f90>
+_name = 'task_id'
+
+    def __getattr__(self, _name):
+>       raise AssertionError("task object was inspected")
+E       AssertionError: task object was inspected
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:44: AssertionError
+________ test_critic_entrypoints_deny_before_reading_or_signing[issue] _________
+
+entry = 'issue'
+
+    @pytest.mark.parametrize("entry", ["host", "route", "issue"])
+    def test_critic_entrypoints_deny_before_reading_or_signing(entry):
+        """A valid route or forged PUBLIC claim cannot invoke the Gemini signer."""
+        signer = Spy()
+        exchanges = []
+    
+        def exchange(**_kwargs):
+            exchanges.append("exchange")
+            raise AssertionError("parent exchange was called")
+    
+        route = _route(signer, exchange)
+        if entry == "host":
+            target = critic.HostGemini36CriticTransport(
+                request_signing_key=signer,
+                parent_exchange=exchange,
+                builder_family="synthetic-builder",
+            ).run
+            value = Opaque()
+        elif entry == "route":
+            target = route.run
+            value = Opaque()
+        else:
+            target = route.issue_task_capability
+            value = {
+                "task_id": "synthetic-task",
+                "goal_id": "synthetic-goal",
+                "run_id": "synthetic-run",
+                "stage": "CRITIQUE",
+                "role": Role.CRITIC,
+                "operation": "critic",
+                "prompt": PROMPT,
+                "builder_family": "synthetic-builder",
+            }
+        with pytest.raises(critic.Gemini36CriticRouteError) as denied:
+            target(**value) if entry == "issue" else target(value)
+>       assert denied.value.code == DENIAL_CODE
+E       AssertionError: assert 'signing_failed' == 'disclosure_a...y_unavailable'
+E         
+E         - disclosure_authority_unavailable
+E         + signing_failed
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:127: AssertionError
+____________ test_critic_direct_parent_helper_denies_before_socket _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105c86780>
+
+    def test_critic_direct_parent_helper_denies_before_socket(monkeypatch):
+        """Direct helper use cannot send a well-shaped signed frame over the socket."""
+        request, environment = _signed_shape()
+        calls = []
+    
+        def socket_call(*_args, **_kwargs):
+            calls.append("socket")
+            raise AssertionError("parent socket was opened")
+    
+        monkeypatch.setattr(critic.socket, "socket", socket_call)
+        with pytest.raises(critic.Gemini36CriticRouteError) as denied:
+>           critic.parent_gemini36_exchange(request=request, environment=environment, timeout_s=1.0)
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/gemini36_critic_route.py:574: in parent_gemini36_exchange
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_args = (<AddressFamily.AF_UNIX: 1>, <SocketKind.SOCK_STREAM: 1>), _kwargs = {}
+
+    def socket_call(*_args, **_kwargs):
+        calls.append("socket")
+>       raise AssertionError("parent socket was opened")
+E       AssertionError: parent socket was opened
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:141: AssertionError
+________ test_critic_direct_exchange_does_not_inspect_opaque_arguments _________
+
+    def test_critic_direct_exchange_does_not_inspect_opaque_arguments():
+        """The local denial runs before validation can inspect any caller-provided frame."""
+        with pytest.raises(critic.Gemini36CriticRouteError) as denied:
+            critic.parent_gemini36_exchange(request=Opaque(), environment=Opaque(), timeout_s=Opaque())
+>       assert denied.value.code == DENIAL_CODE
+E       AssertionError: assert 'malformed_request' == 'disclosure_a...y_unavailable'
+E         
+E         - disclosure_authority_unavailable
+E         + malformed_request
+
+tests/runtime/test_gemini36_critic_route_disclosure_denial.py:155: AssertionError
+_______ test_adversary_entrypoints_deny_before_reading_or_signing[host] ________
+
+entry = 'host'
+
+    @pytest.mark.parametrize("entry", ["host", "route", "issue"])
+    def test_adversary_entrypoints_deny_before_reading_or_signing(entry):
+        """The host facade and route refuse before reading or signing a task prompt."""
+        signer = Spy()
+        exchanges = []
+    
+        def exchange(**_kwargs):
+            exchanges.append("exchange")
+            raise AssertionError("parent exchange was called")
+    
+        route = _route(signer, exchange)
+        if entry == "host":
+            target = adversary.HostGemini36AdversaryTransport(
+                request_signing_key=signer,
+                parent_exchange=exchange,
+                builder_family="synthetic-builder",
+            ).run
+            value = Opaque()
+        elif entry == "route":
+            target = route.run
+            value = Opaque()
+        else:
+            target = route.issue_task_capability
+            value = {
+                "task_id": "synthetic-task",
+                "goal_id": "synthetic-goal",
+                "run_id": "synthetic-run",
+                "stage": StageId.ADVERSARIAL_REVIEW.name,
+                "role": Role.ADVERSARY,
+                "operation": adversary.OPERATION,
+                "prompt": PROMPT,
+                "builder_family": "synthetic-builder",
+            }
+        with pytest.raises(adversary.Gemini36AdversaryRouteError) as denied:
+>           target(**value) if entry == "issue" else target(value)
+                                                     ^^^^^^^^^^^^^
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/gemini36_adversary_route.py:373: in run
+    result = self._route.run(spec)
+             ^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/gemini36_adversary_route.py:246: in run
+    values = {name: self._value(spec, name) for name in ("task_id", "goal_id", "run_id", "stage", "role", "operation", "prompt")}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/gemini36_adversary_route.py:151: in _value
+    return getattr(spec, name)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.runtime.test_gemini36_adversary_route_disclosure_denial.Opaque object at 0x1059e6900>
+_name = 'task_id'
+
+    def __getattr__(self, _name):
+>       raise AssertionError("task object was inspected")
+E       AssertionError: task object was inspected
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:46: AssertionError
+_______ test_adversary_entrypoints_deny_before_reading_or_signing[route] _______
+
+entry = 'route'
+
+    @pytest.mark.parametrize("entry", ["host", "route", "issue"])
+    def test_adversary_entrypoints_deny_before_reading_or_signing(entry):
+        """The host facade and route refuse before reading or signing a task prompt."""
+        signer = Spy()
+        exchanges = []
+    
+        def exchange(**_kwargs):
+            exchanges.append("exchange")
+            raise AssertionError("parent exchange was called")
+    
+        route = _route(signer, exchange)
+        if entry == "host":
+            target = adversary.HostGemini36AdversaryTransport(
+                request_signing_key=signer,
+                parent_exchange=exchange,
+                builder_family="synthetic-builder",
+            ).run
+            value = Opaque()
+        elif entry == "route":
+            target = route.run
+            value = Opaque()
+        else:
+            target = route.issue_task_capability
+            value = {
+                "task_id": "synthetic-task",
+                "goal_id": "synthetic-goal",
+                "run_id": "synthetic-run",
+                "stage": StageId.ADVERSARIAL_REVIEW.name,
+                "role": Role.ADVERSARY,
+                "operation": adversary.OPERATION,
+                "prompt": PROMPT,
+                "builder_family": "synthetic-builder",
+            }
+        with pytest.raises(adversary.Gemini36AdversaryRouteError) as denied:
+>           target(**value) if entry == "issue" else target(value)
+                                                     ^^^^^^^^^^^^^
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/integrations/gemini36_adversary_route.py:246: in run
+    values = {name: self._value(spec, name) for name in ("task_id", "goal_id", "run_id", "stage", "role", "operation", "prompt")}
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+runtime/integrations/gemini36_adversary_route.py:151: in _value
+    return getattr(spec, name)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.runtime.test_gemini36_adversary_route_disclosure_denial.Opaque object at 0x105c12210>
+_name = 'task_id'
+
+    def __getattr__(self, _name):
+>       raise AssertionError("task object was inspected")
+E       AssertionError: task object was inspected
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:46: AssertionError
+_______ test_adversary_entrypoints_deny_before_reading_or_signing[issue] _______
+
+entry = 'issue'
+
+    @pytest.mark.parametrize("entry", ["host", "route", "issue"])
+    def test_adversary_entrypoints_deny_before_reading_or_signing(entry):
+        """The host facade and route refuse before reading or signing a task prompt."""
+        signer = Spy()
+        exchanges = []
+    
+        def exchange(**_kwargs):
+            exchanges.append("exchange")
+            raise AssertionError("parent exchange was called")
+    
+        route = _route(signer, exchange)
+        if entry == "host":
+            target = adversary.HostGemini36AdversaryTransport(
+                request_signing_key=signer,
+                parent_exchange=exchange,
+                builder_family="synthetic-builder",
+            ).run
+            value = Opaque()
+        elif entry == "route":
+            target = route.run
+            value = Opaque()
+        else:
+            target = route.issue_task_capability
+            value = {
+                "task_id": "synthetic-task",
+                "goal_id": "synthetic-goal",
+                "run_id": "synthetic-run",
+                "stage": StageId.ADVERSARIAL_REVIEW.name,
+                "role": Role.ADVERSARY,
+                "operation": adversary.OPERATION,
+                "prompt": PROMPT,
+                "builder_family": "synthetic-builder",
+            }
+        with pytest.raises(adversary.Gemini36AdversaryRouteError) as denied:
+            target(**value) if entry == "issue" else target(value)
+>       assert denied.value.code == DENIAL_CODE
+E       AssertionError: assert 'signing_failed' == 'disclosure_a...y_unavailable'
+E         
+E         - disclosure_authority_unavailable
+E         + signing_failed
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:130: AssertionError
+___________ test_adversary_direct_parent_helper_denies_before_queue ____________
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-gemini-denial-5yk8zruu/pytest/test_adversary_direct_parent_h0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105c84050>
+
+    def test_adversary_direct_parent_helper_denies_before_queue(tmp_path, monkeypatch):
+        """Direct helper use rejects a valid synthetic frame before writing the trusted queue."""
+        request, environment = _signed_shape()
+        queue = tmp_path / "synthetic-parent-queue"
+        queue.mkdir()
+        calls = []
+        real_open = adversary.os.open
+        real_replace = adversary.os.replace
+    
+        def queue_open(path, *args, **kwargs):
+            if str(path).startswith(str(queue)):
+                calls.append("queue-open")
+                raise OSError("synthetic queue write blocked")
+            return real_open(path, *args, **kwargs)
+    
+        def queue_replace(source, destination):
+            if str(source).startswith(str(queue)) or str(destination).startswith(str(queue)):
+                calls.append("queue-replace")
+                raise OSError("synthetic queue rename blocked")
+            return real_replace(source, destination)
+    
+        monkeypatch.setattr(adversary, "TRUSTED_QUEUE", queue)
+        monkeypatch.setattr(adversary.os, "open", queue_open)
+        monkeypatch.setattr(adversary.os, "replace", queue_replace)
+        with pytest.raises(adversary.Gemini36AdversaryRouteError) as denied:
+            adversary.parent_gemini36_adversary_exchange(
+                request=request, environment=environment, timeout_s=0.01
+            )
+>       assert denied.value.code == DENIAL_CODE
+E       AssertionError: assert 'supervisor_unavailable' == 'disclosure_a...y_unavailable'
+E         
+E         - disclosure_authority_unavailable
+E         + supervisor_unavailable
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:165: AssertionError
+_______ test_adversary_direct_exchange_does_not_inspect_opaque_arguments _______
+
+    def test_adversary_direct_exchange_does_not_inspect_opaque_arguments():
+        """The local denial precedes caller-object validation and queue path work."""
+        with pytest.raises(adversary.Gemini36AdversaryRouteError) as denied:
+            adversary.parent_gemini36_adversary_exchange(
+                request=Opaque(), environment=Opaque(), timeout_s=Opaque()
+            )
+>       assert denied.value.code == DENIAL_CODE
+E       AssertionError: assert 'malformed_request' == 'disclosure_a...y_unavailable'
+E         
+E         - disclosure_authority_unavailable
+E         + malformed_request
+
+tests/runtime/test_gemini36_adversary_route_disclosure_denial.py:177: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_entrypoints_deny_before_reading_or_signing[host]
+FAILED tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_entrypoints_deny_before_reading_or_signing[route]
+FAILED tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_entrypoints_deny_before_reading_or_signing[issue]
+FAILED tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_direct_parent_helper_denies_before_socket
+FAILED tests/runtime/test_gemini36_critic_route_disclosure_denial.py::test_critic_direct_exchange_does_not_inspect_opaque_arguments
+FAILED tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_entrypoints_deny_before_reading_or_signing[host]
+FAILED tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_entrypoints_deny_before_reading_or_signing[route]
+FAILED tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_entrypoints_deny_before_reading_or_signing[issue]
+FAILED tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_direct_parent_helper_denies_before_queue
+FAILED tests/runtime/test_gemini36_adversary_route_disclosure_denial.py::test_adversary_direct_exchange_does_not_inspect_opaque_arguments
+10 failed in 0.09s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "runtime": "runtime/__init__.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.gemini36_adversary_route": "runtime/integrations/gemini36_adversary_route.py", "runtime.integrations.gemini36_critic_route": "runtime/integrations/gemini36_critic_route.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.task_package": "runtime/task_package.py", "tests": "tests/__init__.py", "tests.runtime": "tests/runtime/__init__.py", "tests.runtime.test_gemini36_adversary_route_disclosure_denial": "tests/runtime/test_gemini36_adversary_route_disclosure_denial.py", "tests.runtime.test_gemini36_critic_route_disclosure_denial": "tests/runtime/test_gemini36_critic_route_disclosure_denial.py"}
