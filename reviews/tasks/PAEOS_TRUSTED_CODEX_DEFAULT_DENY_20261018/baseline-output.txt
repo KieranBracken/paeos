@@ -1,0 +1,51 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_client_denies_run_without_trusted_disclosure_authority __________
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_client.py:213: in test_client_denies_run_without_trusted_disclosure_authority
+    _assert_disclosure_denial_has_no_effects(
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_client.py:180: in _assert_disclosure_denial_has_no_effects
+    transport.run(_UninspectableSpec())  # type: ignore[attr-defined]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/runtime/integrations/trusted_codex_transport.py:272: in run
+    request = self._request_payload(spec)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/runtime/integrations/trusted_codex_transport.py:241: in _request_payload
+    if not self._workspace_is_approved(spec.workspace):
+                                       ^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_client.py:146: in __getattribute__
+    raise AssertionError("session data must not be read before disclosure authorization")
+E   AssertionError: session data must not be read before disclosure authorization
+______ test_qualification_transport_denies_before_writing_signed_receipts ______
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py:922: in test_qualification_transport_denies_before_writing_signed_receipts
+    _assert_disclosure_denial_has_no_effects(
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py:129: in _assert_disclosure_denial_has_no_effects
+    transport.run(_UninspectableSpec())  # type: ignore[attr-defined]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/runtime/integrations/trusted_codex_transport.py:272: in run
+    request = self._request_payload(spec)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/runtime/integrations/trusted_codex_transport.py:241: in _request_payload
+    if not self._workspace_is_approved(spec.workspace):
+                                       ^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py:95: in __getattribute__
+    raise AssertionError("session data must not be read before disclosure authorization")
+E   AssertionError: session data must not be read before disclosure authorization
+_________ test_qualification_transport_denies_before_ambiguous_timeout _________
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py:954: in test_qualification_transport_denies_before_ambiguous_timeout
+    _assert_disclosure_denial_has_no_effects(
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py:129: in _assert_disclosure_denial_has_no_effects
+    transport.run(_UninspectableSpec())  # type: ignore[attr-defined]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/runtime/integrations/trusted_codex_transport.py:272: in run
+    request = self._request_payload(spec)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/runtime/integrations/trusted_codex_transport.py:241: in _request_payload
+    if not self._workspace_is_approved(spec.workspace):
+                                       ^^^^^^^^^^^^^^
+/tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py:95: in __getattribute__
+    raise AssertionError("session data must not be read before disclosure authorization")
+E   AssertionError: session data must not be read before disclosure authorization
+=========================== short test summary info ============================
+FAILED ../../../tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_client.py::test_client_denies_run_without_trusted_disclosure_authority
+FAILED ../../../tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py::test_qualification_transport_denies_before_writing_signed_receipts
+FAILED ../../../tmp/paeos-default-deny-baseline-20261018/tests/runtime/test_trusted_codex_worker_transport.py::test_qualification_transport_denies_before_ambiguous_timeout

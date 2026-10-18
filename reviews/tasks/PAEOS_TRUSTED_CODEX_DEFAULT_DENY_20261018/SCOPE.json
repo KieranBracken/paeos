@@ -1,0 +1,27 @@
+{
+  "package": "PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018",
+  "purpose": "offline default-deny containment for the fixed trusted Codex worker and inherited Planner transport",
+  "base_commit": "693f33ac4a6171e8c1363f8438ba3a5a00e60ce3",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "preimage_hashes_sha256": {
+    "runtime/integrations/trusted_codex_transport.py": "26f2672f81c069088c4ede42f8171bb2950a1e7acf1785ccbc9af69593dd7438",
+    "tests/runtime/test_trusted_codex_worker_transport.py": "a4da7760b0980e2c1d5a64f024090a8386da528c17b88225f9b81b1188a89c0c",
+    "tests/runtime/test_trusted_codex_client.py": "9a827ccd2df2249f3acfd4fbbcada3af5a269a48c5f77df9d334850afb5e12a0"
+  },
+  "inherited_read_only_hashes_sha256": {
+    "runtime/integrations/trusted_codex_planner_transport.py": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d"
+  },
+  "source_change": "HostCodexWorkerTransport.run raises TrustedTransportFailure(code=disclosure_authority_unavailable) as its first operation with a fixed content-free message.",
+  "test_changes": [
+    "Three former positive run cases now verify no session reads, signing, serialization, path checks, queue/evidence writes, polling, or result receipts.",
+    "The client test invokes both HostCodexWorkerTransport.run and the inherited HostCodexPlannerTransport.run.",
+    "Existing pure response-validation cases remain unchanged and are rerun."
+  ],
+  "constraints": [
+    "Synthetic test objects only; no real secrets or provider requests.",
+    "No PAEOS admission, installation, activation, qualification, Court/debt action, or P3 work.",
+    "No edits to the inherited Planner transport, caller wiring, authority, or unrelated source.",
+    "No full-suite run; the last recorded suite has seven collection errors."
+  ],
+  "review": "Formal independent Security Review is deferred; no review verdict is claimed."
+}

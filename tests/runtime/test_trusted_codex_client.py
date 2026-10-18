@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import json
-import threading
-import time
+import os
 from pathlib import Path
 
 import pytest
@@ -118,53 +117,127 @@ def _spec(workspace: Path) -> SessionSpec:
     )
 
 
-def test_client_requires_fixed_workspace_root_and_signed_response(tmp_path: Path) -> None:
+class _CountingSigner:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def sign(self, _message: bytes) -> None:
+        self.calls += 1
+        raise AssertionError("request signing must not be reached")
+
+
+def _assert_disclosure_denial_has_no_effects(
+    transport: object,
+    signer: _CountingSigner,
+    *,
+    queue_root: Path,
+    evidence_root: Path | None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import runtime.integrations.trusted_codex_transport as codex_transport
+    from runtime.integrations import TrustedTransportFailure
+
+    spec_accesses: list[str] = []
+    effects: list[str] = []
+
+    class _UninspectableSpec:
+        def __getattribute__(self, name: str) -> object:
+            spec_accesses.append(name)
+            raise AssertionError("session data must not be read before disclosure authorization")
+
+    def blocked(label: str):
+        def fail(*_args: object, **_kwargs: object) -> None:
+            effects.append(label)
+            raise AssertionError(f"unexpected transport effect: {label}")
+
+        return fail
+
+    class _NoClockAccess:
+        def __getattr__(self, name: str) -> object:
+            effects.append(f"clock:{name}")
+            raise AssertionError("clock access must not occur before disclosure authorization")
+
+    with monkeypatch.context() as guard:
+        for method in (
+            "resolve",
+            "is_symlink",
+            "is_dir",
+            "exists",
+            "is_file",
+            "read_bytes",
+            "write_bytes",
+            "write_text",
+            "open",
+            "unlink",
+        ):
+            guard.setattr(Path, method, blocked(f"path:{method}"))
+        guard.setattr(codex_transport, "_write_atomic", blocked("queue-write"))
+        guard.setattr(codex_transport, "_write_receipt_once", blocked("evidence-write"))
+        guard.setattr(codex_transport, "_canonical_bytes", blocked("serialization"))
+        guard.setattr(codex_transport, "_sha256", blocked("hashing"))
+        guard.setattr(codex_transport, "time", _NoClockAccess())
+        with pytest.raises(TrustedTransportFailure) as raised:
+            transport.run(_UninspectableSpec())  # type: ignore[attr-defined]
+
+    assert raised.value.code == "disclosure_authority_unavailable"
+    assert str(raised.value) == "trusted disclosure authority is unavailable"
+    assert spec_accesses == []
+    assert effects == []
+    assert signer.calls == 0
+    assert not os.path.lexists(queue_root)
+    if evidence_root is not None:
+        assert not os.path.lexists(evidence_root)
+    assert transport.last_request_sha256 is None  # type: ignore[attr-defined]
+    assert transport.last_response_sha256 is None  # type: ignore[attr-defined]
+    assert transport.last_observation is None  # type: ignore[attr-defined]
+
+
+def test_client_denies_run_without_trusted_disclosure_authority(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from runtime.integrations.trusted_codex_transport import HostCodexWorkerTransport
 
-    request_key = SigningKey.generate()
-    response_key = SigningKey.generate()
     workspace_root = tmp_path / "workspaces"
-    workspace_root.mkdir()
-    workspace = workspace_root / "ws-transport"
-    workspace.mkdir()
     queue = tmp_path / "queue"
+    evidence = tmp_path / "evidence"
+    request_signer = _CountingSigner()
     client = HostCodexWorkerTransport(
         queue_root=queue,
         workspace_root=workspace_root,
-        request_signing_key=request_key,
-        response_verify_key=response_key.verify_key,
+        request_signing_key=request_signer,  # type: ignore[arg-type]
+        response_verify_key=SigningKey.generate().verify_key,
         timeout_s=1,
+        evidence_root=evidence,
     )
 
-    def respond() -> None:
-        deadline = time.monotonic() + 1
-        while time.monotonic() < deadline:
-            requests = list(queue.glob("*.request.json"))
-            if requests:
-                request = json.loads(requests[0].read_text(encoding="utf-8"))
-                response = json.loads(_signed_response(response_key, workspace=workspace))
-                response["payload"]["request_id"] = request["request_id"]
-                response["payload"]["observation"]["request_id"] = request["request_id"]
-                signed_payload = response["payload"]
-                response["signature"] = response_key.sign(
-                    __import__(
-                        "ops.trusted_codex_worker_supervisor", fromlist=["_canonical_bytes"]
-                    )._canonical_bytes(signed_payload)
-                ).signature.hex()
-                (queue / f"{request['request_id']}.response.json").write_text(
-                    json.dumps(response), encoding="utf-8"
-                )
-                return
-            time.sleep(0.01)
+    _assert_disclosure_denial_has_no_effects(
+        client,
+        request_signer,
+        queue_root=queue,
+        evidence_root=evidence,
+        monkeypatch=monkeypatch,
+    )
 
-    thread = threading.Thread(target=respond)
-    thread.start()
-    result = client.run(_spec(workspace))
-    thread.join()
+    from runtime.integrations.trusted_codex_planner_transport import HostCodexPlannerTransport
 
-    assert result.transcript.startswith('{"type":"run_result"')
-    assert result.lifecycle_state == "RETURNED"
-    assert result.environment_fingerprint == "b" * 64
+    planner_queue = tmp_path / "planner-queue"
+    planner_evidence = tmp_path / "planner-evidence"
+    planner_signer = _CountingSigner()
+    planner = HostCodexPlannerTransport(
+        queue_root=planner_queue,
+        workspace_root=workspace_root,
+        request_signing_key=planner_signer,  # type: ignore[arg-type]
+        response_verify_key=SigningKey.generate().verify_key,
+        timeout_s=1,
+        evidence_root=planner_evidence,
+    )
+    _assert_disclosure_denial_has_no_effects(
+        planner,
+        planner_signer,
+        queue_root=planner_queue,
+        evidence_root=planner_evidence,
+        monkeypatch=monkeypatch,
+    )
 
 
 def test_client_rejects_response_with_fallback_or_wrong_workspace(tmp_path: Path) -> None:

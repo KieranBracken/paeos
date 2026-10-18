@@ -1,0 +1,56 @@
+{
+  "candidate_base": "693f33ac4a6171e8c1363f8438ba3a5a00e60ce3",
+  "focused_tdd_baseline": {
+    "source": "a detached baseline worktree at the candidate base; final scoped test files were overlaid without modifying the candidate worktree",
+    "exit_code": 1,
+    "result": "3 failed as expected because all three run paths inspected session data before a disclosure-authority guard existed",
+    "command": "pytest tests/runtime/test_trusted_codex_client.py::test_client_denies_run_without_trusted_disclosure_authority tests/runtime/test_trusted_codex_worker_transport.py::test_qualification_transport_denies_before_writing_signed_receipts tests/runtime/test_trusted_codex_worker_transport.py::test_qualification_transport_denies_before_ambiguous_timeout -q --tb=short",
+    "output": "baseline-output.txt"
+  },
+  "focused_candidate": {
+    "exit_code": 0,
+    "result": "11 passed",
+    "scope": [
+      "the three default-deny run-path cases, including inherited Planner",
+      "pure response rejection, bounded signed failure, and malformed/unbounded response validators"
+    ],
+    "command": "pytest tests/runtime/test_trusted_codex_client.py::test_client_denies_run_without_trusted_disclosure_authority tests/runtime/test_trusted_codex_client.py::test_client_rejects_response_with_fallback_or_wrong_workspace tests/runtime/test_trusted_codex_client.py::test_client_accepts_signed_bounded_worker_failure tests/runtime/test_trusted_codex_client.py::test_client_rejects_unbounded_or_malformed_worker_failure tests/runtime/test_trusted_codex_worker_transport.py::test_qualification_transport_denies_before_writing_signed_receipts tests/runtime/test_trusted_codex_worker_transport.py::test_qualification_transport_denies_before_ambiguous_timeout -q --tb=short",
+    "output": "focused-output.txt"
+  },
+  "static_checks": {
+    "ruff_check": {
+      "exit_code": 0,
+      "output": "lint-output.txt"
+    },
+    "ruff_format_check": {
+      "exit_code": 0,
+      "output": "format-output.txt"
+    },
+    "python_compile": {
+      "exit_code": 0,
+      "output": "compile-output.txt"
+    },
+    "git_diff_check": {
+      "exit_code": 0,
+      "output": "diff-check-output.txt"
+    },
+    "secret_pattern_scan": {
+      "exit_code": 0,
+      "findings": 0,
+      "report": "secret-scan.json"
+    }
+  },
+  "environment": {
+    "python": "3.13.5 from the existing workspace virtualenv",
+    "ruff": "0.15.22 from the existing workspace virtualenv",
+    "provider_calls": 0,
+    "paeos_runs": 0,
+    "host_credentials_or_runtime_state_read": false
+  },
+  "not_run": {
+    "full_suite": "not run; latest recorded full-suite result remains seven collection errors",
+    "formal_independent_review": "deferred by the bounded assignment",
+    "installation_or_qualification": "not authorized in this task"
+  },
+  "disposition": "P1_REMAINS: the Codex worker and inherited Planner routes now deny all dispatch, but trusted classification and positive destination disclosure authority are still absent; other egress paths remain unresolved."
+}

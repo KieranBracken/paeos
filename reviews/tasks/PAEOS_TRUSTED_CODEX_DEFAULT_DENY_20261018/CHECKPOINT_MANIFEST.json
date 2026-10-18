@@ -1,0 +1,24 @@
+{
+  "schema": "paeos.recovery-checkpoint-manifest/1",
+  "base_commit": "693f33ac4a6171e8c1363f8438ba3a5a00e60ce3",
+  "branch": "codex/p1-bound-source-recovery-20261018",
+  "files": {
+    "MessyChangesNeedsReview.md": "79e0b7a14a63ce85d8a0c495737df7f009bb592c6e13094ffe72c50d7122c85b",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": "3d4ad9d8b0fbc50836174b060888eb91cf4c8771116acf74c3675d108de9d2f1",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/SCOPE.json": "39079ff00c344108f870f0f72981c8bc95038ac29524d593fc4c8266308ca839",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/baseline-output.txt": "b21c52ca590b5339d04be9b71ba7ac45702b9ad52755bd4fb67677f68676f028",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/compile-output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/diff-check-output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/explicit-files.txt": "c6c4cc52f65f4e43bdd1b71eb7a16ec62ae7934fba071dc47df5748ba5ff0adb",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/focused-output.txt": "08faea39fd19189f6544839f505d91d76ecb1367e219f5db362cdf22916ef869",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/format-output.txt": "eee76f865de5a9f2456950f710ae5d5f9b5bd0ea02aa54f614c5eed6642a0bfd",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/lint-output.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/secret-scan.json": "cd4ab5f1af696c2de5cffb5e689a9eec1b27ce8a37816b70540fe077c8f81dcf",
+    "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/verification.json": "76a8a9e9be4273848908d086eb918d079f37720267b2f7187d05e2fc4f609922",
+    "runtime/integrations/trusted_codex_transport.py": "4351b8b90d5f393d1236a59af735eeb4947be4d701798e0b0052308bbc515b04",
+    "tests/runtime/test_trusted_codex_client.py": "a14eae14badb251a934a8ac82b2bd3c5c605a2da9955da90567e5ec1dc76eeba",
+    "tests/runtime/test_trusted_codex_worker_transport.py": "2c8a519567d1b7c6da83a71689f51ea12a2d3c04423f9ff1eaea30b47becfe11"
+  },
+  "self_hash_excluded": "reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/CHECKPOINT_MANIFEST.json",
+  "limitation": "Sanitized offline checkpoint only; no PAEOS admission, qualification, production activation, or release claim."
+}

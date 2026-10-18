@@ -1,0 +1,16 @@
+MessyChangesNeedsReview.md
+PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/CHECKPOINT_MANIFEST.json
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/SCOPE.json
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/baseline-output.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/compile-output.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/diff-check-output.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/explicit-files.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/focused-output.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/format-output.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/lint-output.txt
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/secret-scan.json
+reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/verification.json
+runtime/integrations/trusted_codex_transport.py
+tests/runtime/test_trusted_codex_client.py
+tests/runtime/test_trusted_codex_worker_transport.py

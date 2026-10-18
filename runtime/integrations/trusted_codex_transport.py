@@ -269,6 +269,12 @@ class HostCodexWorkerTransport:
         }
 
     def run(self, spec: SessionSpec) -> SessionResult:
+        # This route has no trusted disclosure-authority consumer yet. Do not inspect session
+        # data or create a signed provider-bound request until that authority is integrated.
+        raise TrustedTransportFailure(
+            "disclosure_authority_unavailable",
+            "trusted disclosure authority is unavailable",
+        )
         request = self._request_payload(spec)
         request_id = request["request_id"]
         assert isinstance(request_id, str)

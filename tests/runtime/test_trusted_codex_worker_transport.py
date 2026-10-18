@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -62,6 +63,84 @@ def _request(key: SigningKey, **overrides: object) -> dict[str, object]:
         **payload,
         "signature": key.sign(_canonical_bytes(payload)).signature.hex(),
     }
+
+
+class _CountingSigner:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def sign(self, _message: bytes) -> None:
+        self.calls += 1
+        raise AssertionError("request signing must not be reached")
+
+
+def _assert_disclosure_denial_has_no_effects(
+    transport: object,
+    signer: _CountingSigner,
+    *,
+    queue_root: Path,
+    evidence_root: Path,
+    evidence_exists: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import runtime.integrations.trusted_codex_transport as codex_transport
+    from runtime.integrations import TrustedTransportFailure
+
+    spec_accesses: list[str] = []
+    effects: list[str] = []
+
+    class _UninspectableSpec:
+        def __getattribute__(self, name: str) -> object:
+            spec_accesses.append(name)
+            raise AssertionError("session data must not be read before disclosure authorization")
+
+    def blocked(label: str):
+        def fail(*_args: object, **_kwargs: object) -> None:
+            effects.append(label)
+            raise AssertionError(f"unexpected transport effect: {label}")
+
+        return fail
+
+    class _NoClockAccess:
+        def __getattr__(self, name: str) -> object:
+            effects.append(f"clock:{name}")
+            raise AssertionError("clock access must not occur before disclosure authorization")
+
+    with monkeypatch.context() as guard:
+        for method in (
+            "resolve",
+            "is_symlink",
+            "is_dir",
+            "exists",
+            "is_file",
+            "read_bytes",
+            "write_bytes",
+            "write_text",
+            "open",
+            "unlink",
+        ):
+            guard.setattr(Path, method, blocked(f"path:{method}"))
+        guard.setattr(codex_transport, "_write_atomic", blocked("queue-write"))
+        guard.setattr(codex_transport, "_write_receipt_once", blocked("evidence-write"))
+        guard.setattr(codex_transport, "_canonical_bytes", blocked("serialization"))
+        guard.setattr(codex_transport, "_sha256", blocked("hashing"))
+        guard.setattr(codex_transport, "time", _NoClockAccess())
+        with pytest.raises(TrustedTransportFailure) as raised:
+            transport.run(_UninspectableSpec())  # type: ignore[attr-defined]
+
+    assert raised.value.code == "disclosure_authority_unavailable"
+    assert str(raised.value) == "trusted disclosure authority is unavailable"
+    assert spec_accesses == []
+    assert effects == []
+    assert signer.calls == 0
+    assert not os.path.lexists(queue_root)
+    if evidence_exists:
+        assert os.listdir(evidence_root) == []
+    else:
+        assert not os.path.lexists(evidence_root)
+    assert transport.last_request_sha256 is None  # type: ignore[attr-defined]
+    assert transport.last_response_sha256 is None  # type: ignore[attr-defined]
+    assert transport.last_observation is None  # type: ignore[attr-defined]
 
 
 @pytest.mark.parametrize("count", [1, 2])
@@ -818,131 +897,68 @@ def test_post_response_process_failure_records_its_boundary_before_capture(
     assert capture_reached is False
 
 
-def test_qualification_transport_keeps_signed_request_and_response_receipts(tmp_path: Path) -> None:
-    import threading
-    import time
-
-    from runtime.integrations import SessionSpec
+def test_qualification_transport_denies_before_writing_signed_receipts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from runtime.integrations.trusted_codex_transport import (
         HostCodexWorkerTransport,
-        _canonical_bytes,
     )
 
-    request_key = SigningKey.generate()
-    response_key = SigningKey.generate()
     queue = tmp_path / "queue"
     workspace_root = tmp_path / "workspaces"
     workspace = workspace_root / "ws-bootstrap-receipts"
     workspace.mkdir(mode=0o700, parents=True)
     evidence_root = workspace / "qualification-evidence"
     evidence_root.mkdir(mode=0o700)
-    spec = SessionSpec(
-        workspace=workspace,
-        prompt="bounded test prompt",
-        allowed_tools=(),
-        read_scopes=(),
-        timeout_s=1,
-        task_id="t-receipt-test",
-        goal_id="g-receipt-test",
-        run_id="r-receipt-test",
-        stage="IMPLEMENT",
-    )
-    response_envelopes: list[bytes] = []
-
-    def publish_signed_failure() -> None:
-        deadline = time.monotonic() + 2
-        while time.monotonic() < deadline:
-            requests = list(queue.glob("*.request.json"))
-            if requests:
-                request = json.loads(requests[0].read_bytes())
-                payload = {
-                    "schema": "paeos.trusted-codex-worker-service/1",
-                    "ok": False,
-                    "request_id": request["request_id"],
-                    "error_code": "protocol_failure",
-                    "error": "trusted Codex launch rejected or failed closed",
-                }
-                signed = response_key.sign(_canonical_bytes(payload)).signature.hex()
-                raw = _canonical_bytes({"payload": payload, "signature": signed})
-                response_envelopes.append(raw)
-                (queue / f"{request['request_id']}.response.json").write_bytes(raw)
-                return
-            time.sleep(0.001)
-
-    worker = threading.Thread(target=publish_signed_failure)
-    worker.start()
+    request_signer = _CountingSigner()
     transport = HostCodexWorkerTransport(
         queue_root=queue,
         workspace_root=workspace_root,
-        request_signing_key=request_key,
-        response_verify_key=response_key.verify_key,
+        request_signing_key=request_signer,  # type: ignore[arg-type]
+        response_verify_key=SigningKey.generate().verify_key,
         timeout_s=1,
         evidence_root=evidence_root,
     )
-    result = transport.run(spec)
-    worker.join(timeout=2)
-
-    request_receipt = evidence_root / "request-envelope.json"
-    response_receipt = evidence_root / "response-envelope.json"
-    assert result.failure_code == "protocol_failure"
-    assert request_receipt.is_file()
-    assert response_receipt.read_bytes() == response_envelopes[0]
-    assert (
-        transport.last_request_sha256
-        == __import__("hashlib").sha256(request_receipt.read_bytes()).hexdigest()
-    )
-    assert (
-        transport.last_response_sha256
-        == __import__("hashlib").sha256(response_receipt.read_bytes()).hexdigest()
+    _assert_disclosure_denial_has_no_effects(
+        transport,
+        request_signer,
+        queue_root=queue,
+        evidence_root=evidence_root,
+        evidence_exists=True,
+        monkeypatch=monkeypatch,
     )
 
 
-def test_qualification_transport_preserves_prepared_receipt_after_ambiguous_timeout(
-    tmp_path: Path,
+def test_qualification_transport_denies_before_ambiguous_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from runtime.integrations import SessionSpec
     from runtime.integrations.trusted_codex_transport import (
         HostCodexWorkerTransport,
-        TrustedCodexTransportError,
     )
 
-    request_key = SigningKey.generate()
     workspace_root = tmp_path / "workspaces"
     workspace = workspace_root / "ws-bootstrap-timeout"
     workspace.mkdir(mode=0o700, parents=True)
     evidence_root = workspace / "qualification-evidence"
     evidence_root.mkdir(mode=0o700)
     queue = tmp_path / "queue"
+    request_signer = _CountingSigner()
     transport = HostCodexWorkerTransport(
         queue_root=queue,
         workspace_root=workspace_root,
-        request_signing_key=request_key,
+        request_signing_key=request_signer,  # type: ignore[arg-type]
         response_verify_key=SigningKey.generate().verify_key,
         timeout_s=0.001,
         evidence_root=evidence_root,
     )
-    spec = SessionSpec(
-        workspace=workspace,
-        prompt="one bounded request",
-        allowed_tools=(),
-        read_scopes=(),
-        timeout_s=1,
-        task_id="t-timeout-test",
-        goal_id="g-timeout-test",
-        run_id="r-timeout-test",
-        stage="IMPLEMENT",
+    _assert_disclosure_denial_has_no_effects(
+        transport,
+        request_signer,
+        queue_root=queue,
+        evidence_root=evidence_root,
+        evidence_exists=True,
+        monkeypatch=monkeypatch,
     )
-
-    with pytest.raises(TrustedCodexTransportError, match="deadline exceeded"):
-        transport.run(spec)
-
-    receipt = evidence_root / "request-envelope.json"
-    assert receipt.is_file()
-    assert (
-        transport.last_request_sha256
-        == __import__("hashlib").sha256(receipt.read_bytes()).hexdigest()
-    )
-    assert list(queue.glob("*.request.json")) == []
 
 
 def test_qualification_wrapper_sends_one_request_and_preserves_unknown_workspace(
