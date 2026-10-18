@@ -1,0 +1,93 @@
+{
+  "base": "aad38df810538874d6a749779705e1290fb5c0fb",
+  "files": [
+    {
+      "path": "ops/autonomous_run.py",
+      "sha256": "0426f7c4743f788579f829bf15857d2b37303db97fc928fc407acbd1c8b71f6c"
+    },
+    {
+      "path": "tests/ops/test_explicit_runtime_selection.py",
+      "sha256": "5ef8953a808d43971254cff43874ed6970f8c099a77247170aeabe78937adb5f"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "32e592ecb5ee68aa37474baacc19c87c15cf6ac93aeb385648410a9d50409bc2"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "451f4b2b9133ef5034dcf4959ca070ac6c54313b81b29a6749d176d42b0ee03a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/REPORT.md",
+      "sha256": "8f411dbbcbb905adf860d1d4f5210547c2f0ec0c0bcf32e728303c22902583a9"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/SCOPE.json",
+      "sha256": "1c19c697b7c370206aa80a860f3b8f0d5be896867cd5cb908c2567b8d1d61dd4"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/baseline.command.json",
+      "sha256": "133a2ebfbb2f0a45741ea53c1904448f5aaf8134e02d3440f78873f5d602293a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/baseline.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/baseline.stdout.txt",
+      "sha256": "a7d760350877155b8609f2c570ba7f5e2f3b7f916f86374f7062394b4a17d852"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/candidate.command.json",
+      "sha256": "69ef4fa6ca5ac91957785a7d21db0f6fd97e317c31a00a6a5c5a081ec1787c8a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/candidate.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/candidate.stdout.txt",
+      "sha256": "ede8debcddc890e1c1c8411d16124e18c5db17149497f24f6e7340f6cd6c6b3a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/final.command.json",
+      "sha256": "f3737b3c5f7e84bc584a8fd99aaef48344fffb4b7159d73970da8f68c8545923"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/final.stdout.txt",
+      "sha256": "742e28faba032364f8a0a3f8a6e11a22ff1709122a4c696c4f256c9952c5ffd6"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/full-suite.command.json",
+      "sha256": "c54919ee3276c4a92ca6acadd06c15acebd278cfb737d66e334e5420362c2d3e"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/full-suite.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/full-suite.stdout.txt",
+      "sha256": "b3e0e99b8a997d083daf3eb52bd4ce59485a34c46b67f7e3fbb9c2df3ea7af17"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/run_full_suite.py",
+      "sha256": "6609b74b604460370f3902bf9e2521f378fe3183b5c1c52a7906ec6beff83a53"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/run_verification.py",
+      "sha256": "79127701c68cacedcd9ff7a1ee074ee2a544680af04003210d881c870db21303"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/static-checks.json",
+      "sha256": "35e759b1f3929a8b76a6869d080b3451f24d9ad7cd1448bbcaae8e133b476319"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/secret-scan.json",
+      "sha256": "20409b5f26af0824cdd22ffb1c57953e01ed18de052e5b949ac7477e4cafed98"
+    }
+  ]
+}

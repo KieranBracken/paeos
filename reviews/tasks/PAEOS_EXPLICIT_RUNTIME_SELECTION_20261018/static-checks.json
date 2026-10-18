@@ -1,0 +1,71 @@
+{
+  "base_lint": {
+    "exit": 1,
+    "stdout": "[\n  {\n    \"cell\": null,\n    \"code\": \"I001\",\n    \"end_location\": {\n      \"column\": 53,\n      \"row\": 101\n    },\n    \"filename\": \"/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/ops/autonomous_run.py\",\n    \"fix\": {\n      \"applicability\": \"safe\",\n      \"edits\": [\n        {\n          \"content\": \"from __future__ import annotations\\n\\nimport contextlib\\nimport hashlib\\nimport json\\nimport os\\nimport stat\\nimport sys\\nimport threading\\nimport time\\nimport uuid\\nfrom collections.abc import Sequence\\nfrom pathlib import Path\\nfrom types import SimpleNamespace\\n\\nfrom kernel.cas import CAS, FilesystemCasStore\\nfrom kernel.keystore import load_or_create_signing_key\\nfrom kernel.ledger import Ledger\\nfrom kernel.ledger_sqlite import SqliteLedgerStore\\nfrom kernel.types import ArtifactRef, Role, StageId\\nfrom nacl.signing import SigningKey, VerifyKey\\nfrom runtime.builder_transport import BuilderTransportReadiness\\nfrom runtime.court.completeness_firewall import load_authoritative_manifest\\nfrom runtime.evolution import EvolutionLayer\\nfrom runtime.friction import FrictionCategory, classify_friction, record_friction\\nfrom runtime.integrations import ClaudeCodeRuntime, SessionResult, TrustedTransportFailure\\nfrom runtime.integrations.gemini36_adversary_route import (\\n    HostGemini36AdversaryTransport,\\n    parent_gemini36_adversary_exchange,\\n)\\nfrom runtime.integrations.gemini36_critic_route import (\\n    HostGemini36CriticTransport,\\n    parent_gemini36_exchange,\\n)\\nfrom runtime.integrations.hybrid import CodexRuntime, GlmRuntime, HybridRuntime\\nfrom runtime.integrations.trusted_codex_planner_transport import (\\n    HostCodexPlannerTransport,\\n)\\nfrom runtime.integrations.trusted_codex_transport import (\\n    DEFAULT_BUILDER_TRANSPORT_QUALIFICATION,\\n    DEFAULT_BUILDER_TRANSPORT_VERIFY_KEY,\\n    DEFAULT_CODEX_REQUEST_KEY,\\n    DEFAULT_CODEX_RESPONSE_VERIFY_KEY,\\n    DEFAULT_CODEX_WORKSPACE_ROOT,\\n    HostCodexWorkerTransport,\\n)\\nfrom runtime.orchestrator import (\\n    Intake,\\n    RunOutcome,\\n    RunStatus,\\n    SoftLoop,\\n    StagePlaybook,\\n    durable_scar_store,\\n)\\nfrom runtime.planner_transport import (\\n    L10_FAMILY_AMENDMENT_ID,\\n    LunaAdversaryBinding,\\n    LunaAdversaryBindingNotReady,\\n    LunaCriticBinding,\\n    PlannerTransportNotReady,\\n    PlannerTransportReadiness,\\n    l10_amendment_definition_hash,\\n)\\nfrom runtime.run_state_registry import RunStateRegistry\\nfrom runtime.scheduler import (\\n    ConcurrentScheduler,\\n    ContinuousScheduler,\\n    EconomicGovernor,\\n    GlobalBudget,\\n)\\nfrom runtime.selfhost import DEFAULT_BUDGETS, parse_backlog\\nfrom runtime.sidecar_scorer import SidecarStageScorer\\nfrom runtime.transports.mcp.transport import McpWorkerTransport\\n\\nfrom ops.p1_runtime_l14_audit import audit_candidate\\nfrom runtime.autonomy import (\\n    ActionPermission,\\n    AuthorityEnvelope,\\n    AuthorityTier,\\n    EdgeType,\\n    FindingClass,\\n    PersistentMissionController,\\n    TaskStatus,\\n)\\n\\n\",\n          \"end_location\": {\n            \"column\": 1,\n            \"row\": 103\n          },\n          \"location\": {\n            \"column\": 1,\n            \"row\": 18\n          }\n        }\n      ],\n      \"message\": \"Organize imports\"\n    },\n    \"location\": {\n      \"column\": 1,\n      \"row\": 18\n    },\n    \"message\": \"Import block is un-sorted or un-formatted\",\n    \"name\": \"unsorted-imports\",\n    \"noqa_row\": 18,\n    \"severity\": \"error\",\n    \"url\": \"https://docs.astral.sh/ruff/rules/unsorted-imports\"\n  }\n]",
+    "stderr": ""
+  },
+  "base_format": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "candidate_lint": {
+    "exit": 1,
+    "stdout": "[\n  {\n    \"cell\": null,\n    \"code\": \"I001\",\n    \"end_location\": {\n      \"column\": 53,\n      \"row\": 94\n    },\n    \"filename\": \"/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/ops/autonomous_run.py\",\n    \"fix\": {\n      \"applicability\": \"safe\",\n      \"edits\": [\n        {\n          \"content\": \"from __future__ import annotations\\n\\nimport contextlib\\nimport hashlib\\nimport json\\nimport os\\nimport stat\\nimport sys\\nimport threading\\nimport time\\nimport uuid\\nfrom collections.abc import Sequence\\nfrom pathlib import Path\\nfrom types import SimpleNamespace\\n\\nfrom kernel.cas import CAS, FilesystemCasStore\\nfrom kernel.keystore import load_or_create_signing_key\\nfrom kernel.ledger import Ledger\\nfrom kernel.ledger_sqlite import SqliteLedgerStore\\nfrom kernel.types import ArtifactRef, Role, StageId\\nfrom nacl.signing import SigningKey, VerifyKey\\nfrom runtime.builder_transport import BuilderTransportReadiness\\nfrom runtime.court.completeness_firewall import load_authoritative_manifest\\nfrom runtime.evolution import EvolutionLayer\\nfrom runtime.friction import FrictionCategory, classify_friction, record_friction\\nfrom runtime.integrations import ClaudeCodeRuntime, SessionResult, TrustedTransportFailure\\nfrom runtime.integrations.gemini36_adversary_route import (\\n    HostGemini36AdversaryTransport,\\n    parent_gemini36_adversary_exchange,\\n)\\nfrom runtime.integrations.gemini36_critic_route import (\\n    HostGemini36CriticTransport,\\n    parent_gemini36_exchange,\\n)\\nfrom runtime.integrations.hybrid import CodexRuntime, GlmRuntime, HybridRuntime\\nfrom runtime.integrations.trusted_codex_planner_transport import (\\n    HostCodexPlannerTransport,\\n)\\nfrom runtime.integrations.trusted_codex_transport import (\\n    DEFAULT_BUILDER_TRANSPORT_QUALIFICATION,\\n    DEFAULT_BUILDER_TRANSPORT_VERIFY_KEY,\\n    DEFAULT_CODEX_REQUEST_KEY,\\n    DEFAULT_CODEX_RESPONSE_VERIFY_KEY,\\n    DEFAULT_CODEX_WORKSPACE_ROOT,\\n    HostCodexWorkerTransport,\\n)\\nfrom runtime.orchestrator import (\\n    Intake,\\n    RunOutcome,\\n    RunStatus,\\n    SoftLoop,\\n    StagePlaybook,\\n    durable_scar_store,\\n)\\nfrom runtime.planner_transport import (\\n    L10_FAMILY_AMENDMENT_ID,\\n    LunaAdversaryBinding,\\n    LunaAdversaryBindingNotReady,\\n    LunaCriticBinding,\\n    PlannerTransportNotReady,\\n    PlannerTransportReadiness,\\n    l10_amendment_definition_hash,\\n)\\nfrom runtime.run_state_registry import RunStateRegistry\\nfrom runtime.scheduler import (\\n    ConcurrentScheduler,\\n    ContinuousScheduler,\\n    EconomicGovernor,\\n    GlobalBudget,\\n)\\nfrom runtime.selfhost import DEFAULT_BUDGETS, parse_backlog\\nfrom runtime.sidecar_scorer import SidecarStageScorer\\nfrom runtime.transports.mcp.transport import McpWorkerTransport\\n\\nfrom ops.p1_runtime_l14_audit import audit_candidate\\nfrom runtime.autonomy import (\\n    ActionPermission,\\n    AuthorityEnvelope,\\n    AuthorityTier,\\n    EdgeType,\\n    FindingClass,\\n    PersistentMissionController,\\n    TaskStatus,\\n)\\n\\n\",\n          \"end_location\": {\n            \"column\": 1,\n            \"row\": 96\n          },\n          \"location\": {\n            \"column\": 1,\n            \"row\": 11\n          }\n        }\n      ],\n      \"message\": \"Organize imports\"\n    },\n    \"location\": {\n      \"column\": 1,\n      \"row\": 11\n    },\n    \"message\": \"Import block is un-sorted or un-formatted\",\n    \"name\": \"unsorted-imports\",\n    \"noqa_row\": 11,\n    \"severity\": \"error\",\n    \"url\": \"https://docs.astral.sh/ruff/rules/unsorted-imports\"\n  }\n]",
+    "stderr": ""
+  },
+  "candidate_format": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "tests/ops/test_explicit_runtime_selection.py"
+    ],
+    "exit": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "test_format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "tests/ops/test_explicit_runtime_selection.py"
+    ],
+    "exit": 0,
+    "stdout": "1 file already formatted\n",
+    "stderr": ""
+  },
+  "source_changed_format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "--range",
+      "724-750",
+      "ops/autonomous_run.py"
+    ],
+    "exit": 0,
+    "stdout": "1 file already formatted\n",
+    "stderr": ""
+  },
+  "diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compilation": "PASS (in memory)",
+  "raw_evidence_diff": {
+    "exit": 2,
+    "reason": "Original pytest failure log contains trailing whitespace; retained unchanged. Source/test/document whitespace checked separately."
+  }
+}

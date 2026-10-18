@@ -1,0 +1,20 @@
+{
+  "base": "aad38df810538874d6a749779705e1290fb5c0fb",
+  "owner": "Assign PAEOS pre-P3 workers",
+  "authority": "Human-approved corrected plan E0-E3 offline repair, resumed 2026-10-18",
+  "source_manifest": [
+    "ops/autonomous_run.py",
+    "tests/ops/test_explicit_runtime_selection.py"
+  ],
+  "source_preimage_sha256": "87061c58bcd435a8f63a98d18f5bdc182a2f96236f39be2fc043edf01731b280",
+  "objective": "Reject omitted or invalid runtime selectors before filesystem/key/transport effects; preserve explicit supported choices without activating them.",
+  "forbidden": [
+    "provider calls",
+    "host key reads",
+    "installation",
+    "qualification",
+    "PAEOS admission",
+    "debt integration"
+  ],
+  "review": "No formal review in this package; final candidate review remains required"
+}

@@ -13962,3 +13962,11 @@ No source or test file changed. This is a local composition/refusal check, not P
 ALLOWED_NOW: publish this sanitized evidence-only checkpoint. Owner: Root bootstrap integrator.
 HELD: positive provider dispatch, production activation, Builder qualification/admission, DEBT-0258 and dependent debt work, Court qualification, and P3.
 AUTHORITY_OR_IMPLEMENTATION_GAP: this result proves only offline scheduler wiring and fail-closed missing/stale readiness behavior. Trusted P1 disclosure authority and current production qualification/admission remain separate gates; this verification wakes none of them.
+
+### 2026-10-18 — explicit runtime selection, no implicit Claude fallback
+
+At base `aad38df810538874d6a749779705e1290fb5c0fb`, the bounded offline repair changed only `ops/autonomous_run.py` plus a focused test file. Missing/unknown/unsupported standalone runtime selection now rejects before state creation or key/transport access; CLI selection is mandatory and validated before backlog reads. Explicit legacy choices remain separately gated; no provider was selected or activated by this repair.
+
+Discrimination: baseline11 failed/17 passed; final28 passed in1.31s, including real temporary scheduler/readiness composition. Scoped lint/format, compilation and diff checks pass; full-file import/format debt was reproduced on base. One integrated uv/pytest invocation returned exit2 with seven collection errors in3.47s; outputs are preserved, and no full-suite acceptance is claimed. Evidence: `reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/`. No provider, host-key read, installation, qualification, PAEOS admission, Court action, debt integration or formal review occurred.
+
+ALLOWED_NOW: Root sanitized checkpoint and source-bound response-producer investigation; completion overseer coordinates. HELD: positive egress, activation, qualification, Chat1 admission, dependent debts/P3 until exact boundary/review/authority/readiness gates. AUTHORITY_OR_IMPLEMENTATION_GAP: trusted positive disclosure/enrollment, signed producer verification, observed model evidence and authenticated task admission remain unresolved. Chat1 retains sole D0258 integration.

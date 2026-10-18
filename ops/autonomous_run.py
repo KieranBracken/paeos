@@ -1,18 +1,11 @@
-"""Live fully-autonomous self-hosting run — Phase 3 Milestone 1.
+"""Compose the autonomous scheduler with an explicitly selected runtime.
 
-The culminating composition: a live `claude` session (launched by `ClaudeCodeRuntime` with
-`--mcp-config`) reaches the **CourtServer** MCP tool, which writes the session's own probative
-evidence into the **court pool**; the `SoftLoop` pulls that evidence via the `EvidenceSource`
-port and adjudicates it; the whole loop is pulled by the `ContinuousScheduler` (Stage-19 RESTART)
-and bounded by the `EconomicGovernor` (K11 budget conservation).
+The runtime supplies worker evidence to the Court pool; SoftLoop consumes and
+adjudicates it. Selecting a runtime does not establish its disclosure authority,
+qualification, or task admission. Each applicable gate remains independently required.
 
-    claude --mcp-config → court_server.py → FileCourtEvidencePool → EvidenceSource → seal
-
-This is a **deployment** entry point (needs `claude` auth + real tokens), not unit-tested — the
-adapters it composes are (`runtime/transports/`, `runtime/scheduler.py`, `runtime/integrations`).
-The core runtime it drives imports zero vendor SDK; only `runtime/transports/mcp/` touches MCP.
-
-Usage:  python ops/autonomous_run.py <backlog.json> <state_dir>
+Runtime selection is mandatory; a missing or unknown selector never chooses a provider.
+Usage: python ops/autonomous_run.py <backlog.json> <state_dir> <max_concurrency> <max_runs> <runtime_type>
 """
 
 from __future__ import annotations
@@ -727,15 +720,35 @@ def _execute_nested_remediation_run(
     )
 
 
+def _validate_runtime_type(runtime_type: str | None) -> str:
+    if runtime_type == "bound-cline":
+        raise ValueError(
+            "bound-cline runtime requires an explicit BoundClineWorkerRuntime configuration; "
+            "autonomous_run will not infer provider, profile, qualification, or worktree values"
+        )
+    if runtime_type not in (
+        "claude",
+        "codex",
+        "hybrid",
+        "glm",
+        "cline",
+        "chat-bridge",
+        "antigravity",
+    ):
+        raise ValueError("an explicit supported runtime_type is required")
+    return runtime_type
+
+
 def build_scheduler(
     state_dir: Path,
     repo_root: Path,
     *,
     global_budget: GlobalBudget,
     max_concurrency: int = 1,
-    runtime_type: str = "claude",
+    runtime_type: str | None = None,
 ) -> tuple[ContinuousScheduler | ConcurrentScheduler, EvolutionLayer, Ledger]:
     """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`."""
+    runtime_type = _validate_runtime_type(runtime_type)
     state_dir.mkdir(parents=True, exist_ok=True)
     signing_key = load_or_create_signing_key(state_dir / "seal.key")
     manifest_path = (
@@ -849,12 +862,7 @@ def build_scheduler(
             workspace_source=repo_root,
             artifact_resolver=cas.get,
         )
-    elif runtime_type == "bound-cline":
-        raise ValueError(
-            "bound-cline requires an explicit BoundClineWorkerRuntime configuration; "
-            "autonomous_run will not infer provider, profile, qualification, or worktree values"
-        )
-    else:
+    elif runtime_type == "claude":
         runtime = ClaudeCodeRuntime(
             state_root=state_dir.resolve(),
             workspace_root=workspace_base,
@@ -998,18 +1006,22 @@ def build_scheduler(
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    if not 2 <= len(argv) <= 5:
+    if len(argv) != 5:
         print(
             "usage: python ops/autonomous_run.py <backlog.json> <state_dir> "
-            "[max_concurrency] [max_runs] "
-            "[runtime_type: claude|codex|hybrid|glm|chat-bridge|bound-cline]",
+            "<max_concurrency> <max_runs> "
+            "<runtime_type: codex|hybrid|claude|glm|cline|chat-bridge|antigravity>",
             file=sys.stderr,
         )
         return 64
     backlog_path, state_dir = Path(argv[0]), Path(argv[1])
-    max_concurrency = int(argv[2]) if len(argv) >= 3 else 1
-    max_runs = int(argv[3]) if len(argv) >= 4 else 25
-    runtime_type = argv[4] if len(argv) >= 5 else "claude"
+    try:
+        runtime_type = _validate_runtime_type(argv[4])
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 64
+    max_concurrency = int(argv[2])
+    max_runs = int(argv[3])
     repo_root = Path.cwd()
 
     backlog = parse_backlog(json.loads(backlog_path.read_text(encoding="utf-8")))

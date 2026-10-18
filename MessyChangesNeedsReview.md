@@ -5542,3 +5542,15 @@ Offline scoped candidate: the uploader rejects before processing text or attachm
 The offline candidate makes the fixed `HostCodexWorkerTransport.run` fail closed before reading session data, signing, filesystem/queue/evidence access, or response polling. The inherited Planner route is denied by the same first-operation guard. The former three positive-run cases now check zero effects; the public Planner entrypoint is included. The exact source/test preimages, preserved baseline failures, 11 passing focused/response-validation tests, lint, format, compilation, whitespace and scoped secret-pattern scan are recorded in `reviews/tasks/PAEOS_TRUSTED_CODEX_DEFAULT_DENY_20261018/`.
 
 This is a deliberately blocking containment candidate: no trusted classification or positive disclosure authority is integrated, so it disables all use of these two fixed routes. No provider call, production activation, PAEOS admission, qualification, debt integration or formal independent review occurred. P1 remains open; do not restore positive egress until the actual outbound frame and its data/derivation closure are checked against trusted classification and destination permission under a separately authorized scope.
+
+### 2026-10-18 — explicit runtime selection candidate
+
+# Explicit runtime selection recovery checkpoint
+
+Base: `aad38df810538874d6a749779705e1290fb5c0fb`.
+
+`build_scheduler` now rejects missing, unknown and unsupported standalone `bound-cline` selection before state creation, signing-key access or transport composition. The CLI requires an explicit selector and rejects missing/invalid selectors before reading the backlog. Existing explicitly selected routes remain selectable, subject to their separate denials and qualifications. No route was enabled or invoked. Claude is no longer the implicit fallback. This does not remove the separately configured Claude adapter.
+
+Frozen source/test scope: `ops/autonomous_run.py` and `tests/ops/test_explicit_runtime_selection.py`. Bounded offline repair under the human-approved corrected plan, resumed on 18 October. No PAEOS admission is claimed.
+
+Review and activation remain held. See `reviews/tasks/PAEOS_EXPLICIT_RUNTIME_SELECTION_20261018/REPORT.md` for exact positive/negative tests and the seven full-suite collection failures.
