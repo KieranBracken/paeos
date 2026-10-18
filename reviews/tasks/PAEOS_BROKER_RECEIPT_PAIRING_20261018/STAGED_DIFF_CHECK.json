@@ -1,0 +1,32 @@
+{
+  "checkpoint": "6624c4ef177db9c5ffd92255a2721c52ec758358",
+  "full_diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check",
+      "c88528a3b8f505e2b879e6f25773c55a534ecd80",
+      "6624c4ef177db9c5ffd92255a2721c52ec758358"
+    ],
+    "exit_code": 2,
+    "stdout": "reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:17: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:23: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:47: trailing whitespace.\n+E             \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:68: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:74: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:110: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:119: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:139: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:148: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:168: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt:177: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:17: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:23: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:47: trailing whitespace.\n+E             \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:68: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:74: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:110: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:119: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:139: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:148: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:168: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:177: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:211: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:217: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:222: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:225: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:228: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:231: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:234: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:237: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:255: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:268: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:279: trailing whitespace.\n+    \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:285: trailing whitespace.\n+tests/runtime/test_trusted_codex_worker_transport.py:241: \nreviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt:286: trailing whitespace.\n+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n",
+    "stderr": ""
+  },
+  "excluding_immutable_raw_failure_logs": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check",
+      "c88528a3b8f505e2b879e6f25773c55a534ecd80",
+      "6624c4ef177db9c5ffd92255a2721c52ec758358",
+      "--",
+      ".",
+      ":(exclude)reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/baseline-red.stdout.txt",
+      ":(exclude)reviews/tasks/PAEOS_BROKER_RECEIPT_PAIRING_20261018/consumer-red.stdout.txt"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "disposition": "Full diff whitespace check fails only on preserved pytest failure logs. Source and all remaining package files pass. Original failure log bytes retained unchanged. The checkpoint command ran after the scan script failed because that shell sequence did not stop on the nonzero exit; this addendum records the actual result, not a full-diff pass."
+}
