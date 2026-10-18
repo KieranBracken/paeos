@@ -1,0 +1,12 @@
+{
+  "main_status_sha256": "e9b2b8a267896cd4445ba93a90a90bc53b6f41e1b0f65abc3e8abe7f0bd30b77",
+  "main_status_entries": 3328,
+  "private_inventory": "/private/tmp/paeos-execution-inventory-20261018/main-status.z",
+  "preexisting_untracked_test": {
+    "path": "tests/runtime/test_builder_transport_gate.py",
+    "sha256": "efa280cab0f1617a5245ef8bf5260192ba15a5554182cf3b6fcd16359e746fe4"
+  },
+  "original_review_sha256": "6235d412d625b0e4bf4194d7ad21c9b43245bb2c85d960f752e2ec1ba7e5064b",
+  "private_runtime_snapshot": "NOT_CREATED",
+  "encrypted_offdevice_recovery": "NOT_PROVEN"
+}

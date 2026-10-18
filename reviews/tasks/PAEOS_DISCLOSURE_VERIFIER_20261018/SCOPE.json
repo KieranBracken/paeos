@@ -1,0 +1,51 @@
+{
+  "schema": "paeos.offline-repair-scope/1",
+  "base_commit": "6043fd77107dbba7e971fb328f38453144c6adab",
+  "authority": "Human request PLEASE IMPLEMENT THIS PLAN, PAEOS P1-P9 corrected execution plan, E0/E2; bounded offline implementation only. Not runtime admission or Founder policy ratification.",
+  "owner": "Current coordinating chat; Chat 1 retains exclusive D0258 integration",
+  "workspace": "/private/tmp/paeos-builder-qualification-bootstrap-20261017",
+  "source_manifest": [
+    "paeos/model_router/disclosure_policy.py",
+    "tests/model_router/test_disclosure_policy.py"
+  ],
+  "evidence_manifest_prefix": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/",
+  "append_only_logs": [
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+    "MessyChangesNeedsReview.md"
+  ],
+  "permitted_effects": [
+    "offline source edit",
+    "synthetic tests",
+    "local review",
+    "sanitized explicit-manifest checkpoint and push"
+  ],
+  "forbidden_effects": [
+    "host key generation or enrollment",
+    "production policy installation",
+    "provider calls",
+    "service activation",
+    "runtime state mutation",
+    "D0258 integration",
+    "authority promotion"
+  ],
+  "completion_boundary": "One captured pure-verifier package with focused verification and review; runtime consumers require a separately frozen dependent scope.",
+  "source_authority_pins": [
+    {
+      "path": "architecture/PAEOS_DISCLOSURE_CLASS_AUTHORIZATION_SPEC_v1.md",
+      "sha256": "519828a5425e7a99a3431f727d6af4f4c90ddcd6b8adbee395966571a2329c1c"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-11-paeos-disclosure-class-authorization.md",
+      "sha256": "689932b3c63d6109c93c562e80d43d5f80d719263786aaf8d8ca58b7cba3f4be"
+    },
+    {
+      "path": "ops/backlogs/intake-disclosure-class-authorization.json",
+      "sha256": "f8e24e1272886c53aa5ad55f924ed2792da01fa38810d993f5a4849308f86ea0"
+    }
+  ],
+  "rulings": [
+    "Implement the previously specified dormant Task 1 using current user-authorized offline bootstrap exception. Do not execute the old intake or infer current phase state from stale headers.",
+    "Skip __init__ export: direct module use is sufficient; no route becomes active.",
+    "Signature verification is a mathematical fact only, not a current disclosure permit. Revocation, trusted enrollment, bundle binding, egress and attempts remain unimplemented."
+  ]
+}

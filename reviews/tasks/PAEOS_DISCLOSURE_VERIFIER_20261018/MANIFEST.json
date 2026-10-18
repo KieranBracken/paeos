@@ -1,0 +1,52 @@
+{
+  "schema": "paeos.source-recovery-manifest/1",
+  "base_commit": "6043fd77107dbba7e971fb328f38453144c6adab",
+  "claim": "INACTIVE_PREREQUISITE_CHECKPOINT_NOT_QUALIFICATION",
+  "files": [
+    {
+      "path": "paeos/model_router/disclosure_policy.py",
+      "bytes": 15696,
+      "sha256": "5c58f90c321a7f6bfadeddef912372baa1f814219c2f78bcf347fb833167a3c6"
+    },
+    {
+      "path": "tests/model_router/test_disclosure_policy.py",
+      "bytes": 14674,
+      "sha256": "85c7772687993d8f3028267eba4fd419c0201d4f7f34fd333adc1d1acfd829ed"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1430305,
+      "sha256": "cf23d3b9c04cd93c89dfba0c9d0fec982f878cb4d583c7bc143320a0ffcbfcf7"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 646115,
+      "sha256": "e9849a09cedccd7b249b5a021ffbbbfb3d004d946edf4267982a56161e019ad0"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/SCOPE.json",
+      "bytes": 2386,
+      "sha256": "99c83b5e0cb3c32fb572185ed057256a467b8ee5b4c364ec8b5d6cb56c045b37"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/preservation.json",
+      "bytes": 583,
+      "sha256": "3a968c18c7d490ef219a9b8adf4e1120e0d02d096857572cf824b70e1d9e7b61"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/verification.json",
+      "bytes": 3472,
+      "sha256": "2071b2c4fe85cb221b0011e5640d5656d543a441cbd56be2c6a17b3062f5caa3"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/REPORT.md",
+      "bytes": 4997,
+      "sha256": "a30cb1a39d151bcf9f8d2af8a781b2cdc2357a3deeec3699df2988e6180f36b4"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/secret-scan.json",
+      "bytes": 773,
+      "sha256": "7ba642981d47927b0c766eea29b6d5ea47da2a020da32417c38ef1597e1c5bf9"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema": "paeos.offline-disclosure-verification/1",
+  "base_commit": "6043fd77107dbba7e971fb328f38453144c6adab",
+  "source_files": [
+    "paeos/model_router/disclosure_policy.py",
+    "tests/model_router/test_disclosure_policy.py"
+  ],
+  "focused_tests": {
+    "new_policy_cases": 125,
+    "integrated_passed": 183,
+    "failed": 0,
+    "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync python -m pytest -o addopts= -q tests/model_router/test_disclosure_policy.py tests/model_router/test_catalog_and_privacy.py tests/ops/test_trusted_codex_installer_binding.py tests/runtime/test_trusted_codex_worker_transport.py tests/runtime/test_builder_transport_readiness.py tests/runtime/test_trusted_codex_client.py",
+    "stdout_sha256": "3a6c506c36200c25271cd87135a11191a5833b16ce8babecb02c163cc16c5b81"
+  },
+  "red_controls": {
+    "missing_module": "Pinned python -m pytest failed with ModuleNotFoundError before implementation",
+    "free_variant": "1 failed, 124 passed before correcting exact :free route variant validation"
+  },
+  "static_checks": {
+    "ruff": "PASS",
+    "format": "PASS",
+    "compile": "PASS",
+    "diff_check": "PASS"
+  },
+  "full_suite": {
+    "command": "PYTHONPATH=/private/tmp/paeos-builder-qualification-bootstrap-20261017 UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync pytest",
+    "exit_code": 2,
+    "result": "FAIL_COLLECTION",
+    "errors": [
+      "tests/contracts/test_idea_graph_inspiration_adapter.py",
+      "tests/contracts/test_kae_lof_federation_adapter.py",
+      "tests/contracts/test_orca_mission_control_adapter.py",
+      "tests/contracts/test_sentium_shadow_conformance_harness.py",
+      "tests/ops/test_run_autonomy_canary.py",
+      "tests/runtime/test_architectural_assurance.py",
+      "tests/runtime/test_builder_transport_gate.py",
+      "tests/runtime/test_claude_cli_transport.py",
+      "tests/runtime/test_court_taint_index.py",
+      "tests/runtime/test_evolution.py",
+      "tests/runtime/test_evolution_ledger.py",
+      "tests/runtime/test_friction.py",
+      "tests/runtime/test_ledger_model_attribution.py",
+      "tests/runtime/test_mcp_transport.py",
+      "tests/runtime/test_memory_lifetime_boundary.py",
+      "tests/runtime/test_r4_full_chain_proof.py",
+      "tests/runtime/test_scheduler.py",
+      "tests/runtime/test_selfhost.py",
+      "tests/runtime/test_selfhost_cli.py",
+      "tests/runtime/test_soft_loop.py",
+      "tests/runtime/test_transport.py",
+      "tests/runtime/test_verification.py"
+    ],
+    "error_count": 22,
+    "stdout_sha256": "5faec3c1ac41341864619dc29edda58f806988fde052c6e7e5cc1b44cb8437a9",
+    "runs": 1
+  },
+  "limitations": [
+    "Pure signature and schema verification only; no trusted host enrollment, current revision or revocation validation.",
+    "No production consumer, transport enforcement, bundle validation or attempt reservation.",
+    "V1 exact FREE artifacts do not cover Codex subscription entitlement, standing derivatives or named limited-retention INTERNAL policy.",
+    "The initial pytest console entrypoint resolved host packages; accepted results use pinned invocation plus candidate import-origin assertion.",
+    "No full-suite acceptance."
+  ],
+  "effects": {
+    "provider_calls": 0,
+    "host_install": false,
+    "qualification_request": false,
+    "new_paeos_admission": false,
+    "debt_integration": false,
+    "formal_security_review": "PENDING"
+  },
+  "gate": "P1_REMAINS"
+}
