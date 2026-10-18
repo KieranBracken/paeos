@@ -1,0 +1,68 @@
+{
+  "schema": "paeos.recovery-explicit-file-manifest/1",
+  "kind": "planning checkpoint; no runtime qualification",
+  "base": "2ec6ca1a6e8ecb3eff611781e0c59905dbd0c19b",
+  "files": [
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-p1-p9-execution-guide.md",
+      "sha256": "670a6253ba734cddfa292e3395b238f374c2e577a21cef92522fd75a0fb3e17d",
+      "bytes": 17077
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/bootstrap.md",
+      "sha256": "09b4beebff5abf8be6b561ed2e3635ed07b6b328e01d80d90f398b4a733e908c",
+      "bytes": 24771
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/work-packages.md",
+      "sha256": "ef028ad8637de5fca3552a24741e0190f44f13ca7606b938b96b13ae05b6b5de",
+      "bytes": 34209
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/operations.md",
+      "sha256": "de7b711dce469e4701dbe47421da7f04766c78cab424ee8c2c3eae73f28b13fd",
+      "bytes": 13393
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/programme-source.md",
+      "sha256": "ac465bb6520672c5d3549703872554509422aff234bf681a2d72804c95705997",
+      "bytes": 27363
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/dependency-dag-source.md",
+      "sha256": "562db8cf812ec66380635188a1cbf0aacead2af0c9a09c982f3631c8db7ad28e",
+      "bytes": 7022
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/p5-design-source.md",
+      "sha256": "78917e17a1930f7e408643f2112cc6a0ce969c1f39e8de125b9621017d590081",
+      "bytes": 18195
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/source-inventory.json",
+      "sha256": "2bd7756d1818931fc477cf7dc92b8f18df2093d43981365c6711107b288e7572",
+      "bytes": 14142
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/execution-map.json",
+      "sha256": "3c4823c854d60982ba594aae04b0e68b28081d899ea6e8052caa8896954e0561",
+      "bytes": 8964
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-luna-guide/plan-verification.json",
+      "sha256": "dfa8f3b139adcf232ac424b2c913b611159fd9ef3af361e58ab47710a5c683e0",
+      "bytes": 1705
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "cb255aceffbb359b63b98d2f5f0c3a4ee7d26fef489760caf033011c7ef5869d",
+      "bytes": 1484686
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "abfcdb39730496090f5db1b53a425276e11ae0c64c45a4952ee5a3e13c440f28",
+      "bytes": 663074
+    }
+  ],
+  "manifest_self_excluded": true
+}

@@ -1,0 +1,310 @@
+{
+  "schema": "paeos.planning-source-inventory/1",
+  "date": "2026-10-18",
+  "implementation_base": "2ec6ca1a6e8ecb3eff611781e0c59905dbd0c19b",
+  "runtime_effects": "NONE",
+  "private_key_reads": "NONE",
+  "sources": [
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "docs/superpowers/plans/2026-09-08-pre-sentium-ecosystem-remediation-p1-p9.md",
+      "sha256": "ac465bb6520672c5d3549703872554509422aff234bf681a2d72804c95705997",
+      "snapshot": "programme-source.md",
+      "role": "historical source; October12 reconciliation and later human instructions control conflicts"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "reviews/audits/completeness/12_REMEDIATION_DEPENDENCY_DAG.md",
+      "sha256": "562db8cf812ec66380635188a1cbf0aacead2af0c9a09c982f3631c8db7ad28e",
+      "snapshot": "dependency-dag-source.md",
+      "role": "historical source; October12 reconciliation and later human instructions control conflicts"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "docs/superpowers/specs/2026-09-07-phase-5-substrate-capability-completion-design.md",
+      "sha256": "78917e17a1930f7e408643f2112cc6a0ce969c1f39e8de125b9621017d590081",
+      "snapshot": "p5-design-source.md",
+      "role": "historical source; October12 reconciliation and later human instructions control conflicts"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "paeos/model_router/disclosure_policy.py",
+      "present": true,
+      "sha256": "5c58f90c321a7f6bfadeddef912372baa1f814219c2f78bcf347fb833167a3c6",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "paeos/model_router/disclosure_store.py",
+      "present": true,
+      "sha256": "2307d0707c5fedf595e705f82f0a0e7c39ee07d302ca79943edf36261f1f6a26",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "paeos/model_router/state.py",
+      "present": true,
+      "sha256": "836d018ae3d64e3c560c9f5b8e1cacde4d297dde29689756c6e84bbc773fe640",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "present": true,
+      "sha256": "4351b8b90d5f393d1236a59af735eeb4947be4d701798e0b0052308bbc515b04",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/integrations/trusted_codex_planner_transport.py",
+      "present": true,
+      "sha256": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "present": true,
+      "sha256": "ea8e6f59a1e0b7f09afba80dbf00d5d5924237a388d101e3b75d1e5bb7c11b48",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/integrations/worker_confinement.py",
+      "present": true,
+      "sha256": "f13640b8b76815259671bb2334fb09f02c917ba8cabf0e4e0b40930b779978b1",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/integrations/process_supervisor.py",
+      "present": true,
+      "sha256": "26df7cdb28521e1358d6eff83ac82669c9ec4fea30482bb647b6ade82fa98d13",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/integrations/provider_broker.py",
+      "present": true,
+      "sha256": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/worker_admission.py",
+      "present": true,
+      "sha256": "766665fb19e363fbb05c3cc8ab91674dd891e138f46f0e303adf230982329298",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "ops/trusted_worker_launcher_service.py",
+      "present": true,
+      "sha256": "24afb555e97b0d8199005fea85791598be0a5f0dfee5afa88c1abd78e53c7dff",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "present": true,
+      "sha256": "fb7ba611bc8cba8e18e65f69f11e6e053a5e89bec9a1ea9103215a71dad74e0a",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "ops/install_trusted_codex_worker_supervisor.py",
+      "present": true,
+      "sha256": "d8601b5e00ffbad546b1a90eebf66d66577750b85db8a4e53f9f300d26bb049a",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/implementation_contract.py",
+      "present": true,
+      "sha256": "9761af823f7c52373c0470ac507bf8adfe5f470bad5561e6934dfa6a2c2c18e5",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "kernel/ledger.py",
+      "present": true,
+      "sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "kernel/ledger_sqlite.py",
+      "present": true,
+      "sha256": "864b5151e753030f6fda4f1016d13772c6c7edf9ce41094090950f049df07f8c",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "kernel/capability.py",
+      "present": true,
+      "sha256": "f297064b1dbaffbbd10b1ab499fd1b94e0c5c40310cc279d1f2ce2924c205477",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/supervisors/checkpoint.py",
+      "present": true,
+      "sha256": "aa2a067cf9b66b6f69c71fecc1a8e3dd3b04de82ccc552aa029e875e167fded6",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/scheduler.py",
+      "present": true,
+      "sha256": "7d224317b36956f19c35c353166a60ce1598299ebdfa867a6392c4cc5a14d206",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "runtime/autonomy/resume_engine.py",
+      "present": true,
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "ops/autonomous_run.py",
+      "present": true,
+      "sha256": "0426f7c4743f788579f829bf15857d2b37303db97fc928fc407acbd1c8b71f6c",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "operations/ENGINEERING_LIFECYCLE.md",
+      "present": true,
+      "sha256": "0bc717cc738a27b126c48d2f9a034998ad7d4a29cca61eeff7f1e63149d8dfae",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+      "present": true,
+      "sha256": "6292da5871b7e1120c8ca01de299e7b625c5937e58dd15e35aabdeb37c2c9d09",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "reviews/tasks/PAEOS_SERVER_MODEL_IDENTITY_20261018/REPORT.md",
+      "present": true,
+      "sha256": "eb331382617f56ea07c9e44436a1042ae17e220c0f7cb559ec5e8bf1fdb6d338",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+      "path": "reviews/tasks/PAEOS_PINNED_POLICY_INPUTS_20261018/REPORT.md",
+      "present": true,
+      "sha256": "eba13f854336bf70410880f5bd4f1beab09e80fe0a3392733319bf513e6420f3",
+      "role": "captured implementation baseline, not qualification"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "reviews/architecture/DEBT_0249_PROGRAMME_CONTRACT.md",
+      "present": true,
+      "sha256": "2bf215794b2d3be05226eca4c2d61284fa86d82b1d8c04683e62635bfc297606",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "reviews/architecture/DEBT_0249_ACCEPTANCE_MANIFEST.json",
+      "present": true,
+      "sha256": "dc7f4f5ff998ea00ff63264cfc567f7c04c481f82c1d405ab2bad5d635e0b13e",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "reviews/architecture/PAEOS_SOFT_GUARANTEE_REGISTER.md",
+      "present": true,
+      "sha256": "d1cecbea9e342ef0238eb8ac8adc2019f908fe6dc8f805cf14d7cae6aa257da7",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "docs/PAEOS_MULTI_GOAL_CONCURRENCY_CONTRACT.md",
+      "present": true,
+      "sha256": "1d257c84dd27f249a077979311d7cf24a1fda21f0c710c3b7c6c6fe0d63ab532",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "reviews/tasks/PAEOS_ESTATE_AUTHORITY_TOPOLOGY_MAP.json",
+      "present": true,
+      "sha256": "be499eaf3bad443c083ed98f0c382494e2358ec0c894cfb2aa70abeb00cdd452",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "runtime/transport/orca_paeos_transport.py",
+      "present": true,
+      "sha256": "c107115ccbdcf9167f70d4e7c29c26f38a3a47513143647e55a891802be19fd0",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "ops/verify_orca_paeos_boundary_court.py",
+      "present": true,
+      "sha256": "1e7deece7e904510259d7061cf9fc484928b754565a41c2f2b18b2e1f5534d7e",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "ops/verify_orca_runtime_ux_court.py",
+      "present": true,
+      "sha256": "d47d49fc1bc462da159b3844334977e26a3a66b29f6e89cfec1629dd20bf359b",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/paeos",
+      "path": "reviews/tasks/PAEOS_DEBT0117_PRE_P3_PHYSICAL_AUTONOMY_PROTOCOL_20261015_v1.md",
+      "present": true,
+      "sha256": "bfdbd7f81390b75bdafa863b41c31ea979ef9abdc6e96b5e8661de3ae0ad4674",
+      "role": "reference only; no implicit restoration or activation"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/orca-strator",
+      "path": "backend/app/routers/tasks.py",
+      "present": true,
+      "sha256": "aea7ad22f58c60731be65b1e92cbdb411f8a811cdf8c3b7b71b295cb4fb69fa1",
+      "role": "dirty source reference; exact provenance must be admitted before use"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/orca-strator",
+      "path": "backend/app/orchestrator.py",
+      "present": true,
+      "sha256": "ceb98834db762a9a2cb529ff8144815da51c8a254dc757e640e3aaad6095367e",
+      "role": "dirty source reference; exact provenance must be admitted before use"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/orca-strator",
+      "path": "backend/app/runtime_events.py",
+      "present": true,
+      "sha256": "d5f39c056014c67acc1b97abc21245bffad9ed42556106ccfc0356dbbe78f5d8",
+      "role": "dirty source reference; exact provenance must be admitted before use"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/orca-strator",
+      "path": "backend/app/company/synthesis_engine.py",
+      "present": true,
+      "sha256": "5e94f611d8140afd77567621b729ac9783c8b357bf68dea45e850c3ad9e5e9eb",
+      "role": "dirty source reference; exact provenance must be admitted before use"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/orca-strator",
+      "path": "backend/tests/test_phase4_runtime_ux.py",
+      "present": true,
+      "sha256": "481721f6db45dcf12e0af754ce89b41f70a527b73bb3a6f056a6b921792d02be",
+      "role": "dirty source reference; exact provenance must be admitted before use"
+    },
+    {
+      "source_root": "/Users/bob/GitHub/orca-strator",
+      "path": "frontend/package.json",
+      "present": true,
+      "sha256": "d1a3c645787c884651e75b7bd12f6cba6103655603d8796abb74fa9224cff2f4",
+      "role": "dirty source reference; exact provenance must be admitted before use"
+    }
+  ]
+}

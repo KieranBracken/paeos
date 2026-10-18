@@ -1,0 +1,391 @@
+{
+  "schema": "paeos.planning-dependency-index/1",
+  "authoritative": false,
+  "effects": "NONE; dependencies are necessary, never sufficient admission predicates",
+  "implementation_base": "2ec6ca1a6e8ecb3eff611781e0c59905dbd0c19b",
+  "cards": [
+    {
+      "id": "B00",
+      "dependencies": [],
+      "owner_role": "bootstrap",
+      "document": "bootstrap.md",
+      "deliverable": "Freeze repair manifest and admission/send fence",
+      "planning_disposition": "READY_FOR_BOUNDED_OFFLINE_PREPARATION"
+    },
+    {
+      "id": "B01",
+      "dependencies": [
+        "B00"
+      ],
+      "owner_role": "bootstrap",
+      "document": "bootstrap.md",
+      "deliverable": "Trusted policy state and durable disclosure attempts",
+      "planning_disposition": "HELD_ON_B00"
+    },
+    {
+      "id": "B02",
+      "dependencies": [
+        "B01"
+      ],
+      "owner_role": "bootstrap",
+      "document": "bootstrap.md",
+      "deliverable": "Complete frame and derivative policy",
+      "planning_disposition": "HELD_ON_B01"
+    },
+    {
+      "id": "B03",
+      "dependencies": [
+        "B02"
+      ],
+      "owner_role": "bootstrap",
+      "document": "bootstrap.md",
+      "deliverable": "Mediated tools and real confinement",
+      "planning_disposition": "HELD_ON_B02"
+    },
+    {
+      "id": "B04",
+      "dependencies": [
+        "B03"
+      ],
+      "owner_role": "bootstrap",
+      "document": "bootstrap.md",
+      "deliverable": "Complete bundle signer review and human ceremony",
+      "planning_disposition": "HELD_ON_B03_AND_RESERVED_ACTIONS"
+    },
+    {
+      "id": "B05",
+      "dependencies": [
+        "B04"
+      ],
+      "owner_role": "bootstrap",
+      "document": "bootstrap.md",
+      "deliverable": "Exact installation and one authorized canary",
+      "planning_disposition": "HELD_ON_REVIEW_AND_EXACT_AUTHORITY"
+    },
+    {
+      "id": "B06",
+      "dependencies": [
+        "B05"
+      ],
+      "owner_role": "bootstrap+route",
+      "document": "bootstrap.md",
+      "deliverable": "Stage readiness and eligible independent review route",
+      "planning_disposition": "HELD_ON_QUALIFICATION"
+    },
+    {
+      "id": "D258-A",
+      "dependencies": [
+        "B06"
+      ],
+      "owner_role": "Chat1",
+      "document": "work-packages.md",
+      "deliverable": "Canonical contract codec",
+      "planning_disposition": "HELD_ON_FRESH_ADMISSION"
+    },
+    {
+      "id": "D258-B",
+      "dependencies": [
+        "D258-A"
+      ],
+      "owner_role": "Chat1",
+      "document": "work-packages.md",
+      "deliverable": "Atomic ledger and public verifier",
+      "planning_disposition": "HELD_ON_PREDECESSOR"
+    },
+    {
+      "id": "D258-C",
+      "dependencies": [
+        "D258-B"
+      ],
+      "owner_role": "Chat1",
+      "document": "work-packages.md",
+      "deliverable": "Supersession pending denial and consumers",
+      "planning_disposition": "HELD_ON_PREDECESSOR"
+    },
+    {
+      "id": "D258-D",
+      "dependencies": [
+        "D258-C"
+      ],
+      "owner_role": "Chat1+Chat4",
+      "document": "work-packages.md",
+      "deliverable": "Durable custody and D0258 qualification",
+      "planning_disposition": "HELD_ON_PREDECESSOR"
+    },
+    {
+      "id": "D249-A",
+      "dependencies": [
+        "B06"
+      ],
+      "owner_role": "D0249",
+      "document": "work-packages.md",
+      "deliverable": "Council exact candidate review and integration",
+      "planning_disposition": "ELIGIBLE_ONLY_WITH_CURRENT_OWN_ADMISSION"
+    },
+    {
+      "id": "D249-B",
+      "dependencies": [
+        "D249-A"
+      ],
+      "owner_role": "D0249",
+      "document": "work-packages.md",
+      "deliverable": "Required hardening slices and16-domain accounting",
+      "planning_disposition": "HELD_ON_SCOPED_PREREQUISITES"
+    },
+    {
+      "id": "D260",
+      "dependencies": [
+        "D258-D"
+      ],
+      "owner_role": "D0260",
+      "document": "work-packages.md",
+      "deliverable": "Primitive sufficiency and qualification",
+      "planning_disposition": "HELD_ON_D0258_QUALIFICATION"
+    },
+    {
+      "id": "ISO",
+      "dependencies": [
+        "B06"
+      ],
+      "owner_role": "controller-owner",
+      "document": "work-packages.md",
+      "deliverable": "D0261 bounded goal isolation",
+      "planning_disposition": "HELD_ON_EXACT_OWNER_AND_SCOPE"
+    },
+    {
+      "id": "D117",
+      "dependencies": [
+        "D260",
+        "ISO",
+        "D249-B"
+      ],
+      "owner_role": "D0117",
+      "document": "work-packages.md",
+      "deliverable": "Physical recursive remediation and restart",
+      "planning_disposition": "HELD_ON_SPECIFIC_QUALIFIED_PREREQUISITES"
+    },
+    {
+      "id": "P0",
+      "dependencies": [
+        "D117",
+        "D258-D",
+        "D249-B"
+      ],
+      "owner_role": "Manager",
+      "document": "work-packages.md",
+      "deliverable": "Final pre-P3 and affected baseline gate",
+      "planning_disposition": "HELD_ON_ALL_REQUIRED_SEALS"
+    },
+    {
+      "id": "P3",
+      "dependencies": [
+        "P0"
+      ],
+      "owner_role": "Orca+PAEOS-transport-owners",
+      "document": "work-packages.md",
+      "deliverable": "Real operational boundary",
+      "planning_disposition": "HELD"
+    },
+    {
+      "id": "P4",
+      "dependencies": [
+        "P3"
+      ],
+      "owner_role": "Orca-owner",
+      "document": "work-packages.md",
+      "deliverable": "Exact plans truthful runtime browser and cutover",
+      "planning_disposition": "HELD"
+    },
+    {
+      "id": "P5",
+      "dependencies": [
+        "P4"
+      ],
+      "owner_role": "substrate-owners",
+      "document": "work-packages.md",
+      "deliverable": "All substrate capabilities",
+      "planning_disposition": "HELD"
+    },
+    {
+      "id": "P6",
+      "dependencies": [
+        "P5"
+      ],
+      "owner_role": "runtime-and-domain-owners",
+      "document": "work-packages.md",
+      "deliverable": "Durable runtime recovery and budget",
+      "planning_disposition": "HELD"
+    },
+    {
+      "id": "P7",
+      "dependencies": [
+        "P6"
+      ],
+      "owner_role": "verification-owner",
+      "document": "work-packages.md",
+      "deliverable": "Broader physical verification",
+      "planning_disposition": "HELD"
+    },
+    {
+      "id": "P8",
+      "dependencies": [
+        "P7"
+      ],
+      "owner_role": "journey-owner",
+      "document": "work-packages.md",
+      "deliverable": "Public-note catalogue Founder journey",
+      "planning_disposition": "HELD"
+    },
+    {
+      "id": "P9",
+      "dependencies": [
+        "P8"
+      ],
+      "owner_role": "independent-audit-and-Court",
+      "document": "work-packages.md",
+      "deliverable": "Whole-estate qualification and stop",
+      "planning_disposition": "HELD"
+    }
+  ],
+  "historical_dag_coverage": {
+    "P1.1": [
+      "P0",
+      "P9"
+    ],
+    "P1.2": [
+      "P0",
+      "P9"
+    ],
+    "P2.1": [
+      "P0",
+      "P9"
+    ],
+    "P2.2": [
+      "P0",
+      "P9"
+    ],
+    "P2.3": [
+      "P0",
+      "P5",
+      "P9"
+    ],
+    "P2.4": [
+      "P0",
+      "P9"
+    ],
+    "P3.1": [
+      "P3"
+    ],
+    "P3.2": [
+      "P3"
+    ],
+    "P3.3": [
+      "P3"
+    ],
+    "P4.1": [
+      "P4"
+    ],
+    "P4.2": [
+      "P4"
+    ],
+    "P4.3": [
+      "P4"
+    ],
+    "P4.4": [
+      "P4"
+    ],
+    "P5.1": [
+      "P5"
+    ],
+    "P5.2": [
+      "P5"
+    ],
+    "P5.3": [
+      "P5"
+    ],
+    "P5.4": [
+      "P5"
+    ],
+    "P5.5": [
+      "P5"
+    ],
+    "P6.1": [
+      "P4",
+      "P6"
+    ],
+    "P6.2": [
+      "P4",
+      "P6"
+    ],
+    "P6.3": [
+      "P6"
+    ],
+    "P6.4": [
+      "P6"
+    ],
+    "P6.5": [
+      "P4",
+      "P6"
+    ],
+    "P7.1": [
+      "P4",
+      "P7"
+    ],
+    "P7.2": [
+      "P7"
+    ],
+    "P7.3": [
+      "P7"
+    ],
+    "P7.4": [
+      "P7"
+    ],
+    "P8.1": [
+      "P8"
+    ],
+    "P8.2": [
+      "P8"
+    ],
+    "P8.3": [
+      "P8"
+    ],
+    "P9.1": [
+      "P9"
+    ],
+    "P9.2": [
+      "P9"
+    ]
+  },
+  "p5_claims": {
+    "CLAIM-P5-01-SAKG-CONTINUOUS-EXTRACTION-AND-LIVE-QUERY": "P5",
+    "CLAIM-P5-02-CONCEPT-OS-WAL-CANONICAL-URI-PERSISTENCE": "P5",
+    "CLAIM-P5-03-DISTILLATION-CONTRADICTION-GROUNDING": "P5",
+    "CLAIM-P5-04-IDEA-OS-SYNTHESIS-FAIL-CLOSED-PARSER": "P5",
+    "CLAIM-P5-05-KAE-DURABLE-ACQUISITION-CAS-INGESTION": "P5",
+    "CLAIM-P5-06-QUARANTINE-AND-AUTHORITY-CONTAINMENT": "P5"
+  },
+  "d0249_domains": {
+    "ELH-01": "D249-B",
+    "ELH-02": "D249-B",
+    "ELH-03": "D249-B",
+    "ELH-04": "D249-B",
+    "ELH-05": "D249-B",
+    "ELH-06": "D249-B",
+    "ELH-07": "D249-B",
+    "ELH-08": "D249-B",
+    "ELH-09": "D249-B",
+    "ELH-10": "D249-B",
+    "ELH-11": "D249-B",
+    "ELH-12": "D249-B",
+    "ELH-13": "D249-B",
+    "ELH-14": "D249-B",
+    "ELH-15": "D249-B",
+    "ELH-16": "D249-B"
+  },
+  "special_subobligations": [
+    "ELH-14-WF",
+    "ELH-07/SG-018 exact owner lease",
+    "D0261 C1 before D0117; C2/C3 before general concurrency"
+  ],
+  "completion": "PRE_SENTIUM_ECOSYSTEM_COMPLETE_PENDING_FOUNDER_RATIFICATION"
+}

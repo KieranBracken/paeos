@@ -1,0 +1,39 @@
+{
+  "schema": "paeos.planning-verification/1",
+  "implementation_base": "2ec6ca1a6e8ecb3eff611781e0c59905dbd0c19b",
+  "scope": "documentation and sanitized planning evidence only",
+  "checks": {
+    "dependency_cards": 24,
+    "dependency_cycles": 0,
+    "historical_DAG_obligations": 32,
+    "P5_claims": 6,
+    "D0249_domains": 16,
+    "snapshot_hashes": "MATCH",
+    "new_document_links": "PASS",
+    "placeholder_scan": "PASS",
+    "scoped_high_confidence_secret_patterns": "NO_MATCHES",
+    "full_staged_diff_check": "3 inherited Markdown hard-break whitespace warnings in exact source snapshots; no source normalization performed",
+    "authored_files_diff_check": "PASS"
+  },
+  "limitations": [
+    "Pattern scan is supplementary, not data classification.",
+    "No implementation tests rerun for documentation-only changes.",
+    "No formal Security Review or L14; planning critique only.",
+    "No runtime/debt/qualification or key effects.",
+    "Future source manifests and admission predicates must be freshly bound.",
+    "Original source snapshots retain exact bytes, including three two-space Markdown hard breaks reported by git diff --check."
+  ],
+  "quota_used_percent_last_observed": 84,
+  "planning_critique": {
+    "type": "read-only plan-quality critique, not Security Review or L14",
+    "bootstrap_corrections": 5,
+    "phase_corrections": 4,
+    "phase_corrections_detail": [
+      "Authoritative Home metrics and persisted cockpit events",
+      "Explicit SAKG outcome query and provenance after restart",
+      "Stable programme lineage versus distinct admitted phase executions",
+      "Real reserved approval gate separate from STOP"
+    ],
+    "all_incorporated": true
+  }
+}
