@@ -1,0 +1,13 @@
+{
+  "all_staged": {
+    "exit_code": 2,
+    "stdout": "reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:6: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:8: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:17: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:25: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:57: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:65: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:67: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:86: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:94: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:101: trailing whitespace.\n+ \nreviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/worker-package/lazy-litellm-import.patch:102: trailing whitespace.\n+ \n",
+    "stderr": ""
+  },
+  "excluding_unchanged_worker_patch_record": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "disposition": "Preserve original worker patch bytes and fingerprint. Findings are whitespace in patch context lines, not final source. All other staged files pass. No clean all-artifact diff claim."
+}

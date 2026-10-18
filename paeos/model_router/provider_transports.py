@@ -7,14 +7,15 @@ transport implementation.
 
 from __future__ import annotations
 
+import importlib
 import re
+import threading
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Protocol
 
-import litellm  # type: ignore[reportMissingImports]  # optional gateway dependency
 import requests
 from paeos.model_router.a08_enforcer import derive_family_from_actual_model
 from paeos.model_router.auditor_receipt import request_fingerprint, response_fingerprint
@@ -30,9 +31,34 @@ from paeos.model_router.types import (
     TaskRequest,
 )
 
-litellm.num_retries = 0
-litellm.telemetry = False
-litellm.drop_params = True
+
+class _LazyLiteLLM:
+    """Load optional LiteLLM only when a routed OpenAI-compatible call is made."""
+
+    def __init__(self) -> None:
+        self._module: Any | None = None
+        self._lock = threading.Lock()
+
+    def _load_module(self) -> Any:
+        if self._module is None:
+            with self._lock:
+                if self._module is None:
+                    module = importlib.import_module("litellm")
+                    module.num_retries = 0
+                    module.telemetry = False
+                    module.drop_params = True
+                    self._module = module
+        return self._module
+
+    def completion(self, *args: Any, **kwargs: Any) -> Any:
+        return self._load_module().completion(*args, **kwargs)
+
+    async def acompletion(self, *args: Any, **kwargs: Any) -> Any:
+        return await self._load_module().acompletion(*args, **kwargs)
+
+
+# Shared facade: transport.py re-exports this same object as its compatibility patch point.
+litellm = _LazyLiteLLM()
 
 PROVIDER_API_BASES: Mapping[ProviderId, str] = MappingProxyType(
     {
@@ -66,7 +92,9 @@ class OpenAICompatibleConfig:
     confidential_zdr: bool
 
     def __post_init__(self) -> None:
-        if not isinstance(self.api_base, str) or not self.api_base.startswith(("http://", "https://")):
+        if not isinstance(self.api_base, str) or not self.api_base.startswith(
+            ("http://", "https://")
+        ):
             raise ValueError("api_base must be an absolute HTTP(S) URL")
         if not isinstance(self.single_tool_call_only, bool) or not isinstance(
             self.confidential_zdr, bool

@@ -6,7 +6,6 @@ and delegates one request to the explicitly registered adapter.
 
 from __future__ import annotations
 
-import litellm  # type: ignore[reportMissingImports]  # noqa: F401  # compatibility patch point
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
 from paeos.model_router.errors import normalize_error
@@ -14,6 +13,7 @@ from paeos.model_router.provider_transports import (
     PROVIDER_API_BASES,
     ProviderTransportRegistry,
     build_builtin_transport_registry,
+    litellm,  # noqa: F401 - compatibility patch point
 )
 from paeos.model_router.types import (
     ModelCatalogEntry,

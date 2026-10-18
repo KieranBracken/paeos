@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+import textwrap
 from dataclasses import dataclass
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import paeos.model_router.provider_transports as provider_transports_module
 import pytest
 from paeos.model_router.catalog import ModelCatalog
 from paeos.model_router.credentials import CredentialStore
@@ -27,6 +32,116 @@ from paeos.model_router.types import (
     RouterResponse,
     TaskRequest,
 )
+
+
+def _run_lite_llm_import_probe(body: str) -> subprocess.CompletedProcess[str]:
+    root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    guard = r"""
+import builtins, importlib.abc, inspect, os, socket, sys, urllib.request
+import requests
+blocked = {"litellm", "tiktoken", "dotenv"}
+attempts = []
+class ImportBlocker(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if any(fullname == name or fullname.startswith(name + ".") for name in blocked):
+            attempts.append(fullname)
+            raise ImportError("blocked optional dependency for startup probe: " + fullname)
+sys.meta_path.insert(0, ImportBlocker())
+def is_router_frame():
+    frame = inspect.currentframe().f_back
+    while frame is not None:
+        name = frame.f_globals.get("__name__", "")
+        if name.startswith(("paeos.model_router.provider_transports", "paeos.model_router.transport", "litellm", "tiktoken", "dotenv")):
+            return True
+        frame = frame.f_back
+    return False
+class GuardedEnviron:
+    def __init__(self, wrapped): self.wrapped = wrapped
+    def _check(self):
+        if is_router_frame(): raise AssertionError("adapter import accessed process environment")
+    def __getitem__(self, key): self._check(); return self.wrapped[key]
+    def __contains__(self, key): self._check(); return key in self.wrapped
+    def __iter__(self): self._check(); return iter(self.wrapped)
+    def __len__(self): self._check(); return len(self.wrapped)
+    def get(self, key, default=None): self._check(); return self.wrapped.get(key, default)
+    def keys(self): self._check(); return self.wrapped.keys()
+    def items(self): self._check(); return self.wrapped.items()
+    def values(self): self._check(); return self.wrapped.values()
+original_environ = os.environ
+original_getenv = os.getenv
+def guarded_getenv(key, default=None):
+    if is_router_frame(): raise AssertionError("adapter import called os.getenv")
+    return original_getenv(key, default)
+os.environ = GuardedEnviron(original_environ)
+os.getenv = guarded_getenv
+def deny_http(*args, **kwargs): raise AssertionError("adapter import attempted HTTP")
+requests.sessions.Session.request = deny_http
+urllib.request.urlopen = deny_http
+socket.create_connection = deny_http
+original_open = builtins.open
+def guarded_open(file, *args, **kwargs):
+    if is_router_frame() and any(part in str(file).casefold() for part in ("tiktoken", ".cache")):
+        raise AssertionError("adapter import accessed tokenizer/cache file")
+    return original_open(file, *args, **kwargs)
+builtins.open = guarded_open
+"""
+    script = f"{guard}\nsys.path.insert(0, {root!r})\n{textwrap.dedent(body)}"
+    child_env = dict(os.environ)
+    child_env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return subprocess.run(
+        [sys.executable, "-I", "-B", "-c", script],
+        cwd=root,
+        env=child_env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def test_adapter_import_does_not_load_optional_networked_dependencies():
+    negative = _run_lite_llm_import_probe(
+        """
+        import importlib
+        try:
+            importlib.import_module("litellm")
+        except ImportError as exc:
+            assert "blocked optional dependency" in str(exc)
+            assert attempts == ["litellm"]
+        else:
+            raise AssertionError("negative import control did not block LiteLLM")
+        """
+    )
+    assert negative.returncode == 0, negative.stderr
+
+    positive = _run_lite_llm_import_probe(
+        """
+        import paeos.model_router.provider_transports as adapters
+        import paeos.model_router.transport as dispatcher
+        assert "litellm" not in sys.modules
+        assert "tiktoken" not in sys.modules
+        assert "dotenv" not in sys.modules
+        assert adapters.litellm is dispatcher.litellm
+        assert callable(adapters.litellm.completion)
+        assert callable(adapters.litellm.acompletion)
+        assert attempts == []
+        """
+    )
+    assert positive.returncode == 0, positive.stderr
+
+
+def test_late_litellm_initialization_keeps_retry_and_telemetry_disabled(monkeypatch):
+    fake_litellm = type(sys)("litellm")
+    fake_litellm.num_retries = 9
+    fake_litellm.telemetry = True
+    fake_litellm.drop_params = False
+    monkeypatch.setitem(sys.modules, "litellm", fake_litellm)
+
+    facade = provider_transports_module._LazyLiteLLM()
+    assert facade._module is None
+    assert facade._load_module() is fake_litellm
+    assert fake_litellm.num_retries == 0
+    assert fake_litellm.telemetry is False
+    assert fake_litellm.drop_params is True
 
 
 def entry() -> ModelCatalogEntry:
@@ -218,9 +333,7 @@ def test_cline_adapter_unwraps_data_envelope_and_uses_exact_endpoint() -> None:
         json=lambda: {
             "data": {
                 "model": "cline/model",
-                "choices": [
-                    {"message": {"content": "cline ok"}, "finish_reason": "stop"}
-                ],
+                "choices": [{"message": {"content": "cline ok"}, "finish_reason": "stop"}],
                 "usage": {"prompt_tokens": 4, "completion_tokens": 5},
             }
         },
@@ -256,6 +369,7 @@ def test_builtin_registry_binds_all_legacy_provider_surfaces() -> None:
 
 def test_normalized_error_recovers_http_metadata_from_response_object() -> None:
     """LiteLLM may expose status/headers on response instead of the exception."""
+
     class ResponseOnlyError(Exception):
         response = SimpleNamespace(
             status_code=429,

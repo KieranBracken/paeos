@@ -1,0 +1,2 @@
+error: Failed to initialize cache at `/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-full-suite-ezgrr9h_/uv-cache`
+  Caused by: failed to create directory `/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-full-suite-ezgrr9h_/uv-cache`: Operation not permitted (os error 1)

@@ -5,10 +5,9 @@ from __future__ import annotations
 import importlib.machinery
 import json
 import os
-from pathlib import Path
 import runpy
 import sys
-
+from pathlib import Path
 
 root = Path(sys.argv[1]).resolve(strict=True)
 dependencies = Path(sys.argv[2]).resolve(strict=True)
@@ -55,7 +54,7 @@ class LocalSourceFence:
 def audit(event, args):
     global blocked_socket_binds
     if event == "open":
-        path, mode, flags = args
+        path, _mode, flags = args
         if isinstance(path, int):
             return
         if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND):

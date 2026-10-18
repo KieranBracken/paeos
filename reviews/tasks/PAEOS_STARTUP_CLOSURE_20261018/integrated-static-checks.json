@@ -1,0 +1,109 @@
+{
+  "lint": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "check",
+      "paeos/model_router/provider_transports.py",
+      "paeos/model_router/transport.py",
+      "tests/model_router/test_provider_transports.py",
+      "reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/verify_entrypoint.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  "format": {
+    "argv": [
+      "/Users/bob/GitHub/paeos/.venv/bin/ruff",
+      "format",
+      "--check",
+      "paeos/model_router/provider_transports.py",
+      "paeos/model_router/transport.py",
+      "tests/model_router/test_provider_transports.py",
+      "reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/verify_entrypoint.py"
+    ],
+    "exit_code": 0,
+    "stdout": "4 files already formatted\n",
+    "stderr": ""
+  },
+  "incremental_diff": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compilation": {
+    "count": 46,
+    "status": "PASS",
+    "paths": [
+      "ops/p1_l14_resume.py",
+      "ops/p1_runtime_l14_audit.py",
+      "paeos/model_router/provider_transports.py",
+      "paeos/model_router/transport.py",
+      "paeos/semantic/__init__.py",
+      "paeos/semantic/delta_engine.py",
+      "paeos/semantic/freeze_guard.py",
+      "paeos/semantic/lineage.py",
+      "paeos/semantic/types.py",
+      "reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/verify_entrypoint.py",
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/cycle_detector.py",
+      "runtime/autonomy/mdg.py",
+      "runtime/autonomy/mission_controller.py",
+      "runtime/autonomy/orca_lineage.py",
+      "runtime/autonomy/recovery_controller.py",
+      "runtime/autonomy/resume_engine.py",
+      "runtime/autonomy/schemas/__init__.py",
+      "runtime/autonomy/schemas/architect_cognition.py",
+      "runtime/autonomy/schemas/frontier_research.py",
+      "runtime/autonomy/schemas/tradeoff_analysis.py",
+      "runtime/autonomy/weakness_finder/__init__.py",
+      "runtime/autonomy/weakness_finder/coordinator.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "runtime/autonomy/weakness_finder/types.py",
+      "runtime/autonomy/weakness_finder_probes.py",
+      "runtime/candidate_materialization.py",
+      "runtime/court/completeness_firewall.py",
+      "runtime/integrations/gemini36_adversary_route.py",
+      "runtime/integrations/gemini36_critic_route.py",
+      "runtime/integrations/process_supervisor.py",
+      "runtime/integrations/provider_broker.py",
+      "runtime/integrations/task_scoped_responses_broker.py",
+      "runtime/integrations/trusted_codex_transport.py",
+      "runtime/integrations/worker_confinement.py",
+      "runtime/lifecycle_projection.py",
+      "runtime/p1_discrimination.py",
+      "runtime/planner_transport.py",
+      "runtime/run_state_registry.py",
+      "tests/model_router/test_provider_transports.py",
+      "tests/runtime/test_completeness_firewall.py",
+      "tests/runtime/test_p1_bootstrap_execution_substrate.py",
+      "tests/runtime/test_p1_production_lifecycle.py"
+    ],
+    "method": "compile(source, relative_path, exec); no bytecode or runtime imports"
+  },
+  "worker_to_integrated": {
+    "paeos/model_router/provider_transports.py": {
+      "worker_sha256": "3a2e9fe1be3aca6ae3968e096034e4ac94f824e571f1e23705d68dd9aea66dc4",
+      "integrated_sha256": "b4d5b6afe1f13306fabf96ae6f152e1410933679fcac5617f467ccda98deaeef",
+      "ast_equal": true
+    },
+    "paeos/model_router/transport.py": {
+      "worker_sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58",
+      "integrated_sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58",
+      "ast_equal": true
+    },
+    "tests/model_router/test_provider_transports.py": {
+      "worker_sha256": "0c091ab7aee5ad969baafdcea95ea814cde11c6c3d582cf20f55f3f1efc27ffc",
+      "integrated_sha256": "0fd643e67bcf9edad7c40456c9491ab1699e8306f0aab034d0bab0197cb9b0a3",
+      "ast_equal": true
+    }
+  }
+}

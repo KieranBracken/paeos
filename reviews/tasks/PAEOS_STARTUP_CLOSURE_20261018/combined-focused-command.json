@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network-outbound)(allow network-outbound (remote ip \"localhost:*\"))",
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-I",
+    "-B",
+    "-S",
+    "-c",
+    "import sys;sys.path[:0]=['/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos','/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages'];import pytest;raise SystemExit(pytest.main(['-o', 'addopts=', '-q', '-p', 'no:cacheprovider', '--basetemp', '/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-combined-vgalnna2/pytest', 'tests/model_router/test_disclosure_policy.py', 'tests/model_router/test_catalog_and_privacy.py', 'tests/ops/test_trusted_codex_installer_binding.py', 'tests/runtime/test_trusted_codex_worker_transport.py', 'tests/runtime/test_builder_transport_readiness.py', 'tests/runtime/test_trusted_codex_client.py', 'tests/runtime/test_responses_broker_request_limit.py', 'tests/model_router/test_provider_transports.py', 'tests/model_router/test_auditor_receipt.py', 'tests/model_router/test_a08_integration.py']))"
+  ],
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHON_DOTENV_DISABLED": "1",
+    "TMPDIR": "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-combined-vgalnna2"
+  },
+  "exit_code": 0
+}

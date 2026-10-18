@@ -1,0 +1,65 @@
+{
+  "schema": "paeos.offline-source-package/1",
+  "status": "OFFLINE_CANDIDATE_FOR_ROOT_INTEGRATION_ONLY",
+  "paeos_admission_claimed": false,
+  "base_commit": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+  "scope": {
+    "id": "offline-startup-lazy-import-1bb63c7740f8404082457d7d085c193d",
+    "path": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/reviews/tasks/PAEOS_STARTUP_CLOSURE_20261018/SCOPE-LAZY-IMPORT.json",
+    "sha256": "c7b693925ca0c32ead024ca5d8f46cf52a1aefd96a67f92db5f95c5374d5dc01"
+  },
+  "worktree": "/Users/bob/.codex/worktrees/paeos-lazy-import-20261018/paeos",
+  "files": [
+    {
+      "path": "paeos/model_router/provider_transports.py",
+      "base_preimage_sha256": "d45b832cad35b324c562ac82f1404a5686573053e9804c71228b2b1debd36e3f",
+      "candidate_sha256": "3a2e9fe1be3aca6ae3968e096034e4ac94f824e571f1e23705d68dd9aea66dc4",
+      "bytes": 16553
+    },
+    {
+      "path": "paeos/model_router/transport.py",
+      "base_preimage_sha256": "ff16ab96ed826026dca17b9023d548e44d28ac2f38e65984cc6487ab4bc2263f",
+      "candidate_sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58",
+      "bytes": 2410
+    },
+    {
+      "path": "tests/model_router/test_provider_transports.py",
+      "base_preimage_sha256": "5056b1474816e0441a70c9f9ec2c4e2d386db1fa2d47a98eb98b4228fdc2ce40",
+      "candidate_sha256": "0c091ab7aee5ad969baafdcea95ea814cde11c6c3d582cf20f55f3f1efc27ffc",
+      "bytes": 13980
+    }
+  ],
+  "patch": {
+    "path": "lazy-litellm-import.patch",
+    "sha256": "2c87573fe5d89210b0b9aaadf30a0576e910046a71158e6649ac61f7a0c01cb9",
+    "bytes": 8501
+  },
+  "verification": {
+    "focused_command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<fresh-worktree> sandbox-exec deny network* python -B -m pytest -q -p no:cacheprovider tests/model_router/test_provider_transports.py tests/model_router/test_auditor_receipt.py tests/model_router/test_a08_integration.py",
+    "result": "43 passed",
+    "network": "Blocked for the complete pytest process tree",
+    "receipt_path": "verification.txt",
+    "receipt_sha256": "986dbc9a5d6b6525242d1315dd44f9f5e97162596004680091f1927df955e4ea",
+    "ruff": "All checks passed for the exact three scoped files",
+    "red_phase": "Before implementation, the new import-control test detected an attempted LiteLLM import; the loader-policy test failed because the lazy loader did not yet exist. Ten existing adapter tests passed.",
+    "provider_calls": 0,
+    "dependency_changes": 0,
+    "patch_apply_check": "PASS on a fresh archive of base_commit"
+  },
+  "behavior": {
+    "lazy_boundary": "One shared facade in provider_transports.py; dispatcher re-exports that same object.",
+    "compatibility_patch_points": [
+      "provider_transports.litellm.completion",
+      "provider_transports.litellm.acompletion",
+      "transport.litellm.completion",
+      "transport.litellm.acompletion"
+    ],
+    "initialization_policy": "At first actual completion/acompletion invocation, set num_retries=0, telemetry=False, drop_params=True before delegating.",
+    "import_probe": "Fresh positive adapter import and negative direct-LiteLLM control; blocks LiteLLM/tiktoken/dotenv imports and catches HTTP, router-frame environment reads, and tokenizer/cache file opens."
+  },
+  "limitations": [
+    "LiteLLM import-time cost-map, tokenizer, or other egress may still occur when the first routed dispatch triggers initialization; this patch only moves that boundary and is not a complete egress/privacy control.",
+    "No provider API call, credential read, service/runtime install, PAEOS admission, qualification, independent review, or integration was performed.",
+    "Root retains integration and subsequent applicable independent review."
+  ]
+}

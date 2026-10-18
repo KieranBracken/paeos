@@ -1,0 +1,34 @@
+{
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network-outbound)(allow network-outbound (remote ip \"localhost:*\"))(deny file-write*)(allow file-write* (subpath \"/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos\") (subpath \"/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-full-suite-ezgrr9h_\") (literal \"/dev/null\"))(deny file-read* (literal \"/Users/bob/.codex/auth.json\") (subpath \"/Users/bob/.local/share/paeos\") (subpath \"/Users/bob/GitHub/paeos/ops/keys\") (subpath \"<PRIVATE_BACKUP_KEY_DIRECTORY>\"))",
+    "/Users/bob/.local/bin/uv",
+    "run",
+    "--offline",
+    "--no-sync",
+    "python",
+    "-I",
+    "-B",
+    "-S",
+    "-c",
+    "import sys;sys.path[:0]=['/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos','/Users/bob/GitHub/paeos/.venv/lib/python3.13/site-packages'];import pytest;raise SystemExit(pytest.main(['-o', 'addopts=', '-q', '-p', 'no:cacheprovider', '--basetemp', '/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-full-suite-ezgrr9h_/pytest']))"
+  ],
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHON_DOTENV_DISABLED": "1",
+    "TMPDIR": "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-full-suite-ezgrr9h_",
+    "UV_PROJECT_ENVIRONMENT": "/Users/bob/GitHub/paeos/.venv",
+    "UV_CACHE_DIR": "/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-startup-full-suite-ezgrr9h_/uv-cache"
+  },
+  "exit_code": 2,
+  "note": "uv invokes pytest.main with isolated candidate/dependency paths; site hooks disabled; host auth/PAEOS key roots blocked",
+  "sanitization": {
+    "redacted": "private backup-key directory path only, not test results",
+    "raw_receipt_sha256": "9b7a2b31f2e03ccd459df0c03a945af59f8c6f0f395968b6ae6e8b16f20abb14",
+    "raw_receipt": "retained in restricted local evidence outside repository",
+    "argv_reproducibility": "sandbox profile contains an explicitly redacted path placeholder"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "paeos.offline-integrated-verification/1",
+  "status": "UNREVIEWED_OFFLINE_STARTUP_CANDIDATE",
+  "parent_checkpoint": "ffca76ce5769984dcfd62a9fe062a0156c2afa0d",
+  "base_commit": "8501f65a3d06609afec9519a1f3bff928063ae7d",
+  "worker_patch_sha256": "2c87573fe5d89210b0b9aaadf30a0576e910046a71158e6649ac61f7a0c01cb9",
+  "worker_manifest_sha256": "438037abdab2e80055c2df1671035bc575712b1276b47ae438ed9e2e1551d4c0",
+  "scope_sha256": "c7b693925ca0c32ead024ca5d8f46cf52a1aefd96a67f92db5f95c5374d5dc01",
+  "final_source_binding": {
+    "paeos/model_router/provider_transports.py": {
+      "worker_sha256": "3a2e9fe1be3aca6ae3968e096034e4ac94f824e571f1e23705d68dd9aea66dc4",
+      "integrated_sha256": "b4d5b6afe1f13306fabf96ae6f152e1410933679fcac5617f467ccda98deaeef",
+      "ast_equal": true
+    },
+    "paeos/model_router/transport.py": {
+      "worker_sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58",
+      "integrated_sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58",
+      "ast_equal": true
+    },
+    "tests/model_router/test_provider_transports.py": {
+      "worker_sha256": "0c091ab7aee5ad969baafdcea95ea814cde11c6c3d582cf20f55f3f1efc27ffc",
+      "integrated_sha256": "0fd643e67bcf9edad7c40456c9491ab1699e8306f0aab034d0bab0197cb9b0a3",
+      "ast_equal": true
+    }
+  },
+  "startup": {
+    "status": "PASS",
+    "scope": "IMPORT_AND_NO_ARGUMENT_USAGE_ONLY",
+    "entrypoint_exit": 64,
+    "local_module_count": 104,
+    "effects_attempted": [],
+    "blocked_socket_binds": 1
+  },
+  "physical_closure_controls": {
+    "passed": true,
+    "record": "closure-controls.json"
+  },
+  "focused": {
+    "passed": 239,
+    "failed": 0,
+    "exit_code": 0,
+    "receipt": "final-focused-command.json",
+    "stdout": "final-focused.stdout.txt"
+  },
+  "full_suite": {
+    "exit_code": 2,
+    "collection_errors": [
+      "tests/contracts/test_idea_graph_inspiration_adapter.py",
+      "tests/contracts/test_kae_lof_federation_adapter.py",
+      "tests/contracts/test_orca_mission_control_adapter.py",
+      "tests/contracts/test_sentium_shadow_conformance_harness.py",
+      "tests/runtime/test_claude_cli_transport.py",
+      "tests/runtime/test_mcp_transport.py",
+      "tests/runtime/test_transport.py"
+    ],
+    "status": "FAILED_COLLECTION",
+    "receipt": "full-suite-executed-command.json",
+    "stdout": "full-suite-executed.stdout.txt",
+    "historical_22_error_results": "preserved unchanged; not current acceptance",
+    "timing": "Executed once before AST-equivalent formatting; focused verification repeated afterward. UV cache preflight failure before pytest retained separately."
+  },
+  "checks": {
+    "scoped_lint": "PASS",
+    "scoped_format": "PASS",
+    "compilation_count": 46,
+    "incremental_diff": "PASS",
+    "record": "integrated-static-checks.json",
+    "inherited_restored_source_lint_findings": 50,
+    "inherited_restored_source_format_failures": 24,
+    "staged_diff": {
+      "status": "FAIL_ONLY_PRESERVED_PATCH_CONTEXT_WHITESPACE",
+      "record": "staged-diff-check.json",
+      "all_other_staged_files": "PASS"
+    }
+  },
+  "privacy": {
+    "provider_inference_calls": 0,
+    "key_enrollment": false,
+    "runtime_installation": false,
+    "private_material_included": false,
+    "secret_scan": "INTEGRATED_SECRET_SCAN.json",
+    "scan_is_supplementary": true
+  },
+  "review": {
+    "requested_this_package": false,
+    "verdict": "PENDING",
+    "independent_family_evidence": null,
+    "original_findings_preserved": true
+  },
+  "lifecycle": {
+    "paeos_admission": false,
+    "worker_start_receipt": false,
+    "court_adjudication": false,
+    "qualification": false,
+    "debt_item_seal": false
+  },
+  "limitations": [
+    "No-argument usage/import proof is not scheduler/task execution.",
+    "Static closure excludes some dynamic paths and runtime resources.",
+    "Lazy LiteLLM dispatch initialization still has hidden cost-map/tokenizer access requiring egress control.",
+    "Trusted disclosure/full-frame enforcement and unresolved earlier review findings remain.",
+    "Builder qualification is expired; L10 evidence and applicable authority remain gates.",
+    "Restored-source lint/format failures and seven full-suite collection errors remain."
+  ],
+  "next_gate": "CONTINUATION.json"
+}

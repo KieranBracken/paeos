@@ -1,0 +1,63 @@
+{
+  "schema": "paeos.offline-bootstrap-continuation/1",
+  "authority_basis": "Human-approved corrected P1-P9 plan E0-E3 bounded offline bootstrap exception; not a PAEOS task or authority grant.",
+  "owner": "Assign PAEOS pre-P3 workers",
+  "candidate_branch": "codex/p1-bound-source-recovery-20261018",
+  "candidate_manifest": "INTEGRATED_CHECKPOINT_MANIFEST.json",
+  "immediate_next_package": {
+    "objective": "Prove real scheduler construction and fail-closed missing/stale readiness denial using temporary state and synthetic identities.",
+    "source_changes": "None planned. Freeze exact test/evidence paths before writing; preserve acceptance definitions.",
+    "verification": [
+      "Actual build_scheduler with temporary state/workspace/registry roots; host identity/readiness loaders replaced with synthetic fixtures.",
+      "Trace-B missing/stale qualification denies before run registration and worker invocation; assert zero worker calls and admissions.",
+      "Exact captured lifecycle/manifest binding with missing/tampered negative controls.",
+      "Separate offline Court-server root with candidate-local import-origin assertions."
+    ],
+    "forbidden": [
+      "host credentials/keys/runtime-state reads",
+      "provider requests",
+      "installation",
+      "qualification minting",
+      "new authority or copied historical authority reuse",
+      "debt-item integration"
+    ]
+  },
+  "next_implementation_gates": [
+    "Complete dispatch-time privacy/frame/closure enforcement under bounded exact scopes.",
+    "Preserve and remediate original review findings; obtain applicable review on final candidate.",
+    "Trusted authority and valid stage qualification before fresh Chat1 admission."
+  ],
+  "resource_blockers": [
+    {
+      "path": "tests/runtime/test_orchestrator.py",
+      "kind": "missing and unfrozen verification dependency; restoration alone insufficient",
+      "consumer": "ops/p1_runtime_l14_audit.py:433-455"
+    },
+    {
+      "path": "tests/runtime/test_luna_adversary_subsumption.py",
+      "kind": "missing test dependency",
+      "consumer": "tests/runtime/test_p1_production_lifecycle.py:395"
+    },
+    {
+      "path": "reviews/governance/PAEOS_P1_L10_FAMILY_DECORRELATION_AMENDMENT_20260918.md",
+      "kind": "authority record; fixtures cannot authorize route",
+      "consumer": "ops/autonomous_run.py:186-211"
+    },
+    {
+      "path": "ops/p1_runtime_l14_audit.py:_AUTHORITY_FILES",
+      "kind": "seventeen missing provenance documents for L14 projection; not scheduler-construction prerequisite"
+    }
+  ],
+  "coordination": {
+    "heartbeat_id": "paeos-convergence-oversight",
+    "status": "ACTIVE",
+    "cadence": "hourly",
+    "notifications": "meaningful changes or needed user action only",
+    "route_owner_thread": "01a13075-533b-72a1-b8f8-8f109414f707",
+    "route_owner_next": "Finish official-terms free-only privacy eligibility matrix, no provider probes.",
+    "chat1_thread": "01a147d5-525b-7e31-9fb1-80de3a325e51",
+    "chat1_wake": "Complete boundary, exact review, applicable trusted authority, current Builder qualification and fresh PAEOS admission.",
+    "later_order": "D0260 after D0258 qualification; D0117 after both and remaining dependencies; P3 after required sealed pre-P3 evidence.",
+    "reserve": "20 percent Codex account quota admission reserve, not an account-wide guarantee."
+  }
+}

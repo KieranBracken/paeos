@@ -1,0 +1,215 @@
+diff --git a/paeos/model_router/provider_transports.py b/paeos/model_router/provider_transports.py
+index cbc662c4..7c4c8a67 100644
+--- a/paeos/model_router/provider_transports.py
++++ b/paeos/model_router/provider_transports.py
+@@ -7,14 +7,15 @@ transport implementation.
+ 
+ from __future__ import annotations
+ 
++import importlib
+ import re
++import threading
+ import time
+ from collections.abc import Mapping
+ from dataclasses import dataclass
+ from types import MappingProxyType
+ from typing import Any, Protocol
+ 
+-import litellm  # type: ignore[reportMissingImports]  # optional gateway dependency
+ import requests
+ from paeos.model_router.a08_enforcer import derive_family_from_actual_model
+ from paeos.model_router.auditor_receipt import request_fingerprint, response_fingerprint
+@@ -30,9 +31,34 @@ from paeos.model_router.types import (
+     TaskRequest,
+ )
+ 
+-litellm.num_retries = 0
+-litellm.telemetry = False
+-litellm.drop_params = True
++
++class _LazyLiteLLM:
++    """Load optional LiteLLM only when a routed OpenAI-compatible call is made."""
++
++    def __init__(self) -> None:
++        self._module: Any | None = None
++        self._lock = threading.Lock()
++
++    def _load_module(self) -> Any:
++        if self._module is None:
++            with self._lock:
++                if self._module is None:
++                    module = importlib.import_module("litellm")
++                    module.num_retries = 0
++                    module.telemetry = False
++                    module.drop_params = True
++                    self._module = module
++        return self._module
++
++    def completion(self, *args: Any, **kwargs: Any) -> Any:
++        return self._load_module().completion(*args, **kwargs)
++
++    async def acompletion(self, *args: Any, **kwargs: Any) -> Any:
++        return await self._load_module().acompletion(*args, **kwargs)
++
++
++# Shared facade: transport.py re-exports this same object as its compatibility patch point.
++litellm = _LazyLiteLLM()
+ 
+ PROVIDER_API_BASES: Mapping[ProviderId, str] = MappingProxyType(
+     {
+diff --git a/paeos/model_router/transport.py b/paeos/model_router/transport.py
+index 2a4c95c1..5b5e0451 100644
+--- a/paeos/model_router/transport.py
++++ b/paeos/model_router/transport.py
+@@ -6,7 +6,6 @@ and delegates one request to the explicitly registered adapter.
+ 
+ from __future__ import annotations
+ 
+-import litellm  # type: ignore[reportMissingImports]  # noqa: F401  # compatibility patch point
+ from paeos.model_router.catalog import ModelCatalog
+ from paeos.model_router.credentials import CredentialStore
+ from paeos.model_router.errors import normalize_error
+@@ -14,6 +13,7 @@ from paeos.model_router.provider_transports import (
+     PROVIDER_API_BASES,
+     ProviderTransportRegistry,
+     build_builtin_transport_registry,
++    litellm,  # noqa: F401 - compatibility patch point
+ )
+ from paeos.model_router.types import (
+     ModelCatalogEntry,
+diff --git a/tests/model_router/test_provider_transports.py b/tests/model_router/test_provider_transports.py
+index aadcb03a..9a3429c3 100644
+--- a/tests/model_router/test_provider_transports.py
++++ b/tests/model_router/test_provider_transports.py
+@@ -1,9 +1,14 @@
+ from __future__ import annotations
+ 
++import os
++import subprocess
++import sys
++import textwrap
+ from dataclasses import dataclass
+ from types import SimpleNamespace
+ from unittest.mock import patch
+ 
++import paeos.model_router.provider_transports as provider_transports_module
+ import pytest
+ from paeos.model_router.catalog import ModelCatalog
+ from paeos.model_router.credentials import CredentialStore
+@@ -29,6 +34,116 @@ from paeos.model_router.types import (
+ )
+ 
+ 
++def _run_lite_llm_import_probe(body: str) -> subprocess.CompletedProcess[str]:
++    root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
++    guard = r"""
++import builtins, importlib.abc, inspect, os, socket, sys, urllib.request
++import requests
++blocked = {"litellm", "tiktoken", "dotenv"}
++attempts = []
++class ImportBlocker(importlib.abc.MetaPathFinder):
++    def find_spec(self, fullname, path=None, target=None):
++        if any(fullname == name or fullname.startswith(name + ".") for name in blocked):
++            attempts.append(fullname)
++            raise ImportError("blocked optional dependency for startup probe: " + fullname)
++sys.meta_path.insert(0, ImportBlocker())
++def is_router_frame():
++    frame = inspect.currentframe().f_back
++    while frame is not None:
++        name = frame.f_globals.get("__name__", "")
++        if name.startswith(("paeos.model_router.provider_transports", "paeos.model_router.transport", "litellm", "tiktoken", "dotenv")):
++            return True
++        frame = frame.f_back
++    return False
++class GuardedEnviron:
++    def __init__(self, wrapped): self.wrapped = wrapped
++    def _check(self):
++        if is_router_frame(): raise AssertionError("adapter import accessed process environment")
++    def __getitem__(self, key): self._check(); return self.wrapped[key]
++    def __contains__(self, key): self._check(); return key in self.wrapped
++    def __iter__(self): self._check(); return iter(self.wrapped)
++    def __len__(self): self._check(); return len(self.wrapped)
++    def get(self, key, default=None): self._check(); return self.wrapped.get(key, default)
++    def keys(self): self._check(); return self.wrapped.keys()
++    def items(self): self._check(); return self.wrapped.items()
++    def values(self): self._check(); return self.wrapped.values()
++original_environ = os.environ
++original_getenv = os.getenv
++def guarded_getenv(key, default=None):
++    if is_router_frame(): raise AssertionError("adapter import called os.getenv")
++    return original_getenv(key, default)
++os.environ = GuardedEnviron(original_environ)
++os.getenv = guarded_getenv
++def deny_http(*args, **kwargs): raise AssertionError("adapter import attempted HTTP")
++requests.sessions.Session.request = deny_http
++urllib.request.urlopen = deny_http
++socket.create_connection = deny_http
++original_open = builtins.open
++def guarded_open(file, *args, **kwargs):
++    if is_router_frame() and any(part in str(file).casefold() for part in ("tiktoken", ".cache")):
++        raise AssertionError("adapter import accessed tokenizer/cache file")
++    return original_open(file, *args, **kwargs)
++builtins.open = guarded_open
++"""
++    script = f"{guard}\nsys.path.insert(0, {root!r})\n{textwrap.dedent(body)}"
++    child_env = dict(os.environ)
++    child_env["PYTHONDONTWRITEBYTECODE"] = "1"
++    return subprocess.run(
++        [sys.executable, "-I", "-B", "-c", script],
++        cwd=root,
++        env=child_env,
++        text=True,
++        capture_output=True,
++        check=False,
++    )
++
++
++def test_adapter_import_does_not_load_optional_networked_dependencies():
++    negative = _run_lite_llm_import_probe(
++        """
++        import importlib
++        try:
++            importlib.import_module("litellm")
++        except ImportError as exc:
++            assert "blocked optional dependency" in str(exc)
++            assert attempts == ["litellm"]
++        else:
++            raise AssertionError("negative import control did not block LiteLLM")
++        """
++    )
++    assert negative.returncode == 0, negative.stderr
++
++    positive = _run_lite_llm_import_probe(
++        """
++        import paeos.model_router.provider_transports as adapters
++        import paeos.model_router.transport as dispatcher
++        assert "litellm" not in sys.modules
++        assert "tiktoken" not in sys.modules
++        assert "dotenv" not in sys.modules
++        assert adapters.litellm is dispatcher.litellm
++        assert callable(adapters.litellm.completion)
++        assert callable(adapters.litellm.acompletion)
++        assert attempts == []
++        """
++    )
++    assert positive.returncode == 0, positive.stderr
++
++
++def test_late_litellm_initialization_keeps_retry_and_telemetry_disabled(monkeypatch):
++    fake_litellm = type(sys)("litellm")
++    fake_litellm.num_retries = 9
++    fake_litellm.telemetry = True
++    fake_litellm.drop_params = False
++    monkeypatch.setitem(sys.modules, "litellm", fake_litellm)
++
++    facade = provider_transports_module._LazyLiteLLM()
++    assert facade._module is None
++    assert facade._load_module() is fake_litellm
++    assert fake_litellm.num_retries == 0
++    assert fake_litellm.telemetry is False
++    assert fake_litellm.drop_params is True
++
++
+ def entry() -> ModelCatalogEntry:
+     return ModelCatalogEntry(
+         model_id="synthetic/model",
