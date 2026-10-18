@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import subprocess
 import sys
@@ -129,6 +130,13 @@ def test_adapter_import_does_not_load_optional_networked_dependencies():
     assert positive.returncode == 0, positive.stderr
 
 
+@pytest.fixture
+def synthetic_wire_only(monkeypatch):
+    """Isolate lower-wire tests; this explicit test override is not disclosure permission."""
+    monkeypatch.setattr(provider_transports_module, "_require_disclosure_authority", lambda: None)
+
+
+@pytest.mark.usefixtures("synthetic_wire_only")
 def test_late_litellm_initialization_keeps_retry_and_telemetry_disabled(monkeypatch):
     fake_litellm = type(sys)("litellm")
     fake_litellm.num_retries = 9
@@ -233,6 +241,7 @@ def test_litellm_dispatch_uses_bound_synthetic_adapter() -> None:
     assert synthetic.calls == 1
 
 
+@pytest.mark.usefixtures("synthetic_wire_only")
 def test_openai_compatible_adapter_preserves_endpoint_and_tool_normalization() -> None:
     model_entry = ModelCatalogEntry(
         model_id="nvidia/model",
@@ -282,6 +291,7 @@ def test_openai_compatible_adapter_preserves_endpoint_and_tool_normalization() -
     assert result.content == "ok"
 
 
+@pytest.mark.usefixtures("synthetic_wire_only")
 def test_openai_compatible_adapter_adds_confidential_zdr_body() -> None:
     model_entry = entry()
     adapter = OpenAICompatibleTransport(
@@ -318,6 +328,7 @@ def test_openai_compatible_adapter_adds_confidential_zdr_body() -> None:
     }
 
 
+@pytest.mark.usefixtures("synthetic_wire_only")
 def test_cline_adapter_unwraps_data_envelope_and_uses_exact_endpoint() -> None:
     model_entry = ModelCatalogEntry(
         model_id="cline/model",
@@ -393,3 +404,106 @@ def test_normalized_error_recovers_http_metadata_from_response_object() -> None:
     assert error.error_type is NormalizedErrorType.RATE_LIMITED
     assert error.http_status == 429
     assert error.retry_after == 9.0
+
+
+@pytest.mark.parametrize("provider", list(ProviderId))
+@pytest.mark.parametrize("through_dispatcher", [False, True])
+@pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+    monkeypatch, provider, through_dispatcher, classification
+):
+    """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+    calls = []
+
+    def wire_tripwire(*_args, **_kwargs):
+        calls.append("provider")
+        raise RuntimeError("synthetic provider boundary reached")
+
+    def fingerprint_tripwire(*_args, **_kwargs):
+        calls.append("fingerprint")
+        raise RuntimeError("synthetic receipt boundary reached")
+
+    monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+    monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+    monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+    monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+    registry = build_builtin_transport_registry(ModelCatalog())
+    candidate = ModelCatalogEntry(
+        model_id="gpt-5.6-sol",
+        provider_id=provider,
+        family=ModelFamily.GPT,
+        cost_tier=CostTier.FREE,
+    )
+    request = TaskRequest(
+        messages=[
+            {
+                "role": "user",
+                "content": "synthetic-excluded-sentinel",
+                "attachments": [{"file_data": "synthetic-excluded-sentinel"}],
+            },
+            {"role": "tool", "content": "synthetic-excluded-sentinel"},
+        ],
+        tools=[{"type": "function", "function": {"name": "synthetic"}}],
+        data_class=classification,
+        metadata={
+            "allow": True,
+            "disclosure_permit": {"status": "ACTIVE"},
+            "history": "synthetic-excluded-sentinel",
+        },
+    )
+    failure = None
+    try:
+        if through_dispatcher:
+            credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+            LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+        else:
+            registry.resolve_for_provider(provider).dispatch(
+                candidate, request, api_key="synthetic-key", timeout=2.0
+            )
+    except Exception as exc:
+        failure = exc
+    assert calls == []
+    assert isinstance(failure, RuntimeError)
+    assert "synthetic-excluded-sentinel" not in str(failure)
+    assert "synthetic-key" not in str(failure)
+
+
+@pytest.mark.parametrize("cached", [False, True])
+@pytest.mark.parametrize("operation", ["load", "sync", "async"])
+def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+    monkeypatch, cached, operation
+):
+    """A guard after the cache branch would leave a direct cached-module bypass."""
+    calls = []
+
+    def completion(*_args, **_kwargs):
+        calls.append("sync")
+
+    async def acompletion(*_args, **_kwargs):
+        calls.append("async")
+
+    fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+
+    def load(_name):
+        calls.append("import")
+        return fake
+
+    facade = provider_transports_module._LazyLiteLLM()
+    if cached:
+        facade._module = fake
+    monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+    failure = None
+    returned = None
+    try:
+        if operation == "load":
+            returned = facade._load_module()
+        elif operation == "sync":
+            returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+        else:
+            returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+    except Exception as exc:
+        failure = exc
+    assert calls == []
+    assert returned is None
+    assert isinstance(failure, RuntimeError)
+    assert "synthetic-excluded-sentinel" not in str(failure)

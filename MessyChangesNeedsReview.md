@@ -5520,3 +5520,7 @@ Evidence-only package: concurrency binds raw request/response bytes, while exact
 ### 2026-10-18 — single-broker default-deny candidate
 
 Three scoped source/test files add an always-denying guard in the request handler and direct forwarding helper, with no production enable bypass. Trusted positive disclosure authority remains absent. Baseline34 failures/202 passes became236 focused passes; lint/format/compile passed. Existing receipt-only tests explicitly bypass the guard in test code and do not establish disclosure eligibility. Raw evidence is preserved under `reviews/tasks/PAEOS_BROKER_DEFAULT_DENY_20261018/`. No fresh formal review or activation; P1 remains open and the last full-suite measurement still has seven collection errors.
+
+### 2026-10-18 — built-in adapter default-deny candidate
+
+One production file and two test files implement local denial across both built-in adapter classes and the shared cached/uncached LiteLLM loader. All five built-in bindings are covered; custom policy is unchanged. Baseline36fail/36pass became72pass; OS network-denial control, source origins, lint/format/compile pass. Lower-wire/fingerprint tests explicitly isolate the gate and do not claim permitted egress. Raw evidence is in `reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/`. P1 remains open; no formal review/activation or full-suite pass is claimed.

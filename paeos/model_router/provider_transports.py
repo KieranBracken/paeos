@@ -3,6 +3,9 @@
 The router supplies a catalog entry and an API key; this module owns provider wire details.  All
 adapters are registered explicitly at trusted startup, so a writable directory cannot inject a
 transport implementation.
+
+Built-in egress is disabled until a trusted disclosure-authorization consumer is integrated.
+Catalog entries, credentials and request labels are not disclosure permission.
 """
 
 from __future__ import annotations
@@ -32,6 +35,19 @@ from paeos.model_router.types import (
 )
 
 
+class DisclosureAuthorityUnavailable(RuntimeError):
+    """Local disclosure denial, not a provider response or retryable transport error."""
+
+
+def _require_disclosure_authority() -> None:
+    """Deny without inventing policy currentness, payload binding or attempt authority.
+
+    The dormant signature verifier cannot grant egress. This has no positive permit,
+    callback or flag; enabling it requires a separately reviewed trusted integration.
+    """
+    raise DisclosureAuthorityUnavailable("trusted disclosure authority is unavailable")
+
+
 class _LazyLiteLLM:
     """Load optional LiteLLM only when a routed OpenAI-compatible call is made."""
 
@@ -40,6 +56,7 @@ class _LazyLiteLLM:
         self._lock = threading.Lock()
 
     def _load_module(self) -> Any:
+        _require_disclosure_authority()
         if self._module is None:
             with self._lock:
                 if self._module is None:
@@ -122,6 +139,7 @@ class OpenAICompatibleTransport:
         api_key: str,
         timeout: float,
     ) -> RouterResponse:
+        _require_disclosure_authority()
         cleaned_messages = request.messages
         if self._config.single_tool_call_only:
             cleaned_messages = []
@@ -216,6 +234,7 @@ class ClineEnvelopeTransport:
         api_key: str,
         timeout: float,
     ) -> RouterResponse:
+        _require_disclosure_authority()
         payload: dict[str, Any] = {
             "model": model_entry.model_id,
             "messages": request.messages,

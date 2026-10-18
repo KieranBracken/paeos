@@ -1,0 +1,51 @@
+{
+  "schema": "paeos.offline-bootstrap-scope/1",
+  "base": "7c58f9f5ab95dc0d0c177c0b9d57a140ccb6ff59",
+  "authority": "Existing human-approved E0-E3 bounded offline exception; no production activation or trust authority inferred.",
+  "owner": "Root bootstrap integrator; Chat1 retains exclusive D0258 integration.",
+  "files": [
+    {
+      "path": "paeos/model_router/provider_transports.py",
+      "preimage_sha256": "b4d5b6afe1f13306fabf96ae6f152e1410933679fcac5617f467ccda98deaeef"
+    },
+    {
+      "path": "tests/model_router/test_provider_transports.py",
+      "preimage_sha256": "0fd643e67bcf9edad7c40456c9491ab1699e8306f0aab034d0bab0197cb9b0a3"
+    },
+    {
+      "path": "tests/model_router/test_auditor_receipt.py",
+      "preimage_sha256": "50ac90f222eeb7cd123ea75ea8cd3b2d6e9b367f29a3b7d5012a73cc92f38977"
+    }
+  ],
+  "extension_reason": "test_auditor_receipt.py has one direct built-in dispatch fingerprint test; explicitly isolate its lower-wire behavior rather than mistake it for permitted egress. No source consumer schema changes.",
+  "design": [
+    "Both builtin adapter dispatch methods deny before payload construction, provider call or fingerprint/RouterResponse creation. All five factory bindings use these two classes.",
+    "Guard shared lazy LiteLLM _load_module before cached/uncached paths. This denies direct sync/async completion and direct optional module loading before import side effects. No allow flag/callback/worker permit.",
+    "Use content-free RuntimeError-derived local authority failure outside provider normalization; existing transport/router does not misclassify it as a provider response or retry it. Outer router may already have selected a candidate/acquired a local slot; no claim that all scheduling activity is absent.",
+    "Existing three wire-normalization tests, lazy initialization test and one fingerprint test explicitly bypass the guard only in test code; unpatched denial cases separate. Custom transport policy unchanged."
+  ],
+  "tests": [
+    "All5builtin bindings, direct dispatch and outer dispatcher, synthetic payload/classification/permit claims, tool/attachment/history data deny before network/fingerprints.",
+    "Direct sync/async lazy facade denies before loading optional LiteLLM.",
+    "Existing custom synthetic adapter, import-laziness, registry/wire and receipt regressions."
+  ],
+  "forbidden": [
+    "providers",
+    "host credentials/keys/runtime state",
+    "installation",
+    "qualification/admission",
+    "Court/debt integration",
+    "original review edits",
+    "formal review",
+    "custom transport policy change"
+  ],
+  "completion": "Built-in-adapter default-deny containment only; no positive authorization or whole-repository egress closure.",
+  "remaining_gaps": [
+    "trusted disclosure authority and composition/attempt binding",
+    "other egress paths and producer authentication",
+    "model identity schema",
+    "final review and current qualification/admission"
+  ],
+  "evidence_root": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018",
+  "full_suite": "Focused candidate checks only; prior7 collection errors not rerun or reclassified."
+}

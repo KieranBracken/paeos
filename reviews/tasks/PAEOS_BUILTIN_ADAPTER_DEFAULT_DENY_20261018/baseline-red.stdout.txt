@@ -1,0 +1,2151 @@
+............FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........................ [100%]
+=================================== FAILURES ===================================
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-google] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1054d76f0>
+provider = <ProviderId.GOOGLE: 'google'>, through_dispatcher = False
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-cline] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b3b650>
+provider = <ProviderId.CLINE: 'cline'>, through_dispatcher = False
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-nvidia] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10575dd00>
+provider = <ProviderId.NVIDIA: 'nvidia'>, through_dispatcher = False
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-kilo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10575e470>
+provider = <ProviderId.KILO: 'kilo'>, through_dispatcher = False
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-openrouter] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1057a6a50>
+provider = <ProviderId.OPENROUTER: 'openrouter'>, through_dispatcher = False
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-google] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1057a7150>
+provider = <ProviderId.GOOGLE: 'google'>, through_dispatcher = True
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-cline] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b27020>
+provider = <ProviderId.CLINE: 'cline'>, through_dispatcher = True
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-nvidia] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b276b0>
+provider = <ProviderId.NVIDIA: 'nvidia'>, through_dispatcher = True
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-kilo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b83a10>
+provider = <ProviderId.KILO: 'kilo'>, through_dispatcher = True
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-openrouter] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106bc0750>
+provider = <ProviderId.OPENROUTER: 'openrouter'>, through_dispatcher = True
+classification = <DataClass.PUBLIC: 'PUBLIC'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-google] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106ba1980>
+provider = <ProviderId.GOOGLE: 'google'>, through_dispatcher = False
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-cline] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b55250>
+provider = <ProviderId.CLINE: 'cline'>, through_dispatcher = False
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-nvidia] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x103b70710>
+provider = <ProviderId.NVIDIA: 'nvidia'>, through_dispatcher = False
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-kilo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b71e90>
+provider = <ProviderId.KILO: 'kilo'>, through_dispatcher = False
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-openrouter] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b72200>
+provider = <ProviderId.OPENROUTER: 'openrouter'>, through_dispatcher = False
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-google] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c13cf0>
+provider = <ProviderId.GOOGLE: 'google'>, through_dispatcher = True
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-cline] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c13f70>
+provider = <ProviderId.CLINE: 'cline'>, through_dispatcher = True
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-nvidia] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b5d2e0>
+provider = <ProviderId.NVIDIA: 'nvidia'>, through_dispatcher = True
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-kilo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c748d0>
+provider = <ProviderId.KILO: 'kilo'>, through_dispatcher = True
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-openrouter] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c77150>
+provider = <ProviderId.OPENROUTER: 'openrouter'>, through_dispatcher = True
+classification = <DataClass.SECRET: 'SECRET'>
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-google] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b50ad0>
+provider = <ProviderId.GOOGLE: 'google'>, through_dispatcher = False
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-cline] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b533f0>
+provider = <ProviderId.CLINE: 'cline'>, through_dispatcher = False
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-nvidia] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c8be70>
+provider = <ProviderId.NVIDIA: 'nvidia'>, through_dispatcher = False
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-kilo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c8a9e0>
+provider = <ProviderId.KILO: 'kilo'>, through_dispatcher = False
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-openrouter] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c8ad60>
+provider = <ProviderId.OPENROUTER: 'openrouter'>, through_dispatcher = False
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-google] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c8b2a0>
+provider = <ProviderId.GOOGLE: 'google'>, through_dispatcher = True
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-cline] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c8a660>
+provider = <ProviderId.CLINE: 'cline'>, through_dispatcher = True
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-nvidia] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c8a270>
+provider = <ProviderId.NVIDIA: 'nvidia'>, through_dispatcher = True
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-kilo] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106c89d30>
+provider = <ProviderId.KILO: 'kilo'>, through_dispatcher = True
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-openrouter] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106bab9a0>
+provider = <ProviderId.OPENROUTER: 'openrouter'>, through_dispatcher = True
+classification = 'unknown'
+
+    @pytest.mark.parametrize("provider", list(ProviderId))
+    @pytest.mark.parametrize("through_dispatcher", [False, True])
+    @pytest.mark.parametrize("classification", [DataClass.PUBLIC, DataClass.SECRET, "unknown"])
+    def test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt(
+        monkeypatch, provider, through_dispatcher, classification
+    ):
+        """Removing an adapter guard exposes the synthetic payload to the wire tripwire."""
+        calls = []
+    
+        def wire_tripwire(*_args, **_kwargs):
+            calls.append("provider")
+            raise RuntimeError("synthetic provider boundary reached")
+    
+        def fingerprint_tripwire(*_args, **_kwargs):
+            calls.append("fingerprint")
+            raise RuntimeError("synthetic receipt boundary reached")
+    
+        monkeypatch.setattr(provider_transports_module.litellm, "completion", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module.requests, "post", wire_tripwire)
+        monkeypatch.setattr(provider_transports_module, "request_fingerprint", fingerprint_tripwire)
+        monkeypatch.setattr(provider_transports_module, "response_fingerprint", fingerprint_tripwire)
+        registry = build_builtin_transport_registry(ModelCatalog())
+        candidate = ModelCatalogEntry(
+            model_id="gpt-5.6-sol", provider_id=provider, family=ModelFamily.GPT,
+            cost_tier=CostTier.FREE,
+        )
+        request = TaskRequest(
+            messages=[
+                {"role": "user", "content": "synthetic-excluded-sentinel",
+                 "attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+                {"role": "tool", "content": "synthetic-excluded-sentinel"},
+            ],
+            tools=[{"type": "function", "function": {"name": "synthetic"}}],
+            data_class=classification,
+            metadata={"allow": True, "disclosure_permit": {"status": "ACTIVE"},
+                      "history": "synthetic-excluded-sentinel"},
+        )
+        failure = None
+        try:
+            if through_dispatcher:
+                credentials = SimpleNamespace(get_key=lambda _provider: "synthetic-key")
+                LiteLLMTransport(credentials, registry=registry).dispatch(candidate, request)
+            else:
+                registry.resolve_for_provider(provider).dispatch(
+                    candidate, request, api_key="synthetic-key", timeout=2.0
+                )
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['provider'] == []
+E         
+E         Left contains one more item: 'provider'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:447: AssertionError
+_ test_direct_litellm_facade_denies_before_import_or_cached_dispatch[load-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b512b0>
+cached = False, operation = 'load'
+
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("operation", ["load", "sync", "async"])
+    def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+        monkeypatch, cached, operation
+    ):
+        """A guard after the cache branch would leave a direct cached-module bypass."""
+        calls = []
+    
+        def completion(*_args, **_kwargs):
+            calls.append("sync")
+    
+        async def acompletion(*_args, **_kwargs):
+            calls.append("async")
+    
+        fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+    
+        def load(_name):
+            calls.append("import")
+            return fake
+    
+        facade = provider_transports_module._LazyLiteLLM()
+        if cached:
+            facade._module = fake
+        monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+        failure = None
+        returned = None
+        try:
+            if operation == "load":
+                returned = facade._load_module()
+            elif operation == "sync":
+                returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+            else:
+                returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['import'] == []
+E         
+E         Left contains one more item: 'import'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:488: AssertionError
+_ test_direct_litellm_facade_denies_before_import_or_cached_dispatch[load-True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106b511d0>
+cached = True, operation = 'load'
+
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("operation", ["load", "sync", "async"])
+    def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+        monkeypatch, cached, operation
+    ):
+        """A guard after the cache branch would leave a direct cached-module bypass."""
+        calls = []
+    
+        def completion(*_args, **_kwargs):
+            calls.append("sync")
+    
+        async def acompletion(*_args, **_kwargs):
+            calls.append("async")
+    
+        fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+    
+        def load(_name):
+            calls.append("import")
+            return fake
+    
+        facade = provider_transports_module._LazyLiteLLM()
+        if cached:
+            facade._module = fake
+        monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+        failure = None
+        returned = None
+        try:
+            if operation == "load":
+                returned = facade._load_module()
+            elif operation == "sync":
+                returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+            else:
+                returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+        except Exception as exc:
+            failure = exc
+        assert calls == []
+>       assert returned is None
+E       assert namespace(completion=<function test_direct_litellm_facade_denies_before_import_or_cached_dispatch.<locals>.completion ...tion=<function test_direct_litellm_facade_denies_before_import_or_cached_dispatch.<locals>.acompletion at 0x106c11c60>) is None
+
+tests/model_router/test_provider_transports.py:489: AssertionError
+_ test_direct_litellm_facade_denies_before_import_or_cached_dispatch[sync-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106cae200>
+cached = False, operation = 'sync'
+
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("operation", ["load", "sync", "async"])
+    def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+        monkeypatch, cached, operation
+    ):
+        """A guard after the cache branch would leave a direct cached-module bypass."""
+        calls = []
+    
+        def completion(*_args, **_kwargs):
+            calls.append("sync")
+    
+        async def acompletion(*_args, **_kwargs):
+            calls.append("async")
+    
+        fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+    
+        def load(_name):
+            calls.append("import")
+            return fake
+    
+        facade = provider_transports_module._LazyLiteLLM()
+        if cached:
+            facade._module = fake
+        monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+        failure = None
+        returned = None
+        try:
+            if operation == "load":
+                returned = facade._load_module()
+            elif operation == "sync":
+                returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+            else:
+                returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['import', 'sync'] == []
+E         
+E         Left contains 2 more items, first extra item: 'import'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:488: AssertionError
+_ test_direct_litellm_facade_denies_before_import_or_cached_dispatch[sync-True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106cae3c0>
+cached = True, operation = 'sync'
+
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("operation", ["load", "sync", "async"])
+    def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+        monkeypatch, cached, operation
+    ):
+        """A guard after the cache branch would leave a direct cached-module bypass."""
+        calls = []
+    
+        def completion(*_args, **_kwargs):
+            calls.append("sync")
+    
+        async def acompletion(*_args, **_kwargs):
+            calls.append("async")
+    
+        fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+    
+        def load(_name):
+            calls.append("import")
+            return fake
+    
+        facade = provider_transports_module._LazyLiteLLM()
+        if cached:
+            facade._module = fake
+        monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+        failure = None
+        returned = None
+        try:
+            if operation == "load":
+                returned = facade._load_module()
+            elif operation == "sync":
+                returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+            else:
+                returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['sync'] == []
+E         
+E         Left contains one more item: 'sync'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:488: AssertionError
+_ test_direct_litellm_facade_denies_before_import_or_cached_dispatch[async-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106cae5f0>
+cached = False, operation = 'async'
+
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("operation", ["load", "sync", "async"])
+    def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+        monkeypatch, cached, operation
+    ):
+        """A guard after the cache branch would leave a direct cached-module bypass."""
+        calls = []
+    
+        def completion(*_args, **_kwargs):
+            calls.append("sync")
+    
+        async def acompletion(*_args, **_kwargs):
+            calls.append("async")
+    
+        fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+    
+        def load(_name):
+            calls.append("import")
+            return fake
+    
+        facade = provider_transports_module._LazyLiteLLM()
+        if cached:
+            facade._module = fake
+        monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+        failure = None
+        returned = None
+        try:
+            if operation == "load":
+                returned = facade._load_module()
+            elif operation == "sync":
+                returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+            else:
+                returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['import', 'async'] == []
+E         
+E         Left contains 2 more items, first extra item: 'import'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:488: AssertionError
+_ test_direct_litellm_facade_denies_before_import_or_cached_dispatch[async-True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x106cae7b0>
+cached = True, operation = 'async'
+
+    @pytest.mark.parametrize("cached", [False, True])
+    @pytest.mark.parametrize("operation", ["load", "sync", "async"])
+    def test_direct_litellm_facade_denies_before_import_or_cached_dispatch(
+        monkeypatch, cached, operation
+    ):
+        """A guard after the cache branch would leave a direct cached-module bypass."""
+        calls = []
+    
+        def completion(*_args, **_kwargs):
+            calls.append("sync")
+    
+        async def acompletion(*_args, **_kwargs):
+            calls.append("async")
+    
+        fake = SimpleNamespace(completion=completion, acompletion=acompletion)
+    
+        def load(_name):
+            calls.append("import")
+            return fake
+    
+        facade = provider_transports_module._LazyLiteLLM()
+        if cached:
+            facade._module = fake
+        monkeypatch.setattr(provider_transports_module.importlib, "import_module", load)
+        failure = None
+        returned = None
+        try:
+            if operation == "load":
+                returned = facade._load_module()
+            elif operation == "sync":
+                returned = facade.completion(messages=["synthetic-excluded-sentinel"])
+            else:
+                returned = asyncio.run(facade.acompletion(messages=["synthetic-excluded-sentinel"]))
+        except Exception as exc:
+            failure = exc
+>       assert calls == []
+E       AssertionError: assert ['async'] == []
+E         
+E         Left contains one more item: 'async'
+E         Use -v to get more diff
+
+tests/model_router/test_provider_transports.py:488: AssertionError
+=========================== short test summary info ============================
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-google]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-cline]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-nvidia]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-kilo]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-False-openrouter]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-google]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-cline]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-nvidia]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-kilo]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[PUBLIC-True-openrouter]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-google]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-cline]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-nvidia]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-kilo]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-False-openrouter]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-google]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-cline]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-nvidia]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-kilo]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[SECRET-True-openrouter]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-google]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-cline]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-nvidia]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-kilo]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-False-openrouter]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-google]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-cline]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-nvidia]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-kilo]
+FAILED tests/model_router/test_provider_transports.py::test_builtin_adapters_deny_untrusted_disclosure_before_wire_or_receipt[unknown-True-openrouter]
+FAILED tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch[load-False]
+FAILED tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch[load-True]
+FAILED tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch[sync-False]
+FAILED tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch[sync-True]
+FAILED tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch[async-False]
+FAILED tests/model_router/test_provider_transports.py::test_direct_litellm_facade_denies_before_import_or_cached_dispatch[async-True]
+36 failed, 36 passed in 0.40s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.keystore": "kernel/keystore.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py"}

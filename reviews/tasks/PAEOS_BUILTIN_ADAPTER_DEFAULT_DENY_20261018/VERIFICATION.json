@@ -1,0 +1,29 @@
+{
+  "base": "7c58f9f5ab95dc0d0c177c0b9d57a140ccb6ff59",
+  "result": "BUILTIN_DEFAULT_DENY_CANDIDATE_VERIFIED_P1_REMAINS",
+  "red": {
+    "failed": 36,
+    "passed": 36,
+    "seconds": 0.4
+  },
+  "green": {
+    "passed": 72,
+    "seconds": 0.28
+  },
+  "verified_final": {
+    "passed": 72,
+    "seconds": 0.28,
+    "network_denial_control": "PASS: synthetic loopback bind denied by OS profile"
+  },
+  "checks": "Candidate origins, scoped lint/format/compile/source diff PASS. No LiteLLM imported in test process.",
+  "limits": [
+    "no positive authorization",
+    "five builtin bindings/two adapters/shared facade only",
+    "custom policy unchanged",
+    "outer selection/slot/credential lookup may precede denial",
+    "lower-wire/fingerprint tests explicitly override guard only in tests",
+    "full suite not rerun; prior7 collection errors remain",
+    "no fresh formal review, provider, activation, qualification, admission, Court or debt integration"
+  ],
+  "original_review_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+}

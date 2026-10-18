@@ -1,0 +1,105 @@
+{
+  "base": "7c58f9f5ab95dc0d0c177c0b9d57a140ccb6ff59",
+  "files": [
+    {
+      "path": "paeos/model_router/provider_transports.py",
+      "sha256": "ebd0dae361ce617dd88fc50c2928648d77ea0b5df7fd07230df44c7538850043",
+      "bytes": 17414
+    },
+    {
+      "path": "tests/model_router/test_provider_transports.py",
+      "sha256": "0a8d63176ee452890a2001f331ad182608e8485e0389ab544ffe45572cde376d",
+      "bytes": 18347
+    },
+    {
+      "path": "tests/model_router/test_auditor_receipt.py",
+      "sha256": "deb1b12f846dc6947e53f50f0fc0e2fac92fdc93b326cc503bf1ba61698d5308",
+      "bytes": 18687
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/SCOPE.json",
+      "sha256": "91b2c59ea4d62916eb20e2aa0c71bd16c99ecb54f102e966edc41d202a1248c8",
+      "bytes": 3160
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/STATIC_CHECKS.json",
+      "sha256": "1de8696f9fb657a4444189c20e535c311ba6a7b0d80b9b837cb5cdf02eeb9722",
+      "bytes": 1591
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/VERIFICATION.json",
+      "sha256": "a8d210f2b9cb2864675949036c5e7850bee38cf9098a404e671d6335d740b947",
+      "bytes": 1061
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/baseline-red.command.json",
+      "sha256": "09775d857652992089845b3a400ff332ae7767fe0c564654d185164b8358463a",
+      "bytes": 3322
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/baseline-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/baseline-red.stdout.txt",
+      "sha256": "b97aa1ee0f9ad3a2ed24341c20c0f481a3e29ce16ab1186590084e08f6f757fc",
+      "bytes": 108300
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/focused-green.command.json",
+      "sha256": "185c2137e6f892881b205da557d217e599c2c0705d957a085c2dd0cf5ba69372",
+      "bytes": 3322
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/focused-green.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/focused-green.stdout.txt",
+      "sha256": "a7a3732d4bbeb0a93bbc1c2229db378ce76f1244a1fb4de77d032ca4112e12c3",
+      "bytes": 1597
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/run_verification.py",
+      "sha256": "7725bc4a7616e7de96caa83dcb18b900b9373959388a3556400a41b4eca0007d",
+      "bytes": 4088
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/verified-final.command.json",
+      "sha256": "9de726684a97f4b8807b895648c46553b0fd3a176aa239c53eed4231444ad9da",
+      "bytes": 3663
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/verified-final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/verified-final.stdout.txt",
+      "sha256": "b19cc228a9352aab07ecf0c7f9cf76f3df4fb0c42f1d043547e0379d5503529c",
+      "bytes": 1625
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "3bcb51e286b4199a5e9d285fada7c469a6d115d9571ad9d6788ea59eae7522c4",
+      "bytes": 1467640
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "6bf41c32ecd5a4a97a15f3007f116adc27024f12799fd39f420ed888046b723c",
+      "bytes": 656780
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/SECRET_SCAN.json",
+      "sha256": "8d660228530df225ae9eb94ec9c069d3a6e91da49ea15860773ea407e65bae7a",
+      "bytes": 1563
+    },
+    {
+      "path": "reviews/tasks/PAEOS_BUILTIN_ADAPTER_DEFAULT_DENY_20261018/STAGED_DIFF_CHECK.json",
+      "sha256": "4d0b862bcaf722c44d5da597994a4fd480c0c3aa7b60e6d58a0c9df36e5231c3",
+      "bytes": 18561
+    }
+  ]
+}

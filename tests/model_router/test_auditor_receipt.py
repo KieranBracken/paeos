@@ -178,7 +178,11 @@ def test_litellm_transport_captures_content_free_fingerprints(tmp_path) -> None:
     entry = _catalog().get("gemini-3.6-flash")
     assert entry is not None
 
-    with patch("paeos.model_router.transport.litellm.completion", return_value=response):
+    # Isolate fingerprint formation below the guard; this is not authorized egress evidence.
+    with (
+        patch("paeos.model_router.provider_transports._require_disclosure_authority"),
+        patch("paeos.model_router.transport.litellm.completion", return_value=response),
+    ):
         captured = transport.dispatch(entry, request)
 
     assert captured.transport_request_sha256 == request_fingerprint(request)
@@ -320,9 +324,11 @@ def test_receipt_persistence_is_canonical_create_only_and_content_free(tmp_path)
     assert raw.endswith(b"\n")
     assert b"audit result" not in raw
     assert b"Perform an independent" not in raw
-    assert raw == json.dumps(
-        json.loads(raw), sort_keys=True, separators=(",", ":")
-    ).encode("utf-8") + b"\n"
+    assert (
+        raw
+        == json.dumps(json.loads(raw), sort_keys=True, separators=(",", ":")).encode("utf-8")
+        + b"\n"
+    )
     assert load_auditor_receipt(path) == receipt
 
     with pytest.raises(FileExistsError):
@@ -404,9 +410,7 @@ AUDIT_COMPLETE: true
     persist_auditor_report(report, report_path)
     persist_auditor_receipt(bound, receipt_path)
 
-    assert validate_auditor_artifact_pair(
-        receipt_path, report_path, contract, _catalog()
-    ).passed
+    assert validate_auditor_artifact_pair(receipt_path, report_path, contract, _catalog()).passed
 
     report_path.unlink()
     persist_auditor_report(
@@ -430,17 +434,13 @@ def test_valid_receipt_does_not_upgrade_blocked_report(tmp_path) -> None:
         expected_court_counts=(0, 0, 0),
     )
     report = _bound_report(contract, "BLOCKED_UNQUALIFIABLE")
-    receipt = capture_auditor_receipt(
-        FakeRouter(_response(request), _catalog()), contract, request
-    )
+    receipt = capture_auditor_receipt(FakeRouter(_response(request), _catalog()), contract, request)
     report_path = persist_auditor_report(report, tmp_path / "report.md")
     receipt_path = persist_auditor_receipt(
         bind_auditor_report(receipt, report), tmp_path / "receipt.json"
     )
 
-    result = adjudicate_auditor_artifact_pair(
-        receipt_path, report_path, contract, _catalog()
-    )
+    result = adjudicate_auditor_artifact_pair(receipt_path, report_path, contract, _catalog())
 
     assert result.report_status is AuditorReportStatus.BLOCKED_UNQUALIFIABLE
     assert result.a08_verdict == "PASS"
@@ -456,17 +456,13 @@ def test_substantive_pass_and_valid_a08_pair_qualify(tmp_path) -> None:
     request = _request()
     contract = _contract(request)
     report = _bound_report(contract, "PASS")
-    receipt = capture_auditor_receipt(
-        FakeRouter(_response(request), _catalog()), contract, request
-    )
+    receipt = capture_auditor_receipt(FakeRouter(_response(request), _catalog()), contract, request)
     report_path = persist_auditor_report(report, tmp_path / "report.md")
     receipt_path = persist_auditor_receipt(
         bind_auditor_report(receipt, report), tmp_path / "receipt.json"
     )
 
-    result = adjudicate_auditor_artifact_pair(
-        receipt_path, report_path, contract, _catalog()
-    )
+    result = adjudicate_auditor_artifact_pair(receipt_path, report_path, contract, _catalog())
 
     assert result.report_status is AuditorReportStatus.PASS
     assert result.a08_verdict == "PASS"
