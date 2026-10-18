@@ -1,0 +1,29 @@
+{
+  "schema": "paeos.offline-repair-scope/1",
+  "base_commit": "6cb8844645a2dc15518806fbff45d13f71e0e6aa",
+  "authority": "User-approved corrected P1-P9 plan E2/E4: exactly one broker call for the single qualification canary; offline bounded implementation only.",
+  "owner": "Bootstrap coordinator",
+  "source_manifest": [
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "ops/trusted_codex_worker_supervisor.py",
+    "tests/runtime/test_responses_broker_request_limit.py",
+    "tests/runtime/test_trusted_codex_worker_transport.py"
+  ],
+  "acceptance": [
+    "Strict positive integer per-broker ceiling no greater than existing default 32",
+    "Supervisor sets 1 for exact Builder qualification identity; ordinary requests retain existing ceiling",
+    "Sequential and concurrent attempts cannot exceed ceiling",
+    "Failed/ambiguous upstream call consumes allocation; no retry",
+    "No live provider or host credentials; synthetic loopback tests only"
+  ],
+  "excluded": [
+    "classification authority",
+    "installation",
+    "canary invocation",
+    "new keys or identity rotation",
+    "D0258 atomic ledger",
+    "review findings changes",
+    "claiming full P1 closure"
+  ],
+  "completion_boundary": "One captured, tested offline ceiling patch; activation remains held pending full boundary and review."
+}

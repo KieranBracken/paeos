@@ -66,11 +66,15 @@ class ParentOwnedResponsesBroker:
         model_id: str = _DEFAULT_MODEL_ID,
         upstream: Upstream | None = None,
         clock: Callable[[], float] | None = None,
+        max_requests: int = MAX_TASK_REQUESTS,
     ) -> None:
         if model_id not in AUTHORIZED_MODEL_IDS:
             raise ValueError("parent broker model is not an authorized fixed Codex route")
+        if type(max_requests) is not int or not 1 <= max_requests <= MAX_TASK_REQUESTS:
+            raise ValueError("parent broker request limit is outside the bounded range")
         self._auth_path = Path(auth_path)
         self._model_id = model_id
+        self._max_requests = max_requests
         self._upstream = upstream or self._forward_to_chatgpt
         self._clock = clock or time.time
         self._server: ThreadingHTTPServer | None = None
@@ -197,7 +201,7 @@ class ParentOwnedResponsesBroker:
                     self._send(403, b'{"error":{"type":"model_not_authorized"}}')
                     return
                 with broker._lock:
-                    if broker._request_count >= MAX_TASK_REQUESTS:
+                    if broker._request_count >= broker._max_requests:
                         broker._local_rejection_count += 1
                         broker._local_error_class = "task_request_limit_reached"
                         broker._transport_outcome = "local_rejection"
@@ -277,6 +281,7 @@ class ParentOwnedResponsesBroker:
                 "binding": "127.0.0.1",
                 "model_id": self._model_id,
                 "request_count": self._request_count,
+                "request_limit": self._max_requests,
                 "request_sha256": self._request_sha256,
                 "response_sha256": self._response_sha256,
                 "transport_outcome": self._transport_outcome,

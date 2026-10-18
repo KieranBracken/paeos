@@ -5474,3 +5474,10 @@ A read-only dependency check corrected a possible bootstrap cycle: the one super
 ALLOWED_NOW: Preserve/push the exact findings and prepare the bounded next enforcement package. Owner: bootstrap coordinator.
 HELD: Installation, the single qualification request, Chat 1 admission and P3. Wake requires exact trusted disclosure authority, enforced full-frame/closure controls, corrected receipt/provenance boundaries, clean review and current host/stage checks.
 AUTHORITY_OR_IMPLEMENTATION_GAP: Pure verification is implemented, but production authority/enforcement and independent recovery-key custody are not established. No old backup tree is proven disposable.
+
+
+### 2026-10-18 — qualification call ceiling enforced before forwarding
+
+A second bounded offline package propagates a one-call limit from the exact Builder qualification identity to the parent-owned broker. The broker consumes the allocation under its existing lock before forwarding; concurrent attempts and retries after timeout cannot exceed it. Ordinary tasks retain the existing ceiling. All 196 combined focused tests passed (13 new); lint, formatting, compilation and changed-source whitespace checks passed. A full-suite run for the changed package again failed with 22 collection errors. Evidence: `reviews/tasks/PAEOS_CANARY_CALL_CEILING_20261018/`.
+
+This later code is not covered by the Security Review of `ab7c47d7`; that original report and its five findings remain unchanged. No second review, host install, qualification request, provider call or PAEOS admission occurred. ALLOWED_NOW: bounded offline boundary completion. HELD: live activation and item workers until complete exact authority/frame/closure enforcement and final-candidate review. AUTHORITY_OR_IMPLEMENTATION_GAP: the call ceiling alone does not bind stable disclosure authorization or close P1.

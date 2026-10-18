@@ -841,7 +841,19 @@ class TrustedCodexWorkerSupervisor:
                 ),
             )
             with ParentOwnedResponsesBroker(
-                auth_path=self.codex_home / "auth.json", model_id=model_id
+                auth_path=self.codex_home / "auth.json",
+                model_id=model_id,
+                max_requests=(
+                    1
+                    if _qualification_nonce(
+                        request.get("task_id"),
+                        request.get("goal_id"),
+                        request.get("run_id"),
+                        request.get("stage"),
+                    )
+                    is not None
+                    else MAX_TASK_REQUESTS
+                ),
             ) as broker:
                 policy, environment, codex_executable = self._policy(
                     workspace,

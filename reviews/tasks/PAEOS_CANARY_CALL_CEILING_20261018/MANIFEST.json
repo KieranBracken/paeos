@@ -1,0 +1,57 @@
+{
+  "schema": "paeos.source-recovery-manifest/1",
+  "base_commit": "6cb8844645a2dc15518806fbff45d13f71e0e6aa",
+  "claim": "OFFLINE_TESTED_NOT_REVIEWED_OR_QUALIFIED",
+  "files": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "bytes": 13178,
+      "sha256": "e2271dae4e78d4e7464fb2bc8d0a7aea78c5697434fa848293fb8653ac384153"
+    },
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "bytes": 61340,
+      "sha256": "b79f7e2a32aa228f187fca722794f9786cf360846e45e3ad6b43b52587c51737"
+    },
+    {
+      "path": "tests/runtime/test_responses_broker_request_limit.py",
+      "bytes": 3656,
+      "sha256": "b5f8b622ef5fd4c24977b919eb2683b3eb8aad1452d5417dcb7cec4daef10f95"
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_worker_transport.py",
+      "bytes": 39776,
+      "sha256": "999ee8bf8e94305efb7ea074fcc27d6172fd4edf37aba5d49527cfbc0b69d268"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1433426,
+      "sha256": "6b46443a32e777b0b6ef7e6dd8469fc26f85035de23811177cbc23bc4b6e1e77"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 649236,
+      "sha256": "66e0359954529482ba6a57a872fc36bfbd407b7ffef2ab6166176d3a45356275"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CANARY_CALL_CEILING_20261018/SCOPE.json",
+      "bytes": 1333,
+      "sha256": "162876e34e9f8408a18dc525fefdbb234c84de26d111713f66635b88b9e93106"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CANARY_CALL_CEILING_20261018/verification.json",
+      "bytes": 3440,
+      "sha256": "cbcf257df034a6776ba2e22b4a729040a2434cfb76d72d52dbce25689f352775"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CANARY_CALL_CEILING_20261018/REPORT.md",
+      "bytes": 2412,
+      "sha256": "5ddd98bcb09e7e3540096d38bbfffa79e5bc6d98ddd8b12efd9e795a23c9a573"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_CANARY_CALL_CEILING_20261018/secret-scan.json",
+      "bytes": 706,
+      "sha256": "198acb28e82b3c4454b86f75a9642719dc01bd0a6a889736d6c22def7d1e9e60"
+    }
+  ]
+}

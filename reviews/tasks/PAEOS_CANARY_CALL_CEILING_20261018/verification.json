@@ -1,0 +1,73 @@
+{
+  "schema": "paeos.canary-ceiling-verification/1",
+  "base_commit": "6cb8844645a2dc15518806fbff45d13f71e0e6aa",
+  "focused": {
+    "passed": 196,
+    "failed": 0,
+    "new_ceiling_cases": 13,
+    "output_sha256": "58e239683f166f84e3680d1d4a85ccaf401911af832da2c0c3ebbccc728395fe",
+    "command": "UV_PROJECT_ENVIRONMENT=/Users/bob/GitHub/paeos/.venv uv run --no-sync python -m pytest -o addopts= -q [policy, catalog/privacy, installer, trusted transport, readiness, client, broker ceiling test modules]"
+  },
+  "red_controls": {
+    "broker_limit_missing": "11 new broker cases failed before implementation",
+    "supervisor_binding": "2 corrected harness cases failed against pre-change supervisor, then passed after propagation"
+  },
+  "static_checks": {
+    "lint": "PASS",
+    "format": "PASS",
+    "compile": "PASS",
+    "changed_source_diff_check": "PASS"
+  },
+  "full_suite": {
+    "result": "FAIL_COLLECTION",
+    "error_count": 22,
+    "erroring_modules": [
+      "tests/contracts/test_idea_graph_inspiration_adapter.py",
+      "tests/contracts/test_kae_lof_federation_adapter.py",
+      "tests/contracts/test_orca_mission_control_adapter.py",
+      "tests/contracts/test_sentium_shadow_conformance_harness.py",
+      "tests/ops/test_run_autonomy_canary.py",
+      "tests/runtime/test_architectural_assurance.py",
+      "tests/runtime/test_builder_transport_gate.py",
+      "tests/runtime/test_claude_cli_transport.py",
+      "tests/runtime/test_court_taint_index.py",
+      "tests/runtime/test_evolution.py",
+      "tests/runtime/test_evolution_ledger.py",
+      "tests/runtime/test_friction.py",
+      "tests/runtime/test_ledger_model_attribution.py",
+      "tests/runtime/test_mcp_transport.py",
+      "tests/runtime/test_memory_lifetime_boundary.py",
+      "tests/runtime/test_r4_full_chain_proof.py",
+      "tests/runtime/test_scheduler.py",
+      "tests/runtime/test_selfhost.py",
+      "tests/runtime/test_selfhost_cli.py",
+      "tests/runtime/test_soft_loop.py",
+      "tests/runtime/test_transport.py",
+      "tests/runtime/test_verification.py"
+    ],
+    "exit_code": 2,
+    "runs_for_this_changed_package": 1,
+    "output_sha256": "b9322257f7afb0d460de22670280f8fb593f53402c99653565909c5f1dbb7481"
+  },
+  "review": {
+    "last_reviewed_source": "ab7c47d72b6c5b0dabbfce8cd5ad8a7d70b89a91",
+    "this_ceiling_change_reviewed": false,
+    "reason": "One requested Security Review consumed on preceding candidate. Its original findings are preserved. Changed transport bytes need review before activation.",
+    "original_report_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+  },
+  "known_document_check_warning": "The immutable captured review report at the previous evidence commit has a trailing blank line flagged by git diff --check. It was retained unchanged; source checks pass.",
+  "effects": {
+    "remote_provider_calls": 0,
+    "network_in_tests": "loopback synthetic stub only",
+    "host_credentials_used": false,
+    "installation": false,
+    "qualification_request": false,
+    "new_admission": false
+  },
+  "limitations": [
+    "Ceiling is per broker/qualification attempt, not a stable one-use Founder-authorization claim.",
+    "Classification, complete outbound-frame policy, readable closure, receipt authentication and other review findings remain open.",
+    "Existing default general-task ceiling remains 32; full E2 is not completed."
+  ],
+  "gate": "P1_REMAINS"
+}

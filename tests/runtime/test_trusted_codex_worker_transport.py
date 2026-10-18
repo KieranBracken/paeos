@@ -65,6 +65,37 @@ def _service(
     )
 
 
+@pytest.mark.parametrize("qualification,expected_limit", [(True, 1), (False, 32)])
+def test_supervisor_sets_qualification_broker_ceiling_before_launch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, qualification: bool, expected_limit: int
+) -> None:
+    import ops.trusted_codex_worker_supervisor as supervisor
+
+    key = SigningKey.generate()
+    service = _service(tmp_path, key)
+    (service.workspace_root / "ws-transport").mkdir(mode=0o700)
+    overrides = {}
+    if qualification:
+        for field, prefix in [("task_id", "t"), ("goal_id", "g"), ("run_id", "r")]:
+            overrides[field] = f"{prefix}-builder-transport-qualification-" + "b" * 32
+    request, request_id = service._validate_request(_request(key, **overrides))
+    captured = {}
+
+    class StopBeforeBrokerStart(Exception):
+        pass
+
+    def broker(**kwargs):
+        captured.update(kwargs)
+        raise StopBeforeBrokerStart
+
+    monkeypatch.setattr(service, "_validate_codex_home", lambda: None)
+    monkeypatch.setattr(supervisor, "ParentOwnedResponsesBroker", broker)
+    with pytest.raises(supervisor.SupervisorFailure) as failure:
+        service._run_request(request, request_id)
+    assert isinstance(failure.value.__cause__, StopBeforeBrokerStart)
+    assert captured.get("max_requests") == expected_limit
+
+
 def test_supervisor_rejects_caller_selected_argv_paths_and_environment(tmp_path: Path) -> None:
     key = SigningKey.generate()
     service = _service(tmp_path, key)
