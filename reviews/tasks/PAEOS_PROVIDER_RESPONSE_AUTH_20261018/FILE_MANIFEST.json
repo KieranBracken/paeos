@@ -1,0 +1,162 @@
+{
+  "base": "c184e51b5c3c7f99963c3c3cb1dba3808aceec78",
+  "final_test_project_imports": 46,
+  "files": [
+    {
+      "path": "ops/trusted_worker_launcher_service.py",
+      "sha256": "24afb555e97b0d8199005fea85791598be0a5f0dfee5afa88c1abd78e53c7dff"
+    },
+    {
+      "path": "runtime/integrations/provider_broker.py",
+      "sha256": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1"
+    },
+    {
+      "path": "tests/ops/test_trusted_worker_launcher_response_auth.py",
+      "sha256": "693f4f0e26d1cda9f9ba5aed7aa1ae2201ec4745294ceec8f13edff4781287f7"
+    },
+    {
+      "path": "tests/runtime/test_provider_broker_response_auth.py",
+      "sha256": "ecd87045d6308b028bd110fd2b9a07b4830a522fa5629e273034668ec97f8856"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "5aa46114d37acef979cbfbaa50d2d06f2c461bc172176f72cfcb1f6ab25fb349"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "09e37de1afc9af4cbe2ac95e7c9afe635be4b63078c46b93df8c39f58fa1ddcc"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/OBSERVED_IDENTITY_FINDINGS.json",
+      "sha256": "7b3bb5ea0edb1bae4ebc72fbe0c86e665cc4665671fa915117d60e36fc83ca7d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/REPORT.md",
+      "sha256": "fffa9884bc0b7a2341ee88559e6b1562da98f21e9bf66c67cf519a2ed5686cba"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/SCOPE.json",
+      "sha256": "a515a73860ef6659fa598f3474b87964e73be1b0bc3a07a22ee3226951eaba42"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/STATIC_IMPORT_PREIMAGES.json",
+      "sha256": "0a8714bdf2e52767bd4b70764f88501488b88811060f9a22548731d20084460a"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/baseline.command.json",
+      "sha256": "816d30f307d1b014bab840093437993ec91001a8ec598f5160ababd63e02fd9c"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/baseline.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/baseline.stdout.txt",
+      "sha256": "6f851de58a80d1ec6be93c91dc90d04110ef786ff9b582add14fcee32d4716d3"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/candidate.command.json",
+      "sha256": "4a3dea331e53600cf7dc943b13dad0f63766007f38055f43fa6c5d45304d6ab7"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/candidate.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/candidate.stdout.txt",
+      "sha256": "65d15efcfeee02729c6214271274e9c8838b13cfd44b41f78e5bf73f6ae5cdff"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/changed-range-format.json",
+      "sha256": "bc70f45e2f90478bc48e9c044ff7df4dea225f98d58588eccfee1c41bd6b4e39"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/cleanup-red.command.json",
+      "sha256": "fd33a576ec306d9aa4df13f74356a60f7cdb79b4b00383fc1f33571aaa9260bb"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/cleanup-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/cleanup-red.stdout.txt",
+      "sha256": "08dfadf35686bfd9570a1b4cb0e0773b37dc6f1e2dc6ad2b149c2c44182418a1"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/final.command.json",
+      "sha256": "cc61f34abda053ea904e50c4cd5dfb7f64519e67955554101517d0d72a605d74"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/final.stdout.txt",
+      "sha256": "79816d03cb8a425b9b053b1375a2253ed4f14138b581d507cfd96d4bd75a9f94"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/full-suite.command.json",
+      "sha256": "7900b7a9fde84c9bddc2de6e15b9cce27cab7e22f95c10b8700416e62a898ddf"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/full-suite.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/full-suite.stdout.txt",
+      "sha256": "313f40ba55d7d532b4b4980b2ac3a682d4e599d960340c2ca825ca423a8e054d"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/integrated-final.command.json",
+      "sha256": "c8dbb1d23eb93e03edfe0540511ee5df3ad58a94cd321bdc715a1ebdaa89962b"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/integrated-final.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/integrated-final.stdout.txt",
+      "sha256": "ab430257b71b7f0c53fb24ea229aa7c6024840b7798fb626bb0991fb0e2db986"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/integrated-full-suite.command.json",
+      "sha256": "9b835deb4f09e38f2f280c8417e25db4d9415cc555c8a760acf989389df70280"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/integrated-full-suite.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/integrated-full-suite.stdout.txt",
+      "sha256": "521d0804b144ec91c0cec8da328a80314ddf28bcacb30b7654718c95888d9d19"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/retention-red.command.json",
+      "sha256": "1b4ef4519a503fe01b6abf49a00d05b97bbf687af30bf7ea3b02dfb2ecaf2de3"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/retention-red.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/retention-red.stdout.txt",
+      "sha256": "cba97bea6c84575da6978cdc2ee043ceb920d8a506225e40a648e72458c4d8fb"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/run_full_suite.py",
+      "sha256": "6609b74b604460370f3902bf9e2521f378fe3183b5c1c52a7906ec6beff83a53"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/run_verification.py",
+      "sha256": "5d8d7cf9c8bdc4af66466ee26f7faa77394da8540314aadec986da5f3a08e025"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/static-checks.json",
+      "sha256": "793db12874cd0f93dca3c2460c06d81ad1ed83ecf632d1ae96c4224886561da4"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_PROVIDER_RESPONSE_AUTH_20261018/secret-scan.json",
+      "sha256": "2dab4f1d6ccb11edd255c2bd26701c33a102f7d5a85f7248191b09e1a5d081ab"
+    }
+  ]
+}

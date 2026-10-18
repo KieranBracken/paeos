@@ -19,6 +19,8 @@ from typing import Any
 
 from kernel.keystore import load_or_create_signing_key
 from kernel.types import Role
+from nacl.exceptions import BadSignatureError
+from nacl.signing import VerifyKey
 
 __all__ = [
     "DEFAULT_LAUNCHER_QUEUE",
@@ -96,6 +98,7 @@ class HostClineCriticTransport:
         *,
         queue_root: Path = Path("/Users/bob/GitHub/paeos/ops/.trusted-worker/queue"),
         request_signing_key: Any | None = None,
+        response_verify_key: VerifyKey | None = None,
         timeout_s: float = 180.0,
     ) -> None:
         if not queue_root.is_absolute() or queue_root.is_symlink():
@@ -104,8 +107,14 @@ class HostClineCriticTransport:
             raise ProviderBrokerError("critic launcher timeout is outside the bounded range")
         self._queue_root = queue_root
         self._request_signing_key = request_signing_key
+        self._response_verify_key = response_verify_key
         self._timeout_s = float(timeout_s)
         self.last_observation: dict[str, object] | None = None
+
+    def _authenticate_response(self, raw_response: bytes, request_bytes: bytes) -> dict:
+        return _authenticate_provider_response(
+            raw_response, request_bytes, self._response_verify_key
+        )
 
     @staticmethod
     def _check_route(role: Role, operation: str) -> None:
@@ -303,6 +312,7 @@ class HostClineCriticTransport:
         _require_disclosure_authority()
         if spec.stage != "CRITIQUE":
             raise ProviderBrokerError("critic capability stage is not CRITIQUE")
+        _require_response_verifier(self._response_verify_key)
         capability = self.issue_task_capability(
             task_id=spec.task_id, role=Role.CRITIC, operation=self.allowed_operation
         )
@@ -355,8 +365,6 @@ class HostClineCriticTransport:
             while time.monotonic() < deadline:
                 if response_path.is_file() and not response_path.is_symlink():
                     raw = response_path.read_bytes()
-                    response_path.unlink()
-                    request_path.unlink(missing_ok=True)
                     if len(raw) > _MAX_FRAME_BYTES:
                         raise ProviderBrokerError("critic supervisor response is oversized")
                     break
@@ -364,7 +372,9 @@ class HostClineCriticTransport:
             else:
                 request_path.unlink(missing_ok=True)
                 raise ProviderBrokerError("critic supervisor response deadline exceeded")
-            response = json.loads(raw.decode("utf-8"))
+            response = self._authenticate_response(raw, payload)
+            response_path.unlink()
+            request_path.unlink(missing_ok=True)
         except ProviderBrokerError:
             raise
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -468,6 +478,99 @@ def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def _require_response_verifier(key: VerifyKey | None) -> VerifyKey:
+    if not isinstance(key, VerifyKey):
+        raise ProviderBrokerError("provider response verification authority is unavailable")
+    return key
+
+
+def _strict_response_json(raw: bytes) -> object:
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("duplicate JSON key")
+            result[key] = value
+        return result
+
+    def nonfinite(_value):
+        raise ValueError("nonfinite JSON value")
+
+    return json.loads(raw.decode("utf-8"), object_pairs_hook=pairs, parse_constant=nonfinite)
+
+
+def _authenticate_provider_response(
+    raw_response: bytes, request_bytes: bytes, verify_key: VerifyKey | None
+) -> dict:
+    """Authenticate an exact request/reply pair; this does not qualify its observation.
+
+    The caller retains the actual dispatched request bytes. No shared last-request state,
+    operational key loader, or new replay ledger is introduced here. Durable attempt
+    reconciliation remains the responsibility of the owning execution controller.
+    """
+    key = _require_response_verifier(verify_key)
+    if any(
+        type(raw) is not bytes or len(raw) > _MAX_FRAME_BYTES
+        for raw in (raw_response, request_bytes)
+    ):
+        raise ProviderBrokerError("provider response frame is invalid")
+    try:
+        envelope = _strict_response_json(raw_response)
+        if not isinstance(envelope, dict) or set(envelope) != {"payload", "signature"}:
+            raise ValueError("invalid envelope")
+        payload, signature = envelope["payload"], envelope["signature"]
+        if not isinstance(payload, dict) or not isinstance(signature, str) or len(signature) != 128:
+            raise ValueError("invalid signature encoding")
+        key.verify(
+            b"PAEOS-PROVIDER-RESPONSE-V1\0" + _canonical_bytes(payload),
+            bytes.fromhex(signature),
+        )
+        # Interpret result and authority bindings only after producer authentication.
+        if set(payload) != {"schema", "request_sha256", "response"}:
+            raise ValueError("invalid signed payload")
+        if payload["schema"] != "paeos.trusted-worker-signed-response/1":
+            raise ValueError("invalid signed schema")
+        if payload["request_sha256"] != _sha256(request_bytes):
+            raise ValueError("request digest mismatch")
+        request = _strict_response_json(request_bytes)
+        response = payload["response"]
+        if not isinstance(request, dict) or not isinstance(response, dict):
+            raise ValueError("invalid request or result")
+        capability_id = request.get("capability_id")
+        if (
+            not isinstance(capability_id, str)
+            or len(capability_id) != 32
+            or any(c not in "0123456789abcdef" for c in capability_id)
+            or response.get("capability_id") != capability_id
+            or response.get("schema") != "paeos.trusted-worker-service/1"
+        ):
+            raise ValueError("request attribution mismatch")
+        if response.get("ok") is True:
+            if set(response) != {"schema", "ok", "capability_id", "observation"}:
+                raise ValueError("invalid success fields")
+            observation = response["observation"]
+            if not isinstance(observation, dict):
+                raise ValueError("invalid observation")
+            for field in ("provider_id", "model_id", "model_family"):
+                if (
+                    not isinstance(request.get(field), str)
+                    or observation.get(field) != request[field]
+                ):
+                    raise ValueError("route mismatch")
+            for field in ("capability_id", "operation"):
+                if field in observation and observation[field] != request.get(field):
+                    raise ValueError("observation attribution mismatch")
+        elif response.get("ok") is False:
+            fields = {"schema", "ok", "capability_id", "error", "error_code"}
+            if set(response) not in (fields, fields | {"failure_observation"}):
+                raise ValueError("invalid failure fields")
+        else:
+            raise ValueError("invalid result status")
+        return response
+    except (ValueError, TypeError, UnicodeError, RecursionError, BadSignatureError):
+        raise ProviderBrokerError("provider response authentication or binding failed") from None
+
+
 def child_environment_is_clean(environment: Mapping[str, str]) -> bool:
     """Return whether an environment contains only the fixed non-secret worker keys."""
 
@@ -497,6 +600,7 @@ class HostConfinedProviderClient:
         socket_path: Path | None = None,
         queue_root: Path = DEFAULT_LAUNCHER_QUEUE,
         signing_key: Any | None = None,
+        response_verify_key: VerifyKey | None = None,
         timeout_s: float = 75.0,
     ) -> None:
         if socket_path is not None and (not socket_path.is_absolute() or socket_path.is_symlink()):
@@ -506,8 +610,14 @@ class HostConfinedProviderClient:
         if timeout_s <= 0 or timeout_s > 180:
             raise ProviderBrokerError("trusted launcher timeout is outside the bounded range")
         self._signing_key = signing_key
+        self._response_verify_key = response_verify_key
         self._queue_root = queue_root
         self._timeout_s = timeout_s
+
+    def _authenticate_response(self, raw_response: bytes, request_bytes: bytes) -> dict:
+        return _authenticate_provider_response(
+            raw_response, request_bytes, self._response_verify_key
+        )
 
     def _key(self) -> Any:
         if self._signing_key is None:
@@ -516,6 +626,7 @@ class HostConfinedProviderClient:
 
     def _capability(self, prompt: str) -> dict[str, object]:
         _require_disclosure_authority()
+        _require_response_verifier(self._response_verify_key)
         if not isinstance(prompt, str) or not prompt.strip():
             raise ProviderBrokerError("provider prompt is empty")
         if len(prompt.encode("utf-8")) > _MAX_PROMPT_BYTES or "\x00" in prompt:
@@ -539,6 +650,7 @@ class HostConfinedProviderClient:
 
     def request(self, prompt: str) -> ConfinedProviderObservation:
         _require_disclosure_authority()
+        _require_response_verifier(self._response_verify_key)
         capability = self._capability(prompt)
         frame = (_canonical_bytes(capability)).decode("utf-8")
         if len(frame.encode("utf-8")) > _MAX_FRAME_BYTES:
@@ -568,8 +680,6 @@ class HostConfinedProviderClient:
             while time.monotonic() < deadline:
                 if response_path.is_file() and not response_path.is_symlink():
                     raw_response = response_path.read_bytes()
-                    response_path.unlink()
-                    request_path.unlink(missing_ok=True)
                     if len(raw_response) > _MAX_FRAME_BYTES:
                         raise ProviderBrokerError(
                             "trusted launcher response exceeds the bounded IPC size"
@@ -583,10 +693,12 @@ class HostConfinedProviderClient:
             raise
         except (OSError, ValueError, TimeoutError) as exc:
             raise ProviderBrokerError("trusted launcher is unavailable") from exc
+        response = self._authenticate_response(raw_response, payload)
         try:
-            response = json.loads(raw_response.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise ProviderBrokerError("trusted launcher response is not strict JSON") from exc
+            response_path.unlink()
+            request_path.unlink(missing_ok=True)
+        except OSError:
+            raise ProviderBrokerError("authenticated provider response cleanup failed") from None
         if not isinstance(response, dict):
             raise ProviderBrokerError("trusted launcher response envelope is malformed")
         if response.get("capability_id") != capability["capability_id"]:

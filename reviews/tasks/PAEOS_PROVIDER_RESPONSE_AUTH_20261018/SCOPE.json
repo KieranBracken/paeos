@@ -1,0 +1,33 @@
+{
+  "base": "c184e51b5c3c7f99963c3c3cb1dba3808aceec78",
+  "owner": "Root bootstrap integrator",
+  "authority": "Existing human-approved corrected E0-E3 offline repair resumed2026-10-18; completion-overseer bounded assignment",
+  "manifest": [
+    "ops/trusted_worker_launcher_service.py",
+    "runtime/integrations/provider_broker.py",
+    "tests/ops/test_trusted_worker_launcher_response_auth.py",
+    "tests/runtime/test_provider_broker_response_auth.py"
+  ],
+  "preimages": {
+    "ops/trusted_worker_launcher_service.py": null,
+    "runtime/integrations/provider_broker.py": "c797ee91b4d726e9d61aa6789ba1201a2f27373c8b63536e7f2d55c98658f192",
+    "tests/ops/test_trusted_worker_launcher_response_auth.py": null,
+    "tests/runtime/test_provider_broker_response_auth.py": null
+  },
+  "selected_origin": {
+    "path": "ops/trusted_worker_launcher_service.py",
+    "origin": "preserved main explicit bytes only",
+    "sha256": "0a540f60004690f5fdf2658619f5cd75b00faa91fe9430a009019aaa636e95f4"
+  },
+  "forbidden": [
+    "host keys or runtime state",
+    "installer changes or copying",
+    "provider calls",
+    "positive egress",
+    "qualification",
+    "PAEOS admission",
+    "debt integration",
+    "formal review"
+  ],
+  "constraint": "Synthetic injected response identity only; absent operational signer/verifier denies. Restored producer must deny disclosure before all provider execution. Other producer routes remain unavailable. Model attribution remains NOT_ESTABLISHED."
+}

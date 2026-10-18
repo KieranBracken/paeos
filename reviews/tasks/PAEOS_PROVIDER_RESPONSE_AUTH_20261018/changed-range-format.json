@@ -1,0 +1,20 @@
+{
+  "constructor": {
+    "range": [
+      1494,
+      1528
+    ],
+    "exit": 0,
+    "stdout": "1 file already formatted\n",
+    "stderr": ""
+  },
+  "denial": {
+    "range": [
+      3424,
+      3427
+    ],
+    "exit": 0,
+    "stdout": "1 file already formatted\n",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "ops/trusted_worker_launcher_service.py": {
+    "lint_exit": 1,
+    "lint_findings": [
+      {
+        "cell": null,
+        "code": "SIM105",
+        "end_location": {
+          "column": 25,
+          "row": 3657
+        },
+        "filename": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/ops/trusted_worker_launcher_service.py",
+        "fix": {
+          "applicability": "unsafe",
+          "edits": [
+            {
+              "content": "import contextlib",
+              "end_location": {
+                "column": 18,
+                "row": 11
+              },
+              "location": {
+                "column": 1,
+                "row": 11
+              }
+            },
+            {
+              "content": "with contextlib.suppress(BrokenPipeError, ConnectionResetError)",
+              "end_location": {
+                "column": 20,
+                "row": 3654
+              },
+              "location": {
+                "column": 17,
+                "row": 3654
+              }
+            },
+            {
+              "content": "",
+              "end_location": {
+                "column": 1,
+                "row": 3658
+              },
+              "location": {
+                "column": 1,
+                "row": 3656
+              }
+            }
+          ],
+          "message": "Replace `try`-`except`-`pass` with `with contextlib.suppress(BrokenPipeError, ConnectionResetError): ...`"
+        },
+        "location": {
+          "column": 17,
+          "row": 3654
+        },
+        "message": "Use `contextlib.suppress(BrokenPipeError, ConnectionResetError)` instead of `try`-`except`-`pass`",
+        "name": "suppressible-exception",
+        "noqa_row": 3654,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/suppressible-exception"
+      }
+    ],
+    "format_exit": 1,
+    "format_output": "Would reformat: ops/trusted_worker_launcher_service.py\n1 file would be reformatted\n"
+  },
+  "runtime/integrations/provider_broker.py": {
+    "lint_exit": 0,
+    "lint_findings": [],
+    "format_exit": 0,
+    "format_output": "1 file already formatted\n"
+  },
+  "tests/ops/test_trusted_worker_launcher_response_auth.py": {
+    "lint_exit": 0,
+    "lint_findings": [],
+    "format_exit": 0,
+    "format_output": "1 file already formatted\n"
+  },
+  "tests/runtime/test_provider_broker_response_auth.py": {
+    "lint_exit": 0,
+    "lint_findings": [],
+    "format_exit": 0,
+    "format_output": "1 file already formatted\n"
+  },
+  "producer_preimage_lint": {
+    "exit": 1,
+    "findings": [
+      {
+        "cell": null,
+        "code": "SIM105",
+        "end_location": {
+          "column": 25,
+          "row": 3637
+        },
+        "filename": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/ops/trusted_worker_launcher_service.py",
+        "fix": {
+          "applicability": "unsafe",
+          "edits": [
+            {
+              "content": "import contextlib",
+              "end_location": {
+                "column": 18,
+                "row": 11
+              },
+              "location": {
+                "column": 1,
+                "row": 11
+              }
+            },
+            {
+              "content": "with contextlib.suppress(BrokenPipeError, ConnectionResetError)",
+              "end_location": {
+                "column": 20,
+                "row": 3634
+              },
+              "location": {
+                "column": 17,
+                "row": 3634
+              }
+            },
+            {
+              "content": "",
+              "end_location": {
+                "column": 1,
+                "row": 3638
+              },
+              "location": {
+                "column": 1,
+                "row": 3636
+              }
+            }
+          ],
+          "message": "Replace `try`-`except`-`pass` with `with contextlib.suppress(BrokenPipeError, ConnectionResetError): ...`"
+        },
+        "location": {
+          "column": 17,
+          "row": 3634
+        },
+        "message": "Use `contextlib.suppress(BrokenPipeError, ConnectionResetError)` instead of `try`-`except`-`pass`",
+        "name": "suppressible-exception",
+        "noqa_row": 3634,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/suppressible-exception"
+      }
+    ]
+  },
+  "compilation": "PASS in-memory, no bytecode artifacts",
+  "producer_preimage_sha256_reverified": "0a540f60004690f5fdf2658619f5cd75b00faa91fe9430a009019aaa636e95f4",
+  "final_compilation": "PASS in-memory after cleanup correction",
+  "final_source_hashes": {
+    "ops/trusted_worker_launcher_service.py": "24afb555e97b0d8199005fea85791598be0a5f0dfee5afa88c1abd78e53c7dff",
+    "runtime/integrations/provider_broker.py": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1",
+    "tests/ops/test_trusted_worker_launcher_response_auth.py": "693f4f0e26d1cda9f9ba5aed7aa1ae2201ec4745294ceec8f13edff4781287f7",
+    "tests/runtime/test_provider_broker_response_auth.py": "ecd87045d6308b028bd110fd2b9a07b4830a522fa5629e273034668ec97f8856"
+  },
+  "post_correction_lint_format": "Consumer and both new tests: ruff check/format passed after final correction"
+}

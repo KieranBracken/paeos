@@ -1,0 +1,546 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........... [ 85%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+________ test_missing_response_signer_denies_before_state_or_key_access ________
+tests/ops/test_trusted_worker_launcher_response_auth.py:85: in test_missing_response_signer_denies_before_state_or_key_access
+    service.TrustedProviderService(
+ops/trusted_worker_launcher_service.py:1493: in __init__
+    self.socket_path = _safe_path(socket_path, label="launcher socket")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:81: in forbidden_path
+    raise AssertionError("missing response identity reached filesystem handling")
+E   AssertionError: missing response identity reached filesystem handling
+_ test_signed_response_binds_exact_bytes_and_separate_response_identity[True] __
+tests/ops/test_trusted_worker_launcher_response_auth.py:96: in test_signed_response_binds_exact_bytes_and_separate_response_identity
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_signed_response_binds_exact_bytes_and_separate_response_identity[False] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:96: in test_signed_response_binds_exact_bytes_and_separate_response_identity
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-worker-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-cline-critic-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-nvidia-critic-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini36-critic-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini36-adversary-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini38-critic-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini38-adversary-capability/1] _
+tests/ops/test_trusted_worker_launcher_response_auth.py:131: in test_handle_signs_refusal_before_any_provider_branch
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_____ test_process_queue_publishes_nested_signed_refusal_for_same_request ______
+tests/ops/test_trusted_worker_launcher_response_auth.py:158: in test_process_queue_publishes_nested_signed_refusal_for_same_request
+    producer, request_key, response_key = _producer(tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^
+tests/ops/test_trusted_worker_launcher_response_auth.py:33: in _producer
+    producer = service.TrustedProviderService(
+E   TypeError: TrustedProviderService.__init__() got an unexpected keyword argument 'response_signing_key'
+_ test_authenticates_bound_success_or_failure_without_qualifying_observation[critic-True] _
+tests/runtime/test_provider_broker_response_auth.py:102: in test_authenticates_bound_success_or_failure_without_qualifying_observation
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_authenticates_bound_success_or_failure_without_qualifying_observation[critic-False] _
+tests/runtime/test_provider_broker_response_auth.py:102: in test_authenticates_bound_success_or_failure_without_qualifying_observation
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_authenticates_bound_success_or_failure_without_qualifying_observation[client-True] _
+tests/runtime/test_provider_broker_response_auth.py:102: in test_authenticates_bound_success_or_failure_without_qualifying_observation
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_authenticates_bound_success_or_failure_without_qualifying_observation[client-False] _
+tests/runtime/test_provider_broker_response_auth.py:102: in test_authenticates_bound_success_or_failure_without_qualifying_observation
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_____ test_missing_verifier_denies_even_a_correct_signed_response[critic] ______
+tests/runtime/test_provider_broker_response_auth.py:112: in test_missing_verifier_denies_even_a_correct_signed_response
+    client = _client(kind, tmp_path, verify_key=None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_____ test_missing_verifier_denies_even_a_correct_signed_response[client] ______
+tests/runtime/test_provider_broker_response_auth.py:112: in test_missing_verifier_denies_even_a_correct_signed_response
+    client = _client(kind, tmp_path, verify_key=None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+______ test_unsigned_service_success_and_error_are_rejected[critic-True] _______
+tests/runtime/test_provider_broker_response_auth.py:123: in test_unsigned_service_success_and_error_are_rejected
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+______ test_unsigned_service_success_and_error_are_rejected[critic-False] ______
+tests/runtime/test_provider_broker_response_auth.py:123: in test_unsigned_service_success_and_error_are_rejected
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+______ test_unsigned_service_success_and_error_are_rejected[client-True] _______
+tests/runtime/test_provider_broker_response_auth.py:123: in test_unsigned_service_success_and_error_are_rejected
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+______ test_unsigned_service_success_and_error_are_rejected[client-False] ______
+tests/runtime/test_provider_broker_response_auth.py:123: in test_unsigned_service_success_and_error_are_rejected
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+__ test_signature_rejects_substitution_and_altered_payload[critic-wrong-key] ___
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+__ test_signature_rejects_substitution_and_altered_payload[critic-no-domain] ___
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+___ test_signature_rejects_substitution_and_altered_payload[critic-tampered] ___
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_signature_rejects_substitution_and_altered_payload[critic-bad-signature] _
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+__ test_signature_rejects_substitution_and_altered_payload[client-wrong-key] ___
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+__ test_signature_rejects_substitution_and_altered_payload[client-no-domain] ___
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+___ test_signature_rejects_substitution_and_altered_payload[client-tampered] ___
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_signature_rejects_substitution_and_altered_payload[client-bad-signature] _
+tests/runtime/test_provider_broker_response_auth.py:131: in test_signature_rejects_substitution_and_altered_payload
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-digest] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-capability] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-schema] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-service-schema] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-provider_id] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-model_id] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[critic-model_family] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-digest] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-capability] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-schema] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-service-schema] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-provider_id] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-model_id] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_even_valid_signature_cannot_authorize_different_request_or_route[client-model_family] _
+tests/runtime/test_provider_broker_response_auth.py:155: in test_even_valid_signature_cannot_authorize_different_request_or_route
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+____ test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-json] _____
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+____ test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-utf8] _____
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-outer-extra] _
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-outer-duplicate] _
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-nested-duplicate] _
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+____ test_strict_envelope_rejects_ambiguous_or_malformed_json[client-json] _____
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+____ test_strict_envelope_rejects_ambiguous_or_malformed_json[client-utf8] _____
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_strict_envelope_rejects_ambiguous_or_malformed_json[client-outer-extra] _
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_strict_envelope_rejects_ambiguous_or_malformed_json[client-outer-duplicate] _
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_strict_envelope_rejects_ambiguous_or_malformed_json[client-nested-duplicate] _
+tests/runtime/test_provider_broker_response_auth.py:174: in test_strict_envelope_rejects_ambiguous_or_malformed_json
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_reply_cannot_replay_against_changed_bytes_with_same_capability[critic-prompt] _
+tests/runtime/test_provider_broker_response_auth.py:199: in test_reply_cannot_replay_against_changed_bytes_with_same_capability
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_reply_cannot_replay_against_changed_bytes_with_same_capability[critic-serialization] _
+tests/runtime/test_provider_broker_response_auth.py:199: in test_reply_cannot_replay_against_changed_bytes_with_same_capability
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_reply_cannot_replay_against_changed_bytes_with_same_capability[client-prompt] _
+tests/runtime/test_provider_broker_response_auth.py:199: in test_reply_cannot_replay_against_changed_bytes_with_same_capability
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_reply_cannot_replay_against_changed_bytes_with_same_capability[client-serialization] _
+tests/runtime/test_provider_broker_response_auth.py:199: in test_reply_cannot_replay_against_changed_bytes_with_same_capability
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+____ test_concurrent_reversed_replies_do_not_share_request_identity[critic] ____
+tests/runtime/test_provider_broker_response_auth.py:212: in test_concurrent_reversed_replies_do_not_share_request_identity
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+____ test_concurrent_reversed_replies_do_not_share_request_identity[client] ____
+tests/runtime/test_provider_broker_response_auth.py:212: in test_concurrent_reversed_replies_do_not_share_request_identity
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_queue_consumers_authenticate_signed_failure_before_semantic_rejection[critic] _
+tests/runtime/test_provider_broker_response_auth.py:231: in test_queue_consumers_authenticate_signed_failure_before_semantic_rejection
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:91: in _client
+    return broker.HostClineCriticTransport(request_signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostClineCriticTransport.__init__() got an unexpected keyword argument 'response_verify_key'
+_ test_queue_consumers_authenticate_signed_failure_before_semantic_rejection[client] _
+tests/runtime/test_provider_broker_response_auth.py:231: in test_queue_consumers_authenticate_signed_failure_before_semantic_rejection
+    client = _client(kind, tmp_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+tests/runtime/test_provider_broker_response_auth.py:92: in _client
+    return broker.HostConfinedProviderClient(signing_key=REQUEST_KEY, **common)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: HostConfinedProviderClient.__init__() got an unexpected keyword argument 'response_verify_key'
+=========================== short test summary info ============================
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_missing_response_signer_denies_before_state_or_key_access
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_signed_response_binds_exact_bytes_and_separate_response_identity[True]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_signed_response_binds_exact_bytes_and_separate_response_identity[False]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-worker-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-cline-critic-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-nvidia-critic-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini36-critic-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini36-adversary-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini38-critic-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_handle_signs_refusal_before_any_provider_branch[paeos.trusted-gemini38-adversary-capability/1]
+FAILED tests/ops/test_trusted_worker_launcher_response_auth.py::test_process_queue_publishes_nested_signed_refusal_for_same_request
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_authenticates_bound_success_or_failure_without_qualifying_observation[critic-True]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_authenticates_bound_success_or_failure_without_qualifying_observation[critic-False]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_authenticates_bound_success_or_failure_without_qualifying_observation[client-True]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_authenticates_bound_success_or_failure_without_qualifying_observation[client-False]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_missing_verifier_denies_even_a_correct_signed_response[critic]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_missing_verifier_denies_even_a_correct_signed_response[client]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_unsigned_service_success_and_error_are_rejected[critic-True]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_unsigned_service_success_and_error_are_rejected[critic-False]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_unsigned_service_success_and_error_are_rejected[client-True]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_unsigned_service_success_and_error_are_rejected[client-False]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[critic-wrong-key]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[critic-no-domain]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[critic-tampered]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[critic-bad-signature]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[client-wrong-key]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[client-no-domain]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[client-tampered]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_signature_rejects_substitution_and_altered_payload[client-bad-signature]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-digest]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-capability]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-schema]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-service-schema]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-provider_id]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-model_id]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[critic-model_family]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-digest]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-capability]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-schema]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-service-schema]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-provider_id]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-model_id]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_even_valid_signature_cannot_authorize_different_request_or_route[client-model_family]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-json]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-utf8]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-outer-extra]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-outer-duplicate]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[critic-nested-duplicate]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[client-json]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[client-utf8]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[client-outer-extra]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[client-outer-duplicate]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_strict_envelope_rejects_ambiguous_or_malformed_json[client-nested-duplicate]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_reply_cannot_replay_against_changed_bytes_with_same_capability[critic-prompt]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_reply_cannot_replay_against_changed_bytes_with_same_capability[critic-serialization]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_reply_cannot_replay_against_changed_bytes_with_same_capability[client-prompt]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_reply_cannot_replay_against_changed_bytes_with_same_capability[client-serialization]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_concurrent_reversed_replies_do_not_share_request_identity[critic]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_concurrent_reversed_replies_do_not_share_request_identity[client]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_queue_consumers_authenticate_signed_failure_before_semantic_rejection[critic]
+FAILED tests/runtime/test_provider_broker_response_auth.py::test_queue_consumers_authenticate_signed_failure_before_semantic_rejection[client]
+61 failed, 23 passed in 0.66s
+LOCAL_ORIGINS={"kernel": "kernel/__init__.py", "kernel.capability": "kernel/capability.py", "kernel.cas": "kernel/cas.py", "kernel.evidence": "kernel/evidence.py", "kernel.keystore": "kernel/keystore.py", "kernel.ledger": "kernel/ledger.py", "kernel.sandbox": "kernel/sandbox.py", "kernel.sandbox_backend": "kernel/sandbox_backend.py", "kernel.types": "kernel/types.py", "ops": "ops/__init__.py", "ops.trusted_worker_launcher_service": "ops/trusted_worker_launcher_service.py", "paeos.model_router": "paeos/model_router/__init__.py", "paeos.model_router.a08_enforcer": "paeos/model_router/a08_enforcer.py", "paeos.model_router.aimd": "paeos/model_router/aimd.py", "paeos.model_router.audit": "paeos/model_router/audit.py", "paeos.model_router.audit_prompt": "paeos/model_router/audit_prompt.py", "paeos.model_router.auditor_receipt": "paeos/model_router/auditor_receipt.py", "paeos.model_router.catalog": "paeos/model_router/catalog.py", "paeos.model_router.credentials": "paeos/model_router/credentials.py", "paeos.model_router.errors": "paeos/model_router/errors.py", "paeos.model_router.intelligence_tier": "paeos/model_router/intelligence_tier.py", "paeos.model_router.observability": "paeos/model_router/observability.py", "paeos.model_router.policy": "paeos/model_router/policy.py", "paeos.model_router.privacy": "paeos/model_router/privacy.py", "paeos.model_router.provider_transports": "paeos/model_router/provider_transports.py", "paeos.model_router.providers": "paeos/model_router/providers.py", "paeos.model_router.quota_tracker": "paeos/model_router/quota_tracker.py", "paeos.model_router.router": "paeos/model_router/router.py", "paeos.model_router.server": "paeos/model_router/server.py", "paeos.model_router.state": "paeos/model_router/state.py", "paeos.model_router.transport": "paeos/model_router/transport.py", "paeos.model_router.types": "paeos/model_router/types.py", "runtime": "runtime/__init__.py", "runtime.builder_transport": "runtime/builder_transport.py", "runtime.claude_code": "runtime/claude_code.py", "runtime.context_compiler": "runtime/context_compiler.py", "runtime.integrations": "runtime/integrations/__init__.py", "runtime.integrations.hybrid": "runtime/integrations/hybrid.py", "runtime.integrations.process_supervisor": "runtime/integrations/process_supervisor.py", "runtime.integrations.provider_broker": "runtime/integrations/provider_broker.py", "runtime.integrations.task_scoped_responses_broker": "runtime/integrations/task_scoped_responses_broker.py", "runtime.integrations.trusted_codex_planner_transport": "runtime/integrations/trusted_codex_planner_transport.py", "runtime.integrations.trusted_codex_transport": "runtime/integrations/trusted_codex_transport.py", "runtime.integrations.worker_confinement": "runtime/integrations/worker_confinement.py", "runtime.planner_transport": "runtime/planner_transport.py", "runtime.task_package": "runtime/task_package.py"}

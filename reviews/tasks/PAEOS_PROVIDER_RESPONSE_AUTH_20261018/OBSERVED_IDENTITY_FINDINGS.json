@@ -1,0 +1,42 @@
+{
+  "status": "NOT_ESTABLISHED",
+  "read_only_findings": [
+    {
+      "path": "runtime/integrations/task_scoped_responses_broker.py",
+      "locations": [
+        221,
+        267,
+        294,
+        305,
+        334
+      ],
+      "finding": "Checks outbound model, stores response hash/status, exports configured model. No response-model parsing or version-bound upstream identity contract."
+    },
+    {
+      "path": "ops/trusted_codex_worker_supervisor.py",
+      "locations": [
+        154,
+        947,
+        981
+      ],
+      "finding": "Configured model plus constant provider/family emitted; transcript is UTF8 decoded without identity parsing."
+    },
+    {
+      "path": "preserved-main/ops/trusted_worker_launcher_service.py",
+      "locations": [
+        897,
+        2720,
+        2826,
+        3351
+      ],
+      "finding": "Depends on adapter-reported RouterResponse.actual fields; local gateway fingerprints do not independently establish upstream provider/model identity."
+    }
+  ],
+  "boundary": "Synthetic fixtures may test handling; neither signatures nor configured labels establish live observed identity. No provider calls or formal review performed.",
+  "future_scope": [
+    "runtime/integrations/task_scoped_responses_broker.py",
+    "ops/trusted_codex_worker_supervisor.py",
+    "paeos/model_router/provider_transports.py"
+  ],
+  "authority": "No new host response identity, Founder enrollment, qualification or admission inferred."
+}
