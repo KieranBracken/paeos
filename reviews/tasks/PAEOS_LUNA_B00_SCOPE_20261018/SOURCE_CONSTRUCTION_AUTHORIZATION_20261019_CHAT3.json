@@ -1,0 +1,69 @@
+{
+  "schema": "paeos.source-construction-authorization/1",
+  "authorization_id": "B00_CHAT3_SCRIPT_RETIREMENT_20261019",
+  "status": "AUTHORIZED_OFFLINE_SOURCE_CONSTRUCTION",
+  "authorized_by": "Founder, direct instruction in Codex on 2026-10-19",
+  "authorization": "One bounded offline security fix after Chat 3's current S0 candidate is safely completed or explicitly handed off and recorded. This is not PAEOS admission or worker-start evidence.",
+  "owner": {
+    "thread_id": "01a0f35b-57da-7c52-a9c2-f1131c008069",
+    "role": "Chat 3 — implementation owner",
+    "coordinator": "Architect",
+    "handoff_condition": "Satisfied by explicit recorded handoff of frozen S0 candidate; independent S0 review remains pending and is not claimed accepted."
+  },
+  "s0_handoff": {
+    "chat3_thread_id": "01a0f35b-57da-7c52-a9c2-f1131c008069",
+    "handoff_message_id": "msg_0883033174ce3c8a016ad569d516cc8191a28c1b995f8356d9",
+    "recipient_thread_id": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "candidate_state": "FROZEN_PENDING_INDEPENDENT_REVIEW",
+    "construction_responsibility_relinquished": true,
+    "review_request": "PREPARED_NOT_DISPATCHED",
+    "integration_or_qualification_claimed": false
+  },
+  "pinned_candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "base_commit": "77d319ea59d2386c032acfce6c3fe9232b176411",
+    "remote_readback_commit": "77d319ea59d2386c032acfce6c3fe9232b176411",
+    "isolated_workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "mutable_source_test_manifest": [
+    {
+      "path": "ops/run_task02_codex.sh",
+      "preimage_sha256": "b46eb957d45f6d7b94162795dce1664692d94aa22f916d7c937b61b86be66bea",
+      "preimage_mode": "100755"
+    },
+    {
+      "path": "tests/ops/test_run_task02_codex_denial.py",
+      "preimage": "ABSENT_AT_BASE_COMMIT"
+    }
+  ],
+  "permitted_source_test_change": "Retire only the named script. It must produce a clear fixed refusal and nonzero exit before reading prompts or credentials, launching a provider client, or invoking a fallback. Add one synthetic, provider-free denial test demonstrating this behavior.",
+  "verification_requirements": [
+    "Use temporary synthetic files, an isolated environment, and fake provider/fallback executables only.",
+    "Do not execute the original script against its real prompt path. If demonstrating the preimage behavior, use a temporary copy with only prompt/output paths redirected to synthetic fixtures.",
+    "The regression test must run the actual retired script, assert the fixed nonzero refusal, and prove fake provider/fallback executables are not invoked.",
+    "Run bash syntax validation and the focused pytest test; report exact commands and results.",
+    "Run applicable format, lint, compile, diff, and secret checks without widening the source/test manifest."
+  ],
+  "review_authority": {
+    "maximum_attempts": 1,
+    "eligible_route": "Already-authorized free, privacy-eligible, different-model-family read-only review route only",
+    "permitted_material": "The frozen two-file diff and sanitized synthetic test/evidence permitted by that route",
+    "paid_fallback": false,
+    "automatic_retry": false,
+    "unavailable_disposition": "Preserve the tested candidate and report review pending."
+  },
+  "explicit_exclusions": [
+    "No PAEOS task admission or worker-start claim",
+    "No prompt, user data, host credential, key, runtime-state, or private response access",
+    "No provider request, positive operational egress, provider or credential configuration change",
+    "No ChatBridge dispatch",
+    "No installation, production activation, qualification, Court action, debt integration, DEBT-0258 unblock claim, downstream activation, or P3",
+    "No changes outside the two-file mutable source/test manifest"
+  ],
+  "checkpoint_requirements": [
+    "Freeze source and test postimage hashes plus exact verification results in a separate sanitized evidence record.",
+    "Commit and push only the explicit source/test/evidence manifest through the existing approved repository workflow and verify the remote SHA.",
+    "Preserve all original review findings unchanged."
+  ],
+  "authority_effect": "One-use source-construction authority for this exact offline slice only; it does not amend B00 authority, PAEOS admission, disclosure policy, or any debt owner's scope."
+}
