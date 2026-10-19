@@ -1,0 +1,74 @@
+{
+  "schema": "paeos.b00-fence-composition-scope/1",
+  "recorded_on": "2026-10-19",
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "base_commit": "f0871f4b10742d2c76428495a881e832bf32ad57",
+    "source_candidate": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "worktree": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "authorization": {
+    "direct_human_request_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "direct_human_request_turn": "01a151d3-5216-7972-8883-5e12d7990102",
+    "direct_human_request_message": "msg_01a151d3-52dc-7ec0-8731-f57faa3afdf1",
+    "direct_human_request_text_sha256": "98b66b06e9d60df1948081d7786355fcf50e77a004a87513294dedfd77840b73",
+    "scope_basis": "Direct user instruction to continue B00 implementation and focused testing, scoped here to the exact offline composition gap and its synthetic test. The current B00 correction says this source path was excluded from the previous scope and requires a fresh explicit scope.",
+    "coordination_protocol": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/protocol-v4.json",
+    "coordination_protocol_sha256": "a9a140568b738f37a49b3edd59bad147372399af21e229a6860d4da968df64d7",
+    "coordination_authority_limit": "Supervisory messaging only; it does not grant PAEOS runtime admission, positive egress, key enrollment, installation, or qualification."
+  },
+  "objective": "Wire only an already-constructed, explicit AdmissionSendFence plus admission reference and expected epoch into HostCodexWorkerTransport. If no such binding is supplied, leave the Codex worker transport unavailable before reading transport identities. The CLI supplies no binding, so current production entrypoints remain default-deny.",
+  "mutable_source_and_test_preimages": [
+    {
+      "path": "ops/autonomous_run.py",
+      "preimage": "EXISTING",
+      "bytes": 42727,
+      "sha256": "0426f7c4743f788579f829bf15857d2b37303db97fc928fc407acbd1c8b71f6c"
+    },
+    {
+      "path": "tests/ops/test_autonomous_run_fence_composition.py",
+      "preimage": "ABSENT_AT_BASE",
+      "bytes": 0,
+      "sha256": null
+    }
+  ],
+  "read_only_controls": [
+    "kernel/ledger.py",
+    "kernel/ledger_sqlite.py",
+    "runtime/autonomy/admission_send_fence.py",
+    "runtime/integrations/trusted_codex_transport.py",
+    "tests/kernel/test_ledger.py",
+    "tests/kernel/test_ledger_sqlite.py",
+    "tests/runtime/autonomy/test_admission_send_fence.py",
+    "tests/runtime/test_trusted_codex_worker_transport.py",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_SCOPE_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_SCOPE_BOUNDARY_CORRECTION_20261019.json",
+    "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md"
+  ],
+  "implementation_contract": {
+    "input": "A typed optional binding containing an existing AdmissionSendFence instance, a non-empty admission reference, and a positive expected admission epoch.",
+    "composition": "Pass the same fence/reference/epoch to HostCodexWorkerTransport; do not create a fence, verifier, admission record, policy, key, or route state in ops.autonomous_run.py.",
+    "missing_input": "Return no Codex host transport before request or response identity reads. The existing CodexRuntime unavailable transport must fail closed without direct or provider fallback.",
+    "cli": "Do not add CLI flags, environment loading, key loading for admission, or any positive egress switch. The normal CLI path supplies no binding.",
+    "verification": [
+      "Missing binding returns unavailable before identity reads.",
+      "An explicit synthetic binding reaches the host transport constructor unchanged.",
+      "Existing transport/fence tests continue to prove stale, revoked, mismatched, and duplicate claims fail before queue write."
+    ]
+  },
+  "explicit_exclusions": [
+    "No admission or signed-policy producer/verifier implementation.",
+    "No production positive permit or actual PAEOS admission.",
+    "No provider/network call, queue dispatch, worker start, key creation/enrollment/read, installation, or runtime activation.",
+    "No review, Court, qualification, debt transition, or P3 claim.",
+    "No edits to prior manifests, preserved review findings, ledger/fence/transport modules, or unrelated files."
+  ],
+  "review_and_budget": {
+    "review": "NOT_REQUESTED; candidate remains review-pending until eligible independent route evidence changes.",
+    "focused_tests": "Required; provider-free tests only.",
+    "budget": "Use existing human-approved weekly reserve only; no reset, paid fallback, or new override.",
+    "attempt_ceiling": 1
+  },
+  "rollback": "Revert only the two mutable source/test paths if focused tests expose an unsafe composition. Preserve the scope and evidence records."
+}
