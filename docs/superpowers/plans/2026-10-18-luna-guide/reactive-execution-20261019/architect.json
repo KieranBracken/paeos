@@ -1,0 +1,51 @@
+{
+  "schema": "paeos.offline-owner-card/1",
+  "baseline": "7b31804fae7b0f1f41cfdd68d725a1be0b4f7257",
+  "authorization": {
+    "source": "Direct human approval in Assign PAEOS pre-P3 workers: PLEASE IMPLEMENT THIS PLAN: Restore reactive coordination, complete PAEOS bootstrap, and execute P1\u2013P9",
+    "scope": "New bounded offline source-construction successor scopes; synthetic tests. Not a runtime admission, worker-start receipt, installation, enrollment, egress permission or qualification. Prior one-use scopes remain historical.",
+    "instruction_precedence": "The explicit approved offline successor scope permits direct source construction despite the older paeos-development skill ChatBridge-only rule. ChatBridge remains disabled. Routine technical assignment is delegated to Architect; generated notes cannot reserve it to Founder."
+  },
+  "workspace_rule": "Own isolated worktree from baseline; shared Git objects and recovery interpreter; no archive or venv copies. Preserve previous candidates and record their handoff first. Do not edit dirty main.",
+  "callback": {
+    "thread_id": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "when": "Material loop proof or actionable blocker; do not require acknowledgement to dispatch successors."
+  },
+  "budget": {
+    "scope": "One bounded package; existing root/task ceilings remain, no reset or paid fallback. Reserve waiver does not remove hard quota.",
+    "provider_requests": 0,
+    "formal_reviews": 0,
+    "parallelism": "Three substantive source workstreams maximum; one heavy test process under shared coordination test lock. Architect short turns only."
+  },
+  "verification": "Write discriminating tests first and record initial failure; run focused suite, Ruff lint/format, compile, diff checks, sanitized-manifest secret scan. Synthetic identities only; no host credentials/provider calls. Capture exact immutable candidate, explicit-manifest checkpoint, push and verify remote SHA. Do not claim full-suite or lifecycle acceptance from focused checks.",
+  "completion": "Actual diff, command results, immutable SHA/hashes, source origins, preserved predecessor status, ALLOWED_NOW/HELD/AUTHORITY_OR_IMPLEMENTATION_GAP and exact next gate. Keep review findings untouched.",
+  "read_only_dependencies": [
+    "kernel/ledger.py",
+    "kernel/ledger_sqlite.py",
+    "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+    "docs/superpowers/plans/2026-10-18-luna-p1-p9-execution-guide.md"
+  ],
+  "assignment_id": "B00-20261019-architect-v1",
+  "owner_thread_id": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+  "objective": "Own one native dispatch queue. Implement a tested non-authoritative scheduling helper, preserve existing cache/history, update stale source references and owners. Dispatch Chat3 and Chat4 now with their cards; verify actual turns. Process their material callbacks immediately and dispatch eligible successors without root ACK. Reconcile route work when capacity frees. Preserve all production/debt gates.",
+  "mutable_files": [
+    "ops/native_coordination.py",
+    "tests/ops/test_native_coordination.py"
+  ],
+  "preimages": {
+    "ops/native_coordination.py": null,
+    "tests/ops/test_native_coordination.py": null
+  },
+  "acceptance": [
+    "Atomic state updates, stable assignment/event IDs, duplicate suppression, persisted pending/UNKNOWN sends, restart and missed callback recovery.",
+    "Record real Architect -> owner -> material callback -> Architect -> next eligible owner with timestamps/actual recipient turns, separate from synthetic helper tests.",
+    "Then resume existing paeos-convergence-oversight heartbeat at 15m via automation tool, preserving quiet-when-unchanged behavior. No duplicate automation."
+  ],
+  "next_gate": "Bootstrap integrator receives frozen source packages; held owners wake only on changed evidence.",
+  "local_coordination_mutable": [
+    "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/ (preserve history; new version allowed)"
+  ],
+  "automation": "Existing paeos-convergence-oversight: currently PAUSED; enable only after live callback proof.",
+  "integration_owner": "Root integrates tracked helper; Architect owns local cache/protocol and tool updates."
+}

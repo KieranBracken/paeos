@@ -1,0 +1,45 @@
+{
+  "schema": "paeos.native-ready-queue/1",
+  "source_baseline": "7b31804fae7b0f1f41cfdd68d725a1be0b4f7257",
+  "programme_guide": "../2026-10-18-luna-p1-p9-execution-guide.md",
+  "coordinator": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+  "ready": [
+    "architect",
+    "admission",
+    "confinement",
+    "disclosure"
+  ],
+  "deferred_capacity": [
+    "free-route"
+  ],
+  "held": [
+    "debt0258",
+    "debt0249",
+    "debt0260",
+    "debt0117",
+    "overseer"
+  ],
+  "owner_cards": [
+    "admission.json",
+    "architect.json",
+    "confinement.json",
+    "debt0117.json",
+    "debt0249.json",
+    "debt0258.json",
+    "debt0260.json",
+    "disclosure.json",
+    "free-route.json",
+    "overseer.json"
+  ],
+  "authority": "Scheduling aid only; no canonical task/admission/qualification transitions.",
+  "integration_owner": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "source_work_limit": 3,
+  "heavy_test_limit": 1,
+  "test_lock": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/heavy-test.lock",
+  "success": [
+    "Observed material native callback chain and recovery",
+    "Actual governed codec task",
+    "Durable unattended execution through canonical P9 exit"
+  ],
+  "phase_exit": "PRE_SENTIUM_ECOSYSTEM_COMPLETE_PENDING_FOUNDER_RATIFICATION"
+}

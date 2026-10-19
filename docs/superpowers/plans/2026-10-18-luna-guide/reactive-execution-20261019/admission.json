@@ -1,0 +1,61 @@
+{
+  "schema": "paeos.offline-owner-card/1",
+  "baseline": "7b31804fae7b0f1f41cfdd68d725a1be0b4f7257",
+  "authorization": {
+    "source": "Direct human approval in Assign PAEOS pre-P3 workers: PLEASE IMPLEMENT THIS PLAN: Restore reactive coordination, complete PAEOS bootstrap, and execute P1\u2013P9",
+    "scope": "New bounded offline source-construction successor scopes; synthetic tests. Not a runtime admission, worker-start receipt, installation, enrollment, egress permission or qualification. Prior one-use scopes remain historical.",
+    "instruction_precedence": "The explicit approved offline successor scope permits direct source construction despite the older paeos-development skill ChatBridge-only rule. ChatBridge remains disabled. Routine technical assignment is delegated to Architect; generated notes cannot reserve it to Founder."
+  },
+  "workspace_rule": "Own isolated worktree from baseline; shared Git objects and recovery interpreter; no archive or venv copies. Preserve previous candidates and record their handoff first. Do not edit dirty main.",
+  "callback": {
+    "thread_id": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+    "when": "One material completion, remand, changed blocker or actionable failure; not ACK-only. Human authorized callbacks and follow-up directly in the approved plan.",
+    "fields": [
+      "stable event_id",
+      "assignment_id",
+      "commit",
+      "artifact hashes",
+      "actual tests",
+      "remaining gates",
+      "unresolved operations",
+      "next eligible action"
+    ]
+  },
+  "budget": {
+    "scope": "One bounded package; existing root/task ceilings remain, no reset or paid fallback. Reserve waiver does not remove hard quota.",
+    "provider_requests": 0,
+    "formal_reviews": 0,
+    "parallelism": "Three substantive source workstreams maximum; one heavy test process under shared coordination test lock. Architect short turns only."
+  },
+  "verification": "Write discriminating tests first and record initial failure; run focused suite, Ruff lint/format, compile, diff checks, sanitized-manifest secret scan. Synthetic identities only; no host credentials/provider calls. Capture exact immutable candidate, explicit-manifest checkpoint, push and verify remote SHA. Do not claim full-suite or lifecycle acceptance from focused checks.",
+  "completion": "Actual diff, command results, immutable SHA/hashes, source origins, preserved predecessor status, ALLOWED_NOW/HELD/AUTHORITY_OR_IMPLEMENTATION_GAP and exact next gate. Keep review findings untouched.",
+  "read_only_dependencies": [
+    "kernel/ledger.py",
+    "kernel/ledger_sqlite.py",
+    "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+    "docs/superpowers/plans/2026-10-18-luna-p1-p9-execution-guide.md"
+  ],
+  "assignment_id": "B00-20261019-admission-v1",
+  "owner_thread_id": "01a0f35b-57da-7c52-a9c2-f1131c008069",
+  "objective": "Preserve completed Task02/S0 and record explicit handoff. Implement signed admission/policy producer and concrete verifier beside the fence using existing Ledger.append_if_head; kernel read-only. Independently enrolled public identities and delegated scope required; no worker labels, keys or callbacks as authority. Add query/authenticated settlement after restart. Bind session, contract/scope, policy, workspace, destination and root allocation. Separate WORKER_LAUNCH from PROVIDER_FRAME and stable parent ordinals, never new UUID budget reset.",
+  "mutable_files": [
+    "runtime/autonomy/admission_authority.py",
+    "runtime/autonomy/admission_send_fence.py",
+    "tests/runtime/autonomy/test_admission_authority.py",
+    "tests/runtime/autonomy/test_admission_send_fence.py"
+  ],
+  "preimages": {
+    "runtime/autonomy/admission_authority.py": null,
+    "runtime/autonomy/admission_send_fence.py": "e6329070bcb913ed7a9089cdc97cf5a3ce325dfc3e3829b64dc94112fbffb19a",
+    "tests/runtime/autonomy/test_admission_authority.py": null,
+    "tests/runtime/autonomy/test_admission_send_fence.py": "15534e6633b191bd0b1cbf2a26ce6880b346c4e8e83f6ab5522e2e91e8ac713b"
+  },
+  "acceptance": [
+    "Signed synthetic positive admission/policy; missing/forged/stale/revoked/mismatched/key-substitution negatives.",
+    "Two real processes racing claim/revocation serialize on Ledger, no duplicate send; restart preserves unresolved claim and root allocation.",
+    "Authenticated reconciliation cannot fabricate returned evidence or repeat UNKNOWN sends. Missing host enrollment always denies production."
+  ],
+  "next_gate": "Return frozen source package to root via Architect; production enrollment/qualified execution still held.",
+  "interface": "Preserve existing SendOperation compatibility for existing tests. Add explicit operation_kind/session_id/contract_digest/scope_digest/root_allocation_id/frame_ordinal optional fields with conservative default/deny for new provider frames. Expose concrete verifier and producer with frozen enrolled trust input. Send root an early material interface decision when API is concrete; root does not edit your files. No implicit positive CLI composition."
+}
