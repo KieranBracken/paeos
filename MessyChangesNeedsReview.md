@@ -5602,3 +5602,7 @@ Separate authorization record: `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOUR
 The one-use offline source candidate retires `ops/run_task02_codex.sh` before prompt or client access and adds a synthetic denial regression test. Safe preimage RED observed the fake `codex` invocation; the actual retired script GREEN returned the fixed refusal and invoked neither fake client. Scoped syntax, focused test, lint/format, compile, diff/whitespace, ShellCheck, and secret checks are recorded under `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_*_20261019*`.
 
 Only this manual Task 02 path is contained. B00's wider admission/currentness/revoke/send fence, independent review, production admission, worker start, D0258, qualification and P3 remain held. No provider, credentials, runtime state, installation, positive egress, Court, or integration was used or claimed.
+
+### 2026-10-19 — Task 02 test-guard correction and remote checkpoint
+
+Final review caught that an unsafe script regression could otherwise run before the test rejected it. The test now checks the fixed script path and exact retired bytes before any subprocess, and rejects caller-selected script paths or prompt-path environment overrides. Follow-up focused suite: 3 passed; scoped static checks and cumulative patch replay passed. Commit `1d3d639f50454cc7916f2d104a70589a1664b052` was read back from the recovery branch. The independent review remains pending because no already-authorized eligible free different-family route was demonstrated.

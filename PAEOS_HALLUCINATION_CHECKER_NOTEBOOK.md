@@ -14046,6 +14046,12 @@ The change must refuse before prompt/credential access, provider launch, or fall
 
 ALLOWED_NOW: Chat 3's exact two-file offline edit, focused synthetic verification, immutable capture, explicit checkpoint push/readback, and at most one eligible review attempt. HELD: positive egress, installation, qualification, Court, debt integration, D0258 activation, downstream work, and P3. AUTHORITY_OR_IMPLEMENTATION_GAP: no PAEOS admission/worker-start route is evidenced; that does not block this expressly offline scope. No source/test change or test result is claimed by this authorization record.
 
+### 2026-10-19 — Task 02 denial-test guard correction and checkpoint readback
+
+Final inspection found that the first test version could execute a reintroduced unsafe script before asserting its refusal. Chat 3 changed only the test and evidence patch/manifest: the test now pins the fixed repository path and exact refusal bytes before subprocess execution, rejects caller-selected paths and environment redirection, and then runs the actual retired script with a synthetic environment. Follow-up focused test result: 3 passed. `bash -n`, ShellCheck, Ruff lint/format, Python compile, diff/whitespace checks, secret scan, and cumulative patch replay pass. Retired script hash remains `bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1`; final test hash is `1d314b485095ec5c92dee08d3b8b27717c14d0647ee850afca8355d21cf413ec`.
+
+Source/test candidate commit `1d3d639f50454cc7916f2d104a70589a1664b052` was independently read back from `refs/heads/codex/p1-bound-source-recovery-20261018`; the worktree was clean. The source manifest is reconciled to `MATCH`. No eligible already-authorized free, privacy-eligible, different-family route was demonstrated; no review was attempted and review remains pending. This remains local denial behavior only and does not unblock D0258 or establish PAEOS admission, worker start, qualification, or P3.
+
 
 ### 2026-10-19 — Task 02 standalone Codex runner retired (isolated source candidate)
 

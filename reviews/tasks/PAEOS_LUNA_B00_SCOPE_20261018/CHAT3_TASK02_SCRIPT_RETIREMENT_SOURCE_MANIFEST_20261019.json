@@ -4,10 +4,10 @@
       "operation": "append only",
       "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
       "postimage": {
-        "bytes": 1495533,
+        "bytes": 1496886,
         "mode": "0o644",
         "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
-        "sha256": "f6d1e059f6c8315fb6872d0b0b8a4b8befbb2010bfd58f4068f04e23837d7b6f"
+        "sha256": "c9c65b9eddb0af68e119ac55b9529d25670c09c433870cceddd067abbe8a6511"
       },
       "preimage_sha256": "ae282202d8fb8af896a6f8d195bc40603cb4978a03a60d401b755ed1ffbf192d"
     },
@@ -15,10 +15,10 @@
       "operation": "append only",
       "path": "MessyChangesNeedsReview.md",
       "postimage": {
-        "bytes": 667674,
+        "bytes": 668323,
         "mode": "0o644",
         "path": "MessyChangesNeedsReview.md",
-        "sha256": "6b0421a7f74525c82b0d73de39efebe57d2c36d5be33a053fe6483a1b8e49774"
+        "sha256": "dceac063e417f1a05525763051faef0ac902c8e570ee740cd5ba5e0450c99faf"
       },
       "preimage_sha256": "0e4f67e7b939a90e80f3f99af202d3f8ba7f7dc1504801cd41f27de7e40e6937"
     }
@@ -82,7 +82,10 @@
   ],
   "recorded_at_utc": "2026-10-19T01:16:21.409941+00:00",
   "remote_verification": {
-    "followup_commit_readback": "PENDING",
+    "followup_commit_sha": "1d3d639f50454cc7916f2d104a70589a1664b052",
+    "followup_commit_readback": "MATCH",
+    "followup_readback_ref": "refs/heads/codex/p1-bound-source-recovery-20261018",
+    "followup_readback_sha": "1d3d639f50454cc7916f2d104a70589a1664b052",
     "previous_source_candidate_commit": "8cf091e6a16dbb050e4158a756d58c57069695c4",
     "previous_ssh_readback": "MATCH"
   },
