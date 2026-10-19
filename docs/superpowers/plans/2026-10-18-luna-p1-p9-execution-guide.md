@@ -89,9 +89,11 @@ Two deliberate cycle breaks:
 
 ## Who acts
 
+**Current coordination correction, 2026-10-19:** the later direct human instruction says “Architect remains coordinator.” Epoch2 pointed at a different chat and retained an already-satisfied approval request. The predecessor confirmed no further dispatch and no unresolved PENDING_SEND/UNKNOWN assignments. Epoch3 restores architect; it changes scheduling only. The completed Task 02 script containment at `c18a1e11aea1ad45605fae3f5423fa7d5557d7cb` has 3 focused passes and pending independent review with zero attempts. It does not unblock D0258. The first unresolved task is the B00/B01 source-bound construction contract, now being traced by architect. See `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/COORDINATION_HANDOFF_20261019.json`.
+
 | Role | Existing chat / owner | Responsibility |
 |---|---|---|
-| Completion coordinator | `PAEOS completion overseer`, `01a14f33-dc16-7281-9da8-a241ef9a8b0e` | Single executable queue, verify callbacks, wake only eligible owner |
+| Completion coordinator | `architect`, `01a121c4-864e-7e12-93e0-bfde0ca7a32b` | Single executable queue, verify callbacks, wake only eligible owner; epoch3 handoff supersedes the retired completion overseer |
 | Bootstrap integrator | `Assign PAEOS pre-P3 workers`, `01a1403f-1034-74c2-95ce-bd0f705dbaef` | B00–B06 candidate; hand off after readiness |
 | D0258 sole integrator | `Chat 1 — DEBT-0258 implementation recovery`, `01a147d5-525b-7e31-9fb1-80de3a325e51` | Codec/support APIs/supersession integration |
 | D0249 | `Pre-P3 worker — DEBT-0249 task admission`, `01a14042-702b-72b2-b6fe-4a421e74c4f7` | Eligible D0249 slices and16-domain account |

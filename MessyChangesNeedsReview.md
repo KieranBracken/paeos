@@ -5606,3 +5606,8 @@ Only this manual Task 02 path is contained. B00's wider admission/currentness/re
 ### 2026-10-19 — Task 02 test-guard correction and remote checkpoint
 
 Final review caught that an unsafe script regression could otherwise run before the test rejected it. The test now checks the fixed script path and exact retired bytes before any subprocess, and rejects caller-selected script paths or prompt-path environment overrides. Follow-up focused suite: 3 passed; scoped static checks and cumulative patch replay passed. Commit `1d3d639f50454cc7916f2d104a70589a1664b052` was read back from the recovery branch. The independent review remains pending because no already-authorized eligible free different-family route was demonstrated.
+
+
+## 2026-10-19 — Coordinator conflict corrected (epoch3)
+
+Direct human instruction retained architect as coordinator, while the saved guide/protocol and hourly fallback still selected PAEOS completion overseer. Its last state repeated the now-satisfied script-retirement approval request. Predecessor receipt `msg_0b0e6e2590b30492016ad57292b5b481919f5f86d8c1b682a4` confirms no further dispatch and reports no unresolved PENDING_SEND/UNKNOWN assignments. Preserve epoch2 history; epoch3 and the existing hourly fallback now target architect. Its read-only B00/B01 construction-contract turn `01a151c7-9b71-7ae3-a059-f120a38173a9` is observed in progress. This is native coordination, not PAEOS admission/execution/qualification. Completed script containment at `c18a1e11` remains review-pending and does not unblock D0258. Exact handoff and changed manifest: `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/COORDINATION_HANDOFF_20261019.json`. No production source change, tests, review attempt or budget override in this correction.
