@@ -5595,3 +5595,10 @@ Read-only source evidence and a proposal-only first-slice packet are at `reviews
 ### 2026-10-19 — Founder one-use offline source-construction authorization
 
 Separate authorization record: `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_CONSTRUCTION_AUTHORIZATION_20261019_CHAT3.json`. Chat 3's S0 candidate was explicitly handed to the programme coordinator and remains frozen pending independent review. Chat 3 now owns one offline source slice on the isolated recovery candidate, limited to `ops/run_task02_codex.sh` and `tests/ops/test_run_task02_codex_denial.py`; preimages and exclusions are in the authorization record. The script must fail before prompt/credential access, provider launch, or fallback. Tests must use synthetic fixtures and fake executables. This is not PAEOS admission or worker-start evidence, does not unblock D0258, and does not authorize operational egress or installation. No code change or test result is claimed in this log entry.
+
+
+### 2026-10-19 — Task 02 Codex runner denial candidate
+
+The one-use offline source candidate retires `ops/run_task02_codex.sh` before prompt or client access and adds a synthetic denial regression test. Safe preimage RED observed the fake `codex` invocation; the actual retired script GREEN returned the fixed refusal and invoked neither fake client. Scoped syntax, focused test, lint/format, compile, diff/whitespace, ShellCheck, and secret checks are recorded under `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_*_20261019*`.
+
+Only this manual Task 02 path is contained. B00's wider admission/currentness/revoke/send fence, independent review, production admission, worker start, D0258, qualification and P3 remain held. No provider, credentials, runtime state, installation, positive egress, Court, or integration was used or claimed.

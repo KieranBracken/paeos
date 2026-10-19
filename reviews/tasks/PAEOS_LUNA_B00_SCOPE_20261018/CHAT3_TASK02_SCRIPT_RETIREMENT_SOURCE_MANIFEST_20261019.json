@@ -1,0 +1,132 @@
+{
+  "append_only_records": [
+    {
+      "operation": "append only",
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "postimage": {
+        "bytes": 1495533,
+        "mode": "0o644",
+        "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+        "sha256": "f6d1e059f6c8315fb6872d0b0b8a4b8befbb2010bfd58f4068f04e23837d7b6f"
+      },
+      "preimage_sha256": "ae282202d8fb8af896a6f8d195bc40603cb4978a03a60d401b755ed1ffbf192d"
+    },
+    {
+      "operation": "append only",
+      "path": "MessyChangesNeedsReview.md",
+      "postimage": {
+        "bytes": 667674,
+        "mode": "0o644",
+        "path": "MessyChangesNeedsReview.md",
+        "sha256": "6b0421a7f74525c82b0d73de39efebe57d2c36d5be33a053fe6483a1b8e49774"
+      },
+      "preimage_sha256": "0e4f67e7b939a90e80f3f99af202d3f8ba7f7dc1504801cd41f27de7e40e6937"
+    }
+  ],
+  "authorization": {
+    "authority": "one-use offline source construction only",
+    "id": "B00_CHAT3_SCRIPT_RETIREMENT_20261019",
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_CONSTRUCTION_AUTHORIZATION_20261019_CHAT3.json",
+    "sha256": "233de8db72a612b19071a315f0c90dee1b6636d17c2f506b6e279437a57a4bff"
+  },
+  "candidate": {
+    "authorization_base_is_ancestor": true,
+    "authorization_recorded_base": "77d319ea59d2386c032acfce6c3fe9232b176411",
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "named_script_preimage_matches_authorization": true,
+    "starting_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+    "starting_remote_ref_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+    "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "commit_allowlist": [
+    "ops/run_task02_codex.sh",
+    "tests/ops/test_run_task02_codex_denial.py",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_PRE_EDIT_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_TEST_EVIDENCE_20261019.json",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+    "MessyChangesNeedsReview.md",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_MANIFEST_20261019.json"
+  ],
+  "evidence_records": [
+    {
+      "bytes": 1449,
+      "mode": "0o644",
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_PRE_EDIT_20261019.json",
+      "sha256": "cda5c069f2d34e6b97952f971441f9ba98b0c6724391b172d21d46c4c8414de5"
+    },
+    {
+      "bytes": 2843,
+      "mode": "0o644",
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
+      "sha256": "aa96e0fb9e79459785cb2a5e8884b1dee18eda0f058a05294f834f73bb423938"
+    },
+    {
+      "bytes": 8850,
+      "mode": "0o644",
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_TEST_EVIDENCE_20261019.json",
+      "sha256": "09d07496767aa5f8c079dd126d14db3ef0825e02fbbbbbfade765ab285cad699"
+    }
+  ],
+  "limitations": [
+    "This retires only the named standalone Task 02 script; the wider B00 admission/currentness/revocation/send fence remains unresolved.",
+    "No provider or credential access, operational egress, installation, PAEOS admission, worker start, review acceptance, qualification, Court action, debt integration, D0258 progress, or P3 is established.",
+    "Independent review remains pending; original review findings are unchanged."
+  ],
+  "recorded_at_utc": "2026-10-19T01:16:21.409941+00:00",
+  "remote_verification": "Pending explicit commit and push; final remote ref must be read back and reported.",
+  "review_findings_preserved": [
+    {
+      "bytes": 4228,
+      "mode": "0o644",
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+      "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+    },
+    {
+      "bytes": 1050,
+      "mode": "0o644",
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-disposition.json",
+      "sha256": "03cfc527ce4be953d58ed1df18331a0929f4a7edd7acfd56be7bc16f8621bbac"
+    }
+  ],
+  "review_status": {
+    "attempted": false,
+    "reason": "No currently demonstrable already-authorized free, privacy-eligible different-family route was identified; no paid fallback or retry used.",
+    "status": "PENDING"
+  },
+  "schema": "paeos.chat3-task02-script-retirement-source-manifest/1",
+  "source_patch": {
+    "bytes": 2843,
+    "mode": "0o644",
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
+    "sha256": "aa96e0fb9e79459785cb2a5e8884b1dee18eda0f058a05294f834f73bb423938"
+  },
+  "source_test_changes": [
+    {
+      "path": "ops/run_task02_codex.sh",
+      "postimage": {
+        "bytes": 148,
+        "mode": "0o755",
+        "path": "ops/run_task02_codex.sh",
+        "sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1"
+      },
+      "preimage_sha256": "b46eb957d45f6d7b94162795dce1664692d94aa22f916d7c937b61b86be66bea"
+    },
+    {
+      "path": "tests/ops/test_run_task02_codex_denial.py",
+      "postimage": {
+        "bytes": 1763,
+        "mode": "0o644",
+        "path": "tests/ops/test_run_task02_codex_denial.py",
+        "sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c"
+      },
+      "preimage": "ABSENT_AT_BASE_COMMIT"
+    }
+  ],
+  "verification_summary": {
+    "actual_candidate_green": "focused test passes; actual script is invoked by committed test; fake codex/fallback not invoked",
+    "checks": "bash -n, focused pytest, Ruff lint/format, in-memory Python compile, ShellCheck, staged diff check, whitespace scan, scoped high-confidence secret scan all pass",
+    "patch_replay": "git apply --check and git apply succeeded against exact 6b808f42 preimages; both resulting hashes match frozen postimages.",
+    "safe_preimage_red": "test fails against temp source copy; fixed refusal missing; fake codex called; only prompt/output literals redirected"
+  }
+}

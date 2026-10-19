@@ -1,0 +1,29 @@
+{
+  "actual_head": "6b808f4212741549771e8fc9e7847291d8f96d93",
+  "actual_remote_ref": "6b808f4212741549771e8fc9e7847291d8f96d93",
+  "authorization": {
+    "path": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_CONSTRUCTION_AUTHORIZATION_20261019_CHAT3.json",
+    "sha256": "233de8db72a612b19071a315f0c90dee1b6636d17c2f506b6e279437a57a4bff",
+    "status": "AUTHORIZED_OFFLINE_SOURCE_CONSTRUCTION"
+  },
+  "authorization_recorded_base": "77d319ea59d2386c032acfce6c3fe9232b176411",
+  "authorized_script_preimage": {
+    "bytes": 528,
+    "mode": "0o755",
+    "path": "ops/run_task02_codex.sh",
+    "sha256": "b46eb957d45f6d7b94162795dce1664692d94aa22f916d7c937b61b86be66bea"
+  },
+  "other_authorized_records_preimage": {
+    "MessyChangesNeedsReview.md": "0e4f67e7b939a90e80f3f99af202d3f8ba7f7dc1504801cd41f27de7e40e6937",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": "ae282202d8fb8af896a6f8d195bc40603cb4978a03a60d401b755ed1ffbf192d"
+  },
+  "recorded_at_utc": "2026-10-19T01:12:54Z",
+  "recorded_base_is_ancestor": true,
+  "requested_base_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+  "schema": "paeos.chat3-task02-retirement-pre-edit/1",
+  "scope": "Only the two named source/test paths plus this task-directory evidence and required append-only notebook/log records.",
+  "test_preimage": {
+    "path": "tests/ops/test_run_task02_codex_denial.py",
+    "state": "ABSENT"
+  }
+}

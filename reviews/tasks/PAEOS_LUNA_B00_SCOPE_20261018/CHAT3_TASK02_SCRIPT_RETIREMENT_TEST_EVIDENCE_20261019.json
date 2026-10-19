@@ -1,0 +1,140 @@
+{
+  "additional_checks": [
+    {
+      "command": "LC_ALL=C LANG=C bash -n ops/run_task02_codex.sh",
+      "name": "bash_syntax",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /Users/bob/GitHub/paeos/.venv/bin/python -I -B -m pytest -p no:cacheprovider -q tests/ops/test_run_task02_codex_denial.py",
+      "name": "focused_pytest",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ".                                                                        [100%]\n"
+    },
+    {
+      "command": "/Users/bob/GitHub/paeos/.venv/bin/ruff check tests/ops/test_run_task02_codex_denial.py",
+      "name": "ruff_lint",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    },
+    {
+      "command": "/Users/bob/GitHub/paeos/.venv/bin/ruff format --check tests/ops/test_run_task02_codex_denial.py",
+      "name": "ruff_format",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "1 file already formatted\n"
+    },
+    {
+      "command": "/Users/bob/GitHub/paeos/.venv/bin/python -I -B -c \"from pathlib import Path; p=Path('tests/ops/test_run_task02_codex_denial.py'); compile(p.read_text(), str(p), 'exec'); print('compile: PASS')\"",
+      "name": "python_compile",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "compile: PASS\n"
+    },
+    {
+      "command": "git diff --cached --check -- ops/run_task02_codex.sh tests/ops/test_run_task02_codex_denial.py",
+      "name": "git_diff_check",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": "LC_ALL=C LANG=C shellcheck ops/run_task02_codex.sh",
+      "name": "shellcheck",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": "Python stdlib regex scan of the two named source/test files for private-key PEM headers and common GitHub/OpenAI/Slack token shapes",
+      "name": "high_confidence_secret_scan",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "secret scan: PASS no high-confidence credential patterns\n"
+    },
+    {
+      "command": "Python trailing-whitespace scan of the two named source/test files",
+      "name": "whitespace_scan",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "whitespace scan: PASS\n"
+    }
+  ],
+  "authorization_id": "B00_CHAT3_SCRIPT_RETIREMENT_20261019",
+  "authorization_sha256": "233de8db72a612b19071a315f0c90dee1b6636d17c2f506b6e279437a57a4bff",
+  "base_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+  "candidate_green": {
+    "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /Users/bob/GitHub/paeos/.venv/bin/python -I -B -m pytest -p no:cacheprovider -q tests/ops/test_run_task02_codex_denial.py",
+    "returncode": 0,
+    "script_under_test": "ops/run_task02_codex.sh in this workspace (no test override)",
+    "stderr": "",
+    "stdout": ".                                                                        [100%]\n",
+    "synthetic_provider_and_fallback_invoked": false
+  },
+  "limitations": [
+    "This is source-level local refusal behavior only.",
+    "No provider request, positive operational egress, credential access, installation, PAEOS admission, worker start, formal review, qualification, Court action, debt integration, D0258 progress, or P3 is evidenced.",
+    "No independent review attempt was made because no currently eligible free privacy-eligible different-family route was demonstrated; review remains pending."
+  ],
+  "patch_replay": {
+    "apply_returncode": 0,
+    "base_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+    "check_returncode": 0,
+    "command_apply": "git apply <frozen patch>",
+    "command_check": "git apply --check <frozen patch>",
+    "isolated_temp_root": "/private/tmp (disposable replay only)",
+    "postimages": {
+      "ops/run_task02_codex.sh": {
+        "matches_postimage": true,
+        "mode": "0o755",
+        "sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1"
+      },
+      "tests/ops/test_run_task02_codex_denial.py": {
+        "matches_postimage": true,
+        "mode": "0o644",
+        "sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c"
+      }
+    }
+  },
+  "preimage_control": {
+    "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /Users/bob/GitHub/paeos/.venv/bin/python -I -B -m pytest -p no:cacheprovider --basetemp /private/tmp/paeos-task02-red-final-csifhmar/pytest-red-evidence -q /private/tmp/paeos-task02-red-final-csifhmar/test_run_task02_codex_denial_red.py",
+    "fake_fallback_invocation_observed": false,
+    "fake_provider_invocation_observed": "codex\n",
+    "method": "Temporary preimage copy with only PROMPT_FILE and OUTPUT_FILE literals redirected to synthetic files; temporary copy of the regression test changed only SCRIPT_PATH to point at that preimage.",
+    "preimage_script_sha256": "b46eb957d45f6d7b94162795dce1664692d94aa22f916d7c937b61b86be66bea",
+    "preimage_source_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+    "real_prompt_path_accessed": false,
+    "real_provider_or_credentials_used": false,
+    "returncode": 1,
+    "stderr": "",
+    "stdout": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_______ test_task02_script_refuses_without_invoking_provider_or_fallback _______\n\ntmp_path = PosixPath('/private/tmp/paeos-task02-red-final-csifhmar/pytest-red-evidence/test_task02_script_refuses_wit0')\n\n    def test_task02_script_refuses_without_invoking_provider_or_fallback(tmp_path: Path) -> None:\n        fake_bin = tmp_path / \"bin\"\n        fake_bin.mkdir()\n        calls = tmp_path / \"client-calls.txt\"\n    \n        for name in (\"codex\", \"fallback\"):\n            executable = fake_bin / name\n            executable.write_text(\n                f\"#!/bin/sh\\nprintf '%s\\\\n' '{name}' >> \\\"$PAEOS_TASK02_CALL_LOG\\\"\\nexit 0\\n\",\n                encoding=\"utf-8\",\n            )\n            executable.chmod(0o755)\n    \n        date = fake_bin / \"date\"\n        date.write_text(\"#!/bin/sh\\nprintf '%s\\\\n' '2026-10-19T00:00:00Z'\\n\", encoding=\"utf-8\")\n        date.chmod(0o755)\n    \n        result = subprocess.run(\n            [\"/bin/bash\", str(SCRIPT_PATH)],\n            cwd=tmp_path,\n            env={\n                \"HOME\": str(tmp_path),\n                \"LANG\": \"C\",\n                \"LC_ALL\": \"C\",\n                \"PATH\": str(fake_bin),\n                \"PAEOS_TASK02_CALL_LOG\": str(calls),\n                \"TMPDIR\": str(tmp_path),\n            },\n            capture_output=True,\n            text=True,\n            timeout=5,\n            check=False,\n        )\n    \n        observed_calls = calls.read_text(encoding=\"utf-8\") if calls.exists() else \"<none>\"\n>       assert result.returncode == 1, (\n            f\"expected fixed refusal, got {result.returncode}; fake calls: {observed_calls}\"\n        )\nE       AssertionError: expected fixed refusal, got 0; fake calls: codex\nE         \nE       assert 0 == 1\nE        +  where 0 = CompletedProcess(args=['/bin/bash', '/private/tmp/paeos-task02-red-final-csifhmar/preimage-red-control.sh'], returncode=0, stdout='[2026-10-19T00:00:00Z] Launching Codex (GPT-5.6 Luna @ Extra High reasoning) for Task 02...\\n', stderr='').returncode\n\n/private/tmp/paeos-task02-red-final-csifhmar/test_run_task02_codex_denial_red.py:48: AssertionError\n=========================== short test summary info ============================\nFAILED ../../../../../../private/tmp/paeos-task02-red-final-csifhmar/test_run_task02_codex_denial_red.py::test_task02_script_refuses_without_invoking_provider_or_fallback\n1 failed in 0.25s\n",
+    "synthetic_prompt_used": true,
+    "temporary_copy_exactly_two_path_replacements": true
+  },
+  "recorded_at_utc": "2026-10-19T01:15:18.643735+00:00",
+  "replay_patch": {
+    "bytes": 2843,
+    "format": "git unified diff with zero context",
+    "path": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
+    "sha256": "aa96e0fb9e79459785cb2a5e8884b1dee18eda0f058a05294f834f73bb423938",
+    "source_test_paths_only": true
+  },
+  "schema": "paeos.chat3-task02-script-retirement-test-evidence/1",
+  "source_test_postimages": {
+    "ops/run_task02_codex.sh": {
+      "bytes": 148,
+      "mode": "0o755",
+      "sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1"
+    },
+    "tests/ops/test_run_task02_codex_denial.py": {
+      "bytes": 1763,
+      "mode": "0o644",
+      "sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c"
+    }
+  },
+  "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+}
