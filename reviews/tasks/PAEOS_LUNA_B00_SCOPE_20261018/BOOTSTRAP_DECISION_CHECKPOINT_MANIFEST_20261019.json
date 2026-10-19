@@ -1,6 +1,23 @@
 {
-  "architect_delegation_check": "PENDING",
+  "architect_delegation_check": "NOT_EVIDENCED_IN_GOVERNING_RECORDS",
   "chat3_s0_handoff": "FROZEN_PENDING_INDEPENDENT_REVIEW; construction responsibility relinquished; no integration",
+  "coordination_evidence": [
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SCOPE.json",
+      "sha256": "24d5d8c0a8c5c839cb6d763ef5c20f282147242e4c89c14530c1f31ed673af4e",
+      "finding": "Mutable paths exclude ops/run_task02_codex.sh and its test; B01 writes require the fence prerequisite."
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/OWNER_GAP_FOLLOWUP_20261019.md",
+      "sha256": "147fe42c276fc7b62e18124179ff10c851d227c147b13f3f073ef28ec44d81be",
+      "finding": "No named owner or owner-approved implementation scope; Founder appointment and bounded authorization required before source changes."
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/ADMISSION_FENCE_CONTRACT.md",
+      "sha256": "e187f919b284f80e92f93dab44f0e35811b62d480902262565bf19be9c5c7135",
+      "finding": "Chat 3 is a proposed routing destination; actual authority owner must be confirmed."
+    }
+  ],
   "decision_id": "B00_BOOTSTRAP_S1_20261019",
   "files": [
     {
@@ -13,7 +30,7 @@
     },
     {
       "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/BOOTSTRAP_DECISION_20261019.md",
-      "sha256": "9196c7fe6f6160a8e3e6c8fcf49eba9c1f60521d5f7231397ff71250272e450d"
+      "sha256": "27700e654a676018d531984019d6fb571edebc553e5c61f8b5e908417a9a9f5b"
     }
   ],
   "implementation_authority_granted": false,
@@ -21,12 +38,12 @@
   "local_scheduler_construction": "PRESENT",
   "manifest_self_hash_excluded": true,
   "original_review_modified": false,
-  "parent_checkpoint": "c6f7444af4ef8b70b8ed6372361bc7be8e7c78c2",
+  "parent_checkpoint": "cf3dcd5422bba3f039f11450f6dda3117655fb62",
   "pinned_source_candidate": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
   "provider_or_runtime_effects": false,
   "schema": "paeos.b00-bootstrap-decision-checkpoint/1",
   "scope": "documentation-only route and delegation analysis; no source/test modification or bootstrap authorization",
   "source_code_changed": false,
-  "status": "COORDINATION_CHECK_PENDING",
+  "status": "FOUNDER_DECISION_REQUIRED",
   "tests_run": false
 }

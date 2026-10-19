@@ -2,7 +2,7 @@
 
 **Decision ID:** `B00_BOOTSTRAP_S1_20261019`
 
-**Status:** `COORDINATION_CHECK_PENDING`
+**Status:** `FOUNDER_DECISION_REQUIRED`
 
 **Type:** one-use, provider-free source bootstrap proposal; not a PAEOS admission, owner appointment, egress permit, or production activation
 
@@ -28,7 +28,17 @@ Chat 3's existing task is authenticated ORCA-to-PAEOS mission admission in an is
 
 Chat 3 has now handed off its S0 candidate: the candidate is frozen pending independent review, the review request is prepared but not dispatched, and Chat 3 relinquished further candidate construction. No integration, review acceptance, or qualification is claimed. The handoff clears availability; it does not transfer S0 authority to B00.
 
-The Architect's prior coordination role is acknowledged. The latest B00 follow-up says its thread was retired from completion dispatch. The Architect is checking whether any standing delegation covers the exact first slice. Until that check is returned, neither an executable delegated assignment nor a need for new Founder authority is asserted.
+The Architect's prior coordination role is acknowledged. The latest B00 follow-up says its thread was retired from completion dispatch. The repository-backed check below found no standing delegation covering the exact first slice, so the work cannot proceed as a routine assignment.
+
+### Coordination result: standing delegation not evidenced
+
+The controlling repository records do not cover the proposed script-retirement slice as an existing delegated write:
+
+- `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SCOPE.json` permits changes only to the four named model-router disclosure files, and only if the B00 fence prerequisite is evidenced. `ops/run_task02_codex.sh` and its proposed test are outside that mutable manifest.
+- `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/OWNER_GAP_FOLLOWUP_20261019.md` says that, absent an existing canonical owner, the Founder must appoint one and authorize bounded ownership before source changes. It records no owner-approved implementation scope.
+- `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/ADMISSION_FENCE_CONTRACT.md` calls Chat 3 a proposed routing destination and requires confirmation of the actual authority owner; it does not itself appoint Chat 3 or authorize this code change.
+
+Therefore **standing delegation for this slice is not evidenced**. This conclusion comes from the pinned repository records; the Architect's current read-only check was consistent with them. The user's recommendation supports Chat 3 as the proposed technical owner after its S0 handoff, but it is not treated as source-write authorization. The current user decision is limited to whether to grant the one-use scope below.
 
 ### Exact first slice
 
@@ -42,7 +52,7 @@ This one-file retirement **does not unblock DEBT-0258**. It closes an independen
 
 The later B00 repair that can unblock a live D0258 Builder task is the canonical, owner-approved admission/currentness and disclosure check at the actual Codex outbound-send boundary, bound to the complete outbound frame and accessible-input closure, followed by a stage-qualified Builder route. The current Codex transport denies before prompt inspection/signing when trusted disclosure authority is unavailable. The retirement slice does not change that behavior, supply the missing currentness/revocation state, or qualify a worker. Only after those independent prerequisites are proven may the coordinator hand Chat 1 a fresh D0258 task contract and admission.
 
-## Exact one-use bootstrap scope, if no standing delegation covers it
+## Exact one-use bootstrap scope requiring Founder authorization
 
 **Proposed technical owner:** Chat 3, for this slice only, after the S0 handoff already recorded above.
 
@@ -79,16 +89,16 @@ The current SQLite backend is durable and each row insert is atomic, but `Ledger
 
 ## Decision requested
 
-The Architect must first report whether standing delegation covers **this exact provider-egress denial slice**. If it does, the Architect should make the one-item assignment under that delegation after confirming the S0 handoff; no Founder approval is needed merely to appoint an owner within remit. If it does not, the minimum reserved decision is:
+Because no standing delegation for this exact slice is evidenced, the minimum reserved decision is:
 
 > Authorize Chat 3, after its recorded S0 handoff, for one offline provider-free bootstrap change limited to `ops/run_task02_codex.sh` and `tests/ops/test_run_task02_codex_denial.py`, with the report/checkpoint records listed above. The change may only retire the direct Codex task-script route. It must use synthetic tests, stay in the isolated candidate, make no PAEOS admission or worker-start claim, and stop after the pushed checkpoint and one eligible read-only review attempt. This does not appoint a permanent B00 owner, authorize the full send-fence scope, unblock D0258, enable egress, or change the separate quota instruction.
 
-The user's 20% reserve override for this week is a separate existing instruction. This packet neither extends its time window nor creates a spending ceiling or any paid-route authorization.
+The user's 20% reserve override for this week is a separate existing instruction. This packet neither extends its time window nor creates a spending ceiling or any paid-route authorization. The proposed slice is parallel P1 security hygiene and does **not** unblock DEBT-0258. The later source-bound admission/currentness and disclosure repair remains a separate B00 scope; Chat 1's sole DEBT-0258 integration authority remains unchanged.
 
 ## Current gates
 
 **ALLOWED_NOW:** preserve the source-bound route analysis; receive the Architect's delegation check; retain Chat 3's frozen S0 handoff.
 
-**HELD:** the two-file write until the Architect confirms applicable standing authority or the user approves the exact one-use exception; all positive egress, B00 send-fence implementation, D0258 activation, dependent debt work, installation, qualification, Court action, and P3.
+**HELD:** the two-file write until the user approves the exact one-use exception; all positive egress, B00 send-fence implementation, D0258 activation, dependent debt work, installation, qualification, Court action, and P3.
 
-**AUTHORITY_OR_IMPLEMENTATION_GAP:** no externally evidenced task admission/start route for this candidate; no established owner for B00 provider-egress authority/currentness/revocation; no proven atomic send claim. Exact wake: the Architect's source-backed delegation result, then—if needed—the user's decision above. No source/test code has changed under this packet.
+**AUTHORITY_OR_IMPLEMENTATION_GAP:** no externally evidenced task admission/start route for this candidate; no established owner for B00 provider-egress authority/currentness/revocation; no proven atomic send claim; no standing delegation for the script-retirement slice. Exact wake: the user's one-use decision above. No source/test code has changed under this packet.
