@@ -33,6 +33,7 @@
     "authorization_base_is_ancestor": true,
     "authorization_recorded_base": "77d319ea59d2386c032acfce6c3fe9232b176411",
     "branch": "codex/p1-bound-source-recovery-20261018",
+    "latest_parent_commit": "8cf091e6a16dbb050e4158a756d58c57069695c4",
     "named_script_preimage_matches_authorization": true,
     "starting_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
     "starting_remote_ref_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
@@ -56,17 +57,23 @@
       "sha256": "cda5c069f2d34e6b97952f971441f9ba98b0c6724391b172d21d46c4c8414de5"
     },
     {
-      "bytes": 2843,
+      "bytes": 4787,
       "mode": "0o644",
       "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
-      "sha256": "aa96e0fb9e79459785cb2a5e8884b1dee18eda0f058a05294f834f73bb423938"
+      "sha256": "fc6b58eb6eaae3572c353f52e7fb8c9f16aec2e2ba515870ea118f3ddb439687"
     },
     {
-      "bytes": 8850,
+      "bytes": 12284,
       "mode": "0o644",
       "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_TEST_EVIDENCE_20261019.json",
-      "sha256": "09d07496767aa5f8c079dd126d14db3ef0825e02fbbbbbfade765ab285cad699"
+      "sha256": "534b246f05bac28d0feebc16074c52f7f7bc26a299b96c8fc6498f3d592d51b3"
     }
+  ],
+  "followup_commit_allowlist": [
+    "tests/ops/test_run_task02_codex_denial.py",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_TEST_EVIDENCE_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_MANIFEST_20261019.json"
   ],
   "limitations": [
     "This retires only the named standalone Task 02 script; the wider B00 admission/currentness/revocation/send fence remains unresolved.",
@@ -74,7 +81,11 @@
     "Independent review remains pending; original review findings are unchanged."
   ],
   "recorded_at_utc": "2026-10-19T01:16:21.409941+00:00",
-  "remote_verification": "Pending explicit commit and push; final remote ref must be read back and reported.",
+  "remote_verification": {
+    "followup_commit_readback": "PENDING",
+    "previous_source_candidate_commit": "8cf091e6a16dbb050e4158a756d58c57069695c4",
+    "previous_ssh_readback": "MATCH"
+  },
   "review_findings_preserved": [
     {
       "bytes": 4228,
@@ -96,13 +107,20 @@
   },
   "schema": "paeos.chat3-task02-script-retirement-source-manifest/1",
   "source_patch": {
-    "bytes": 2843,
+    "bytes": 4787,
     "mode": "0o644",
     "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
-    "sha256": "aa96e0fb9e79459785cb2a5e8884b1dee18eda0f058a05294f834f73bb423938"
+    "sha256": "fc6b58eb6eaae3572c353f52e7fb8c9f16aec2e2ba515870ea118f3ddb439687"
   },
   "source_test_changes": [
     {
+      "followup_postimage": {
+        "bytes": 148,
+        "mode": "0o755",
+        "sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1",
+        "unchanged": true
+      },
+      "followup_preimage_sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1",
       "path": "ops/run_task02_codex.sh",
       "postimage": {
         "bytes": 148,
@@ -113,12 +131,13 @@
       "preimage_sha256": "b46eb957d45f6d7b94162795dce1664692d94aa22f916d7c937b61b86be66bea"
     },
     {
+      "followup_parent_commit": "8cf091e6a16dbb050e4158a756d58c57069695c4",
+      "followup_preimage_sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c",
       "path": "tests/ops/test_run_task02_codex_denial.py",
       "postimage": {
-        "bytes": 1763,
+        "bytes": 3658,
         "mode": "0o644",
-        "path": "tests/ops/test_run_task02_codex_denial.py",
-        "sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c"
+        "sha256": "1d314b485095ec5c92dee08d3b8b27717c14d0647ee850afca8355d21cf413ec"
       },
       "preimage": "ABSENT_AT_BASE_COMMIT"
     }
@@ -126,6 +145,8 @@
   "verification_summary": {
     "actual_candidate_green": "focused test passes; actual script is invoked by committed test; fake codex/fallback not invoked",
     "checks": "bash -n, focused pytest, Ruff lint/format, in-memory Python compile, ShellCheck, staged diff check, whitespace scan, scoped high-confidence secret scan all pass",
+    "followup_patch_replay": "Cumulative patch checked and replayed against exact original base; both source/test postimage hashes and modes matched.",
+    "followup_test_guard": "Exact-byte/path preflight now runs before subprocess; fixed-target and caller-environment redirection controls pass (3 tests).",
     "patch_replay": "git apply --check and git apply succeeded against exact 6b808f42 preimages; both resulting hashes match frozen postimages.",
     "safe_preimage_red": "test fails against temp source copy; fixed refusal missing; fake codex called; only prompt/output literals redirected"
   }

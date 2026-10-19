@@ -75,6 +75,83 @@
     "stdout": ".                                                                        [100%]\n",
     "synthetic_provider_and_fallback_invoked": false
   },
+  "followup_patch_replay": {
+    "apply_returncode": 0,
+    "base_commit": "6b808f4212741549771e8fc9e7847291d8f96d93",
+    "check_returncode": 0,
+    "command_apply": "git apply <frozen combined patch>",
+    "command_check": "git apply --check <frozen combined patch>",
+    "postimages": {
+      "ops/run_task02_codex.sh": {
+        "matches_postimage": true,
+        "mode": "0o755",
+        "sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1"
+      },
+      "tests/ops/test_run_task02_codex_denial.py": {
+        "matches_postimage": true,
+        "mode": "0o644",
+        "sha256": "1d314b485095ec5c92dee08d3b8b27717c14d0647ee850afca8355d21cf413ec"
+      }
+    }
+  },
+  "followup_recorded_at_utc": "2026-10-19T01:22:13.091686+00:00",
+  "followup_test_safety_guard": {
+    "checks": [
+      {
+        "command": "LC_ALL=C LANG=C bash -n ops/run_task02_codex.sh",
+        "name": "bash_syntax",
+        "returncode": 0
+      },
+      {
+        "command": "/Users/bob/GitHub/paeos/.venv/bin/ruff check tests/ops/test_run_task02_codex_denial.py",
+        "name": "ruff_lint",
+        "returncode": 0,
+        "stdout": "All checks passed!"
+      },
+      {
+        "command": "/Users/bob/GitHub/paeos/.venv/bin/ruff format --check tests/ops/test_run_task02_codex_denial.py",
+        "name": "ruff_format",
+        "returncode": 0,
+        "stdout": "1 file already formatted"
+      },
+      {
+        "command": "/Users/bob/GitHub/paeos/.venv/bin/python -I -B -c \"from pathlib import Path; p=Path('tests/ops/test_run_task02_codex_denial.py'); compile(p.read_text(), str(p), 'exec'); print('compile: PASS')\"",
+        "name": "python_compile",
+        "returncode": 0,
+        "stdout": "compile: PASS"
+      },
+      {
+        "command": "git diff --check -- tests/ops/test_run_task02_codex_denial.py",
+        "name": "git_diff_check",
+        "returncode": 0
+      },
+      {
+        "command": "LC_ALL=C LANG=C shellcheck ops/run_task02_codex.sh",
+        "name": "shellcheck",
+        "returncode": 0
+      },
+      {
+        "name": "secret_scan",
+        "result": "PASS no high-confidence credential patterns"
+      }
+    ],
+    "focused_pytest": {
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /Users/bob/GitHub/paeos/.venv/bin/python -I -B -m pytest -p no:cacheprovider -q tests/ops/test_run_task02_codex_denial.py",
+      "result": "3 passed",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "...                                                                      [100%]\n"
+    },
+    "guard": "Before any subprocess, test derives the fixed repository entrypoint, rejects any other path/symlink/non-regular file, then requires byte-for-byte equality with the exact retired refusal body.",
+    "parent_commit": "8cf091e6a16dbb050e4158a756d58c57069695c4",
+    "redirection_controls": [
+      "A caller-selected script path is rejected without executing it.",
+      "PAEOS_TASK02_SCRIPT, PAEOS_TASK02_PROMPT_FILE, and PROMPT_FILE environment values do not alter the fixed target; the child execution environment is explicitly constructed."
+    ],
+    "retired_script_unchanged_sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1",
+    "test_postimage_sha256": "1d314b485095ec5c92dee08d3b8b27717c14d0647ee850afca8355d21cf413ec",
+    "test_preimage_sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c"
+  },
   "limitations": [
     "This is source-level local refusal behavior only.",
     "No provider request, positive operational egress, credential access, installation, PAEOS admission, worker start, formal review, qualification, Court action, debt integration, D0258 progress, or P3 is evidenced.",
@@ -117,10 +194,10 @@
   },
   "recorded_at_utc": "2026-10-19T01:15:18.643735+00:00",
   "replay_patch": {
-    "bytes": 2843,
-    "format": "git unified diff with zero context",
+    "bytes": 4787,
+    "format": "cumulative git unified diff with zero context from authorized base",
     "path": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/CHAT3_TASK02_SCRIPT_RETIREMENT_SOURCE_PATCH_20261019.patch",
-    "sha256": "aa96e0fb9e79459785cb2a5e8884b1dee18eda0f058a05294f834f73bb423938",
+    "sha256": "fc6b58eb6eaae3572c353f52e7fb8c9f16aec2e2ba515870ea118f3ddb439687",
     "source_test_paths_only": true
   },
   "schema": "paeos.chat3-task02-script-retirement-test-evidence/1",
@@ -131,9 +208,9 @@
       "sha256": "bd640cbadd58f83a61b5ee2d3316855b2f0b59c2522fbea09c8934572c2298f1"
     },
     "tests/ops/test_run_task02_codex_denial.py": {
-      "bytes": 1763,
+      "bytes": 3658,
       "mode": "0o644",
-      "sha256": "0f49d3caa39ee7b0ae736a6cbc13da320675ed994215b839f3767dbf6e5a937c"
+      "sha256": "1d314b485095ec5c92dee08d3b8b27717c14d0647ee850afca8355d21cf413ec"
     }
   },
   "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
