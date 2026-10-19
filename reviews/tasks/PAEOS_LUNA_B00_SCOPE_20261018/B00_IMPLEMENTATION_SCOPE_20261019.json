@@ -1,0 +1,59 @@
+{
+  "schema": "paeos.b00-implementation-scope/1",
+  "recorded_on": "2026-10-19",
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "purpose": "Provider-free implementation of the canonical admission/revocation and send-claim transaction boundary, with a synthetic-only positive control and a default-deny trusted transport seam.",
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "base_commit": "b9cd1aa5c88ce29ffadcfb5f4ab5984c569b2276",
+    "live_remote_readback_commit": "b9cd1aa5c88ce29ffadcfb5f4ab5984c569b2276",
+    "worktree": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "scope_decision": {
+    "prior_b01_manifest": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+    "prior_b01_manifest_sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a",
+    "prior_b01_mutable_paths_preserved_as_historical": [
+      "paeos/model_router/state.py",
+      "paeos/model_router/disclosure_authority.py",
+      "tests/model_router/test_disclosure_authority.py",
+      "tests/model_router/test_disclosure_attempts.py"
+    ],
+    "direct_instruction_override": "The direct human instruction on 2026-10-19 authorizes provider-free offline B00 implementation and focused tests, and requires the actual currentness/revocation/send boundary in the existing canonical subsystem. Source tracing shows the saved B01 four-file model-router scope cannot provide that transaction. This record expands only this B00 source/test scope to the canonical kernel ledger and SQLite backend plus the trusted Codex transport seam; it does not claim the earlier B01 manifest already allowed these paths.",
+    "original_scope_records_and_security_review_preserved": true
+  },
+  "mutable_source_and_test_preimages": [
+    {"path": "kernel/ledger.py", "preimage": "EXISTING", "bytes": 14811, "sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b"},
+    {"path": "kernel/ledger_sqlite.py", "preimage": "EXISTING", "bytes": 7669, "sha256": "864b5151e753030f6fda4f1016d13772c6c7edf9ce41094090950f049df07f8c"},
+    {"path": "runtime/autonomy/admission_send_fence.py", "preimage": "ABSENT_AT_BASE", "bytes": 0, "sha256": null},
+    {"path": "runtime/integrations/trusted_codex_transport.py", "preimage": "EXISTING", "bytes": 21508, "sha256": "4351b8b90d5f393d1236a59af735eeb4947be4d701798e0b0052308bbc515b04"},
+    {"path": "tests/kernel/test_ledger.py", "preimage": "EXISTING", "bytes": 7913, "sha256": "b1bde30886d951938568157a3161725977119097b5722e81f985fb06a448ea58"},
+    {"path": "tests/kernel/test_ledger_sqlite.py", "preimage": "EXISTING", "bytes": 3785, "sha256": "d0b7b2751dca3be806126f8159df8b65430c70897fc5c58759d12b1e73e671ee"},
+    {"path": "tests/runtime/autonomy/test_admission_send_fence.py", "preimage": "ABSENT_AT_BASE", "bytes": 0, "sha256": null},
+    {"path": "tests/runtime/test_trusted_codex_worker_transport.py", "preimage": "EXISTING", "bytes": 44544, "sha256": "57ee6bf8c782febf65df917662103ffcdeb9b6fd1d50ddd25b46440519a946ab"}
+  ],
+  "read_only_controls": [
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SCOPE.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/EGRESS_INVENTORY.json",
+    "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+    "runtime/worker_admission.py",
+    "runtime/supervisors/admission.py",
+    "runtime/autonomy/authority.py",
+    "ops/autonomous_run.py",
+    "paeos/model_router/state.py",
+    "paeos/model_router/disclosure_policy.py"
+  ],
+  "explicit_exclusions": [
+    "No provider calls or external network use by tests",
+    "No production policy defaults, environment activation, key enrollment, installation, or egress enablement",
+    "No changes to Chat1-owned capability APIs or debt integration",
+    "No PAEOS admission, worker-start, Court, qualification, or debt-lifecycle claims"
+  ],
+  "operation_state": {
+    "paeos_run_task_stage_worker_operation_ids": "NONE_SOURCE_ONLY",
+    "tests_run_before_edits": false,
+    "review": "NOT_REQUESTED",
+    "court": "NONE",
+    "qualification": "NONE"
+  }
+}

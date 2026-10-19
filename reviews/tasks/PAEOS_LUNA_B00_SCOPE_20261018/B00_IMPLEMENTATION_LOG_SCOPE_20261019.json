@@ -1,0 +1,26 @@
+{
+  "schema": "paeos.b00-implementation-log-scope/1",
+  "recorded_on": "2026-10-19",
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "candidate_base": "b9cd1aa5c88ce29ffadcfb5f4ab5984c569b2276",
+  "authority_basis": "User-provided AGENTS.md, Overseer Agent Ingestion Protocol item 2: log runtime/code remediation to PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md and MessyChangesNeedsReview.md.",
+  "scope": "Append one evidence-scoped B00 implementation status entry to each named oversight log; preserve all existing bytes and entries.",
+  "preimages": [
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1497920,
+      "sha256": "6c2256c9706a117b0a4f7cba663455279557f211481fc99df9d208edf0452b6c"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 669357,
+      "sha256": "ff6f2b3be273f7ea5773ec6136c731090353a4010177226ade749264178141ec"
+    }
+  ],
+  "write_constraints": [
+    "Append-only; no edits, pruning, normalization, or reformatting of existing log content.",
+    "Record offline synthetic implementation and test evidence only.",
+    "State that production admission, provider egress, worker start, review acceptance, qualification, Court, and debt lifecycle effects are not established.",
+    "Record review as pending because no eligible free, privacy-eligible different-family route was demonstrated; do not claim an attempt or acceptance."
+  ]
+}

@@ -13,11 +13,18 @@ import os
 import signal
 import time
 import uuid
+from contextlib import suppress
 from pathlib import Path
 
 from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey, VerifyKey
 
+from runtime.autonomy.admission_send_fence import (
+    AdmissionSendFence,
+    SendOperation,
+    SendOutcome,
+    SendSettlementError,
+)
 from runtime.builder_transport import REQUIRED_CANARIES, REQUIRED_LIFECYCLE
 from runtime.integrations import SessionResult, SessionSpec, TrustedTransportFailure
 from runtime.integrations.task_scoped_responses_broker import MAX_TASK_REQUESTS
@@ -52,6 +59,8 @@ _CAPABILITY_SCHEMA = "paeos.trusted-codex-launch/1"
 _MAX_FRAME_BYTES = 2 * 1024 * 1024
 _MAX_RESPONSE_BYTES = 8 * 1024 * 1024
 _CAPABILITY_TTL_SECONDS = 90.0
+_ROUTE_ID = "trusted-codex-worker/v1"
+_ROUTE_DIGEST = hashlib.sha256(_ROUTE_ID.encode("ascii")).hexdigest()
 _FAILURE_ERROR = "trusted Codex launch rejected or failed closed"
 _FAILURE_CODES = frozenset(
     {
@@ -203,6 +212,9 @@ class HostCodexWorkerTransport:
         response_verify_key: VerifyKey,
         timeout_s: float = DEFAULT_RESPONSE_TIMEOUT_S,
         evidence_root: Path | None = None,
+        admission_send_fence: AdmissionSendFence | None = None,
+        admission_ref: str | None = None,
+        expected_admission_epoch: int | None = None,
     ) -> None:
         if not queue_root.is_absolute() or queue_root.is_symlink():
             raise TrustedCodexTransportError(
@@ -218,12 +230,28 @@ class HostCodexWorkerTransport:
             not evidence_root.is_absolute() or evidence_root.is_symlink()
         ):
             raise TrustedCodexTransportError("trusted supervisor evidence root is unsafe")
+        if admission_send_fence is None:
+            if admission_ref is not None or expected_admission_epoch is not None:
+                raise TrustedCodexTransportError(
+                    "admission identity cannot be configured without the trusted send fence"
+                )
+        elif (
+            not isinstance(admission_send_fence, AdmissionSendFence)
+            or not isinstance(admission_ref, str)
+            or not admission_ref
+            or type(expected_admission_epoch) is not int
+            or expected_admission_epoch < 1
+        ):
+            raise TrustedCodexTransportError("trusted admission send-fence binding is incomplete")
         self.queue_root = queue_root
         self.workspace_root = workspace_root.resolve()
         self.evidence_root = evidence_root
         self._request_signing_key = request_signing_key
         self._response_verify_key = response_verify_key
         self._timeout_s = timeout_s
+        self._admission_send_fence = admission_send_fence
+        self._admission_ref = admission_ref
+        self._expected_admission_epoch = expected_admission_epoch
         self.last_request_sha256: str | None = None
         self.last_response_sha256: str | None = None
         self.last_observation: dict[str, object] | None = None
@@ -269,12 +297,24 @@ class HostCodexWorkerTransport:
         }
 
     def run(self, spec: SessionSpec) -> SessionResult:
-        # This route has no trusted disclosure-authority consumer yet. Do not inspect session
-        # data or create a signed provider-bound request until that authority is integrated.
-        raise TrustedTransportFailure(
-            "disclosure_authority_unavailable",
-            "trusted disclosure authority is unavailable",
-        )
+        # No environment/default path activates this boundary. Production composition still
+        # supplies no fence until its admission owner and policy verifier are integrated.
+        fence = self._admission_send_fence
+        admission_ref = self._admission_ref
+        expected_epoch = self._expected_admission_epoch
+        if fence is None or admission_ref is None or expected_epoch is None:
+            raise TrustedTransportFailure(
+                "disclosure_authority_unavailable",
+                "trusted disclosure authority is unavailable",
+            )
+        try:
+            fence.preflight(admission_ref, expected_epoch)
+        except Exception as exc:
+            raise TrustedTransportFailure(
+                "disclosure_authority_unavailable",
+                "current admission and disclosure policy are unavailable",
+            ) from exc
+
         request = self._request_payload(spec)
         request_id = request["request_id"]
         assert isinstance(request_id, str)
@@ -290,50 +330,84 @@ class HostCodexWorkerTransport:
         if len(encoded) > _MAX_FRAME_BYTES:
             raise TrustedCodexTransportError("trusted supervisor request exceeds bounded size")
         self.last_request_sha256 = _sha256(encoded)
+        operation = SendOperation(
+            admission_ref=admission_ref,
+            expected_epoch=expected_epoch,
+            task_id=spec.task_id,
+            goal_id=spec.goal_id,
+            run_id=spec.run_id,
+            stage=spec.stage,
+            role="BUILDER",
+            workspace_id=spec.workspace.name,
+            route_id=_ROUTE_ID,
+            route_digest=_ROUTE_DIGEST,
+            request_id=request_id,
+            frame=encoded,
+        )
         try:
-            if self.evidence_root is not None:
-                try:
-                    evidence_root = self.evidence_root.resolve(strict=True)
-                except OSError as exc:
-                    raise TrustedCodexTransportError(
-                        "trusted supervisor evidence root is unavailable"
-                    ) from exc
-                if (
-                    self.evidence_root.is_symlink()
-                    or not self.evidence_root.is_dir()
-                    or evidence_root != self.evidence_root
-                    or self.evidence_root.parent != spec.workspace
-                    or not evidence_root.is_relative_to(spec.workspace)
-                ):
-                    raise TrustedCodexTransportError(
-                        "trusted supervisor evidence root is outside the workspace"
-                    )
-                _write_receipt_once(self.evidence_root / "request-envelope.json", encoded)
-            _write_atomic(request_path, encoded)
-            deadline = time.monotonic() + self._timeout_s
-            while time.monotonic() < deadline:
-                if response_path.is_file() and not response_path.is_symlink():
-                    raw = response_path.read_bytes()
-                    if self.evidence_root is not None:
-                        _write_receipt_once(self.evidence_root / "response-envelope.json", raw)
-                    response_path.unlink()
-                    request_path.unlink(missing_ok=True)
-                    if len(raw) > _MAX_RESPONSE_BYTES:
-                        raise TrustedCodexTransportError(
-                            "trusted supervisor response exceeds bounded size"
-                        )
-                    self.last_response_sha256 = _sha256(raw)
-                    response = json.loads(raw.decode("utf-8"))
-                    return self._validate_response(response, request_id=request_id, spec=spec)
-                time.sleep(0.05)
-            request_path.unlink(missing_ok=True)
-            raise TrustedCodexTransportError("trusted supervisor response deadline exceeded")
-        except TrustedCodexTransportError:
-            raise
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
-            raise TrustedCodexTransportError(
-                "trusted supervisor is unavailable or malformed"
+            lease = fence.acquire_send_lease(operation)
+        except Exception as exc:
+            raise TrustedTransportFailure(
+                "disclosure_authority_unavailable",
+                "current admission refused the exact outbound frame",
             ) from exc
+        settled = False
+        try:
+            try:
+                if self.evidence_root is not None:
+                    try:
+                        evidence_root = self.evidence_root.resolve(strict=True)
+                    except OSError as exc:
+                        raise TrustedCodexTransportError(
+                            "trusted supervisor evidence root is unavailable"
+                        ) from exc
+                    if (
+                        self.evidence_root.is_symlink()
+                        or not self.evidence_root.is_dir()
+                        or evidence_root != self.evidence_root
+                        or self.evidence_root.parent != spec.workspace
+                        or not evidence_root.is_relative_to(spec.workspace)
+                    ):
+                        raise TrustedCodexTransportError(
+                            "trusted supervisor evidence root is outside the workspace"
+                        )
+                    _write_receipt_once(self.evidence_root / "request-envelope.json", encoded)
+                _write_atomic(request_path, encoded)
+                deadline = time.monotonic() + self._timeout_s
+                while time.monotonic() < deadline:
+                    if response_path.is_file() and not response_path.is_symlink():
+                        raw = response_path.read_bytes()
+                        if self.evidence_root is not None:
+                            _write_receipt_once(self.evidence_root / "response-envelope.json", raw)
+                        response_path.unlink()
+                        request_path.unlink(missing_ok=True)
+                        if len(raw) > _MAX_RESPONSE_BYTES:
+                            raise TrustedCodexTransportError(
+                                "trusted supervisor response exceeds bounded size"
+                            )
+                        self.last_response_sha256 = _sha256(raw)
+                        response = json.loads(raw.decode("utf-8"))
+                        result = self._validate_response(response, request_id=request_id, spec=spec)
+                        fence.finish_send_lease(
+                            lease,
+                            SendOutcome.RETURNED,
+                            outcome_ref=self.last_response_sha256,
+                        )
+                        settled = True
+                        return result
+                    time.sleep(0.05)
+                request_path.unlink(missing_ok=True)
+                raise TrustedCodexTransportError("trusted supervisor response deadline exceeded")
+            except TrustedCodexTransportError:
+                raise
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+                raise TrustedCodexTransportError(
+                    "trusted supervisor is unavailable or malformed"
+                ) from exc
+        finally:
+            if not settled:
+                with suppress(SendSettlementError):
+                    fence.finish_send_lease(lease, SendOutcome.UNKNOWN)
 
     def _validate_response(
         self,

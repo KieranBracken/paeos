@@ -63,7 +63,9 @@ class SqliteLedgerStore:
         self._db.executescript(_SCHEMA)
         cols = [c[1] for c in self._db.execute("PRAGMA table_info(ledger_rows)").fetchall()]
         if "domain_tag" not in cols:
-            self._db.execute("ALTER TABLE ledger_rows ADD COLUMN domain_tag TEXT NOT NULL DEFAULT 'PRODUCTION'")
+            self._db.execute(
+                "ALTER TABLE ledger_rows ADD COLUMN domain_tag TEXT NOT NULL DEFAULT 'PRODUCTION'"
+            )
 
     def acquire_writer(self, owner: str) -> None:
         with self._lock:
@@ -90,14 +92,40 @@ class SqliteLedgerStore:
         return _to_row(row) if row is not None else None
 
     def append_row(self, row: LedgerRow) -> None:
+        self._append_row_transaction(row, expected_head_hash=None)
+
+    def append_row_if_head(self, row: LedgerRow, expected_head_hash: str) -> None:
+        self._append_row_transaction(row, expected_head_hash=expected_head_hash)
+
+    def _append_row_transaction(
+        self,
+        row: LedgerRow,
+        *,
+        expected_head_hash: str | None,
+    ) -> None:
+        """Serialize head comparison and append across SQLite connections/processes."""
         with self._lock:
-            expected = self.count() + 1
-            if row.seq != expected:
-                raise ForkRejected(
-                    f"expected seq {expected} (head+1); got {row.seq} — fork refused"
-                )
-            domain = getattr(row, "domain_tag", "PRODUCTION") or "PRODUCTION"
             try:
+                self._db.execute("BEGIN IMMEDIATE")
+                head = self._db.execute(
+                    "SELECT seq, row_hash FROM ledger_rows ORDER BY seq DESC LIMIT 1"
+                ).fetchone()
+                actual_seq = int(head[0]) if head is not None else 0
+                actual_head_hash = str(head[1]) if head is not None else ""  # filled below
+                if head is None:
+                    from kernel.ledger import GENESIS_HASH
+
+                    actual_head_hash = GENESIS_HASH
+                if expected_head_hash is not None and actual_head_hash != expected_head_hash:
+                    raise ForkRejected(
+                        "ledger head changed before conditional append — fork refused"
+                    )
+                expected_seq = actual_seq + 1
+                if row.seq != expected_seq or row.prev_hash != actual_head_hash:
+                    raise ForkRejected(
+                        f"expected seq {expected_seq} and current predecessor; got seq {row.seq} — fork refused"
+                    )
+                domain = getattr(row, "domain_tag", "PRODUCTION") or "PRODUCTION"
                 self._db.execute(
                     "INSERT INTO ledger_rows "
                     "(seq, timestamp, prev_hash, row_hash, schema_ver, kind, payload, domain_tag) "
@@ -113,8 +141,15 @@ class SqliteLedgerStore:
                         domain,
                     ),
                 )
+                self._db.execute("COMMIT")
             except sqlite3.IntegrityError as exc:  # duplicate seq PK ⇒ a racing fork
+                if self._db.in_transaction:
+                    self._db.execute("ROLLBACK")
                 raise ForkRejected(f"seq {row.seq} already present — fork refused") from exc
+            except Exception:
+                if self._db.in_transaction:
+                    self._db.execute("ROLLBACK")
+                raise
 
     def read(self, start: int, end: int | None) -> list[LedgerRow]:
         if start < 1:

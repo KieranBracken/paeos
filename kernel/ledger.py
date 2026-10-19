@@ -53,6 +53,7 @@ type JsonValue = None | bool | int | float | str | list[JsonValue] | dict[str, J
 # Chain anchor. The genesis row's predecessor. A constant so an empty ledger has a
 # well-defined head hash and the first real row is bound to it.
 GENESIS_HASH: str = hashlib.sha256(b"PAEOS-LEDGER-GENESIS/v1").hexdigest()
+_MAX_APPEND_ATTEMPTS = 16
 
 
 # ---- errors ---------------------------------------------------------------
@@ -174,6 +175,10 @@ class LedgerStore(Protocol):
         """Append atomically. Raise ForkRejected if ``row.seq`` is not exactly head.seq+1."""
         ...
 
+    def append_row_if_head(self, row: LedgerRow, expected_head_hash: str) -> None:
+        """Append only if the current durable head still matches ``expected_head_hash``."""
+        ...
+
     def read(self, start: int, end: int | None) -> list[LedgerRow]:
         """Rows with seq in [start, end); end=None means through head. Ascending by seq."""
         ...
@@ -193,39 +198,59 @@ class InMemoryLedgerStore:
     def __init__(self) -> None:
         self._rows: list[LedgerRow] = []
         self._writer: str | None = None
+        self._lock = threading.RLock()
 
     def acquire_writer(self, owner: str) -> None:
-        if self._writer is not None and self._writer != owner:
-            raise SingleWriterViolation(
-                f"ledger already owned by writer {self._writer!r}; {owner!r} refused"
-            )
-        self._writer = owner
+        with self._lock:
+            if self._writer is not None and self._writer != owner:
+                raise SingleWriterViolation(
+                    f"ledger already owned by writer {self._writer!r}; {owner!r} refused"
+                )
+            self._writer = owner
 
     def release_writer(self, owner: str) -> None:
-        if self._writer == owner:
-            self._writer = None
+        with self._lock:
+            if self._writer == owner:
+                self._writer = None
 
     def head(self) -> LedgerRow | None:
-        return self._rows[-1] if self._rows else None
+        with self._lock:
+            return self._rows[-1] if self._rows else None
 
     def append_row(self, row: LedgerRow) -> None:
-        expected = len(self._rows) + 1
-        if row.seq != expected:
-            raise ForkRejected(
-                f"expected seq {expected} (head+1); got {row.seq} — fork refused"
-            )
-        self._rows.append(row)
+        with self._lock:
+            expected = len(self._rows) + 1
+            prev_hash = self._rows[-1].row_hash if self._rows else GENESIS_HASH
+            if row.seq != expected or row.prev_hash != prev_hash:
+                raise ForkRejected(
+                    f"expected seq {expected} and current predecessor; got seq {row.seq} — fork refused"
+                )
+            self._rows.append(row)
+
+    def append_row_if_head(self, row: LedgerRow, expected_head_hash: str) -> None:
+        with self._lock:
+            prev_hash = self._rows[-1].row_hash if self._rows else GENESIS_HASH
+            if prev_hash != expected_head_hash:
+                raise ForkRejected("ledger head changed before conditional append — fork refused")
+            expected_seq = len(self._rows) + 1
+            if row.seq != expected_seq or row.prev_hash != prev_hash:
+                raise ForkRejected(
+                    f"expected seq {expected_seq} and current predecessor; got seq {row.seq} — fork refused"
+                )
+            self._rows.append(row)
 
     def read(self, start: int, end: int | None) -> list[LedgerRow]:
         if start < 1:
             raise ValueError(f"start must be >= 1, got {start}")
         if end is not None and end < start:
             raise ValueError(f"end ({end}) must be >= start ({start})")
-        hi = len(self._rows) + 1 if end is None else end
-        return [r for r in self._rows if start <= r.seq < hi]
+        with self._lock:
+            hi = len(self._rows) + 1 if end is None else end
+            return [r for r in self._rows if start <= r.seq < hi]
 
     def count(self) -> int:
-        return len(self._rows)
+        with self._lock:
+            return len(self._rows)
 
 
 # ---- the ledger -----------------------------------------------------------
@@ -258,36 +283,90 @@ class Ledger:
         """Append ``event``; return its 1-based seq. Never mutates an existing row.
 
         Thread-safe: the whole read-head→derive-seq→commit sequence runs under `_append_lock`, so
-        parallel goals (ConcurrentScheduler) integrate serially onto one dense, unforked chain."""
+        parallel goals (ConcurrentScheduler) integrate serially onto one dense, unforked chain.
+        Independent connections using the same canonical writer identity may race at storage;
+        a stale append is recomposed against the committed head and retried."""
         with self._append_lock:
-            self._ensure_open()
-            prev = self._store.head()
-            prev_hash = prev.row_hash if prev is not None else GENESIS_HASH
-            seq = (prev.seq if prev is not None else 0) + 1
-            timestamp = _utcnow_iso()
-            if domain_tag is None and isinstance(event.payload, dict) and "domain_tag" in event.payload:
-                domain_tag = str(event.payload["domain_tag"])
-            tag = (domain_tag or "PRODUCTION").strip().upper()
-            valid_domains = {d.value for d in DomainTag}
-            if tag not in valid_domains:
-                raise ValueError(f"Invalid domain_tag {tag!r}; must be one of {sorted(valid_domains)}")
-            if tag == "PRODUCTION" and isinstance(event.payload, dict):
-                payload_str = json.dumps(event.payload).lower()
-                if any(kw in payload_str for kw in ("synthetic", "mock_id", "test_fixture", "fake_evidence", "synthetic_mock")):
-                    raise ValueError(
-                        "SYNTHETIC_STATE_CONTAMINATION_REJECTED: Event with synthetic/mock payload markers cannot be appended under PRODUCTION domain_tag"
-                    )
-            row_hash = compute_row_hash(prev_hash, seq, timestamp, event, domain_tag=tag)
-            row = LedgerRow(
-                seq=seq,
-                timestamp=timestamp,
-                event=event,
-                prev_hash=prev_hash,
-                row_hash=row_hash,
-                domain_tag=tag,
+            conflict: ForkRejected | None = None
+            for _ in range(_MAX_APPEND_ATTEMPTS):
+                try:
+                    return self._append_locked(event, domain_tag=domain_tag)
+                except ForkRejected as exc:
+                    conflict = exc
+            raise ForkRejected(
+                "canonical ledger remained contended; append was not committed"
+            ) from conflict
+
+    def append_if_head(
+        self,
+        event: Event,
+        *,
+        expected_head_hash: str,
+        domain_tag: str | None = None,
+    ) -> int:
+        """Append only if no event has changed the observed canonical head.
+
+        The store rechecks the head and writes the new row in one transaction. Callers that
+        validate a state projection before this append must retry the projection after
+        ``ForkRejected``; a revocation committed between validation and append cannot be
+        overtaken by a stale claim.
+        """
+        with self._append_lock:
+            return self._append_locked(
+                event,
+                domain_tag=domain_tag,
+                expected_head_hash=expected_head_hash,
             )
-            self._store.append_row(row)  # atomic; ForkRejected if a racer took this seq
-            return seq
+
+    def _append_locked(
+        self,
+        event: Event,
+        *,
+        domain_tag: str | None = None,
+        expected_head_hash: str | None = None,
+    ) -> int:
+        self._ensure_open()
+        prev = self._store.head()
+        prev_hash = prev.row_hash if prev is not None else GENESIS_HASH
+        if expected_head_hash is not None and prev_hash != expected_head_hash:
+            raise ForkRejected("ledger head changed before conditional append — fork refused")
+        seq = (prev.seq if prev is not None else 0) + 1
+        timestamp = _utcnow_iso()
+        if domain_tag is None and isinstance(event.payload, dict) and "domain_tag" in event.payload:
+            domain_tag = str(event.payload["domain_tag"])
+        tag = (domain_tag or "PRODUCTION").strip().upper()
+        valid_domains = {d.value for d in DomainTag}
+        if tag not in valid_domains:
+            raise ValueError(f"Invalid domain_tag {tag!r}; must be one of {sorted(valid_domains)}")
+        if tag == "PRODUCTION" and isinstance(event.payload, dict):
+            payload_str = json.dumps(event.payload).lower()
+            if any(
+                kw in payload_str
+                for kw in (
+                    "synthetic",
+                    "mock_id",
+                    "test_fixture",
+                    "fake_evidence",
+                    "synthetic_mock",
+                )
+            ):
+                raise ValueError(
+                    "SYNTHETIC_STATE_CONTAMINATION_REJECTED: Event with synthetic/mock payload markers cannot be appended under PRODUCTION domain_tag"
+                )
+        row_hash = compute_row_hash(prev_hash, seq, timestamp, event, domain_tag=tag)
+        row = LedgerRow(
+            seq=seq,
+            timestamp=timestamp,
+            event=event,
+            prev_hash=prev_hash,
+            row_hash=row_hash,
+            domain_tag=tag,
+        )
+        if expected_head_hash is None:
+            self._store.append_row(row)
+        else:
+            self._store.append_row_if_head(row, expected_head_hash)
+        return seq
 
     def read(self, start: int = 1, end: int | None = None) -> list[LedgerRow]:
         """Rows with seq in [start, end); end=None reads through the head."""
@@ -315,9 +394,7 @@ class Ledger:
         expected_seq = 1
         for row in self._store.read(1, None):
             if row.seq != expected_seq:
-                raise ChainCorruption(
-                    f"seq gap/reorder: expected {expected_seq}, found {row.seq}"
-                )
+                raise ChainCorruption(f"seq gap/reorder: expected {expected_seq}, found {row.seq}")
             if row.prev_hash != prev_hash:
                 raise ChainCorruption(
                     f"broken link at seq {row.seq}: prev_hash does not match seq {row.seq - 1}"
@@ -342,9 +419,7 @@ class Ledger:
                 if legacy_hash == row.row_hash:
                     recomputed = legacy_hash
             if recomputed != row.row_hash:
-                raise ChainCorruption(
-                    f"tampered row at seq {row.seq}: content hash mismatch"
-                )
+                raise ChainCorruption(f"tampered row at seq {row.seq}: content hash mismatch")
             prev_hash = row.row_hash
             expected_seq += 1
         return prev_hash

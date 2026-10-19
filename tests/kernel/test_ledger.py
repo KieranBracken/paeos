@@ -35,8 +35,9 @@ _json_scalars = (
 )
 _json_values = st.recursive(
     _json_scalars,
-    lambda children: st.lists(children, max_size=4)
-    | st.dictionaries(st.text(max_size=8), children, max_size=4),
+    lambda children: (
+        st.lists(children, max_size=4) | st.dictionaries(st.text(max_size=8), children, max_size=4)
+    ),
     max_leaves=6,
 )
 _payloads = st.dictionaries(st.text(max_size=8), _json_values, max_size=4)
@@ -160,6 +161,21 @@ def test_fork_at_existing_seq_refused() -> None:
         store.append_row(forged_row)
 
 
+def test_conditional_append_rejects_a_stale_head() -> None:
+    _, ledger = _fresh()
+    expected = ledger.head_hash()
+    ledger.append(Event(1, "admission_revoked", {"admission_ref": "fixture"}))
+
+    with pytest.raises(ForkRejected):
+        ledger.append_if_head(
+            Event(1, "send_claimed", {"logical_job_id": "fixture-job"}),
+            expected_head_hash=expected,
+            domain_tag="TEST",
+        )
+
+    assert [row.event.kind for row in ledger.read()] == ["admission_revoked"]
+
+
 def test_seq_must_be_dense_no_skips() -> None:
     store, ledger = _fresh()
     ledger.append(Event(1, "a"))
@@ -177,7 +193,7 @@ def test_verify_detects_any_tampered_row(events: list[Event], seed: int) -> None
     store = InMemoryLedgerStore()
     ledger = Ledger(store)
     for ev in events:
-        ledger.append(ev)
+        ledger.append(ev, domain_tag="TEST")
     assert ledger.verify_chain() == ledger.head_hash()  # honest chain verifies
 
     n = len(events)

@@ -58,6 +58,30 @@ def test_fork_refused_on_sqlite(tmp_path: Path) -> None:
         store.append_row(forged)
 
 
+def test_compare_and_append_serializes_revocation_across_connections(tmp_path: Path) -> None:
+    db = tmp_path / "ledger.db"
+    store_a = SqliteLedgerStore(db)
+    ledger_a = Ledger(store_a, writer_id="b00-test")
+    store_b = SqliteLedgerStore(db)
+    ledger_b = Ledger(store_b, writer_id="b00-test")
+    expected_head = ledger_a.head_hash()
+
+    ledger_a.append(Event(1, "admission_revoked", {"admission_ref": "fixture"}))
+    with pytest.raises(ForkRejected):
+        ledger_b.append_if_head(
+            Event(1, "send_claimed", {"logical_job_id": "fixture-job"}),
+            expected_head_hash=expected_head,
+            domain_tag="TEST",
+        )
+
+    assert [row.event.kind for row in ledger_b.read()] == ["admission_revoked"]
+    assert ledger_b.verify_chain() == ledger_b.head_hash()
+    ledger_a.close()
+    store_a.close()
+    ledger_b.close()
+    store_b.close()
+
+
 def test_tamper_detected_on_reopened_ledger(tmp_path: Path) -> None:
     db = tmp_path / "ledger.db"
     store = SqliteLedgerStore(db)
@@ -96,3 +120,57 @@ def test_concurrent_appends_produce_one_dense_unforked_chain(tmp_path: Path) -> 
     assert ledger.verify_chain() == ledger.head_hash()  # chain intact (no fork/tamper)
     submitted = {(t, i) for t in range(n_threads) for i in range(per_thread)}
     assert {(r.event.payload["t"], r.event.payload["i"]) for r in rows} == submitted  # none lost
+
+
+def test_concurrent_independent_connections_retry_stale_append(tmp_path: Path) -> None:
+    db = tmp_path / "ledger.db"
+    store_a = SqliteLedgerStore(db)
+    store_b = SqliteLedgerStore(db)
+    ledger_a = Ledger(store_a, writer_id="b00-test")
+    ledger_b = Ledger(store_b, writer_id="b00-test")
+    barrier = threading.Barrier(2)
+
+    def delay_first_head_read(store: SqliteLedgerStore) -> None:
+        original_head = store.head
+        first = True
+
+        def delayed_head():
+            nonlocal first
+            row = original_head()
+            if first:
+                first = False
+                barrier.wait(timeout=5)
+            return row
+
+        store.head = delayed_head  # type: ignore[method-assign]
+
+    for store in (store_a, store_b):
+        delay_first_head_read(store)
+
+    failures: list[BaseException] = []
+
+    def append(ledger: Ledger, kind: str) -> None:
+        try:
+            ledger.append(Event(1, kind, {"writer": kind}))
+        except BaseException as exc:  # captured so thread failures reach the test
+            failures.append(exc)
+
+    threads = [
+        threading.Thread(target=append, args=(ledger_a, "writer-a")),
+        threading.Thread(target=append, args=(ledger_b, "writer-b")),
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=10)
+
+    rows = ledger_a.read()
+    assert not any(thread.is_alive() for thread in threads)
+    assert failures == []
+    assert [row.seq for row in rows] == [1, 2]
+    assert {row.event.kind for row in rows} == {"writer-a", "writer-b"}
+    assert ledger_a.verify_chain() == ledger_a.head_hash()
+    ledger_a.close()
+    store_a.close()
+    ledger_b.close()
+    store_b.close()

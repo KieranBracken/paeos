@@ -986,6 +986,280 @@ def test_qualification_transport_denies_before_ambiguous_timeout(
     )
 
 
+def test_trusted_transport_claims_before_fake_queue_send_and_settles_return(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hashlib
+    from datetime import UTC, datetime
+
+    import runtime.integrations.trusted_codex_transport as transport_module
+    from kernel.ledger import Event, Ledger
+    from kernel.ledger_sqlite import SqliteLedgerStore
+    from runtime.autonomy.admission_send_fence import AdmissionSendFence
+    from runtime.integrations import SessionSpec
+    from runtime.integrations.trusted_codex_transport import HostCodexWorkerTransport
+
+    route_id = "trusted-codex-worker/v1"
+    route_digest = hashlib.sha256(route_id.encode("ascii")).hexdigest()
+    policy_digest = "a" * 64
+    workspace_root = tmp_path / "workspaces"
+    workspace = workspace_root / "ws-send-fence"
+    workspace.mkdir(mode=0o700, parents=True)
+    queue = tmp_path / "queue"
+    queue.mkdir(mode=0o700)
+    ledger_store = SqliteLedgerStore(tmp_path / "canonical-ledger.db")
+    ledger = Ledger(ledger_store, writer_id="trusted-transport-test")
+    ledger.append(
+        Event(
+            1,
+            "DISCLOSURE_POLICY_CURRENT",
+            {
+                "policy_id": "synthetic-policy",
+                "revision": 1,
+                "digest": policy_digest,
+                "expires_at": "2026-10-20T12:00:00+00:00",
+                "proof": "synthetic-policy-proof",
+            },
+        ),
+        domain_tag="TEST",
+    )
+    ledger.append(
+        Event(
+            1,
+            "ADMISSION_CURRENT",
+            {
+                "admission_ref": "synthetic-admission",
+                "epoch": 4,
+                "logical_job_id": "synthetic-logical-job",
+                "task_id": "t-send-fence",
+                "goal_id": "g-send-fence",
+                "run_id": "r-send-fence",
+                "stage": "IMPLEMENT",
+                "role": "BUILDER",
+                "workspace_id": workspace.name,
+                "route_id": route_id,
+                "route_digest": route_digest,
+                "policy_id": "synthetic-policy",
+                "policy_revision": 1,
+                "policy_digest": policy_digest,
+                "expires_at": "2026-10-20T12:00:00+00:00",
+                "proof": "synthetic-admission-proof",
+            },
+        ),
+        domain_tag="TEST",
+    )
+
+    class SyntheticAuthority:
+        def verify_policy(self, payload):
+            return payload.get("proof") == "synthetic-policy-proof"
+
+        def verify_admission(self, payload):
+            return payload.get("proof") == "synthetic-admission-proof"
+
+        def authorize_frame(self, admission, policy, *, frame_digest, route_digest):
+            return (
+                admission.get("policy_id") == policy.get("policy_id")
+                and admission.get("route_digest") == route_digest
+                and len(frame_digest) == 64
+            )
+
+    fence = AdmissionSendFence(
+        ledger,
+        authority=SyntheticAuthority(),
+        domain_tag="TEST",
+        now=lambda: datetime(2026, 10, 19, 12, 0, tzinfo=UTC),
+    )
+    request_key = SigningKey.generate()
+    response_key = SigningKey.generate()
+    transport = HostCodexWorkerTransport(
+        queue_root=queue,
+        workspace_root=workspace_root,
+        request_signing_key=request_key,
+        response_verify_key=response_key.verify_key,
+        timeout_s=0.1,
+        admission_send_fence=fence,
+        admission_ref="synthetic-admission",
+        expected_admission_epoch=4,
+    )
+    fake_sink: list[bytes] = []
+    fake_responses: list[bytes] = []
+    write_atomic = transport_module._write_atomic
+
+    def fake_write(path: Path, payload: bytes) -> None:
+        if path.name.endswith(".request.json"):
+            fake_sink.append(payload)
+        write_atomic(path, payload)
+        if path.name.endswith(".request.json"):
+            request = json.loads(payload.decode("utf-8"))
+            response_payload = {
+                "schema": transport_module._SCHEMA,
+                "ok": False,
+                "request_id": request["request_id"],
+                "error_code": "supervisor_failure",
+                "error": transport_module._FAILURE_ERROR,
+            }
+            response = {
+                "payload": response_payload,
+                "signature": response_key.sign(
+                    transport_module._canonical_bytes(response_payload)
+                ).signature.hex(),
+            }
+            response_path = queue / f"{request['request_id']}.response.json"
+            response_bytes = transport_module._canonical_bytes(response)
+            fake_responses.append(response_bytes)
+            response_path.write_bytes(response_bytes)
+
+    monkeypatch.setattr(transport_module, "_write_atomic", fake_write)
+    result = transport.run(
+        SessionSpec(
+            workspace=workspace,
+            prompt="synthetic prompt only",
+            allowed_tools=(),
+            read_scopes=(),
+            timeout_s=1,
+            task_id="t-send-fence",
+            goal_id="g-send-fence",
+            run_id="r-send-fence",
+            stage="IMPLEMENT",
+        )
+    )
+
+    assert result.failure_code == "supervisor_failure"
+    assert len(fake_sink) == 1
+    request = json.loads(fake_sink[0].decode("utf-8"))
+    claim = next(row for row in ledger.read() if row.event.kind == "ADMISSION_SEND_CLAIMED")
+    settlement = next(row for row in ledger.read() if row.event.kind == "ADMISSION_SEND_SETTLED")
+    assert claim.event.payload["request_id"] == request["request_id"]
+    assert claim.event.payload["frame_digest"] == hashlib.sha256(fake_sink[0]).hexdigest()
+    assert settlement.event.payload["outcome"] == "RETURNED"
+    assert settlement.event.payload["outcome_ref"] == hashlib.sha256(fake_responses[0]).hexdigest()
+
+
+def test_revoked_admission_denies_at_trusted_transport_before_queue_write(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hashlib
+    from datetime import UTC, datetime
+
+    import runtime.integrations.trusted_codex_transport as transport_module
+    from kernel.ledger import Event, Ledger
+    from kernel.ledger_sqlite import SqliteLedgerStore
+    from runtime.autonomy.admission_send_fence import AdmissionSendFence
+    from runtime.integrations import SessionSpec, TrustedTransportFailure
+    from runtime.integrations.trusted_codex_transport import HostCodexWorkerTransport
+
+    route_id = "trusted-codex-worker/v1"
+    route_digest = hashlib.sha256(route_id.encode("ascii")).hexdigest()
+    workspace_root = tmp_path / "workspaces"
+    workspace = workspace_root / "ws-revoked"
+    workspace.mkdir(mode=0o700, parents=True)
+    queue = tmp_path / "queue"
+    ledger_store = SqliteLedgerStore(tmp_path / "canonical-ledger.db")
+    ledger = Ledger(ledger_store, writer_id="trusted-transport-test")
+    ledger.append(
+        Event(
+            1,
+            "DISCLOSURE_POLICY_CURRENT",
+            {
+                "policy_id": "synthetic-policy",
+                "revision": 1,
+                "digest": "a" * 64,
+                "expires_at": "2026-10-20T12:00:00+00:00",
+                "proof": "synthetic-policy-proof",
+            },
+        ),
+        domain_tag="TEST",
+    )
+    ledger.append(
+        Event(
+            1,
+            "ADMISSION_CURRENT",
+            {
+                "admission_ref": "synthetic-admission",
+                "epoch": 4,
+                "logical_job_id": "synthetic-logical-job",
+                "task_id": "t-revoked",
+                "goal_id": "g-revoked",
+                "run_id": "r-revoked",
+                "stage": "IMPLEMENT",
+                "role": "BUILDER",
+                "workspace_id": workspace.name,
+                "route_id": route_id,
+                "route_digest": route_digest,
+                "policy_id": "synthetic-policy",
+                "policy_revision": 1,
+                "policy_digest": "a" * 64,
+                "expires_at": "2026-10-20T12:00:00+00:00",
+                "proof": "synthetic-admission-proof",
+            },
+        ),
+        domain_tag="TEST",
+    )
+    ledger.append(
+        Event(1, "ADMISSION_REVOKED", {"admission_ref": "synthetic-admission", "epoch": 4}),
+        domain_tag="TEST",
+    )
+
+    class SyntheticAuthority:
+        def verify_policy(self, payload):
+            return payload.get("proof") == "synthetic-policy-proof"
+
+        def verify_admission(self, payload):
+            return payload.get("proof") == "synthetic-admission-proof"
+
+        def authorize_frame(self, *_args, **_kwargs):
+            return True
+
+    fence = AdmissionSendFence(
+        ledger,
+        authority=SyntheticAuthority(),
+        domain_tag="TEST",
+        now=lambda: datetime(2026, 10, 19, 12, 0, tzinfo=UTC),
+    )
+
+    class CountingSigner:
+        calls = 0
+
+        def sign(self, _payload: bytes):
+            self.calls += 1
+            raise AssertionError("revoked admission must deny before request signing")
+
+    signer = CountingSigner()
+    transport = HostCodexWorkerTransport(
+        queue_root=queue,
+        workspace_root=workspace_root,
+        request_signing_key=signer,  # type: ignore[arg-type]
+        response_verify_key=SigningKey.generate().verify_key,
+        timeout_s=0.1,
+        admission_send_fence=fence,
+        admission_ref="synthetic-admission",
+        expected_admission_epoch=4,
+    )
+
+    def forbidden_write(*_args: object, **_kwargs: object) -> None:
+        pytest.fail("revoked request reached the trusted transport sink")
+
+    monkeypatch.setattr(transport_module, "_write_atomic", forbidden_write)
+    with pytest.raises(TrustedTransportFailure) as raised:
+        transport.run(
+            SessionSpec(
+                workspace=workspace,
+                prompt="synthetic prompt only",
+                allowed_tools=(),
+                read_scopes=(),
+                timeout_s=1,
+                task_id="t-revoked",
+                goal_id="g-revoked",
+                run_id="r-revoked",
+                stage="IMPLEMENT",
+            )
+        )
+
+    assert raised.value.code == "disclosure_authority_unavailable"
+    assert signer.calls == 0
+    assert not queue.exists()
+
+
 def test_qualification_wrapper_sends_one_request_and_preserves_unknown_workspace(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
