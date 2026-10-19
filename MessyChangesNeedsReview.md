@@ -5587,3 +5587,7 @@ Read-only Chat 3 response and completion-overseer reconciliation are recorded in
 ### 2026-10-19 — Founder owner-scope proposal
 
 Proposal-only packet: `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/FOUNDER_OWNER_SCOPE_DECISION_20261019.md`. It recommends a technical Admission Boundary Owner distinct from architect coordination and nominates Chat 3 only after a safe handoff of its current S0 candidate. Founder disposition is required. No appointment, source edit, PAEOS admission, tests, runtime effect, provider call, installation, qualification or debt wake occurred. Existing owners and gates remain intact.
+
+### 2026-10-19 — B00 construction-route decision draft
+
+Read-only source evidence and a proposal-only first-slice packet are at `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/BOOTSTRAP_DECISION_20261019.md`. The local autonomous scheduler can create run/task records, but current evidence does not establish an independently verified admission receipt or physical worker start. Chat 3 has handed off S0 frozen pending review. The Architect is checking whether its standing delegation covers the exact scope. No source code changed; no PAEOS task, worker, provider, key, review, install, qualification, Court or debt effect is claimed. The proposed script-retirement slice does not unblock D0258; it is separate P1 containment.

@@ -1,0 +1,32 @@
+{
+  "architect_delegation_check": "PENDING",
+  "chat3_s0_handoff": "FROZEN_PENDING_INDEPENDENT_REVIEW; construction responsibility relinquished; no integration",
+  "decision_id": "B00_BOOTSTRAP_S1_20261019",
+  "files": [
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "f6c8e3c01081a2b5af1adaaac44c27d7285c069801a3a60328920cdda401bb93"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "5eacc7c3faa78b6adfc6e7f162b00e914d3ff50299e086387218862ac6e43977"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/BOOTSTRAP_DECISION_20261019.md",
+      "sha256": "9196c7fe6f6160a8e3e6c8fcf49eba9c1f60521d5f7231397ff71250272e450d"
+    }
+  ],
+  "implementation_authority_granted": false,
+  "independently_verified_task_admission_and_worker_start": "NOT_EVIDENCED",
+  "local_scheduler_construction": "PRESENT",
+  "manifest_self_hash_excluded": true,
+  "original_review_modified": false,
+  "parent_checkpoint": "c6f7444af4ef8b70b8ed6372361bc7be8e7c78c2",
+  "pinned_source_candidate": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "provider_or_runtime_effects": false,
+  "schema": "paeos.b00-bootstrap-decision-checkpoint/1",
+  "scope": "documentation-only route and delegation analysis; no source/test modification or bootstrap authorization",
+  "source_code_changed": false,
+  "status": "COORDINATION_CHECK_PENDING",
+  "tests_run": false
+}
