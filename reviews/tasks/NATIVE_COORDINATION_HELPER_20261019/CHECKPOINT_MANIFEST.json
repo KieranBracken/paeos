@@ -1,0 +1,53 @@
+{
+  "schema": "paeos.native-coordination-helper-checkpoint/1",
+  "checkpoint_id": "native-coordination-helper-20261019-v1",
+  "candidate": {
+    "branch": "codex/native-coordination-helper",
+    "base_commit": "7b31804fae7b0f1f41cfdd68d725a1be0b4f7257",
+    "worktree": "/Users/bob/.codex/worktrees/native-coordination-helper/paeos",
+    "scope": "local native coordination bookkeeping only; not PAEOS runtime state or admission",
+    "integration_state": "not integrated with a live dispatch loop; no PAEOS runtime receipt, admission, worker start, Court disposition, or qualification is established"
+  },
+  "files": {
+    "ops/native_coordination.py": "92e4bec8a18d666a4627f695a4d8acae9b7fe4cb37537fd281545c366171e370",
+    "tests/ops/test_native_coordination.py": "cb2dd34254fff8b761f067145c811daa5d0b7399713af37e74bf149e6fc81064"
+  },
+  "verification": [
+    {
+      "command": "/Users/bob/.local/bin/uv run --no-sync --offline --project /Users/bob/GitHub/paeos python -m pytest -q tests/ops/test_native_coordination.py",
+      "runtime": "Python 3.13.5",
+      "exit_code": 0,
+      "result": "14 passed"
+    },
+    {
+      "command": "/Users/bob/GitHub/paeos/.venv/bin/ruff check --no-cache ops/native_coordination.py tests/ops/test_native_coordination.py",
+      "version": "ruff 0.15.22",
+      "exit_code": 0,
+      "result": "All checks passed"
+    },
+    {
+      "command": "/Users/bob/GitHub/paeos/.venv/bin/ruff format --check ops/native_coordination.py tests/ops/test_native_coordination.py",
+      "version": "ruff 0.15.22",
+      "exit_code": 0,
+      "result": "2 files already formatted"
+    }
+  ],
+  "environment_note": "An initial invocation through system Python 3.9 failed during collection because datetime.UTC is unavailable there. The repository requires Python 3.12 or newer. Verification was repeated via the existing project environment with --offline --no-sync; no environment or dependency was installed.",
+  "fallback_assessment": {
+    "observed_live_callback_event": "B00-20261019-free-route-v1-result-5efdbc38-v1",
+    "source_thread": "01a13075-533b-72a1-b8f8-8f109414f707",
+    "source_turn": "01a1550c-f421-7b13-954c-1e412468d9da",
+    "coordinator_thread": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+    "observed_disposition": "VALIDATED_HELD",
+    "decision": "do not activate a separate fallback dispatch path",
+    "reason": "The owner delivered a material callback to Architect and it was processed. The helper only reports missed-callback recovery candidates and explicitly returns no redispatch. Keep callback-first coordination and the heartbeat as recovery only.",
+    "boundary": "This is evidence about native coordination messages only; it is not PAEOS runtime activity."
+  },
+  "limits": {
+    "provider_requests": 0,
+    "formal_reviews": 0,
+    "routing_changes": 0,
+    "runtime_changes": 0,
+    "deletions": 0
+  }
+}
