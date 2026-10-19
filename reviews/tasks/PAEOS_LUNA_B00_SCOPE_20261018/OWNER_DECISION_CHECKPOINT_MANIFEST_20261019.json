@@ -1,0 +1,27 @@
+{
+  "decision_id": "OWNER_SCOPE_B00_20261019",
+  "decision_status": "FOUNDER_DECISION_REQUIRED",
+  "files": [
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "a4fc0debc2968eaf440e4a1cafca8cda5978ee74e12baa829eb318d478a18f35"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "d836350f32ba36cffca6d87c96ccc1b8e03f6b94eea084c203ecc748313303c9"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/FOUNDER_OWNER_SCOPE_DECISION_20261019.md",
+      "sha256": "17f09de6d8a93436b1c728ed4044e4cb1948c801533dacecb497c595c640a43d"
+    }
+  ],
+  "implementation_authority_granted": false,
+  "manifest_self_hash_excluded": true,
+  "parent_checkpoint": "1a7b8b03afd53c58ee0606e3a37381f56b1b1430",
+  "pinned_source_candidate": "082a59ce163d15fc0d40141c1c6cc74e7522d063",
+  "provider_or_runtime_effects": false,
+  "schema": "paeos.founder-decision-checkpoint/1",
+  "scope": "proposal only; no role appointment or implementation authority",
+  "source_code_changed": false,
+  "tests_run": false
+}
