@@ -5628,3 +5628,8 @@ The later Founder-only effect is private policy-key creation/enrollment and sign
 ### 2026-10-19 — B00 builder provenance supplement
 
 Documentation-only evidence checkpoint for source candidate `717381ab6d073c3f656b73dd88eb9f899d474302`. The new provenance record binds the candidate-creating Codex task to `gpt-6-luna` / OpenAI (GPT family), using local transcript record digests without publishing transcript contents or conversation identifiers. The route-owner event remains HELD; review attempts remain zero. This supplies only the missing builder-family evidence. Exact project/model zero-charge entitlement and Google retention/INTERNAL metadata reconciliation remain unresolved. No source or test files changed and no tests were run. Production fence/admission composition, review, runtime admission, provider egress, installation, qualification, Court, debts, and P3 remain held.
+
+
+### 2026-10-19 — B00 source-scope boundary correction
+
+The current B00 source scope explicitly lists `ops/autonomous_run.py` as read-only and does not authorize editing it. Production fence composition is therefore an absent implementation outside the current mutable preimages. Architect is the existing technical owner; wake only after a fresh explicit scope covers `ops/autonomous_run.py` and `tests/ops/test_autonomous_run_fence_composition.py`. This does not establish a Founder-exclusive permission reservation. The candidate remains default-deny; no source/test edit, review attempt, provider/key action, admission, qualification, Court, debt, or P3 effect occurred.

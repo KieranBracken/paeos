@@ -1,0 +1,69 @@
+{
+  "schema": "paeos.b00-scope-boundary-correction/1",
+  "recorded_on": "2026-10-19",
+  "candidate_source_commit": "717381ab6d073c3f656b73dd88eb9f899d474302",
+  "evidence_checkpoint_commit": "20a4c78af055c026bddf79671cc98aae2d14950b",
+  "prior_evidence_manifest": {
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_COORDINATION_EVIDENCE_CHECKPOINT_MANIFEST_20261019.json",
+    "sha256": "fb560cb612d84f22459e48635a5a7f011f8d0ebe8cc4d5418c86d1db83b484e2"
+  },
+  "scope_record": {
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_SCOPE_20261019.json",
+    "sha256": "819f7561ff6f4fe58f86c9fec36457c7e4edaf27942848c6a5577b507a45b4fb",
+    "authorized_mutable_source_and_test_paths": [
+      "kernel/ledger.py",
+      "kernel/ledger_sqlite.py",
+      "runtime/autonomy/admission_send_fence.py",
+      "runtime/integrations/trusted_codex_transport.py",
+      "tests/kernel/test_ledger.py",
+      "tests/kernel/test_ledger_sqlite.py",
+      "tests/runtime/autonomy/test_admission_send_fence.py",
+      "tests/runtime/test_trusted_codex_worker_transport.py"
+    ],
+    "ops_autonomous_run_classification": "Listed under read_only_controls; not a mutable path in this B00 scope."
+  },
+  "correction": {
+    "prior_notebook_wording": "This is an absent implementation gap owned by the B00 Architect builder under the existing offline scope.",
+    "corrected_finding": "Production fence composition is absent, and Architect is the existing technical B00 owner. However, ops/autonomous_run.py is explicitly read-only in the current scope. The existing authorization does not permit a source edit there. This is a scope boundary, not evidence that Founder permission is reserved for ordinary fail-closed local code construction.",
+    "current_source_evidence": {
+      "production_composition_path": "ops/autonomous_run.py:127-140",
+      "composition_finding": "_load_codex_transport constructs HostCodexWorkerTransport without admission_send_fence, admission_ref, or expected_admission_epoch.",
+      "transport_default_deny_path": "runtime/integrations/trusted_codex_transport.py:299-309",
+      "default_deny_finding": "run raises disclosure_authority_unavailable before queue work when the fence or admission reference is absent.",
+      "existing_fence_contract": "runtime/autonomy/admission_send_fence.py:1-5,66-80",
+      "fence_contract_finding": "The source consumes trusted admission/policy facts supplied by an owner; it does not create admission, enroll a key, or enable a route."
+    }
+  },
+  "candidate_acceptance_packet": {
+    "source_commit": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "original_manifest_sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582",
+    "focused_tests_carried_forward": "95 passed across the four B00 ledger/fence/transport modules",
+    "review": "HELD; zero attempts; builder-family supplement is recorded but not re-evaluated by the route owner.",
+    "production_route": "Default-deny while trusted admission/policy evidence and fence composition are absent."
+  },
+  "exact_future_source_test_package_if_authorized": {
+    "source_path": "ops/autonomous_run.py",
+    "new_test_path": "tests/ops/test_autonomous_run_fence_composition.py",
+    "test_path_status_at_review": "ABSENT",
+    "bounded_acceptance": [
+      "Production composition passes an explicit trusted fence, admission reference, and expected epoch, or keeps the transport unavailable/default-deny when any trusted verifier or admission input is absent.",
+      "Focused synthetic tests show missing, stale, revoked, mismatched, and duplicate-send states cannot write a queue request.",
+      "No provider/network call, positive permit, key enrollment, installation, or production activation is part of this package."
+    ]
+  },
+  "classification": {
+    "implementation_gap": "Production composition and a production trusted admission/policy verifier are absent.",
+    "reserved_permission": "No Founder-exclusive source permission is established for offline fail-closed composition. The separately documented human-only effects are private signing-key creation/enrollment and signed-policy activation after a complete tested and reviewed package.",
+    "owner": "Architect as the existing B00 technical owner; no new authority owner is inferred.",
+    "wake_condition": "A fresh, explicit source/test scope must include the production composition path and its focused test path. Until then, retain the current default-deny candidate and do not edit the read-only path."
+  },
+  "effects": {
+    "source_changed": false,
+    "tests_run": false,
+    "review_attempts": 0,
+    "provider_or_key_activity": false,
+    "paeos_admission_or_worker_start": false,
+    "qualification_or_court": false,
+    "debt_or_p3": false
+  }
+}

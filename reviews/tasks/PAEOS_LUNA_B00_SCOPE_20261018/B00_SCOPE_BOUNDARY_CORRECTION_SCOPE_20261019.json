@@ -1,0 +1,37 @@
+{
+  "schema": "paeos.b00-scope-boundary-correction-scope/1",
+  "recorded_on": "2026-10-19",
+  "base_checkpoint": "20a4c78af055c026bddf79671cc98aae2d14950b",
+  "prior_manifest": {
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_COORDINATION_EVIDENCE_CHECKPOINT_MANIFEST_20261019.json",
+    "sha256": "fb560cb612d84f22459e48635a5a7f011f8d0ebe8cc4d5418c86d1db83b484e2"
+  },
+  "preimages": [
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1504052,
+      "sha256": "a40fb0847c3549d8ff308b507b75c589e9b8a33e1f4abe442654d030a296238b"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 672341,
+      "sha256": "73013ed849456697412fadb68d3fe933b3a2b16fc9ae579d936a30c631024dbb"
+    }
+  ],
+  "new_paths_absent_at_freeze": [
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_SCOPE_BOUNDARY_CORRECTION_SCOPE_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_SCOPE_BOUNDARY_CORRECTION_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_SCOPE_BOUNDARY_CHECKPOINT_MANIFEST_20261019.json"
+  ],
+  "allowed_changes": [
+    "Create this scope record, one correction record, and one explicit checkpoint manifest.",
+    "Append one scope-clarification entry to PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md.",
+    "Append one matching evidence entry to MessyChangesNeedsReview.md."
+  ],
+  "excluded_changes_and_effects": [
+    "No production source or test source edits; `ops/autonomous_run.py` remains read-only under the existing B00 source scope.",
+    "No review attempt, provider probe, key access, installation, egress, PAEOS admission, qualification, Court action, debt effect, or outbound native message.",
+    "No modification of the prior checkpoint or its manifest; the new manifest will supersede it for current file hashes while preserving it as history."
+  ],
+  "reason": "Clarify that production fence composition is an absent implementation outside the current mutable source/test preimages, not a Founder-exclusive permission reservation and not covered by the existing eight-file B00 authorization."
+}
