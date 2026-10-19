@@ -5,6 +5,7 @@ key independently from trusted configuration. A returned manifest is NOT an egre
 permit: policy currentness/revocation, enrollment, bundle composition, admission and
 atomic attempt reservation require separate trusted enforcement. No production
 transport calls this module yet. V1 supports exact artifacts, not transformations.
+V2 adds explicit derivative rules; neither version authenticates runtime derivation receipts.
 """
 
 from __future__ import annotations
@@ -314,6 +315,83 @@ class DisclosurePolicyManifest:
     canonical_envelope: bytes
 
 
+@dataclass(frozen=True, slots=True)
+class DerivativeRule:
+    """Signed permission shape, not evidence that a transformation actually occurred."""
+
+    rule_id: str
+    class_id: str
+    input_artifact_sha256s: tuple[str, ...]
+    input_data_class: str
+    output_data_class: str
+    tool_envelope_sha256: str
+    transformation_ids: tuple[str, ...]
+    max_output_bytes: int
+
+    @classmethod
+    def from_mapping(cls, value: object, classes: tuple[DisclosureClassPolicy, ...]):
+        obj = _object(
+            value,
+            {
+                "rule_id",
+                "class_id",
+                "input_artifact_sha256s",
+                "input_data_class",
+                "output_data_class",
+                "tool_envelope_sha256",
+                "transformation_ids",
+                "max_output_bytes",
+            },
+        )
+        class_id = _identifier(obj["class_id"])
+        policy = next((item for item in classes if item.class_id == class_id), None)
+        if (
+            policy is None
+            or obj["input_data_class"] != policy.data_class
+            or obj["output_data_class"] != policy.data_class
+        ):
+            raise DisclosurePolicyError("derivative class must preserve its approved input class")
+        inputs = tuple(_sequence(obj["input_artifact_sha256s"]))
+        known = {item.sha256 for item in policy.scope.allowed_artifacts}
+        if any(
+            type(item) is not str or not _HASH.fullmatch(item) or item not in known
+            for item in inputs
+        ):
+            raise DisclosurePolicyError(
+                "derivative inputs are not bound to the approved artifact scope"
+            )
+        _unique(inputs)
+        envelope = obj["tool_envelope_sha256"]
+        if type(envelope) is not str or not _HASH.fullmatch(envelope):
+            raise DisclosurePolicyError("derivative tool envelope must be exact")
+        transforms = _identifiers(obj["transformation_ids"])
+        if not set(transforms) <= {
+            "READ_APPROVED_ARTIFACT",
+            "SCOPED_PATCH",
+            "NAMED_TEST_OUTPUT",
+            "MODEL_OUTPUT_WITH_CONFINED_INPUTS",
+        }:
+            raise DisclosurePolicyError("derivative transformation is unsupported")
+        bound = _positive(obj["max_output_bytes"])
+        if bound > policy.max_bundle_bytes or len(inputs) > policy.max_artifacts:
+            raise DisclosurePolicyError("derivative exceeds its parent policy bounds")
+        return cls(
+            _identifier(obj["rule_id"]),
+            class_id,
+            inputs,
+            policy.data_class,
+            policy.data_class,
+            envelope,
+            transforms,
+            bound,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DerivativeDisclosurePolicyManifest(DisclosurePolicyManifest):
+    derivative_rules: tuple[DerivativeRule, ...]
+
+
 def policy_digest(manifest: DisclosurePolicyManifest) -> str:
     """Identity of the signed canonical envelope, not an authorization decision."""
     return hashlib.sha256(manifest.canonical_envelope).hexdigest()
@@ -342,6 +420,27 @@ def verify_founder_policy(
     Never pass worker-selected public verification material to an authority consumer.
     No file access, signing, credential loading, policy installation or network occurs.
     """
+    return _verify_policy(manifest_bytes, verify_key, expected_key_id, now=now, version=1)
+
+
+def verify_founder_derivative_policy(
+    manifest_bytes: bytes,
+    verify_key: VerifyKey,
+    expected_key_id: str,
+    *,
+    now: datetime | None = None,
+) -> DerivativeDisclosurePolicyManifest:
+    """Verify the separately versioned, signed V2 derivative policy shape.
+
+    A runtime consumer must additionally establish current enrollment/revocation,
+    admitted tool confinement and authenticated derivation receipts binding the actual
+    input hashes, tool envelope and output bytes. Worker assertions never suffice.
+    The input and output classes must match; there is no automatic declassification.
+    """
+    return _verify_policy(manifest_bytes, verify_key, expected_key_id, now=now, version=2)
+
+
+def _verify_policy(manifest_bytes, verify_key, expected_key_id, *, now, version):
     if (
         not isinstance(verify_key, VerifyKey)
         or not isinstance(expected_key_id, str)
@@ -366,11 +465,12 @@ def verify_founder_policy(
             "expires_at",
             "revocation_mode",
             "classes",
-        },
+        }
+        | ({"derivative_rules"} if version == 2 else set()),
     )
     encoded = canonical_policy_bytes(obj)
     if (
-        obj["schema"] != "paeos.disclosure-policy/1"
+        obj["schema"] != f"paeos.disclosure-policy/{version}"
         or obj["status"] != "ACTIVE"
         or obj["revocation_mode"] != "IMMEDIATE"
     ):
@@ -398,7 +498,8 @@ def verify_founder_policy(
         unsigned["founder_authority"] = {
             key: value for key, value in authority.items() if key != "signature"
         }
-        verify_key.verify(_DOMAIN + canonical_policy_bytes(unsigned), signature)
+        domain = _DOMAIN if version == 1 else b"PAEOS-DISCLOSURE-POLICY-V2\0"
+        verify_key.verify(domain + canonical_policy_bytes(unsigned), signature)
     except (BadSignatureError, binascii.Error, ValueError) as exc:
         raise FounderTrustRootError("Founder policy signature did not verify") from exc
     issued_at, expires_at = _timestamp(obj["issued_at"]), _timestamp(obj["expires_at"])
@@ -412,7 +513,7 @@ def verify_founder_policy(
         raise DisclosurePolicyError("policy is not valid at the supplied clock")
     classes = tuple(DisclosureClassPolicy.from_mapping(item) for item in _sequence(obj["classes"]))
     _unique(tuple(item.class_id for item in classes))
-    return DisclosurePolicyManifest(
+    manifest = DisclosurePolicyManifest(
         _identifier(obj["policy_id"]),
         _positive(obj["revision"]),
         "ACTIVE",
@@ -421,4 +522,21 @@ def verify_founder_policy(
         expires_at,
         classes,
         encoded,
+    )
+    if version == 1:
+        return manifest
+    rules = tuple(
+        DerivativeRule.from_mapping(item, classes) for item in _sequence(obj["derivative_rules"])
+    )
+    _unique(tuple(rule.rule_id for rule in rules))
+    return DerivativeDisclosurePolicyManifest(
+        manifest.policy_id,
+        manifest.revision,
+        manifest.status,
+        manifest.founder_key_id,
+        manifest.issued_at,
+        manifest.expires_at,
+        manifest.classes,
+        manifest.canonical_envelope,
+        rules,
     )

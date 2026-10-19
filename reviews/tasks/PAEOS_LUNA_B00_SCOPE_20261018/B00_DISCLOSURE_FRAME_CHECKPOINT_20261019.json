@@ -1,0 +1,36 @@
+{
+  "schema": "paeos.offline-source-checkpoint/1",
+  "assignment_id": "B00-20261019-disclosure-v1",
+  "baseline": "f91b7774cccd10c8a4745797afa911c45cfb5302",
+  "source_sha256": {
+    "runtime/integrations/disclosure_frame.py": "44815d99b059af56574f01b7a9c0294ece6da1fd22472dc504c3c4af8260e567",
+    "tests/runtime/test_disclosure_frame.py": "cc3f88f0450b482ad50a5c5339d6d2ffd883db55201faeba00f300c159f88935",
+    "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+    "tests/model_router/test_disclosure_policy.py": "bedcd929617dc6ac02cd5384ffa1520938e0ee8539ac7847a1353d727e7371f8"
+  },
+  "verification": {
+    "focused_command": ".venv/bin/python -m pytest tests/model_router/test_disclosure_policy.py tests/model_router/test_disclosure_store.py tests/runtime/test_disclosure_frame.py -o addopts= -q",
+    "result": "217 passed in 1.48s",
+    "red_controls": [
+      "Missing complete-frame inspector assertion failed before implementation.",
+      "Missing verify_founder_derivative_policy assertion failed before implementation."
+    ],
+    "static": [
+      "Ruff lint passed",
+      "Ruff format check: 4 unchanged",
+      "compileall passed",
+      "git diff --check passed"
+    ],
+    "secret_scan": "Targeted private-key/GitHub-token/API-key patterns checked on explicit source manifest; no matches. This is supplementary and is not classification authority."
+  },
+  "limits": [
+    "Pure inspection and signed policy syntax only; no enrolled trust/currentness or runtime derivation claim is implied.",
+    "Broker positive integration pending concrete Chat3 authority and Chat4 tool confinement.",
+    "Unsupported remote references/opaque history/attachments denied by inspector.",
+    "V1 semantics unchanged; V2 does not permit automatic declassification.",
+    "No provider calls, host key reads, enrollment, installation, review, Court or qualification.",
+    "Full suite not run for this intermediate dependency-free source package; combined integration requires one actual run."
+  ],
+  "review": "PENDING on final combined candidate; no review consumed",
+  "state": "ALLOWED_NOW: continue source integration. HELD: production egress and downstream codec. AUTHORITY_OR_IMPLEMENTATION_GAP: concrete admitted runtime integration and authentic enrollment."
+}

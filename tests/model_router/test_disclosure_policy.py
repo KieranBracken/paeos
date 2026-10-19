@@ -415,3 +415,101 @@ def test_clock_without_timezone_is_not_authoritative(policy, key):
 def test_malformed_and_resource_bounded_input(raw, key):
     with pytest.raises(DisclosurePolicyError):
         verify(raw, key)
+
+
+# V2 is an explicit signed derivative contract; it cannot widen the V1 parser.
+def _derivative_policy(policy):
+    value = copy.deepcopy(policy)
+    value["schema"] = "paeos.disclosure-policy/2"
+    value["derivative_rules"] = [
+        {
+            "rule_id": "synthetic-derivative",
+            "class_id": "PUBLIC_ARTIFACT",
+            "input_artifact_sha256s": [
+                value["classes"][0]["scope"]["allowed_artifacts"][0]["sha256"]
+            ],
+            "input_data_class": "PUBLIC",
+            "output_data_class": "PUBLIC",
+            "tool_envelope_sha256": "a" * 64,
+            "transformation_ids": ["READ_APPROVED_ARTIFACT", "SCOPED_PATCH", "NAMED_TEST_OUTPUT"],
+            "max_output_bytes": 100,
+        }
+    ]
+    return value
+
+
+def _verify_derivative(policy, key, domain=b"PAEOS-DISCLOSURE-POLICY-V2\0"):
+    assert hasattr(implementation, "verify_founder_derivative_policy"), (
+        "versioned derivative verifier missing"
+    )
+    return implementation.verify_founder_derivative_policy(
+        signed(policy, key, domain=domain), key.verify_key, "synthetic-founder", now=NOW
+    )
+
+
+def test_versioned_derivative_policy_keeps_v1_exact_artifact_semantics(policy, key):
+    v2 = _derivative_policy(policy)
+    result = _verify_derivative(v2, key)
+    rule = result.derivative_rules[0]
+    assert rule.output_data_class == rule.input_data_class == "PUBLIC"
+    assert rule.tool_envelope_sha256 == "a" * 64
+    assert not hasattr(rule, "authorized")
+    with pytest.raises(DisclosurePolicyError):
+        verify(signed(v2, key, domain=b"PAEOS-DISCLOSURE-POLICY-V2\0"), key)
+    with pytest.raises(DisclosurePolicyError):
+        _verify_derivative(v2, key, domain=DOMAIN)
+    with pytest.raises(DisclosurePolicyError):
+        _verify_derivative(policy, key)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("input_data_class", "SECRET"),
+        ("output_data_class", "SECRET"),
+        ("input_data_class", "UNKNOWN"),
+        ("output_data_class", "UNKNOWN"),
+        ("input_data_class", "INTERNAL"),
+        ("class_id", "unclassified"),
+        ("input_artifact_sha256s", ["b" * 64]),
+        ("input_artifact_sha256s", []),
+        ("tool_envelope_sha256", "worker-label"),
+        ("tool_envelope_sha256", "A" * 64),
+        ("transformation_ids", ["UNRESTRICTED_SHELL"]),
+        ("transformation_ids", []),
+        ("max_output_bytes", 0),
+        ("max_output_bytes", True),
+        ("max_output_bytes", 1000000000),
+    ],
+)
+def test_derivative_rules_require_bound_inputs_tools_and_nonsecret_class(policy, key, field, value):
+    v2 = _derivative_policy(policy)
+    v2["derivative_rules"][0][field] = value
+    with pytest.raises(DisclosurePolicyError):
+        _verify_derivative(v2, key)
+
+
+def test_internal_derivative_cannot_be_downgraded_to_public(policy, key):
+    v2 = _derivative_policy(policy)
+    v2["classes"][0].update(class_id="REDACTED_INTERNAL_ENGINEERING_SOURCE", data_class="INTERNAL")
+    v2["derivative_rules"][0].update(
+        class_id="REDACTED_INTERNAL_ENGINEERING_SOURCE",
+        input_data_class="INTERNAL",
+        output_data_class="INTERNAL",
+    )
+    assert _verify_derivative(v2, key).derivative_rules[0].output_data_class == "INTERNAL"
+    v2["derivative_rules"][0]["output_data_class"] = "PUBLIC"
+    with pytest.raises(DisclosurePolicyError):
+        _verify_derivative(v2, key)
+
+
+def test_derivative_unknown_fields_duplicates_and_embedded_keys_reject(policy, key):
+    v2 = _derivative_policy(policy)
+    for field in ["verify_key", "classification_authority", "worker_callback", "unknown"]:
+        mutated = copy.deepcopy(v2)
+        mutated["derivative_rules"][0][field] = "synthetic untrusted value"
+        with pytest.raises(DisclosurePolicyError):
+            _verify_derivative(mutated, key)
+    v2["derivative_rules"].append(copy.deepcopy(v2["derivative_rules"][0]))
+    with pytest.raises(DisclosurePolicyError):
+        _verify_derivative(v2, key)
