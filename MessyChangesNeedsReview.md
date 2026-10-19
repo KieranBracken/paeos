@@ -5623,3 +5623,8 @@ Open findings: production construction does not inject the fence or trusted admi
 ### 2026-10-19 — B00 exact Founder activation gate
 
 The later Founder-only effect is private policy-key creation/enrollment and signed-policy activation after a complete tested/reviewed package (`docs/superpowers/plans/2026-10-18-luna-guide/bootstrap.md:101,109-118`; `docs/superpowers/plans/2026-10-18-luna-guide/operations.md:91-93`). The existing `FOUNDER_OWNER_SCOPE_DECISION_20261019.md` remains a decision-required proposal, not approval or appointment. No such effect occurred in this offline candidate.
+
+
+### 2026-10-19 — B00 builder provenance supplement
+
+Documentation-only evidence checkpoint for source candidate `717381ab6d073c3f656b73dd88eb9f899d474302`. The new provenance record binds the candidate-creating Codex task to `gpt-6-luna` / OpenAI (GPT family), using local transcript record digests without publishing transcript contents or conversation identifiers. The route-owner event remains HELD; review attempts remain zero. This supplies only the missing builder-family evidence. Exact project/model zero-charge entitlement and Google retention/INTERNAL metadata reconciliation remain unresolved. No source or test files changed and no tests were run. Production fence/admission composition, review, runtime admission, provider egress, installation, qualification, Court, debts, and P3 remain held.

@@ -1,0 +1,54 @@
+{
+  "schema": "paeos.b00-review-route-disposition/1",
+  "recorded_on": "2026-10-19",
+  "event_id": "review-route-readiness-717381ab-v1",
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "source_commit": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "original_manifest": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_CHECKPOINT_MANIFEST_20261019.json",
+    "original_manifest_sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582",
+    "manifested_source_files": 14,
+    "focused_tests_recorded": "95 passed",
+    "review_attempts": 0
+  },
+  "owner_callback": {
+    "owner": "Resolve worker-pool review route",
+    "status": "completed",
+    "result": "HELD",
+    "review_performed": false,
+    "finding": "No presently evidenced route satisfies all constraints for the exact candidate packet."
+  },
+  "evidence_reconciliation": {
+    "builder_family": {
+      "callback_gap": "The original candidate packet did not bind its builder model family.",
+      "supplement": "B00_BUILDER_PROVENANCE_20261019.json binds the candidate creation to a native gpt-6-luna/OpenAI authoring session (GPT family).",
+      "state": "SUPPLEMENTED; route owner has not re-evaluated this evidence."
+    },
+    "google_conditional_route": {
+      "candidate": "Google Gemini 3.6 Flash",
+      "missing_entitlement_evidence": "No current non-inference evidence proves exact-model zero-charge entitlement and availability in the intended project.",
+      "privacy_conflict": "PAEOS metadata says retains_prompts=False and the mesh describes INTERNAL non-retention/private handling, while Google's UK terms allow limited purpose-specific safety and abuse retention. Reconcile the project metadata and review-data classification with those terms before considering the route.",
+      "sources_already_reviewed": [
+        "https://ai.google.dev/gemini-api/terms?hl=en",
+        "https://ai.google.dev/gemini-api/docs/pricing?authuser=6",
+        "https://ai.google.dev/gemini-api/docs/usage-policies?authuser=50&hl=en"
+      ],
+      "provider_probe": "NOT_PERFORMED; do not repeat the prior probe"
+    },
+    "other_routes": "The route owner found no other existing route with sufficient evidence for zero cost, privacy eligibility, and a distinct model family."
+  },
+  "disposition": "HELD",
+  "remaining_gate": "An eligible route owner must establish exact intended-project zero-charge entitlement and model availability without inference or key access; reconcile the review packet's privacy/retention classification with the route's terms; and confirm the reviewer is authorized and from a family distinct from GPT. The family evidence is now recorded, but the other gates remain open and the route owner has not re-evaluated the supplement.",
+  "responsible_existing_owner": "Resolve worker-pool review route",
+  "wake_condition": "Revisit only after non-inference project/model entitlement evidence and a documented privacy/retention reconciliation are available. Then the existing route owner may assess the exact packet and report AVAILABLE or HELD. No route substitution, paid fallback, new provider probe, or review attempt is authorized by this record.",
+  "runtime_and_stage_effects": {
+    "paeos_admission": "NOT_EVIDENCED",
+    "worker_start": "NOT_EVIDENCED",
+    "provider_send": "NOT_PERFORMED",
+    "review_acceptance": "NOT_EVIDENCED",
+    "qualification": "NOT_EVIDENCED",
+    "court_disposition": "NOT_EVIDENCED",
+    "debt_integration": "NOT_PERFORMED",
+    "p3": "HELD"
+  }
+}

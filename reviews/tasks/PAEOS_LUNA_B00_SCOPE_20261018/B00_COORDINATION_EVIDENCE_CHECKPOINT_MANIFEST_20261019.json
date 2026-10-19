@@ -1,0 +1,142 @@
+{
+  "schema": "paeos.b00-coordination-evidence-checkpoint/1",
+  "recorded_on": "2026-10-19",
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "checkpoint_kind": "documentation-only provenance and review-route disposition supplement",
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "source_commit": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "source_commit_remote_readback_at_prior_checkpoint": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "worktree": "recovery worktree for the authorized PAEOS B00 candidate"
+  },
+  "prior_checkpoint": {
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_CHECKPOINT_MANIFEST_20261019.json",
+    "sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582",
+    "candidate_file_count": 14,
+    "source_and_test_bytes_preserved": true
+  },
+  "file_manifest": [
+    {
+      "path": "kernel/ledger.py",
+      "bytes": 17808,
+      "sha256": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da"
+    },
+    {
+      "path": "kernel/ledger_sqlite.py",
+      "bytes": 9287,
+      "sha256": "70c4774ba91cabbfc7f3cfa570d996923654cc500eadcf9da51ea56cf3aaf4d3"
+    },
+    {
+      "path": "runtime/autonomy/admission_send_fence.py",
+      "bytes": 18390,
+      "sha256": "e6329070bcb913ed7a9089cdc97cf5a3ce325dfc3e3829b64dc94112fbffb19a"
+    },
+    {
+      "path": "runtime/integrations/trusted_codex_transport.py",
+      "bytes": 24751,
+      "sha256": "04e2aba7a25da3c28d1f964a998ef6aff9e03463cd1f0c117c8c44a4b6ef176e"
+    },
+    {
+      "path": "tests/kernel/test_ledger.py",
+      "bytes": 8448,
+      "sha256": "9fa2020b70bc08fadfd8355ebb56e100ef11189d0c8690f2bfd31205febf8d70"
+    },
+    {
+      "path": "tests/kernel/test_ledger_sqlite.py",
+      "bytes": 6397,
+      "sha256": "ab8f226548f541088febbfd8cade52c2d76f478385591c724e395402b4c1c843"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_send_fence.py",
+      "bytes": 16072,
+      "sha256": "15534e6633b191bd0b1cbf2a26ce6880b346c4e8e83f6ab5522e2e91e8ac713b"
+    },
+    {
+      "path": "tests/runtime/test_trusted_codex_worker_transport.py",
+      "bytes": 54698,
+      "sha256": "1b55259b22de674a763bdf4edc5bbf7b681d1fb77434b8e2747fc904e63e3cd2"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_SCOPE_20261019.json",
+      "bytes": 4154,
+      "sha256": "819f7561ff6f4fe58f86c9fec36457c7e4edaf27942848c6a5577b507a45b4fb"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_LOG_SCOPE_20261019.json",
+      "bytes": 1402,
+      "sha256": "83ea7d09fb2f34167d49418e68c346330514ae197f6f3064b69495270f0d9087"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_REPORT_20261019.md",
+      "bytes": 4548,
+      "sha256": "392d7322da20dfbe3450af786be755977f0f536ecd3ea5abd9498363e7e1fabb"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_EVIDENCE_20261019.json",
+      "bytes": 9253,
+      "sha256": "daea4e84885024dd5df235db37cf1a0e097caaec988c5f4b6ce4b399f50906a2"
+    },
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1504052,
+      "sha256": "a40fb0847c3549d8ff308b507b75c589e9b8a33e1f4abe442654d030a296238b"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 672341,
+      "sha256": "73013ed849456697412fadb68d3fe933b3a2b16fc9ae579d936a30c631024dbb"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BUILDER_PROVENANCE_SCOPE_20261019.json",
+      "bytes": 4445,
+      "sha256": "cad7177ef8135509b6ce0b2a17704f748543e85cae3a8d5d8ed4a525f0e385ae"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BUILDER_PROVENANCE_20261019.json",
+      "bytes": 3043,
+      "sha256": "184691a43407a6ba93a550af0e1cfcba24bfdf26944ba24c5583638051b45273"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_REVIEW_ROUTE_DISPOSITION_20261019.json",
+      "bytes": 3544,
+      "sha256": "52da76a06e150b2a4b67be12723b9a2e0b27360f90f07886a23c504427c43af3"
+    }
+  ],
+  "preserved_read_only_artifacts": [
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+      "bytes": 4228,
+      "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+      "expected_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+      "bytes": 4062,
+      "sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a",
+      "expected_sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a"
+    }
+  ],
+  "verification_record": {
+    "new_source_or_test_changes": false,
+    "tests_run_for_this_documentation_only_supplement": false,
+    "prior_focused_result_carried_forward": "95 passed",
+    "review_status": "PENDING_NO_ELIGIBLE_ROUTE_DEMONSTRATED",
+    "review_attempts": 0,
+    "builder_family_record": "gpt-6-luna / OpenAI (GPT); source-authoring evidence only",
+    "route_disposition": "HELD; no review performed"
+  },
+  "lifecycle_claims": {
+    "paeos_admission": false,
+    "worker_start": false,
+    "provider_send": false,
+    "review_acceptance": false,
+    "installation": false,
+    "qualification": false,
+    "court_disposition": false,
+    "debt_integration": false,
+    "p3": false
+  },
+  "production_activation": "NOT_WIRED; trusted Codex transport remains default-deny; production scheduler does not inject the B00 fence or trusted admission/policy verifier",
+  "self_hash_excluded": true,
+  "manifest_scope": "This manifest lists all 14 files from the prior candidate plus the provenance scope, builder provenance, and review-route disposition records. This manifest is excluded from its own file list; its committed bytes are captured by the Git commit and remote branch SHA readback."
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "paeos.b00-builder-provenance-scope/1",
+  "recorded_on": "2026-10-19",
+  "purpose": "Freeze a documentation-only supplement that binds the exact B00 candidate commit to its native authoring model family and records the completed review-route disposition.",
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "source_commit": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "original_checkpoint_manifest": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_CHECKPOINT_MANIFEST_20261019.json",
+    "original_checkpoint_manifest_sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582",
+    "remote_branch_sha_at_scope_freeze": "717381ab6d073c3f656b73dd88eb9f899d474302"
+  },
+  "evidence_sources": [
+    {
+      "kind": "local native Codex task execution metadata; transcript retained locally and not copied into this public repository",
+      "native_thread_settings_record_line": 615,
+      "native_thread_settings_record_sha256": "ff666570ad559bf31bcf083534078d5e0dd91553d7965a18de2805710a37cd3f",
+      "native_thread_settings_timestamp": "2026-10-19T02:00:13.859Z",
+      "candidate_commit_command_record_line": 1254,
+      "candidate_commit_command_record_sha256": "d260392030f363db174f72e3d062f5fdc60f2ab026fb439fe606f5a33d4475d2",
+      "candidate_commit_command_timestamp": "2026-10-19T02:11:37.181Z",
+      "candidate_commit_tool_output_record_line": 1257,
+      "candidate_commit_tool_output_record_sha256": "2145e05b20fba2218d5848907b93857246be158f8fbc445fd608a762af21b883",
+      "evidence_fields": ["model=gpt-6-luna", "model_provider_id=openai", "reasoning_effort=max", "git commit created 717381ab"]
+    },
+    {
+      "kind": "existing route-owner callback",
+      "event_id": "review-route-readiness-717381ab-v1",
+      "owner": "Resolve worker-pool review route",
+      "received_on": "2026-10-19",
+      "disposition": "HELD; no eligible independent route is currently evidenced; review was not performed; review-attempt count remains zero"
+    }
+  ],
+  "preimages": [
+    {
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "bytes": 1501345,
+      "sha256": "bec0dc27849351cb6fd8379ba49006bc5b87edcf639942f38dd890d2f29d22a5"
+    },
+    {
+      "path": "MessyChangesNeedsReview.md",
+      "bytes": 671530,
+      "sha256": "3b8e296195634c21c369e8a7bfbe68ce20728b25ff847404fad8bc6787b2daa1"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+      "bytes": 4228,
+      "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+      "handling": "preserve byte-for-byte; do not stage as a changed file"
+    },
+    {
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+      "bytes": 4062,
+      "sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a",
+      "handling": "preserve byte-for-byte; do not stage as a changed file"
+    }
+  ],
+  "new_paths_expected_absent_at_freeze": [
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BUILDER_PROVENANCE_SCOPE_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BUILDER_PROVENANCE_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_REVIEW_ROUTE_DISPOSITION_20261019.json",
+    "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_COORDINATION_EVIDENCE_CHECKPOINT_MANIFEST_20261019.json"
+  ],
+  "allowed_changes": [
+    "Create the three listed B00 evidence/checkpoint JSON files.",
+    "Append one evidence entry to PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md.",
+    "Append one matching evidence entry to MessyChangesNeedsReview.md."
+  ],
+  "excluded_changes_and_effects": [
+    "No production source, test source, original B00 manifest, preserved Security Review, or SOURCE_MANIFEST changes.",
+    "No provider, account, key, credential, subscription, installation, runtime, admission, positive-egress, Court, debt, or qualification action.",
+    "No independent review attempt or review acceptance.",
+    "No native message, worker assignment, coordinator-cache mutation, or PAEOS runtime claim."
+  ],
+  "review_gate_after_supplement": "HELD until a currently eligible free route has non-inference proof of exact intended-project zero-charge entitlement and availability, the Google retention/INTERNAL metadata conflict is reconciled if Google is proposed, and the ordinary independent review authority and privacy gates are satisfied."
+}

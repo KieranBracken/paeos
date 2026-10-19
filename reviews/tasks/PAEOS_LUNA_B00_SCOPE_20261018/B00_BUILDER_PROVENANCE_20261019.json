@@ -1,0 +1,55 @@
+{
+  "schema": "paeos.b00-builder-provenance/1",
+  "recorded_on": "2026-10-19",
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "source_commit": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "original_checkpoint_manifest": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_CHECKPOINT_MANIFEST_20261019.json",
+    "original_checkpoint_manifest_sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582"
+  },
+  "authoring_session": {
+    "model": "gpt-6-luna",
+    "provider": "openai",
+    "model_family": "GPT",
+    "reasoning_effort": "max",
+    "evidence": [
+      {
+        "record": "native Codex task thread settings",
+        "timestamp": "2026-10-19T02:00:13.859Z",
+        "record_line": 615,
+        "record_sha256": "ff666570ad559bf31bcf083534078d5e0dd91553d7965a18de2805710a37cd3f"
+      },
+      {
+        "record": "git commit invocation that created the B00 candidate",
+        "timestamp": "2026-10-19T02:11:37.181Z",
+        "record_line": 1254,
+        "record_sha256": "d260392030f363db174f72e3d062f5fdc60f2ab026fb439fe606f5a33d4475d2",
+        "commit": "717381ab6d073c3f656b73dd88eb9f899d474302"
+      },
+      {
+        "record": "native tool output confirming the created commit",
+        "timestamp": "2026-10-19T02:11:37.380Z",
+        "record_line": 1257,
+        "record_sha256": "2145e05b20fba2218d5848907b93857246be158f8fbc445fd608a762af21b883"
+      }
+    ],
+    "privacy_note": "The native transcript remains local and was not copied into this repository. Its record digests bind the recorded model and candidate-creation evidence without publishing conversation identifiers or transcript contents."
+  },
+  "review_family_comparison": {
+    "candidate_builder_family": "GPT",
+    "requirement": "Independent reviewer family must differ from builder where the constrained review stage requires Builder != Auditor.",
+    "effect": "This evidence establishes the candidate authoring family for comparison only. It does not establish an eligible reviewer route or perform a review."
+  },
+  "verification_carried_forward_from_original_checkpoint": {
+    "manifest_sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582",
+    "focused_command": "uv run pytest -o addopts='' tests/kernel/test_ledger.py tests/kernel/test_ledger_sqlite.py tests/runtime/autonomy/test_admission_send_fence.py tests/runtime/test_trusted_codex_worker_transport.py -q",
+    "focused_result": "95 passed",
+    "review_status": "PENDING_NO_ELIGIBLE_ROUTE_DEMONSTRATED",
+    "review_attempts": 0
+  },
+  "limits": [
+    "This is source-authoring provenance, not PAEOS runtime model identity, provider admission, credential provenance, or an execution receipt.",
+    "It does not prove account entitlement, route availability, privacy eligibility, reviewer authority, review acceptance, qualification, or debt closure.",
+    "No production source, tests, runtime settings, keys, credentials, provider route, installation, Court state, or debt state changed."
+  ]
+}
