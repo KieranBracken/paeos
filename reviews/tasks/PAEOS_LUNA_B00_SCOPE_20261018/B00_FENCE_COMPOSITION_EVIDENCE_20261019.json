@@ -1,0 +1,82 @@
+{
+  "authorization_and_scope": {
+    "direct_user_request_message": "msg_01a151d3-52dc-7ec0-8731-f57faa3afdf1",
+    "direct_user_request_text_sha256": "98b66b06e9d60df1948081d7786355fcf50e77a004a87513294dedfd77840b73",
+    "direct_user_request_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+    "direct_user_request_turn": "01a151d3-5216-7972-8883-5e12d7990102",
+    "protocol_is_supervisory_only": true,
+    "scope_authorizes_only": [
+      "ops/autonomous_run.py",
+      "tests/ops/test_autonomous_run_fence_composition.py"
+    ],
+    "scope_path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_FENCE_COMPOSITION_SCOPE_20261019.json",
+    "scope_sha256": "4ffa2a3266023ed03c754bbeceec83ce5db357aac64ca8a08b4c5fb7dbd39e0d"
+  },
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "scope_base_evidence_head": "f0871f4b10742d2c76428495a881e832bf32ad57",
+    "scope_base_source_candidate": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "scope_commit": "7c6a22a8a293398d0d99022a8b676938b3f42f75",
+    "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "gates_and_effects": {
+    "Court_or_debt_transition_or_P3": false,
+    "D0258_unblocked": false,
+    "PAEOS_admission_or_runtime_execution": false,
+    "admission_producer_present": false,
+    "credential_or_key_read_or_change": false,
+    "installation_or_qualification": false,
+    "production_cli_default_deny": true,
+    "provider_probe_or_call": false,
+    "queue_write_or_worker_start": false,
+    "trusted_admission_policy_verifier_present": false
+  },
+  "recorded_on": "2026-10-19",
+  "remaining_gap": {
+    "classification": "AUTHORITY_OR_IMPLEMENTATION_GAP",
+    "next_gate": "independent eligible review plus source-backed trusted verifier/admission producer before any production binding or activation",
+    "owner": "Architect for bounded offline composition; trusted policy/admission owner is not evidenced in source"
+  },
+  "review": {
+    "attempts": 0,
+    "route_owner_thread": "01a13075-533b-72a1-b8f8-8f109414f707",
+    "status": "PENDING_HELD_NO_ELIGIBLE_ROUTE",
+    "wake_condition": [
+      "non-inference evidence of current exact-project zero-charge availability for Google gemini-3.6-flash",
+      "documented reconciliation of PAEOS INTERNAL/non-retention metadata with applicable Google safety/abuse retention",
+      "reviewer authorization for this exact packet"
+    ]
+  },
+  "schema": "paeos.b00-fence-composition-evidence/1",
+  "self_hash_excluded": true,
+  "source_and_test": {
+    "artifacts": [
+      {
+        "bytes": 44118,
+        "path": "ops/autonomous_run.py",
+        "sha256": "d5d984c4a3c9835431f666fc992671668030dca08ae41653a4c4747b82ca2f91"
+      },
+      {
+        "bytes": 5558,
+        "path": "tests/ops/test_autonomous_run_fence_composition.py",
+        "sha256": "8114afb07aefa8e816aa1ee7c10aa532f4850e0148d52e6c4614d0acb1a77f07"
+      }
+    ],
+    "base_source_sha256": "0426f7c4743f788579f829bf15857d2b37303db97fc928fc407acbd1c8b71f6c",
+    "behavior": [
+      "Codex transport remains unavailable before identity reads unless an existing AdmissionSendFence, non-empty admission reference, and positive expected epoch are explicitly supplied.",
+      "The scheduler passes only explicitly supplied binding values to HostCodexWorkerTransport; the normal CLI call supplies none.",
+      "No admission/policy verifier, admission producer, positive permit, environment switch, or key-loading path was added."
+    ],
+    "test_absent_at_scope_base": true
+  },
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "verification": {
+    "focused_command": "uv run pytest -o addopts='' -q --no-header tests/ops/test_autonomous_run_fence_composition.py tests/ops/test_explicit_runtime_selection.py tests/ops/test_offline_scheduler_readiness.py tests/kernel/test_ledger.py tests/kernel/test_ledger_sqlite.py tests/runtime/autonomy/test_admission_send_fence.py tests/runtime/test_trusted_codex_worker_transport.py",
+    "focused_result": "126 passed in 1.59s",
+    "full_suite": "not run; this package used focused verification only",
+    "git_diff_check": "pass",
+    "ruff_check": "pass: ops/autonomous_run.py and tests/ops/test_autonomous_run_fence_composition.py",
+    "ruff_format_check": "pass: tests/ops/test_autonomous_run_fence_composition.py"
+  }
+}

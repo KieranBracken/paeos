@@ -29,15 +29,7 @@ from kernel.ledger import Ledger
 from kernel.ledger_sqlite import SqliteLedgerStore
 from kernel.types import ArtifactRef, Role, StageId
 from nacl.signing import SigningKey, VerifyKey
-from runtime.autonomy import (
-    ActionPermission,
-    AuthorityEnvelope,
-    AuthorityTier,
-    EdgeType,
-    FindingClass,
-    PersistentMissionController,
-    TaskStatus,
-)
+from runtime.autonomy.admission_send_fence import AdmissionSendFence
 from runtime.builder_transport import BuilderTransportReadiness
 from runtime.court.completeness_firewall import load_authoritative_manifest
 from runtime.evolution import EvolutionLayer
@@ -92,6 +84,15 @@ from runtime.sidecar_scorer import SidecarStageScorer
 from runtime.transports.mcp.transport import McpWorkerTransport
 
 from ops.p1_runtime_l14_audit import audit_candidate
+from runtime.autonomy import (
+    ActionPermission,
+    AuthorityEnvelope,
+    AuthorityTier,
+    EdgeType,
+    FindingClass,
+    PersistentMissionController,
+    TaskStatus,
+)
 
 # RB-0008: autonomous friction detection — record structural gaps as DEBT/RB items on disk.
 
@@ -124,7 +125,22 @@ def _read_raw_seed(path: Path) -> bytes | None:
     return raw if len(raw) == 32 else None
 
 
-def _load_codex_transport(workspace_root: Path) -> HostCodexWorkerTransport | None:
+def _load_codex_transport(
+    workspace_root: Path,
+    *,
+    admission_send_fence: AdmissionSendFence | None = None,
+    admission_ref: str | None = None,
+    expected_admission_epoch: int | None = None,
+) -> HostCodexWorkerTransport | None:
+    """Load Codex only with an existing explicit send fence and currentness binding."""
+    if (
+        not isinstance(admission_send_fence, AdmissionSendFence)
+        or type(admission_ref) is not str
+        or not admission_ref
+        or type(expected_admission_epoch) is not int
+        or expected_admission_epoch < 1
+    ):
+        return None
     request_bytes = _read_hex_identity(DEFAULT_CODEX_REQUEST_KEY, private=True)
     response_bytes = _read_hex_identity(
         DEFAULT_CODEX_RESPONSE_VERIFY_KEY, private=False
@@ -137,6 +153,9 @@ def _load_codex_transport(workspace_root: Path) -> HostCodexWorkerTransport | No
             workspace_root=workspace_root,
             request_signing_key=SigningKey(request_bytes),
             response_verify_key=VerifyKey(response_bytes),
+            admission_send_fence=admission_send_fence,
+            admission_ref=admission_ref,
+            expected_admission_epoch=expected_admission_epoch,
         )
     except ValueError:
         return None
@@ -746,8 +765,11 @@ def build_scheduler(
     global_budget: GlobalBudget,
     max_concurrency: int = 1,
     runtime_type: str | None = None,
+    codex_admission_send_fence: AdmissionSendFence | None = None,
+    codex_admission_ref: str | None = None,
+    codex_expected_admission_epoch: int | None = None,
 ) -> tuple[ContinuousScheduler | ConcurrentScheduler, EvolutionLayer, Ledger]:
-    """Wire the live autonomous loop over `state_dir`, driving builds against `repo_root`."""
+    """Wire the scheduler; trusted Codex admission inputs are caller-supplied, never created here."""
     runtime_type = _validate_runtime_type(runtime_type)
     state_dir.mkdir(parents=True, exist_ok=True)
     signing_key = load_or_create_signing_key(state_dir / "seal.key")
@@ -774,7 +796,19 @@ def build_scheduler(
     critic_binding = None
     adversary_binding = None
     if runtime_type in {"codex", "hybrid"}:
-        codex_transport = _load_codex_transport(workspace_base)
+        if (
+            codex_admission_send_fence is None
+            and codex_admission_ref is None
+            and codex_expected_admission_epoch is None
+        ):
+            codex_transport = _load_codex_transport(workspace_base)
+        else:
+            codex_transport = _load_codex_transport(
+                workspace_base,
+                admission_send_fence=codex_admission_send_fence,
+                admission_ref=codex_admission_ref,
+                expected_admission_epoch=codex_expected_admission_epoch,
+            )
         luna_planner = _load_luna_planner_transport(workspace_base)
         planner_transport = luna_planner[0] if luna_planner is not None else None
         planner_readiness = luna_planner[1] if luna_planner is not None else None

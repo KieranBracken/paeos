@@ -1,0 +1,124 @@
+{
+  "candidate": {
+    "branch": "codex/p1-bound-source-recovery-20261018",
+    "prior_evidence_head": "f0871f4b10742d2c76428495a881e832bf32ad57",
+    "scope_commit": "7c6a22a8a293398d0d99022a8b676938b3f42f75",
+    "source_candidate_ancestor": "717381ab6d073c3f656b73dd88eb9f899d474302",
+    "worktree": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "checkpoint_kind": "offline source/test composition candidate; no runtime activation",
+  "file_manifest": [
+    {
+      "bytes": 44118,
+      "path": "ops/autonomous_run.py",
+      "sha256": "d5d984c4a3c9835431f666fc992671668030dca08ae41653a4c4747b82ca2f91"
+    },
+    {
+      "bytes": 5558,
+      "path": "tests/ops/test_autonomous_run_fence_composition.py",
+      "sha256": "8114afb07aefa8e816aa1ee7c10aa532f4850e0148d52e6c4614d0acb1a77f07"
+    },
+    {
+      "bytes": 4308,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_FENCE_COMPOSITION_EVIDENCE_20261019.json",
+      "sha256": "819e2d0611ffea9af2c7e8ba241cb6458ee498135ed8a113201d38d426e19258"
+    },
+    {
+      "bytes": 1507683,
+      "path": "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md",
+      "sha256": "6be86dd89bdf86d7fe42cf8d9a4ab2d7b4d472e184d51978a85318547636d256"
+    },
+    {
+      "bytes": 673697,
+      "path": "MessyChangesNeedsReview.md",
+      "sha256": "eefe2d7b20db0439b2cefdacc32087e238430047cb77d14fcf5d9553d923c277"
+    }
+  ],
+  "frozen_scope": {
+    "base_source_sha256": "0426f7c4743f788579f829bf15857d2b37303db97fc928fc407acbd1c8b71f6c",
+    "mutable_source_and_test_paths": [
+      "ops/autonomous_run.py",
+      "tests/ops/test_autonomous_run_fence_composition.py"
+    ],
+    "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_FENCE_COMPOSITION_SCOPE_20261019.json",
+    "sha256": "4ffa2a3266023ed03c754bbeceec83ce5db357aac64ca8a08b4c5fb7dbd39e0d",
+    "test_absent_at_scope_base": true
+  },
+  "lineage_controls": [
+    {
+      "bytes": 4324,
+      "expected_sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582",
+      "matches_expected": true,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_IMPLEMENTATION_CHECKPOINT_MANIFEST_20261019.json",
+      "sha256": "7b2c4b2a1726231d36ceedb1992e178be61ddf49bf352ad9abb260d303115582"
+    },
+    {
+      "bytes": 5967,
+      "expected_sha256": "fb560cb612d84f22459e48635a5a7f011f8d0ebe8cc4d5418c86d1db83b484e2",
+      "matches_expected": true,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_COORDINATION_EVIDENCE_CHECKPOINT_MANIFEST_20261019.json",
+      "sha256": "fb560cb612d84f22459e48635a5a7f011f8d0ebe8cc4d5418c86d1db83b484e2"
+    },
+    {
+      "bytes": 6322,
+      "expected_sha256": "1c235d1f396b98691cb7558f92140ee142744fcdaad28ab58606940440c70b19",
+      "matches_expected": true,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_SCOPE_BOUNDARY_CHECKPOINT_MANIFEST_20261019.json",
+      "sha256": "1c235d1f396b98691cb7558f92140ee142744fcdaad28ab58606940440c70b19"
+    },
+    {
+      "bytes": 3544,
+      "expected_sha256": "52da76a06e150b2a4b67be12723b9a2e0b27360f90f07886a23c504427c43af3",
+      "matches_expected": true,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_REVIEW_ROUTE_DISPOSITION_20261019.json",
+      "sha256": "52da76a06e150b2a4b67be12723b9a2e0b27360f90f07886a23c504427c43af3"
+    }
+  ],
+  "manifest_scope": "Lists every changed source, test, evidence, and append-only oversight-log file for this candidate. The manifest is self-excluded and bound by the Git commit object.",
+  "manifest_self_hash_excluded": true,
+  "preserved_read_only_artifacts": [
+    {
+      "bytes": 4228,
+      "expected_sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa",
+      "matches_expected": true,
+      "path": "reviews/tasks/PAEOS_DISCLOSURE_VERIFIER_20261018/security-review-original.md",
+      "sha256": "9fc4cfd01d4727e307949f10dfb2650e3e644af35db64a666727a3f0e6d93afa"
+    },
+    {
+      "bytes": 4062,
+      "expected_sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a",
+      "matches_expected": true,
+      "path": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/SOURCE_MANIFEST.json",
+      "sha256": "72ba546ffce3045696c54155f469a5db4213247b847cbb8c548beaf92cdefb3a"
+    }
+  ],
+  "recorded_on": "2026-10-19",
+  "remote_readback": "Pending explicit push/readback attempt; actual result will be recorded in coordinator cache and root callback.",
+  "review": {
+    "attempts": 0,
+    "status": "PENDING_HELD_NO_ELIGIBLE_ROUTE",
+    "wake_condition": "route owner must obtain exact-project zero-charge evidence, privacy/retention reconciliation, and reviewer authorization for this exact packet"
+  },
+  "runtime_and_authority": {
+    "Court_or_debt_transition_or_P3": false,
+    "D0258_unblocked": false,
+    "PAEOS_admission_or_runtime_execution": false,
+    "admission_producer": "absent",
+    "credential_or_key_read_or_change": false,
+    "installation_or_qualification": false,
+    "production_cli_binding": "none; normal CLI remains default-deny",
+    "provider_or_positive_egress": false,
+    "queue_or_worker_start": false,
+    "trusted_admission_policy_verifier": "absent"
+  },
+  "schema": "paeos.b00-fence-composition-checkpoint/1",
+  "task": "PAEOS_LUNA_B00_SCOPE_20261018",
+  "verification": {
+    "focused_result": "126 passed in 1.59s",
+    "full_suite": "not run",
+    "git_diff_check": "pass after evidence/log creation; rerun before commit",
+    "ruff_check": "pass",
+    "ruff_format_check": "pass",
+    "source_diff_within_frozen_scope": true
+  }
+}
