@@ -5638,3 +5638,8 @@ The current B00 source scope explicitly lists `ops/autonomous_run.py` as read-on
 ### 2026-10-19 — B00 offline fence-composition candidate
 
 Added bounded optional `AdmissionSendFence`/admission-reference/epoch composition in `ops/autonomous_run.py` and synthetic tests in `tests/ops/test_autonomous_run_fence_composition.py`. Missing binding remains unavailable before identity reads; the normal CLI supplies no binding. Focused suite: 126 passed; Ruff lint, test format, and diff check passed. Evidence: `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_FENCE_COMPOSITION_EVIDENCE_20261019.json`. Independent review remains held with zero attempts; trusted verifier/admission producer remains absent. No PAEOS runtime progress or D0258 unblock is claimed.
+
+
+### 2026-10-19 — B00 broker boundary, root-owned offline checkpoint
+
+Complete-frame parser, versioned derivative-policy syntax and broker pre-send/credential-path hardening require combined independent review. See `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BROKER_BOUNDARY_CHECKPOINT_20261019.json` for exact hashes, 312 focused passes, RED controls and limitations. Production remains denied; no host installation, identities, provider request or Court disposition changed.

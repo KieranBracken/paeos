@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import http.client
 import json
+import os
 import re
 import secrets
 import socket
@@ -24,6 +25,8 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, replace
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+from runtime.integrations.disclosure_frame import FrameRejected, inspect_responses_frame
 
 __all__ = [
     "AUTHORIZED_MODEL_IDS",
@@ -232,8 +235,6 @@ class ParentOwnedResponsesBroker:
         self._server: ThreadingHTTPServer | None = None
         self._thread: threading.Thread | None = None
         self._task_token: str | None = None
-        self._access_token: str | None = None
-        self._account_id: str | None = None
         self._expires_at = 0.0
         self._request_count = 0
         self._request_receipts: list[_RequestReceipt] = []
@@ -277,31 +278,79 @@ class ParentOwnedResponsesBroker:
         return _ENV_KEY
 
     def _load_parent_auth(self) -> tuple[str, str]:
+        """Read only a bounded private regular file through pinned directory descriptors."""
         path = self._auth_path
-        if not path.is_absolute() or path.is_symlink() or not path.is_file():
+        if not path.is_absolute() or any(part in {".", ".."} for part in path.parts):
             raise RuntimeError("parent Codex auth state is unavailable")
-        if stat.S_IMODE(path.stat().st_mode) & 0o077:
-            raise RuntimeError("parent Codex auth state permissions are too broad")
+        directory = None
+        descriptor = None
         try:
-            document = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise RuntimeError("parent Codex auth state is malformed") from exc
-        tokens = document.get("tokens") if isinstance(document, dict) else None
-        access_token = tokens.get("access_token") if isinstance(tokens, dict) else None
-        account_id = tokens.get("account_id") if isinstance(tokens, dict) else None
-        if (
-            not isinstance(access_token, str)
-            or not access_token
-            or not isinstance(account_id, str)
-            or not account_id
+            directory = os.open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
+            for part in path.parts[1:-1]:
+                child = os.open(
+                    part,
+                    os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
+                    dir_fd=directory,
+                )
+                os.close(directory)
+                directory = child
+            descriptor = os.open(
+                path.name,
+                os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC,
+                dir_fd=directory,
+            )
+            metadata = os.fstat(descriptor)
+            limit = 1024 * 1024
+            if (
+                not stat.S_ISREG(metadata.st_mode)
+                or stat.S_IMODE(metadata.st_mode) & 0o077
+                or metadata.st_uid != os.geteuid()
+                or not 0 < metadata.st_size <= limit
+            ):
+                raise RuntimeError("parent Codex auth state is not a bounded private regular file")
+            blocks = []
+            total = 0
+            while total <= limit:
+                block = os.read(descriptor, min(65536, limit + 1 - total))
+                if not block:
+                    break
+                blocks.append(block)
+                total += len(block)
+            if total > limit:
+                raise RuntimeError("parent Codex auth state exceeds its size bound")
+
+            def unique(pairs):
+                result = {}
+                for name, value in pairs:
+                    if name in result:
+                        raise ValueError("duplicate auth field")
+                    result[name] = value
+                return result
+
+            document = json.loads(b"".join(blocks), object_pairs_hook=unique)
+        except (OSError, ValueError, UnicodeError, RecursionError):
+            raise RuntimeError("parent Codex auth state is unavailable or malformed") from None
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+            if directory is not None:
+                os.close(directory)
+        tokens = document.get("tokens") if type(document) is dict else None
+        access_token = tokens.get("access_token") if type(tokens) is dict else None
+        account_id = tokens.get("account_id") if type(tokens) is dict else None
+        if any(
+            type(value) is not str
+            or not value
+            or len(value) > 65536
+            or any(ord(c) <= 32 or ord(c) >= 127 for c in value)
+            for value in (access_token, account_id)
         ):
-            raise RuntimeError("parent Codex auth state lacks required identity")
+            raise RuntimeError("parent Codex auth state lacks valid header identities")
         return access_token, account_id
 
     def start(self) -> None:
         if self._server is not None or self._task_token is not None:
             raise RuntimeError("task broker is already active")
-        access_token, account_id = self._load_parent_auth()
         task_token = secrets.token_urlsafe(32)
         broker = self
 
@@ -356,6 +405,16 @@ class ParentOwnedResponsesBroker:
                         broker._local_error_class = "disclosure_authority_unavailable"
                     self._send(403, b'{"error":{"type":"disclosure_authority_unavailable"}}')
                     return
+                try:
+                    # Authorize/send the original immutable bytes, never a reconstructed
+                    # subset which could omit attachments, history or tool definitions.
+                    inspect_responses_frame(body, expected_model=broker._model_id)
+                except FrameRejected:
+                    with broker._lock:
+                        broker._local_rejection_count += 1
+                        broker._local_error_class = "outbound_frame_rejected"
+                    self._send(403, b'{"error":{"type":"outbound_frame_rejected"}}')
+                    return
                 with broker._lock:
                     if broker._request_count >= broker._max_requests:
                         broker._local_rejection_count += 1
@@ -366,9 +425,9 @@ class ParentOwnedResponsesBroker:
                     receipt = _RequestReceipt(broker._request_count, _sha256(body))
                     broker._request_receipts.append(receipt)
                 try:
-                    assert broker._access_token is not None
-                    assert broker._account_id is not None
-                    reply = broker._upstream(body, broker._access_token, broker._account_id)
+                    # The absent-authority path must not even inspect host credentials.
+                    access_token, account_id = broker._load_parent_auth()
+                    reply = broker._upstream(body, access_token, account_id)
                 except Exception as exc:
                     with broker._lock:
                         broker._request_receipts[receipt.request_id - 1] = replace(
@@ -411,8 +470,6 @@ class ParentOwnedResponsesBroker:
 
         server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         server.daemon_threads = True
-        self._access_token = access_token
-        self._account_id = account_id
         self._task_token = task_token
         self._expires_at = self._clock() + _TTL_SECONDS
         self._server = server
@@ -423,6 +480,13 @@ class ParentOwnedResponsesBroker:
     def _forward_to_chatgpt(body: bytes, access_token: str, account_id: str) -> BrokerReply:
         # The network owner must also reject direct calls that bypass the HTTP handler.
         _require_disclosure_authority()
+        # This direct entry has no parent task context, so production remains denied
+        # above. Even an isolated test bypass cannot omit complete-frame inspection.
+        try:
+            model = json.loads(body).get("model")
+        except (ValueError, TypeError, AttributeError):
+            raise FrameRejected("unsupported or unbound outbound frame") from None
+        inspect_responses_frame(body, expected_model=model)
         headers = {
             "Authorization": f"Bearer {access_token}",
             "ChatGPT-Account-Id": account_id,
@@ -499,8 +563,6 @@ class ParentOwnedResponsesBroker:
         if thread is not None:
             thread.join(timeout=2)
         self._task_token = None
-        self._access_token = None
-        self._account_id = None
         self._expires_at = 0.0
 
     def __enter__(self) -> ParentOwnedResponsesBroker:

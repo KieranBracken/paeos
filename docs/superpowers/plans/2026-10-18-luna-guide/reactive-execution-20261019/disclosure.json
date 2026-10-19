@@ -53,7 +53,8 @@
     "ops/autonomous_run.py",
     "tests/ops/test_autonomous_run_fence_composition.py",
     "ops/install_trusted_codex_worker_supervisor.py",
-    "tests/ops/test_trusted_codex_installer_binding.py"
+    "tests/ops/test_trusted_codex_installer_binding.py",
+    "tests/runtime/test_responses_broker_request_limit.py"
   ],
   "preimages": {
     "runtime/integrations/disclosure_frame.py": null,
@@ -69,7 +70,8 @@
     "ops/autonomous_run.py": "d5d984c4a3c9835431f666fc992671668030dca08ae41653a4c4747b82ca2f91",
     "tests/ops/test_autonomous_run_fence_composition.py": "8114afb07aefa8e816aa1ee7c10aa532f4850e0148d52e6c4614d0acb1a77f07",
     "ops/install_trusted_codex_worker_supervisor.py": "d8601b5e00ffbad546b1a90eebf66d66577750b85db8a4e53f9f300d26bb049a",
-    "tests/ops/test_trusted_codex_installer_binding.py": "9ffd8f96eee5d043955442fa8f72f4c836f6f1894a06e4277614fecec9196e50"
+    "tests/ops/test_trusted_codex_installer_binding.py": "9ffd8f96eee5d043955442fa8f72f4c836f6f1894a06e4277614fecec9196e50",
+    "tests/runtime/test_responses_broker_request_limit.py": "797d97cf9d8f63c0c98cf4fe5c1b37f94c7fbc436d0ab8fce2f35a0d6fd1b4df"
   },
   "acceptance": [
     "Instructions/history/attachments/tools/results/unknown fields and injected/direct forwarder bypass negatives before signature/network.",
@@ -77,5 +79,6 @@
     "Bundle source/runtime separation and startup/negative control, original files/identities preserved.",
     "Combined focused regression and full suite once; current errors recorded. Final exact candidate independent Security Review before installation/enrollment/canary."
   ],
-  "next_gate": "One guided reviewed signing/enrollment ceremony if human-only action required; no activation before applicable approval."
+  "next_gate": "One guided reviewed signing/enrollment ceremony if human-only action required; no activation before applicable approval.",
+  "scope_clarification": "Existing broker receipt tests use explicit test-only authority monkeypatches; update their frame fixtures to the closed supported schema when ingress enforcement lands. This is an applicable regression test under the directly approved disclosure package, not a new production permission."
 }

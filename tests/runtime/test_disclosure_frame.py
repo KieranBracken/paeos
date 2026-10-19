@@ -199,3 +199,22 @@ def test_supported_control_fields_cannot_hide_arbitrary_disclosures():
     )
     with pytest.raises(_module().FrameRejected):
         _inspect(_body(reasoning={"effort": "synthetic secret"}))
+
+
+def test_diagnostics_and_repr_do_not_expose_dynamic_argument_keys_or_call_ids():
+    tool = _tool()
+    parent = {"read_artifact": json.dumps(tool, sort_keys=True, separators=(",", ":")).encode()}
+    body = _body(
+        tools=[tool],
+        input=[
+            {
+                "type": "function_call",
+                "name": "read_artifact",
+                "call_id": "synthetic-excluded-sentinel",
+                "arguments": '{"synthetic-excluded-sentinel":"value"}',
+            }
+        ],
+    )
+    frame = _inspect(body, approved_tools=parent)
+    assert "synthetic-excluded-sentinel" not in repr(frame)
+    assert all("synthetic-excluded-sentinel" not in c.location for c in frame.components)

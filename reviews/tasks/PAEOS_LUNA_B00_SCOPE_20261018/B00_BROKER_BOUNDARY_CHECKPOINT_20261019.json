@@ -1,0 +1,42 @@
+{
+  "schema": "paeos.offline-source-checkpoint/1",
+  "assignment_id": "B00-20261019-disclosure-v1",
+  "baseline": "aefdf625e1a44ba33bc2a611a8e1c894a5f88b1e",
+  "source_sha256": {
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "runtime/integrations/disclosure_frame.py": "c865813ffc133e2e214f8f71c83dd9a82f599947ceb2754ea81a3857c19cba01",
+    "tests/runtime/test_disclosure_frame.py": "04fa7687c73cf5761e55835a7eaaf595c3bd4771b5921849d7cd8f2a3da0558b",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27",
+    "tests/runtime/test_responses_broker_request_limit.py": "b7ad19e8c46f79e0eb21d92699765e774a62a4fe90ca62a6888e04d7e15c7e39",
+    "docs/superpowers/plans/2026-10-18-luna-guide/reactive-execution-20261019/disclosure.json": "b78326e3482ee00e9a974cddc24d3b0aa935faf516cf2f9e462164b745f2778b"
+  },
+  "verified_result": "312 passed in 26.23s",
+  "command": ".venv/bin/python -m pytest tests/runtime/test_responses_broker_disclosure_denial.py tests/runtime/test_responses_broker_request_limit.py tests/runtime/test_responses_broker_model_identity.py tests/runtime/test_disclosure_frame.py tests/model_router/test_disclosure_policy.py tests/model_router/test_disclosure_store.py -o addopts= -q",
+  "red_controls": [
+    "Absent authority still read parent auth before repair.",
+    "Symlinked auth ancestor reached synthetic credentials before repair.",
+    "Dynamic tool call/argument metadata appeared in repr before repair."
+  ],
+  "static_checks": [
+    "Ruff lint passed",
+    "Ruff format: 5 already formatted",
+    "compileall passed",
+    "git diff --check passed"
+  ],
+  "security_scan": "Explicit candidate text scanned for targeted private-key and credential patterns; no match. Not a classification or comprehensive security review.",
+  "effects": {
+    "providers_called": 0,
+    "host_credentials_read": false,
+    "keys_created": false,
+    "production_activated": false,
+    "formal_reviews": 0
+  },
+  "limits": [
+    "Authority-composition gate remains unconditional deny; positive integration is pending concrete signed admission/currentness and process confinement.",
+    "HTTP frame and direct-network parser tests use explicit test-only authority monkeypatches solely to exercise downstream rejection; not authorized egress evidence.",
+    "Canonical provider-frame budget/restart claims remain the next Chat3 integration dependency.",
+    "No complete PAEOS task, Court adjudication or qualification claimed.",
+    "Full suite deferred to combined integration, historical collection counts remain historical."
+  ],
+  "next_gate": "Chat3 and Chat4 frozen packages -> exact combined integration/regression -> eligible independent Security Review -> reviewed human-only enrollment/activation decision."
+}

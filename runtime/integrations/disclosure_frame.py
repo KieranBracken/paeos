@@ -99,8 +99,8 @@ class InspectedResponsesFrame:
     body: bytes = field(repr=False)
     sha256: str
     components: tuple[FrameComponent, ...]
-    tool_calls: tuple[str, ...]
-    tool_results: tuple[str, ...]
+    tool_calls: tuple[str, ...] = field(repr=False)
+    tool_results: tuple[str, ...] = field(repr=False)
 
 
 def inspect_responses_frame(
@@ -142,7 +142,35 @@ def _inspect(body: bytes, expected_model: str, approved_tools: Mapping[str, byte
         elif type(value) is dict:
             for key, item in value.items():
                 _text(key)
-                visit(item, location + "/" + key.replace("~", "~0").replace("/", "~1"), depth + 1)
+                # Caller-supplied schema/argument keys can themselves contain data.
+                # Keep diagnostic paths content-free outside the fixed wire vocabulary.
+                segment = (
+                    key
+                    if key
+                    in _FIELDS
+                    | {
+                        "role",
+                        "content",
+                        "type",
+                        "text",
+                        "name",
+                        "description",
+                        "parameters",
+                        "strict",
+                        "properties",
+                        "required",
+                        "additionalProperties",
+                        "call_id",
+                        "arguments",
+                        "output",
+                        "effort",
+                        "summary",
+                        "format",
+                        "verbosity",
+                    }
+                    else "key-sha256-" + hashlib.sha256(key.encode("utf-8")).hexdigest()
+                )
+                visit(item, location + "/" + segment, depth + 1)
         elif type(value) is list:
             for index, item in enumerate(value):
                 visit(item, location + "/" + str(index), depth + 1)

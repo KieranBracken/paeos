@@ -38,7 +38,7 @@ def _response(body=None, model="gpt-5.6-sol"):
     )
 
 
-def _post(broker, body=b'{"model":"gpt-5.6-sol","input":"synthetic","max_requests":32}'):
+def _post(broker, body=b'{"model":"gpt-5.6-sol","input":"synthetic"}'):
     connection = HTTPConnection("127.0.0.1", broker.loopback_port, timeout=3)
     try:
         connection.request(

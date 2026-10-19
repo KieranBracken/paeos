@@ -112,3 +112,109 @@ def test_direct_forwarding_cannot_bypass_authority_guard(monkeypatch):
             "synthetic-account",
         )
     assert connections == []
+
+
+def test_absent_authority_does_not_read_parent_credentials(monkeypatch):
+    reads = []
+    broker = module.ParentOwnedResponsesBroker(auth_path=Path("/unused-synthetic-auth"))
+
+    def forbidden_read():
+        reads.append("read")
+        raise AssertionError("credential loading must follow actual frame authorization")
+
+    monkeypatch.setattr(broker, "_load_parent_auth", forbidden_read)
+    with broker:
+        assert _post(broker, b'{"model":"gpt-5.6-sol","input":"synthetic"}')[0] == 403
+    assert reads == []
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        {"attachments": [{"file_data": "synthetic-excluded-sentinel"}]},
+        {"previous_response_id": "opaque-remote"},
+        {"tools": [{"type": "local_shell"}]},
+        {"input": [{"type": "function_call_output", "call_id": "orphan", "output": "synthetic"}]},
+    ],
+)
+def test_frame_inspection_is_enforced_before_even_injected_forwarder(monkeypatch, extra):
+    # Isolate frame enforcement from the still-disabled authority-composition boundary.
+    monkeypatch.setattr(module, "_require_disclosure_authority", lambda: None)
+    broker, forwarded = _denial_broker(monkeypatch, "gpt-5.6-sol")
+    with broker:
+        status, _ = _post(
+            broker, json.dumps({"model": "gpt-5.6-sol", "input": "synthetic", **extra}).encode()
+        )
+    assert status == 403
+    assert forwarded == []
+    assert broker.evidence()["request_count"] == 0
+
+
+def test_direct_network_method_also_enforces_full_frame(monkeypatch):
+    monkeypatch.setattr(module, "_require_disclosure_authority", lambda: None)
+    calls = []
+    monkeypatch.setattr(
+        module.http.client, "HTTPSConnection", lambda *a, **k: calls.append("network")
+    )
+    with pytest.raises(ValueError):
+        module.ParentOwnedResponsesBroker._forward_to_chatgpt(
+            b'{"model":"gpt-5.6-sol","input":"synthetic","attachments":[]}',
+            "synthetic-token",
+            "synthetic-account",
+        )
+    assert calls == []
+
+
+@pytest.mark.parametrize("link", ["ancestor", "leaf"])
+def test_parent_auth_rejects_symlinked_components(tmp_path, link):
+    original = tmp_path / "original"
+    original.mkdir()
+    auth = original / "auth.json"
+    auth.write_text(
+        json.dumps({"tokens": {"access_token": "synthetic", "account_id": "synthetic-account"}})
+    )
+    auth.chmod(0o600)
+    if link == "ancestor":
+        (tmp_path / "alias").symlink_to(original, target_is_directory=True)
+        candidate = tmp_path / "alias" / "auth.json"
+    else:
+        candidate = tmp_path / "alias.json"
+        candidate.symlink_to(auth)
+    broker = module.ParentOwnedResponsesBroker(auth_path=candidate)
+    with pytest.raises(RuntimeError):
+        broker._load_parent_auth()
+
+
+def test_parent_auth_reads_bounded_private_regular_file(tmp_path):
+    auth = tmp_path / "auth.json"
+    auth.write_text(
+        json.dumps({"tokens": {"access_token": "synthetic", "account_id": "synthetic-account"}})
+    )
+    auth.chmod(0o600)
+    broker = module.ParentOwnedResponsesBroker(auth_path=auth)
+    assert broker._load_parent_auth() == ("synthetic", "synthetic-account")
+    auth.chmod(0o644)
+    with pytest.raises(RuntimeError):
+        broker._load_parent_auth()
+    auth.chmod(0o600)
+    auth.write_bytes(b" " * (1024 * 1024 + 1))
+    with pytest.raises(RuntimeError):
+        broker._load_parent_auth()
+
+
+def test_parent_auth_duplicate_identity_and_header_injection_reject(tmp_path):
+    auth = tmp_path / "auth.json"
+    broker = module.ParentOwnedResponsesBroker(auth_path=auth)
+    auth.write_text(
+        '{"tokens":{"access_token":"synthetic","access_token":"other","account_id":"synthetic"}}'
+    )
+    auth.chmod(0o600)
+    with pytest.raises(RuntimeError):
+        broker._load_parent_auth()
+    auth.write_text(
+        json.dumps(
+            {"tokens": {"access_token": "synthetic\r\nx-bad: yes", "account_id": "synthetic"}}
+        )
+    )
+    with pytest.raises(RuntimeError):
+        broker._load_parent_auth()
