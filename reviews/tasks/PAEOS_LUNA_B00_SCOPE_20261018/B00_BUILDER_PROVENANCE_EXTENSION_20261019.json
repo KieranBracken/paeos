@@ -1,0 +1,86 @@
+{
+  "schema": "paeos.b00-builder-provenance-extension/1",
+  "candidate_source_commit": "5efdbc380e6f3e4d3103a16bf0cfdeaf8deea45f",
+  "previous_record": "reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BUILDER_PROVENANCE_20261019.json",
+  "previous_record_sha256": "184691a43407a6ba93a550af0e1cfcba24bfdf26944ba24c5583638051b45273",
+  "covered_source_increments": [
+    {
+      "source_commit": "aefdf625e1a44ba33bc2a611a8e1c894a5f88b1e",
+      "source_tree": "00e0dc710af4ac2459614d855ef9c107dee293fb",
+      "configured_native_authoring_context": {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "record_line": 27849,
+        "record_sha256": "b6b50055538c06be3b1efd591fb433e7d30552138fde28f0853d9b16ddaa3142",
+        "timestamp": "2026-10-19T16:26:46.681Z"
+      },
+      "native_commit_output": {
+        "record_line": 28007,
+        "record_sha256": "eb384d159abcf389cb29bfd58457626a7b3b485ed8f79512872e206333992058",
+        "timestamp": "2026-10-19T16:34:39.905Z"
+      },
+      "provider": "openai",
+      "family": "GPT",
+      "source_and_test_paths": [
+        "paeos/model_router/disclosure_policy.py",
+        "runtime/integrations/disclosure_frame.py",
+        "tests/model_router/test_disclosure_policy.py",
+        "tests/runtime/test_disclosure_frame.py"
+      ]
+    },
+    {
+      "source_commit": "5efdbc380e6f3e4d3103a16bf0cfdeaf8deea45f",
+      "source_tree": "63e8fc6a825f7a7e7c2dfd70f031c2d471824e5e",
+      "configured_native_authoring_context": {
+        "model": "gpt-6-astra",
+        "effort": "high",
+        "record_line": 27849,
+        "record_sha256": "b6b50055538c06be3b1efd591fb433e7d30552138fde28f0853d9b16ddaa3142",
+        "timestamp": "2026-10-19T16:26:46.681Z"
+      },
+      "native_commit_output": {
+        "record_line": 28149,
+        "record_sha256": "44b4318c19624b00793528572bd13867aea021f220c000acb1f75e4765f0d0b4",
+        "timestamp": "2026-10-19T16:40:50.439Z"
+      },
+      "provider": "openai",
+      "family": "GPT",
+      "source_and_test_paths": [
+        "runtime/integrations/disclosure_frame.py",
+        "runtime/integrations/task_scoped_responses_broker.py",
+        "tests/runtime/test_disclosure_frame.py",
+        "tests/runtime/test_responses_broker_disclosure_denial.py",
+        "tests/runtime/test_responses_broker_request_limit.py"
+      ]
+    },
+    {
+      "source_commit": "7b31804fae7b0f1f41cfdd68d725a1be0b4f7257",
+      "source_tree": "6fc1800426ae2656756649e3959370c575f7e217",
+      "configured_native_authoring_context": {
+        "model": "gpt-6-luna",
+        "effort": "max",
+        "record_line": 3865,
+        "record_sha256": "8f5df374d35545a77a906605acf55e795f986fa6e0ddf7d0f63cd54a3190b517",
+        "timestamp": "2026-10-19T14:58:50.570Z"
+      },
+      "native_commit_output": {
+        "record_line": 4043,
+        "record_sha256": "6bc53f903e1a0138d8cfa1f8da32aebe81d78c5127b627f80c89e02b183f45e7",
+        "timestamp": "2026-10-19T15:01:51.808Z"
+      },
+      "provider": "openai",
+      "family": "GPT",
+      "source_and_test_paths": [
+        "ops/autonomous_run.py",
+        "tests/ops/test_autonomous_run_fence_composition.py"
+      ]
+    }
+  ],
+  "evidence_method": "Observed local native turn_context model settings associated with native tool output creating each exact commit; raw native records remain local, only their SHA256 and positions are published. No backend-weight or provider cryptographic attestation claimed.",
+  "required_review_family": "Different from GPT for the applicable heterogeneous audit; independent request/response and eligible route still required.",
+  "limits": [
+    "This extends source-authoring provenance only; it does not establish PAEOS runtime model identity, admission, eligibility or review acceptance.",
+    "The three listed increments plus preserved earlier record cover the B00 source changes through 5efdbc38; later owner packages require their own bound provenance.",
+    "No provider/model request, credential access, source edit, enrollment, installation or qualification performed by this evidence capture."
+  ]
+}
