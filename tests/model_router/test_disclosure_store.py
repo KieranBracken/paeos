@@ -8,7 +8,7 @@ from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime
 
 import pytest
-from test_disclosure_policy import NOW, signed
+from test_disclosure_policy import NOW, _derivative_policy, signed
 from test_disclosure_policy import key as synthetic_key  # noqa: F401
 from test_disclosure_policy import policy as synthetic_policy  # noqa: F401
 
@@ -53,6 +53,168 @@ def inputs(tmp_path, synthetic_key, synthetic_policy):  # noqa: F811 - imported 
         "expected_policy_sha256": hashlib.sha256(canonical).hexdigest(),
         "now": NOW,
     }
+
+
+def _write_signed_policy(inputs, policy, key, *, domain):
+    raw = signed(policy, key, domain=domain)
+    (inputs["root"] / "policy.json").write_bytes(raw)
+    canonical = json.dumps(
+        json.loads(raw), sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode()
+    inputs["expected_policy_sha256"] = hashlib.sha256(canonical).hexdigest()
+
+
+@pytest.fixture
+def derivative_policy(synthetic_policy):  # noqa: F811 - imported pytest fixture
+    return _derivative_policy(synthetic_policy)
+
+
+@pytest.fixture
+def v2_inputs(inputs, derivative_policy, synthetic_key):  # noqa: F811
+    _write_signed_policy(
+        inputs, derivative_policy, synthetic_key, domain=b"PAEOS-DISCLOSURE-POLICY-V2\0"
+    )
+    return {**inputs, "expected_policy_version": 2}
+
+
+def test_explicit_v2_loads_signed_derivative_snapshot_without_authority(loader, v2_inputs):
+    result = loader.load_pinned_disclosure_policy(**v2_inputs)
+    assert result.policy_id == "synthetic-policy"
+    assert result.derivative_rules[0].input_data_class == "PUBLIC"
+    assert result.derivative_rules[0].output_data_class == "PUBLIC"
+    assert not any(hasattr(result, field) for field in ("enrolled", "current", "egress_permitted"))
+    with pytest.raises(FrozenInstanceError):
+        result.revision = 2
+
+
+@pytest.mark.parametrize("selection", ["omitted", 1])
+def test_v2_document_cannot_select_its_own_verifier(loader, v2_inputs, selection):
+    if selection == "omitted":
+        del v2_inputs["expected_policy_version"]
+    else:
+        v2_inputs["expected_policy_version"] = selection
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+
+
+def test_v1_document_rejected_when_independent_version_is_two(loader, inputs):
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**inputs, expected_policy_version=2)
+    assert loader.load_pinned_disclosure_policy(**inputs, expected_policy_version=1).revision == 1
+
+
+@pytest.mark.parametrize("version", [None, True, False, 0, -1, 3, 2.0, "2", {}, []])
+def test_invalid_expected_version_denies_before_input_read(loader, inputs, monkeypatch, version):
+    def forbidden(*args, **kwargs):
+        pytest.fail("invalid expected version reached filesystem")
+
+    monkeypatch.setattr(os, "open", forbidden)
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**inputs, expected_policy_version=version)
+
+
+@pytest.mark.parametrize("field", ["expected_public_key_sha256", "expected_policy_sha256"])
+def test_v2_rejects_wrong_independent_pins(loader, v2_inputs, field):
+    v2_inputs[field] = "0" * 64
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+
+
+def test_v2_rejects_invalid_signature_even_when_repinned(loader, v2_inputs):
+    path = v2_inputs["root"] / "policy.json"
+    document = json.loads(path.read_bytes())
+    document["revision"] = 2
+    raw = json.dumps(document, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    path.write_bytes(raw)
+    v2_inputs["expected_policy_sha256"] = hashlib.sha256(raw).hexdigest()
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+
+
+def test_v2_rejects_v1_signature_domain(loader, v2_inputs, derivative_policy, synthetic_key):  # noqa: F811
+    _write_signed_policy(
+        v2_inputs, derivative_policy, synthetic_key, domain=b"PAEOS-DISCLOSURE-POLICY-V1\0"
+    )
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+
+
+@pytest.mark.parametrize(
+    "clock",
+    [
+        datetime(2026, 10, 18),
+        datetime(2026, 10, 16, tzinfo=UTC),
+        datetime(2026, 10, 20, tzinfo=UTC),
+    ],
+)
+def test_v2_rejects_invalid_future_or_expired_time(loader, v2_inputs, clock):
+    v2_inputs["now"] = clock
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["class_secret", "input_secret", "output_secret", "declassification", "schema"]
+)
+def test_v2_rejects_secret_declassification_and_unexpected_schema(
+    loader,
+    v2_inputs,
+    derivative_policy,
+    synthetic_key,  # noqa: F811 - imported pytest fixture
+    mutation,
+):
+    rule = derivative_policy["derivative_rules"][0]
+    if mutation == "class_secret":
+        derivative_policy["classes"][0]["data_class"] = "SECRET"
+    elif mutation == "input_secret":
+        rule["input_data_class"] = "SECRET"
+    elif mutation == "output_secret":
+        rule["output_data_class"] = "SECRET"
+    elif mutation == "declassification":
+        derivative_policy["classes"][0].update(
+            class_id="REDACTED_INTERNAL_ENGINEERING_SOURCE", data_class="INTERNAL"
+        )
+        rule.update(
+            class_id="REDACTED_INTERNAL_ENGINEERING_SOURCE",
+            input_data_class="INTERNAL",
+            output_data_class="PUBLIC",
+        )
+    else:
+        derivative_policy["schema"] = "paeos.disclosure-policy/999"
+    _write_signed_policy(
+        v2_inputs, derivative_policy, synthetic_key, domain=b"PAEOS-DISCLOSURE-POLICY-V2\0"
+    )
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+
+
+@pytest.mark.parametrize("relative", ["public/key.json", "policy.json"])
+def test_v2_keeps_no_follow_reads(loader, v2_inputs, tmp_path, relative):
+    path = v2_inputs["root"] / relative
+    outside = tmp_path / "synthetic-outside-sentinel"
+    path.rename(outside)
+    before = outside.read_bytes()
+    path.symlink_to(outside)
+    with pytest.raises(loader.DisclosureInputError):
+        loader.load_pinned_disclosure_policy(**v2_inputs)
+    assert outside.read_bytes() == before
+
+
+def test_v2_reads_only_public_inputs_without_key_generation(loader, v2_inputs, monkeypatch):
+    from nacl.signing import SigningKey
+
+    original_open = os.open
+
+    def readonly_open(path, flags, *args, **kwargs):
+        assert not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC)
+        return original_open(path, flags, *args, **kwargs)
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("loader attempted signing-key generation")
+
+    monkeypatch.setattr(os, "open", readonly_open)
+    monkeypatch.setattr(SigningKey, "generate", forbidden)
+    assert len(loader.load_pinned_disclosure_policy(**v2_inputs).derivative_rules) == 1
 
 
 def test_loads_exact_signed_policy_without_granting_authority(loader, inputs):

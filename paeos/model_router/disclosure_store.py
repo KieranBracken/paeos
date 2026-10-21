@@ -25,6 +25,7 @@ from paeos.model_router.disclosure_policy import (
     DisclosurePolicyError,
     DisclosurePolicyManifest,
     policy_digest,
+    verify_founder_derivative_policy,
     verify_founder_policy,
 )
 
@@ -114,15 +115,20 @@ def load_pinned_disclosure_policy(
     expected_public_key_sha256: str,
     expected_policy_sha256: str,
     now: datetime,
+    expected_policy_version: int = 1,
 ) -> DisclosurePolicyManifest:
     """Return a signature-verified snapshot only; no current-authority claim.
 
     Public-key pin hashes the 32 raw public bytes. Policy pin uses the existing
     canonical signed-envelope digest. Public JSON fields are exactly schema,
     key_id, algorithm and public_key_hex. No write, install or network occurs.
+    The parent selects the expected version independently; document contents
+    cannot upgrade the default v1 verifier or select a fallback parser.
     """
     if (
-        type(expected_key_id) is not str
+        type(expected_policy_version) is not int
+        or expected_policy_version not in (1, 2)
+        or type(expected_key_id) is not str
         or not _ID.fullmatch(expected_key_id)
         or any(
             type(v) is not str or not _HASH.fullmatch(v)
@@ -160,7 +166,12 @@ def load_pinned_disclosure_policy(
                 hashlib.sha256(raw_key).hexdigest(), expected_public_key_sha256
             ):
                 raise DisclosureInputError("public identity pin mismatch")
-            manifest = verify_founder_policy(
+            verifier = (
+                verify_founder_policy
+                if expected_policy_version == 1
+                else verify_founder_derivative_policy
+            )
+            manifest = verifier(
                 _read(root_fd, policy_parts, _POLICY_LIMIT),
                 VerifyKey(raw_key),
                 expected_key_id,
