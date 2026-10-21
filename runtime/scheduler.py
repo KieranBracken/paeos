@@ -7,9 +7,10 @@ never exceed the global budget, per dimension (tokens · wallclock · runs). Whe
 admit the next run, the scheduler **HALTS — it does not spin** (halt-not-spiral, §9.4), and under
 budget pressure it recommends a cheaper model **tier** (backpressure, 7.5 A-7).
 
-The scheduler depends only on an injected `run_one: Intake -> RunOutcome` (the soft-loop driver) and
-the governor — no vendor, no live coupling. Tests inject a scripted `run_one`; deployment injects a
-self-host driver.
+The scheduler's readiness port supplies negative diagnostics only. No verified canonical C2
+admission adapter is composed here, so production dispatch remains unavailable even when a caller
+claims readiness. Test-only substitutions exercise queue and budget behavior; they supply no
+runtime authority, atomic admission or qualification evidence.
 """
 
 from __future__ import annotations
@@ -32,6 +33,8 @@ __all__ = [
     "ContinuousScheduler",
     "EconomicGovernor",
     "GlobalBudget",
+    "HeldIntake",
+    "ReadinessHold",
     "SchedulerReport",
     "StopReason",
 ]
@@ -132,6 +135,50 @@ class BudgetConservationError(Exception):
 class StopReason(Enum):
     SOURCE_EXHAUSTED = "source-exhausted"  # nothing left
     BUDGET_EXHAUSTED = "budget-exhausted"  # governor cannot admit the next run (halt-not-spiral)
+    READINESS_HELD = "readiness-held"  # unfinished work, not source completion
+
+
+class ReadinessHold(Enum):
+    """Negative diagnostics only; no member grants execution authority."""
+
+    MISSING = "missing-readiness"
+    ERROR = "readiness-error"
+    INVALID = "invalid-readiness"
+    BLOCKED = "prerequisite-blocked"
+    UNQUALIFIED = "prerequisite-unqualified"
+    STALE = "stale-readiness"
+    CONTRADICTORY = "contradictory-readiness"
+    UNKNOWN = "acceptance-unknown"
+    ADMISSION_UNAVAILABLE = "canonical-admission-unavailable"
+
+
+@dataclass(frozen=True, slots=True)
+class HeldIntake:
+    intake: Intake
+    reason: ReadinessHold
+
+
+def _admission_hold(
+    intake: Intake, readiness_probe: Callable[[Intake], object] | None
+) -> ReadinessHold:
+    """Deny before budget effects; caller readiness can only explain the hold.
+
+    A boolean, metadata shape or caller-supplied Ready is not authenticated admission.
+    The missing production adapter must eventually bind current canonical identity,
+    authority, prerequisites, attempt, scope, snapshot and fencing atomically with
+    the applicable budget reservation. This local port cannot establish that proof.
+    """
+    if readiness_probe is None:
+        return ReadinessHold.MISSING
+    try:
+        verdict = readiness_probe(intake)
+    except Exception:
+        return ReadinessHold.ERROR
+    if verdict is None:
+        return ReadinessHold.MISSING
+    if isinstance(verdict, ReadinessHold):
+        return verdict
+    return ReadinessHold.INVALID
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,6 +188,7 @@ class SchedulerReport:
     outcomes: tuple[RunOutcome, ...]
     remaining: GlobalBudget
     stop_reason: StopReason
+    held: tuple[HeldIntake, ...] = ()
 
 
 def _allocation(intake: Intake, budget_by_class: Mapping[WeightClass, Budget]) -> Budget:
@@ -162,10 +210,12 @@ class ContinuousScheduler:
         *,
         governor: EconomicGovernor,
         budget_by_class: Mapping[WeightClass, Budget],
+        readiness_probe: Callable[[Intake], object] | None = None,
     ) -> None:
         self._run_one = run_one
         self._governor = governor
         self._budget_by_class = budget_by_class
+        self._readiness_probe = readiness_probe
 
     def _allocation(self, intake: Intake) -> Budget:
         return _allocation(intake, self._budget_by_class)
@@ -173,10 +223,15 @@ class ContinuousScheduler:
     def run(self, source: Iterable[Intake]) -> SchedulerReport:
         """Run goals until the source is exhausted OR the governor halts the loop."""
         outcomes: list[RunOutcome] = []
+        held: list[HeldIntake] = []
         stop = StopReason.SOURCE_EXHAUSTED
         queue = deque(source)
         while queue:
             intake = queue.popleft()
+            reason = _admission_hold(intake, self._readiness_probe)
+            if reason is not None:
+                held.append(HeldIntake(intake, reason))
+                continue  # retain the hold; never requeue/retry it in this pass
             allocation = self._allocation(intake)
             if not self._governor.can_admit(allocation):
                 stop = StopReason.BUDGET_EXHAUSTED  # halt, do NOT spin (§9.4)
@@ -188,7 +243,9 @@ class ContinuousScheduler:
             # RB-0008 §3: Queue high-leverage (>5x) friction repair intakes ahead of goals
             if outcome.high_leverage_intake is not None:
                 queue.appendleft(outcome.high_leverage_intake)
-        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
+        if held and stop is StopReason.SOURCE_EXHAUSTED:
+            stop = StopReason.READINESS_HELD
+        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop, tuple(held))
 
 
 class ConcurrentScheduler:
@@ -201,6 +258,7 @@ class ConcurrentScheduler:
         governor: EconomicGovernor,
         budget_by_class: Mapping[WeightClass, Budget],
         max_concurrency: int = 4,
+        readiness_probe: Callable[[Intake], object] | None = None,
     ) -> None:
         if max_concurrency < 1:
             raise ValueError("max_concurrency must be >= 1")
@@ -208,6 +266,7 @@ class ConcurrentScheduler:
         self._governor = governor
         self._budget_by_class = budget_by_class
         self._max_concurrency = max_concurrency
+        self._readiness_probe = readiness_probe
 
     def run(self, source: Iterable[Intake]) -> SchedulerReport:
         """Admit and run goals concurrently under the K11 parent until the source is exhausted or
@@ -215,6 +274,7 @@ class ConcurrentScheduler:
         it = iter(source)
         pending: deque[Intake] = deque()
         outcomes: list[RunOutcome] = []
+        held: list[HeldIntake] = []
         stop = StopReason.SOURCE_EXHAUSTED
         inflight: dict[Future[RunOutcome], Budget] = {}
         holdover: Intake | None = None  # an intake refused under pressure, awaiting freed budget
@@ -235,6 +295,10 @@ class ConcurrentScheduler:
                     if intake is None:
                         source_done = True
                         break
+                    reason = _admission_hold(intake, self._readiness_probe)
+                    if reason is not None:
+                        held.append(HeldIntake(intake, reason))
+                        continue
                     allocation = self._allocation(intake)
                     if self._governor.try_admit(allocation):  # atomic reserve (K11 child)
                         inflight[pool.submit(self._run_one, intake)] = allocation
@@ -264,7 +328,9 @@ class ConcurrentScheduler:
                         pending.appendleft(outcome.high_leverage_intake)
                         source_done = False
 
-        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
+        if held and stop is StopReason.SOURCE_EXHAUSTED:
+            stop = StopReason.READINESS_HELD
+        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop, tuple(held))
 
     def _allocation(self, intake: Intake) -> Budget:
         return _allocation(intake, self._budget_by_class)
