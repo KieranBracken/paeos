@@ -360,3 +360,474 @@ def test_client_rejects_unbounded_or_malformed_worker_failure(
             request_id="a" * 32,
             spec=_spec(workspace),
         )
+
+
+# Synthetic queue peer: known inline bytes, real canonical TEST authority, no parent read.
+def _tool_client_fixture(tmp_path):
+    import hashlib
+    import importlib.util
+
+    from kernel.ledger import Ledger
+    from kernel.ledger_sqlite import SqliteLedgerStore
+    from nacl.signing import VerifyKey
+    from runtime.autonomy.admission_send_fence import AdmissionSendFence, SendOperation
+    from runtime.integrations import trusted_codex_transport as client_module
+
+    fixture_path = Path(__file__).parent / "autonomy/test_admission_authority.py"
+    spec = importlib.util.spec_from_file_location("synthetic_tool_wire_fixtures", fixture_path)
+    fixtures = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fixtures)
+    workspaces = tmp_path / "workspaces"
+    workspace = workspaces / "ws-transport"
+    workspace.mkdir(parents=True)
+    session = _spec(workspace)
+    fixtures.BINDINGS = dict(
+        fixtures.BINDINGS,
+        goal_id=session.goal_id,
+        task_id=session.task_id,
+        run_id=session.run_id,
+        stage=session.stage,
+        workspace_id=workspace.name,
+        route_id=client_module._ROUTE_ID,
+        route_digest=client_module._ROUTE_DIGEST,
+    )
+    store = SqliteLedgerStore(tmp_path / "synthetic-tool.db")
+    f = fixtures.tool_fixture(Ledger(store))
+    f.update(
+        fixtures=fixtures, store=store, session=session, database=tmp_path / "synthetic-tool.db"
+    )
+    f["request_id"] = "a" * 32
+    f["request"] = fixtures.tool_request(f, changes={"request_id": f["request_id"]})
+    request = json.loads(f["request"])["body"]
+    f["binding"] = fixtures.wire_json(
+        {
+            k: request[k]
+            for k in ("context", "parent_identity_sha256", "parent_boot_id", "parent_process_id")
+        }
+    )
+    f["fence"] = AdmissionSendFence(
+        f["ledger"], authority=f["authority"], domain_tag="TEST", now=lambda: fixtures.NOW
+    )
+    f["fence"].acquire_send_lease(
+        SendOperation(
+            admission_ref="admission",
+            expected_epoch=1,
+            request_id=f["request_id"],
+            frame=b"frame",
+            operation_kind="WORKER_LAUNCH",
+            frame_ordinal=0,
+            **fixtures.BINDINGS,
+        )
+    )
+    queue = tmp_path / "queue"
+    queue.mkdir()
+    f["kwargs"] = dict(
+        queue_root=queue,
+        workspace_root=workspaces,
+        request_signing_key=SigningKey.generate(),
+        response_verify_key=VerifyKey(f["parent"].public_key().public_bytes_raw()),
+        admission_send_fence=f["fence"],
+        admission_ref="admission",
+        expected_admission_epoch=1,
+        parent_tool_authority=f["authority"],
+        parent_tool_binding=f["binding"],
+        parent_tool_ack_issuer_id="issuer",
+        parent_tool_ack_signer=f["issuer"].sign,
+    )
+    f["client"] = client_module.HostCodexWorkerTransport(**f["kwargs"])
+    f["client"].last_request_sha256 = hashlib.sha256(b"frame").hexdigest()
+    return f
+
+
+def _tool_queue_event(f, file_phase, raw, **changes):
+    import base64
+
+    wrapper = dict(
+        schema="paeos.parent-tool-queue-event/1",
+        request_id=f["request_id"],
+        phase=file_phase,
+        envelope_b64=base64.b64encode(raw).decode(),
+    )
+    wrapper.update(changes)
+    path = f["kwargs"]["queue_root"] / f"{f['request_id']}.parent-tool.{file_phase.lower()}.json"
+    path.write_bytes(f["fixtures"].wire_json(wrapper))
+    return path
+
+
+def _poll_tool(f, *, expired=False):
+    import time
+
+    return f["client"]._poll_parent_tool_queue(
+        f["request_id"], f["session"], deadline=time.monotonic() + (-1 if expired else 10)
+    )
+
+
+def _tool_ack(f, phase):
+    import base64
+
+    path = f["kwargs"]["queue_root"] / f"{f['request_id']}.parent-tool.{phase.lower()}-ack.json"
+    wrapper = json.loads(path.read_bytes())
+    assert wrapper["request_id"] == f["request_id"] and wrapper["phase"] == phase
+    return base64.b64decode(wrapper["ack_b64"], validate=True)
+
+
+def test_client_parent_tool_claim_and_returned_outcome_use_real_ledger(tmp_path):
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        assert _poll_tool(f) == "UNRESOLVED"
+        claim_ack = _tool_ack(f, "CLAIM")
+        view = f["authority"].verify_parent_tool_commit_ack(
+            claim_ack, expected_request_bytes=f["request"]
+        )
+        assert view.outcome == "UNRESOLVED"
+        claim = next(r for r in f["ledger"].read() if r.event.kind == "PARENT_TOOL_READ_CLAIMED")
+        assert json.loads(claim_ack)["body"]["accepted_row_hash"] == claim.row_hash
+        observation, result = f["fixtures"].tool_observation(f)
+        _tool_queue_event(f, "OUTCOME", observation)
+        assert _poll_tool(f) == "RETURNED"
+        ack = _tool_ack(f, "OUTCOME")
+        view = f["authority"].verify_parent_tool_commit_ack(
+            ack, expected_request_bytes=f["request"], expected_observation_bytes=observation
+        )
+        assert view.result_bytes == result and view.raw_bytes == f["raw"]
+        head = f["ledger"].head_hash()
+        assert _poll_tool(f) == "RETURNED"
+        assert f["ledger"].head_hash() == head and _tool_ack(f, "OUTCOME") == ack
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "request",
+        "phase",
+        "extra",
+        "signature",
+        "purpose",
+        "context",
+        "symlink",
+        "oversize",
+        "noncanonical",
+        "before_claim",
+        "timeout",
+        "launch",
+    ],
+)
+def test_client_parent_tool_denies_unbound_or_malformed_events(tmp_path, mutation):
+    from runtime.integrations.trusted_codex_transport import TrustedCodexTransportError
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        raw = f["request"]
+        changes = {}
+        if mutation == "request":
+            changes["request_id"] = "b" * 32
+        if mutation == "phase":
+            changes["phase"] = "OUTCOME"
+        if mutation == "extra":
+            changes["authority"] = True
+        if mutation == "signature":
+            envelope = json.loads(raw)
+            envelope["signature"] = "0" * 128
+            raw = f["fixtures"].wire_json(envelope)
+        if mutation == "purpose":
+            raw = f["fixtures"].tool_request(f, changes={"purpose": "PARENT_TOOL_OBSERVATION"})
+        if mutation == "context":
+            context = json.loads(raw)["body"]["context"]
+            context["bindings"]["session_id"] = "wrong-session"
+            raw = f["fixtures"].tool_request(f, changes={"context": context})
+        phase = "OUTCOME" if mutation == "before_claim" else "CLAIM"
+        path = _tool_queue_event(f, phase, raw, **changes)
+        sentinel = tmp_path / "outside"
+        sentinel.write_bytes(b"synthetic-outside-sentinel")
+        if mutation == "symlink":
+            path.unlink()
+            path.symlink_to(sentinel)
+        if mutation == "oversize":
+            path.write_bytes(b"x" * 270337)
+        if mutation == "noncanonical":
+            path.write_bytes(path.read_bytes() + b"\n")
+        if mutation == "launch":
+            f["client"].last_request_sha256 = "0" * 64
+        before = f["ledger"].head_hash()
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f, expired=mutation == "timeout")
+        assert f["ledger"].head_hash() == before
+        assert sentinel.read_bytes() == b"synthetic-outside-sentinel"
+        assert not list(f["kwargs"]["queue_root"].glob("*-ack.json"))
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+@pytest.mark.parametrize("outcome", ["UNKNOWN", "ERROR"])
+def test_client_parent_tool_uncertainty_never_releases_result(tmp_path, outcome):
+    from runtime.integrations.trusted_codex_transport import TrustedCodexTransportError
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        _poll_tool(f)
+        observation, _ = f["fixtures"].tool_observation(f, outcome=outcome)
+        _tool_queue_event(f, "OUTCOME", observation)
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f)
+        assert f["authority"].read_parent_tool_operation(f["operation"]).outcome == outcome
+        assert not list(f["kwargs"]["queue_root"].glob("*.outcome-ack.json"))
+        replacement, _ = f["fixtures"].tool_observation(f)
+        _tool_queue_event(f, "OUTCOME", replacement)
+        head = f["ledger"].head_hash()
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f)
+        assert f["ledger"].head_hash() == head
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_reopen_uses_existing_claim_without_second_effect(tmp_path):
+    from kernel.ledger import Ledger
+    from kernel.ledger_sqlite import SqliteLedgerStore
+    from runtime.autonomy.admission_send_fence import AdmissionSendFence
+    from runtime.integrations.trusted_codex_transport import HostCodexWorkerTransport
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        _poll_tool(f)
+        original_ack = _tool_ack(f, "CLAIM")
+        f["ledger"].close()
+        f["store"].close()
+        f["store"] = SqliteLedgerStore(f["database"])
+        f["ledger"] = Ledger(f["store"])
+        f["authority"] = f["fixtures"].tool_rebuild(f)
+        f["kwargs"].update(
+            parent_tool_authority=f["authority"],
+            admission_send_fence=AdmissionSendFence(
+                f["ledger"],
+                authority=f["authority"],
+                domain_tag="TEST",
+                now=lambda: f["fixtures"].NOW,
+            ),
+        )
+        f["client"] = HostCodexWorkerTransport(**f["kwargs"])
+        f["client"].last_request_sha256 = f["fixtures"].sha(b"frame")
+        head = f["ledger"].head_hash()
+        assert _poll_tool(f) == "UNRESOLVED"
+        assert _tool_ack(f, "CLAIM") == original_ack and f["ledger"].head_hash() == head
+        assert sum(r.event.kind == "PARENT_TOOL_READ_CLAIMED" for r in f["ledger"].read()) == 1
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_revocation_denies_fresh_ack(tmp_path):
+    from runtime.integrations.trusted_codex_transport import TrustedCodexTransportError
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        _poll_tool(f)
+        observation, _ = f["fixtures"].tool_observation(f)
+        f["authority"].issue(
+            "ADMISSION_REVOKED",
+            dict(
+                admission_ref="admission",
+                epoch=1,
+                grant_id="grant",
+                expires_at=f["fixtures"].END,
+                **f["fixtures"].BINDINGS,
+            ),
+            issuer_id="issuer",
+            signer=f["issuer"].sign,
+        )
+        _tool_queue_event(f, "OUTCOME", observation)
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f)
+        assert not list(f["kwargs"]["queue_root"].glob("*.outcome-ack.json"))
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+@pytest.mark.parametrize(
+    "missing",
+    [
+        "parent_tool_authority",
+        "parent_tool_binding",
+        "parent_tool_ack_issuer_id",
+        "parent_tool_ack_signer",
+    ],
+)
+def test_client_parent_tool_configuration_has_no_positive_defaults(tmp_path, missing):
+    from runtime.integrations.trusted_codex_transport import (
+        HostCodexWorkerTransport,
+        TrustedCodexTransportError,
+    )
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        kwargs = dict(f["kwargs"])
+        kwargs.pop(missing)
+        with pytest.raises(TrustedCodexTransportError):
+            HostCodexWorkerTransport(**kwargs)
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_without_any_authority_rejects_event(tmp_path):
+    from runtime.integrations.trusted_codex_transport import (
+        HostCodexWorkerTransport,
+        TrustedCodexTransportError,
+    )
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        kwargs = {k: v for k, v in f["kwargs"].items() if not k.startswith("parent_tool_")}
+        f["client"] = HostCodexWorkerTransport(**kwargs)
+        _tool_queue_event(f, "CLAIM", f["request"])
+        head = f["ledger"].head_hash()
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f)
+        assert head == f["ledger"].head_hash()
+        assert not list(f["kwargs"]["queue_root"].glob("*-ack.json"))
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_request_signer_cannot_be_reused_for_ack(tmp_path):
+    from runtime.integrations.trusted_codex_transport import (
+        HostCodexWorkerTransport,
+        TrustedCodexTransportError,
+    )
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        kwargs = dict(f["kwargs"], request_signing_key=SigningKey(f["issuer"].private_bytes_raw()))
+        with pytest.raises(TrustedCodexTransportError):
+            HostCodexWorkerTransport(**kwargs)
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+@pytest.mark.parametrize("mutation", ["phase", "signature", "body_type", "size", "symlink"])
+def test_client_parent_tool_cannot_overwrite_conflicting_ack(tmp_path, mutation):
+    import base64
+
+    from runtime.integrations.trusted_codex_transport import TrustedCodexTransportError
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        _poll_tool(f)
+        path = f["kwargs"]["queue_root"] / f"{f['request_id']}.parent-tool.claim-ack.json"
+        wrapper = json.loads(path.read_bytes())
+        if mutation == "phase":
+            wrapper["phase"] = "OUTCOME"
+        if mutation in {"signature", "body_type"}:
+            signed = json.loads(base64.b64decode(wrapper["ack_b64"]))
+            if mutation == "signature":
+                signed["signature"] = "0" * 128
+            else:
+                signed["body"] = []
+            wrapper["ack_b64"] = base64.b64encode(f["fixtures"].wire_json(signed)).decode()
+        path.write_bytes(f["fixtures"].wire_json(wrapper))
+        if mutation == "size":
+            path.write_bytes(b"x" * 270337)
+        sentinel = tmp_path / "outside-ack"
+        sentinel.write_bytes(b"synthetic-outside-sentinel")
+        if mutation == "symlink":
+            path.unlink()
+            path.symlink_to(sentinel)
+        before = path.read_bytes()
+        head = f["ledger"].head_hash()
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f)
+        assert head == f["ledger"].head_hash() and path.read_bytes() == before
+        assert sentinel.read_bytes() == b"synthetic-outside-sentinel"
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_new_request_id_cannot_reset_allocation(tmp_path):
+    from runtime.integrations.trusted_codex_transport import TrustedCodexTransportError
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        _poll_tool(f)
+        f["request_id"] = "b" * 32
+        new_request = f["fixtures"].tool_request(f, changes={"request_id": f["request_id"]})
+        _tool_queue_event(f, "CLAIM", new_request)
+        head = f["ledger"].head_hash()
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f)
+        assert f["ledger"].head_hash() == head
+        assert sum(r.event.kind == "PARENT_TOOL_READ_CLAIMED" for r in f["ledger"].read()) == 1
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_returned_reopen_retains_same_ack_and_exact_bytes(tmp_path):
+    from kernel.ledger import Ledger
+    from kernel.ledger_sqlite import SqliteLedgerStore
+    from runtime.autonomy.admission_send_fence import AdmissionSendFence
+    from runtime.integrations.trusted_codex_transport import HostCodexWorkerTransport
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        _poll_tool(f)
+        observation, result = f["fixtures"].tool_observation(f)
+        _tool_queue_event(f, "OUTCOME", observation)
+        _poll_tool(f)
+        ack = _tool_ack(f, "OUTCOME")
+        f["ledger"].close()
+        f["store"].close()
+        f["store"] = SqliteLedgerStore(f["database"])
+        f["ledger"] = Ledger(f["store"])
+        f["authority"] = f["fixtures"].tool_rebuild(f)
+        f["kwargs"].update(
+            parent_tool_authority=f["authority"],
+            admission_send_fence=AdmissionSendFence(
+                f["ledger"],
+                authority=f["authority"],
+                domain_tag="TEST",
+                now=lambda: f["fixtures"].NOW,
+            ),
+        )
+        f["client"] = HostCodexWorkerTransport(**f["kwargs"])
+        f["client"].last_request_sha256 = f["fixtures"].sha(b"frame")
+        head = f["ledger"].head_hash()
+        assert _poll_tool(f) == "RETURNED" and _tool_ack(f, "OUTCOME") == ack
+        assert f["ledger"].head_hash() == head
+        assert f["authority"].read_parent_tool_operation(f["operation"]).result_bytes == result
+    finally:
+        f["ledger"].close()
+        f["store"].close()
+
+
+def test_client_parent_tool_missing_outcome_then_timeout_stays_unresolved(tmp_path):
+    from runtime.integrations.trusted_codex_transport import TrustedCodexTransportError
+
+    f = _tool_client_fixture(tmp_path)
+    try:
+        _tool_queue_event(f, "CLAIM", f["request"])
+        assert _poll_tool(f) == "UNRESOLVED"
+        head = f["ledger"].head_hash()
+        with pytest.raises(TrustedCodexTransportError):
+            _poll_tool(f, expired=True)
+        assert f["authority"].read_parent_tool_operation(f["operation"]).outcome == "UNRESOLVED"
+        assert f["ledger"].head_hash() == head
+        assert not list(f["kwargs"]["queue_root"].glob("*.outcome-ack.json"))
+    finally:
+        f["ledger"].close()
+        f["store"].close()

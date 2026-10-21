@@ -7,18 +7,22 @@ signed observation, and converts that observation into the existing ``SessionRes
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
 import signal
+import stat
 import time
 import uuid
-from contextlib import suppress
+from collections.abc import Callable
+from contextlib import contextmanager, suppress
 from pathlib import Path
 
 from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey, VerifyKey
 
+from runtime.autonomy.admission_authority import BINDINGS, AdmissionAuthority, canonical
 from runtime.autonomy.admission_send_fence import (
     AdmissionSendFence,
     SendOperation,
@@ -92,6 +96,124 @@ _FAILURE_OBSERVATION_FIELDS = frozenset(
     }
 )
 _FAILURE_LIFECYCLE_STATES = frozenset({"RETURNED", "FAILED", "TIMED_OUT"})
+_TOOL_QUEUE_LIMIT = 270336
+_TOOL_WIRE_LIMIT = 196608
+_TOOL_CONTEXT_FIELDS = frozenset(
+    (
+        "bindings",
+        "base_grant_id",
+        "base_grant_digest",
+        "tool_grant_id",
+        "tool_grant_digest",
+        "admission_ref",
+        "admission_epoch",
+        "policy_id",
+        "policy_revision",
+        "policy_digest",
+        "signed_v2_manifest_sha256",
+        "derivative_rule_id",
+    )
+)
+
+
+def _tool_json(raw: bytes, limit: int) -> dict:
+    if type(raw) is not bytes or not 0 < len(raw) <= limit:
+        raise ValueError("bounded parent-tool encoding required")
+
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate parent-tool field")
+            result[key] = value
+        return result
+
+    value = json.loads(raw.decode("ascii"), object_pairs_hook=unique)
+    if type(value) is not dict or canonical(value) != raw:
+        raise ValueError("noncanonical parent-tool encoding")
+    return value
+
+
+def _tool_decode(value: object, limit: int) -> bytes:
+    if type(value) is not str or len(value) > 4 * ((limit + 2) // 3):
+        raise ValueError("bounded parent-tool bytes required")
+    raw = base64.b64decode(value, validate=True)
+    if not 0 < len(raw) <= limit or base64.b64encode(raw).decode("ascii") != value:
+        raise ValueError("noncanonical parent-tool bytes")
+    return raw
+
+
+@contextmanager
+def _tool_queue_directory(root: Path):
+    if not root.is_absolute():
+        raise ValueError("absolute parent-tool directory required")
+    fd = os.open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
+    try:
+        for part in root.parts[1:]:
+            if part in {"", ".", ".."}:
+                raise ValueError("unsafe parent-tool directory")
+            child = os.open(
+                part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=fd
+            )
+            os.close(fd)
+            fd = child
+        yield fd
+    finally:
+        os.close(fd)
+
+
+def _tool_queue_read(directory: int, name: str) -> bytes | None:
+    try:
+        fd = os.open(
+            name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC, dir_fd=directory
+        )
+    except FileNotFoundError:
+        return None
+    try:
+        before = os.fstat(fd)
+        if (
+            not stat.S_ISREG(before.st_mode)
+            or before.st_nlink != 1
+            or not 0 < before.st_size <= _TOOL_QUEUE_LIMIT
+        ):
+            raise ValueError("parent-tool queue input is not bounded regular bytes")
+        raw = bytearray()
+        while len(raw) <= _TOOL_QUEUE_LIMIT:
+            block = os.read(fd, min(65536, _TOOL_QUEUE_LIMIT + 1 - len(raw)))
+            if not block:
+                break
+            raw.extend(block)
+        after = os.fstat(fd)
+        if len(raw) != before.st_size or (
+            before.st_size,
+            before.st_mtime_ns,
+            before.st_ctime_ns,
+        ) != (after.st_size, after.st_mtime_ns, after.st_ctime_ns):
+            raise ValueError("parent-tool queue input changed during read")
+        return bytes(raw)
+    finally:
+        os.close(fd)
+
+
+def _tool_queue_publish(directory: int, name: str, raw: bytes) -> None:
+    temporary = ".parent-tool-" + uuid.uuid4().hex + ".tmp"
+    fd = os.open(
+        temporary,
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC,
+        0o600,
+        dir_fd=directory,
+    )
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(raw)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, name, src_dir_fd=directory, dst_dir_fd=directory, follow_symlinks=False)
+        os.unlink(temporary, dir_fd=directory)
+        os.fsync(directory)
+    finally:
+        with suppress(FileNotFoundError):
+            os.unlink(temporary, dir_fd=directory)
 
 
 class TrustedCodexTransportError(TrustedTransportFailure):
@@ -215,6 +337,10 @@ class HostCodexWorkerTransport:
         admission_send_fence: AdmissionSendFence | None = None,
         admission_ref: str | None = None,
         expected_admission_epoch: int | None = None,
+        parent_tool_authority: AdmissionAuthority | None = None,
+        parent_tool_binding: bytes | None = None,
+        parent_tool_ack_issuer_id: str | None = None,
+        parent_tool_ack_signer: Callable[[bytes], bytes] | None = None,
     ) -> None:
         if not queue_root.is_absolute() or queue_root.is_symlink():
             raise TrustedCodexTransportError(
@@ -255,6 +381,270 @@ class HostCodexWorkerTransport:
         self.last_request_sha256: str | None = None
         self.last_response_sha256: str | None = None
         self.last_observation: dict[str, object] | None = None
+        self._parent_tool_authority = parent_tool_authority
+        self._parent_tool_binding = parent_tool_binding
+        self._parent_tool_ack_issuer_id = parent_tool_ack_issuer_id
+        self._parent_tool_ack_signer = parent_tool_ack_signer
+        supplied = (
+            parent_tool_authority,
+            parent_tool_binding,
+            parent_tool_ack_issuer_id,
+            parent_tool_ack_signer,
+        )
+        if any(value is not None for value in supplied):
+            try:
+                if (
+                    any(value is None for value in supplied)
+                    or type(parent_tool_authority) is not AdmissionAuthority
+                    or not callable(parent_tool_ack_signer)
+                    or admission_send_fence is None
+                    or admission_send_fence._authority is not parent_tool_authority
+                    or admission_send_fence._ledger is not parent_tool_authority.ledger
+                ):
+                    raise ValueError("concrete parent-tool binding is unavailable")
+                binding = self._parent_binding()
+                identities = [
+                    i
+                    for i in parent_tool_authority.trust.identities
+                    if i.identity_id == parent_tool_ack_issuer_id
+                ]
+                if (
+                    len(identities) != 1
+                    or identities[0].public_key
+                    in (
+                        bytes(response_verify_key),
+                        bytes(request_signing_key.verify_key),
+                        *(i.public_key for i in parent_tool_authority.trust.roots),
+                    )
+                    or binding["parent_identity_sha256"] != _sha256(bytes(response_verify_key))
+                ):
+                    raise ValueError("parent-tool signer separation is unavailable")
+            except (ValueError, TypeError, AttributeError, UnicodeError) as exc:
+                raise TrustedCodexTransportError("parent-tool configuration is incomplete") from exc
+
+    def _parent_binding(self) -> dict:
+        value = _tool_json(self._parent_tool_binding, 32768)
+        if (
+            set(value)
+            != {"context", "parent_identity_sha256", "parent_boot_id", "parent_process_id"}
+            or type(value["context"]) is not dict
+            or set(value["context"]) != _TOOL_CONTEXT_FIELDS
+            or type(value["context"]["bindings"]) is not dict
+            or set(value["context"]["bindings"]) != set(BINDINGS)
+        ):
+            raise ValueError("exact parent-tool binding required")
+        for name in ("parent_boot_id", "parent_process_id"):
+            text = value[name]
+            if type(text) is not str or not 0 < len(text.encode("utf-8")) <= 128 or "\0" in text:
+                raise ValueError("parent-tool process binding required")
+        return value
+
+    def _parent_launch_fields(self, spec: SessionSpec) -> dict:
+        if self._parent_tool_authority is None:
+            return {}
+        context = self._parent_binding()["context"]
+        expected = dict(
+            goal_id=spec.goal_id,
+            task_id=spec.task_id,
+            run_id=spec.run_id,
+            stage=spec.stage,
+            role="BUILDER",
+            workspace_id=spec.workspace.name,
+            route_id=_ROUTE_ID,
+            route_digest=_ROUTE_DIGEST,
+        )
+        if (
+            context["admission_ref"] != self._admission_ref
+            or type(context["admission_epoch"]) is not int
+            or context["admission_epoch"] != self._expected_admission_epoch
+            or any(context["bindings"][k] != v for k, v in expected.items())
+        ):
+            raise TrustedCodexTransportError("parent-tool awaited session binding differs")
+        return dict(
+            operation_kind="WORKER_LAUNCH",
+            frame_ordinal=0,
+            **{
+                k: context["bindings"][k]
+                for k in ("session_id", "contract_digest", "scope_digest", "root_allocation_id")
+            },
+        )
+
+    def _poll_parent_tool_queue(self, request_id: str, spec: SessionSpec, *, deadline: float):
+        try:
+            if (
+                type(request_id) is not str
+                or len(request_id) != 32
+                or any(c not in "0123456789abcdef" for c in request_id)
+                or time.monotonic() >= deadline
+            ):
+                raise ValueError("parent-tool wait is unavailable")
+            with _tool_queue_directory(self.queue_root) as directory:
+
+                def event(phase):
+                    raw = _tool_queue_read(
+                        directory, f"{request_id}.parent-tool.{phase.lower()}.json"
+                    )
+                    if raw is None:
+                        return None
+                    wrapper = _tool_json(raw, _TOOL_QUEUE_LIMIT)
+                    if (
+                        set(wrapper) != {"schema", "request_id", "phase", "envelope_b64"}
+                        or wrapper["schema"] != "paeos.parent-tool-queue-event/1"
+                        or wrapper["request_id"] != request_id
+                        or wrapper["phase"] != phase
+                    ):
+                        raise ValueError("parent-tool event correlation differs")
+                    return _tool_decode(
+                        wrapper["envelope_b64"], 32768 if phase == "CLAIM" else _TOOL_WIRE_LIMIT
+                    )
+
+                claim_raw, outcome_raw = event("CLAIM"), event("OUTCOME")
+                authority = self._parent_tool_authority
+                if authority is None:
+                    if claim_raw is not None or outcome_raw is not None:
+                        raise ValueError("parent-tool authority unavailable")
+                    return None
+                self._parent_launch_fields(spec)
+                binding = self._parent_binding()
+                context = binding["context"]
+                if not _is_sha256(self.last_request_sha256):
+                    raise ValueError("actual awaited launch digest unavailable")
+                rows = authority.ledger.read()
+                authority.ledger.verify_chain()
+                launches = [
+                    r.event.payload
+                    for r in rows
+                    if r.domain_tag == authority.domain_tag
+                    and r.event.kind == "ADMISSION_SEND_CLAIMED"
+                    and r.event.payload.get("request_id") == request_id
+                ]
+                if len(launches) != 1:
+                    raise ValueError("canonical awaited launch missing")
+                launch = launches[0]
+                expected = dict(
+                    context["bindings"],
+                    admission_ref=context["admission_ref"],
+                    admission_epoch=context["admission_epoch"],
+                    operation_kind="WORKER_LAUNCH",
+                    frame_ordinal=0,
+                    frame_digest=self.last_request_sha256,
+                    policy_id=context["policy_id"],
+                    policy_revision=context["policy_revision"],
+                    policy_digest=context["policy_digest"],
+                )
+                if any(
+                    type(launch.get(k)) is not type(v) or launch.get(k) != v
+                    for k, v in expected.items()
+                ) or any(
+                    r.event.kind == "ADMISSION_SEND_SETTLED"
+                    and r.event.payload.get("lease_id") == launch["lease_id"]
+                    for r in rows
+                ):
+                    raise ValueError("canonical launch binding differs or is settled")
+                operation_id = _sha256(
+                    canonical(
+                        dict(
+                            root_allocation_id=context["bindings"]["root_allocation_id"],
+                            operation_kind="PARENT_TOOL_READ",
+                            ordinal=0,
+                        )
+                    )
+                )
+                exists = any(
+                    r.event.kind == "PARENT_TOOL_READ_CLAIMED"
+                    and r.domain_tag == authority.domain_tag
+                    and r.event.payload.get("operation_id") == operation_id
+                    for r in rows
+                )
+                if not exists and claim_raw is None:
+                    if outcome_raw is not None:
+                        raise ValueError("parent-tool outcome precedes claim")
+                    return None
+                if exists:
+                    view = authority.read_parent_tool_operation(operation_id)
+                    if claim_raw is not None and claim_raw != view.request_bytes:
+                        raise ValueError("conflicting parent-tool request")
+                    claim_raw = view.request_bytes
+                claim = _tool_json(claim_raw, 32768)["body"]
+                if (
+                    type(claim) is not dict
+                    or claim.get("purpose") != "PARENT_TOOL_CLAIM_REQUEST"
+                    or claim.get("request_id") != request_id
+                    or claim.get("context") != context
+                    or claim.get("operation_id") != operation_id
+                    or any(
+                        claim.get(k) != binding[k]
+                        for k in ("parent_identity_sha256", "parent_boot_id", "parent_process_id")
+                    )
+                ):
+                    raise ValueError("parent-tool signed request binding differs")
+                if not exists:
+                    authority.claim_parent_tool_read(claim_raw)
+                view = authority.read_parent_tool_operation(operation_id)
+
+                def commit_ack(phase, observation):
+                    if time.monotonic() >= deadline:
+                        raise ValueError("parent-tool wait expired")
+                    name = f"{request_id}.parent-tool.{phase.lower()}-ack.json"
+                    stored = _tool_queue_read(directory, name)
+                    if stored is not None:
+                        wrapper = _tool_json(stored, _TOOL_QUEUE_LIMIT)
+                        if (
+                            set(wrapper) != {"schema", "request_id", "phase", "ack_b64"}
+                            or wrapper["schema"] != "paeos.parent-tool-queue-ack/1"
+                            or wrapper["request_id"] != request_id
+                            or wrapper["phase"] != phase
+                        ):
+                            raise ValueError("parent-tool ACK correlation differs")
+                        ack = _tool_decode(wrapper["ack_b64"], _TOOL_WIRE_LIMIT)
+                    else:
+                        ack = authority.issue_parent_tool_commit_ack(
+                            operation_id,
+                            phase,
+                            issuer_id=self._parent_tool_ack_issuer_id,
+                            signer=self._parent_tool_ack_signer,
+                        )
+                    ack_body = _tool_json(ack, _TOOL_WIRE_LIMIT)["body"]
+                    if type(ack_body) is not dict or ack_body.get("phase") != phase:
+                        raise ValueError("parent-tool ACK phase differs")
+                    authority.verify_parent_tool_commit_ack(
+                        ack,
+                        expected_request_bytes=claim_raw,
+                        expected_observation_bytes=observation,
+                    )
+                    if time.monotonic() >= deadline:
+                        raise ValueError("parent-tool wait expired before ACK publication")
+                    if stored is None:
+                        _tool_queue_publish(
+                            directory,
+                            name,
+                            canonical(
+                                dict(
+                                    schema="paeos.parent-tool-queue-ack/1",
+                                    request_id=request_id,
+                                    phase=phase,
+                                    ack_b64=base64.b64encode(ack).decode("ascii"),
+                                )
+                            ),
+                        )
+
+                if view.outcome == "UNRESOLVED":
+                    commit_ack("CLAIM", None)
+                if outcome_raw is not None:
+                    if view.observation_bytes is None:
+                        authority.record_parent_tool_observation(outcome_raw)
+                    elif view.observation_bytes != outcome_raw:
+                        raise ValueError("conflicting parent-tool outcome")
+                    view = authority.read_parent_tool_operation(operation_id)
+                if view.outcome == "RETURNED":
+                    commit_ack("OUTCOME", view.observation_bytes)
+                elif view.outcome != "UNRESOLVED":
+                    raise ValueError("parent-tool outcome is not returned")
+                return view.outcome
+        except TrustedCodexTransportError:
+            raise
+        except (OSError, ValueError, TypeError, KeyError, UnicodeError, RecursionError) as exc:
+            raise TrustedCodexTransportError("parent-tool queue exchange refused") from exc
 
     def _workspace_is_approved(self, workspace: Path) -> bool:
         if not workspace.is_absolute() or workspace.is_symlink() or not workspace.is_dir():
@@ -315,6 +705,7 @@ class HostCodexWorkerTransport:
                 "current admission and disclosure policy are unavailable",
             ) from exc
 
+        parent_launch = self._parent_launch_fields(spec)
         request = self._request_payload(spec)
         request_id = request["request_id"]
         assert isinstance(request_id, str)
@@ -343,6 +734,7 @@ class HostCodexWorkerTransport:
             route_digest=_ROUTE_DIGEST,
             request_id=request_id,
             frame=encoded,
+            **parent_launch,
         )
         try:
             lease = fence.acquire_send_lease(operation)
@@ -375,7 +767,10 @@ class HostCodexWorkerTransport:
                 _write_atomic(request_path, encoded)
                 deadline = time.monotonic() + self._timeout_s
                 while time.monotonic() < deadline:
+                    tool_state = self._poll_parent_tool_queue(request_id, spec, deadline=deadline)
                     if response_path.is_file() and not response_path.is_symlink():
+                        if tool_state == "UNRESOLVED":
+                            raise TrustedCodexTransportError("parent-tool operation is unresolved")
                         raw = response_path.read_bytes()
                         if self.evidence_root is not None:
                             _write_receipt_once(self.evidence_root / "response-envelope.json", raw)
