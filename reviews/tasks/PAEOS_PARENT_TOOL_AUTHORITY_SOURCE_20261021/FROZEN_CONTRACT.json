@@ -1,0 +1,361 @@
+{
+  "shared_contract": {
+    "status": "MODIFIED_AND_FROZEN_OFFLINE_CONSTRUCTION_TARGET_V1; NOT_RUNTIME_AUTHORITY",
+    "assignment_id": "B00-shared-observer-wire-authority-contract-freeze-20261021-v1",
+    "event_id": "B00-shared-observer-wire-authority-contract-freeze-20261021-v1-frozen",
+    "source_thread_id": "01a15526-84df-7fe3-9863-bfb64754d733",
+    "source_turn_id": "01a15f21-d545-74b2-84ba-99a052fa166a",
+    "recorded_at_utc": "2026-10-21T15:52:10.015940+00:00",
+    "reference_checkpoint": "7dd4443c81e873ad564b03a944dad32367b8b1ab",
+    "input_hashes": {
+      "scope": "47a1763815c88b8ccbccbeef12f5b029eed32fdcad6a6f622d7e21a7667ef6f9",
+      "chat3_initial": "64847c0bd7cc62f356af9b4e3caadd1c7bc55d6d0dfc79227f006c6ed12886f8",
+      "chat4_disposition": "918f475ebe16488a6f4132a60408607d0e1255f852ec656c180ad2c4fed15260",
+      "coordinator_correction": "70d3a39cd6518dbacab22fa455286de2369f95ef317fb3c21a5882ad641a134a"
+    },
+    "provenance_correction": {
+      "actual_chat4_turn": "01a15f14-c493-71f2-99ac-b3308f6c2c30",
+      "stale_manifest_turn": "01a15f02-a942-7381-9857-0a47ce137b2c",
+      "callback_evidence": {
+        "path": "/Users/bob/.codex/sessions/2026/09/30/rollout-2026-09-30T18-28-04-01a0f35b-f3d9-79f2-8a59-86ac1a8226c9.jsonl",
+        "line": 12574,
+        "type": "event_msg item_completed McpToolCall send_message_to_thread"
+      },
+      "originals": "Retained unchanged; correction is cited, not rewritten into original evidence."
+    },
+    "agreed": "Parent-owned bounded read through the existing task broker; signed request before canonical PARENT_TOOL_READ_CLAIMED; signed outcome before PARENT_TOOL_OBSERVATION_RECORDED; durable readback before ACK/result release; later exact-frame witness consumption in existing send CAS.",
+    "necessary_modifications": [
+      "Separate three purpose/signature domains and strict field sets. ACK is signed by an explicitly purpose-delegated existing technical admission identity, never an online Founder root signer.",
+      "Claim request contains no future claim sequence/hash. Those exist only after append and appear in outcome/ACK. Remove circular self-hash requirements.",
+      "A schema-2 purpose grant explicitly links the existing schema-1 base grant; existing CURRENT records remain schema-1 and retain their exact base-grant binding. No automatic v1-to-v2 migration or legacy purpose expansion.",
+      "Retain bounded raw and exact result bytes inline in canonical Ledger outcome rows; no optional CAS/sidecar path in this minimum slice. Concrete Ledger readback, not queue fsync/signature, establishes append acceptance.",
+      "Post-claim uncertainty forbids reread. Recovery may return only exact bytes already committed and verified; no new request/session/ordinal/grant can reset the same allocation.",
+      "Root completed runtime/transport.py separately. trusted_codex_transport.py/test_trusted_codex_client.py is a future interactive pair, with no active competing source lease."
+    ],
+    "only_transform": "READ_APPROVED_ARTIFACT through read_artifact. SCOPED_PATCH, NAMED_TEST_OUTPUT and MODEL_OUTPUT_WITH_CONFINED_INPUTS remain denied for derived disclosure; ordinary independently scoped tools retain their prior semantics.",
+    "authority_status": "Wire/event names below are now explicit normative offline construction targets. This document grants no enrolled production identity, new runtime action or source mutation."
+  },
+  "wire_and_delegation": {
+    "encoding": "Each NEW signed envelope (schema-2 purpose grant and the three new wire messages) has EXACT keys body,signature. body has the exact field set for its kind below; signature is 128 lowercase hex characters. Canonical body is AdmissionAuthority.canonical: sorted compact ASCII JSON, ensure_ascii=True, allow_nan=False, no newline. Strict byte parser rejects duplicate keys at every depth, nonfinite numbers, unknown/missing fields, noncanonical encodings and oversized inputs before signature validation. Explicit NUL in each signature prefix is one 0x00 byte. Never reuse supervisor process-response newline encoding. Existing base ROOT_GRANT/v1 and signed V2 disclosure-policy envelopes keep their original byte/signature format; never rewrap or reinterpret them.",
+    "type_rules": "schema/purpose_version/ordinal/epochs/lengths are exact int (never bool). schema=1 and purpose_version=1 for all three wire bodies; ordinal=0 for this first slice. Digests are lowercase SHA-256 hex. IDs nonempty bounded strings <=128 UTF-8 bytes except existing BINDINGS <=512; reject NUL. Timestamps timezone-aware ISO-8601. mcp_id is a <=128-byte string or exact int 0..2^53-1, preserving JSON type. domain_tag must equal the concrete authority domain. No arbitrary error text. Lengths are nonnegative within bounds; epochs/revisions positive. Claim/ACK issued_at cannot be in the future and effective expiry is the minimum applicable purpose/grant/policy/window expiry.",
+    "context_exact_fields": [
+      "bindings",
+      "base_grant_id",
+      "base_grant_digest",
+      "tool_grant_id",
+      "tool_grant_digest",
+      "admission_ref",
+      "admission_epoch",
+      "policy_id",
+      "policy_revision",
+      "policy_digest",
+      "signed_v2_manifest_sha256",
+      "derivative_rule_id"
+    ],
+    "bindings_exact_fields": [
+      "goal_id",
+      "task_id",
+      "run_id",
+      "session_id",
+      "stage",
+      "role",
+      "workspace_id",
+      "contract_digest",
+      "scope_digest",
+      "route_id",
+      "route_digest",
+      "root_allocation_id"
+    ],
+    "claim_request": {
+      "purpose": "PARENT_TOOL_CLAIM_REQUEST",
+      "prefix": "PAEOS_PARENT_TOOL_CLAIM_REQUEST/v1\\0",
+      "body_fields": [
+        "schema",
+        "purpose",
+        "purpose_version",
+        "domain_tag",
+        "issuer_id",
+        "issued_at",
+        "expires_at",
+        "context",
+        "operation_id",
+        "ordinal",
+        "request_id",
+        "mcp_id",
+        "tool_name",
+        "arguments",
+        "arguments_sha256",
+        "artifact_id",
+        "expected_input_sha256",
+        "tool_envelope_sha256",
+        "tool_source_sha256",
+        "tool_protocol_version",
+        "transformation",
+        "transformation_version",
+        "parent_identity_sha256",
+        "parent_boot_id",
+        "parent_process_id",
+        "max_raw_bytes",
+        "max_result_bytes"
+      ],
+      "constraints": "tool_name=read_artifact; transformation=READ_APPROVED_ARTIFACT; arguments has EXACT field artifact_id and its value equals artifact_id. arguments_sha256 hashes its canonical bytes. All context, tool/source/envelope/version, expected artifact digest, limits and parent identity match the signed purpose grant. Parent supplies request/operation/ordinal; worker supplies only untrusted artifact_id/mcp_id. operation_id = digest({root_allocation_id, operation_kind:PARENT_TOOL_READ, ordinal:0}); request_id is correlation only, never uniqueness authority. Bounded first canonical allocation binding prevents grant renewal from resetting this operation."
+    },
+    "observation": {
+      "purpose": "PARENT_TOOL_OBSERVATION",
+      "prefix": "PAEOS_PARENT_TOOL_OBSERVATION/v1\\0",
+      "body_fields": [
+        "schema",
+        "purpose",
+        "purpose_version",
+        "domain_tag",
+        "issuer_id",
+        "issued_at",
+        "expires_at",
+        "context",
+        "operation_id",
+        "ordinal",
+        "request_sha256",
+        "claim_seq",
+        "claim_row_hash",
+        "parent_identity_sha256",
+        "parent_boot_id",
+        "parent_process_id",
+        "effect_started_at",
+        "observed_at",
+        "outcome",
+        "error_code",
+        "actual_input_sha256",
+        "raw_length",
+        "raw_b64",
+        "result_sha256",
+        "result_length",
+        "result_b64"
+      ],
+      "constraints": "Same signer and parent identity/boot/process as accepted request, exact claim seq/hash and canonical signed request-envelope digest. RETURNED has error_code=null and non-null raw/result fields. ERROR has one fixed code READ_FAILED/INPUT_MISMATCH/LIMIT_EXCEEDED/INVALID_UTF8 and all byte/digest/length fields null; UNKNOWN has error_code=UNKNOWN and all byte fields null. A RETURNED record contains exact actual raw bytes and exact serialized response, never a caller-selected path/reference. effect_started_at lies within accepted claim start window; observed_at >= effect_started_at. Missing evidence never means RETURNED."
+    },
+    "commit_ack": {
+      "purpose": "PARENT_TOOL_COMMIT_ACK",
+      "prefix": "PAEOS_PARENT_TOOL_COMMIT_ACK/v1\\0",
+      "body_fields": [
+        "schema",
+        "purpose",
+        "purpose_version",
+        "domain_tag",
+        "issuer_id",
+        "issued_at",
+        "expires_at",
+        "context",
+        "operation_id",
+        "ordinal",
+        "phase",
+        "request_sha256",
+        "observation_sha256",
+        "parent_identity_sha256",
+        "parent_boot_id",
+        "parent_process_id",
+        "claim_seq",
+        "claim_row_hash",
+        "accepted_kind",
+        "accepted_seq",
+        "accepted_row_hash",
+        "accepted_prev_hash",
+        "commit_head_hash",
+        "verified_head_hash",
+        "raw_sha256",
+        "raw_length",
+        "result_sha256",
+        "result_length",
+        "status"
+      ],
+      "constraints": "phase=CLAIM or OUTCOME; status=COMMITTED only. CLAIM has observation_sha256/raw/result hashes and lengths null; accepted_kind=PARENT_TOOL_READ_CLAIMED and accepted seq/hash equal claim seq/hash. OUTCOME binds the exact signed observation envelope digest and its PARENT_TOOL_OBSERVATION_RECORDED row plus original claim; only verified RETURNED yields a result-release ACK. commit_head_hash=accepted_row_hash (the head at that append); verified_head_hash is an actually read verified descendant head, not necessarily unchanged head. Echo exact parent/operation/ordinal/context/request. ACK proves accepted-row binding, not fresh execution/egress authority."
+    },
+    "root_purpose_grant": {
+      "schema": 2,
+      "record_kind": "ROOT_GRANT",
+      "prefix": "PAEOS_PARENT_TOOL_GRANT/v2\\0",
+      "body_fields": [
+        "schema",
+        "record_kind",
+        "domain_tag",
+        "issuer_id",
+        "grant_id",
+        "issued_at",
+        "expires_at",
+        "parent_grant_id",
+        "parent_grant_digest",
+        "bindings",
+        "admission_ref",
+        "admission_epoch",
+        "policy_id",
+        "policy_revision",
+        "policy_digest",
+        "policy_signer_id",
+        "signed_v2_manifest_sha256",
+        "derivative_rule_id",
+        "parent_identity_sha256",
+        "tool_name",
+        "tool_envelope_sha256",
+        "tool_source_sha256",
+        "tool_protocol_version",
+        "transformation",
+        "transformation_version",
+        "artifact_id",
+        "expected_input_sha256",
+        "max_operations",
+        "max_raw_bytes",
+        "max_result_bytes",
+        "start_window_seconds",
+        "purpose_delegations"
+      ],
+      "purpose_delegation_exact_fields": [
+        "purpose",
+        "purpose_version",
+        "signer_identity_id",
+        "public_key_sha256",
+        "expires_at"
+      ],
+      "purpose_entries": "Exactly one entry for each of PARENT_TOOL_CLAIM_REQUEST, PARENT_TOOL_OBSERVATION and PARENT_TOOL_COMMIT_ACK, purpose_version=1; no wildcard/generic observer role. Root grant signature is verified against independently enrolled FrozenTrust.roots.",
+      "base_join": "parent_grant_id/digest resolves the existing schema-1 grant with its original verification rules. Schema-2 grant issuer equals that base grant root issuer; bindings and base admission/policy match exactly. Distinct grant ID, no duplicate/ambiguous trust entries. Root-signed v2 purpose grant cannot expand expiry, scope, parent root allocation, frame allowance or signed V2 policy/rule. policy_signer_id resolves an independently enrolled FrozenTrust root used by the existing signed V2 policy verifier. Raw policy bytes are immutable explicit inputs pinned by signed_v2_manifest_sha256; no file/key discovery.",
+      "parent_signer": "Claim and observation entries identify the same independently enrolled existing protected supervisor public key; public-key digest must equal parent_identity_sha256 from the grant and trusted parent binding. Signature of a boot/launch response alone does not establish this enrollment/purpose.",
+      "ack_signer": "ACK entry names the existing base grant delegate_id, independently enrolled in FrozenTrust.identities, and explicitly grants only this ACK purpose. It must differ from parent signer and root issuer. It runs in the protected canonical-authority/root-client boundary; private key stays out of worker, argv/env/queue and MCP. The grant root issuer signs the delegation offline only. No production mapping or private-key availability is claimed; absent matching explicit purpose => deny.",
+      "limits": "max_operations=1 across this inherited root_allocation_id for PARENT_TOOL_READ; max_raw_bytes<=16384, max_result_bytes<=131072, and both <= applicable signed derivative policy bounds. start_window_seconds is exact int 1..30. All purpose expiries <= purpose-grant expiry <= base grant expiry and policy expiry. All source/scope/version/policy/rule bindings exact. No default positive purpose grants.",
+      "legacy_denial": "Do not broaden existing _signature/_grant/issue/append_signed or legacy send settlement to accept schema-2 tool evidence implicitly. Dedicated versioned APIs verify this new purpose. V1 root grants/CURRENT/SEND_EVIDENCE and legacy delegate/reconciler labels alone grant no tool/ACK purpose."
+    }
+  },
+  "canonical_retention_and_lifecycle": {
+    "store_evidence": "kernel/ledger.py:86-106,300-316,371-423 supports JSON event payload and accepted-row/chain readback. kernel/ledger_sqlite.py:61,109-145,154-178 uses synchronous=FULL, transactional head check/insert and JSON TEXT readback. No inspected application row-size cap precludes the conservative bound; durable capacity/crash behavior must be tested later, not claimed now.",
+    "claim_event": {
+      "kind": "PARENT_TOOL_READ_CLAIMED",
+      "schema_ver": 1,
+      "payload_exact_fields": [
+        "schema",
+        "domain_tag",
+        "operation_id",
+        "ordinal",
+        "request_b64",
+        "request_sha256",
+        "base_grant_b64",
+        "tool_grant_b64",
+        "authority_claimed_at",
+        "start_deadline"
+      ],
+      "constraints": "schema=1; retained signed request/base grant/tool grant envelope bytes are canonical strict encodings. Verify request purpose, signatures, parent scope, all current bindings and existing allocation state before append_if_head. Revalidate entire snapshot on CAS conflict. Duplicate operation, same allocation regrant or ambiguous previous claim denies before read. No future own seq/hash field in payload. base_grant_b64 retains the existing v1 signed format, not a new wire envelope; tool_grant_b64 retains the new v2 envelope. Canonicalize only the formats their existing/new signature contracts prescribe."
+    },
+    "outcome_event": {
+      "kind": "PARENT_TOOL_OBSERVATION_RECORDED",
+      "schema_ver": 1,
+      "payload_exact_fields": [
+        "schema",
+        "domain_tag",
+        "operation_id",
+        "ordinal",
+        "claim_seq",
+        "claim_row_hash",
+        "observation_b64",
+        "observation_sha256"
+      ],
+      "constraints": "One immutable outcome per claim; observation_b64 contains the full signed observation including canonical base64 raw/result bytes. Validate signatures and exact historical claim from the concrete Ledger, never caller rows. No auto-upgrade from ERROR/UNKNOWN or conflicting duplicate append. Late recording of historical claim outcome is permitted after revocation only under captured claim-time purpose proof; it cannot grant new use."
+    },
+    "bounds_and_readback": [
+      "Application checks canonical JSON event payload <=262144 bytes before append; wire envelope <=196608 bytes, claim request <=32768 bytes, each root-grant envelope <=16384 bytes. Bounds include base64/signature overhead; if total exceeds bound, refuse before append/read or release. Canonical standard padded base64 only: validate encoded length before decoding and require re-encoding equality.",
+      "First-slice actual raw input <=16384 bytes. Exact result envelope <=131072 bytes; lower signed policy/grant/mediator limits prevail. No external CAS or arbitrary file reference permitted. Oversize/error cannot release content or fall back to a sidecar. Existing Ledger append/rejection behavior is retained.",
+      "Hash raw read bytes once, require expected SHA and UTF-8 validity; input set is exactly the grant/rule-bound artifact. The result is the complete existing MCP JSON-RPC response: inner result json.dumps({artifact_id,text,sha256}, sort_keys=True) with existing default spacing/ASCII escaping; outer {jsonrpc:\"2.0\",id:mcp_id,result:{content:[{type:\"text\",text:inner}]}} uses sort_keys=True,separators=(\",\",\":\"),ensure_ascii=True, then exactly one LF. Verify raw digest/length, decoded text and recomputed result bytes independently. A raw hash, envelope hash and full provider-frame hash are different identities.",
+      "Root authority rereads exact accepted seq from its OWN concrete Ledger, verifies chain/domain/row hash, claim/outcome signatures and all retained bytes. ACK producer cannot accept caller-provided Ledger rows, digest dictionaries or positive callbacks. It signs only after that readback. ACK verifier on canonical side independently repeats readback; fake-but-signed ACK for absent/different row fails.",
+      "Parent-side ACK signature validation authenticates the designated technical commit attestation; it is not an independent Ledger reader. Canonical append evidence comes from the concrete issuer readback and is rechecked by the eventual canonical consumer. Parent verifies expected phase/context/operation/nonce/row/byte digests before release. If issuer readback or protected signer/channel cannot be established, no ACK/content release. A signed or fsynced queue file alone never qualifies.",
+      "No broad capacity claim: if bounded inline append/readback is unsupported in the selected store, stop with exact kernel/ledger.py/kernel/ledger_sqlite.py primitive evidence and request owner scope; do not introduce CAS/sidecar or change those immutable files in the first slice."
+    ],
+    "ordering": "Validate current base/purpose trust, admission, canonical policy plus signed V2 rule/source/scope; CAS claim; committed claim readback and CLAIM ACK; exactly one parent read for that live pending parent boot/process/operation; compute/retain signed observation; CAS outcome; readback and OUTCOME ACK; release exact stored result only. ACK never independently starts a tool. Duplicate ACK is ignored; no awaiting-call recreation after crash. All mutations remain on one canonical Ledger.",
+    "currentness": "Revocation/expiry/supersession/source mismatch checked at claim and at every fresh consumption/result replay. Existing base root-grant/admission/policy revocation invalidates the derived purpose; matching v2-grant revocation or malformed relevant canonical revocation also denies. Claim-first may record historical completion, but revocation-first permits zero read and later invalidation always denies new disclosure. Historical receipt checks use signed proofs retained with the accepted claim; expiry is not ignored for fresh use. Outcome ACK/result replay requires live/current bound context; otherwise preserve historical row without release.",
+    "crash_and_replay": "Before successful claim: no read, fresh validation may retry only within an issued attempt budget. After claim: no reread, reset, new-ordinal/session/request-ID reuse or automatic retry, even when no output row exists. Unsettled is non-consumable UNKNOWN-equivalent; it needs no forged parent UNKNOWN signature. Explicit signed UNKNOWN/ERROR is terminal. If exact RETURNED outcome is already committed, requery may produce a fresh purpose-authenticated ACK for the SAME operation/phase and replay only its stored bytes under current scope; never reread source. Lost send ACK uses existing send reconciliation, never resend.",
+    "future_consumption": "Separate fence scope must bind sorted witness row/claim digests, raw/result identities and actual complete provider frame/route/root-allocation ordinal in the same existing ADMISSION_SEND_CLAIMED CAS after currentness re-evaluation. One witness to one explicitly allocated provider frame by default. No hash-only permission, exact-allowlist auto-expansion or implicit repeated transcript reuse. Readback object/ACK is not a send lease."
+  },
+  "first_source_slice": {
+    "status": "PROPOSED_EXACT_FIRST_PAIR_AWAITING_ARCHITECT_SOURCE_CARD",
+    "paths": {
+      "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+      "tests/runtime/autonomy/test_admission_authority.py": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5"
+    },
+    "reference_checkpoint": "7dd4443c81e873ad564b03a944dad32367b8b1ab",
+    "source_import_manifest": [],
+    "implementation_target": "Only admission_authority.py and its existing test. Add dedicated strict schema-2 purpose-grant and three-domain wire verification, claim/outcome append on existing Ledger, bounded inline byte validation/readback and technical ACK issuing/verification. No parent read, queue polling, CLI, network, provider, fence mutation or broker wiring in this slice.",
+    "proposed_APIs": [
+      "AdmissionAuthority(..., tool_policy_manifests: tuple[bytes,...]=()): immutable explicit signed V2 policy bytes; empty defaults deny this purpose. No enrollment/file reads or discovery; verify with enrolled root identity and purpose-grant digest binding.",
+      "claim_parent_tool_read(request_bytes: bytes) -> int: strict signed request + currentness/policy verification, unique allocation CAS, return accepted Ledger sequence only; performs no tool read.",
+      "record_parent_tool_observation(observation_bytes: bytes) -> int: verify accepted claim/purpose and actual inline raw/result bytes, append one immutable outcome. No reading the artifact path to reconstruct evidence.",
+      "read_parent_tool_operation(operation_id: str) -> immutable readback: concrete Ledger chain/row/signature/retained-byte verification; missing or unsettled state remains non-consumable. Never a permit.",
+      "issue_parent_tool_commit_ack(operation_id: str, phase: str, *, issuer_id: str, signer: Callable[[bytes],bytes]) -> bytes: authority-owned API, readback first, exact ACK-purpose identity required, verify signature after external signer. No worker-exposed signer/callback acceptance.",
+      "verify_parent_tool_commit_ack(ack_bytes: bytes, *, expected_request_bytes: bytes, expected_observation_bytes: bytes | None) -> immutable readback: strict purpose/phase/request/claim/retained-row join against self.ledger, not caller rows; no send/read authority."
+    ],
+    "immutable_dependencies": {
+      "kernel/ledger.py": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da",
+      "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+      "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+      "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+      "kernel/ledger_sqlite.py": "70c4774ba91cabbfc7f3cfa570d996923654cc500eadcf9da51ea56cf3aaf4d3"
+    },
+    "dependency_notes": "Existing Ledger/CAS implementation remains immutable. Existing signed V2 policy verifier is reused as signature/shape validation only, with independently enrolled pinned policy signer; this slice adds canonical current-policy linkage, not trust enrollment. Parent disposition source pairs remain unmodified. Kernel/source insufficiency stops first slice.",
+    "future_test_ceiling": "Propose one discriminating RED and one focused GREEN in tests/runtime/autonomy/test_admission_authority.py, with at most one corrective focused rerun only for an observed defect, under a fresh explicit source card and any stricter inherited budget. No test allowance is granted/reset here. Temporary TEST Ledger and ephemeral in-memory test keys only; no actual parent process or read workflow.",
+    "acceptance": [
+      "RED demonstrates absent dedicated purpose/grant/claim/outcome/ACK behavior, while legacy unsupported kinds still reject without append. A missing API alone is not the final behavior assertion: require exact claim/outcome rows, retained readback and strict rejection controls in GREEN.",
+      "Positive TEST fixture: enrolled test base root/delegate and separate parent key; explicitly signed v2 purpose grant linked to current v1 admission/policy + valid signed V2 derivative rule; one claim, one signed known-byte observation, exact durable row/readback and purpose-delegated ACK. Run no actual tool and no sink in this first pair.",
+      "Each domain cannot substitute for another; supervisor launch, legacy SEND_EVIDENCE, v1 grant, reconciler-only identity, absent/ambiguous/root-issuer ACK signer, wrong parent/public key and missing purpose deny. Ensure no legacy CURRENT/send behavior gains authority.",
+      "Unknown/missing/duplicate fields, bool integers, noncanonical JSON/base64, NaN, wrong context/epoch/policy-vs-manifest digest, raw/result/envelope mutation, omitted input, wrong tool/version, unsupported transforms, bounds and SECRET/class mismatch all reject without effect or privilege.",
+      "Fake signed ACK or correct hash referencing absent/wrong Ledger row, wrong phase/ordinal/request/observation, copied output or noncanonical result fails. Concrete SQLite TEMP store append/reopen/readback retains byte-identical raw and result. Overflow/store rejection yields no success ACK; no sidecar fallback.",
+      "Race two temporary independent Ledger connections/processes for the same allocation/ordinal and race revocation between verification and CAS. At most one claim; invalidation-first denies. No production parent process launched. Preserve prior two-process send tests rather than weaken them.",
+      "Reopen after claim without outcome: no re-claim/new-ID reset. Returned row can be read back without reread; UNKNOWN/ERROR/conflicting duplicates never upgrade. Historical outcome after revocation does not become current/releasable. Old grants, new grant IDs or request UUIDs cannot refresh consumed allocation.",
+      "Keep existing admission/send-settlement tests in this test file unchanged in meaning. Full fence/client/parent/broker effects and complete-frame consumption are later scoped acceptance, not claimed by first-pair pass."
+    ],
+    "separate_future_stages": [
+      {
+        "owner_stage": "Chat4 parent read/mediator; after the Chat3 encoding is frozen",
+        "paths": [
+          "ops/trusted_codex_worker_supervisor.py",
+          "runtime/integrations/mediated_worker_tools.py",
+          "tests/runtime/test_confined_codex_cli.py",
+          "tests/runtime/test_mediated_worker_tools.py"
+        ],
+        "pins_ref": "parent_disposition.minimum_source_test_preimages.ordered_source_test_pairs (exact immutable input SHA in shared_contract.input_hashes)"
+      },
+      {
+        "owner_stage": "Root-owned existing interactive queue-client pair; separate future scope, no active lease",
+        "paths": [
+          "runtime/integrations/trusted_codex_transport.py",
+          "tests/runtime/test_trusted_codex_client.py"
+        ],
+        "pins_ref": "parent_disposition.minimum_source_test_preimages.ordered_source_test_pairs (exact immutable input SHA in shared_contract.input_hashes)"
+      },
+      {
+        "owner_stage": "Existing broker route and later exact-frame consumer; preserve its separate owner/scope",
+        "paths": [
+          "runtime/integrations/task_scoped_responses_broker.py",
+          "tests/runtime/test_responses_broker_disclosure_denial.py"
+        ],
+        "pins_ref": "parent_disposition.minimum_source_test_preimages.ordered_source_test_pairs (exact immutable input SHA in shared_contract.input_hashes)"
+      },
+      {
+        "owner_stage": "Chat3 send-fence composition when witness consumption is ready",
+        "paths": [
+          "runtime/autonomy/admission_send_fence.py",
+          "tests/runtime/autonomy/test_admission_send_fence.py"
+        ],
+        "pins_ref": "parent_disposition.minimum_source_test_preimages.ordered_source_test_pairs (exact immutable input SHA in shared_contract.input_hashes)"
+      }
+    ],
+    "stage_correction": "Future interactive trusted_codex_transport.py pair has no active source lease and is distinct from completed runtime/transport.py. Parent source4, interactive client2, broker2 and fence2 remain separate successor cards; their input preimages are reverified in VERIFICATION.json.",
+    "ALLOWED_NOW": "Architect can use this MODIFIED frozen offline contract to issue the exact first admission-authority/test card after checking current preimages and remaining allocation; communicate modified signer/domain/retention contract to Chat4 through existing coordination. No new human ownership/key research is needed.",
+    "HELD": "All source/tests this turn; real service/custody/enrollment/root-grant-v2 activation/CLI/confinement/egress/install; independent review/Court/qualification/debt/P3. C2/loader/transport ceilings unchanged; Chat1 sole D0258; SENTIUM_FROZEN.",
+    "AUTHORITY_OR_IMPLEMENTATION_GAP": "Normative encoding now frozen, but dedicated producer/verifier/retention/ACK APIs and later parent/channel/root-client/broker/fence composition are absent. No production purpose-grant or protected technical ACK signer mapping is evidenced; exact missing purpose is PARENT_TOOL_COMMIT_ACK/v1 for the enrolled base delegate, separately granted from parent request/observation purposes.",
+    "exact_source_wake": "Architect-issued two-file card binding this contract hash, exact current preimages, read-only dependencies and bounded TEST-only acceptance/budget. Stop on an extra file/primitive requirement. Later parent and runtime gates are not prerequisites to implementing these offline producer/verifier controls.",
+    "effects_this_turn": {
+      "source_edits": 0,
+      "tests": 0,
+      "imports_or_probes": 0,
+      "provider": 0,
+      "paid": 0,
+      "formal_review": 0,
+      "host_keys_or_enrollment": 0,
+      "runtime_action": 0,
+      "new_worktrees": 0
+    }
+  }
+}

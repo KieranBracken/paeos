@@ -1,0 +1,10 @@
+{
+  "observed_defect": "Static final inspection after 187 passing tests found ACK-parent/root separation compared identity IDs only, permitting key aliasing across distinct enrolled IDs.",
+  "evidence": "Pre-corrective _grant required ack signer ID distinct from parent/root but did not compare key digests; green.json pins that exact tested source.",
+  "correction": "Also reject ACK public-key SHA matching parent or base root. Two tests alias the enrolled ACK key to parent/root and re-sign CURRENT records to keep legacy checks valid.",
+  "source_candidates": 1,
+  "red_used": 1,
+  "green_used": 1,
+  "corrective_authorized_max": 1,
+  "extra_red_runs": 0
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "paeos.bounded-offline-existing-owner-source-card/1",
+  "assignment_id": "B00-parent-tool-authority-two-file-source-20261021-v1",
+  "owner_thread": "01a15526-84df-7fe3-9863-bfb64754d733",
+  "source_event": "B00-shared-observer-wire-authority-contract-freeze-20261021-v1-frozen",
+  "construction_authority": "Standing direct human end-to-end continuation, existing B00 technical delegation and execution guide115-121. This issues only the exact offline source/test construction; no runtime role/grant/enrollment/activation.",
+  "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "baseline": "7dd4443c81e873ad564b03a944dad32367b8b1ab",
+  "construction_branch": "codex/b00-parent-tool-authority-20261021",
+  "workspace_disposition": "Use existing clean coherent recovery checkout; root checked idle. Create construction branch from exact current HEAD; preserve codex/b00-combined-bootstrap-20261021 at7dd4443c and all prior branches/worktrees. Original ef8f confinement dependencies differ, so do not use/transplant/replace its baseline. No new worktree/reset/stash/rebase. This is coherence selection before edits, not permission-denial evasion.",
+  "mutable_product_manifest": {
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "tests/runtime/autonomy/test_admission_authority.py": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5"
+  },
+  "read_only_reference_pins": {
+    "kernel/ledger.py": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da",
+    "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+    "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+    "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "runtime/integrations/trusted_codex_transport.py": "04e2aba7a25da3c28d1f964a998ef6aff9e03463cd1f0c117c8c44a4b6ef176e",
+    "tests/runtime/test_trusted_codex_client.py": "a14eae14badb251a934a8ac82b2bd3c5c605a2da9955da90567e5ec1dc76eeba",
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "kernel/ledger_sqlite.py": "70c4774ba91cabbfc7f3cfa570d996923654cc500eadcf9da51ea56cf3aaf4d3"
+  },
+  "frozen_contract_path": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/shared-observer-wire-contract-20261021/FROZEN_CONTRACT.json",
+  "frozen_contract_sha256": "2c4cdd9af5e13721dc10ef8729affe5c0684552e3b4aa429e4a37e6ee6c343c0",
+  "contract_manifest_sha256": "3bc500ace972ef15f495eb5acf00be9285ada1452ec34a742fbcb9762452985d",
+  "source_import_manifest": [],
+  "claim": "Implement dedicated first-pair purpose/grant/claim/outcome/concrete-Ledger-readback/ACK producer-verifier APIs for READ_APPROVED_ARTIFACT under explicit independent immutable inputs. Empty purpose/policy inputs deny; legacy source semantics remain unchanged. No actual artifact read, parent/channel/CLI/queue/fence/broker/provider wiring.",
+  "normative_acceptance_ref": "FROZEN_CONTRACT.json first_source_slice.acceptance, wire_and_delegation and canonical_retention_and_lifecycle in full. All exact encodings/field/domain/limits/currentness/CAS/retention/replay rules bind this source card.",
+  "critical_bounds": [
+    "Claim request, observation and ACK use distinct exact purposes/domains; v2 purpose grant linked to current v1 base, explicit enrolled parent and technical base delegate ACK signer; no Founder root key online or worker signing oracle.",
+    "Raw<=16384/result<=131072/event<=262144 bytes with all lower signed bounds and strict encodings; existing concrete Ledger append_if_head/readback only, no new CAS/sidecar or caller-supplied positive proof.",
+    "Reread self.ledger chain/actual accepted row and bytes before ACK; independently verify external signer output using purpose-authorized key. Readbacks/ACKs grant no tool/send authority.",
+    "Revalidate currentness/revocation/source/policy/strict field binding on claim and fresh use; exact claim uniqueness across grant/request/session changes. Post-claim uncertainty/UNKNOWN/ERROR never rereads or upgrades. Committed RETURNED only replays retained exact bytes under current scope.",
+    "No legacy ROOT_GRANT/CURRENT/SEND_EVIDENCE privilege widening, default positive constructor, public test flag, worker-controlled trust/config, fake production authority or relaxed Court. Dedicated immutable configuration may be minimal/private as needed for strict new version; document any constructor clarification rather than changing normative wire semantics silently.",
+    "If any necessary third source path, kernel/SQLite primitive or contract contradiction prevents the exact slice, preserve denial and return exact source/preimage/test/clause packet; do not broaden scope or replace dependencies."
+  ],
+  "budget": {
+    "source_candidates_max": 1,
+    "red_runs_max": 1,
+    "focused_green_runs_max": 1,
+    "corrective_focused_reruns_max": 1,
+    "test_scope": "tests/runtime/autonomy/test_admission_authority.py only; include existing semantics and new negatives; no other suite",
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "full_suite": 0,
+    "live_parent_or_cli": 0,
+    "host_keys_or_enrollment": 0,
+    "inherit_all_cumulative_limits": true,
+    "new_override": false,
+    "usage_percent": 23,
+    "ordinary_usage_allowed": true,
+    "credits": 0,
+    "heavy_test_lock": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/heavy-test.lock",
+    "prior_ceiling_rule": "C2/loader/neutral-transport allowances remain exactly consumed as recorded; no reset. This is a new exact bounded implementation slice under standing source delegation, no new provider/review allocation."
+  },
+  "verification": "One discriminating RED, focused GREEN, at most one observed-defect corrective run. Temporary TEST SQLite Ledger/connections/processes and ephemeral in-memory test keys only. No actual parent read/tool/sink/workflow/provider/service. Isolated HOME/env/state, network denial and scratch-only writes; no ancestor blanket write literals. Inspect effects before tests; record phase intent/counters before execution, reconcile any ambiguous run before repeat.",
+  "evidence_logging_manifest": {
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": {
+      "preimage": "4ef5e415f3134d091e9ac0344de0c0dd5818253de7f0d6dda9bbdbeea978067f",
+      "mode": "append bounded source finding only"
+    },
+    "MessyChangesNeedsReview.md": {
+      "preimage": "3599dab5d13c3d2f89d1e7f68ecb86baf03a602e3319fffe5e50e1e8182a5017",
+      "mode": "append bounded source finding only"
+    }
+  },
+  "checkpoint": "Explicit exact two-file source commit plus sanitized explicit evidence/log manifest on construction branch. Non-force push and actual remote SHA readback under existing mandate. No raw private material/state databases or test private keys in artifacts. Preserve original failures.",
+  "ownership": "Chat3 constructs only its two admission paths. Root alone later integrates B00 after required disposition; no current combined-branch promotion, debt integration or review acceptance. Chat4 parent4/rootclient2/broker2/fence2 remain separate future scopes. Chat1 sole D0258.",
+  "held": "All real service/custody/enrollment/purpose activation/CLI/confinement/egress/install, applicable independent review, Court/qualification/debts/P3 and SENTIUM_FROZEN.",
+  "callback": "Immediate literal material completion/blocker/correction to Architect01a151d6-4fd3-7f23-a35d-167815a58cdb with actual turn, exact source/evidence/candidate/test/counters and gates. Reopen exact card after compaction and before finalizing. If actual tool restriction denies authorized files, preserve exact denial and stop; no relocation/copy/bypass or old operation retry."
+}

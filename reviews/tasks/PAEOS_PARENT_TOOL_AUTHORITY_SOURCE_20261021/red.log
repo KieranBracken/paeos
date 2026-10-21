@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_parent_tool_claim_requires_dedicated_versioned_authority _________
+
+    def test_parent_tool_claim_requires_dedicated_versioned_authority():
+        from runtime.autonomy.admission_authority import AdmissionAuthority
+    
+>       assert callable(getattr(AdmissionAuthority, "claim_parent_tool_read", None)), (
+            "missing dedicated parent-tool claim verifier/producer"
+        )
+E       AssertionError: missing dedicated parent-tool claim verifier/producer
+E       assert False
+E        +  where False = callable(None)
+E        +    where None = getattr(<class 'runtime.autonomy.admission_authority.AdmissionAuthority'>, 'claim_parent_tool_read', None)
+
+tests/runtime/autonomy/test_admission_authority.py:30: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_parent_tool_claim_requires_dedicated_versioned_authority
+1 failed, 60 deselected in 0.11s

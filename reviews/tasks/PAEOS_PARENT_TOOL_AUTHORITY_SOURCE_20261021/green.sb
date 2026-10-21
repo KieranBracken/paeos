@@ -1,0 +1,1 @@
+(version 1) (allow default) (deny network*) (deny file-write*) (allow file-write* (subpath "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-green")) (allow file-write* (literal "/dev/null"))

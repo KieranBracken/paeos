@@ -1,0 +1,35 @@
+{
+  "phase": "corrective",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*) (deny file-write*) (allow file-write* (subpath \"/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-corrective\")) (allow file-write* (literal \"/dev/null\"))",
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--noconftest",
+    "tests/runtime/autonomy/test_admission_authority.py"
+  ],
+  "cwd": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "environment_overrides": {
+    "HOME": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-corrective/home",
+    "TMPDIR": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-corrective/tmp",
+    "XDG_CACHE_HOME": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-corrective/home",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONPATH": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "source_sha256": {
+    "runtime/autonomy/admission_authority.py": "1c339be0af54f0a3add5f25a2eb466a73f301d065653c918f71a1fe24847cd77",
+    "tests/runtime/autonomy/test_admission_authority.py": "0c74332c107182ce999d955bf2e82a2f53d9c3ce0ef28dd5dcfa86fc1b317135"
+  },
+  "state": "FINISHED",
+  "exit_code": 0,
+  "seconds": 2.879
+}

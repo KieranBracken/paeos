@@ -1,0 +1,90 @@
+{
+  "schema": "paeos.bounded-offline-parent-tool-source/1",
+  "assignment_id": "B00-parent-tool-authority-two-file-source-20261021-v1",
+  "event_id": "B00-parent-tool-authority-source-20261021-v1-complete",
+  "owner_thread": "01a15526-84df-7fe3-9863-bfb64754d733",
+  "actual_turn_id": "01a15f31-acce-7631-b69d-faae1e38610a",
+  "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "branch": "codex/b00-parent-tool-authority-20261021",
+  "baseline": "7dd4443c81e873ad564b03a944dad32367b8b1ab",
+  "source_commit": "2ce8af93673cfe74628694201d08d8879f8edadb",
+  "source_sha256": {
+    "runtime/autonomy/admission_authority.py": "1c339be0af54f0a3add5f25a2eb466a73f301d065653c918f71a1fe24847cd77",
+    "tests/runtime/autonomy/test_admission_authority.py": "0c74332c107182ce999d955bf2e82a2f53d9c3ce0ef28dd5dcfa86fc1b317135"
+  },
+  "result": "OFFLINE_SOURCE_CANDIDATE_COMPLETE_UNREVIEWED",
+  "tests": {
+    "red": "1 failed, 60 deselected; discriminating missing API assertion",
+    "green": "187 passed in 2.89s",
+    "corrective": "189 passed in 2.71s; final source bytes",
+    "corrective_reason": "Distinct signer IDs could alias one public key; final check also separates ACK key from parent/root key."
+  },
+  "counters": {
+    "source_candidate": 1,
+    "red": 1,
+    "green": 1,
+    "corrective": 1,
+    "full_suite": 0,
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "live_parent_or_cli": 0,
+    "host_keys_or_enrollment": 0,
+    "actual_tool_reads": 0,
+    "new_sink_workflows": 0,
+    "new_worktrees": 0
+  },
+  "test_boundary": "Only existing authority test file. Existing legacy synthetic send/sink tests are retained unchanged per contract; new parent-tool tests use known in-memory bytes and temporary TEST Ledger/SQLite connections/processes only. Runner denies network and all filesystem writes outside exact scratch directory plus /dev/null. No production parent, artifact read or provider.",
+  "verification": {
+    "scope_sha256": "9ce058a84e392b0e5eb328923a3a0578dc4c916241eba42ef3feeb7ada01c429",
+    "contract_sha256": "2c4cdd9af5e13721dc10ef8729affe5c0684552e3b4aa429e4a37e6ee6c343c0",
+    "tested_final_source_matches_corrective_record": true,
+    "read_only_15_pins_unchanged": true,
+    "legacy_authority_methods_except_constructor_ast_unchanged": true,
+    "all_existing_test_functions_and_classes_ast_unchanged": true,
+    "ruff": "PASS",
+    "format": "PASS",
+    "compile_without_execution": "PASS",
+    "diff_check": "PASS",
+    "original_worktrees": {
+      "ef8f": {
+        "head": "bd28b3780f93ff0dad4422b7ca68490c71a877e2",
+        "clean": true
+      },
+      "debt0261-slice1": {
+        "head": "e74208da4335f3dc01eb8c313c5d99998cb9c381",
+        "clean": true
+      }
+    },
+    "preserved_combined_branch": "7dd4443c81e873ad564b03a944dad32367b8b1ab"
+  },
+  "constructor_and_encoding_clarifications": [
+    "tool_policy_manifests is an immutable tuple of immutable signed V2 policy byte inputs, each <=1048576; empty defaults deny tool authority. No key/file discovery.",
+    "context.tool_grant_digest is SHA256 of the canonical unsigned v2 grant BODY; the full canonical envelope is independently signature-verified and retained. context.base_grant_digest preserves v1 digest of its complete signed flat record. Request and observation SHA fields hash complete canonical signed envelopes. The frozen contract named tool_grant_digest without separately specifying body versus envelope; this explicit encoding must be consumed consistently by successor owners.",
+    "Frozen readback contains bytes and identities only, with UNRESOLVED for claim-only state; no read/send capability.",
+    "Historical readback validates CURRENT/revocation at the actual claim prefix using retained signed grants and claim clock; fresh query/ACK also validates current configured trust and current Ledger.",
+    "ACK signer must differ from parent/root by both enrolled identity ID and public key digest."
+  ],
+  "ALLOWED_NOW": "Architect may inspect exact source/evidence and issue the next scoped owner assignment. Root alone integrates B00 after required disposition.",
+  "HELD": "All real service/custody/enrollment/purpose activation/CLI/confinement/egress/install, applicable independent review, Court/qualification/debts/P3 and SENTIUM_FROZEN.",
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "No production purpose grant or protected ACK signer mapping is evidenced. Parent4, interactive client2, broker2 and fence2 integrations remain separate future source scopes. Independent review/Court/runtime admission/qualification not established.",
+  "exact_wake": "Existing coordinator accepts/disposes this exact source checkpoint and issues a separate bounded successor card; no retry of consumed test phases or earlier C2/loader/transport allowances.",
+  "evidence_files_sha256": {
+    "CORRECTIVE_REASON.json": "01e51b927bfa0877867d2474e2e35b647015a7a103cde842d4819655dfb2e352",
+    "FROZEN_CONTRACT.json": "2c4cdd9af5e13721dc10ef8729affe5c0684552e3b4aa429e4a37e6ee6c343c0",
+    "SCOPE.json": "9ce058a84e392b0e5eb328923a3a0578dc4c916241eba42ef3feeb7ada01c429",
+    "SOURCE.patch": "707bc91e914abbc7b99c9552bcfe7488de8c42a33e2e3283dfb73c5fd19317fe",
+    "corrective.json": "8b8061bd9420fec624c6796579b1fd2ebe0b4e775edca8716df9cb0830149445",
+    "corrective.log": "79ec11039b88505fb94881e8f7534de9f7d2e0d0ebe62e9408d8964f5351b047",
+    "corrective.sb": "0ac86f197a8168e9919ea76b196e837c9351cac63939a7a66ebd026ab4715ace",
+    "green.json": "f9613dd69378a29f862f198fb28a40515332ae306861289e78fc6881bfd0694b",
+    "green.log": "0fdb6160a61997d59315dc14d519fa625fa48a180a21119b3375a85a567b4aec",
+    "green.sb": "343458353868419d9909dcbe9fd6f0760a62bee5f50286fa4b3c1d0ca173cee5",
+    "red.json": "d914f017741c47de3de3f00b309456022d3d4166af11d33c07b81619c0ef44a6",
+    "red.log": "c35037eb168129e7a8e6e6cb3294e0865b3a14b63921993b0a60be4c007b1667",
+    "red.sb": "1bed0d79d86cdc6f695adea2bee185a80216ddd6093390ea7f5ee6be09cdb025",
+    "run_phase.py": "e727ecb055fe77c20e42eca8e686626729151cc26106d971ab6b82b7500a866d"
+  },
+  "remote_verification": "Recorded separately after non-force push; this manifest does not assert remote state.",
+  "bounded_secret_pattern_scan": "0 matches over explicitly packaged evidence; not comprehensive classification"
+}

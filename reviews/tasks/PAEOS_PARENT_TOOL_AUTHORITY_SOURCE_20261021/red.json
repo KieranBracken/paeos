@@ -1,0 +1,37 @@
+{
+  "phase": "red",
+  "command": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1) (allow default) (deny network*) (deny file-write*) (allow file-write* (subpath \"/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-red\")) (allow file-write* (literal \"/dev/null\"))",
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-o",
+    "addopts=",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--noconftest",
+    "tests/runtime/autonomy/test_admission_authority.py",
+    "-k",
+    "parent_tool_claim_requires_dedicated_versioned_authority"
+  ],
+  "cwd": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "environment_overrides": {
+    "HOME": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-red/home",
+    "TMPDIR": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-red/tmp",
+    "XDG_CACHE_HOME": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/parent-tool-authority-source-20261021/scratch-red/home",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONPATH": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos"
+  },
+  "source_sha256": {
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "tests/runtime/autonomy/test_admission_authority.py": "ad0a10c6face30ac53b26c9847c6dbfe0664b8a9d95b3bec7b216cb3ae53a1e1"
+  },
+  "state": "FINISHED",
+  "exit_code": 1,
+  "seconds": 0.268
+}
