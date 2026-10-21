@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/runtime/autonomy/test_admission_authority.py",
+    "tests/runtime/autonomy/test_admission_send_fence.py"
+  ],
+  "exit_code": 0,
+  "seconds": 1.22
+}

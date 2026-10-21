@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/usr/bin/git",
+    "push",
+    "--set-upstream",
+    "origin",
+    "codex/b00-admission-authority-20261021"
+  ],
+  "exit_code": 0,
+  "stdout": "branch 'codex/b00-admission-authority-20261021' set up to track 'origin/codex/b00-admission-authority-20261021'.\n",
+  "stderr": "remote: \nremote: Create a pull request for 'codex/b00-admission-authority-20261021' on GitHub by visiting:        \nremote:      https://github.com/KieranBracken/paeos/pull/new/codex/b00-admission-authority-20261021        \nremote: \nTo https://github.com/KieranBracken/paeos\n * [new branch]        codex/b00-admission-authority-20261021 -> codex/b00-admission-authority-20261021\n"
+}

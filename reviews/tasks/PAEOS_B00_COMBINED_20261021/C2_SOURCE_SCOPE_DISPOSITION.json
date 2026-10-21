@@ -1,0 +1,78 @@
+{
+  "schema": "paeos.readonly-source-scope-disposition/1",
+  "event_id": "C2-bootstrap-owner-target-disposition-20261021-v1",
+  "decision": "PREPARED_C2_ONLY_TARGET; RUNTIME_OWNER_AND_EXECUTABLE_SOURCE_SCOPE_NOT_ISSUED",
+  "canonical_authority": false,
+  "prior_disposition_sha256": "c08c69c8586fcbfdc1fdb251cff7ed28306e90a606f90058205e06e3041a1606",
+  "proposed_isolated_target": {
+    "path": "/Users/bob/.codex/worktrees/debt0261-slice1/paeos",
+    "commit": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+    "reason": "Existing coherent candidate contains the observed local import closure. Do not import newer kernel/types.py or dependencies into the original d02952a2 tree. No source import or baseline replacement is authorized here."
+  },
+  "source_import_manifest": [],
+  "proposed_mutable_preimages": {
+    "runtime/scheduler.py": "7d224317b36956f19c35c353166a60ce1598299ebdfa867a6392c4cc5a14d206",
+    "tests/runtime/test_scheduler.py": "9ae092b28ffd35e62e61e79909148a7f31675e46eec60be40be27152754a6b97"
+  },
+  "excluded": [
+    "ops/autonomous_run.py and C1/R3 recovery",
+    "runtime/readiness.py unless explicitly included by the eventual owner card",
+    "kernel source changes",
+    "production admission/dispatch",
+    "baseline replacement or dependency copying"
+  ],
+  "kernel_types": {
+    "original_d02952a2_sha256": "e9682f410b5b7a6e26fd9b91ab366a33cad92f5e3d522691a3918ffae581f58e",
+    "coherent_and_combined_sha256": "70f691b9d33157174b7b5c722e7196fa9bd2471c055c5909612d516add0b8b8c",
+    "resolution": "Choose existing coherent candidate for any separately scoped source work; no kernel copy."
+  },
+  "closure_observation": {
+    "path": "C2_DIRECTED_CLOSURE_OBSERVATION.json",
+    "files": 82,
+    "missing_local_static_modules": [],
+    "unresolved_dynamic_import_calls": [],
+    "limits": "Directed AST observation only; does not prove runtime resource availability or authorize imports. All observed files are already present in the selected candidate.",
+    "differences_from_combined": [
+      {
+        "path": "kernel/ledger.py",
+        "coherent_sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b",
+        "combined_sha256": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da"
+      },
+      {
+        "path": "paeos/model_router/provider_transports.py",
+        "coherent_sha256": "b4d5b6afe1f13306fabf96ae6f152e1410933679fcac5617f467ccda98deaeef",
+        "combined_sha256": "ebd0dae361ce617dd88fc50c2928648d77ea0b5df7fd07230df44c7538850043"
+      }
+    ],
+    "integration_rule": "Any future two-file C2 patch integrates serially; never replace the combined tree with the historical baseline or copy its older Ledger/provider transport."
+  },
+  "required_C2_acceptance": [
+    "R1/R2/R4/R5/R6/R7/R8 preserved; R3 excluded",
+    "Missing, None, stale, invalid or contradictory readiness holds before charge, reservation or invocation",
+    "Authenticated root/task/parent/current-scope/accepted-attempt/snapshot/fencing identity; goal_signature is metadata only",
+    "Synthetic fixtures do not create production authority; physical C3 remains separate"
+  ],
+  "owner_disposition": {
+    "bootstrap_owner": "Root owns B00 integration; that role does not itself supply runtime C2 admission.",
+    "technical_assignment": "Architect may assign an existing technical owner under the human standing delegation; no Founder-exclusive ownership restriction is evidenced.",
+    "actual_C2_runtime_owner_receipt": null,
+    "exact_missing_mechanism": "A recorded C2-only owner assignment and executable source-construction scope bound to the chosen target, explicit read closure, acceptance, attempt/budget and reviewer path. Saved CONTRACT-ONLY C1+C2 text and registration are not that receipt.",
+    "governing_clauses": [
+      "ledger/debt/DEBT-0261.md:7 normal owner admission",
+      "ledger/debt/DEBT-0261.md:66 design/registration only",
+      "ledger/debt/DEBT-0261.md:72 D0258 qualification and D0260 applicability",
+      "ledger/debt/DEBT-0261.md:76 not an automatic new pre-P3 gate"
+    ],
+    "wake": "Architect resolves the existing runtime/composition owner and issues the C2-only scope through the applicable existing authority; if runtime admission is required, its actual prerequisite gates must first be satisfied.",
+    "does_not_block_B00_source_integration": true
+  },
+  "effects": {
+    "source_edits": 0,
+    "imports_copied": 0,
+    "project_modules_executed": 0,
+    "tests_run": 0,
+    "builders_dispatched": 0,
+    "providers_called": 0,
+    "admissions_issued": 0
+  }
+}

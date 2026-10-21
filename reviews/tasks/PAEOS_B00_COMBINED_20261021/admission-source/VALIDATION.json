@@ -1,0 +1,108 @@
+{
+  "files": [
+    {
+      "path": "runtime/autonomy/admission_authority.py",
+      "sha256": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+      "bytes": 19292,
+      "compile": "PASS"
+    },
+    {
+      "path": "runtime/autonomy/admission_send_fence.py",
+      "sha256": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+      "bytes": 27060,
+      "compile": "PASS"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_authority.py",
+      "sha256": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+      "bytes": 30770,
+      "compile": "PASS"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_send_fence.py",
+      "sha256": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+      "bytes": 17394,
+      "compile": "PASS"
+    }
+  ],
+  "compile": "PASS",
+  "whitespace": "PASS",
+  "whitespace_commands": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "runtime/autonomy/admission_authority.py"
+      ],
+      "exit_code": 1,
+      "diagnostics": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "runtime/autonomy/admission_send_fence.py"
+      ],
+      "exit_code": 1,
+      "diagnostics": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "tests/runtime/autonomy/test_admission_authority.py"
+      ],
+      "exit_code": 1,
+      "diagnostics": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/dev/null",
+        "tests/runtime/autonomy/test_admission_send_fence.py"
+      ],
+      "exit_code": 1,
+      "diagnostics": ""
+    }
+  ],
+  "validation_harness_note": "Initial no-index check expected exit 0; corrected to allow exit 1 (files differ) only when diagnostics are empty. No source change.",
+  "explicit_scope": "PASS",
+  "read_only_controls": {
+    "kernel/ledger.py": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da",
+    "kernel/ledger_sqlite.py": "70c4774ba91cabbfc7f3cfa570d996923654cc500eadcf9da51ea56cf3aaf4d3",
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": "057091e1419a01aabcdbd23e93988ab8f02c1707a71dbaf9c7c40d96a2b8e57d",
+    "docs/PAEOS_MODEL_ROUTER_INFERENCE_MESH_SPEC.md": "6292da5871b7e1120c8ca01de299e7b625c5937e58dd15e35aabdeb37c2c9d09"
+  },
+  "interpreter": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+  "python_version": "3.13.5 (main, Jun 12 2025, 12:22:43) [Clang 20.1.4 ]",
+  "cryptography_version": "50.0.0",
+  "pytest_version": "9.1.1",
+  "import_origins": {
+    "runtime.autonomy.admission_authority": "/Users/bob/.codex/worktrees/ef8f/paeos/runtime/autonomy/admission_authority.py",
+    "runtime.autonomy.admission_send_fence": "/Users/bob/.codex/worktrees/ef8f/paeos/runtime/autonomy/admission_send_fence.py",
+    "kernel.ledger": "/Users/bob/.codex/worktrees/ef8f/paeos/kernel/ledger.py",
+    "kernel.ledger_sqlite": "/Users/bob/.codex/worktrees/ef8f/paeos/kernel/ledger_sqlite.py"
+  },
+  "scoped_high_confidence_secret_scan": {
+    "patterns": [
+      "private-key-pem",
+      "github-token",
+      "openai-key",
+      "aws-access"
+    ],
+    "findings": [],
+    "limitation": "Pattern scan of four explicit source/test files; not comprehensive credential detection."
+  }
+}

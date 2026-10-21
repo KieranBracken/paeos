@@ -1,0 +1,109 @@
+........................FFF........F..F.......                           [100%]
+=================================== FAILURES ===================================
+_ test_replayed_signed_record_cannot_resurrect_revoked_identity[ADMISSION_REVOKED] _
+
+kind = 'ADMISSION_REVOKED'
+
+    @pytest.mark.parametrize('kind', ['ADMISSION_REVOKED', 'DISCLOSURE_POLICY_REVOKED'])
+    def test_replayed_signed_record_cannot_resurrect_revoked_identity(kind):
+        from kernel.ledger import Event
+        ledger, authority, fence, op, policy, admission, issuer, *_ = setup_authority()
+        record = admission if kind == 'ADMISSION_REVOKED' else policy
+        authority.issue(kind, unsigned(record), issuer_id='issuer', signer=issuer.sign)
+        # A valid old signature appended after revocation is still not current authority.
+        ledger.append(Event(1, record['record_kind'], record), domain_tag='TEST')
+>       with pytest.raises(AdmissionNotCurrent): fence.acquire_send_lease(op)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AdmissionNotCurrent
+
+tests/runtime/autonomy/test_admission_authority.py:287: Failed
+_ test_replayed_signed_record_cannot_resurrect_revoked_identity[DISCLOSURE_POLICY_REVOKED] _
+
+kind = 'DISCLOSURE_POLICY_REVOKED'
+
+    @pytest.mark.parametrize('kind', ['ADMISSION_REVOKED', 'DISCLOSURE_POLICY_REVOKED'])
+    def test_replayed_signed_record_cannot_resurrect_revoked_identity(kind):
+        from kernel.ledger import Event
+        ledger, authority, fence, op, policy, admission, issuer, *_ = setup_authority()
+        record = admission if kind == 'ADMISSION_REVOKED' else policy
+        authority.issue(kind, unsigned(record), issuer_id='issuer', signer=issuer.sign)
+        # A valid old signature appended after revocation is still not current authority.
+        ledger.append(Event(1, record['record_kind'], record), domain_tag='TEST')
+>       with pytest.raises(AdmissionNotCurrent): fence.acquire_send_lease(op)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AdmissionNotCurrent
+
+tests/runtime/autonomy/test_admission_authority.py:287: Failed
+________ test_domain_and_canonical_ledger_binding_cannot_be_substituted ________
+
+    def test_domain_and_canonical_ledger_binding_cannot_be_substituted():
+        ledger, authority, _, _, *_ = setup_authority()
+>       with pytest.raises(ValueError): AdmissionSendFence(ledger, authority=authority, domain_tag='PRODUCTION')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_authority.py:292: Failed
+_______ test_same_root_allocation_cannot_be_expanded_by_replacing_grant ________
+
+tmp_path = PosixPath('/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/pytest-of-bob/pytest-3/test_same_root_allocation_cann0')
+
+    def test_same_root_allocation_cannot_be_expanded_by_replacing_grant(tmp_path):
+        from runtime.autonomy.admission_authority import AdmissionAuthority
+        root = Ed25519PrivateKey.generate()
+        ledger, _, fence, op, _, admission, _, _, trust = setup_authority(root=root)
+        fence.acquire_send_lease(op)
+        grant = signed(dict(unsigned(json.loads(trust.grants[0])), max_frames=3), root)
+        expanded = AdmissionAuthority(ledger, trust=replace(trust, grants=(json.dumps(grant).encode(),)), domain_tag='TEST', now=lambda: NOW)
+        other = AdmissionSendFence(ledger, authority=expanded, domain_tag='TEST', now=lambda: NOW)
+>       with pytest.raises(AdmissionNotCurrent): other.acquire_send_lease(replace(op, frame_ordinal=2))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AdmissionNotCurrent
+
+tests/runtime/autonomy/test_admission_authority.py:361: Failed
+____ test_authenticated_sink_return_stays_unresolved_until_receiver_receipt ____
+
+    def test_authenticated_sink_return_stays_unresolved_until_receiver_receipt():
+        ledger, _, fence, op, *_ = setup_authority()
+        sent = []
+        def sink(frame):
+            sent.append(frame)
+            return b'response'
+>       assert fence.send_once(op, sink) == b'response'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/runtime/autonomy/test_admission_authority.py:390: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/autonomy/admission_send_fence.py:464: in send_once
+    self.finish_send_lease(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <runtime.autonomy.admission_send_fence.AdmissionSendFence object at 0x103b9e550>
+lease = SendLease(lease_id='7685a827e99f41af9f7a8615fcf95bf4', logical_job_id='3a7d66c11c28a6afe1b39463db42530c3195b53fbaac5da...d4ba48712782502975a70e', route_digest='cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', ledger_seq=3)
+outcome = <SendOutcome.RETURNED: 'RETURNED'>
+outcome_ref = 'a9f4b3d22a523fdada41c85c175425bcd15b32b4cd0f54d9433accd52d7195a1'
+
+    def finish_send_lease(
+        self,
+        lease: SendLease,
+        outcome: SendOutcome,
+        *,
+        outcome_ref: str | None = None,
+    ) -> int:
+        """Append one immutable result or UNKNOWN settlement; never releases the claim."""
+        if not isinstance(lease, SendLease) or not re.fullmatch(r"[0-9a-f]{32}", lease.lease_id):
+            raise SendSettlementError("send lease capability is invalid")
+        if not isinstance(outcome, SendOutcome):
+            raise SendSettlementError("send outcome is invalid")
+        if outcome is SendOutcome.RETURNED:
+            if getattr(self._authority, "requires_authenticated_settlement", False):
+>               raise SendSettlementError("returned evidence requires authenticated reconciliation")
+E               runtime.autonomy.admission_send_fence.SendSettlementError: returned evidence requires authenticated reconciliation
+
+runtime/autonomy/admission_send_fence.py:318: SendSettlementError
+=========================== short test summary info ============================
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_replayed_signed_record_cannot_resurrect_revoked_identity[ADMISSION_REVOKED]
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_replayed_signed_record_cannot_resurrect_revoked_identity[DISCLOSURE_POLICY_REVOKED]
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_domain_and_canonical_ledger_binding_cannot_be_substituted
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_same_root_allocation_cannot_be_expanded_by_replacing_grant
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_authenticated_sink_return_stays_unresolved_until_receiver_receipt
+5 failed, 41 passed in 1.29s

@@ -1,0 +1,187 @@
+..............................................FF...................FFFFF [ 94%]
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_reissued_records_cannot_reallocate_an_existing_root_allowance ______
+
+    def test_reissued_records_cannot_reallocate_an_existing_root_allowance():
+        from runtime.autonomy.admission_authority import AdmissionAuthority
+        root = Ed25519PrivateKey.generate()
+        ledger, _, fence, op, policy, _, issuer, _, trust = setup_authority(root=root)
+        fence.acquire_send_lease(op)
+        grant = signed(dict(unsigned(json.loads(trust.grants[0])), max_frames=3), root)
+        expanded = AdmissionAuthority(ledger, trust=replace(trust, grants=(json.dumps(grant).encode(),)), domain_tag='TEST', now=lambda: NOW)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_authority.py:423: Failed
+__ test_valid_old_admission_and_policy_cannot_be_replayed_after_new_versions ___
+
+    def test_valid_old_admission_and_policy_cannot_be_replayed_after_new_versions():
+        from kernel.ledger import Event
+        ledger, authority, fence, op, policy, admission, issuer, *_ = setup_authority()
+        new = authority.issue('DISCLOSURE_POLICY_CURRENT', dict(unsigned(policy), revision=2), issuer_id='issuer', signer=issuer.sign)
+        authority.issue('ADMISSION_CURRENT', dict(unsigned(admission), epoch=2, policy_revision=2, policy_digest=new['digest']), issuer_id='issuer', signer=issuer.sign)
+        ledger.append(Event(1, 'DISCLOSURE_POLICY_CURRENT', policy), domain_tag='TEST')
+        ledger.append(Event(1, 'ADMISSION_CURRENT', admission), domain_tag='TEST')
+>       with pytest.raises(AdmissionNotCurrent): fence.acquire_send_lease(op)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE AdmissionNotCurrent
+
+tests/runtime/autonomy/test_admission_authority.py:434: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[operation_kind-value0] _
+
+field = 'operation_kind', value = []
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[operation_kind-OTHER] _
+
+field = 'operation_kind', value = 'OTHER'
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[frame_ordinal-True] _
+
+field = 'frame_ordinal', value = True
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[frame_ordinal--1] _
+
+field = 'frame_ordinal', value = -1
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[session_id-] _
+
+field = 'session_id', value = ''
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[contract_digest-not-a-hash] _
+
+field = 'contract_digest', value = 'not-a-hash'
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[scope_digest-None] _
+
+field = 'scope_digest', value = None
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+_ test_explicit_parent_operation_requires_complete_well_typed_binding[root_allocation_id-] _
+
+field = 'root_allocation_id', value = ''
+
+    @pytest.mark.parametrize('field,value', [
+        ('operation_kind', []), ('operation_kind','OTHER'), ('frame_ordinal',True),
+        ('frame_ordinal',-1), ('session_id',''), ('contract_digest','not-a-hash'),
+        ('scope_digest',None), ('root_allocation_id',''),
+    ])
+    def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+        fields = dict(operation_kind='PROVIDER_FRAME',session_id='session',contract_digest='a'*64,
+                      scope_digest='b'*64,root_allocation_id='root',frame_ordinal=0)
+        fields[field]=value
+>       with pytest.raises(ValueError): _operation(**fields)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_send_fence.py:478: Failed
+=========================== short test summary info ============================
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_reissued_records_cannot_reallocate_an_existing_root_allowance
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_valid_old_admission_and_policy_cannot_be_replayed_after_new_versions
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[operation_kind-value0]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[operation_kind-OTHER]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[frame_ordinal-True]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[frame_ordinal--1]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[session_id-]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[contract_digest-not-a-hash]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[scope_digest-None]
+FAILED tests/runtime/autonomy/test_admission_send_fence.py::test_explicit_parent_operation_requires_complete_well_typed_binding[root_allocation_id-]
+10 failed, 66 passed in 1.55s

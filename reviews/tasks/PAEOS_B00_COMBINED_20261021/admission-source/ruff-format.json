@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/ruff",
+    "format",
+    "--check",
+    "runtime/autonomy/admission_authority.py",
+    "runtime/autonomy/admission_send_fence.py",
+    "tests/runtime/autonomy/test_admission_authority.py",
+    "tests/runtime/autonomy/test_admission_send_fence.py"
+  ],
+  "exit_code": 0,
+  "seconds": 0.013
+}

@@ -1,0 +1,34 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+___ test_signed_revocation_rejects_boolean_version[ADMISSION_REVOKED-epoch] ____
+
+kind = 'ADMISSION_REVOKED', version = 'epoch'
+
+    @pytest.mark.parametrize('kind,version', [('ADMISSION_REVOKED','epoch'),('DISCLOSURE_POLICY_REVOKED','revision')])
+    def test_signed_revocation_rejects_boolean_version(kind,version):
+        ledger,authority,_,_,policy,admission,issuer,*_=setup_authority()
+        record=admission if kind=='ADMISSION_REVOKED' else policy
+        before=len(ledger.read())
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_authority.py:769: Failed
+_ test_signed_revocation_rejects_boolean_version[DISCLOSURE_POLICY_REVOKED-revision] _
+
+kind = 'DISCLOSURE_POLICY_REVOKED', version = 'revision'
+
+    @pytest.mark.parametrize('kind,version', [('ADMISSION_REVOKED','epoch'),('DISCLOSURE_POLICY_REVOKED','revision')])
+    def test_signed_revocation_rejects_boolean_version(kind,version):
+        ledger,authority,_,_,policy,admission,issuer,*_=setup_authority()
+        record=admission if kind=='ADMISSION_REVOKED' else policy
+        before=len(ledger.read())
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/runtime/autonomy/test_admission_authority.py:769: Failed
+=========================== short test summary info ============================
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_signed_revocation_rejects_boolean_version[ADMISSION_REVOKED-epoch]
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_signed_revocation_rejects_boolean_version[DISCLOSURE_POLICY_REVOKED-revision]
+2 failed, 1 passed, 57 deselected in 0.20s

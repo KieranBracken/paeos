@@ -1,0 +1,95 @@
+{
+  "event_id": "B00-admission-01a15526-source-complete-20261021-v1",
+  "continuation_id": "B00-admission-continuation-quota-reset-20261021-v1",
+  "assignment_id": "B00-20261019-admission-v1-rollover-01",
+  "card_assignment_id": "B00-20261019-admission-v1",
+  "source_thread_id": "01a15526-84df-7fe3-9863-bfb64754d733",
+  "source_turn_id": "01a15e90-24cf-7c30-9ad7-3998f1476d35",
+  "status": "OFFLINE_SOURCE_CANDIDATE_COMPLETE_UNREVIEWED",
+  "commit": "bd28b3780f93ff0dad4422b7ca68490c71a877e2",
+  "base_commit": "c6709750a07c823bcb31b0a4d819f9ab84ae1f25",
+  "branch": "codex/b00-admission-authority-20261021",
+  "remote_verified": true,
+  "worktree_clean": true,
+  "files": [
+    {
+      "path": "runtime/autonomy/admission_authority.py",
+      "sha256": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+      "bytes": 19292,
+      "compile": "PASS"
+    },
+    {
+      "path": "runtime/autonomy/admission_send_fence.py",
+      "sha256": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+      "bytes": 27060,
+      "compile": "PASS"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_authority.py",
+      "sha256": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+      "bytes": 30770,
+      "compile": "PASS"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_send_fence.py",
+      "sha256": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+      "bytes": 17394,
+      "compile": "PASS"
+    }
+  ],
+  "origins": "Resume the preserved dirty candidate from the October19 hard-ceiling checkpoint; new source and tests authored in this existing worktree only. Kernel files read-only. No files restored from other source trees.",
+  "predecessor": "Preserved unchanged at /Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/admission-01a15526; manifest SHA256 0d9be2b1df4240a1ee218836197f5ed79de614fa47cd2f54e9c19786ae9dd238. Fenced predecessor and S0/Task02 remain separate.",
+  "human_authorization": {
+    "coordination_message_id": "msg_01a14f2a-967f-7a93-8267-b87dab40196a",
+    "plan_message_id": "msg_01a154fa-532b-7392-8658-eb3f64f7cb2d",
+    "plan_text_sha256": "0d3287f97f83f4838189885badc7ed60a9cd6983fac77c2d8beac64d44ca1bb8"
+  },
+  "verification": {
+    "final_focused": "113 passed in 3.10s",
+    "full_suite": "NOT RUN; integrated full-suite run belongs to bootstrap owner",
+    "lint": "PASS",
+    "format": "PASS",
+    "compile": "PASS",
+    "diff_whitespace": "PASS",
+    "explicit_scope": "PASS",
+    "secret_patterns": "PASS on four files and explicit evidence manifest; bounded pattern scan, not comprehensive detection",
+    "formal_reviews": 0
+  },
+  "tdd": {
+    "signature-red": "2 failed, 3 passed, 19 deselected; exact preserved InvalidSignature failures",
+    "signature-green": "39 passed",
+    "controls-red": "5 failed, 41 passed",
+    "controls-green": "61 passed",
+    "durable-controls-red": "10 failed, 66 passed",
+    "durable-controls-green": "76 passed",
+    "settlement-red": "5 failed, 52 deselected",
+    "settlement-green": "81 passed",
+    "version-red": "2 failed, 1 passed, 57 deselected",
+    "final-focused": "113 passed"
+  },
+  "verified_controls": [
+    "signed scoped positive issuance and exact frame authorization",
+    "forged/missing/expired/key-substituted proofs deny before append or sink",
+    "terminal revocation and no signed-version replay rollback",
+    "independent process claim race yields one local fake-sink write",
+    "independent process admission/policy/root revocation wins at CAS and yields zero sink writes",
+    "new UUID/admission identity cannot reset consumed root allocation",
+    "reissued grant cannot expand existing allocation",
+    "unresolved and UNKNOWN claims survive SQLite reopen",
+    "authenticated receiver signature plus exact return bytes required; no unsigned RETURNED query",
+    "separate launch and provider-frame identities; conservative optional-field validation; legacy test compatibility"
+  ],
+  "interface": {
+    "trust": "EnrolledIdentity plus FrozenTrust tuples of enrolled public identities and root-signed grant bytes; no defaults for production enrollment",
+    "producer": "AdmissionAuthority.issue(kind, fields, issuer_id=..., signer=...) verifies then append_signed performs canonical CAS. Grant identity and signed digest are bound in records. goal_id is the mission binding.",
+    "send": "AdmissionSendFence with same Ledger/domain as AdmissionAuthority; complete SendOperation operation_kind/session_id/contract_digest/scope_digest/root_allocation_id/frame_ordinal required for concrete claims. preflight checks worker-launch ordinal zero. Provider ordinals consume the root max_frames allowance.",
+    "settlement": "query_send_claim and reconcile_send_claim with signed SEND_EVIDENCE from enrolled reconciler. RETURNED additionally requires exact outcome_bytes. UNKNOWN remains terminal. send_once leaves authenticated successful responses durably unresolved until reconciliation.",
+    "currentness": "verify_admission/verify_policy/authorize_frame verify proof bytes only; actual send requires the fence snapshot/currentness/allocation checks and atomic claim. Reconciliation and returned-evidence query fail closed if the supplied trust or evidence is no longer verifiable/current."
+  },
+  "unresolved_operations": "None. Push exit0 and remote readback verified. No provider, host-key/credential, enrollment, runtime or Court operation initiated. Callback will be submitted once after this record.",
+  "ALLOWED_NOW": "Architect validates frozen packet and hands it to bootstrap integration owner within existing offline scope. Separately eligible independent review may follow under its own allocation.",
+  "HELD": "Real enrollment/root authority, production positive composition/egress, runtime admission, worker qualification, Court/debt integration. Formal review allocation remains zero here. SENTIUM_FROZEN.",
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "This supplies offline producer/verifier/fence source only. Independently enrolled production trust and actual outbound-owner integration remain external gates.",
+  "next_eligible_action": "Architect handoff to bootstrap owner 01a1403f-1034-74c2-95ce-bd0f705dbaef for combined source integration/verification; Chat1 alone owns D0258 integration.",
+  "tooling_note": "Default /Users/bob/.local/bin/git lacked remote-https. Existing /usr/bin/git completed push and fetched readback. No installation or permission bypass. No extra worktree, copied environment or deletion."
+}

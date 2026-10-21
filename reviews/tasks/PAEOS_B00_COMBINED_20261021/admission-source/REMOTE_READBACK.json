@@ -1,0 +1,32 @@
+{
+  "commit": "bd28b3780f93ff0dad4422b7ca68490c71a877e2",
+  "branch": "codex/b00-admission-authority-20261021",
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/git",
+        "ls-remote",
+        "--heads",
+        "origin",
+        "refs/heads/codex/b00-admission-authority-20261021"
+      ],
+      "exit_code": 0,
+      "stdout": "bd28b3780f93ff0dad4422b7ca68490c71a877e2\trefs/heads/codex/b00-admission-authority-20261021\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/git",
+        "fetch",
+        "--no-tags",
+        "origin",
+        "refs/heads/codex/b00-admission-authority-20261021"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "From https://github.com/KieranBracken/paeos\n * branch              codex/b00-admission-authority-20261021 -> FETCH_HEAD\n"
+    }
+  ],
+  "fetched_commit": "bd28b3780f93ff0dad4422b7ca68490c71a877e2",
+  "explicit_file_hashes_match": true
+}

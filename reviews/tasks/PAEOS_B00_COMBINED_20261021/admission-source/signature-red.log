@@ -1,0 +1,78 @@
+..F.F                                                                    [100%]
+=================================== FAILURES ===================================
+_______ test_forgery_substitution_and_stale_proofs_denied[scope_digest] ________
+
+mutation = 'scope_digest'
+
+    @pytest.mark.parametrize('mutation', ['signature', 'issuer_id', 'scope_digest', 'grant_id', 'expires_at'])
+    def test_forgery_substitution_and_stale_proofs_denied(mutation):
+        ledger, authority, _, _, _, admission, *_ = setup_authority()
+        changed = copy.deepcopy(admission)
+        changed[mutation] = 'forged'
+        before = len(ledger.read())
+        assert not authority.verify_admission(changed)
+        with pytest.raises(ValueError):
+>           authority.append_signed(changed)
+
+tests/runtime/autonomy/test_admission_authority.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/autonomy/admission_authority.py:191: in append_signed
+    self._validate(record, kind)
+runtime/autonomy/admission_authority.py:113: in _validate
+    self._signature(record, self.trust.roots if root_revoke else self.trust.identities)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <runtime.autonomy.admission_authority.AdmissionAuthority object at 0x103335810>
+record = {'admission_ref': 'admission', 'contract_digest': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'domain_tag': 'TEST', 'epoch': 1, ...}
+identities = (EnrolledIdentity(identity_id='issuer', public_key=b"'G\xf2\x9a\xd0\x13\x89Xo\x08\xb7\x8dJ\x96\xdc\xa6g\x1f%<\xa2\xbf\...ceiver', public_key=b'\xb6\x00\x80l}\xcc\r\x03wj\xd4B\xf6\x8b\n$D\xb3\x8cn\xb6\x02\xd9\x8a\xfd\xd4\xc3{\xe7\xb9X\xa2'))
+
+    def _signature(self, record, identities):
+        if record.get('schema') != 1 or type(record.get('schema')) is not int or record.get('domain_tag') != self.domain_tag:
+            raise ValueError('wrong signature context')
+        key = next((x for x in identities if x.identity_id == record.get('issuer_id')), None)
+        if key is None: raise ValueError('issuer not enrolled')
+        signature = bytes.fromhex(record['signature'])
+>       Ed25519PublicKey.from_public_bytes(key.public_key).verify(signature, canonical({k:v for k,v in record.items() if k != 'signature'}))
+E       cryptography.exceptions.InvalidSignature
+
+runtime/autonomy/admission_authority.py:91: InvalidSignature
+________ test_forgery_substitution_and_stale_proofs_denied[expires_at] _________
+
+mutation = 'expires_at'
+
+    @pytest.mark.parametrize('mutation', ['signature', 'issuer_id', 'scope_digest', 'grant_id', 'expires_at'])
+    def test_forgery_substitution_and_stale_proofs_denied(mutation):
+        ledger, authority, _, _, _, admission, *_ = setup_authority()
+        changed = copy.deepcopy(admission)
+        changed[mutation] = 'forged'
+        before = len(ledger.read())
+        assert not authority.verify_admission(changed)
+        with pytest.raises(ValueError):
+>           authority.append_signed(changed)
+
+tests/runtime/autonomy/test_admission_authority.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/autonomy/admission_authority.py:191: in append_signed
+    self._validate(record, kind)
+runtime/autonomy/admission_authority.py:113: in _validate
+    self._signature(record, self.trust.roots if root_revoke else self.trust.identities)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <runtime.autonomy.admission_authority.AdmissionAuthority object at 0x1033a89d0>
+record = {'admission_ref': 'admission', 'contract_digest': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'domain_tag': 'TEST', 'epoch': 1, ...}
+identities = (EnrolledIdentity(identity_id='issuer', public_key=b"\x88C\xe1J\xa8\xbev\xb5\xf3\x97\xf1\xfc\x8b\xe4\x00'\x81Kx\x8e\xb...y_id='receiver', public_key=b'\x9e6\x825ou\xd2\xe6jC\x02\xf7\xea\x1d*3\xd3\xaf~;\x94\x89)L}\x0c\x12\x90-\xb2\x9c\xa6'))
+
+    def _signature(self, record, identities):
+        if record.get('schema') != 1 or type(record.get('schema')) is not int or record.get('domain_tag') != self.domain_tag:
+            raise ValueError('wrong signature context')
+        key = next((x for x in identities if x.identity_id == record.get('issuer_id')), None)
+        if key is None: raise ValueError('issuer not enrolled')
+        signature = bytes.fromhex(record['signature'])
+>       Ed25519PublicKey.from_public_bytes(key.public_key).verify(signature, canonical({k:v for k,v in record.items() if k != 'signature'}))
+E       cryptography.exceptions.InvalidSignature
+
+runtime/autonomy/admission_authority.py:91: InvalidSignature
+=========================== short test summary info ============================
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_forgery_substitution_and_stale_proofs_denied[scope_digest]
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_forgery_substitution_and_stale_proofs_denied[expires_at]
+2 failed, 3 passed, 19 deselected in 0.20s

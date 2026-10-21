@@ -1,0 +1,64 @@
+{
+  "schema": "paeos.offline-combined-source-assembly/1",
+  "event_id": "B00-admission-root-assembly-20261021-v1",
+  "recorded_at_utc": "2026-10-21T13:28:32.863072+00:00",
+  "baseline": "c6709750a07c823bcb31b0a4d819f9ab84ae1f25",
+  "source_candidate_commit": "bd28b3780f93ff0dad4422b7ca68490c71a877e2",
+  "branch": "codex/b00-combined-bootstrap-20261021",
+  "reused_isolated_worktree": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "preserved_recovery_branch": "codex/p1-bound-source-recovery-20261018 at c6709750a07c823bcb31b0a4d819f9ab84ae1f25",
+  "integrated_source_files": [
+    {
+      "path": "runtime/autonomy/admission_authority.py",
+      "sha256": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+      "bytes": 19292,
+      "compile": "PASS"
+    },
+    {
+      "path": "runtime/autonomy/admission_send_fence.py",
+      "sha256": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+      "bytes": 27060,
+      "compile": "PASS"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_authority.py",
+      "sha256": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+      "bytes": 30770,
+      "compile": "PASS"
+    },
+    {
+      "path": "tests/runtime/autonomy/test_admission_send_fence.py",
+      "sha256": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+      "bytes": 17394,
+      "compile": "PASS"
+    }
+  ],
+  "evidence_packet": {
+    "manifest_sha256": "1f9c53a6dbaecc359b5497a8b85521378d03d2a23f1a84d285da93dce9485517",
+    "artifacts_verified": 35,
+    "patch_byte_identity_verified": true,
+    "remote_source_commit_readback": "bd28b3780f93ff0dad4422b7ca68490c71a877e2"
+  },
+  "tests": {
+    "owner_focused_result": "113 passed",
+    "owner_log": "admission-source/final-focused.log",
+    "owner_command": "admission-source/final-focused.json",
+    "root_tests_this_assembly": 0,
+    "combined_regression": "WAITING_FOR_CHAT4_FROZEN_PACKAGE; one run under shared heavy-test lock",
+    "full_suite": "NOT RUN for combined package; historical collection failures remain historical"
+  },
+  "review": "NOT_REVIEWED; different-family review awaits independently evidenced route/authority/allocation",
+  "state": "PARTIAL_COMBINED_OFFLINE_CANDIDATE_UNQUALIFIED",
+  "next_gate": "Chat4 frozen confinement package, then exact combined source verification. Trusted production enrollment/egress/installation/qualification remain held.",
+  "effects": {
+    "source_authored_by_root": false,
+    "admission_source_assembled": true,
+    "paid_calls": 0,
+    "provider_calls": 0,
+    "host_keys_created_or_read": false,
+    "production_installed": false,
+    "runtime_admitted": false,
+    "court_action": false,
+    "debt_closure": false
+  }
+}

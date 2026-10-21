@@ -1,0 +1,163 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_launch_preflight_uses_parent_claim_identity _______________
+
+    def test_launch_preflight_uses_parent_claim_identity():
+        _, _, fence, op, *_ = setup_authority()
+        fence.acquire_send_lease(op)
+        fence.preflight(op.admission_ref, op.expected_epoch)
+        fence.acquire_send_lease(replace(op, operation_kind='WORKER_LAUNCH'))
+>       with pytest.raises(DuplicateSendOperation): fence.preflight(op.admission_ref, op.expected_epoch)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE DuplicateSendOperation
+
+tests/runtime/autonomy/test_admission_authority.py:724: Failed
+_______________ test_query_rejects_unsigned_returned_settlement ________________
+
+    def test_query_rejects_unsigned_returned_settlement():
+        from kernel.ledger import Event
+        ledger, _, fence, op, *_ = setup_authority()
+        lease=fence.acquire_send_lease(op)
+        ledger.append(Event(1,'ADMISSION_SEND_SETTLED',{'lease_id':lease.lease_id,'logical_job_id':lease.logical_job_id,'outcome':'RETURNED','outcome_ref':'a'*64}),domain_tag='TEST')
+>       with pytest.raises(SendSettlementError): fence.query_send_claim(lease.lease_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE SendSettlementError
+
+tests/runtime/autonomy/test_admission_authority.py:732: Failed
+__ test_malformed_envelopes_raise_value_error_without_append[signature-None] ___
+
+field = 'signature', value = None
+
+    @pytest.mark.parametrize('field,value', [('signature',None),('signature',b'invalid'),('expires_at',None)])
+    def test_malformed_envelopes_raise_value_error_without_append(field,value):
+        ledger,authority,_,_,_,admission,issuer,*_=setup_authority()
+        record=dict(unsigned(admission),**{field:value})
+        if field!='signature': record=signed(record,issuer)
+        before=len(ledger.read())
+>       with pytest.raises(ValueError): authority.append_signed(record)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/runtime/autonomy/test_admission_authority.py:741: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/autonomy/admission_authority.py:340: in append_signed
+    self._validate(record, kind)
+runtime/autonomy/admission_authority.py:161: in _validate
+    self._signature(record, self.trust.roots if root_revoke else self.trust.identities)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <runtime.autonomy.admission_authority.AdmissionAuthority object at 0x101506990>
+record = {'admission_ref': 'admission', 'contract_digest': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'domain_tag': 'TEST', 'epoch': 1, ...}
+identities = (EnrolledIdentity(identity_id='issuer', public_key=b"B6n\x18\x85\x06\xe7D\xb4\x8fQU<\xa4\xc6m\xb8;q\xb9\xd2%1'\xcb\x05...eiver', public_key=b'q\x9a{F`\xe3\xc8\xe5\x13\xe1\x00N\x07\xd7"=\xa6\xb8\xc9D\x0e\xac\xd4\x9bwa\x97\xec"\x9c\xdd\x17'))
+
+    def _signature(self, record, identities):
+        if (
+            record.get("schema") != 1
+            or type(record.get("schema")) is not int
+            or record.get("domain_tag") != self.domain_tag
+        ):
+            raise ValueError("wrong signature context")
+        key = next((x for x in identities if x.identity_id == record.get("issuer_id")), None)
+        if key is None:
+            raise ValueError("issuer not enrolled")
+>       signature = bytes.fromhex(record["signature"])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fromhex() argument must be str, not None
+
+runtime/autonomy/admission_authority.py:124: TypeError
+_ test_malformed_envelopes_raise_value_error_without_append[signature-invalid] _
+
+field = 'signature', value = b'invalid'
+
+    @pytest.mark.parametrize('field,value', [('signature',None),('signature',b'invalid'),('expires_at',None)])
+    def test_malformed_envelopes_raise_value_error_without_append(field,value):
+        ledger,authority,_,_,_,admission,issuer,*_=setup_authority()
+        record=dict(unsigned(admission),**{field:value})
+        if field!='signature': record=signed(record,issuer)
+        before=len(ledger.read())
+>       with pytest.raises(ValueError): authority.append_signed(record)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/runtime/autonomy/test_admission_authority.py:741: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/autonomy/admission_authority.py:330: in append_signed
+    record = json.loads(canonical(dict(payload)))  # isolate caller mutations
+                        ^^^^^^^^^^^^^^^^^^^^^^^^
+runtime/autonomy/admission_authority.py:43: in canonical
+    return json.dumps(
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/json/__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/json/encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/json/encoder.py:261: in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.encoder.JSONEncoder object at 0x101446a80>, o = b'invalid'
+
+    def default(self, o):
+        """Implement this method in a subclass such that it returns
+        a serializable object for ``o``, or calls the base implementation
+        (to raise a ``TypeError``).
+    
+        For example, to support arbitrary iterators, you could
+        implement default like this::
+    
+            def default(self, o):
+                try:
+                    iterable = iter(o)
+                except TypeError:
+                    pass
+                else:
+                    return list(iterable)
+                # Let the base class default method raise the TypeError
+                return super().default(o)
+    
+        """
+>       raise TypeError(f'Object of type {o.__class__.__name__} '
+                        f'is not JSON serializable')
+E       TypeError: Object of type bytes is not JSON serializable
+
+/Users/bob/.local/share/uv/python/cpython-3.13-macos-aarch64-none/lib/python3.13/json/encoder.py:180: TypeError
+__ test_malformed_envelopes_raise_value_error_without_append[expires_at-None] __
+
+field = 'expires_at', value = None
+
+    @pytest.mark.parametrize('field,value', [('signature',None),('signature',b'invalid'),('expires_at',None)])
+    def test_malformed_envelopes_raise_value_error_without_append(field,value):
+        ledger,authority,_,_,_,admission,issuer,*_=setup_authority()
+        record=dict(unsigned(admission),**{field:value})
+        if field!='signature': record=signed(record,issuer)
+        before=len(ledger.read())
+>       with pytest.raises(ValueError): authority.append_signed(record)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/runtime/autonomy/test_admission_authority.py:741: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+runtime/autonomy/admission_authority.py:340: in append_signed
+    self._validate(record, kind)
+runtime/autonomy/admission_authority.py:161: in _validate
+    self._signature(record, self.trust.roots if root_revoke else self.trust.identities)
+runtime/autonomy/admission_authority.py:131: in _signature
+    if not self.now() < self._time(record["expires_at"]):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <runtime.autonomy.admission_authority.AdmissionAuthority object at 0x101581cd0>
+value = None
+
+    def _time(self, value):
+>       parsed = datetime.fromisoformat(value)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fromisoformat: argument must be str
+
+runtime/autonomy/admission_authority.py:109: TypeError
+=========================== short test summary info ============================
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_launch_preflight_uses_parent_claim_identity
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_query_rejects_unsigned_returned_settlement
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_malformed_envelopes_raise_value_error_without_append[signature-None]
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_malformed_envelopes_raise_value_error_without_append[signature-invalid]
+FAILED tests/runtime/autonomy/test_admission_authority.py::test_malformed_envelopes_raise_value_error_without_append[expires_at-None]
+5 failed, 52 deselected in 0.22s

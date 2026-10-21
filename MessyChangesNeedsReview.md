@@ -5643,3 +5643,8 @@ Added bounded optional `AdmissionSendFence`/admission-reference/epoch compositio
 ### 2026-10-19 — B00 broker boundary, root-owned offline checkpoint
 
 Complete-frame parser, versioned derivative-policy syntax and broker pre-send/credential-path hardening require combined independent review. See `reviews/tasks/PAEOS_LUNA_B00_SCOPE_20261018/B00_BROKER_BOUNDARY_CHECKPOINT_20261019.json` for exact hashes, 312 focused passes, RED controls and limitations. Production remains denied; no host installation, identities, provider request or Court disposition changed.
+
+
+### 2026-10-21 — B00 partial combined source checkpoint (unreviewed)
+
+Admission source `bd28b378` is assembled byte-for-byte on the isolated combined branch; all 35 owner evidence artifacts and four source hashes verified. Owner-focused result:113 passed. Root did not rerun tests while Chat4 constructs confinement. Combined regression, full-suite disposition and eligible independent review remain pending. See `reviews/tasks/PAEOS_B00_COMBINED_20261021/ASSEMBLY.json`; source candidate only, no activation or qualification. C2-only target/owner decision remains separate and cannot block this B00 source assembly.

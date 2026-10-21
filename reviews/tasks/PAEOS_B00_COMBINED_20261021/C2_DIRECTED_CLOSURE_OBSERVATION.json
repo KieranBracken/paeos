@@ -1,0 +1,760 @@
+{
+  "schema": "paeos.source-closure-observation/1",
+  "source_root": "/Users/bob/.codex/worktrees/debt0261-slice1/paeos",
+  "source_commit": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "interpreter": "3.13.5 (main, Jun 12 2025, 12:22:43) [Clang 20.1.4 ]",
+  "seeds": [
+    "runtime/scheduler.py",
+    "tests/runtime/test_scheduler.py"
+  ],
+  "files": {
+    "runtime/scheduler.py": {
+      "sha256": "7d224317b36956f19c35c353166a60ce1598299ebdfa867a6392c4cc5a14d206",
+      "bytes": 11688
+    },
+    "tests/runtime/test_scheduler.py": {
+      "sha256": "9ae092b28ffd35e62e61e79909148a7f31675e46eec60be40be27152754a6b97",
+      "bytes": 7777
+    },
+    "kernel/types.py": {
+      "sha256": "70f691b9d33157174b7b5c722e7196fa9bd2471c055c5909612d516add0b8b8c",
+      "bytes": 9977
+    },
+    "kernel/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "runtime/orchestrator/__init__.py": {
+      "sha256": "f56a0aac982e8fec7c47256391aa5467dc1bdd209b0fd4952726fd4f68995bff",
+      "bytes": 120731
+    },
+    "runtime/__init__.py": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "runtime/task_package.py": {
+      "sha256": "b9376bd9996ebf8091bd0b47b1d891f237c14cb58c588a97313e377d0b091b4d",
+      "bytes": 4074
+    },
+    "runtime/triage.py": {
+      "sha256": "725e5185f675620afe04caf470eaaaa79c30a622e73901d67cae1b34357a7ad9",
+      "bytes": 4620
+    },
+    "kernel/capability.py": {
+      "sha256": "f297064b1dbaffbbd10b1ab499fd1b94e0c5c40310cc279d1f2ce2924c205477",
+      "bytes": 6906
+    },
+    "kernel/cas.py": {
+      "sha256": "f5e270afe072f074a869ded93dd4a78143d36ad42a0c208d84eb28814fe0934f",
+      "bytes": 8658
+    },
+    "kernel/evidence.py": {
+      "sha256": "29a8ae8d7e7612903dd0a1567333895d1c86689011e37de64bbaaafbf9cd5235",
+      "bytes": 11378
+    },
+    "kernel/gates.py": {
+      "sha256": "74c678620b26bdb62eb078a49a542d55c385afbd465ff75074fd1d378f95fbe9",
+      "bytes": 8047
+    },
+    "kernel/ledger.py": {
+      "sha256": "604cb856e3d488c7df5d00ff5ca98c8734e62005581800f2763cefa653829a2b",
+      "bytes": 14811
+    },
+    "kernel/sandbox.py": {
+      "sha256": "a830221763c29b25af4e2e93ffb43580d2fe937863b2260be60021d5b43beb5e",
+      "bytes": 13629
+    },
+    "kernel/seal.py": {
+      "sha256": "f6fe8af416cd3c55b5e50ece3307c22544bc6c60b713f9e2419e31f10165d7d3",
+      "bytes": 8041
+    },
+    "paeos/model_router/auditor_receipt.py": {
+      "sha256": "4ca0166a4db54e6040b66e4fcaf695ce9a88a7d9b984129dbe483ec286c5bde2",
+      "bytes": 34951
+    },
+    "paeos/model_router/__init__.py": {
+      "sha256": "b007b78f8e593627fe8a3078186fafd9186699cf975b4369838d37e43f8c8604",
+      "bytes": 3979
+    },
+    "runtime/agents/__init__.py": {
+      "sha256": "fad5c8fd6838a2c9794b9dbd37a87fc8e1cac1517f458701c2a62ac456ec8640",
+      "bytes": 11097
+    },
+    "runtime/autonomy/__init__.py": {
+      "sha256": "d60f13829f2542db050c8a788466df1ee6b8faf0a066fb7c4767bcd4b3b0fab4",
+      "bytes": 2368
+    },
+    "runtime/builder_transport.py": {
+      "sha256": "5d7735206d2b36dc776cb2745eaa6b89d3f85cc198f98dcfafd874e2d5d5efaa",
+      "bytes": 9767
+    },
+    "runtime/candidate_materialization.py": {
+      "sha256": "eaac6ad9ca43ba3d7af4762983cbb3bfc9e98d6e192836bccd74855b67dba886",
+      "bytes": 27588
+    },
+    "runtime/ceremony.py": {
+      "sha256": "1a0624676ceb5a9fbb3a78e11a11f00c41e84191fec5f3d5e0af1b691b28e17e",
+      "bytes": 9127
+    },
+    "runtime/claude_code.py": {
+      "sha256": "d19d8c68345e8d94d21a66aa8f523ed8c4fc9f92fd438ec36766d89874f54aa2",
+      "bytes": 7755
+    },
+    "runtime/court/__init__.py": {
+      "sha256": "2ed11d07cabafe83f14699b334340c694b232c3b51ee1ce8fcd524377a44c34c",
+      "bytes": 4457
+    },
+    "runtime/court/completeness_firewall.py": {
+      "sha256": "c99c0e6b2074264557b601cdcea1cfbc45729c41308b83e632292dfe270cf28a",
+      "bytes": 39114
+    },
+    "paeos/semantic/freeze_guard.py": {
+      "sha256": "97dc7b21e39a10e3b9fe5852d9e01a44701c883dc8002ccd1bd16923b9b6cb48",
+      "bytes": 3966
+    },
+    "paeos/semantic/__init__.py": {
+      "sha256": "cb7710c169113ec08efd24fd17b5e68edfc0da10ced00e35ac15fbe05cdfbafd",
+      "bytes": 1165
+    },
+    "paeos/semantic/types.py": {
+      "sha256": "5646f98c7d361668ee483eb32c0a56474e56c6139e1d933346015a3fe6dc1540",
+      "bytes": 6609
+    },
+    "runtime/autonomy/schemas/frontier_research.py": {
+      "sha256": "f9be9e6cca47bb9b6f677814708593f07fe38e9e0e3bfa2f74e13a02a430e64b",
+      "bytes": 1378
+    },
+    "runtime/autonomy/schemas/__init__.py": {
+      "sha256": "b299493c1110f4fc71a27ac7d8037eb83c74554a86890004ac4059871368d49d",
+      "bytes": 1062
+    },
+    "runtime/autonomy/schemas/tradeoff_analysis.py": {
+      "sha256": "fa4fa2caef6fba04e91ddb8fa501edbe37ba8842bc6685ca548e9de98de62bfb",
+      "bytes": 1253
+    },
+    "runtime/autonomy/weakness_finder/__init__.py": {
+      "sha256": "74ce8d342ccdd0e8f61c5ff253392ccb8acdcd911405bef74d58380653bd3beb",
+      "bytes": 1012
+    },
+    "runtime/lifecycle_projection.py": {
+      "sha256": "d646da7bf7ca7003c998e05a27d276a187ee2fc2838291870eb1a9a6d665576e",
+      "bytes": 3133
+    },
+    "runtime/memory/__init__.py": {
+      "sha256": "2f3c427a5056f333db3cd78d4112554bf550ed95d061e8d9e5d8a6678a0bec98",
+      "bytes": 5153
+    },
+    "runtime/p1_discrimination.py": {
+      "sha256": "370a422dc22dbf74e5b488d8221fcadadd2009f00edc758ea3f6d6f26c036e93",
+      "bytes": 10197
+    },
+    "runtime/retrospective.py": {
+      "sha256": "644c69004e3c2405ffdb4d6e91cf53f0c5b307811b9a4fbdd5eda0f5b30b79c7",
+      "bytes": 5014
+    },
+    "runtime/review/__init__.py": {
+      "sha256": "feb761ab5cb87bb49d5e1d24f0f4b429ba66edd9315112628b05cedaa1d660e6",
+      "bytes": 6749
+    },
+    "runtime/run_state_registry.py": {
+      "sha256": "01052d5bfc79430cbb58a049271011dc7288792ce9a467f26e28e9af28f755fe",
+      "bytes": 8017
+    },
+    "runtime/scar_store.py": {
+      "sha256": "015438346178e1411bbb6376ca45926b09fa7872a4d02aea32671753e3e4c088",
+      "bytes": 6493
+    },
+    "runtime/sidecar_scorer.py": {
+      "sha256": "79147ea3b662f74b6398581b5a975d6b40a1ec083b558d0fe6ab5aefa6740f72",
+      "bytes": 5452
+    },
+    "runtime/verification.py": {
+      "sha256": "07fa8652cd4b532c1677848d514206dca0726bc3e92c2cbd2c7004e2c61e33b9",
+      "bytes": 15542
+    },
+    "kernel/classifier.py": {
+      "sha256": "61a4626063ba3e20e2fa326ef35d62ced4d8ba4d89d444b7782daa7faaf48faf",
+      "bytes": 2638
+    },
+    "kernel/lifecycle.py": {
+      "sha256": "df72ef368c44b3faed4a62e6b366ec4f49898af4ab3eb5fcffad4a6b776794d3",
+      "bytes": 3259
+    },
+    "paeos/model_router/a08_enforcer.py": {
+      "sha256": "70d9e0d91f0f0b8a62a20c0694f90f4f70039e12a1881c7f4557423f5b38fcd1",
+      "bytes": 16952
+    },
+    "paeos/model_router/catalog.py": {
+      "sha256": "51e49bd23c86e46b138f58b6083a249b374e5e472703e7f0acb414c32cf078f6",
+      "bytes": 14063
+    },
+    "paeos/model_router/types.py": {
+      "sha256": "789f2efa38e0e22fc3f57290842abd34b5d69f55011e8cee5b8d18732f3fc954",
+      "bytes": 6665
+    },
+    "kernel/keystore.py": {
+      "sha256": "ad6e735bd5c0749fd0033ccc664441cb3d499b8a0db01c89c4f21948bc6f3a6d",
+      "bytes": 1988
+    },
+    "paeos/model_router/audit_prompt.py": {
+      "sha256": "51a04c713de5d5a3ab14363557779df9f377dc37d6713e38814a0d8a49d75953",
+      "bytes": 6333
+    },
+    "paeos/model_router/credentials.py": {
+      "sha256": "96794ba97fc9663404c789f29338eb1e16103b0e39198d98de4bbdf3cb975ccd",
+      "bytes": 4633
+    },
+    "paeos/model_router/intelligence_tier.py": {
+      "sha256": "dcb831673fa49e4f7e847cfd0643404f5ae38dfe1d3739d84b1c386681c5b825",
+      "bytes": 15452
+    },
+    "paeos/model_router/observability.py": {
+      "sha256": "b337f7b226d391cd5bcfcdea72201f47951cd06ee6ff90ae45913e7526f0067a",
+      "bytes": 9020
+    },
+    "paeos/model_router/provider_transports.py": {
+      "sha256": "b4d5b6afe1f13306fabf96ae6f152e1410933679fcac5617f467ccda98deaeef",
+      "bytes": 16575
+    },
+    "paeos/model_router/providers.py": {
+      "sha256": "ea53d6d10d030421adbc7ae8dce1d5a83fbcc035aa28c3f6842e38717a9abf1f",
+      "bytes": 9516
+    },
+    "paeos/model_router/router.py": {
+      "sha256": "b49e44d6030bee58aebccc4688e4fa2833b133797c28490089aea010351b270a",
+      "bytes": 11382
+    },
+    "paeos/model_router/server.py": {
+      "sha256": "c505fc60d13f8ee4403b4d05d52fa77ca6fcfae0d2f87bb4d4f79b4730a45955",
+      "bytes": 13843
+    },
+    "paeos/model_router/state.py": {
+      "sha256": "836d018ae3d64e3c560c9f5b8e1cacde4d297dde29689756c6e84bbc773fe640",
+      "bytes": 20490
+    },
+    "runtime/autonomy/authority.py": {
+      "sha256": "ef1aaa769217f8c5a564e37fa515256afcd35a335e82ba4b2591a524582c42d8",
+      "bytes": 7091
+    },
+    "runtime/autonomy/cycle_detector.py": {
+      "sha256": "d75ef3b4c523849bef7918f0211e6f49a1594670e403fee773b053fa8d64b193",
+      "bytes": 3569
+    },
+    "runtime/autonomy/mdg.py": {
+      "sha256": "2c29ec9afd6c1349062a82f864fd3ea224849a2c13c7f865302f22e7131394be",
+      "bytes": 15972
+    },
+    "runtime/autonomy/mission_controller.py": {
+      "sha256": "1e604eb2d03dd9c6db178ff0021f6a72dd135c1940116fd863e36dd1ccb86dbe",
+      "bytes": 11179
+    },
+    "runtime/autonomy/orca_lineage.py": {
+      "sha256": "c09f9fa5c15cd98c6e58b496a095fcf1d88f1ee1cae7f8e0c6f7befed06b932d",
+      "bytes": 3667
+    },
+    "runtime/autonomy/recovery_controller.py": {
+      "sha256": "43092d239662f7ea2643edc796062d59cf6dadaeee39cc2b9e408662893d8a78",
+      "bytes": 7971
+    },
+    "runtime/autonomy/resume_engine.py": {
+      "sha256": "54ffc66223c82f2d0830af3fc43d40538c6b8e640196b5ace5ce947df49bdad6",
+      "bytes": 10037
+    },
+    "runtime/autonomy/weakness_finder_probes.py": {
+      "sha256": "407b3773ec609d2a0aa93c43b06bf8ba9f4ff71d562203bcb600a4f5122931ac",
+      "bytes": 10393
+    },
+    "runtime/context_compiler.py": {
+      "sha256": "c586dbf194b34ac864f1418d9e187adae2f3c43d4f5891301d1829575f330690",
+      "bytes": 2698
+    },
+    "paeos/semantic/delta_engine.py": {
+      "sha256": "229a536bc39ee000e95c2d43a323524763d424265b0bf4807821e93e29ec4f13",
+      "bytes": 5285
+    },
+    "paeos/semantic/lineage.py": {
+      "sha256": "57c50213f279f48ab9161a433b97a3524e72c36c3b862ec84fdea66d7512de95",
+      "bytes": 4352
+    },
+    "runtime/autonomy/schemas/architect_cognition.py": {
+      "sha256": "61780185a86d4c5b27693da7959faa077e5ed0f746286e917e0157f2c2427a6f",
+      "bytes": 15303
+    },
+    "runtime/autonomy/weakness_finder/coordinator.py": {
+      "sha256": "7952e2e318703648005edbc5247023109e6fc205e6086361df9e7b2fdf63be43",
+      "bytes": 3446
+    },
+    "runtime/autonomy/weakness_finder/sensor_pack_drift.py": {
+      "sha256": "3053e5459bafc2e975d336e47c4161af5ec18a458fecc47a659e273f752579be",
+      "bytes": 1537
+    },
+    "runtime/autonomy/weakness_finder/sensor_pack_mdg.py": {
+      "sha256": "495dd655cd92f82b24a15ec18a9759ea95929c3f265d3b5294466f37c1970321",
+      "bytes": 1442
+    },
+    "runtime/autonomy/weakness_finder/sensor_pack_semantic.py": {
+      "sha256": "19a99aea02ce5bbf3520aa200a6c59f7a98c47eedb8935f582a570d91da9f68b",
+      "bytes": 2372
+    },
+    "runtime/autonomy/weakness_finder/sensor_pack_structural.py": {
+      "sha256": "1e10075c584c7401bc0413eaeea4c672f400b6da08b2ad15599f7a98e2e661d3",
+      "bytes": 15436
+    },
+    "runtime/autonomy/weakness_finder/types.py": {
+      "sha256": "5d5523a549337e79d5356ef0e774b44d713fe3bb1f2137d6002b36d94cc23634",
+      "bytes": 2103
+    },
+    "runtime/ast_linter.py": {
+      "sha256": "fc167518cd747cd621cdc02bd9671aee675b9cc5c2baa7f68566590d1c383e8f",
+      "bytes": 16572
+    },
+    "paeos/model_router/errors.py": {
+      "sha256": "a04f94f15b153843ce023648370b661fa24f167e113ef1efc1cda11360207d92",
+      "bytes": 10493
+    },
+    "paeos/model_router/aimd.py": {
+      "sha256": "219b3f87110575b07767a854335839b55779413882c6ee53a2f5991dd306fa46",
+      "bytes": 7949
+    },
+    "paeos/model_router/policy.py": {
+      "sha256": "2c850db0621890fe13cd6ed5af5092e7604799621ccd0055960162bd67721e08",
+      "bytes": 9908
+    },
+    "paeos/model_router/quota_tracker.py": {
+      "sha256": "1f9d517854977399866691dfd61254e85c12b6464aa973d83f667010e89377df",
+      "bytes": 4123
+    },
+    "paeos/model_router/transport.py": {
+      "sha256": "11bf5f1d8c2f8f2ea411cc30c1e4cbf575cc1d7cca5fd04f482fdbe1b9dc0f58",
+      "bytes": 2410
+    },
+    "paeos/model_router/audit.py": {
+      "sha256": "04b8ce086b9448e089c0af37e7b6dbdacb02548a75f131dc30b893a42be9c5c9",
+      "bytes": 4577
+    },
+    "paeos/model_router/privacy.py": {
+      "sha256": "02d1af32307cfa5df0994442a4621a3bd548597f39e0e1502135e36ab986e31f",
+      "bytes": 1301
+    }
+  },
+  "edges": {
+    "runtime/scheduler.py": [
+      "kernel/types.py",
+      "runtime/orchestrator/__init__.py",
+      "runtime/task_package.py",
+      "runtime/triage.py"
+    ],
+    "tests/runtime/test_scheduler.py": [
+      "kernel/types.py",
+      "runtime/orchestrator/__init__.py",
+      "runtime/scheduler.py",
+      "runtime/task_package.py"
+    ],
+    "runtime/orchestrator/__init__.py": [
+      "kernel/capability.py",
+      "kernel/cas.py",
+      "kernel/evidence.py",
+      "kernel/gates.py",
+      "kernel/ledger.py",
+      "kernel/sandbox.py",
+      "kernel/seal.py",
+      "kernel/types.py",
+      "paeos/model_router/auditor_receipt.py",
+      "paeos/semantic/freeze_guard.py",
+      "paeos/semantic/types.py",
+      "runtime/agents/__init__.py",
+      "runtime/autonomy/__init__.py",
+      "runtime/autonomy/schemas/frontier_research.py",
+      "runtime/autonomy/schemas/tradeoff_analysis.py",
+      "runtime/autonomy/weakness_finder/__init__.py",
+      "runtime/builder_transport.py",
+      "runtime/candidate_materialization.py",
+      "runtime/ceremony.py",
+      "runtime/claude_code.py",
+      "runtime/court/__init__.py",
+      "runtime/court/completeness_firewall.py",
+      "runtime/lifecycle_projection.py",
+      "runtime/memory/__init__.py",
+      "runtime/p1_discrimination.py",
+      "runtime/retrospective.py",
+      "runtime/review/__init__.py",
+      "runtime/run_state_registry.py",
+      "runtime/scar_store.py",
+      "runtime/sidecar_scorer.py",
+      "runtime/task_package.py",
+      "runtime/triage.py",
+      "runtime/verification.py"
+    ],
+    "runtime/task_package.py": [
+      "kernel/evidence.py",
+      "kernel/types.py"
+    ],
+    "runtime/triage.py": [
+      "kernel/classifier.py",
+      "kernel/types.py",
+      "runtime/ceremony.py",
+      "runtime/task_package.py"
+    ],
+    "kernel/capability.py": [
+      "kernel/types.py"
+    ],
+    "kernel/evidence.py": [
+      "kernel/ledger.py",
+      "kernel/types.py"
+    ],
+    "kernel/gates.py": [
+      "kernel/capability.py",
+      "kernel/evidence.py",
+      "kernel/lifecycle.py",
+      "kernel/types.py"
+    ],
+    "kernel/ledger.py": [
+      "kernel/types.py"
+    ],
+    "kernel/sandbox.py": [
+      "kernel/ledger.py"
+    ],
+    "kernel/seal.py": [
+      "kernel/ledger.py",
+      "kernel/types.py"
+    ],
+    "paeos/model_router/auditor_receipt.py": [
+      "kernel/keystore.py",
+      "paeos/model_router/a08_enforcer.py",
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/__init__.py": [
+      "paeos/model_router/audit_prompt.py",
+      "paeos/model_router/auditor_receipt.py",
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/credentials.py",
+      "paeos/model_router/intelligence_tier.py",
+      "paeos/model_router/observability.py",
+      "paeos/model_router/provider_transports.py",
+      "paeos/model_router/providers.py",
+      "paeos/model_router/router.py",
+      "paeos/model_router/server.py",
+      "paeos/model_router/state.py",
+      "paeos/model_router/types.py"
+    ],
+    "runtime/agents/__init__.py": [
+      "kernel/evidence.py",
+      "kernel/types.py",
+      "runtime/claude_code.py",
+      "runtime/task_package.py"
+    ],
+    "runtime/autonomy/__init__.py": [
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/cycle_detector.py",
+      "runtime/autonomy/mdg.py",
+      "runtime/autonomy/mission_controller.py",
+      "runtime/autonomy/orca_lineage.py",
+      "runtime/autonomy/recovery_controller.py",
+      "runtime/autonomy/resume_engine.py",
+      "runtime/autonomy/weakness_finder/__init__.py",
+      "runtime/autonomy/weakness_finder_probes.py"
+    ],
+    "runtime/candidate_materialization.py": [
+      "kernel/cas.py",
+      "kernel/types.py"
+    ],
+    "runtime/claude_code.py": [
+      "kernel/capability.py",
+      "kernel/cas.py",
+      "kernel/types.py",
+      "runtime/context_compiler.py",
+      "runtime/task_package.py"
+    ],
+    "runtime/court/__init__.py": [
+      "kernel/evidence.py",
+      "kernel/sandbox.py",
+      "kernel/types.py"
+    ],
+    "runtime/court/completeness_firewall.py": [
+      "paeos/model_router/auditor_receipt.py",
+      "paeos/model_router/catalog.py",
+      "paeos/semantic/freeze_guard.py",
+      "paeos/semantic/types.py"
+    ],
+    "paeos/semantic/freeze_guard.py": [
+      "paeos/semantic/types.py"
+    ],
+    "paeos/semantic/__init__.py": [
+      "paeos/semantic/delta_engine.py",
+      "paeos/semantic/freeze_guard.py",
+      "paeos/semantic/lineage.py",
+      "paeos/semantic/types.py"
+    ],
+    "runtime/autonomy/schemas/frontier_research.py": [
+      "paeos/semantic/types.py"
+    ],
+    "runtime/autonomy/schemas/__init__.py": [
+      "runtime/autonomy/schemas/architect_cognition.py",
+      "runtime/autonomy/schemas/frontier_research.py",
+      "runtime/autonomy/schemas/tradeoff_analysis.py"
+    ],
+    "runtime/autonomy/weakness_finder/__init__.py": [
+      "runtime/autonomy/weakness_finder/coordinator.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "runtime/autonomy/weakness_finder/types.py"
+    ],
+    "runtime/lifecycle_projection.py": [
+      "kernel/types.py",
+      "runtime/ceremony.py"
+    ],
+    "runtime/memory/__init__.py": [
+      "kernel/types.py",
+      "paeos/semantic/types.py"
+    ],
+    "runtime/p1_discrimination.py": [
+      "kernel/cas.py",
+      "kernel/sandbox.py",
+      "runtime/candidate_materialization.py",
+      "runtime/verification.py"
+    ],
+    "runtime/retrospective.py": [
+      "kernel/cas.py",
+      "kernel/types.py",
+      "runtime/memory/__init__.py"
+    ],
+    "runtime/review/__init__.py": [
+      "kernel/types.py",
+      "runtime/claude_code.py",
+      "runtime/task_package.py"
+    ],
+    "runtime/scar_store.py": [
+      "kernel/types.py",
+      "runtime/memory/__init__.py"
+    ],
+    "runtime/sidecar_scorer.py": [
+      "kernel/types.py"
+    ],
+    "runtime/verification.py": [
+      "kernel/cas.py",
+      "kernel/evidence.py",
+      "kernel/ledger.py",
+      "kernel/sandbox.py",
+      "kernel/types.py",
+      "runtime/ast_linter.py",
+      "runtime/candidate_materialization.py",
+      "runtime/court/completeness_firewall.py"
+    ],
+    "kernel/lifecycle.py": [
+      "kernel/types.py"
+    ],
+    "paeos/model_router/a08_enforcer.py": [
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/providers.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/catalog.py": [
+      "paeos/model_router/providers.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/credentials.py": [
+      "paeos/model_router/providers.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/intelligence_tier.py": [
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/observability.py": [
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/credentials.py",
+      "paeos/model_router/providers.py",
+      "paeos/model_router/state.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/provider_transports.py": [
+      "paeos/model_router/a08_enforcer.py",
+      "paeos/model_router/auditor_receipt.py",
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/errors.py",
+      "paeos/model_router/providers.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/providers.py": [
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/router.py": [
+      "paeos/model_router/aimd.py",
+      "paeos/model_router/auditor_receipt.py",
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/credentials.py",
+      "paeos/model_router/policy.py",
+      "paeos/model_router/quota_tracker.py",
+      "paeos/model_router/state.py",
+      "paeos/model_router/transport.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/server.py": [
+      "paeos/model_router/observability.py",
+      "paeos/model_router/router.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/state.py": [
+      "paeos/model_router/providers.py",
+      "paeos/model_router/types.py"
+    ],
+    "runtime/autonomy/authority.py": [
+      "kernel/types.py"
+    ],
+    "runtime/autonomy/mdg.py": [
+      "kernel/ledger.py",
+      "paeos/semantic/lineage.py",
+      "paeos/semantic/types.py",
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/cycle_detector.py"
+    ],
+    "runtime/autonomy/mission_controller.py": [
+      "kernel/cas.py",
+      "kernel/ledger.py",
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/cycle_detector.py",
+      "runtime/autonomy/mdg.py",
+      "runtime/autonomy/recovery_controller.py",
+      "runtime/autonomy/resume_engine.py",
+      "runtime/autonomy/weakness_finder/__init__.py",
+      "runtime/autonomy/weakness_finder/types.py"
+    ],
+    "runtime/autonomy/orca_lineage.py": [
+      "kernel/ledger.py",
+      "runtime/autonomy/mdg.py"
+    ],
+    "runtime/autonomy/recovery_controller.py": [
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/mdg.py"
+    ],
+    "runtime/autonomy/resume_engine.py": [
+      "kernel/ledger.py",
+      "runtime/autonomy/mdg.py"
+    ],
+    "runtime/autonomy/weakness_finder_probes.py": [
+      "runtime/autonomy/authority.py",
+      "runtime/autonomy/cycle_detector.py",
+      "runtime/autonomy/mdg.py"
+    ],
+    "runtime/context_compiler.py": [
+      "kernel/types.py"
+    ],
+    "paeos/semantic/delta_engine.py": [
+      "paeos/semantic/types.py"
+    ],
+    "paeos/semantic/lineage.py": [
+      "paeos/semantic/types.py"
+    ],
+    "runtime/autonomy/weakness_finder/coordinator.py": [
+      "runtime/autonomy/weakness_finder/sensor_pack_drift.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_mdg.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_semantic.py",
+      "runtime/autonomy/weakness_finder/sensor_pack_structural.py",
+      "runtime/autonomy/weakness_finder/types.py"
+    ],
+    "runtime/autonomy/weakness_finder/sensor_pack_drift.py": [
+      "runtime/autonomy/weakness_finder/types.py"
+    ],
+    "runtime/autonomy/weakness_finder/sensor_pack_mdg.py": [
+      "runtime/autonomy/mdg.py",
+      "runtime/autonomy/weakness_finder/types.py",
+      "runtime/autonomy/weakness_finder_probes.py"
+    ],
+    "runtime/autonomy/weakness_finder/sensor_pack_semantic.py": [
+      "paeos/semantic/lineage.py",
+      "runtime/autonomy/mdg.py",
+      "runtime/autonomy/weakness_finder/types.py"
+    ],
+    "runtime/autonomy/weakness_finder/sensor_pack_structural.py": [
+      "runtime/autonomy/weakness_finder/types.py"
+    ],
+    "runtime/ast_linter.py": [
+      "kernel/ledger.py",
+      "kernel/types.py"
+    ],
+    "paeos/model_router/errors.py": [
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/aimd.py": [
+      "paeos/model_router/providers.py",
+      "paeos/model_router/state.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/policy.py": [
+      "paeos/model_router/aimd.py",
+      "paeos/model_router/audit.py",
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/credentials.py",
+      "paeos/model_router/intelligence_tier.py",
+      "paeos/model_router/privacy.py",
+      "paeos/model_router/state.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/transport.py": [
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/credentials.py",
+      "paeos/model_router/errors.py",
+      "paeos/model_router/provider_transports.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/audit.py": [
+      "paeos/model_router/a08_enforcer.py",
+      "paeos/model_router/catalog.py",
+      "paeos/model_router/types.py"
+    ],
+    "paeos/model_router/privacy.py": [
+      "paeos/model_router/types.py"
+    ]
+  },
+  "unresolved_dynamic_imports": [],
+  "missing_local_modules": [],
+  "external_module_names": [
+    "__future__",
+    "argparse",
+    "ast",
+    "base64",
+    "collections",
+    "collections.abc",
+    "concurrent.futures",
+    "contextlib",
+    "dataclasses",
+    "datetime",
+    "enum",
+    "hashlib",
+    "http.server",
+    "importlib",
+    "io",
+    "itertools",
+    "json",
+    "litellm",
+    "logging",
+    "math",
+    "nacl.exceptions",
+    "nacl.signing",
+    "os",
+    "pathlib",
+    "posixpath",
+    "pytest",
+    "random",
+    "re",
+    "requests",
+    "resource",
+    "shlex",
+    "shutil",
+    "sqlite3",
+    "stat",
+    "subprocess",
+    "sys",
+    "tarfile",
+    "tempfile",
+    "threading",
+    "time",
+    "types",
+    "typing",
+    "uuid"
+  ],
+  "prior_observation_attempt": "System python3 could not AST-parse Python 3.13 type aliases; read-only attempt failed before executing any project module. Repeated only the observation with the verified recovery interpreter.",
+  "boundary": "READ_ONLY_DIRECTED_AST_OBSERVATION_ONLY; not an authorized import manifest, runtime import proof, resource closure or C2 construction admission; no Python project module executed"
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "command": [
+      "/usr/bin/git",
+      "switch",
+      "-c",
+      "codex/b00-admission-authority-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Switched to a new branch 'codex/b00-admission-authority-20261021'\n"
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "add",
+      "--",
+      "runtime/autonomy/admission_authority.py",
+      "runtime/autonomy/admission_send_fence.py",
+      "tests/runtime/autonomy/test_admission_authority.py",
+      "tests/runtime/autonomy/test_admission_send_fence.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "-c",
+      "commit.gpgsign=false",
+      "commit",
+      "-m",
+      "checkpoint: authenticated admission source candidate (offline, unreviewed)"
+    ],
+    "exit_code": 0,
+    "stdout": "[codex/b00-admission-authority-20261021 bd28b378] checkpoint: authenticated admission source candidate (offline, unreviewed)\n 4 files changed, 1477 insertions(+)\n create mode 100644 runtime/autonomy/admission_authority.py\n create mode 100644 tests/runtime/autonomy/test_admission_authority.py\n",
+    "stderr": ""
+  }
+]

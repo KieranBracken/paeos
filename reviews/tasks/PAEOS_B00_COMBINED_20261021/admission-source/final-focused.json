@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/runtime/autonomy/test_admission_authority.py",
+    "tests/runtime/autonomy/test_admission_send_fence.py",
+    "tests/kernel/test_ledger.py",
+    "tests/kernel/test_ledger_sqlite.py",
+    "tests/ops/test_autonomous_run_fence_composition.py",
+    "tests/runtime/test_trusted_codex_worker_transport.py::test_trusted_transport_claims_before_fake_queue_send_and_settles_return",
+    "tests/runtime/test_trusted_codex_worker_transport.py::test_revoked_admission_denies_at_trusted_transport_before_queue_write"
+  ],
+  "exit_code": 0,
+  "seconds": 3.372
+}
