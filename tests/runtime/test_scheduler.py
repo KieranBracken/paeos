@@ -412,10 +412,13 @@ def test_synthetic_admission_refusal_precedes_second_reservation(
     # R5/R6/R7 exercise scheduler consumption of a synthetic canonical refusal,
     # not authentication or atomicity of the nonexistent production adapter.
     intake = _intake(case)
+    # R6 needs two distinct tasks competing for the same scope, not a duplicate.
+    contender = _intake("incompatible-contender") if case == "scope-incompatible" else intake
+    expected = [intake, contender]
     checked, ran = [], []
 
     def synthetic(item, probe):
-        assert item is intake
+        assert item is expected[len(checked)]
         checked.append(item)
         return None if len(checked) == 1 else reason
 
@@ -429,13 +432,13 @@ def test_synthetic_admission_refusal_precedes_second_reservation(
         run_one,
         governor=EconomicGovernor(GlobalBudget(1000, 1000, 10)),
         budget_by_class=_BUDGETS,
-    ).run([intake, intake])
-    assert checked == [intake, intake]
+    ).run(expected)
+    assert checked == expected
     assert ran == [intake]
     assert len(report.outcomes) == 1
     assert report.remaining == GlobalBudget(900, 1000, 9)
     assert report.stop_reason is StopReason.READINESS_HELD
-    assert [(hold.intake, hold.reason) for hold in report.held] == [(intake, reason)]
+    assert [(hold.intake, hold.reason) for hold in report.held] == [(contender, reason)]
 
 
 @pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
