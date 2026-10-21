@@ -8,6 +8,7 @@ append-only and remains consumed after a crash, timeout, restart, or UNKNOWN out
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import threading
 import uuid
@@ -96,6 +97,12 @@ class SendOperation:
     route_digest: str
     request_id: str
     frame: bytes
+    operation_kind: str | None = None
+    session_id: str | None = None
+    contract_digest: str | None = None
+    scope_digest: str | None = None
+    root_allocation_id: str | None = None
+    frame_ordinal: int | None = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -118,6 +125,22 @@ class SendOperation:
             raise ValueError("outbound frame is empty or outside its size bound")
         if type(self.route_digest) is not str or not _HASH.fullmatch(self.route_digest):
             raise ValueError("route_digest must be a lowercase SHA-256 digest")
+        if self.operation_kind is not None:
+            if type(self.operation_kind) is not str or self.operation_kind not in {
+                "WORKER_LAUNCH",
+                "PROVIDER_FRAME",
+            }:
+                raise ValueError("invalid operation_kind")
+            if type(self.frame_ordinal) is not int or self.frame_ordinal < 0:
+                raise ValueError("invalid parent frame ordinal")
+            for name in ("session_id", "root_allocation_id"):
+                value = getattr(self, name)
+                if type(value) is not str or not value or len(value) > 512 or "\x00" in value:
+                    raise ValueError(f"invalid {name}")
+            for name in ("contract_digest", "scope_digest"):
+                value = getattr(self, name)
+                if type(value) is not str or not _HASH.fullmatch(value):
+                    raise ValueError(f"invalid {name}")
 
     @property
     def frame_digest(self) -> str:
@@ -157,6 +180,9 @@ class AdmissionSendFence:
         self._ledger = ledger
         self._authority = authority
         self._domain_tag = domain_tag.strip().upper()
+        context_validator = getattr(authority, "validate_context", None)
+        if context_validator is not None:
+            context_validator(ledger, self._domain_tag)
         self._now = now or (lambda: datetime.now(UTC))
         self._settlement_lock = threading.Lock()
         self._issued_leases: dict[str, SendLease] = {}
@@ -174,6 +200,10 @@ class AdmissionSendFence:
         rows, head_hash = self._snapshot()
         admission, _policy = self._resolve_current(rows, admission_ref, expected_epoch)
         logical_job_id = self._required_text(admission, "logical_job_id")
+        if getattr(self._authority, "requires_authenticated_settlement", False):
+            logical_job_id = self._parent_job_id(
+                self._required_text(admission, "root_allocation_id"), "WORKER_LAUNCH", 0
+            )
         if any(
             row.event.kind == _SEND_CLAIMED
             and row.domain_tag == self._domain_tag
@@ -196,6 +226,17 @@ class AdmissionSendFence:
             )
             self._validate_operation(operation, admission)
             logical_job_id = self._required_text(admission, "logical_job_id")
+            if operation.operation_kind is not None:
+                if (
+                    operation.operation_kind not in {"WORKER_LAUNCH", "PROVIDER_FRAME"}
+                    or type(operation.frame_ordinal) is not int
+                    or operation.frame_ordinal < 0
+                    or not operation.root_allocation_id
+                ):
+                    raise AdmissionNotCurrent("explicit parent operation binding required")
+                logical_job_id = self._parent_job_id(
+                    operation.root_allocation_id, operation.operation_kind, operation.frame_ordinal
+                )
             if any(
                 row.event.kind == _SEND_CLAIMED
                 and row.domain_tag == self._domain_tag
@@ -203,6 +244,11 @@ class AdmissionSendFence:
                 for row in rows
             ):
                 raise DuplicateSendOperation("logical operation already has a durable send claim")
+            validator = getattr(self._authority, "validate_operation", None)
+            if operation.operation_kind is not None and validator is None:
+                raise AdmissionNotCurrent("provider frames require concrete parent authorization")
+            if validator is not None and validator(operation, admission, rows) is not True:
+                raise AdmissionNotCurrent("parent scope or root allocation refused operation")
             try:
                 allowed = self._authority.authorize_frame(
                     admission,
@@ -236,6 +282,27 @@ class AdmissionSendFence:
                 "request_id": operation.request_id,
                 "frame_digest": operation.frame_digest,
                 "state": "CLAIMED",
+                **(
+                    {
+                        k: getattr(operation, k)
+                        for k in (
+                            "operation_kind",
+                            "session_id",
+                            "contract_digest",
+                            "scope_digest",
+                            "root_allocation_id",
+                            "frame_ordinal",
+                        )
+                    }
+                    if operation.operation_kind is not None
+                    else {}
+                ),
+                **({"grant_id": admission["grant_id"]} if "grant_id" in admission else {}),
+                **(
+                    {"root_grant_digest": admission["root_grant_digest"]}
+                    if "root_grant_digest" in admission
+                    else {}
+                ),
             }
             try:
                 seq = self._ledger.append_if_head(
@@ -270,6 +337,8 @@ class AdmissionSendFence:
         if not isinstance(outcome, SendOutcome):
             raise SendSettlementError("send outcome is invalid")
         if outcome is SendOutcome.RETURNED:
+            if getattr(self._authority, "requires_authenticated_settlement", False):
+                raise SendSettlementError("returned evidence requires authenticated reconciliation")
             if type(outcome_ref) is not str or not _HASH.fullmatch(outcome_ref):
                 raise SendSettlementError("returned outcome requires a digest reference")
         elif outcome_ref is not None:
@@ -317,6 +386,100 @@ class AdmissionSendFence:
             "canonical ledger remained contended; settlement was not recorded"
         )
 
+    def query_send_claim(self, lease_id: str) -> dict[str, object]:
+        """Read durable claim/outcome after restart; never grants a new send."""
+        rows, head = self._snapshot()
+        claims = [
+            r
+            for r in rows
+            if r.domain_tag == self._domain_tag
+            and r.event.kind == _SEND_CLAIMED
+            and r.event.payload.get("lease_id") == lease_id
+        ]
+        if len(claims) != 1:
+            raise SendSettlementError("claim absent or ambiguous")
+        result = dict(claims[0].event.payload)
+        settlements = [
+            r
+            for r in rows
+            if r.domain_tag == self._domain_tag
+            and r.event.kind == _SEND_SETTLED
+            and r.event.payload.get("lease_id") == lease_id
+        ]
+        if len(settlements) > 1:
+            raise SendSettlementError("ambiguous settlement")
+        if settlements:
+            settlement = settlements[0].event.payload
+            if settlement.get("outcome") == "RETURNED" and getattr(
+                self._authority, "requires_authenticated_settlement", False
+            ):
+                evidence = settlement.get("evidence")
+                verifier = getattr(self._authority, "verify_settlement_record", None)
+                if (
+                    not isinstance(evidence, Mapping)
+                    or verifier is None
+                    or verifier(evidence, result) is not True
+                    or evidence.get("outcome") != settlement.get("outcome")
+                    or evidence.get("outcome_ref") != settlement.get("outcome_ref")
+                ):
+                    raise SendSettlementError("stored return evidence is unauthenticated")
+            result.update(settlement)
+            result["state"] = "SETTLED"
+        if self._ledger.head_hash() != head:
+            raise SendSettlementError("claim changed during query")
+        return json.loads(json.dumps(result))
+
+    def reconcile_send_claim(
+        self, lease_id: str, evidence: Mapping[str, object], *, outcome_bytes: bytes | None = None
+    ) -> int:
+        """Authenticate a receiver receipt against the durable exact claim and bytes.
+
+        UNKNOWN is terminal and consumes the allocation; reconciliation never retries
+        a send and cannot replace any existing settlement.
+        """
+        evidence = json.loads(json.dumps(dict(evidence), allow_nan=False))
+        verifier = getattr(self._authority, "verify_settlement", None)
+        if verifier is None:
+            raise SendSettlementError("authenticated reconciliation unavailable")
+        for _ in range(_MAX_CAS_ATTEMPTS):
+            rows, head = self._snapshot()
+            claims = [
+                r
+                for r in rows
+                if r.domain_tag == self._domain_tag
+                and r.event.kind == _SEND_CLAIMED
+                and r.event.payload.get("lease_id") == lease_id
+            ]
+            if len(claims) != 1 or any(
+                r.domain_tag == self._domain_tag
+                and r.event.kind == _SEND_SETTLED
+                and r.event.payload.get("lease_id") == lease_id
+                for r in rows
+            ):
+                raise SendSettlementError("claim absent, ambiguous or already settled")
+            claim = claims[0].event.payload
+            if verifier(evidence, claim, outcome_bytes) is not True:
+                raise SendSettlementError("invalid authenticated return evidence")
+            payload = {
+                "lease_id": lease_id,
+                "logical_job_id": claim["logical_job_id"],
+                "outcome": evidence["outcome"],
+                "outcome_ref": evidence.get("outcome_ref"),
+                "evidence": evidence,
+            }
+            try:
+                seq = self._ledger.append_if_head(
+                    Event(1, _SEND_SETTLED, payload),
+                    expected_head_hash=head,
+                    domain_tag=self._domain_tag,
+                )
+                with self._settlement_lock:
+                    self._issued_leases.pop(lease_id, None)
+                return seq
+            except ForkRejected:
+                continue
+        raise SendSettlementError("canonical ledger remained contended")
+
     def send_once(
         self,
         operation: SendOperation,
@@ -330,6 +493,12 @@ class AdmissionSendFence:
             with suppress(SendSettlementError):
                 self.finish_send_lease(lease, SendOutcome.UNKNOWN)
             raise
+        if getattr(self._authority, "requires_authenticated_settlement", False):
+            # Local sink return is not an authenticated receiver receipt. Keep the
+            # durable claim consumed and unresolved until explicit reconciliation.
+            with self._settlement_lock:
+                self._issued_leases.pop(lease.lease_id, None)
+            return result
         if isinstance(result, bytes):
             outcome_bytes = result
         elif isinstance(result, str):
@@ -350,6 +519,10 @@ class AdmissionSendFence:
         if verified_head != observed_head:
             raise AdmissionNotCurrent("canonical ledger changed while resolving authority state")
         return rows, observed_head
+
+    @staticmethod
+    def _parent_job_id(allocation_id: str, operation_kind: str, ordinal: int) -> str:
+        return hashlib.sha256(repr((allocation_id, operation_kind, ordinal)).encode()).hexdigest()
 
     def _resolve_current(
         self,
@@ -395,6 +568,9 @@ class AdmissionSendFence:
             raise AdmissionNotCurrent("canonical disclosure policy proof is invalid")
         if not self._not_expired(policy):
             raise AdmissionNotCurrent("canonical disclosure policy is expired")
+        validator = getattr(self._authority, "validate_current", None)
+        if validator is not None and validator(rows, admission, policy) is not True:
+            raise AdmissionNotCurrent("canonical root authority is revoked")
         return admission, policy
 
     @staticmethod

@@ -464,3 +464,47 @@ def test_revocation_committing_between_validation_and_claim_blocks_the_sink(tmp_
     assert reopened.verify_chain() == reopened.head_hash()
     reopened.close()
     reopened_store.close()
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("operation_kind", []),
+        ("operation_kind", "OTHER"),
+        ("frame_ordinal", True),
+        ("frame_ordinal", -1),
+        ("session_id", ""),
+        ("contract_digest", "not-a-hash"),
+        ("scope_digest", None),
+        ("root_allocation_id", ""),
+    ],
+)
+def test_explicit_parent_operation_requires_complete_well_typed_binding(field, value):
+    fields = dict(
+        operation_kind="PROVIDER_FRAME",
+        session_id="session",
+        contract_digest="a" * 64,
+        scope_digest="b" * 64,
+        root_allocation_id="root",
+        frame_ordinal=0,
+    )
+    fields[field] = value
+    with pytest.raises(ValueError):
+        _operation(**fields)
+
+
+def test_legacy_verifier_cannot_authorize_new_parent_frame():
+    ledger = Ledger(InMemoryLedgerStore())
+    _seed(ledger)
+    with pytest.raises(AdmissionNotCurrent):
+        _fence(ledger).acquire_send_lease(
+            _operation(
+                operation_kind="PROVIDER_FRAME",
+                session_id="session",
+                contract_digest="a" * 64,
+                scope_digest="b" * 64,
+                root_allocation_id="root",
+                frame_ordinal=0,
+            )
+        )
+    assert not any(r.event.kind == "ADMISSION_SEND_CLAIMED" for r in ledger.read())
