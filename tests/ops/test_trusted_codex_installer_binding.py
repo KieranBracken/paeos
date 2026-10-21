@@ -18,6 +18,8 @@ from ops import install_trusted_codex_worker_supervisor as installer
 
 BUNDLE_MEMBERS = (
     "ops/trusted_codex_worker_supervisor.py",
+    "runtime/integrations/mediated_worker_tools.py",
+    "runtime/integrations/disclosure_frame.py",
     "runtime/integrations/process_supervisor.py",
     "runtime/integrations/task_scoped_responses_broker.py",
     "runtime/integrations/worker_confinement.py",
@@ -35,6 +37,8 @@ BUNDLE_MEMBERS = (
 EXPECTED_BUNDLE_IMPORT_CLOSURE = frozenset(
     {
         "ops/trusted_codex_worker_supervisor.py",
+        "runtime/integrations/mediated_worker_tools.py",
+        "runtime/integrations/disclosure_frame.py",
         "runtime/integrations/process_supervisor.py",
         "runtime/integrations/task_scoped_responses_broker.py",
         "runtime/integrations/worker_confinement.py",
@@ -307,24 +311,32 @@ def test_built_bundle_starts_real_supervisor_and_signs_identity(tmp_path: Path) 
             process.wait(timeout=5)
         process.communicate(timeout=2)
 
-    incomplete_bundle = tmp_path / "incomplete-bundle"
-    shutil.copytree(bundle, incomplete_bundle)
-    (incomplete_bundle / "kernel").chmod(0o755)
-    (incomplete_bundle / "kernel/types.py").unlink()
-    negative_environment = {
-        "PATH": os.defpath,
-        "PYTHONPATH": str(incomplete_bundle),
-    }
-    negative = subprocess.run(
-        [sys.executable, "-c", "import ops.trusted_codex_worker_supervisor"],
-        cwd=tmp_path,
-        env=negative_environment,
-        capture_output=True,
-        check=False,
-        timeout=5,
-    )
-    assert negative.returncode != 0
-    assert b"kernel.types" in negative.stderr
+    for index, (missing_path, missing_module) in enumerate(
+        (
+            ("kernel/types.py", b"kernel.types"),
+            ("runtime/integrations/mediated_worker_tools.py", b"mediated_worker_tools"),
+            ("runtime/integrations/disclosure_frame.py", b"disclosure_frame"),
+        )
+    ):
+        incomplete_bundle = tmp_path / f"incomplete-bundle-{index}"
+        shutil.copytree(bundle, incomplete_bundle)
+        missing = incomplete_bundle / missing_path
+        missing.parent.chmod(0o755)
+        missing.unlink()
+        negative_environment = {
+            "PATH": os.defpath,
+            "PYTHONPATH": str(incomplete_bundle),
+        }
+        negative = subprocess.run(
+            [sys.executable, "-c", "import ops.trusted_codex_worker_supervisor"],
+            cwd=tmp_path,
+            env=negative_environment,
+            capture_output=True,
+            check=False,
+            timeout=5,
+        )
+        assert negative.returncode != 0
+        assert missing_module in negative.stderr
 
 
 def test_bundle_rejects_symlinked_source_ancestor(tmp_path: Path) -> None:

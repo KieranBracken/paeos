@@ -46,6 +46,8 @@ PYTHON = REPO_ROOT / ".venv" / "bin" / "python3"
 
 BUNDLE_MEMBERS = (
     "ops/trusted_codex_worker_supervisor.py",
+    "runtime/integrations/mediated_worker_tools.py",
+    "runtime/integrations/disclosure_frame.py",
     "runtime/integrations/process_supervisor.py",
     "runtime/integrations/task_scoped_responses_broker.py",
     "runtime/integrations/worker_confinement.py",
