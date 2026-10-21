@@ -1,0 +1,20 @@
+{
+  "schema": "paeos.frozen-source-publish-receipt/1",
+  "source_commit": "50a54a59b9e0d27190e9355af5af6fa552de897e",
+  "branch": "codex/b00-confinement-20261021",
+  "files": [
+    "ops/trusted_codex_worker_supervisor.py",
+    "runtime/integrations/mediated_worker_tools.py",
+    "runtime/integrations/process_supervisor.py",
+    "runtime/integrations/worker_confinement.py",
+    "tests/runtime/test_confined_codex_cli.py",
+    "tests/runtime/test_mediated_worker_tools.py",
+    "tests/runtime/test_worker_confinement_mutations.py"
+  ],
+  "bounded_secret_scan": "No matched targeted high-confidence key patterns in seven synthetic source/test files; not classification authority",
+  "push_exit": 0,
+  "remote_readback": "50a54a59b9e0d27190e9355af5af6fa552de897e\trefs/heads/codex/b00-confinement-20261021",
+  "force_push": false,
+  "review": "UNREVIEWED",
+  "qualification": false
+}

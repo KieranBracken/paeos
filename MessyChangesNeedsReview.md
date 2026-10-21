@@ -5648,3 +5648,8 @@ Complete-frame parser, versioned derivative-policy syntax and broker pre-send/cr
 ### 2026-10-21 — B00 partial combined source checkpoint (unreviewed)
 
 Admission source `bd28b378` is assembled byte-for-byte on the isolated combined branch; all 35 owner evidence artifacts and four source hashes verified. Owner-focused result:113 passed. Root did not rerun tests while Chat4 constructs confinement. Combined regression, full-suite disposition and eligible independent review remain pending. See `reviews/tasks/PAEOS_B00_COMBINED_20261021/ASSEMBLY.json`; source candidate only, no activation or qualification. C2-only target/owner decision remains separate and cannot block this B00 source assembly.
+
+
+### 2026-10-21 — tested B00 combined checkpoint, still unreviewed
+
+Admission and confinement source packages are combined, with the root-owned two-module installer closure repair at `58c800d3`. Focused:520 passed,1 known-failed real CLI probe excluded,1 cache warning. Full-suite attempt:7 collection errors (`contracts.adapters`, `runtime.transport`), not acceptance. Preserve the failed CLI tool-inventory result, original review findings, raw RED/harness logs and C2-only owner boundary. See `reviews/tasks/PAEOS_B00_COMBINED_20261021/FINAL_ASSEMBLY.json`. No runtime, install, provider, Court or debt activation.

@@ -1,0 +1,49 @@
+B00 confinement continuation verification record — 2026-10-21
+
+Candidate: /Users/bob/.codex/worktrees/b00-confinement-v1/paeos
+Original assignment: B00-20261019-confinement-v1
+Continuation: B00-confinement-same-task-continuation-20261021-v1
+Base: aefdf625e1a44ba33bc2a611a8e1c894a5f88b1e
+Candidate commit: 50a54a59b9e0d27190e9355af5af6fa552de897e
+Patch: CHAT4_B00_CONFINEMENT_CONTINUATION_20261021.patch
+Patch SHA-256: 9e4a257aee968574c91eefd3214b05ad29dc7cf040b01d55062f03bb57f22451
+
+TDD RED -> GREEN
+- New test: tests/runtime/test_confined_codex_cli.py::test_supervisor_fails_closed_before_legacy_bypass_launch_when_mcp_is_unsupported.
+- Before repair, the synthetic request reached the legacy path. Captured failure: expected stable/ supported mediated-MCP refusal, actual `trusted Codex launch failed closed` after the launch stub was reached. No actual Codex process or provider request was made by this RED test.
+- Minimal repair: `_run_request` rejects the exact configured pinned Codex executable when there is no verified supported mediated MCP inventory. It raises `capability_failure` after policy construction and before canaries, `_codex_argv`, or `run_bounded_process`. Synthetic supervisor tests using a fake executable continue to cover transport behavior.
+- GREEN: that test passed in the committed focused suite.
+
+Committed focused/adjacent regression
+- Command: `python -B -m pytest -p no:cacheprovider --basetemp <isolated Seatbelt write root>/pytest-temp -v tests/runtime/test_mediated_worker_tools.py tests/runtime/test_worker_confinement_mutations.py tests/runtime/test_confined_codex_cli.py tests/runtime/test_trusted_codex_worker_transport.py -k not real_pinned_cli`.
+- Runner was launched through `/usr/bin/sandbox-exec` with `deny network*`; all test subprocesses inherited that OS profile. No host credentials were present. Shared heavy-test lock was acquired with a 15-second bounded wait.
+- Result: 78 passed, 1 deselected. Seatbelt profile SHA-256: c49e60bea2c5c7b8d4258f446edd636b4382d15270d7fdbef76e24738a3522ea.
+- Exact output record: CHAT4_B00_CONFINEMENT_FOCUSED_20261021.txt; SHA-256 4b335a58e9f302d03c2f0ffe034993ba4157a0ef8f9daaaf1515ba70ac3a50f1.
+- The new `run_test` negative case confirmed its child cannot write to a path outside the Seatbelt workspace. The test runner and child were both under OS confinement for this suite.
+
+Pinned CLI capability test — expected blocker retained
+- Command: `python -B -m pytest -p no:cacheprovider --basetemp <isolated temp>/pytest-temp -q tests/runtime/test_confined_codex_cli.py::test_real_pinned_cli_exposes_only_mediated_tools_to_local_fake_provider`.
+- Actual CLI and its version preflight ran inside Seatbelt. The actual CLI had a Seatbelt policy with only the local fake-provider loopback port allowed; external egress was denied. HOME, CODEX_HOME, TMPDIR, PATH and token were synthetic. One request went only to the local fake provider; no real inference or external provider call occurred.
+- Version preflight passed: `codex-cli 0.147.0`.
+- Test then failed at the required inventory assertion. Exact observed fields: `tools=None`; `request_keys=['client_metadata','include','input','model','parallel_tool_calls','prompt_cache_key','reasoning','store','stream','text','tool_choice']`; `tool_choice='auto'`; `request_count=1`; `mcp_logs=[]`. No function_call or mediated tool invocation occurred. The prior frozen probe also recorded `mcp_2026_07_28` as under development and disabled; it was not enabled.
+- This is the unresolved platform capability gate. Do not weaken the assertion, use an under-development flag, or restore the legacy launch.
+
+Static verification
+- Ruff format check: passed, 7 files.
+- Ruff lint: passed, 7 files.
+- Python compile() check: passed, 7 files.
+- `git diff --check` and committed `git show --check`: passed.
+- Scoped secret scan: no matches.
+- First sandboxed Ruff run failed because its default cache tried writing under the candidate; the rerun sent RUFF_CACHE_DIR into the isolated temp root. A sandboxed `git diff --check` also hit a macOS xcode-select metadata denial; the same read-only check passed outside the Seatbelt runner. Those were harness-boundary failures, not source/test failures. Detailed captured static attempts: CHAT4_B00_CONFINEMENT_STATIC_20261021.txt (SHA-256 fae2f40d3b8b27001ff55498447ed7123bd9c627f4712f0056590428d041e8a2) and CHAT4_B00_CONFINEMENT_STATIC_RERUN_20261021.txt (SHA-256 45c8925cd5cb2988a05a329676f7c69738725971e57ee2deffecfbac7a332a11).
+- The first confined pytest harness failed because its own scratch root was omitted from read roots. After correction, the regression suite passed. The first broader suite harness lacked the exact `/etc/codex/requirements.toml` read-probe exception; rerun added that one exact probe path and passed. No broader read or write permission was added.
+
+Prior independent review and current status
+- The preserved Luna review identified the unsafe `_run_request` launch through `_codex_argv` and the lack of an actual mediated tool call. The new path-level gate blocks the configured pinned executable before canary or process launch. No new independent review was requested or performed for this continuation; root must obtain an independent review before any production wiring.
+
+Prior evidence correction
+- The 2026-10-19 handoff described later Codex CLI probes as Seatbelt-confined. This continuation found that its test source still ran `codex --version` outside Seatbelt. The test was corrected; its current version preflight and main CLI process both run under Seatbelt. The previously disclosed earlier telemetry egress to `ab.chatgpt.com` is unchanged and was not repeated.
+
+Boundaries
+- No authoritative checkout or Chat 1 candidate was changed; only the seven owner-card paths in this isolated worktree were changed.
+- No host service was installed or enabled; no credentials or signing keys were read; no provider requests, formal reviews, Court, A-08, qualification, PF03, or production activation are claimed.
+- No remote was pushed. The checkpoint is a detached local commit in the preserved candidate worktree; no approved remote branch identity was supplied for readback.

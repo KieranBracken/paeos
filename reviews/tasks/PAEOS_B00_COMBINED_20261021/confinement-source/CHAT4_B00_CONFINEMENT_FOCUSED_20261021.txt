@@ -1,0 +1,23 @@
+worktree=/Users/bob/.codex/worktrees/b00-confinement-v1/paeos
+commit=50a54a59b9e0d27190e9355af5af6fa552de897e
+command=('/Users/bob/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/bin/python3.13', '-B', '-m', 'pytest', '-p', 'no:cacheprovider', '--basetemp', '/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-b00-final-focused-eny8xq4g/workspace/pytest-temp', '-v', 'tests/runtime/test_mediated_worker_tools.py', 'tests/runtime/test_worker_confinement_mutations.py', 'tests/runtime/test_confined_codex_cli.py', 'tests/runtime/test_trusted_codex_worker_transport.py', '-k', 'not real_pinned_cli')
+seatbelt_profile_sha256=c49e60bea2c5c7b8d4258f446edd636b4382d15270d7fdbef76e24738a3522ea
+network=deny network*
+write_root=/private/var/folders/b0/hb9_mxhn4nz09tzctglbjq6w0000gp/T/paeos-b00-final-focused-eny8xq4g/workspace
+exit_code=0
+--- stdout ---
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: /Users/bob/.codex/worktrees/b00-confinement-v1/paeos
+configfile: pyproject.toml
+collected 79 items / 1 deselected / 78 selected
+
+tests/runtime/test_mediated_worker_tools.py ............                 [ 15%]
+tests/runtime/test_worker_confinement_mutations.py ......                [ 23%]
+tests/runtime/test_confined_codex_cli.py ....                            [ 28%]
+tests/runtime/test_trusted_codex_worker_transport.py ................... [ 52%]
+.....................................                                    [100%]
+
+======================= 78 passed, 1 deselected in 0.39s =======================
+
+--- stderr ---

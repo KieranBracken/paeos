@@ -1,0 +1,104 @@
+{
+  "schema": "paeos.combined-offline-candidate-result/1",
+  "event_id": "B00-combined-root-checkpoint-20261021-v1",
+  "recorded_at_utc": "2026-10-21T13:45:21.307722+00:00",
+  "source_commit": "58c800d3cf4fdc51235e7a4f5e08b2c2a2d8c4cc",
+  "source_files": {
+    "ops/install_trusted_codex_worker_supervisor.py": "3514b2cba5b9099cc0fc9f302ef97c775cbf051b14bb6e651eba0d777d816615",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+    "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+    "tests/ops/test_trusted_codex_installer_binding.py": "78f532db39a89116903a452b210b485550510223e39e01eeef04e812674db37a",
+    "tests/runtime/autonomy/test_admission_authority.py": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "tests/runtime/test_worker_confinement_mutations.py": "443dbfa90c815bed9858b8ff8891f76b990096cb033b6f026a886785c12a91e8"
+  },
+  "source_delta_sha256": "99d2afdbacaefc6dd074fa35f72064c391bb6703978f7fd13c25e89a1a0fc042",
+  "branch": "codex/b00-combined-bootstrap-20261021",
+  "base": "c6709750a07c823bcb31b0a4d819f9ab84ae1f25",
+  "preserved_recovery_branch": "codex/p1-bound-source-recovery-20261018 at base",
+  "admission_source_commit": "bd28b3780f93ff0dad4422b7ca68490c71a877e2",
+  "admission_evidence_commit": "8fdf70ace41906465216307853bc9127673a8e43",
+  "confinement_source_commit": "50a54a59b9e0d27190e9355af5af6fa552de897e",
+  "confinement_cherry_pick": "efbee00f38e15850c2f22097693565ec9a54691f",
+  "builder_families": {
+    "admission": "GPT; actual native gpt-6-astra/high authoring turn, not PAEOS model qualification",
+    "confinement": "GPT; actual native gpt-6-luna/xhigh authoring turn, not PAEOS model qualification"
+  },
+  "root_correction": {
+    "paths": [
+      "ops/install_trusted_codex_worker_supervisor.py",
+      "tests/ops/test_trusted_codex_installer_binding.py"
+    ],
+    "scope": "Existing root disclosure/installer integration card",
+    "RED": "Real temporary supervisor startup failed because mediated_worker_tools was absent. Root closure inspection also identified disclosure_frame as a required local import.",
+    "GREEN": "Added only those two existing modules to bundle closure and fixture manifests. Actual temporary supervisor startup/signed identity and missing-module negatives for kernel types, mediated tools and disclosure frame pass.",
+    "worker_files_edited_by_root": false
+  },
+  "verification": {
+    "focused": "520 passed, 1 deselected, 1 warning in 28.72s",
+    "deselection": "real_pinned_cli remains a known FAILED capability result; no repeated unchanged CLI probe authorized",
+    "warning": "Hypothesis example database cannot write outside synthetic scratch; fell back to in-memory database.",
+    "source_lint_format_compile": "PASS on 13 changed source/test files",
+    "source_diff_check": "PASS; original immutable patch/RED log whitespace remains recorded separately in CAPTURE_CHECKS.json",
+    "full_suite": {
+      "command": "uv run --no-sync pytest -p no:cacheprovider -k not real_pinned_cli -q",
+      "attempts": 1,
+      "exit_code": 2,
+      "collection_error_count": 7,
+      "collection_errors": [
+        "tests/contracts/test_idea_graph_inspiration_adapter.py",
+        "tests/contracts/test_kae_lof_federation_adapter.py",
+        "tests/contracts/test_orca_mission_control_adapter.py",
+        "tests/contracts/test_sentium_shadow_conformance_harness.py",
+        "tests/runtime/test_claude_cli_transport.py",
+        "tests/runtime/test_mcp_transport.py",
+        "tests/runtime/test_transport.py"
+      ],
+      "causes": [
+        "contracts.adapters absent (four test modules)",
+        "runtime.transport absent (three test modules)"
+      ],
+      "acceptance": false,
+      "historical_22_error_result": "Historical, not rerun or represented as this result"
+    },
+    "source_hashes_unchanged_after_checks": true,
+    "raw_records": "verification/COMBINED_VERIFICATION.json; its parent source commit plus recorded working-source delta bind the exact final source_commit above"
+  },
+  "remaining_capability": {
+    "current_pinned_cli": "0.147.0 configured invocation lacks mediated tools: tools=None, zero MCP tool invocations. Source containment refuses that pin before legacy launch. This does not prove every supported invocation impossible.",
+    "protocol_observation": "Mediator source speaks MCP 2025-03-26; disabled experimental 2026-07-28 support is not by itself an explanation or authority to enable it.",
+    "supported_path_hypothesis": "Narrow the next question to whether the exact pinned configuration loads/initializes the explicitly required stdio mediator. Inspect resolved server configuration and initialization behavior under the same isolated/confining envelope, without changing pin or using a provider. No such new run is performed or authorized by this record.",
+    "proposed_next_scope": "Existing confinement owner only; freeze any diagnostic/source delta to ops/trusted_codex_worker_supervisor.py and tests/runtime/test_confined_codex_cli.py (plus mediator only if an evidenced protocol defect requires it); retain original seven-file card ceiling, same allocation and no experimental feature. Return to Architect before any new synthetic run.",
+    "official_reference": "https://learn.chatgpt.com/docs/extend/mcp?surface=cli and https://learn.chatgpt.com/docs/config-file/config-reference document standard stdio config and required-server initialization; current docs do not establish a specific installed binary qualification.",
+    "installed_alternate": "App-bundled executable digest 0d5ac7aae20c4eda6242428d5e218c55ba96d8763fda2a271088ff37104b9d28 is a read-only support observation; no version probe, pin change, execution or capability qualification performed.",
+    "protected_service": "Still unprovisioned; no administrator command or Founder key request from this incomplete package"
+  },
+  "C2_source_scope": "Separate prepared target/read-closure disposition in C2_SOURCE_SCOPE_DISPOSITION.json; no runtime owner/admission or source import issued; not a new B00 gate.",
+  "review": {
+    "new_reviews": 0,
+    "verdict": "PENDING_ELIGIBLE_DIFFERENT_FAMILY_ROUTE_AND_ALLOCATION",
+    "original_findings": "Preserved unchanged",
+    "owner": "01a13075-533b-72a1-b8f8-8f109414f707"
+  },
+  "ALLOWED_NOW": "Save exact combined offline source/evidence, return material handoff to Architect; resolve the existing C2-only source owner/card and bounded same-owner CLI configuration hypothesis.",
+  "HELD": "Independent review, supported positive editing path, protected service, production trust/enrollment/egress, installation/qualification, actual PAEOS admission, Court/debt integration and P3.",
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "Exact CLI-mediated capability and protected-service evidence missing; review eligibility/allocation missing; C2-only runtime owner/card missing. No general Founder-only technical ownership restriction.",
+  "effects": {
+    "providers_called": 0,
+    "paid_requests": 0,
+    "new_models_or_clients_installed": 0,
+    "host_keys_read_or_created": false,
+    "production_installed": false,
+    "runtime_admitted": false,
+    "court_action": false,
+    "qualification": false,
+    "debt_closed": false
+  },
+  "manifest_history_note": "CHECKPOINT_MANIFEST.json binds the historical admission evidence checkpoint 8fdf70ac. Later notebook appends are bound by FINAL_CHECKPOINT_MANIFEST.json; original findings/logs were not normalized or rewritten."
+}

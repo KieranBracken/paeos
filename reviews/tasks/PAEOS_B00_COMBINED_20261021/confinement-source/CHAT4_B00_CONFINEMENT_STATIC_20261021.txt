@@ -1,0 +1,9 @@
+Static verification log
+[ruff-format] command=['/Users/bob/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/bin/python3.13', '-B', '-m', 'ruff', 'format', '--check', 'ops/trusted_codex_worker_supervisor.py', 'runtime/integrations/mediated_worker_tools.py', 'runtime/integrations/process_supervisor.py', 'runtime/integrations/worker_confinement.py', 'tests/runtime/test_confined_codex_cli.py', 'tests/runtime/test_mediated_worker_tools.py', 'tests/runtime/test_worker_confinement_mutations.py']
+exit=2
+stdout:
+
+stderr:
+ruff failed
+  Cause: Failed to create temporary file
+  Cause: Operation not permitted (os error 1) at path "/Users/bob/.codex/worktrees/b00-confinement-v1/paeos/.ruff_cache/0.15.22/.tmpt5m6xi"

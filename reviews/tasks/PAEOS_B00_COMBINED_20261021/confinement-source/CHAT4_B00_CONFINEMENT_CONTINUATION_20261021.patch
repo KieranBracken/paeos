@@ -1,0 +1,1658 @@
+diff --git a/ops/trusted_codex_worker_supervisor.py b/ops/trusted_codex_worker_supervisor.py
+index caf6fb67..99d70e9f 100644
+--- a/ops/trusted_codex_worker_supervisor.py
++++ b/ops/trusted_codex_worker_supervisor.py
+@@ -12,6 +12,7 @@ service is a different fixed OpenRouter capability and is not repurposed for the
+ from __future__ import annotations
+ 
+ import argparse
++import base64
+ import contextlib
+ import hashlib
+ import json
+@@ -28,6 +29,7 @@ from typing import Any
+ from nacl.exceptions import BadSignatureError
+ from nacl.signing import SigningKey, VerifyKey
+ from runtime.builder_transport import REQUIRED_CANARIES, REQUIRED_LIFECYCLE
++from runtime.integrations.mediated_worker_tools import MediatedWorkerError, WorkerToolScope
+ from runtime.integrations.process_supervisor import (
+     ProcessLifecycleState,
+     ProcessObservation,
+@@ -55,6 +57,7 @@ __all__ = [
+     "SERVICE_SCHEMA",
+     "TrustedCodexWorkerSupervisor",
+     "_canonical_bytes",
++    "build_confined_codex_argv",
+     "main",
+     "serve",
+     "verify_bundle_manifest",
+@@ -325,6 +328,144 @@ def _codex_argv(
+     )
+ 
+ 
++_CONFINED_DISABLED_FEATURES = (
++    "apps",
++    "browser_use",
++    "browser_use_external",
++    "browser_use_full_cdp_access",
++    "computer_use",
++    "image_generation",
++    "in_app_browser",
++    "memories",
++    "multi_agent",
++    "plugins",
++    "shell_tool",
++    "skill_search",
++    "tool_suggest",
++    "view_image",
++    "workspace_dependencies",
++)
++
++
++def _toml_string(value: str) -> str:
++    """Encode a validated scalar as a TOML basic string."""
++
++    return json.dumps(value, ensure_ascii=True)
++
++
++def build_confined_codex_argv(
++    executable: Path,
++    *,
++    prompt: str,
++    workspace: Path,
++    broker_base_url: str,
++    scope: WorkerToolScope,
++    python_executable: Path,
++    model_id: str = MODEL_ID,
++) -> tuple[str, ...]:
++    """Build the synthetic worker CLI invocation with only the parent MCP surface.
++
++    This builder is source-construction support. It is deliberately not wired into
++    the production supervisor until root binds the admission, broker, disclosure,
++    and launch scopes together.
++    """
++
++    if not isinstance(scope, WorkerToolScope):
++        raise MediatedWorkerError("parent-issued worker scope is required")
++    workspace = Path(workspace)
++    if not workspace.is_absolute() or workspace.is_symlink() or not workspace.is_dir():
++        raise MediatedWorkerError("worker workspace is unavailable or non-canonical")
++    if workspace.resolve(strict=True) != workspace or scope.workspace != workspace:
++        raise MediatedWorkerError("worker scope does not bind the exact workspace")
++    if not isinstance(prompt, str) or not prompt or len(prompt.encode("utf-8")) > MAX_PROMPT_BYTES:
++        raise MediatedWorkerError("worker prompt is missing or exceeds its byte limit")
++    if model_id not in {MODEL_ID, PLANNER_MODEL_ID}:
++        raise MediatedWorkerError("model route is not fixed for this supervisor")
++    if re.fullmatch(r"http://127\.0\.0\.1:[1-9][0-9]{0,4}/v1", broker_base_url) is None:
++        raise MediatedWorkerError("task broker URL must be an exact loopback endpoint")
++    port = int(broker_base_url.split(":")[2].split("/")[0])
++    if not 1 <= port <= 65535:
++        raise MediatedWorkerError("task broker port is invalid")
++    try:
++        pinned_codex = _fixed_codex_executable()
++        requested_codex = Path(executable).resolve(strict=True)
++        requested_python = Path(python_executable).resolve(strict=True)
++    except OSError as exc:
++        raise MediatedWorkerError("pinned worker executable is unavailable") from exc
++    if requested_codex != pinned_codex:
++        raise MediatedWorkerError("Codex executable is not the pinned installation")
++    if not requested_python.is_file() or not os.access(requested_python, os.X_OK):
++        raise MediatedWorkerError("MCP Python executable is unavailable")
++    scope_json = scope.to_json().encode("utf-8")
++    if len(scope_json) > 128 * 1024:
++        raise MediatedWorkerError("parent scope exceeds its size limit")
++    scope_b64 = base64.b64encode(scope_json).decode("ascii")
++    mediator_script = (
++        Path(__file__).resolve().parents[1] / "runtime/integrations/mediated_worker_tools.py"
++    )
++    if not mediator_script.is_file() or mediator_script.is_symlink():
++        raise MediatedWorkerError("mediated tool server source is unavailable")
++
++    argv = [
++        str(pinned_codex),
++        "exec",
++        prompt,
++        "-m",
++        model_id,
++        "--json",
++        "--ephemeral",
++        "--ignore-rules",
++        "--skip-git-repo-check",
++        "--sandbox",
++        "read-only",
++    ]
++    for feature in _CONFINED_DISABLED_FEATURES:
++        argv.extend(("--disable", feature))
++    argv.extend(
++        (
++            "-C",
++            str(workspace),
++            "-c",
++            'model_provider="paeos_broker"',
++            "-c",
++            'model_providers.paeos_broker.name="PAEOS Broker"',
++            "-c",
++            f"model_providers.paeos_broker.base_url={_toml_string(broker_base_url)}",
++            "-c",
++            'model_providers.paeos_broker.env_key="PAEOS_TASK_BROKER_TOKEN"',
++            "-c",
++            'model_providers.paeos_broker.wire_api="responses"',
++            "-c",
++            "model_providers.paeos_broker.request_max_retries=0",
++            "-c",
++            "model_providers.paeos_broker.stream_max_retries=0",
++            "-c",
++            "model_providers.paeos_broker.requires_openai_auth=false",
++            "-c",
++            "analytics.enabled=false",
++            "-c",
++            'otel.metrics_exporter="none"',
++            "-c",
++            f"mcp_servers.paeos_mediated.command={_toml_string(str(requested_python))}",
++            "-c",
++            "mcp_servers.paeos_mediated.args=["
++            + ",".join(
++                _toml_string(value) for value in ("-B", "-I", "-S", str(mediator_script), "--stdio")
++            )
++            + "]",
++            "-c",
++            f"mcp_servers.paeos_mediated.cwd={_toml_string(str(workspace))}",
++            "-c",
++            "mcp_servers.paeos_mediated.required=true",
++            "-c",
++            'mcp_servers.paeos_mediated.default_tools_approval_mode="auto"',
++            "-c",
++            f"mcp_servers.paeos_mediated.env.PAEOS_TASK_SCOPE_B64={_toml_string(scope_b64)}",
++        )
++    )
++    return tuple(argv)
++
++
+ def _write_atomic(path: Path, payload: bytes) -> None:
+     if not path.is_absolute() or path.is_symlink():
+         raise SupervisorFailure("state_failure", "supervisor state path is unsafe")
+@@ -925,6 +1066,17 @@ class TrustedCodexWorkerSupervisor:
+                     loopback_port=broker.loopback_port,
+                     broker_token=broker.task_token,
+                 )
++                try:
++                    resolved_codex = Path(codex_executable).resolve(strict=True)
++                except OSError as exc:
++                    raise SupervisorFailure(
++                        "executable_failure", "pinned Codex executable is unavailable"
++                    ) from exc
++                if resolved_codex == _fixed_codex_executable():
++                    raise SupervisorFailure(
++                        "capability_failure",
++                        "pinned Codex CLI 0.147.0 exposes no supported mediated MCP tool inventory; refusing legacy launch",
++                    )
+                 canary_state = request_state / "canary"
+                 canary_state.mkdir(mode=0o700)
+                 canaries = self._run_canaries(workspace, policy, environment, canary_state)
+diff --git a/runtime/integrations/mediated_worker_tools.py b/runtime/integrations/mediated_worker_tools.py
+new file mode 100644
+index 00000000..53f85c75
+--- /dev/null
++++ b/runtime/integrations/mediated_worker_tools.py
+@@ -0,0 +1,652 @@
++"""Closed parent-issued tool envelope for an isolated Codex worker.
++
++The worker receives only three MCP tools. Paths and test commands come from a
++parent-owned immutable scope; the model cannot supply a path, executable,
++environment, sandbox profile, or receipt-signing key.
++"""
++
++from __future__ import annotations
++
++import base64
++import contextlib
++import fcntl
++import hashlib
++import json
++import os
++import re
++import selectors
++import signal
++import stat
++import subprocess
++import sys
++import time
++import uuid
++from collections.abc import Mapping
++from dataclasses import dataclass
++from pathlib import Path, PurePosixPath
++from types import MappingProxyType
++from typing import Any
++
++__all__ = [
++    "MediatedWorkerError",
++    "MediatedWorkerTools",
++    "WorkerToolScope",
++    "main",
++]
++
++SCOPE_SCHEMA = "paeos.mediated-worker-scope/1"
++MCP_PROTOCOL_VERSION = "2025-03-26"
++SCOPE_ENV = "PAEOS_TASK_SCOPE_B64"
++MAX_SCOPE_BYTES = 128 * 1024
++MAX_RPC_LINE_BYTES = 2 * 1024 * 1024
++MAX_ARTIFACT_BYTES = 1024 * 1024
++MAX_PATCH_BYTES = 1024 * 1024
++MAX_TEST_OUTPUT_BYTES = 64 * 1024
++TEST_TIMEOUT_SECONDS = 120.0
++_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
++_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
++_HUNK_RE = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(?: .*)?\n$")
++_FIXED_PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
++
++
++class MediatedWorkerError(RuntimeError):
++    """A parent-scoped worker operation was invalid or could not be completed."""
++
++
++def _canonical_workspace(path: Path) -> Path:
++    path = Path(path)
++    if not path.is_absolute() or path.is_symlink() or not path.is_dir():
++        raise MediatedWorkerError("workspace must be an existing absolute non-symlink directory")
++    try:
++        resolved = path.resolve(strict=True)
++    except OSError as exc:
++        raise MediatedWorkerError("workspace is unavailable") from exc
++    if resolved != path:
++        raise MediatedWorkerError("workspace is not canonical")
++    return resolved
++
++
++def _relative_path(value: object, *, label: str) -> str:
++    if not isinstance(value, str) or not value or "\x00" in value or "\\" in value:
++        raise MediatedWorkerError(f"{label} is not a safe relative path")
++    path = PurePosixPath(value)
++    if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
++        raise MediatedWorkerError(f"{label} is not a safe relative path")
++    if path.as_posix() != value:
++        raise MediatedWorkerError(f"{label} is not canonical")
++    return value
++
++
++def _id_map(value: object, *, label: str) -> Mapping[str, str]:
++    if not isinstance(value, Mapping):
++        raise MediatedWorkerError(f"{label} must be an object")
++    normalized: dict[str, str] = {}
++    for item_id, relative in value.items():
++        if not isinstance(item_id, str) or _ID_RE.fullmatch(item_id) is None:
++            raise MediatedWorkerError(f"{label} contains an invalid identifier")
++        if item_id in normalized:
++            raise MediatedWorkerError(f"{label} contains a duplicate identifier")
++        normalized[item_id] = _relative_path(relative, label=label)
++    return MappingProxyType(dict(sorted(normalized.items())))
++
++
++@dataclass(frozen=True, slots=True)
++class WorkerToolScope:
++    """Parent-issued workspace and operation allowlists for one worker process."""
++
++    workspace: Path
++    artifacts: Mapping[str, str]
++    patch_targets: Mapping[str, str]
++    tests: Mapping[str, tuple[str, ...]]
++
++    def __post_init__(self) -> None:
++        workspace = _canonical_workspace(self.workspace)
++        artifacts = _id_map(self.artifacts, label="artifacts")
++        patch_targets = _id_map(self.patch_targets, label="patch_targets")
++        if not isinstance(self.tests, Mapping):
++            raise MediatedWorkerError("tests must be an object")
++        tests: dict[str, tuple[str, ...]] = {}
++        for test_id, raw_argv in self.tests.items():
++            if not isinstance(test_id, str) or _ID_RE.fullmatch(test_id) is None:
++                raise MediatedWorkerError("tests contains an invalid identifier")
++            if not isinstance(raw_argv, (tuple, list)) or not raw_argv:
++                raise MediatedWorkerError("each named test must have a fixed non-empty argv")
++            argv = tuple(raw_argv)
++            if any(not isinstance(item, str) or not item or "\x00" in item for item in argv):
++                raise MediatedWorkerError("test argv must contain non-empty strings")
++            executable = Path(argv[0])
++            if not executable.is_absolute():
++                raise MediatedWorkerError("test executable must be an absolute pinned path")
++            try:
++                resolved = executable.resolve(strict=True)
++            except OSError as exc:
++                raise MediatedWorkerError("test executable is unavailable") from exc
++            if not resolved.is_file() or not os.access(resolved, os.X_OK):
++                raise MediatedWorkerError("test executable is not executable")
++            tests[test_id] = (str(resolved), *argv[1:])
++        object.__setattr__(self, "workspace", workspace)
++        object.__setattr__(self, "artifacts", artifacts)
++        object.__setattr__(self, "patch_targets", patch_targets)
++        object.__setattr__(self, "tests", MappingProxyType(dict(sorted(tests.items()))))
++
++    def to_json(self) -> str:
++        value = {
++            "schema": SCOPE_SCHEMA,
++            "workspace": str(self.workspace),
++            "artifacts": dict(self.artifacts),
++            "patch_targets": dict(self.patch_targets),
++            "tests": {test_id: list(argv) for test_id, argv in self.tests.items()},
++        }
++        return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
++
++    @classmethod
++    def from_mapping(cls, value: object) -> WorkerToolScope:
++        expected = {"schema", "workspace", "artifacts", "patch_targets", "tests"}
++        if not isinstance(value, dict) or set(value) != expected:
++            raise MediatedWorkerError("scope fields are incomplete or unsupported")
++        if value.get("schema") != SCOPE_SCHEMA or not isinstance(value.get("workspace"), str):
++            raise MediatedWorkerError("scope schema or workspace is invalid")
++        raw_tests = value.get("tests")
++        if not isinstance(raw_tests, dict):
++            raise MediatedWorkerError("tests must be an object")
++        return cls(
++            workspace=Path(value["workspace"]),
++            artifacts=value["artifacts"],
++            patch_targets=value["patch_targets"],
++            tests={
++                test_id: tuple(argv) if isinstance(argv, list) else argv
++                for test_id, argv in raw_tests.items()
++            },
++        )
++
++    @classmethod
++    def from_json(cls, value: str) -> WorkerToolScope:
++        if not isinstance(value, str) or len(value.encode("utf-8")) > MAX_SCOPE_BYTES:
++            raise MediatedWorkerError("scope is missing or exceeds its size limit")
++
++        def unique_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
++            result: dict[str, object] = {}
++            for key, item in pairs:
++                if key in result:
++                    raise MediatedWorkerError("scope contains duplicate fields")
++                result[key] = item
++            return result
++
++        try:
++            parsed = json.loads(value, object_pairs_hook=unique_pairs)
++        except (json.JSONDecodeError, UnicodeError) as exc:
++            raise MediatedWorkerError("scope JSON is malformed") from exc
++        return cls.from_mapping(parsed)
++
++
++def _tool_definitions() -> list[dict[str, object]]:
++    return [
++        {
++            "name": "read_artifact",
++            "description": "Read one artifact selected by its parent-issued identifier.",
++            "annotations": {
++                "readOnlyHint": True,
++                "destructiveHint": False,
++                "idempotentHint": True,
++                "openWorldHint": False,
++            },
++            "inputSchema": {
++                "type": "object",
++                "properties": {"artifact_id": {"type": "string", "pattern": _ID_RE.pattern}},
++                "required": ["artifact_id"],
++                "additionalProperties": False,
++            },
++        },
++        {
++            "name": "propose_patch",
++            "description": "Apply one unified patch to its parent-authorized target after base-hash verification.",
++            "annotations": {
++                "readOnlyHint": False,
++                "destructiveHint": True,
++                "idempotentHint": False,
++                "openWorldHint": False,
++            },
++            "inputSchema": {
++                "type": "object",
++                "properties": {
++                    "patch_id": {"type": "string", "pattern": _ID_RE.pattern},
++                    "expected_sha256": {"type": "string", "pattern": _SHA256_RE.pattern},
++                    "unified_diff": {"type": "string", "maxLength": MAX_PATCH_BYTES},
++                },
++                "required": ["patch_id", "expected_sha256", "unified_diff"],
++                "additionalProperties": False,
++            },
++        },
++        {
++            "name": "run_test",
++            "description": "Run one parent-named acceptance test using its fixed executable and arguments.",
++            "annotations": {
++                "readOnlyHint": False,
++                "destructiveHint": True,
++                "idempotentHint": False,
++                "openWorldHint": False,
++            },
++            "inputSchema": {
++                "type": "object",
++                "properties": {"test_id": {"type": "string", "pattern": _ID_RE.pattern}},
++                "required": ["test_id"],
++                "additionalProperties": False,
++            },
++        },
++    ]
++
++
++class MediatedWorkerTools:
++    """Implements the closed tool envelope behind a local MCP stdio server."""
++
++    def __init__(self, scope: WorkerToolScope):
++        if not isinstance(scope, WorkerToolScope):
++            raise MediatedWorkerError("a parent-issued WorkerToolScope is required")
++        self._scope = scope
++
++    def list_tools(self) -> list[dict[str, object]]:
++        return _tool_definitions()
++
++    def invoke(self, name: object, arguments: object) -> dict[str, object]:
++        if not isinstance(name, str) or not isinstance(arguments, dict):
++            raise MediatedWorkerError("tool name and arguments are malformed")
++        if name == "read_artifact":
++            if set(arguments) != {"artifact_id"}:
++                raise MediatedWorkerError("read_artifact arguments are incomplete or unsupported")
++            artifact_id = arguments["artifact_id"]
++            if not isinstance(artifact_id, str) or artifact_id not in self._scope.artifacts:
++                raise MediatedWorkerError("artifact identifier is not parent-authorized")
++            data = self._read_relative(self._scope.artifacts[artifact_id])
++            try:
++                text = data.decode("utf-8")
++            except UnicodeDecodeError as exc:
++                raise MediatedWorkerError("artifact is not UTF-8 text") from exc
++            return {
++                "artifact_id": artifact_id,
++                "text": text,
++                "sha256": hashlib.sha256(data).hexdigest(),
++            }
++        if name == "propose_patch":
++            if set(arguments) != {"patch_id", "expected_sha256", "unified_diff"}:
++                raise MediatedWorkerError("propose_patch arguments are incomplete or unsupported")
++            patch_id = arguments["patch_id"]
++            expected = arguments["expected_sha256"]
++            unified_diff = arguments["unified_diff"]
++            if not isinstance(patch_id, str) or patch_id not in self._scope.patch_targets:
++                raise MediatedWorkerError("patch identifier is not parent-authorized")
++            if not isinstance(expected, str) or _SHA256_RE.fullmatch(expected) is None:
++                raise MediatedWorkerError("base digest is malformed")
++            if (
++                not isinstance(unified_diff, str)
++                or len(unified_diff.encode("utf-8")) > MAX_PATCH_BYTES
++            ):
++                raise MediatedWorkerError("patch is missing or exceeds its size limit")
++            relative = self._scope.patch_targets[patch_id]
++            current = self._read_relative(relative)
++            observed = hashlib.sha256(current).hexdigest()
++            if observed != expected:
++                raise MediatedWorkerError("patch base digest does not match current artifact")
++            replacement = _apply_unified_diff(relative, current, unified_diff)
++            self._atomic_replace(relative, current, replacement)
++            return {
++                "applied": True,
++                "patch_id": patch_id,
++                "sha256": hashlib.sha256(replacement).hexdigest(),
++            }
++        if name == "run_test":
++            if set(arguments) != {"test_id"}:
++                raise MediatedWorkerError("run_test arguments are incomplete or unsupported")
++            test_id = arguments["test_id"]
++            if not isinstance(test_id, str) or test_id not in self._scope.tests:
++                raise MediatedWorkerError("test identifier is not parent-authorized")
++            return self._run_test(test_id)
++        raise MediatedWorkerError("tool is not in the parent-mediated interface")
++
++    def _parent_fd(self, relative: str) -> tuple[int, str]:
++        parts = PurePosixPath(relative).parts
++        if not parts:
++            raise MediatedWorkerError("empty relative path")
++        directory_flag = getattr(os, "O_DIRECTORY", 0)
++        nofollow_flag = getattr(os, "O_NOFOLLOW", 0)
++        fd = os.open(self._scope.workspace, os.O_RDONLY | directory_flag)
++        try:
++            for component in parts[:-1]:
++                next_fd = os.open(
++                    component,
++                    os.O_RDONLY | directory_flag | nofollow_flag,
++                    dir_fd=fd,
++                )
++                os.close(fd)
++                fd = next_fd
++            return fd, parts[-1]
++        except OSError as exc:
++            os.close(fd)
++            raise MediatedWorkerError(
++                "artifact path contains a missing or symlinked directory"
++            ) from exc
++
++    def _read_relative(self, relative: str) -> bytes:
++        parent_fd, name = self._parent_fd(relative)
++        try:
++            fd = os.open(name, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=parent_fd)
++            try:
++                info = os.fstat(fd)
++                if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_ARTIFACT_BYTES:
++                    raise MediatedWorkerError("artifact is not a bounded regular file")
++                data = bytearray()
++                while len(data) <= MAX_ARTIFACT_BYTES:
++                    chunk = os.read(fd, min(65536, MAX_ARTIFACT_BYTES + 1 - len(data)))
++                    if not chunk:
++                        break
++                    data.extend(chunk)
++                if len(data) > MAX_ARTIFACT_BYTES:
++                    raise MediatedWorkerError("artifact exceeds its size limit")
++                return bytes(data)
++            finally:
++                os.close(fd)
++        except OSError as exc:
++            raise MediatedWorkerError("artifact is missing or symlinked") from exc
++        finally:
++            os.close(parent_fd)
++
++    def _atomic_replace(self, relative: str, before: bytes, after: bytes) -> None:
++        parent_fd, name = self._parent_fd(relative)
++        current_fd = -1
++        temporary = f".{name}.{uuid.uuid4().hex}.tmp"
++        try:
++            current_fd = os.open(name, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=parent_fd)
++            fcntl.flock(current_fd, fcntl.LOCK_EX)
++            info = os.fstat(current_fd)
++            if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_ARTIFACT_BYTES:
++                raise MediatedWorkerError("patch target is not a bounded regular file")
++            latest = self._read_relative(relative)
++            if latest != before:
++                raise MediatedWorkerError("patch target changed before atomic replacement")
++            write_fd = os.open(
++                temporary,
++                os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
++                stat.S_IMODE(info.st_mode),
++                dir_fd=parent_fd,
++            )
++            try:
++                view = memoryview(after)
++                while view:
++                    written = os.write(write_fd, view)
++                    if written <= 0:
++                        raise MediatedWorkerError("patch write made no progress")
++                    view = view[written:]
++                os.fsync(write_fd)
++            finally:
++                os.close(write_fd)
++            os.replace(temporary, name, src_dir_fd=parent_fd, dst_dir_fd=parent_fd)
++            os.fsync(parent_fd)
++        except OSError as exc:
++            raise MediatedWorkerError("patch target could not be atomically replaced") from exc
++        finally:
++            if current_fd >= 0:
++                os.close(current_fd)
++            with contextlib.suppress(FileNotFoundError):
++                os.unlink(temporary, dir_fd=parent_fd)
++            os.close(parent_fd)
++
++    def _run_test(self, test_id: str) -> dict[str, object]:
++        argv = self._scope.tests[test_id]
++        runtime_dir = self._scope.workspace / ".paeos-worker-tools"
++        home = runtime_dir / "home"
++        temp = runtime_dir / "tmp"
++        runtime_dir.mkdir(mode=0o700, exist_ok=True)
++        home.mkdir(mode=0o700, exist_ok=True)
++        temp.mkdir(mode=0o700, exist_ok=True)
++        for path in (runtime_dir, home, temp):
++            if path.is_symlink() or path.resolve(strict=True) != path:
++                raise MediatedWorkerError("test runtime directory is not canonical")
++        environment = {
++            "HOME": str(home),
++            "LANG": "C.UTF-8",
++            "LC_ALL": "C",
++            "PATH": _FIXED_PATH,
++            "TMPDIR": str(temp),
++        }
++        started = time.monotonic()
++        try:
++            process = subprocess.Popen(
++                argv,
++                cwd=self._scope.workspace,
++                env=environment,
++                stdin=subprocess.DEVNULL,
++                stdout=subprocess.PIPE,
++                stderr=subprocess.PIPE,
++                shell=False,
++                start_new_session=True,
++                bufsize=0,
++            )
++        except (OSError, ValueError) as exc:
++            raise MediatedWorkerError("named test failed to start") from exc
++        assert process.stdout is not None and process.stderr is not None
++        selector = selectors.DefaultSelector()
++        selector.register(process.stdout, selectors.EVENT_READ, "stdout")
++        selector.register(process.stderr, selectors.EVENT_READ, "stderr")
++        captured = {"stdout": bytearray(), "stderr": bytearray()}
++        overflow = False
++        timed_out = False
++        deadline = started + TEST_TIMEOUT_SECONDS
++        try:
++            while selector.get_map():
++                remaining = deadline - time.monotonic()
++                if remaining <= 0:
++                    timed_out = True
++                    break
++                for key, _ in selector.select(timeout=min(0.25, remaining)):
++                    chunk = os.read(key.fileobj.fileno(), 65536)
++                    if not chunk:
++                        selector.unregister(key.fileobj)
++                        continue
++                    output = captured[key.data]
++                    room = MAX_TEST_OUTPUT_BYTES - len(output)
++                    output.extend(chunk[: max(0, room)])
++                    if len(chunk) > room:
++                        overflow = True
++                        break
++                if overflow:
++                    break
++            if process.poll() is None and (timed_out or overflow):
++                os.killpg(process.pid, signal.SIGTERM)
++                try:
++                    process.wait(timeout=0.5)
++                except subprocess.TimeoutExpired:
++                    os.killpg(process.pid, signal.SIGKILL)
++                    process.wait(timeout=0.5)
++            else:
++                process.wait(timeout=max(0.1, deadline - time.monotonic()))
++        except (OSError, subprocess.TimeoutExpired) as exc:
++            with contextlib.suppress(OSError):
++                os.killpg(process.pid, signal.SIGKILL)
++            process.wait(timeout=0.5)
++            raise MediatedWorkerError("named test process could not be observed") from exc
++        finally:
++            selector.close()
++            process.stdout.close()
++            process.stderr.close()
++        stdout = bytes(captured["stdout"])
++        stderr = bytes(captured["stderr"])
++        return {
++            "test_id": test_id,
++            "exit_code": process.returncode,
++            "timed_out": timed_out,
++            "output_limit_exceeded": overflow,
++            "stdout": stdout.decode("utf-8", errors="replace"),
++            "stderr": stderr.decode("utf-8", errors="replace"),
++            "stdout_sha256": hashlib.sha256(stdout).hexdigest(),
++            "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
++            "duration_ms": int((time.monotonic() - started) * 1000),
++        }
++
++
++def _apply_unified_diff(relative: str, before: bytes, unified_diff: str) -> bytes:
++    if "\x00" in unified_diff or "\r" in unified_diff:
++        raise MediatedWorkerError("patch encoding or line endings are unsupported")
++    try:
++        original = before.decode("utf-8")
++    except UnicodeDecodeError as exc:
++        raise MediatedWorkerError("patch target is not UTF-8 text") from exc
++    lines = unified_diff.splitlines(keepends=True)
++    if len(lines) < 3 or lines[0] != f"--- a/{relative}\n" or lines[1] != f"+++ b/{relative}\n":
++        raise MediatedWorkerError("patch must name exactly its parent-authorized target")
++    old_lines = original.splitlines(keepends=True)
++    output: list[str] = []
++    cursor = 0
++    index = 2
++    changed = False
++    while index < len(lines):
++        match = _HUNK_RE.fullmatch(lines[index])
++        if match is None:
++            raise MediatedWorkerError("patch contains unsupported headers or malformed hunks")
++        old_start = int(match.group(1))
++        old_count = int(match.group(2) or "1")
++        new_count = int(match.group(4) or "1")
++        old_index = old_start - 1 if old_count else old_start
++        if old_index < cursor or old_index > len(old_lines):
++            raise MediatedWorkerError("patch hunk range is invalid")
++        output.extend(old_lines[cursor:old_index])
++        index += 1
++        expected_old: list[str] = []
++        replacement: list[str] = []
++        observed_old = observed_new = 0
++        while index < len(lines) and not lines[index].startswith("@@ "):
++            line = lines[index]
++            if not line.endswith("\n") or line.startswith("\\"):
++                raise MediatedWorkerError("patch has unsupported no-newline or truncated records")
++            marker, body = line[0], line[1:]
++            if marker == " ":
++                expected_old.append(body)
++                replacement.append(body)
++                observed_old += 1
++                observed_new += 1
++            elif marker == "-":
++                expected_old.append(body)
++                observed_old += 1
++                changed = True
++            elif marker == "+":
++                replacement.append(body)
++                observed_new += 1
++                changed = True
++            else:
++                raise MediatedWorkerError("patch contains an unsupported record")
++            index += 1
++        if observed_old != old_count or observed_new != new_count:
++            raise MediatedWorkerError("patch hunk counts do not match its records")
++        if old_lines[old_index : old_index + old_count] != expected_old:
++            raise MediatedWorkerError("patch context does not match the current file")
++        output.extend(replacement)
++        cursor = old_index + old_count
++    if not changed:
++        raise MediatedWorkerError("empty patches are not accepted")
++    output.extend(old_lines[cursor:])
++    return "".join(output).encode("utf-8")
++
++
++def _json_object(raw: str) -> dict[str, object]:
++    def unique_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
++        result: dict[str, object] = {}
++        for key, value in pairs:
++            if key in result:
++                raise MediatedWorkerError("RPC message contains duplicate fields")
++            result[key] = value
++        return result
++
++    parsed = json.loads(raw, object_pairs_hook=unique_pairs)
++    if not isinstance(parsed, dict):
++        raise MediatedWorkerError("RPC message must be an object")
++    return parsed
++
++
++def _handle_rpc(tools: MediatedWorkerTools, request: dict[str, object]) -> dict[str, object] | None:
++    if request.get("jsonrpc") != "2.0" or not isinstance(request.get("method"), str):
++        raise MediatedWorkerError("RPC envelope is malformed")
++    method = request["method"]
++    request_id = request.get("id")
++    if request_id is None and method.startswith("notifications/"):
++        return None
++    if method == "initialize":
++        params = request.get("params", {})
++        version = (
++            params.get("protocolVersion", MCP_PROTOCOL_VERSION)
++            if isinstance(params, dict)
++            else MCP_PROTOCOL_VERSION
++        )
++        if not isinstance(version, str):
++            version = MCP_PROTOCOL_VERSION
++        return {
++            "jsonrpc": "2.0",
++            "id": request_id,
++            "result": {
++                "protocolVersion": version,
++                "capabilities": {"tools": {}},
++                "serverInfo": {"name": "paeos-mediated-worker", "version": "1"},
++            },
++        }
++    if method == "ping":
++        return {"jsonrpc": "2.0", "id": request_id, "result": {}}
++    if method == "tools/list":
++        return {"jsonrpc": "2.0", "id": request_id, "result": {"tools": tools.list_tools()}}
++    if method == "tools/call":
++        params = request.get("params")
++        if not isinstance(params, dict) or set(params) != {"name", "arguments"}:
++            raise MediatedWorkerError("tool call parameters are incomplete or unsupported")
++        result = tools.invoke(params["name"], params["arguments"])
++        return {
++            "jsonrpc": "2.0",
++            "id": request_id,
++            "result": {"content": [{"type": "text", "text": json.dumps(result, sort_keys=True)}]},
++        }
++    if request_id is None:
++        return None
++    return {
++        "jsonrpc": "2.0",
++        "id": request_id,
++        "error": {"code": -32601, "message": "method not found"},
++    }
++
++
++def serve_stdio(tools: MediatedWorkerTools, *, stdin: Any = None, stdout: Any = None) -> int:
++    source = stdin or sys.stdin.buffer
++    target = stdout or sys.stdout.buffer
++    for raw in source:
++        if len(raw) > MAX_RPC_LINE_BYTES:
++            return 2
++        try:
++            request = _json_object(raw.decode("utf-8"))
++            response = _handle_rpc(tools, request)
++        except (MediatedWorkerError, UnicodeError, json.JSONDecodeError) as exc:
++            request_id = None
++            with contextlib.suppress(Exception):
++                request_id = _json_object(raw.decode("utf-8")).get("id")
++            response = {
++                "jsonrpc": "2.0",
++                "id": request_id,
++                "error": {"code": -32602, "message": str(exc)},
++            }
++        if response is not None:
++            target.write(
++                json.dumps(response, sort_keys=True, separators=(",", ":")).encode() + b"\n"
++            )
++            target.flush()
++    return 0
++
++
++def main() -> int:
++    if sys.argv[1:] != ["--stdio"]:
++        return 2
++    raw_scope = os.environ.get(SCOPE_ENV)
++    if not isinstance(raw_scope, str) or len(raw_scope) > (MAX_SCOPE_BYTES * 2):
++        return 2
++    try:
++        decoded = base64.b64decode(raw_scope, validate=True)
++        scope = WorkerToolScope.from_json(decoded.decode("utf-8"))
++    except (ValueError, UnicodeError, MediatedWorkerError):
++        return 2
++    return serve_stdio(MediatedWorkerTools(scope))
++
++
++if __name__ == "__main__":  # pragma: no cover - exercised by the real MCP stdio test
++    raise SystemExit(main())
+diff --git a/runtime/integrations/process_supervisor.py b/runtime/integrations/process_supervisor.py
+index f55c6be4..4f72d295 100644
+--- a/runtime/integrations/process_supervisor.py
++++ b/runtime/integrations/process_supervisor.py
+@@ -172,12 +172,16 @@ def run_bounded_process(
+         raise ProcessSupervisorError("process deadlines must be positive")
+     executable = _resolve_executable(argv[0], environment)
+     executable_version = _executable_version(executable)
++    # Launch the same canonical path whose bytes and digest were just recorded.
++    # Retaining the caller's PATH or symlink spelling could make the observation
++    # describe one executable while Popen resolves another at launch time.
++    launch_argv = (str(executable), *argv[1:])
+     env = dict(environment)
+     environment_fingerprint = _environment_fingerprint(env)
+     started_at = time.monotonic()
+     state: dict[str, object] = {
+         "schema": "paeos.process-lifecycle/1",
+-        "argv": list(argv),
++        "argv": list(launch_argv),
+         "executable": str(executable),
+         "executable_version": executable_version,
+         "cwd": str(cwd),
+@@ -219,7 +223,7 @@ def run_bounded_process(
+     def launch() -> None:
+         try:
+             launch_result["process"] = subprocess.Popen(
+-                list(argv),
++                list(launch_argv),
+                 cwd=str(cwd),
+                 env=env,
+                 stdin=subprocess.DEVNULL,
+@@ -248,7 +252,7 @@ def run_bounded_process(
+             target=terminate_late_launch, name="paeos-late-launch-cleanup", daemon=True
+         ).start()
+         return ProcessObservation(
+-            argv=argv,
++            argv=launch_argv,
+             executable=str(executable),
+             executable_version=executable_version,
+             cwd=str(cwd),
+@@ -375,7 +379,7 @@ def run_bounded_process(
+     _write_state(state_path, state)
+     assert terminal is not None
+     return ProcessObservation(
+-        argv=argv,
++        argv=launch_argv,
+         executable=str(executable),
+         executable_version=executable_version,
+         cwd=str(cwd),
+diff --git a/runtime/integrations/worker_confinement.py b/runtime/integrations/worker_confinement.py
+index 98da153f..4a8a1d0a 100644
+--- a/runtime/integrations/worker_confinement.py
++++ b/runtime/integrations/worker_confinement.py
+@@ -149,9 +149,42 @@ class WorkerConfinementPolicy:
+     preference_domains: tuple[str, ...] = ()
+     read_probe_paths: tuple[Path, ...] = ()
+ 
++    def _verify_compiled_policy(self) -> None:
++        """Reject hand-built or caller-modified profiles before a process is wrapped."""
++
++        workspace = self.workspace
++        if (
++            not workspace.is_absolute()
++            or workspace.is_symlink()
++            or not workspace.is_dir()
++            or workspace.resolve(strict=True) != workspace
++        ):
++            raise WorkerConfinementError("worker workspace is no longer canonical")
++        for root in (*self.write_roots, self.runtime_home, self.temp_root):
++            if not root.is_absolute() or root.is_symlink() or not _within(root, workspace):
++                raise WorkerConfinementError("write authority escaped the worker workspace")
++            if root.exists() and root.resolve(strict=True) != root:
++                raise WorkerConfinementError("write authority crosses a symlink")
++        try:
++            expected = build_seatbelt_path_profile(
++                read_roots=self.read_roots,
++                write_roots=self.write_roots,
++                allow_network=False,
++                loopback_port=self.loopback_port,
++                read_files=_SYSTEM_READ_FILES,
++                read_probe_paths=self.read_probe_paths,
++                network_hosts=self.network_hosts,
++                preference_domains=self.preference_domains,
++            )
++        except Exception as exc:
++            raise WorkerConfinementError("worker profile inputs are not enforceable") from exc
++        if self.seatbelt_profile != expected:
++            raise WorkerConfinementError("worker Seatbelt profile is not parent-compiled")
++
+     def wrap_argv(self, argv: tuple[str, ...]) -> tuple[str, ...]:
+         if not argv or any(not isinstance(item, str) or not item for item in argv):
+             raise WorkerConfinementError("provider argv must be explicit and non-empty")
++        self._verify_compiled_policy()
+         if _canonical_executable(argv[0]) != argv[0]:
+             raise WorkerConfinementError("provider executable must be canonical and non-symlinked")
+         mechanism = self.sandbox_exec
+diff --git a/tests/runtime/test_confined_codex_cli.py b/tests/runtime/test_confined_codex_cli.py
+new file mode 100644
+index 00000000..3295de04
+--- /dev/null
++++ b/tests/runtime/test_confined_codex_cli.py
+@@ -0,0 +1,359 @@
++from __future__ import annotations
++
++import os
++import subprocess
++import sys
++from pathlib import Path
++
++from runtime.integrations.mediated_worker_tools import WorkerToolScope
++
++
++def test_confined_codex_argv_disables_shell_and_binds_only_parent_tools(tmp_path: Path) -> None:
++    from ops.trusted_codex_worker_supervisor import build_confined_codex_argv
++
++    workspace = tmp_path / "workspace"
++    workspace.mkdir()
++    scope = WorkerToolScope(
++        workspace=workspace,
++        artifacts={"readme": "README.md"},
++        patch_targets={"readme": "README.md"},
++        tests={"unit": (sys.executable, "-m", "pytest", "-q")},
++    )
++    argv = build_confined_codex_argv(
++        Path("/opt/homebrew/Caskroom/codex/0.147.0/bin/codex"),
++        prompt="Read the approved artifact, make the bounded patch, then run the named test.",
++        workspace=workspace,
++        broker_base_url="http://127.0.0.1:43123/v1",
++        scope=scope,
++        python_executable=Path(sys.executable),
++    )
++    rendered = "\n".join(argv)
++
++    assert "--disable" in argv and "shell_tool" in argv
++    assert "--sandbox" in argv and argv[argv.index("--sandbox") + 1] == "read-only"
++    assert "--dangerously-bypass-approvals-and-sandbox" not in argv
++    # The parent supplies an empty isolated CODEX_HOME; no user config or approval file is inherited.
++    assert "--ignore-user-config" not in argv and "--ignore-rules" in argv
++    assert "plugins" in argv and "apps" in argv
++    assert "mcp_servers.paeos_mediated" in rendered
++    assert "mcp_servers.paeos_mediated.required=true" in argv
++    assert not any(arg.startswith("mcp_servers.paeos_mediated.enabled_tools=") for arg in argv)
++    assert 'mcp_servers.paeos_mediated.default_tools_approval_mode="auto"' in argv
++    assert "PAEOS_TASK_SCOPE_B64" in rendered
++    assert "analytics.enabled=false" in argv
++    assert 'otel.metrics_exporter="none"' in argv
++    assert "ephemeral-task-token" not in rendered
++    assert "receipt_key" not in rendered and 'sandbox="' not in rendered
++
++
++def test_confined_cli_arguments_reject_non_loopback_provider_and_scope_mismatch(
++    tmp_path: Path,
++) -> None:
++    import pytest
++    from ops.trusted_codex_worker_supervisor import build_confined_codex_argv
++    from runtime.integrations.mediated_worker_tools import MediatedWorkerError
++
++    workspace = tmp_path / "workspace"
++    workspace.mkdir()
++    other = tmp_path / "other"
++    other.mkdir()
++    scope = WorkerToolScope(workspace=workspace, artifacts={}, patch_targets={}, tests={})
++
++    with pytest.raises(MediatedWorkerError):
++        build_confined_codex_argv(
++            Path("/opt/homebrew/Caskroom/codex/0.147.0/bin/codex"),
++            prompt="do bounded work",
++            workspace=other,
++            broker_base_url="http://127.0.0.1:43123/v1",
++            scope=scope,
++            python_executable=Path(sys.executable),
++        )
++    with pytest.raises(MediatedWorkerError):
++        build_confined_codex_argv(
++            Path("/opt/homebrew/Caskroom/codex/0.147.0/bin/codex"),
++            prompt="do bounded work",
++            workspace=workspace,
++            broker_base_url="https://provider.invalid/v1",
++            scope=scope,
++            python_executable=Path(sys.executable),
++        )
++
++
++def test_supervisor_fails_closed_before_legacy_bypass_launch_when_mcp_is_unsupported(
++    tmp_path: Path, monkeypatch
++) -> None:
++    import pytest
++    from nacl.signing import SigningKey
++
++    from ops import trusted_codex_worker_supervisor as supervisor_module
++
++    codex_home = tmp_path / "codex-home"
++    codex_home.mkdir()
++    auth_path = codex_home / "auth.json"
++    auth_path.write_text("{}\n", encoding="utf-8")
++    auth_path.chmod(0o600)
++    request_key = SigningKey.generate().verify_key
++    request_key_path = tmp_path / "request-verify-key.hex"
++    request_key_path.write_text(request_key.encode().hex(), encoding="ascii")
++    service = supervisor_module.TrustedCodexWorkerSupervisor(
++        queue_root=tmp_path / "queue",
++        state_root=tmp_path / "state",
++        workspace_root=tmp_path / "workspaces",
++        codex_home=codex_home,
++        request_verify_key_path=request_key_path,
++        response_signing_key=SigningKey.generate(),
++    )
++    workspace = service.workspace_root / "ws-synthetic"
++    workspace.mkdir(parents=True)
++
++    class LocalBroker:
++        task_token = "synthetic-only"
++        base_url = "http://127.0.0.1:43123/v1"
++        loopback_port = 43123
++
++        def __init__(self, **_kwargs) -> None:
++            pass
++
++        def __enter__(self):
++            return self
++
++        def __exit__(self, *_args) -> None:
++            return None
++
++    service._policy = lambda *_args, **_kwargs: (
++        object(),
++        {"PATH": os.defpath},
++        supervisor_module._fixed_codex_executable(),
++    )
++    canary_calls: list[bool] = []
++    service._run_canaries = lambda *_args: canary_calls.append(True)
++    monkeypatch.setattr(supervisor_module, "ParentOwnedResponsesBroker", LocalBroker)
++
++    def unexpected_legacy_launch(*_args, **_kwargs):
++        raise AssertionError("unsupported mediated-tool inventory reached the legacy launcher")
++
++    monkeypatch.setattr(supervisor_module, "_codex_argv", unexpected_legacy_launch)
++    monkeypatch.setattr(supervisor_module, "run_bounded_process", unexpected_legacy_launch)
++
++    with pytest.raises(supervisor_module.SupervisorFailure, match="supported mediated MCP"):
++        service._run_request(
++            {
++                "workspace_id": workspace.name,
++                "task_id": "t-synthetic",
++                "goal_id": "g-synthetic",
++                "run_id": "r-synthetic",
++                "stage": "IMPLEMENT",
++                "prompt": "synthetic blocked request",
++            },
++            "synthetic-request",
++        )
++
++    assert not canary_calls
++    lifecycle = tmp_path / "state" / "synthetic-request" / "lifecycle.json"
++    assert lifecycle.is_file()
++    assert '"error_code":"capability_failure"' in lifecycle.read_text(encoding="utf-8")
++
++
++def test_real_pinned_cli_exposes_only_mediated_tools_to_local_fake_provider(tmp_path: Path) -> None:
++    """Exercise the pinned CLI with loopback only and no user auth/configuration."""
++    import json
++    import threading
++    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++
++    import pytest
++    from ops.trusted_codex_worker_supervisor import build_confined_codex_argv
++    from runtime.integrations.worker_confinement import policy_for_worker
++
++    codex = Path("/opt/homebrew/bin/codex")
++    if not codex.exists():
++        pytest.fail("pinned Codex CLI is not installed; actual CLI inventory was not tested")
++
++    workspace = tmp_path / "workspace"
++    workspace.mkdir()
++    (workspace / "README.md").write_text("approved artifact\n", encoding="utf-8")
++    worker_home = workspace / ".worker-home"
++    worker_codex_home = worker_home / ".codex"
++    worker_temp = workspace / ".worker-tmp"
++    worker_home.mkdir()
++    worker_codex_home.mkdir()
++    worker_temp.mkdir()
++    env = {
++        "HOME": str(worker_home),
++        "CODEX_HOME": str(worker_codex_home),
++        "PATH": os.defpath,
++        "LANG": "C",
++        "LC_ALL": "C",
++        "TMPDIR": str(worker_temp),
++        "PAEOS_TASK_BROKER_TOKEN": "local-fake-provider-token",
++    }
++    version_policy = policy_for_worker(
++        workspace=workspace,
++        read_roots=(workspace, Path(sys.base_prefix).resolve()),
++        write_roots=(workspace,),
++        runtime_home=Path(env["CODEX_HOME"]),
++        temp_root=Path(env["TMPDIR"]),
++    )
++    version_argv = version_policy.wrap_argv((str(codex.resolve(strict=True)), "--version"))
++    version_result = subprocess.run(
++        version_argv,
++        cwd=workspace,
++        env=env,
++        stdin=subprocess.DEVNULL,
++        capture_output=True,
++        text=True,
++        timeout=30,
++        check=False,
++    )
++    assert version_result.returncode == 0, version_result.stderr[-2000:]
++    version = version_result.stdout.strip()
++    if version != "codex-cli 0.147.0":
++        pytest.fail(f"unexpected Codex CLI version for pinned test: {version}")
++
++    python_executable = (Path(sys.base_prefix).resolve() / "bin" / "python3.13").resolve(
++        strict=True
++    )
++    scope = WorkerToolScope(
++        workspace=workspace,
++        artifacts={"readme": "README.md"},
++        patch_targets={"readme": "README.md"},
++        tests={"unit": (str(python_executable), "-c", "print('TEST_OK')")},
++    )
++    observed: dict[str, object] = {
++        "tools": None,
++        "calls": [],
++        "request_count": 0,
++        "request_keys": None,
++        "tool_choice": None,
++    }
++
++    class Handler(BaseHTTPRequestHandler):
++        def do_POST(self) -> None:
++            length = int(self.headers.get("Content-Length", "0"))
++            request = json.loads(self.rfile.read(length))
++            tools = request.get("tools")
++            observed["tools"] = tools
++            observed["request_keys"] = sorted(request)
++            observed["tool_choice"] = request.get("tool_choice")
++            observed["request_count"] = int(observed["request_count"]) + 1
++            response = {
++                "id": "resp_test",
++                "object": "response",
++                "created_at": 0,
++                "status": "completed",
++                "model": "gpt-5.6-sol",
++                "output": [
++                    {
++                        "id": "msg_test",
++                        "type": "message",
++                        "role": "assistant",
++                        "status": "completed",
++                        "content": [
++                            {
++                                "type": "output_text",
++                                "text": "bounded local test complete",
++                                "annotations": [],
++                            }
++                        ],
++                    }
++                ],
++                "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
++            }
++            payload = (
++                "event: response.completed\n"
++                "data: " + json.dumps({"type": "response.completed", "response": response}) + "\n\n"
++                "data: [DONE]\n\n"
++            ).encode("utf-8")
++            self.send_response(200)
++            self.send_header("Content-Type", "text/event-stream")
++            self.send_header("Content-Length", str(len(payload)))
++            self.end_headers()
++            self.wfile.write(payload)
++
++        def log_message(self, *_args: object) -> None:
++            return
++
++    class LocalServer(ThreadingHTTPServer):
++        daemon_threads = True
++
++    server = LocalServer(("127.0.0.1", 0), Handler)
++    thread = threading.Thread(target=server.serve_forever, daemon=True)
++    thread.start()
++    try:
++        argv = build_confined_codex_argv(
++            codex.resolve(),
++            prompt="Use the read_artifact tool for artifact_id readme, then return a short response.",
++            workspace=workspace,
++            broker_base_url=f"http://127.0.0.1:{server.server_port}/v1",
++            scope=scope,
++            python_executable=python_executable,
++        )
++        policy = policy_for_worker(
++            workspace=workspace,
++            read_roots=(
++                workspace,
++                Path(__file__).resolve().parents[2]
++                / "runtime/integrations/mediated_worker_tools.py",
++                Path(sys.base_prefix).resolve(),
++            ),
++            write_roots=(workspace,),
++            runtime_home=Path(env["CODEX_HOME"]),
++            temp_root=Path(env["TMPDIR"]),
++            loopback_port=server.server_port,
++            read_probe_paths=(Path("/etc/codex/requirements.toml"),),
++        )
++        launch_argv = policy.wrap_argv(tuple(argv))
++        assert launch_argv[:3] == (
++            "/usr/bin/sandbox-exec",
++            "-p",
++            policy.seatbelt_profile,
++        )
++        proc = subprocess.run(
++            launch_argv,
++            cwd=workspace,
++            env=env,
++            stdin=subprocess.DEVNULL,
++            capture_output=True,
++            text=True,
++            timeout=60,
++            check=False,
++        )
++        assert proc.returncode == 0, proc.stderr[-4000:] + "\n" + proc.stdout[-4000:]
++        names = [item.get("name") for item in observed["tools"] or []]
++        assert names == [
++            "mcp__paeos_mediated__read_artifact",
++            "mcp__paeos_mediated__propose_patch",
++            "mcp__paeos_mediated__run_test",
++        ], (
++            f"tools={observed['tools']!r}; request_keys={observed['request_keys']!r}; "
++            f"tool_choice={observed['tool_choice']!r}; request_count={observed['request_count']!r}; "
++            f"mcp_logs={[line for line in proc.stderr.splitlines() if 'paeos_mediated' in line or 'tools/list' in line or 'dynamic_tool_count' in line]!r}; "
++            f"stderr={proc.stderr[-2000:]!r}; stdout={proc.stdout[-4000:]!r}"
++        )
++        assert "shell" not in names and "exec_command" not in names
++        assert "bounded local test complete" in proc.stdout
++        assert not (workspace / "escaped").exists()
++    finally:
++        server.shutdown()
++        server.server_close()
++        thread.join(timeout=5)
++
++
++def test_process_supervisor_executes_the_canonical_path_it_records(tmp_path: Path) -> None:
++    from runtime.integrations.process_supervisor import run_bounded_process
++
++    workspace = tmp_path / "workspace"
++    workspace.mkdir()
++    alias = tmp_path / "python-alias"
++    alias.symlink_to(sys.executable)
++    observation = run_bounded_process(
++        (str(alias), "-c", "print('PROCESS_OK')"),
++        cwd=workspace,
++        environment={"PATH": os.defpath},
++        start_timeout_s=5,
++        execution_timeout_s=10,
++        state_path=tmp_path / "process-state.json",
++    )
++    assert observation.argv[0] == str(Path(sys.executable).resolve())
++    assert observation.executable == observation.argv[0]
++    assert observation.stdout == b"PROCESS_OK\n"
++    assert observation.exit_code == 0
+diff --git a/tests/runtime/test_mediated_worker_tools.py b/tests/runtime/test_mediated_worker_tools.py
+new file mode 100644
+index 00000000..82680ae7
+--- /dev/null
++++ b/tests/runtime/test_mediated_worker_tools.py
+@@ -0,0 +1,260 @@
++from __future__ import annotations
++
++import hashlib
++import json
++import os
++import sys
++from pathlib import Path
++
++import pytest
++from runtime.integrations.mediated_worker_tools import (
++    MediatedWorkerError,
++    MediatedWorkerTools,
++    WorkerToolScope,
++)
++
++
++def _scope(workspace: Path) -> WorkerToolScope:
++    return WorkerToolScope(
++        workspace=workspace,
++        artifacts={"sample": "src/sample.txt"},
++        patch_targets={"sample": "src/sample.txt"},
++        tests={"unit": (sys.executable, "-c", "print('TEST_OK')")},
++    )
++
++
++def _sample_workspace(root: Path) -> Path:
++    workspace = root / "workspace"
++    source = workspace / "src" / "sample.txt"
++    source.parent.mkdir(parents=True)
++    source.write_text("before\n", encoding="utf-8")
++    return workspace
++
++
++def test_tool_inventory_is_only_parent_mediated_and_has_closed_schemas(tmp_path: Path) -> None:
++    tools = MediatedWorkerTools(_scope(_sample_workspace(tmp_path)))
++    definitions = tools.list_tools()
++
++    assert {item["name"] for item in definitions} == {
++        "read_artifact",
++        "propose_patch",
++        "run_test",
++    }
++    annotations = {item["name"]: item.get("annotations") for item in definitions}
++    assert annotations == {
++        "read_artifact": {
++            "readOnlyHint": True,
++            "destructiveHint": False,
++            "idempotentHint": True,
++            "openWorldHint": False,
++        },
++        "propose_patch": {
++            "readOnlyHint": False,
++            "destructiveHint": True,
++            "idempotentHint": False,
++            "openWorldHint": False,
++        },
++        "run_test": {
++            "readOnlyHint": False,
++            "destructiveHint": True,
++            "idempotentHint": False,
++            "openWorldHint": False,
++        },
++    }
++    for item in definitions:
++        schema = item["inputSchema"]
++        assert schema["additionalProperties"] is False
++        assert not {"command", "argv", "cwd", "workspace", "sandbox", "receipt_key"} & set(
++            schema["properties"]
++        )
++
++
++def test_scope_serialization_rejects_sandbox_command_and_caller_receipt_key(
++    tmp_path: Path,
++) -> None:
++    scope = _scope(_sample_workspace(tmp_path))
++    encoded = json.loads(scope.to_json())
++    assert set(encoded) == {"schema", "workspace", "artifacts", "patch_targets", "tests"}
++
++    for forbidden in ("sandbox", "command", "receipt_key", "environment"):
++        forged = dict(encoded)
++        forged[forbidden] = "caller-controlled"
++        with pytest.raises(MediatedWorkerError):
++            WorkerToolScope.from_mapping(forged)
++
++
++def test_read_artifact_uses_parent_id_and_denies_path_arguments(tmp_path: Path) -> None:
++    workspace = _sample_workspace(tmp_path)
++    tools = MediatedWorkerTools(_scope(workspace))
++
++    result = tools.invoke("read_artifact", {"artifact_id": "sample"})
++    assert result["text"] == "before\n"
++    assert result["sha256"] == hashlib.sha256(b"before\n").hexdigest()
++    with pytest.raises(MediatedWorkerError, match="arguments"):
++        tools.invoke("read_artifact", {"artifact_id": "sample", "path": "../../etc/passwd"})
++    with pytest.raises(MediatedWorkerError):
++        tools.invoke("read_artifact", {"artifact_id": "../../etc/passwd"})
++
++
++def test_read_artifact_rejects_symlinked_target_and_outside_sentinel(tmp_path: Path) -> None:
++    workspace = _sample_workspace(tmp_path)
++    outside = tmp_path / "outside.txt"
++    outside.write_text("OUTSIDE_SENTINEL", encoding="utf-8")
++    target = workspace / "src" / "sample.txt"
++    target.unlink()
++    target.symlink_to(outside)
++
++    with pytest.raises(MediatedWorkerError):
++        MediatedWorkerTools(_scope(workspace)).invoke("read_artifact", {"artifact_id": "sample"})
++    assert outside.read_text(encoding="utf-8") == "OUTSIDE_SENTINEL"
++
++
++def test_propose_patch_applies_only_exact_parent_bound_target(tmp_path: Path) -> None:
++    workspace = _sample_workspace(tmp_path)
++    tools = MediatedWorkerTools(_scope(workspace))
++    expected = hashlib.sha256(b"before\n").hexdigest()
++    unified_diff = "--- a/src/sample.txt\n+++ b/src/sample.txt\n@@ -1 +1 @@\n-before\n+after\n"
++
++    result = tools.invoke(
++        "propose_patch",
++        {"patch_id": "sample", "expected_sha256": expected, "unified_diff": unified_diff},
++    )
++    assert result["applied"] is True
++    assert result["sha256"] == hashlib.sha256(b"after\n").hexdigest()
++    assert (workspace / "src" / "sample.txt").read_text(encoding="utf-8") == "after\n"
++
++
++@pytest.mark.parametrize(
++    "patch_id, expected_sha256, unified_diff",
++    [
++        (
++            "sample",
++            "0" * 64,
++            "--- a/src/sample.txt\n+++ b/src/sample.txt\n@@ -1 +1 @@\n-before\n+after\n",
++        ),
++        (
++            "../../outside.txt",
++            "0" * 64,
++            "--- a/src/sample.txt\n+++ b/src/sample.txt\n@@ -1 +1 @@\n-before\n+after\n",
++        ),
++        (
++            "sample",
++            hashlib.sha256(b"before\n").hexdigest(),
++            "--- a/../../outside.txt\n+++ b/../../outside.txt\n@@ -1 +1 @@\n-before\n+after\n",
++        ),
++    ],
++)
++def test_propose_patch_rejects_stale_or_unbound_patch(
++    tmp_path: Path, patch_id: str, expected_sha256: str, unified_diff: str
++) -> None:
++    workspace = _sample_workspace(tmp_path)
++    tools = MediatedWorkerTools(_scope(workspace))
++    with pytest.raises(MediatedWorkerError):
++        tools.invoke(
++            "propose_patch",
++            {
++                "patch_id": patch_id,
++                "expected_sha256": expected_sha256,
++                "unified_diff": unified_diff,
++            },
++        )
++    assert (workspace / "src" / "sample.txt").read_text(encoding="utf-8") == "before\n"
++    assert not (tmp_path / "outside.txt").exists()
++
++
++def test_run_test_accepts_only_parent_named_test_and_fixed_argv(tmp_path: Path) -> None:
++    workspace = _sample_workspace(tmp_path)
++    tools = MediatedWorkerTools(_scope(workspace))
++
++    result = tools.invoke("run_test", {"test_id": "unit"})
++    assert result["exit_code"] == 0
++    assert result["stdout"] == "TEST_OK\n"
++    with pytest.raises(MediatedWorkerError):
++        tools.invoke("run_test", {"test_id": "unit", "command": "touch escaped"})
++    with pytest.raises(MediatedWorkerError):
++        tools.invoke("run_test", {"test_id": "arbitrary"})
++
++
++def test_run_test_child_inherits_seatbelt_write_denial(tmp_path: Path) -> None:
++    import uuid
++
++    workspace = _sample_workspace(tmp_path)
++    outside = Path("/private/tmp") / f"paeos-run-test-escape-{uuid.uuid4().hex}"
++    script = (
++        "from pathlib import Path\n"
++        f"path = Path({str(outside)!r})\n"
++        "try:\n"
++        "    path.write_text('unexpected', encoding='utf-8')\n"
++        "except OSError:\n"
++        "    print('DENIED')\n"
++        "else:\n"
++        "    path.unlink(missing_ok=True)\n"
++        "    print('WRITTEN')\n"
++    )
++    scope = WorkerToolScope(
++        workspace=workspace,
++        artifacts={},
++        patch_targets={},
++        tests={"outside-write": (sys.executable, "-c", script)},
++    )
++
++    result = MediatedWorkerTools(scope).invoke("run_test", {"test_id": "outside-write"})
++
++    assert result["exit_code"] == 0
++    assert result["stdout"] == "DENIED\n"
++
++
++def test_unknown_or_shell_tool_calls_fail_closed(tmp_path: Path) -> None:
++    tools = MediatedWorkerTools(_scope(_sample_workspace(tmp_path)))
++    for name, arguments in (
++        ("shell", {"command": "touch escaped"}),
++        ("exec_command", {"cmd": "touch escaped"}),
++        ("apply_patch", {"patch": "unbounded"}),
++    ):
++        with pytest.raises(MediatedWorkerError):
++            tools.invoke(name, arguments)
++
++
++def test_stdio_mcp_server_reports_exact_tool_inventory(tmp_path: Path) -> None:
++    import base64
++    import subprocess
++
++    workspace = _sample_workspace(tmp_path)
++    scope = _scope(workspace)
++    env = {
++        "PATH": os.defpath,
++        "PAEOS_TASK_SCOPE_B64": base64.b64encode(scope.to_json().encode()).decode(),
++    }
++    server = Path(__file__).parents[2] / "runtime/integrations/mediated_worker_tools.py"
++    requests = [
++        {
++            "jsonrpc": "2.0",
++            "id": 1,
++            "method": "initialize",
++            "params": {
++                "protocolVersion": "2025-03-26",
++                "capabilities": {},
++                "clientInfo": {"name": "test", "version": "1"},
++            },
++        },
++        {"jsonrpc": "2.0", "method": "notifications/initialized"},
++        {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
++    ]
++    proc = subprocess.run(
++        [sys.executable, str(server), "--stdio"],
++        input="".join(json.dumps(item) + "\n" for item in requests),
++        text=True,
++        capture_output=True,
++        env=env,
++        cwd=workspace,
++        timeout=10,
++        check=False,
++    )
++    assert proc.returncode == 0, proc.stderr
++    responses = [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
++    assert responses[0]["result"]["serverInfo"]["name"] == "paeos-mediated-worker"
++    assert {item["name"] for item in responses[1]["result"]["tools"]} == {
++        "read_artifact",
++        "propose_patch",
++        "run_test",
++    }
+diff --git a/tests/runtime/test_worker_confinement_mutations.py b/tests/runtime/test_worker_confinement_mutations.py
+index b1f3607e..ad9bbad3 100644
+--- a/tests/runtime/test_worker_confinement_mutations.py
++++ b/tests/runtime/test_worker_confinement_mutations.py
+@@ -180,3 +180,77 @@ def test_mutation_contract_hash_mismatch_killed(tmp_path: Path) -> None:
+             worker_session="session-001",
+             current_seq=1,
+         )
++
++
++def test_provider_environment_never_inherits_host_credentials(tmp_path: Path) -> None:
++    from runtime.integrations.worker_confinement import (
++        WorkerConfinementError,
++        build_provider_environment,
++    )
++
++    workspace = tmp_path / "workspace"
++    home = workspace / ".runtime"
++    temp = workspace / ".tmp"
++    env = build_provider_environment(
++        {"OPENAI_API_KEY": "must-not-copy", "CODEX_HOME": "/Users/owner/.codex"},
++        runtime_home=home,
++        temp_root=temp,
++        task_environment={"PAEOS_TASK_BROKER_TOKEN": "ephemeral"},
++    )
++    assert "OPENAI_API_KEY" not in env
++    assert "CODEX_HOME" not in env
++    assert env["PAEOS_TASK_BROKER_TOKEN"] == "ephemeral"
++    assert set(env) == {"HOME", "LANG", "LC_ALL", "PATH", "TMPDIR", "PAEOS_TASK_BROKER_TOKEN"}
++
++    with pytest.raises(WorkerConfinementError):
++        build_provider_environment(
++            {},
++            runtime_home=home,
++            temp_root=temp,
++            task_environment={"CODEX_HOME": "/Users/owner/.codex"},
++        )
++
++
++def test_worker_confinement_rejects_caller_selected_sandbox_binary(tmp_path: Path) -> None:
++    import sys
++
++    from runtime.integrations.worker_confinement import (
++        WorkerConfinementError,
++        policy_for_worker,
++    )
++
++    workspace = tmp_path / "workspace"
++    workspace.mkdir()
++    policy = policy_for_worker(
++        workspace=workspace,
++        read_roots=(workspace,),
++        write_roots=(workspace,),
++        runtime_home=workspace / ".runtime",
++        temp_root=workspace / ".tmp",
++        sandbox_exec=Path("/bin/sh"),
++    )
++    with pytest.raises(WorkerConfinementError, match="pinned"):
++        policy.wrap_argv((str(Path(sys.executable).resolve()), "-c", "pass"))
++
++
++def test_worker_confinement_rejects_caller_supplied_permissive_profile(tmp_path: Path) -> None:
++    import dataclasses
++    import sys
++
++    from runtime.integrations.worker_confinement import (
++        WorkerConfinementError,
++        policy_for_worker,
++    )
++
++    workspace = tmp_path / "workspace"
++    workspace.mkdir()
++    policy = policy_for_worker(
++        workspace=workspace,
++        read_roots=(workspace,),
++        write_roots=(workspace,),
++        runtime_home=workspace / ".runtime",
++        temp_root=workspace / ".tmp",
++    )
++    forged = dataclasses.replace(policy, seatbelt_profile="(version 1)\n(allow default)")
++    with pytest.raises(WorkerConfinementError, match="parent-compiled"):
++        forged.wrap_argv((str(Path(sys.executable).resolve()), "-c", "pass"))

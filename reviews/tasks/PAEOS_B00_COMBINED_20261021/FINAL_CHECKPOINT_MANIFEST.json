@@ -1,0 +1,131 @@
+{
+  "schema": "paeos.explicit-final-checkpoint-manifest/1",
+  "source_commit": "58c800d3cf4fdc51235e7a4f5e08b2c2a2d8c4cc",
+  "files": {
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/COMBINED_VERIFICATION.json": {
+      "sha256": "c79dbbd878a8ef45047dd9cf064648f2305c922d17d5c76018f830f9b04ad367",
+      "bytes": 8726
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/ruff-check.txt": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/ruff-format.txt": {
+      "sha256": "04eb0d6e6734823dcd2b2b704729e976f683df7a8f334da7216520ef1cb319bf",
+      "bytes": 27
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/compile.txt": {
+      "sha256": "cdfec349b9d1f5c25d7c9a324b3d65e9b1265ccd34664f2b43918e003a2b0c67",
+      "bytes": 18
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/focused.txt": {
+      "sha256": "cf277be8bbaf412d9cef4595067b21a5e101103791037d7f9d771ed5276be746",
+      "bytes": 1361
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/full-suite.txt": {
+      "sha256": "ce5bdf5cb6db2e1e1cbdb2e2213954e1e48401b59b45f1fe7b179fd650a26b90",
+      "bytes": 6124
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/SOURCE_CORRECTION_COMMIT.json": {
+      "sha256": "fce23d65074edc441d68bd394530923435ca22e1ad588913fe383ebd8e1cd083",
+      "bytes": 2018
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/CONFINEMENT_REMOTE_RECEIPT.json": {
+      "sha256": "fa6cd29e76620f74d970fc0a23930ccf76a8c56baa8af76ac63e2e740d120ddf",
+      "bytes": 883
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/HARNESS_PREFLIGHT_FAILURE.json": {
+      "sha256": "a0f97245c146fa5e9fd555fd5e91c6cf56050b60e2b5b85a83bdc22bb169cf95",
+      "bytes": 3263
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/HARNESS_SANDBOX_PROFILE_FAILURE.txt": {
+      "sha256": "265f0c8e270419bc29b1c1e13f9594ab39361fb02914829e917b4791fc0b9265",
+      "bytes": 122
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/HARNESS_RUFF_ENV_FAILURE.json": {
+      "sha256": "0ca2c4b3b8300cddaed7c3b999ecb6321f6ba4fc6525e8df188d7dd8e8e305be",
+      "bytes": 3998
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/HARNESS_RUFF_ENV_FAILURE.txt": {
+      "sha256": "245af95ac1d9725e24f69dfc77ebea2867b8585da0f21a84328f36cd25f8144c",
+      "bytes": 112
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/run_combined_checks.py": {
+      "sha256": "502d86b0f4a32cfac2f2574e4bf7626033dd0a8d988fd2e113c8af11d1061eb7",
+      "bytes": 6529
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/combined-red/COMBINED_VERIFICATION.json": {
+      "sha256": "370eeba145a17fdd4922831260864675857d03ae9bc6e9f1784709b0a10515e8",
+      "bytes": 7254
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/combined-red/ruff-check.txt": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/combined-red/ruff-format.txt": {
+      "sha256": "75b7030be9d7de96bf4e76e79b1f03f14af8899d169fd8d79564d59167d1ab80",
+      "bytes": 27
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/combined-red/compile.txt": {
+      "sha256": "5550e3f005c2c65a8f34e8c128843c87de83ecfe572c33fe2393a9e580a22f41",
+      "bytes": 18
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/verification/combined-red/focused.txt": {
+      "sha256": "d6e423fff19c1e2b6f8c1dd62e37ae8fb443e9c5e6287ab8435a0242943d238b",
+      "bytes": 6173
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/confinement-source/CHAT4_B00_CONFINEMENT_CONTINUATION_20261021.md": {
+      "sha256": "4429182ffcb190b60c36f8528d1e0e23317efc6b42f243ad994a29c9d41ed961",
+      "bytes": 3572
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/confinement-source/CHAT4_B00_CONFINEMENT_CONTINUATION_20261021.patch": {
+      "sha256": "9e4a257aee968574c91eefd3214b05ad29dc7cf040b01d55062f03bb57f22451",
+      "bytes": 68345
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/confinement-source/CHAT4_B00_CONFINEMENT_EVIDENCE_20261021.txt": {
+      "sha256": "8b7fb5cdb65da8dd5089978c4d4a9c7a9870bb017c4d37d6ff05b2fbbaad5366",
+      "bytes": 6188
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/confinement-source/CHAT4_B00_CONFINEMENT_FOCUSED_20261021.txt": {
+      "sha256": "4b335a58e9f302d03c2f0ffe034993ba4157a0ef8f9daaaf1515ba70ac3a50f1",
+      "bytes": 1645
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/confinement-source/CHAT4_B00_CONFINEMENT_STATIC_20261021.txt": {
+      "sha256": "fae2f40d3b8b27001ff55498447ed7123bd9c627f4712f0056590428d041e8a2",
+      "bytes": 719
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/confinement-source/CHAT4_B00_CONFINEMENT_STATIC_RERUN_20261021.txt": {
+      "sha256": "45c8925cd5cb2988a05a329676f7c69738725971e57ee2deffecfbac7a332a11",
+      "bytes": 2281
+    },
+    "reviews/tasks/PAEOS_B00_COMBINED_20261021/FINAL_ASSEMBLY.json": {
+      "sha256": "776e674c6266fead5bb9eb84db0cf805021ccca2a8b139924eb9a63bea7c63d2",
+      "bytes": 8407
+    },
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": {
+      "sha256": "86905c8efa78c7f8baada8972f433e9da4fa095697d832fd6518bf7d3917b19b",
+      "bytes": 1512976
+    },
+    "MessyChangesNeedsReview.md": {
+      "sha256": "50bca9aaabac2016f9231c7d1fbfd2714f7ce45d47d72e87d983255d639d9719",
+      "bytes": 675424
+    }
+  },
+  "source_files": {
+    "ops/install_trusted_codex_worker_supervisor.py": "3514b2cba5b9099cc0fc9f302ef97c775cbf051b14bb6e651eba0d777d816615",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+    "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+    "tests/ops/test_trusted_codex_installer_binding.py": "78f532db39a89116903a452b210b485550510223e39e01eeef04e812674db37a",
+    "tests/runtime/autonomy/test_admission_authority.py": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "tests/runtime/test_worker_confinement_mutations.py": "443dbfa90c815bed9858b8ff8891f76b990096cb033b6f026a886785c12a91e8"
+  },
+  "secret_scan": "No targeted high-confidence key matches in this explicit synthetic source/evidence manifest. Not comprehensive detection or classification authority.",
+  "acceptance": "OFFLINE_SOURCE_CANDIDATE_ONLY; review/positive capability/full suite unresolved"
+}

@@ -1,0 +1,25 @@
+{
+  "commit": "58c800d3cf4fdc51235e7a4f5e08b2c2a2d8c4cc",
+  "parent": "efbee00f38e15850c2f22097693565ec9a54691f",
+  "paths": [
+    "ops/install_trusted_codex_worker_supervisor.py",
+    "tests/ops/test_trusted_codex_installer_binding.py"
+  ],
+  "verified_working_source_hashes": {
+    "ops/install_trusted_codex_worker_supervisor.py": "3514b2cba5b9099cc0fc9f302ef97c775cbf051b14bb6e651eba0d777d816615",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+    "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+    "tests/ops/test_trusted_codex_installer_binding.py": "78f532db39a89116903a452b210b485550510223e39e01eeef04e812674db37a",
+    "tests/runtime/autonomy/test_admission_authority.py": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "tests/runtime/test_worker_confinement_mutations.py": "443dbfa90c815bed9858b8ff8891f76b990096cb033b6f026a886785c12a91e8"
+  },
+  "tests": "520 passed, 1 deliberately excluded known-failed CLI capability test, 1 Hypothesis cache warning",
+  "full_suite": "7 collection errors; no full acceptance"
+}

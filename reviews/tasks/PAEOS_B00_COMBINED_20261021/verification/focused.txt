@@ -1,0 +1,15 @@
+........................................................................ [ 13%]
+........................................................................ [ 27%]
+........................................................................ [ 41%]
+........................................................................ [ 55%]
+........................................................................ [ 69%]
+........................................................................ [ 83%]
+........................................................................ [ 96%]
+................                                                         [100%]
+=============================== warnings summary ===============================
+tests/kernel/test_ledger.py::test_verify_detects_any_tampered_row
+  /Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/lib/python3.13/site-packages/hypothesis/_settings.py:832: HypothesisWarning: The database setting is not configured, and the default location is unusable - falling back to an in-memory database for this session.  path=PosixPath('/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.hypothesis/examples')
+    self._fallback.database if self._database is not_set else self._database
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+520 passed, 1 deselected, 1 warning in 28.72s

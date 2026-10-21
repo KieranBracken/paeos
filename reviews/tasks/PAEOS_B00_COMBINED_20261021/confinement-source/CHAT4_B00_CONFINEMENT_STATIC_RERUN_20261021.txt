@@ -1,0 +1,33 @@
+Static verification rerun log
+[ruff-format] command=['/Users/bob/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/bin/python3.13', '-B', '-m', 'ruff', 'format', '--check', 'ops/trusted_codex_worker_supervisor.py', 'runtime/integrations/mediated_worker_tools.py', 'runtime/integrations/process_supervisor.py', 'runtime/integrations/worker_confinement.py', 'tests/runtime/test_confined_codex_cli.py', 'tests/runtime/test_mediated_worker_tools.py', 'tests/runtime/test_worker_confinement_mutations.py']
+exit=0
+stdout:
+7 files already formatted
+
+stderr:
+
+[ruff-check] command=['/Users/bob/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/bin/python3.13', '-B', '-m', 'ruff', 'check', 'ops/trusted_codex_worker_supervisor.py', 'runtime/integrations/mediated_worker_tools.py', 'runtime/integrations/process_supervisor.py', 'runtime/integrations/worker_confinement.py', 'tests/runtime/test_confined_codex_cli.py', 'tests/runtime/test_mediated_worker_tools.py', 'tests/runtime/test_worker_confinement_mutations.py']
+exit=0
+stdout:
+All checks passed!
+
+stderr:
+
+[python-compile] command=['/Users/bob/.local/share/uv/python/cpython-3.13.5-macos-aarch64-none/bin/python3.13', '-B', '-c', "from pathlib import Path; files=['ops/trusted_codex_worker_supervisor.py', 'runtime/integrations/mediated_worker_tools.py', 'runtime/integrations/process_supervisor.py', 'runtime/integrations/worker_confinement.py', 'tests/runtime/test_confined_codex_cli.py', 'tests/runtime/test_mediated_worker_tools.py', 'tests/runtime/test_worker_confinement_mutations.py']; [compile(Path(f).read_bytes(), f, 'exec') for f in files]; print('compiled', len(files), 'files')"]
+exit=0
+stdout:
+compiled 7 files
+
+stderr:
+
+[git-diff-check] command=['/usr/bin/git', 'diff', '--check']
+exit=1
+stdout:
+
+stderr:
+xcode-select: error: unable to read data link at '/var/select/developer_dir', expected symbolic link (Operation not permitted)
+xcode-select: note: No developer tools were found, requesting install.
+If developer tools are located at a non-default location on disk, use `sudo xcode-select --switch path/to/Xcode.app` to specify the Xcode that you wish to use for command line developer tools, and cancel the installation dialog.
+See `man xcode-select` for more details.
+
+scoped_secret_scan=NO_MATCHES
