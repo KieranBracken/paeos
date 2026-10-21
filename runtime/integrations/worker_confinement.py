@@ -149,9 +149,42 @@ class WorkerConfinementPolicy:
     preference_domains: tuple[str, ...] = ()
     read_probe_paths: tuple[Path, ...] = ()
 
+    def _verify_compiled_policy(self) -> None:
+        """Reject hand-built or caller-modified profiles before a process is wrapped."""
+
+        workspace = self.workspace
+        if (
+            not workspace.is_absolute()
+            or workspace.is_symlink()
+            or not workspace.is_dir()
+            or workspace.resolve(strict=True) != workspace
+        ):
+            raise WorkerConfinementError("worker workspace is no longer canonical")
+        for root in (*self.write_roots, self.runtime_home, self.temp_root):
+            if not root.is_absolute() or root.is_symlink() or not _within(root, workspace):
+                raise WorkerConfinementError("write authority escaped the worker workspace")
+            if root.exists() and root.resolve(strict=True) != root:
+                raise WorkerConfinementError("write authority crosses a symlink")
+        try:
+            expected = build_seatbelt_path_profile(
+                read_roots=self.read_roots,
+                write_roots=self.write_roots,
+                allow_network=False,
+                loopback_port=self.loopback_port,
+                read_files=_SYSTEM_READ_FILES,
+                read_probe_paths=self.read_probe_paths,
+                network_hosts=self.network_hosts,
+                preference_domains=self.preference_domains,
+            )
+        except Exception as exc:
+            raise WorkerConfinementError("worker profile inputs are not enforceable") from exc
+        if self.seatbelt_profile != expected:
+            raise WorkerConfinementError("worker Seatbelt profile is not parent-compiled")
+
     def wrap_argv(self, argv: tuple[str, ...]) -> tuple[str, ...]:
         if not argv or any(not isinstance(item, str) or not item for item in argv):
             raise WorkerConfinementError("provider argv must be explicit and non-empty")
+        self._verify_compiled_policy()
         if _canonical_executable(argv[0]) != argv[0]:
             raise WorkerConfinementError("provider executable must be canonical and non-symlinked")
         mechanism = self.sandbox_exec

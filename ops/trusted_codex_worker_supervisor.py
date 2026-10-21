@@ -12,6 +12,7 @@ service is a different fixed OpenRouter capability and is not repurposed for the
 from __future__ import annotations
 
 import argparse
+import base64
 import contextlib
 import hashlib
 import json
@@ -28,6 +29,7 @@ from typing import Any
 from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey, VerifyKey
 from runtime.builder_transport import REQUIRED_CANARIES, REQUIRED_LIFECYCLE
+from runtime.integrations.mediated_worker_tools import MediatedWorkerError, WorkerToolScope
 from runtime.integrations.process_supervisor import (
     ProcessLifecycleState,
     ProcessObservation,
@@ -55,6 +57,7 @@ __all__ = [
     "SERVICE_SCHEMA",
     "TrustedCodexWorkerSupervisor",
     "_canonical_bytes",
+    "build_confined_codex_argv",
     "main",
     "serve",
     "verify_bundle_manifest",
@@ -323,6 +326,144 @@ def _codex_argv(
         "-c",
         "model_providers.paeos_broker.requires_openai_auth=false",
     )
+
+
+_CONFINED_DISABLED_FEATURES = (
+    "apps",
+    "browser_use",
+    "browser_use_external",
+    "browser_use_full_cdp_access",
+    "computer_use",
+    "image_generation",
+    "in_app_browser",
+    "memories",
+    "multi_agent",
+    "plugins",
+    "shell_tool",
+    "skill_search",
+    "tool_suggest",
+    "view_image",
+    "workspace_dependencies",
+)
+
+
+def _toml_string(value: str) -> str:
+    """Encode a validated scalar as a TOML basic string."""
+
+    return json.dumps(value, ensure_ascii=True)
+
+
+def build_confined_codex_argv(
+    executable: Path,
+    *,
+    prompt: str,
+    workspace: Path,
+    broker_base_url: str,
+    scope: WorkerToolScope,
+    python_executable: Path,
+    model_id: str = MODEL_ID,
+) -> tuple[str, ...]:
+    """Build the synthetic worker CLI invocation with only the parent MCP surface.
+
+    This builder is source-construction support. It is deliberately not wired into
+    the production supervisor until root binds the admission, broker, disclosure,
+    and launch scopes together.
+    """
+
+    if not isinstance(scope, WorkerToolScope):
+        raise MediatedWorkerError("parent-issued worker scope is required")
+    workspace = Path(workspace)
+    if not workspace.is_absolute() or workspace.is_symlink() or not workspace.is_dir():
+        raise MediatedWorkerError("worker workspace is unavailable or non-canonical")
+    if workspace.resolve(strict=True) != workspace or scope.workspace != workspace:
+        raise MediatedWorkerError("worker scope does not bind the exact workspace")
+    if not isinstance(prompt, str) or not prompt or len(prompt.encode("utf-8")) > MAX_PROMPT_BYTES:
+        raise MediatedWorkerError("worker prompt is missing or exceeds its byte limit")
+    if model_id not in {MODEL_ID, PLANNER_MODEL_ID}:
+        raise MediatedWorkerError("model route is not fixed for this supervisor")
+    if re.fullmatch(r"http://127\.0\.0\.1:[1-9][0-9]{0,4}/v1", broker_base_url) is None:
+        raise MediatedWorkerError("task broker URL must be an exact loopback endpoint")
+    port = int(broker_base_url.split(":")[2].split("/")[0])
+    if not 1 <= port <= 65535:
+        raise MediatedWorkerError("task broker port is invalid")
+    try:
+        pinned_codex = _fixed_codex_executable()
+        requested_codex = Path(executable).resolve(strict=True)
+        requested_python = Path(python_executable).resolve(strict=True)
+    except OSError as exc:
+        raise MediatedWorkerError("pinned worker executable is unavailable") from exc
+    if requested_codex != pinned_codex:
+        raise MediatedWorkerError("Codex executable is not the pinned installation")
+    if not requested_python.is_file() or not os.access(requested_python, os.X_OK):
+        raise MediatedWorkerError("MCP Python executable is unavailable")
+    scope_json = scope.to_json().encode("utf-8")
+    if len(scope_json) > 128 * 1024:
+        raise MediatedWorkerError("parent scope exceeds its size limit")
+    scope_b64 = base64.b64encode(scope_json).decode("ascii")
+    mediator_script = (
+        Path(__file__).resolve().parents[1] / "runtime/integrations/mediated_worker_tools.py"
+    )
+    if not mediator_script.is_file() or mediator_script.is_symlink():
+        raise MediatedWorkerError("mediated tool server source is unavailable")
+
+    argv = [
+        str(pinned_codex),
+        "exec",
+        prompt,
+        "-m",
+        model_id,
+        "--json",
+        "--ephemeral",
+        "--ignore-rules",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "read-only",
+    ]
+    for feature in _CONFINED_DISABLED_FEATURES:
+        argv.extend(("--disable", feature))
+    argv.extend(
+        (
+            "-C",
+            str(workspace),
+            "-c",
+            'model_provider="paeos_broker"',
+            "-c",
+            'model_providers.paeos_broker.name="PAEOS Broker"',
+            "-c",
+            f"model_providers.paeos_broker.base_url={_toml_string(broker_base_url)}",
+            "-c",
+            'model_providers.paeos_broker.env_key="PAEOS_TASK_BROKER_TOKEN"',
+            "-c",
+            'model_providers.paeos_broker.wire_api="responses"',
+            "-c",
+            "model_providers.paeos_broker.request_max_retries=0",
+            "-c",
+            "model_providers.paeos_broker.stream_max_retries=0",
+            "-c",
+            "model_providers.paeos_broker.requires_openai_auth=false",
+            "-c",
+            "analytics.enabled=false",
+            "-c",
+            'otel.metrics_exporter="none"',
+            "-c",
+            f"mcp_servers.paeos_mediated.command={_toml_string(str(requested_python))}",
+            "-c",
+            "mcp_servers.paeos_mediated.args=["
+            + ",".join(
+                _toml_string(value) for value in ("-B", "-I", "-S", str(mediator_script), "--stdio")
+            )
+            + "]",
+            "-c",
+            f"mcp_servers.paeos_mediated.cwd={_toml_string(str(workspace))}",
+            "-c",
+            "mcp_servers.paeos_mediated.required=true",
+            "-c",
+            'mcp_servers.paeos_mediated.default_tools_approval_mode="auto"',
+            "-c",
+            f"mcp_servers.paeos_mediated.env.PAEOS_TASK_SCOPE_B64={_toml_string(scope_b64)}",
+        )
+    )
+    return tuple(argv)
 
 
 def _write_atomic(path: Path, payload: bytes) -> None:
@@ -925,6 +1066,17 @@ class TrustedCodexWorkerSupervisor:
                     loopback_port=broker.loopback_port,
                     broker_token=broker.task_token,
                 )
+                try:
+                    resolved_codex = Path(codex_executable).resolve(strict=True)
+                except OSError as exc:
+                    raise SupervisorFailure(
+                        "executable_failure", "pinned Codex executable is unavailable"
+                    ) from exc
+                if resolved_codex == _fixed_codex_executable():
+                    raise SupervisorFailure(
+                        "capability_failure",
+                        "pinned Codex CLI 0.147.0 exposes no supported mediated MCP tool inventory; refusing legacy launch",
+                    )
                 canary_state = request_state / "canary"
                 canary_state.mkdir(mode=0o700)
                 canaries = self._run_canaries(workspace, policy, environment, canary_state)
