@@ -1,0 +1,13 @@
+{
+  "assignment_id": "B00-pinned-v2-loader-two-file-repair-20261021-v1",
+  "baseline": "5dce3245132721c532024ed31694aa831516b5b6",
+  "mutable_preimages": {
+    "paeos/model_router/disclosure_store.py": "2307d0707c5fedf595e705f82f0a0e7c39ee07d302ca79943edf36261f1f6a26",
+    "tests/model_router/test_disclosure_store.py": "8b01f7b390cc80240c41ba786530c6f44b47642bf145ee6ac8c991f06a79b46f"
+  },
+  "design": "Independent expected_policy_version keyword, default1; reject non-int/bool/unknown before I/O. Select existing verifier only by this version. No data-driven fallback; no authority or route-vocabulary change.",
+  "red_commands_used": 0,
+  "green_commands_used": 0,
+  "corrective_green_commands_used": 0,
+  "provider_paid_review_full_suite_calls": 0
+}

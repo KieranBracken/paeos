@@ -1,0 +1,28 @@
+{
+  "phase": "corrective",
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "tests/model_router/test_disclosure_store.py",
+    "tests/model_router/test_disclosure_policy.py",
+    "-o",
+    "addopts=",
+    "-q"
+  ],
+  "state": "RETURNED",
+  "started_at_utc": "2026-10-21T15:12:38.245751+00:00",
+  "profile_sha256": "2247f70934f76074b76f9eddf830e5800c96f1523e876cc42fdd05dab8d4dc4e",
+  "network": "DENY_ALL",
+  "filesystem": "SCRATCH_WRITES_ONLY; known host key/auth paths denied",
+  "environment": "Isolated HOME/CODEX_HOME/TMPDIR; no provider credentials inherited",
+  "source_hashes": {
+    "paeos/model_router/disclosure_store.py": "ee9f1b2cbd3737f805eef45c9b52646e8fa0fa84f70da95bf0c7206f6da9fc34",
+    "tests/model_router/test_disclosure_store.py": "464b66826e7a3ee771f0b266d1be1d1d162f8fe7841a15845e92c43aa3234ea7"
+  },
+  "exit_code": 0,
+  "seconds": 0.751,
+  "stdout_sha256": "0fe9050b65b841273f9cc572e7e563ed8a1b841663259909dd7a678e365063bf"
+}

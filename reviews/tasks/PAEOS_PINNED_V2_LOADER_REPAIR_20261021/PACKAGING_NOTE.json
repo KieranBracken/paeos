@@ -1,0 +1,5 @@
+{
+  "observed_failure": "git diff --cached --check rejects raw unified-diff context lines containing one space when stored as added text",
+  "remediation": "Losslessly JSON-encode exact captured patch; original raw patch retained locally; no source/test bytes changed",
+  "source_commit": "a4195fbc9ca4c43404dd5a321640703c528532d4"
+}

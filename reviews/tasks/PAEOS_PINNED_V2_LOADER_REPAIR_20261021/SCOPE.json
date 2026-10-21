@@ -1,0 +1,40 @@
+{
+  "schema": "paeos.bounded-existing-owner-source-scope/1",
+  "assignment_id": "B00-pinned-v2-loader-two-file-repair-20261021-v1",
+  "owner_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "source_event": "B00-broker-composition-primitive-gap-20261021-v1",
+  "baseline": "5dce3245132721c532024ed31694aa831516b5b6",
+  "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "branch": "codex/b00-combined-bootstrap-20261021",
+  "authorization": "Standing direct human end-to-end continuation msg_01a15eda-c046-7082-83a9-37b0df5b8bbd; ordinary delegated offline source repair. Exact two-file successor to prior read-only loader boundary; no runtime admission.",
+  "mutable_files": {
+    "paeos/model_router/disclosure_store.py": "2307d0707c5fedf595e705f82f0a0e7c39ee07d302ca79943edf36261f1f6a26",
+    "tests/model_router/test_disclosure_store.py": "8b01f7b390cc80240c41ba786530c6f44b47642bf145ee6ac8c991f06a79b46f"
+  },
+  "acceptance": [
+    "Explicit independently parent-supplied expected policy version; default v1 behavior retained. Existing v1/v2 verifier selected only by trusted expected version, never untrusted document. Unknown/mismatched versions reject.",
+    "Preserve descriptor-relative no-follow input traversal, bounded files, separate public key and canonical envelope pins, aware time and exact key identity.",
+    "Valid synthetic signed v2 passes only explicit v2 selection; preserve all old v1 tests plus wrong pins/signatures/time/version, SECRET and declassification negatives.",
+    "Output remains signature/shape snapshot only, never enrollment, trusted classification/currentness/revocation, egress permit or production eligibility.",
+    "No broker, admission, observer, installer, C2, route-vocabulary, key or external operation edits. Missing third-file need returns exact packet and retains denial."
+  ],
+  "budget": {
+    "inherit_all_cumulative_limits": true,
+    "new_override": false,
+    "provider_requests": 0,
+    "paid_requests": 0,
+    "formal_reviews": 0,
+    "one_bounded_source_candidate": true,
+    "red": "Reuse captured actual v2 loader RED. At most one discriminating focused RED if required to bind new explicit-version API; preserve both.",
+    "focused_green_max": 1,
+    "corrective_focused_rerun_max": 1,
+    "full_suite": 0,
+    "heavy_test_lock": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/heavy-test.lock",
+    "usage_percent": 19,
+    "ordinary_usage_allowed": true,
+    "credits": 0
+  },
+  "evidence": "Captured boundary packet reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021; immutable failures retained. Append source/evidence notebook only under existing logging mandate; explicit Git path manifest, non-force push and remote SHA readback.",
+  "next_gate": "Freeze result to Architect; eligible exact-byte independent review and trusted derivation/route contracts remain held. No automatic broker permit or C2 merge.",
+  "callback": "Immediate literal material completion/blocker/correction to Architect 01a151d6-4fd3-7f23-a35d-167815a58cdb under protocol-v4; reopen scope after compaction."
+}

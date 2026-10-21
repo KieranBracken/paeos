@@ -1,0 +1,45 @@
+{
+  "assignment_id": "B00-pinned-v2-loader-two-file-repair-20261021-v1",
+  "source_commit": "a4195fbc9ca4c43404dd5a321640703c528532d4",
+  "baseline": "5dce3245132721c532024ed31694aa831516b5b6",
+  "captured_at_utc": "2026-10-21T15:13:52.003220+00:00",
+  "scope_sha256": "03a5b2b98d977330730196fa4affc719c4eecadc54a35eb1a29ed3144a7abb18",
+  "source_postimages": {
+    "paeos/model_router/disclosure_store.py": "ee9f1b2cbd3737f805eef45c9b52646e8fa0fa84f70da95bf0c7206f6da9fc34",
+    "tests/model_router/test_disclosure_store.py": "464b66826e7a3ee771f0b266d1be1d1d162f8fe7841a15845e92c43aa3234ea7"
+  },
+  "implementation": "Explicit parent-supplied expected_policy_version integer1(default) or2 selects existing verifier; unsupported/non-int rejects before file access. No document-driven upgrade/fallback. Existing no-follow/pins/time behavior preserved.",
+  "verification": {
+    "red": "Actual TypeError on original source; 1failed",
+    "green": "204passed in0.56s",
+    "corrective": "204passed in0.48s on final bytes after noqa comment relocation",
+    "static": "Ruff lint/format, in-memory compile, git diff check passed; bounded source secret-pattern scan0matches"
+  },
+  "counters": {
+    "red": 1,
+    "green": 1,
+    "corrective": 1
+  },
+  "external_operations": {
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "full_suite": 0,
+    "cli_probe": 0,
+    "installation": 0,
+    "qualification": 0
+  },
+  "review_disposition": "PENDING; no new review authorized or attempted; no independence or acceptance claimed",
+  "ALLOWED_NOW": {
+    "owner": "Architect",
+    "action": "Validate captured source/evidence and coordinate actual next primitive contract or eligible scoped review"
+  },
+  "HELD": {
+    "owner": "Existing admission/custody/review owners; Chat1 retains exclusive D0258 integration",
+    "wake_condition": "Authenticated derivation/currentness and exact lawful route/CLI/confinement/service/review/enrollment/activation prerequisites evidenced; actual task admission and qualification before dependent activation"
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "Loader-only feature repaired. Signature/shape snapshot is not enrollment, trusted classification, policy currentness/revocation, egress permit or production eligibility. Broker remains denied; C2 unmerged; no Court/adjudication/debt/P3/Sentium activation.",
+  "suite_disposition": "No full suite in this allocation. Earlier combined attempt7collection errors remains failure; historical22error observation separate. No full-suite acceptance.",
+  "builder_provenance": "Native Codex root chat source authoring; no heterogeneous review claim",
+  "original_findings": "Existing review reports unchanged"
+}

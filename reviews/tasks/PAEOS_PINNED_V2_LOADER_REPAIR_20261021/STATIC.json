@@ -1,0 +1,73 @@
+{
+  "ruff_lint": {
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "check",
+      "--no-cache",
+      "paeos/model_router/disclosure_store.py",
+      "tests/model_router/test_disclosure_store.py"
+    ],
+    "exit_code": 0,
+    "output": "All checks passed!\n"
+  },
+  "ruff_format": {
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "paeos/model_router/disclosure_store.py",
+      "tests/model_router/test_disclosure_store.py"
+    ],
+    "exit_code": 0,
+    "output": "2 files already formatted\n"
+  },
+  "diff_check": {
+    "argv": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  "compile": {
+    "method": "compile(bytes, path, exec); no bytecode writes",
+    "files": [
+      "paeos/model_router/disclosure_store.py",
+      "tests/model_router/test_disclosure_store.py"
+    ],
+    "passed": true
+  },
+  "source_manifest": {
+    "exact_two_file_diff": [
+      "paeos/model_router/disclosure_store.py",
+      "tests/model_router/test_disclosure_store.py"
+    ]
+  },
+  "secret_pattern_scan": {
+    "files": [
+      "paeos/model_router/disclosure_store.py",
+      "tests/model_router/test_disclosure_store.py"
+    ],
+    "patterns": [
+      "private_key_header",
+      "provider_key",
+      "credential_assignment"
+    ],
+    "matches": 0,
+    "limitation": "Bounded pattern scan only; not comprehensive or classification authority."
+  },
+  "initial_lint_failure": {
+    "observed": "F811 and RUF100 from misplaced noqa on mutation instead of synthetic_key",
+    "resolution": "Move comment to imported fixture parameter; no test assertions changed",
+    "raw_evidence": "Native tool chunk830337; failure preserved as this factual record, not a fabricated subprocess capture."
+  },
+  "postimages": {
+    "paeos/model_router/disclosure_store.py": "ee9f1b2cbd3737f805eef45c9b52646e8fa0fa84f70da95bf0c7206f6da9fc34",
+    "tests/model_router/test_disclosure_store.py": "464b66826e7a3ee771f0b266d1be1d1d162f8fe7841a15845e92c43aa3234ea7"
+  }
+}

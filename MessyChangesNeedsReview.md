@@ -5658,3 +5658,10 @@ Admission and confinement source packages are combined, with the root-owned two-
 ### 2026-10-21 — broker continuation source boundary (no permit added)
 
 Preserved source41edb289. Valid v2 parser plus v1 loader controls expose a RED pinned-v2 bridge outside the mutable root card. Existing mediated result dictionaries/canonical exact-frame claims do not establish authenticated dynamic derivation. Exact owner/scope/preimage packet and untouched C2 e74208da recovery evidence are in reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021. No source/test edits, C2 integration, new review, host key, provider, runtime or qualification effect. Architect owns successor scoping; no premature Founder action requested.
+
+
+### 2026-10-21 — explicit pinned-v2 loader source repair (unreviewed)
+
+Bounded two-file source commit `a4195fbc9ca4c43404dd5a321640703c528532d4` adds independently parent-selected expected_policy_version (default1; explicit2), rejects invalid versions before input reads, and preserves existing descriptor-relative no-follow, independent pins and signature/time checks. Documents cannot select a verifier or trigger fallback. The returned immutable signature/shape snapshot establishes no enrollment, trusted classification/currentness or egress permission. Existing broker denial and all runtime/debt/P3/Sentium gates remain.
+
+Captured API RED:1failed on original loader TypeError. Focused GREEN:204passed; final-byte corrective run204passed after moving a misplaced lint noqa comment. Counters red1/green1/corrective1 consumed. Ruff lint/format, compile and diff checks pass; bounded source pattern scan0matches (not comprehensive classification). Source/evidence: `reviews/tasks/PAEOS_PINNED_V2_LOADER_REPAIR_20261021/`. Provider/paid/formal-review/full-suite/CLI/install/qualification calls0. Review PENDING; no review acceptance or Court claim. Earlier full-suite7collection failures and historical22 remain separate failures, not rerun. Original findings and other owner packages unchanged.

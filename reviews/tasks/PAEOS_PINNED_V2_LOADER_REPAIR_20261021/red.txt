@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_explicit_v2_loads_signed_derivative_snapshot_without_authority ______
+
+loader = <test_disclosure_store.loader.<locals>.LazyModule object at 0x105913620>
+v2_inputs = {'root': PosixPath('/private/tmp/paeos-v2-loader-test-bv504fc3/tmp/pytest-of-bob/pytest-0/test_explicit_v2_loads_signe..._relative_path': 'public/key.json', 'policy_relative_path': 'policy.json', 'expected_key_id': 'synthetic-founder', ...}
+
+    def test_explicit_v2_loads_signed_derivative_snapshot_without_authority(loader, v2_inputs):
+>       result = loader.load_pinned_disclosure_policy(**v2_inputs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: load_pinned_disclosure_policy() got an unexpected keyword argument 'expected_policy_version'. Did you mean 'expected_policy_sha256'?
+
+tests/model_router/test_disclosure_store.py:81: TypeError
+=========================== short test summary info ============================
+FAILED tests/model_router/test_disclosure_store.py::test_explicit_v2_loads_signed_derivative_snapshot_without_authority
+1 failed in 0.28s

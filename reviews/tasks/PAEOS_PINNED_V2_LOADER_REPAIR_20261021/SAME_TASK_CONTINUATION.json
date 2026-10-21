@@ -1,0 +1,27 @@
+{
+  "assignment_id": "B00-loader-same-task-context-recovery-20261021-v1",
+  "parent_assignment": "B00-pinned-v2-loader-two-file-repair-20261021-v1",
+  "mode": "SAME_TASK_CONTINUE_PARTIAL_TWO_FILE_CANDIDATE",
+  "source_baseline": "5dce3245132721c532024ed31694aa831516b5b6",
+  "current_dirty_source_hashes": {
+    "paeos/model_router/disclosure_store.py": "ee9f1b2cbd3737f805eef45c9b52646e8fa0fa84f70da95bf0c7206f6da9fc34",
+    "tests/model_router/test_disclosure_store.py": "d78db24a79c186f0f5dd2a09fd21374e679e0942b2dc0ce0d33c183291e98341"
+  },
+  "existing_scope_sha256": "03a5b2b98d977330730196fa4affc719c4eecadc54a35eb1a29ed3144a7abb18",
+  "scope_expansion": false,
+  "consumed_phase_counters": {
+    "red": 1,
+    "green": 0,
+    "corrective": 0
+  },
+  "remaining": "One focused GREEN; at most one corrective focused rerun for observed defect. RED consumed; never replay. Existing cumulative ceilings apply.",
+  "actual_cause": "Root transcript compaction line30235 dropped assigned task/version/counters and retained old human connector proposal msg_01a15943-4bef-75a3-8a8b-44099a357d39 from earlier turn01a15943-4b3e-74e3-9a59-8dc0254a043b. No intervening human cancellation found. Final connector answer is not loader acceptance.",
+  "next_action": "Preserve dirty two-file candidate and captured RED. Finish one scoped GREEN/static/capture/non-force checkpoint/readback, material callback to Architect. No redesign or connector work.",
+  "callback": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+  "prohibited": [
+    "New RED/fullsuite/provider/paid/review/CLI probe",
+    "Reset/stash/newworktree/overwriting partial candidate",
+    "Extra product paths/brokerpermit/C2merge/keys/install/qualification",
+    "Connector proposal as substitute final answer"
+  ]
+}
