@@ -22,6 +22,21 @@ from runtime.autonomy.admission_send_fence import (
 
 NOW = datetime(2026, 10, 19, 12, tzinfo=UTC)
 END = "2026-10-20T12:00:00+00:00"
+
+
+def test_parent_tool_claim_requires_dedicated_versioned_authority():
+    from runtime.autonomy.admission_authority import AdmissionAuthority
+
+    assert callable(getattr(AdmissionAuthority, "claim_parent_tool_read", None)), (
+        "missing dedicated parent-tool claim verifier/producer"
+    )
+    ledger, authority, *_ = setup_authority()
+    before = ledger.head_hash()
+    with pytest.raises(ValueError):
+        authority.claim_parent_tool_read(b'{"ready":true}')
+    assert ledger.head_hash() == before
+
+
 BINDINGS = dict(
     goal_id="mission",
     task_id="task",
@@ -807,3 +822,1124 @@ def test_authenticated_unknown_remains_consumed_after_restart(tmp_path):
         )
     ledger.close()
     store.close()
+
+
+# Independent wire fixtures: no production encoder, observer, artifact read or sink.
+TOOL_PURPOSES = ("PARENT_TOOL_CLAIM_REQUEST", "PARENT_TOOL_OBSERVATION", "PARENT_TOOL_COMMIT_ACK")
+
+
+def wire_json(value):
+    return json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
+    ).encode("ascii")
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def tool_signed(body, key, *, prefix=None):
+    if prefix is None:
+        prefix = (
+            b"PAEOS_PARENT_TOOL_GRANT/v2\0"
+            if body.get("schema") == 2
+            else ("PAEOS_" + body["purpose"] + "/v1\0").encode()
+        )
+    return wire_json({"body": body, "signature": key.sign(prefix + wire_json(body)).hex()})
+
+
+def tool_rebuild(f, *, grant=None, policy=None, trust=None, now=NOW):
+    from runtime.autonomy.admission_authority import AdmissionAuthority
+
+    grant = f["grant"] if grant is None else grant
+    policy = f["policy_bytes"] if policy is None else policy
+    trust = trust or replace(f["trust"], grants=(f["base_raw"], tool_signed(grant, f["root"])))
+    return AdmissionAuthority(
+        f["ledger"],
+        trust=trust,
+        domain_tag="TEST",
+        now=lambda: now,
+        tool_policy_manifests=(policy,),
+    )
+
+
+def tool_fixture(ledger=None, *, raw=b"known synthetic text \xc2\xa3\n", policy_mutate=None):
+    import base64
+
+    from runtime.autonomy.admission_authority import EnrolledIdentity
+
+    root, parent = Ed25519PrivateKey.generate(), Ed25519PrivateKey.generate()
+    ledger, legacy, _, _, policy, admission, issuer, receiver, trust = setup_authority(
+        ledger, root=root
+    )
+    manifest = dict(
+        schema="paeos.disclosure-policy/2",
+        policy_id="policy",
+        revision=1,
+        status="ACTIVE",
+        founder_authority=dict(
+            key_id="root", algorithm="Ed25519", signature_encoding="base64url-no-pad"
+        ),
+        issued_at="2026-10-19T00:00:00Z",
+        expires_at="2026-10-20T12:00:00Z",
+        revocation_mode="IMMEDIATE",
+        classes=[
+            dict(
+                class_id="PUBLIC_ARTIFACT",
+                data_class="PUBLIC",
+                purpose_ids=["synthetic-audit"],
+                scope=dict(
+                    repository_ids=["synthetic-repository"],
+                    scope_mode="EXACT_ARTIFACTS",
+                    allowed_artifacts=[
+                        dict(relative_path="docs/synthetic.txt", sha256=sha(raw), max_bytes=16384)
+                    ],
+                ),
+                allowed_routes=[
+                    dict(
+                        provider_id="google",
+                        model_id="synthetic-model-1",
+                        model_family="gemini",
+                        entitlement_class="FREE",
+                        transport_profile_id="synthetic-transport",
+                        external_operator_id="synthetic-operator",
+                    )
+                ],
+                max_bundle_bytes=131072,
+                max_artifacts=1,
+                required_exclusions=[
+                    "credentials",
+                    "sentium",
+                    "legacy_orca_credentials",
+                    "unrelated_private_data",
+                ],
+                require_builder_auditor_family_distinct=True,
+                require_a08=True,
+                max_attempts=1,
+                capability_ttl_seconds=60,
+            )
+        ],
+        derivative_rules=[
+            dict(
+                rule_id="read-rule",
+                class_id="PUBLIC_ARTIFACT",
+                input_artifact_sha256s=[sha(raw)],
+                input_data_class="PUBLIC",
+                output_data_class="PUBLIC",
+                tool_envelope_sha256="d" * 64,
+                transformation_ids=["READ_APPROVED_ARTIFACT"],
+                max_output_bytes=131072,
+            )
+        ],
+    )
+    if policy_mutate:
+        policy_mutate(manifest)
+    policy_signing = json.dumps(
+        manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    ).encode()
+    manifest["founder_authority"]["signature"] = (
+        base64.urlsafe_b64encode(root.sign(b"PAEOS-DISCLOSURE-POLICY-V2\0" + policy_signing))
+        .rstrip(b"=")
+        .decode()
+    )
+    policy_bytes = wire_json(manifest)
+    base_raw = trust.grants[0]
+    grant = dict(
+        schema=2,
+        record_kind="ROOT_GRANT",
+        domain_tag="TEST",
+        issuer_id="root",
+        grant_id="tool-grant",
+        issued_at=NOW.isoformat(),
+        expires_at=END,
+        parent_grant_id="grant",
+        parent_grant_digest=sha(wire_json(json.loads(base_raw))),
+        bindings=dict(BINDINGS),
+        admission_ref="admission",
+        admission_epoch=1,
+        policy_id="policy",
+        policy_revision=1,
+        policy_digest=policy["digest"],
+        policy_signer_id="root",
+        signed_v2_manifest_sha256=sha(policy_bytes),
+        derivative_rule_id="read-rule",
+        parent_identity_sha256=sha(parent.public_key().public_bytes_raw()),
+        tool_name="read_artifact",
+        tool_envelope_sha256="d" * 64,
+        tool_source_sha256="e" * 64,
+        tool_protocol_version="mcp-v1",
+        transformation="READ_APPROVED_ARTIFACT",
+        transformation_version="read-v1",
+        artifact_id="artifact",
+        expected_input_sha256=sha(raw),
+        max_operations=1,
+        max_raw_bytes=16384,
+        max_result_bytes=131072,
+        start_window_seconds=30,
+        purpose_delegations=[
+            dict(
+                purpose=p,
+                purpose_version=1,
+                signer_identity_id="issuer" if p == TOOL_PURPOSES[2] else "parent",
+                public_key_sha256=sha(
+                    (issuer if p == TOOL_PURPOSES[2] else parent).public_key().public_bytes_raw()
+                ),
+                expires_at=END,
+            )
+            for p in TOOL_PURPOSES
+        ],
+    )
+    trust = replace(
+        trust,
+        identities=(
+            *trust.identities,
+            EnrolledIdentity("parent", parent.public_key().public_bytes_raw()),
+        ),
+    )
+    f = dict(
+        ledger=ledger,
+        legacy=legacy,
+        root=root,
+        parent=parent,
+        issuer=issuer,
+        receiver=receiver,
+        base_raw=base_raw,
+        trust=trust,
+        grant=grant,
+        policy_bytes=policy_bytes,
+        admission=admission,
+        policy=policy,
+        raw=raw,
+    )
+    f["authority"] = tool_rebuild(f)
+    f["trust"] = f["authority"].trust
+    f["request"] = tool_request(f)
+    f["operation"] = json.loads(f["request"])["body"]["operation_id"]
+    return f
+
+
+def tool_request(f, *, grant=None, changes=None):
+    g = grant or f["grant"]
+    context = dict(
+        bindings=copy.deepcopy(g["bindings"]),
+        base_grant_id=g["parent_grant_id"],
+        base_grant_digest=g["parent_grant_digest"],
+        tool_grant_id=g["grant_id"],
+        tool_grant_digest=sha(wire_json(g)),
+        **{
+            k: g[k]
+            for k in (
+                "admission_ref",
+                "admission_epoch",
+                "policy_id",
+                "policy_revision",
+                "policy_digest",
+                "signed_v2_manifest_sha256",
+                "derivative_rule_id",
+            )
+        },
+    )
+    body = dict(
+        schema=1,
+        purpose=TOOL_PURPOSES[0],
+        purpose_version=1,
+        domain_tag="TEST",
+        issuer_id="parent",
+        issued_at=NOW.isoformat(),
+        expires_at=END,
+        context=context,
+        operation_id=sha(
+            wire_json(
+                dict(
+                    root_allocation_id=g["bindings"]["root_allocation_id"],
+                    operation_kind="PARENT_TOOL_READ",
+                    ordinal=0,
+                )
+            )
+        ),
+        ordinal=0,
+        request_id="request-1",
+        mcp_id=7,
+        arguments={"artifact_id": "artifact"},
+        arguments_sha256=sha(wire_json({"artifact_id": "artifact"})),
+        parent_boot_id="boot-1",
+        parent_process_id="process-1",
+        **{
+            k: g[k]
+            for k in (
+                "tool_name",
+                "artifact_id",
+                "expected_input_sha256",
+                "tool_envelope_sha256",
+                "tool_source_sha256",
+                "tool_protocol_version",
+                "transformation",
+                "transformation_version",
+                "parent_identity_sha256",
+                "max_raw_bytes",
+                "max_result_bytes",
+            )
+        },
+    )
+    if changes:
+        body.update(changes)
+    return tool_signed(body, f["parent"])
+
+
+def tool_observation(f, *, changes=None, outcome="RETURNED"):
+    import base64
+
+    req = json.loads(f["request"])["body"]
+    claim = next(r for r in f["ledger"].read() if r.event.kind == "PARENT_TOOL_READ_CLAIMED")
+    raw = f["raw"]
+    inner = json.dumps(
+        dict(artifact_id=req["artifact_id"], text=raw.decode(), sha256=sha(raw)), sort_keys=True
+    )
+    result = (
+        wire_json(
+            dict(
+                jsonrpc="2.0",
+                id=req["mcp_id"],
+                result={"content": [{"type": "text", "text": inner}]},
+            )
+        )
+        + b"\n"
+    )
+    body = dict(
+        schema=1,
+        purpose=TOOL_PURPOSES[1],
+        purpose_version=1,
+        domain_tag="TEST",
+        issuer_id="parent",
+        issued_at=NOW.isoformat(),
+        expires_at=END,
+        context=req["context"],
+        operation_id=req["operation_id"],
+        ordinal=0,
+        request_sha256=sha(f["request"]),
+        claim_seq=claim.seq,
+        claim_row_hash=claim.row_hash,
+        **{k: req[k] for k in ("parent_identity_sha256", "parent_boot_id", "parent_process_id")},
+        effect_started_at=NOW.isoformat(),
+        observed_at=NOW.isoformat(),
+        outcome=outcome,
+        error_code=None,
+        actual_input_sha256=sha(raw),
+        raw_length=len(raw),
+        raw_b64=base64.b64encode(raw).decode(),
+        result_sha256=sha(result),
+        result_length=len(result),
+        result_b64=base64.b64encode(result).decode(),
+    )
+    if outcome != "RETURNED":
+        body.update(error_code="UNKNOWN" if outcome == "UNKNOWN" else "READ_FAILED")
+        body.update(
+            {
+                k: None
+                for k in (
+                    "actual_input_sha256",
+                    "raw_length",
+                    "raw_b64",
+                    "result_sha256",
+                    "result_length",
+                    "result_b64",
+                )
+            }
+        )
+    if changes:
+        body.update(changes)
+    return tool_signed(body, f["parent"]), result
+
+
+def test_parent_tool_commits_exact_rows_and_independent_ack_readback():
+    import base64
+    from dataclasses import FrozenInstanceError
+
+    f = tool_fixture()
+    a, ledger = f["authority"], f["ledger"]
+    seq = a.claim_parent_tool_read(f["request"])
+    claim = ledger.read()[-1]
+    assert seq == claim.seq == 3
+    assert claim.event.kind == "PARENT_TOOL_READ_CLAIMED"
+    assert set(claim.event.payload) == {
+        "schema",
+        "domain_tag",
+        "operation_id",
+        "ordinal",
+        "request_b64",
+        "request_sha256",
+        "base_grant_b64",
+        "tool_grant_b64",
+        "authority_claimed_at",
+        "start_deadline",
+    }
+    assert base64.b64decode(claim.event.payload["request_b64"]) == f["request"]
+    assert base64.b64decode(claim.event.payload["tool_grant_b64"]) == f["trust"].grants[1]
+    ack = a.issue_parent_tool_commit_ack(
+        f["operation"], "CLAIM", issuer_id="issuer", signer=f["issuer"].sign
+    )
+    claim_view = a.verify_parent_tool_commit_ack(ack, expected_request_bytes=f["request"])
+    assert claim_view.outcome == "UNRESOLVED" and claim_view.result_bytes is None
+    assert claim_view.claim_row_hash == claim.row_hash
+    obs, result = tool_observation(f)
+    accepted = a.record_parent_tool_observation(obs)
+    row = ledger.read()[-1]
+    assert accepted == row.seq == 4 and row.event.kind == "PARENT_TOOL_OBSERVATION_RECORDED"
+    assert set(row.event.payload) == {
+        "schema",
+        "domain_tag",
+        "operation_id",
+        "ordinal",
+        "claim_seq",
+        "claim_row_hash",
+        "observation_b64",
+        "observation_sha256",
+    }
+    assert base64.b64decode(row.event.payload["observation_b64"]) == obs
+    ack = a.issue_parent_tool_commit_ack(
+        f["operation"], "OUTCOME", issuer_id="issuer", signer=f["issuer"].sign
+    )
+    view = a.verify_parent_tool_commit_ack(
+        ack, expected_request_bytes=f["request"], expected_observation_bytes=obs
+    )
+    assert view == a.read_parent_tool_operation(f["operation"])
+    assert (view.raw_bytes, view.result_bytes, view.accepted_seq, view.accepted_row_hash) == (
+        f["raw"],
+        result,
+        row.seq,
+        row.row_hash,
+    )
+    with pytest.raises(FrozenInstanceError):
+        view.outcome = "UNKNOWN"
+    assert ledger.verify_chain() == ledger.head_hash()
+    assert not any(r.event.kind == "ADMISSION_SEND_CLAIMED" for r in ledger.read())
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("schema", True),
+        ("purpose_version", True),
+        ("ordinal", False),
+        ("ordinal", 1),
+        ("mcp_id", True),
+        ("mcp_id", -1),
+        ("mcp_id", 2**53),
+        ("request_id", ""),
+        ("request_id", "x" * 129),
+        ("parent_boot_id", "boot\0"),
+        ("parent_process_id", None),
+        ("tool_name", "shell"),
+        ("tool_source_sha256", "a" * 64),
+        ("tool_protocol_version", "wrong"),
+        ("transformation", "SCOPED_PATCH"),
+        ("transformation_version", "wrong"),
+        ("arguments", {}),
+        ("arguments", {"artifact_id": "wrong"}),
+        ("arguments_sha256", "A" * 64),
+        ("expected_input_sha256", "a" * 64),
+        ("max_raw_bytes", True),
+        ("max_result_bytes", 131073),
+        ("issuer_id", "receiver"),
+        ("domain_tag", "PRODUCTION"),
+        ("issued_at", "2026-10-19T12:00:01+00:00"),
+        ("expires_at", "2026-10-21T12:00:00+00:00"),
+        ("issued_at", "2026-10-19T12:00:00"),
+    ],
+)
+def test_parent_tool_bad_request_denies_without_append(field, value):
+    f = tool_fixture()
+    before = f["ledger"].head_hash()
+    with pytest.raises(ValueError):
+        f["authority"].claim_parent_tool_read(tool_request(f, changes={field: value}))
+    assert f["ledger"].head_hash() == before
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("admission_epoch", True),
+        ("policy_revision", True),
+        ("policy_digest", "a" * 64),
+        ("signed_v2_manifest_sha256", "a" * 64),
+        ("tool_grant_digest", "a" * 64),
+        ("base_grant_digest", "a" * 64),
+    ],
+)
+def test_parent_tool_context_is_exact_and_type_preserving(field, value):
+    f = tool_fixture()
+    body = json.loads(f["request"])["body"]
+    body["context"][field] = value
+    before = f["ledger"].head_hash()
+    with pytest.raises(ValueError):
+        f["authority"].claim_parent_tool_read(tool_signed(body, f["parent"]))
+    assert f["ledger"].head_hash() == before
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("max_operations", 2),
+        ("max_operations", True),
+        ("max_raw_bytes", 16385),
+        ("max_result_bytes", 131073),
+        ("start_window_seconds", 31),
+        ("start_window_seconds", False),
+        ("parent_grant_digest", "a" * 64),
+        ("parent_identity_sha256", "a" * 64),
+        ("policy_digest", "a" * 64),
+        ("policy_signer_id", "parent"),
+        ("derivative_rule_id", "absent"),
+        ("purpose_delegations", []),
+        ("transformation", "MODEL_OUTPUT_WITH_CONFINED_INPUTS"),
+    ],
+)
+def test_parent_tool_signed_grant_cannot_expand_scope(field, value):
+    f = tool_fixture()
+    grant = copy.deepcopy(f["grant"])
+    grant[field] = value
+    a = tool_rebuild(f, grant=grant)
+    before = f["ledger"].head_hash()
+    with pytest.raises(ValueError):
+        a.claim_parent_tool_read(tool_request(f, grant=grant))
+    assert f["ledger"].head_hash() == before
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "missing",
+        "duplicate",
+        "receiver_ack",
+        "parent_ack",
+        "root_ack",
+        "wrong_public_key",
+        "wrong_parent",
+        "wrong_version",
+    ],
+)
+def test_parent_tool_purposes_need_explicit_distinct_enrollment(case):
+    f = tool_fixture()
+    grant = copy.deepcopy(f["grant"])
+    entries = grant["purpose_delegations"]
+    if case == "missing":
+        entries.pop()
+    elif case == "duplicate":
+        entries[2] = copy.deepcopy(entries[1])
+    elif case.endswith("_ack"):
+        who = case.removesuffix("_ack")
+        entries[2]["signer_identity_id"] = who
+        entries[2]["public_key_sha256"] = sha(f[who].public_key().public_bytes_raw())
+    elif case == "wrong_public_key":
+        entries[0]["public_key_sha256"] = "a" * 64
+    elif case == "wrong_parent":
+        entries[1]["signer_identity_id"] = "receiver"
+    else:
+        entries[0]["purpose_version"] = True
+    with pytest.raises(ValueError):
+        tool_rebuild(f, grant=grant).claim_parent_tool_read(tool_request(f, grant=grant))
+    assert len(f["ledger"].read()) == 2
+
+
+def test_parent_tool_strict_wire_encodings_and_domain_separation():
+    f = tool_fixture()
+    a = f["authority"]
+    body = json.loads(f["request"])["body"]
+    malformed = [
+        f["request"] + b"\n",
+        json.dumps(json.loads(f["request"])).encode(),
+        f["request"].replace(b'"ordinal":0', b'"ordinal":0,"ordinal":0'),
+        f["request"].replace(b'"mcp_id":7', b'"mcp_id":NaN'),
+        f["request"].replace(b'"mcp_id":7', b'"mcp_id":Infinity'),
+        b" " * 32769,
+        tool_signed(dict(body, unknown=1), f["parent"]),
+        tool_signed({k: v for k, v in body.items() if k != "arguments"}, f["parent"]),
+        wire_json(signed(body, f["parent"])),
+        f["base_raw"],
+        tool_signed(body, f["parent"], prefix=b"PAEOS_PARENT_TOOL_OBSERVATION/v1\0"),
+        tool_signed(body, f["parent"], prefix=b"PAEOS_PARENT_TOOL_COMMIT_ACK/v1\0"),
+        tool_signed(body, f["receiver"]),
+    ]
+    for raw in malformed:
+        with pytest.raises(ValueError):
+            a.claim_parent_tool_read(raw)
+    assert len(f["ledger"].read()) == 2
+    with pytest.raises(ValueError):
+        a.append_signed(json.loads(f["request"])["body"])
+    with pytest.raises(ValueError):
+        a.append_signed(json.loads(f["trust"].grants[1]))
+    assert len(f["ledger"].read()) == 2
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "empty_policy",
+        "missing_grant",
+        "duplicate_grant",
+        "bad_signature",
+        "missing_parent",
+        "old_manifest",
+    ],
+)
+def test_parent_tool_no_default_positive_configuration(case):
+    from runtime.autonomy.admission_authority import AdmissionAuthority
+
+    f = tool_fixture()
+    trust = f["trust"]
+    policies = (f["policy_bytes"],)
+    if case == "empty_policy":
+        policies = ()
+    elif case == "missing_grant":
+        trust = replace(trust, grants=trust.grants[:1])
+    elif case == "duplicate_grant":
+        trust = replace(trust, grants=(*trust.grants, trust.grants[1]))
+    elif case == "missing_parent":
+        trust = replace(trust, identities=trust.identities[:2])
+    elif case == "old_manifest":
+        policies = (b"{}",)
+    else:
+        env = json.loads(trust.grants[1])
+        env["signature"] = "0" * 128
+        trust = replace(trust, grants=(trust.grants[0], wire_json(env)))
+    a = AdmissionAuthority(
+        f["ledger"], trust=trust, domain_tag="TEST", now=lambda: NOW, tool_policy_manifests=policies
+    )
+    with pytest.raises(ValueError):
+        a.claim_parent_tool_read(f["request"])
+    assert len(f["ledger"].read()) == 2
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "secret",
+        "class_mismatch",
+        "omitted_input",
+        "no_read",
+        "rule_bound",
+        "artifact_bound",
+        "envelope",
+    ],
+)
+def test_parent_tool_signed_policy_is_independently_enforced(case):
+    def mutate(p):
+        rule = p["derivative_rules"][0]
+        cls = p["classes"][0]
+        if case == "secret":
+            cls["data_class"] = "SECRET"
+        elif case == "class_mismatch":
+            rule["output_data_class"] = "INTERNAL"
+        elif case == "omitted_input":
+            rule["input_artifact_sha256s"] = []
+        elif case == "no_read":
+            rule["transformation_ids"] = ["SCOPED_PATCH"]
+        elif case == "rule_bound":
+            rule["max_output_bytes"] = 100
+        elif case == "artifact_bound":
+            cls["scope"]["allowed_artifacts"][0]["max_bytes"] = 10
+        else:
+            rule["tool_envelope_sha256"] = "a" * 64
+
+    f = tool_fixture(policy_mutate=mutate)
+    with pytest.raises(ValueError):
+        f["authority"].claim_parent_tool_read(f["request"])
+    assert len(f["ledger"].read()) == 2
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("claim_seq", True),
+        ("claim_seq", 1),
+        ("claim_row_hash", "a" * 64),
+        ("request_sha256", "a" * 64),
+        ("parent_boot_id", "other"),
+        ("parent_process_id", "other"),
+        ("raw_length", True),
+        ("raw_length", 16385),
+        ("result_length", 131073),
+        ("actual_input_sha256", "a" * 64),
+        ("result_sha256", "a" * 64),
+        ("raw_b64", ""),
+        ("raw_b64", "YQ"),
+        ("result_b64", "YQ=="),
+        ("effect_started_at", "2026-10-19T11:59:59+00:00"),
+        ("observed_at", "2026-10-19T11:59:59+00:00"),
+        ("effect_started_at", "2026-10-19T12:00:31+00:00"),
+        ("error_code", "arbitrary text"),
+        ("outcome", "missing"),
+    ],
+)
+def test_parent_tool_observation_cannot_substitute_bytes_or_claim(field, value):
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    before = f["ledger"].head_hash()
+    obs, _ = tool_observation(f, changes={field: value})
+    with pytest.raises(ValueError):
+        a.record_parent_tool_observation(obs)
+    assert f["ledger"].head_hash() == before
+    assert a.read_parent_tool_operation(f["operation"]).result_bytes is None
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "noncanonical_result",
+        "different_result",
+        "different_raw",
+        "overflow_raw",
+        "noncanonical_base64",
+        "oversize_wire",
+    ],
+)
+def test_parent_tool_hashes_alone_do_not_prove_exact_observed_bytes(case):
+    import base64
+
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    obs, result = tool_observation(f)
+    body = json.loads(obs)["body"]
+    if case in {"different_raw", "overflow_raw", "noncanonical_base64"}:
+        raw = b"wrong" if case == "different_raw" else b"x" * 16385
+        if case == "noncanonical_base64":
+            body["raw_b64"] += "="
+        else:
+            body.update(
+                raw_b64=base64.b64encode(raw).decode(),
+                raw_length=len(raw),
+                actual_input_sha256=sha(raw),
+            )
+    elif case == "oversize_wire":
+        body["result_b64"] = "A" * 196608
+    else:
+        result = (
+            json.dumps(json.loads(result), indent=2).encode()
+            if case == "noncanonical_result"
+            else b"{}\n"
+        )
+        body.update(
+            result_b64=base64.b64encode(result).decode(),
+            result_length=len(result),
+            result_sha256=sha(result),
+        )
+    before = f["ledger"].head_hash()
+    with pytest.raises(ValueError):
+        a.record_parent_tool_observation(tool_signed(body, f["parent"]))
+    assert f["ledger"].head_hash() == before
+
+
+@pytest.mark.parametrize("outcome", ["UNKNOWN", "ERROR"])
+def test_parent_tool_uncertain_outcome_is_terminal_without_result_ack(outcome):
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    obs, _ = tool_observation(f, outcome=outcome)
+    a.record_parent_tool_observation(obs)
+    view = a.read_parent_tool_operation(f["operation"])
+    assert view.outcome == outcome and view.raw_bytes is view.result_bytes is None
+    before = f["ledger"].head_hash()
+    returned, _ = tool_observation(f)
+    for raw in (obs, returned):
+        with pytest.raises(ValueError):
+            a.record_parent_tool_observation(raw)
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "OUTCOME", issuer_id="issuer", signer=f["issuer"].sign
+        )
+    assert f["ledger"].head_hash() == before
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("accepted_seq", 1),
+        ("accepted_seq", True),
+        ("accepted_row_hash", "a" * 64),
+        ("accepted_prev_hash", "a" * 64),
+        ("commit_head_hash", "a" * 64),
+        ("verified_head_hash", "a" * 64),
+        ("claim_row_hash", "a" * 64),
+        ("claim_seq", 1),
+        ("ordinal", 1),
+        ("ordinal", False),
+        ("request_sha256", "a" * 64),
+        ("observation_sha256", "a" * 64),
+        ("phase", "CLAIM"),
+        ("parent_boot_id", "other"),
+        ("raw_length", True),
+        ("result_sha256", "a" * 64),
+        ("status", "READY"),
+        ("issuer_id", "receiver"),
+        ("purpose", TOOL_PURPOSES[1]),
+    ],
+)
+def test_parent_tool_signed_ack_must_join_actual_ledger(field, value):
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    obs, _ = tool_observation(f)
+    a.record_parent_tool_observation(obs)
+    ack = a.issue_parent_tool_commit_ack(
+        f["operation"], "OUTCOME", issuer_id="issuer", signer=f["issuer"].sign
+    )
+    body = json.loads(ack)["body"]
+    body[field] = value
+    with pytest.raises(ValueError):
+        a.verify_parent_tool_commit_ack(
+            tool_signed(body, f["issuer"]),
+            expected_request_bytes=f["request"],
+            expected_observation_bytes=obs,
+        )
+
+
+def test_parent_tool_ack_requires_concrete_store_and_exact_expected_wires():
+    from kernel.ledger import Event
+    from runtime.autonomy.admission_authority import AdmissionAuthority
+
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    obs, _ = tool_observation(f)
+    a.record_parent_tool_observation(obs)
+    ack = a.issue_parent_tool_commit_ack(
+        f["operation"], "OUTCOME", issuer_id="issuer", signer=f["issuer"].sign
+    )
+    absent = AdmissionAuthority(
+        Ledger(InMemoryLedgerStore()),
+        trust=f["trust"],
+        domain_tag="TEST",
+        now=lambda: NOW,
+        tool_policy_manifests=(f["policy_bytes"],),
+    )
+    with pytest.raises(ValueError):
+        absent.verify_parent_tool_commit_ack(
+            ack, expected_request_bytes=f["request"], expected_observation_bytes=obs
+        )
+    for request, observation in (
+        (f["request"] + b"\n", obs),
+        (f["request"], None),
+        (f["request"], obs + b"\n"),
+    ):
+        with pytest.raises(ValueError):
+            a.verify_parent_tool_commit_ack(
+                ack, expected_request_bytes=request, expected_observation_bytes=observation
+            )
+    f["ledger"].append(Event(1, "UNRELATED", {}), domain_tag="TEST")
+    assert (
+        a.verify_parent_tool_commit_ack(
+            ack, expected_request_bytes=f["request"], expected_observation_bytes=obs
+        ).outcome
+        == "RETURNED"
+    )
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "OUTCOME", issuer_id="receiver", signer=f["receiver"].sign
+        )
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "OUTCOME", issuer_id="issuer", signer=f["parent"].sign
+        )
+
+
+def test_parent_tool_claim_ack_cannot_extend_start_window_or_survive_signer_revocation():
+    from kernel.ledger import Event
+
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    ack = a.issue_parent_tool_commit_ack(
+        f["operation"], "CLAIM", issuer_id="issuer", signer=f["issuer"].sign
+    )
+    body = json.loads(ack)["body"]
+    body["expires_at"] = END
+    with pytest.raises(ValueError):
+        a.verify_parent_tool_commit_ack(
+            tool_signed(body, f["issuer"]), expected_request_bytes=f["request"]
+        )
+
+    def revoking_signer(data):
+        f["ledger"].append(
+            Event(1, "AUTHORITY_GRANT_REVOKED", {"grant_id": "tool-grant"}), domain_tag="TEST"
+        )
+        return f["issuer"].sign(data)
+
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "CLAIM", issuer_id="issuer", signer=revoking_signer
+        )
+
+
+@pytest.mark.parametrize(
+    "kind,field,identity",
+    [
+        ("AUTHORITY_GRANT_REVOKED", "grant_id", "grant"),
+        ("AUTHORITY_GRANT_REVOKED", "grant_id", "tool-grant"),
+        ("ADMISSION_REVOKED", "admission_ref", "admission"),
+        ("DISCLOSURE_POLICY_REVOKED", "policy_id", "policy"),
+    ],
+)
+def test_parent_tool_revocation_preserves_historical_outcome_but_denies_fresh_use(
+    kind, field, identity
+):
+    from kernel.ledger import Event
+
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    obs, _ = tool_observation(f)
+    f["ledger"].append(Event(1, kind, {field: identity}), domain_tag="TEST")
+    seq = a.record_parent_tool_observation(obs)
+    assert f["ledger"].read()[-1].seq == seq
+    with pytest.raises(ValueError):
+        a.read_parent_tool_operation(f["operation"])
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "OUTCOME", issuer_id="issuer", signer=f["issuer"].sign
+        )
+    with pytest.raises(ValueError):
+        a.claim_parent_tool_read(tool_request(f, changes={"request_id": "new"}))
+
+
+def test_parent_tool_supersession_expiry_and_removed_purpose_deny_replay():
+    from kernel.ledger import Event
+
+    f = tool_fixture()
+    a = f["authority"]
+    a.claim_parent_tool_read(f["request"])
+    obs, _ = tool_observation(f)
+    a.record_parent_tool_observation(obs)
+    later = tool_rebuild(f, now=datetime(2026, 10, 20, 12, tzinfo=UTC))
+    with pytest.raises(ValueError):
+        later.read_parent_tool_operation(f["operation"])
+    removed = tool_rebuild(f, trust=replace(f["trust"], grants=(f["base_raw"],)))
+    with pytest.raises(ValueError):
+        removed.read_parent_tool_operation(f["operation"])
+    f["ledger"].append(
+        Event(1, "ADMISSION_CURRENT", dict(f["admission"], epoch=2)), domain_tag="TEST"
+    )
+    with pytest.raises(ValueError):
+        a.read_parent_tool_operation(f["operation"])
+
+
+def test_parent_tool_sqlite_reopen_unsettled_and_returned_retains_exact_bytes(tmp_path):
+    from runtime.autonomy.admission_authority import AdmissionAuthority
+
+    database = tmp_path / "parent-tool.db"
+    store = SqliteLedgerStore(database)
+    f = tool_fixture(Ledger(store))
+    f["authority"].claim_parent_tool_read(f["request"])
+    f["ledger"].close()
+    store.close()
+    store = SqliteLedgerStore(database)
+    ledger = Ledger(store)
+    f["ledger"] = ledger
+    a = tool_rebuild(f)
+    f["authority"] = a
+    assert a.read_parent_tool_operation(f["operation"]).outcome == "UNRESOLVED"
+    with pytest.raises(ValueError):
+        a.claim_parent_tool_read(tool_request(f, changes={"request_id": "after-crash"}))
+    grant = dict(f["grant"], grant_id="new-tool-grant")
+    with pytest.raises(ValueError):
+        tool_rebuild(f, grant=grant).claim_parent_tool_read(tool_request(f, grant=grant))
+    obs, result = tool_observation(f)
+    a.record_parent_tool_observation(obs)
+    ledger.close()
+    store.close()
+    store = SqliteLedgerStore(database)
+    ledger = Ledger(store)
+    a = AdmissionAuthority(
+        ledger,
+        trust=f["trust"],
+        domain_tag="TEST",
+        now=lambda: NOW,
+        tool_policy_manifests=(f["policy_bytes"],),
+    )
+    try:
+        view = a.read_parent_tool_operation(f["operation"])
+        assert (view.raw_bytes, view.result_bytes, view.observation_bytes) == (
+            f["raw"],
+            result,
+            obs,
+        )
+        before = ledger.head_hash()
+        for _ in range(2):
+            ack = a.issue_parent_tool_commit_ack(
+                f["operation"], "OUTCOME", issuer_id="issuer", signer=f["issuer"].sign
+            )
+            assert (
+                a.verify_parent_tool_commit_ack(
+                    ack, expected_request_bytes=f["request"], expected_observation_bytes=obs
+                )
+                == view
+            )
+        assert ledger.head_hash() == before
+    finally:
+        ledger.close()
+        store.close()
+
+
+class ParentRejectingStore(InMemoryLedgerStore):
+    def append_row_if_head(self, row, expected_head_hash):
+        if row.event.kind.startswith("PARENT_TOOL_"):
+            raise OSError("synthetic capacity rejection")
+        return super().append_row_if_head(row, expected_head_hash)
+
+
+def test_parent_tool_store_rejection_cannot_yield_success_ack():
+    f = tool_fixture(Ledger(ParentRejectingStore()))
+    a = f["authority"]
+    with pytest.raises(OSError):
+        a.claim_parent_tool_read(f["request"])
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "CLAIM", issuer_id="issuer", signer=f["issuer"].sign
+        )
+    assert len(f["ledger"].read()) == 2
+
+
+class ParentPausingStore(SqliteLedgerStore):
+    def __init__(self, path, ready, resume):
+        super().__init__(path)
+        self.ready, self.resume = ready, resume
+
+    def append_row_if_head(self, row, expected_head_hash):
+        if row.event.kind == "PARENT_TOOL_READ_CLAIMED":
+            self.ready.set()
+            if not self.resume.wait(10):
+                raise TimeoutError("revoker not released")
+        return super().append_row_if_head(row, expected_head_hash)
+
+
+def parent_claim_process(database, trust, policies, request, gate, results, pause=None):
+    from runtime.autonomy.admission_authority import AdmissionAuthority
+
+    store = ParentPausingStore(database, *pause) if pause else SqliteLedgerStore(database)
+    ledger = Ledger(store, writer_id="signed-process-test")
+    a = AdmissionAuthority(
+        ledger, trust=trust, domain_tag="TEST", now=lambda: NOW, tool_policy_manifests=policies
+    )
+    try:
+        if gate is not None:
+            gate.wait(10)
+        a.claim_parent_tool_read(request)
+        results.put("CLAIMED")
+    except ValueError:
+        results.put("DENIED")
+    except Exception as exc:
+        results.put(("ERROR", type(exc).__name__))
+    finally:
+        ledger.close()
+        store.close()
+
+
+def test_parent_tool_two_processes_share_one_allocation_claim(tmp_path):
+    import multiprocessing
+
+    database = tmp_path / "parent-race.db"
+    store = SqliteLedgerStore(database)
+    f = tool_fixture(Ledger(store, writer_id="signed-process-test"))
+    requests = [tool_request(f, changes={"request_id": str(i)}) for i in range(2)]
+    f["ledger"].close()
+    store.close()
+    context = multiprocessing.get_context("spawn")
+    gate = context.Barrier(2)
+    results = context.Queue()
+    processes = [
+        context.Process(
+            target=parent_claim_process,
+            args=(str(database), f["trust"], (f["policy_bytes"],), request, gate, results),
+        )
+        for request in requests
+    ]
+    join_processes(processes)
+    assert sorted(results.get(timeout=5) for _ in processes) == ["CLAIMED", "DENIED"]
+    store = SqliteLedgerStore(database)
+    ledger = Ledger(store, writer_id="signed-process-test")
+    try:
+        assert sum(r.event.kind == "PARENT_TOOL_READ_CLAIMED" for r in ledger.read()) == 1
+        assert ledger.verify_chain() == ledger.head_hash()
+    finally:
+        ledger.close()
+        store.close()
+        results.close()
+        results.join_thread()
+
+
+def test_parent_tool_revocation_wins_between_validation_and_cas(tmp_path):
+    import multiprocessing
+
+    database = tmp_path / "parent-revoke.db"
+    store = SqliteLedgerStore(database)
+    f = tool_fixture(Ledger(store, writer_id="signed-process-test"))
+    revoke = signed(dict(unsigned(f["admission"]), record_kind="ADMISSION_REVOKED"), f["issuer"])
+    f["ledger"].close()
+    store.close()
+    context = multiprocessing.get_context("spawn")
+    ready = context.Event()
+    resume = context.Event()
+    results = context.Queue()
+    claimant = context.Process(
+        target=parent_claim_process,
+        args=(
+            str(database),
+            f["trust"],
+            (f["policy_bytes"],),
+            f["request"],
+            None,
+            results,
+            (ready, resume),
+        ),
+    )
+    revoker = context.Process(
+        target=signed_process_revoke,
+        args=(str(database), f["trust"], revoke, ready, resume, results),
+    )
+    join_processes([claimant, revoker])
+    assert sorted(results.get(timeout=5) for _ in range(2)) == ["DENIED", "REVOKED"]
+    store = SqliteLedgerStore(database)
+    ledger = Ledger(store, writer_id="signed-process-test")
+    try:
+        assert not any(r.event.kind == "PARENT_TOOL_READ_CLAIMED" for r in ledger.read())
+        assert ledger.read()[-1].event.kind == "ADMISSION_REVOKED"
+        assert ledger.verify_chain() == ledger.head_hash()
+    finally:
+        ledger.close()
+        store.close()
+        results.close()
+        results.join_thread()
+
+
+@pytest.mark.parametrize("alias_of", ["parent", "root"])
+def test_parent_tool_distinct_identity_labels_cannot_alias_ack_signing_key(alias_of):
+    from runtime.autonomy.admission_authority import EnrolledIdentity
+
+    f = tool_fixture()
+    grant = copy.deepcopy(f["grant"])
+    key = f[alias_of].public_key().public_bytes_raw()
+    grant["purpose_delegations"][2]["public_key_sha256"] = sha(key)
+    trust = replace(
+        f["trust"],
+        identities=tuple(
+            EnrolledIdentity("issuer", key) if x.identity_id == "issuer" else x
+            for x in f["trust"].identities
+        ),
+        grants=(f["base_raw"], tool_signed(grant, f["root"])),
+    )
+    # Re-sign both CURRENT records under the alias so legacy signature failure
+    # cannot accidentally be the reason the new separation control passes.
+    from kernel.ledger import Event
+
+    ledger = Ledger(InMemoryLedgerStore())
+    for old in f["ledger"].read():
+        body = unsigned(old.event.payload)
+        ledger.append(Event(1, old.event.kind, signed(body, f[alias_of])), domain_tag="TEST")
+    f["ledger"] = ledger
+    a = tool_rebuild(f, grant=grant, trust=trust)
+    assert a.verify_admission(ledger.read()[1].event.payload)
+    before = ledger.head_hash()
+    with pytest.raises(ValueError):
+        a.claim_parent_tool_read(tool_request(f, grant=grant))
+    assert ledger.head_hash() == before
