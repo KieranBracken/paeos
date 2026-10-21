@@ -172,12 +172,16 @@ def run_bounded_process(
         raise ProcessSupervisorError("process deadlines must be positive")
     executable = _resolve_executable(argv[0], environment)
     executable_version = _executable_version(executable)
+    # Launch the same canonical path whose bytes and digest were just recorded.
+    # Retaining the caller's PATH or symlink spelling could make the observation
+    # describe one executable while Popen resolves another at launch time.
+    launch_argv = (str(executable), *argv[1:])
     env = dict(environment)
     environment_fingerprint = _environment_fingerprint(env)
     started_at = time.monotonic()
     state: dict[str, object] = {
         "schema": "paeos.process-lifecycle/1",
-        "argv": list(argv),
+        "argv": list(launch_argv),
         "executable": str(executable),
         "executable_version": executable_version,
         "cwd": str(cwd),
@@ -219,7 +223,7 @@ def run_bounded_process(
     def launch() -> None:
         try:
             launch_result["process"] = subprocess.Popen(
-                list(argv),
+                list(launch_argv),
                 cwd=str(cwd),
                 env=env,
                 stdin=subprocess.DEVNULL,
@@ -248,7 +252,7 @@ def run_bounded_process(
             target=terminate_late_launch, name="paeos-late-launch-cleanup", daemon=True
         ).start()
         return ProcessObservation(
-            argv=argv,
+            argv=launch_argv,
             executable=str(executable),
             executable_version=executable_version,
             cwd=str(cwd),
@@ -375,7 +379,7 @@ def run_bounded_process(
     _write_state(state_path, state)
     assert terminal is not None
     return ProcessObservation(
-        argv=argv,
+        argv=launch_argv,
         executable=str(executable),
         executable_version=executable_version,
         cwd=str(cwd),

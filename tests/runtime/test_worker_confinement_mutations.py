@@ -180,3 +180,77 @@ def test_mutation_contract_hash_mismatch_killed(tmp_path: Path) -> None:
             worker_session="session-001",
             current_seq=1,
         )
+
+
+def test_provider_environment_never_inherits_host_credentials(tmp_path: Path) -> None:
+    from runtime.integrations.worker_confinement import (
+        WorkerConfinementError,
+        build_provider_environment,
+    )
+
+    workspace = tmp_path / "workspace"
+    home = workspace / ".runtime"
+    temp = workspace / ".tmp"
+    env = build_provider_environment(
+        {"OPENAI_API_KEY": "must-not-copy", "CODEX_HOME": "/Users/owner/.codex"},
+        runtime_home=home,
+        temp_root=temp,
+        task_environment={"PAEOS_TASK_BROKER_TOKEN": "ephemeral"},
+    )
+    assert "OPENAI_API_KEY" not in env
+    assert "CODEX_HOME" not in env
+    assert env["PAEOS_TASK_BROKER_TOKEN"] == "ephemeral"
+    assert set(env) == {"HOME", "LANG", "LC_ALL", "PATH", "TMPDIR", "PAEOS_TASK_BROKER_TOKEN"}
+
+    with pytest.raises(WorkerConfinementError):
+        build_provider_environment(
+            {},
+            runtime_home=home,
+            temp_root=temp,
+            task_environment={"CODEX_HOME": "/Users/owner/.codex"},
+        )
+
+
+def test_worker_confinement_rejects_caller_selected_sandbox_binary(tmp_path: Path) -> None:
+    import sys
+
+    from runtime.integrations.worker_confinement import (
+        WorkerConfinementError,
+        policy_for_worker,
+    )
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    policy = policy_for_worker(
+        workspace=workspace,
+        read_roots=(workspace,),
+        write_roots=(workspace,),
+        runtime_home=workspace / ".runtime",
+        temp_root=workspace / ".tmp",
+        sandbox_exec=Path("/bin/sh"),
+    )
+    with pytest.raises(WorkerConfinementError, match="pinned"):
+        policy.wrap_argv((str(Path(sys.executable).resolve()), "-c", "pass"))
+
+
+def test_worker_confinement_rejects_caller_supplied_permissive_profile(tmp_path: Path) -> None:
+    import dataclasses
+    import sys
+
+    from runtime.integrations.worker_confinement import (
+        WorkerConfinementError,
+        policy_for_worker,
+    )
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    policy = policy_for_worker(
+        workspace=workspace,
+        read_roots=(workspace,),
+        write_roots=(workspace,),
+        runtime_home=workspace / ".runtime",
+        temp_root=workspace / ".tmp",
+    )
+    forged = dataclasses.replace(policy, seatbelt_profile="(version 1)\n(allow default)")
+    with pytest.raises(WorkerConfinementError, match="parent-compiled"):
+        forged.wrap_argv((str(Path(sys.executable).resolve()), "-c", "pass"))
