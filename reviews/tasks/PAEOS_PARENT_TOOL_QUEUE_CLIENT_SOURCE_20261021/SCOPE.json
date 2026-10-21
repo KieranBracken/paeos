@@ -1,0 +1,93 @@
+{
+  "schema": "paeos.bounded-existing-owner-offline-queue-client-source/1",
+  "assignment_id": "B00-interactive-parent-tool-queue-client-source-20261021-v1",
+  "owner_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "source_event": "B00-parent-tool-authority-source-20261021-v1-complete",
+  "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "baseline": "c48a05833f41c6598dba2b927831e47de22ffe6a",
+  "construction_branch": "codex/b00-parent-tool-queue-client-20261021",
+  "workspace_lease": "Existing recovery checkout, serial root construction. Create branch at exact current HEAD; preserve parent-authority branch/c48 and combined branch7dd, original ef8f/C2. No newworktree/reset/stash/rebase/old dependency transplant.",
+  "mutable_product_manifest": {
+    "runtime/integrations/trusted_codex_transport.py": "04e2aba7a25da3c28d1f964a998ef6aff9e03463cd1f0c117c8c44a4b6ef176e",
+    "tests/runtime/test_trusted_codex_client.py": "a14eae14badb251a934a8ac82b2bd3c5c605a2da9955da90567e5ec1dc76eeba"
+  },
+  "read_only_pins": {
+    "kernel/ledger.py": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da",
+    "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+    "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+    "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+    "runtime/autonomy/admission_authority.py": "1c339be0af54f0a3add5f25a2eb466a73f301d065653c918f71a1fe24847cd77",
+    "tests/runtime/autonomy/test_admission_authority.py": "0c74332c107182ce999d955bf2e82a2f53d9c3ce0ef28dd5dcfa86fc1b317135",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "kernel/ledger_sqlite.py": "70c4774ba91cabbfc7f3cfa570d996923654cc500eadcf9da51ea56cf3aaf4d3"
+  },
+  "frozen_wire_contract": {
+    "path": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/shared-observer-wire-contract-20261021/FROZEN_CONTRACT.json",
+    "sha256": "2c4cdd9af5e13721dc10ef8729affe5c0684552e3b4aa429e4a37e6ee6c343c0"
+  },
+  "authority_candidate": {
+    "source": "2ce8af93673cfe74628694201d08d8879f8edadb",
+    "evidence": "c48a05833f41c6598dba2b927831e47de22ffe6a",
+    "manifest_sha256": "be4635183efc3dcc227e0362b5cacd65d5172298f6146f428c6cb862463f11bc",
+    "acceptance_status": "Validated immutable input for further offline construction only; independent review/integration/production not accepted"
+  },
+  "encoding_clarification": [
+    "tool_policy_manifests is an immutable tuple of immutable signed V2 policy byte inputs, each <=1048576; empty defaults deny tool authority. No key/file discovery.",
+    "context.tool_grant_digest is SHA256 of the canonical unsigned v2 grant BODY; the full canonical envelope is independently signature-verified and retained. context.base_grant_digest preserves v1 digest of its complete signed flat record. Request and observation SHA fields hash complete canonical signed envelopes. The frozen contract named tool_grant_digest without separately specifying body versus envelope; this explicit encoding must be consumed consistently by successor owners.",
+    "Frozen readback contains bytes and identities only, with UNRESOLVED for claim-only state; no read/send capability.",
+    "Historical readback validates CURRENT/revocation at the actual claim prefix using retained signed grants and claim clock; fresh query/ACK also validates current configured trust and current Ledger.",
+    "ACK signer must differ from parent/root by both enrolled identity ID and public key digest."
+  ],
+  "source_import_manifest": [],
+  "objective": "Extend existing HostCodexWorkerTransport wait path to consume strict per-request signed parent claim/outcome queue events, invoke the concrete AdmissionAuthority claim/record/readback/ACK APIs, then publish exact delegated commit ACK bytes. Queue remains transport. Normal path remains disabled without explicit concrete authority/delegated ACK inputs and all existing fences. No actual parent read/CLI/provider.",
+  "acceptance": [
+    "Freeze compact queue interface filename/wrapper/schema/phase/correlation and size limits BEFORE edits. Bind to actual awaited task/run/session/allocation/admission/scope/parent identity/source/purpose, not caller filenames or event claims. Use only existing queue root, exclusive no-follow bounded reads/writes and fsync; no sidecar authority, extra runner, generic callback permission or arbitrary command. Include interface artifact hash in result for Chat4.",
+    "Call concrete first-pair APIs and readback self.ledger. ACK signing supplied only by protected independently purpose-delegated technical identity, externally signed bytes reverified by authority; never automatically reuse request/root-issuer signer or accept queue-supplied signer/keys/authority flags. Empty/missing binding denies interactive events.",
+    "Claim event -> verified canonical allocation claim/readback -> CLAIM ACK; outcome -> exact claim/signature/inline bytes/currentness/row/readback -> OUTCOME ACK for RETURNED only. No release ACK from row shape/signature/fsync alone. Errors/UNKNOWN/missing or ambiguous evidence cannot become success, reset ordinal/new request or bypass fresh currentness. Never re-send, re-claim or re-read an effect to recover an uncertain message. Existing final-response/fence/reconciliation behavior stays unchanged.",
+    "Use actual current authority APIs with known raw/result bytes and ephemeral TEST parent/delegate keys in isolated temporary queue/SQLite fixtures. Synthetic parent peer only; no artifact-reading workflow, real host supervisor, CLI, provider, model request, service or production signer. Demonstrate exact ACK/row bytes; malformed/wrong signature/domain/purpose/context/request/allocation/phase/row/size/symlink/cross-request/conflicting duplicates deny.",
+    "Reopen Ledger/queue at claim/outcome/ACK boundaries: same committed row can yield the same-operation attestation/stored-byte result under live scope, never a second claim/effect. Missing outcome remains unresolved; stale/revoked context gives no content ACK. Duplicate files/late events/timeouts do not become worker completion or valid permits. Preserve original legacy tests and default deny.",
+    "If required awaited identity/binding, installer closure, parent/broker/fence API or other source path is absent, preserve denial and return exact code/preimage/test/contract packet before an outside edit. Do not silently weaken binding or construct test-only production authority.",
+    "Freeze only two product paths plus append-only source/evidence logging. Original combined7dd remains preserved; root source construction on separate branch is not formal review, runtime admission or D0258 integration."
+  ],
+  "budget": {
+    "one_source_candidate": true,
+    "red_max": 1,
+    "focused_green_max": 1,
+    "test_scope": "tests/runtime/test_trusted_codex_client.py only",
+    "corrective_focused_rerun_max": 1,
+    "full_suite": 0,
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "actual_parent_artifact_read": 0,
+    "CLI_or_host_service": 0,
+    "keys_or_enrollment": 0,
+    "inherit_all_cumulative_limits": true,
+    "usage_percent": 25,
+    "ordinary_usage_allowed": true,
+    "credits": 0,
+    "new_override": false,
+    "heavy_test_lock": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/heavy-test.lock",
+    "prior_counters": "Authority1RED/1GREEN/1corrective exhausted; C2/loader/neutral transport unchanged. No reset/new provider or review allocation."
+  },
+  "verification": "Inspect collection/test effects first; isolated HOME/env/state, deny-all-network and scratch-only writes, no ancestor blanket-write literals; record phase intent/counters and actual receipts. Temporary independent connections/processes allowed only fixed TEST queue peers. Static lint/format/compile/diff/scoped secret checks. Explicit sanitized path manifest, non-force push and actual remote SHA readback. Preserve original failures; no private test key material/state DB in Git.",
+  "logging": {
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": {
+      "preimage": "f5eb0d7fae474eff871b87404df6828520fe0f226ea09277b1e0ed9df65da73c",
+      "mode": "append exact bounded source finding only"
+    },
+    "MessyChangesNeedsReview.md": {
+      "preimage": "345aadb0a97cf87ba2d54c92f462d833d2bd5e1ef25966de825f3e64d220298b",
+      "mode": "append exact bounded source finding only"
+    }
+  },
+  "held": "Chat4 parent4, broker2, fence2 separately scoped later. No source changes to those or authority pair/kernel/policy/installer. Independent eligible exact-byte review, actual signer enrollment/service/CLI/confinement/egress/install/Court/qualification/debt/P3 held. Chat1 sole D0258; SENTIUM_FROZEN.",
+  "callback": "Immediate literal completion/blocker/correction to Architect01a151d6-4fd3-7f23-a35d-167815a58cdb with actual turn/interface/source/evidence/candidate/test counters and ALLOWED_NOW/HELD/AUTHORITY_OR_IMPLEMENTATION_GAP. Reopen exact card after compaction and before finalizing; actual tool denial -> exact callback, no relocation/bypass/retry."
+}

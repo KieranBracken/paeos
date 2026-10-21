@@ -1,0 +1,5 @@
+{
+  "patterns": 2,
+  "matches": 0,
+  "scope": "Explicit new synthetic artifacts and appended notebook entry only. No key files, state DBs, raw private provider responses. Limited pattern scan, not classification authority."
+}

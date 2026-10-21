@@ -1,0 +1,27 @@
+{
+  "phase": "corrective",
+  "state": "RETURNED",
+  "started_at_utc": "2026-10-21T16:39:30.793070+00:00",
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "tests/runtime/test_trusted_codex_client.py",
+    "-o",
+    "addopts=",
+    "-q"
+  ],
+  "environment": "Isolated HOME/CODEX_HOME/TMPDIR; no credentials; plugin autoload disabled",
+  "network": "DENY_ALL",
+  "filesystem": "Scratch writes only; known host credentials/USB reads denied",
+  "profile_sha256": "5f3aea84c12c180c01d18a5e80550bd981d50935fd2738bad841f16cd41db134",
+  "source_hashes": {
+    "runtime/integrations/trusted_codex_transport.py": "9b96833b1d504fa7abaa6773fe6f8d637b0afd4f6edfa165c0086778c11828c5",
+    "tests/runtime/test_trusted_codex_client.py": "9bc1f2b7b52e562a5c89f57b402bd3cac69287b814350f825c903ba4621eaf0f"
+  },
+  "exit_code": 0,
+  "seconds": 1.315,
+  "stdout_sha256": "5d212e4231ec9af0ec32c470fb4581e04b5fed5a307e292c1977ea231f60ca37"
+}

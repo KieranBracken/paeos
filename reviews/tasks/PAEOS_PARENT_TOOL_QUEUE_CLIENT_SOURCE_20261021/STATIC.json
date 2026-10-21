@@ -1,0 +1,74 @@
+{
+  "lint": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "check",
+      "--no-cache",
+      "runtime/integrations/trusted_codex_transport.py",
+      "tests/runtime/test_trusted_codex_client.py"
+    ],
+    "exit_code": 0,
+    "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "format": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "runtime/integrations/trusted_codex_transport.py",
+      "tests/runtime/test_trusted_codex_client.py"
+    ],
+    "exit_code": 0,
+    "output_sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938"
+  },
+  "diff": {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "compile": "PASS; in-memory,no pycache",
+  "legacy_test_AST": {
+    "definitions_unchanged": 9,
+    "passed": true
+  },
+  "final_test_byte_binding": {
+    "runtime/integrations/trusted_codex_transport.py": "9b96833b1d504fa7abaa6773fe6f8d637b0afd4f6edfa165c0086778c11828c5",
+    "tests/runtime/test_trusted_codex_client.py": "9bc1f2b7b52e562a5c89f57b402bd3cac69287b814350f825c903ba4621eaf0f"
+  },
+  "secret_scan": {
+    "pattern_count": 2,
+    "matches": 0,
+    "limitation": "Bounded pattern scan of exact source; synthetic ephemeral TEST keys only in memory, no host material or runtime databases copied"
+  },
+  "read_only_pins": {
+    "kernel/ledger.py": "e37610936401b20d160ef66e318f06b1936c279bad410b209a3dac813a80d7da",
+    "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+    "runtime/integrations/process_supervisor.py": "68372f0b2e99dd4c54d0108db28d30f7a7cdfb37b15bfda3a6a24596ac269302",
+    "runtime/integrations/worker_confinement.py": "f292cd194eac5d022b36f7c8dbe0b317775a716b4c1dd788cebad659fa24af42",
+    "runtime/autonomy/admission_authority.py": "1c339be0af54f0a3add5f25a2eb466a73f301d065653c918f71a1fe24847cd77",
+    "tests/runtime/autonomy/test_admission_authority.py": "0c74332c107182ce999d955bf2e82a2f53d9c3ce0ef28dd5dcfa86fc1b317135",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "kernel/ledger_sqlite.py": "70c4774ba91cabbfc7f3cfa570d996923654cc500eadcf9da51ea56cf3aaf4d3"
+  },
+  "interface_sha256": "46ba2cfeff5d4f6104e6b945a49cf4e9bfda7265b64b4e044877ff9bc5cfa6b3",
+  "failures_preserved": [
+    "RED missing parent_tool_authority constructor parameter",
+    "First GREEN25pass/1test-helper phase parameter collision; original raw output unchanged",
+    "Initial import-order lint corrected before GREEN; no finding rewritten"
+  ]
+}

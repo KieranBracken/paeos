@@ -1,0 +1,58 @@
+{
+  "schema": "paeos.parent-tool-queue-interface/1",
+  "assignment_id": "B00-interactive-parent-tool-queue-client-source-20261021-v1",
+  "source_baseline": "c48a05833f41c6598dba2b927831e47de22ffe6a",
+  "wire_contract_sha256": "2c4cdd9af5e13721dc10ef8729affe5c0684552e3b4aa429e4a37e6ee6c343c0",
+  "filenames": {
+    "CLAIM": "<launch_request_id>.parent-tool.claim.json",
+    "OUTCOME": "<launch_request_id>.parent-tool.outcome.json",
+    "CLAIM_ACK": "<launch_request_id>.parent-tool.claim-ack.json",
+    "OUTCOME_ACK": "<launch_request_id>.parent-tool.outcome-ack.json"
+  },
+  "event": {
+    "exact_fields": [
+      "schema",
+      "request_id",
+      "phase",
+      "envelope_b64"
+    ],
+    "schema": "paeos.parent-tool-queue-event/1",
+    "phase": [
+      "CLAIM",
+      "OUTCOME"
+    ],
+    "encoding": "Strict canonical ASCII JSON, no LF; canonical padded base64 of complete signed wire envelope"
+  },
+  "ack": {
+    "exact_fields": [
+      "schema",
+      "request_id",
+      "phase",
+      "ack_b64"
+    ],
+    "schema": "paeos.parent-tool-queue-ack/1",
+    "phase": [
+      "CLAIM",
+      "OUTCOME"
+    ],
+    "encoding": "Same canonical wrapper, independently authority-verified complete signed commit ACK bytes"
+  },
+  "limits": {
+    "wrapper_bytes": 270336,
+    "claim_wire_bytes": 32768,
+    "outcome_wire_bytes": 196608,
+    "ack_wire_bytes": 196608,
+    "operations_per_allocation": 1
+  },
+  "trusted_inputs": "Explicit concrete AdmissionAuthority, immutable canonical parent_tool_binding bytes containing context,parent_identity_sha256,parent_boot_id,parent_process_id, separately enrolled ACK issuer+protected signing callable. No discovered/queue-supplied keys. Bind full context to actual canonical WORKER_LAUNCH claim/request/frame and actual spec/admission/route; response public key must match parent identity; ACK key must differ from request and parent/root keys.",
+  "ordering": "Canonical claim/readback then verified CLAIM ACK. Canonical exact outcome/readback then verified OUTCOME ACK only RETURNED. Existing accepted state yields only same-operation readback/attestation, not new claim or effect. Missing/error/UNKNOWN/stale/revoked/conflicting/late events never release a result or become completion.",
+  "filesystem": "Traverse pinned queue directory descriptors with no-follow, bounded regular-file reads; exact exclusive ACK publication from fsynced temporary bytes, exclusive hard link and directory fsync. Never overwrite a preexisting ACK; verify exact stored ACK instead. Files transport only, never authority.",
+  "scope_limits": "No parent file read/tool invocation, CLI/provider, authority/broker/fence/installer edits, production enrollment or permit; final launch response/fence flow remains otherwise intact.",
+  "constructor_optional_inputs": [
+    "parent_tool_authority",
+    "parent_tool_binding",
+    "parent_tool_ack_issuer_id",
+    "parent_tool_ack_signer"
+  ],
+  "missing_inputs": "No interactive events allowed; default transport denial/legacy final-response semantics preserved."
+}

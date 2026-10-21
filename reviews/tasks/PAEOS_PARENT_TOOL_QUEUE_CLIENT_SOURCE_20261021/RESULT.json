@@ -1,0 +1,73 @@
+{
+  "assignment_id": "B00-interactive-parent-tool-queue-client-source-20261021-v1",
+  "event_id": "B00-parent-tool-queue-client-source-20261021-v1-complete",
+  "source_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "actual_turn_id": "01a15f4c-599c-7012-94bd-dd244b8ea798",
+  "source_commit": "3c8d1f4c0476921b24b4bb863c851e86884d43fd",
+  "baseline": "c48a05833f41c6598dba2b927831e47de22ffe6a",
+  "construction_branch": "codex/b00-parent-tool-queue-client-20261021",
+  "captured_at_utc": "2026-10-21T16:42:05.252984+00:00",
+  "scope_sha256": "bc2e1323b4b3363913d80fbe958e602bb069fdd39bc1c65372fc4db22a158497",
+  "interface_sha256": "46ba2cfeff5d4f6104e6b945a49cf4e9bfda7265b64b4e044877ff9bc5cfa6b3",
+  "frozen_wire_contract_sha256": "2c4cdd9af5e13721dc10ef8729affe5c0684552e3b4aa429e4a37e6ee6c343c0",
+  "source_postimages": {
+    "runtime/integrations/trusted_codex_transport.py": "9b96833b1d504fa7abaa6773fe6f8d637b0afd4f6edfa165c0086778c11828c5",
+    "tests/runtime/test_trusted_codex_client.py": "9bc1f2b7b52e562a5c89f57b402bd3cac69287b814350f825c903ba4621eaf0f"
+  },
+  "implementation": [
+    "Exact canonical signed claim/outcome wrappers correlated to actual awaited request, admitted context, current concrete canonical WORKER_LAUNCH claim/frame/allocation and expected parent key/boot/process",
+    "Explicit optional concrete authority/binding/delegated technical ACK signer; missing inputs deny interactive events. ACK key distinct from request/parent/root; signature and concrete accepted Ledger row independently reverified",
+    "No-follow descriptor-relative bounded regular-file queue reads; fsynced exclusive ACK link publication, no overwrite. Exact stored ACK recovery needs live authority/readback; no file receipt alone grants authority",
+    "Only committed claim yields CLAIM ACK; only exact durable RETURNED yields OUTCOME result-release ACK. UNKNOWN/ERROR/conflict/revocation/timeout deny; same operation cannot be reset by new request IDs",
+    "Existing default run denial, final response validation and send settlement behavior retained. Interactive wait-loop hook constructed but no actual parent/host full-session proof performed"
+  ],
+  "verification": {
+    "RED": "1failed expected missing parent_tool_authority API; production preimage04e2aba7",
+    "first_GREEN": "25passed/1failed due test helper phase argument collision; preserved unchanged",
+    "corrective": "40passed in1.12s on exact final source/test bytes",
+    "static": "Ruff lint/format, in-memory compile, source diff checks pass;15read-only pins unchanged;9original test/helper/class AST definitions unchanged",
+    "secret_pattern_scan": "0matches in scoped pattern scan; not comprehensive classification or review"
+  },
+  "counters": {
+    "red": 1,
+    "green": 1,
+    "corrective": 1,
+    "collect": 0
+  },
+  "budget_disposition": "RED1/GREEN1/corrective1 consumed for this card; collect0 is unused legacy runner counter, collect is not an allowed phase. Authority test ceiling and all earlier C2/loader/neutral transport counters unchanged; no reset.",
+  "test_environment": "Synthetic message peer directly calls real current TEST AdmissionAuthority and temporary SQLite Ledger; known inline raw/result bytes and ephemeral TEST parent/delegate keys only. Deny-all-network, scratch-only writes, isolated HOME/env, no host credentials/USB access. Test fixture imports definitions from unchanged authority test module; no authority tests rerun.",
+  "effect_counts": {
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "full_suite": 0,
+    "actual_parent_artifact_read": 0,
+    "CLI_or_host_service": 0,
+    "host_keys_or_enrollment": 0,
+    "installation_or_activation": 0
+  },
+  "review": "PENDING; no independent acceptance/provenance asserted and no formal review attempted",
+  "limitations": [
+    "Parent4 read/mediator composition, broker2 and fence2 remain separate scopes; no returned-artifact/provider-frame permit is created",
+    "Private ACK signer protection and production identity mappings/enrollment are still not established; explicit constructor input is not a host-custody claim",
+    "The exact wait-loop queue handler is exercised against actual synthetic launch/claim/outcome rows; complete real supervisor session/parent read/CLI/provider flow is not exercised or qualified",
+    "Normal final-response/current fence/reconciliation requirements remain and can hold operational completion; no test stub substitutes for them",
+    "Only the scoped client file was tested. Prior7full-suite collection failures and historical22separate remain historical failures, not full-suite acceptance"
+  ],
+  "ALLOWED_NOW": {
+    "owner": "Architect/root existing source owners",
+    "action": "Validate frozen source/interface; route interface46ba2cfe to existing Chat4 for separately scoped parent-side composition; eligible review/source tasks may continue"
+  },
+  "HELD": {
+    "owner": "Existing parent/custody/broker/fence/review owners; Chat1 exclusive D0258",
+    "wake": "Exact successor source cards plus verified protected enrollment/identity/policy, parent/mediator/CLI/service/confinement/egress capability, eligible different-family privacy/$0/authority/review allocation and required Court/qualification evidence"
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "Queue-client offline dependency implemented and tested only. No independently reviewed B00 integration, production grant, positive egress, installation/qualification, Court/debt/P3 activation.",
+  "preserved": [
+    "Immutable original findings and raw failure logs",
+    "Original authority source2ce8af93/evidencec48a0583 and combined7dd4443c branches",
+    "No authority/parent/broker/fence/installer/kernel edits",
+    "Chat1 exclusive D0258",
+    "SENTIUM_FROZEN"
+  ]
+}
