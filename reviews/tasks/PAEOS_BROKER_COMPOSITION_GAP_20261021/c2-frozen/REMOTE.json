@@ -1,0 +1,57 @@
+[
+  {
+    "command": [
+      "/usr/bin/git",
+      "push",
+      "-u",
+      "origin",
+      "HEAD:refs/heads/codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "branch 'codex/debt0261-c2-offline-denial-20261021' set up to track 'origin/codex/debt0261-c2-offline-denial-20261021'.\n",
+    "stderr": "remote: \nremote: Create a pull request for 'codex/debt0261-c2-offline-denial-20261021' on GitHub by visiting:        \nremote:      https://github.com/KieranBracken/paeos/pull/new/codex/debt0261-c2-offline-denial-20261021        \nremote: \nTo https://github.com/KieranBracken/paeos\n * [new branch]        HEAD -> codex/debt0261-c2-offline-denial-20261021\n"
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "ls-remote",
+      "--heads",
+      "origin",
+      "refs/heads/codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "1ab244b2380a8526058249c9eaab0c5cdaf1659b\trefs/heads/codex/debt0261-c2-offline-denial-20261021\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "fetch",
+      "origin",
+      "refs/heads/codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "From https://github.com/KieranBracken/paeos\n * branch              codex/debt0261-c2-offline-denial-20261021 -> FETCH_HEAD\n"
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "FETCH_HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "1ab244b2380a8526058249c9eaab0c5cdaf1659b\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "schema": "paeos.frozen-c2-evidence-receipt/1",
+  "commit": "e74208da4335f3dc01eb8c313c5d99998cb9c381",
+  "manifest_sha256": "c363a1a957922395709f7dd42a31ad583cce804c0cbf7253c0903c6e5fc8f5c8",
+  "verified_artifacts": 24,
+  "source_hashes": {
+    "runtime/scheduler.py": "0caf4af809ebf75f880e1a2ac8cfc81d776ed4863495cf6bd33779246fd2dfb2",
+    "tests/runtime/test_scheduler.py": "3d62a31ead96cc9c9d889433cf7a1ad8f75dbd89c5165e8a4a6c8ee8a121e4d5"
+  },
+  "remote_readback": "e74208da4335f3dc01eb8c313c5d99998cb9c381\trefs/heads/codex/debt0261-c2-offline-denial-20261021",
+  "source_integrated": false,
+  "new_tests": 0,
+  "review": "PENDING",
+  "runtime_admission": false
+}

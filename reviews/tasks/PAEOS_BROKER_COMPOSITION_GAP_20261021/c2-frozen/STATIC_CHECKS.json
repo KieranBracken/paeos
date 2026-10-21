@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "check": "ruff",
+      "command": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "--no-cache",
+        "runtime/scheduler.py",
+        "tests/runtime/test_scheduler.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "format",
+      "command": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "--no-cache",
+        "runtime/scheduler.py",
+        "tests/runtime/test_scheduler.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "diff-check",
+      "command": [
+        "/usr/bin/git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "compile": "2 in-memory compilations, no execution",
+  "scope": "exact two-file diff; 80 readonly closure files unchanged",
+  "secret_pattern_scan": "0 matches in added lines, bounded patterns only",
+  "green_tests_passed": 66,
+  "source_sha256": {
+    "runtime/scheduler.py": "0caf4af809ebf75f880e1a2ac8cfc81d776ed4863495cf6bd33779246fd2dfb2",
+    "tests/runtime/test_scheduler.py": "66c0ad859a854b9b3398ac9e2347996a544fb96cf0dbde5e57b29a46e500a823"
+  },
+  "patch_sha256": "3a628e824f99368e48dfa55c92bcc76d5e462ec3f89d5ef2d709c0d51b38bb66",
+  "B00_candidate_unchanged": true
+}

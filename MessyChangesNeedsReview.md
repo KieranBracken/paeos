@@ -5653,3 +5653,8 @@ Admission source `bd28b378` is assembled byte-for-byte on the isolated combined 
 ### 2026-10-21 — tested B00 combined checkpoint, still unreviewed
 
 Admission and confinement source packages are combined, with the root-owned two-module installer closure repair at `58c800d3`. Focused:520 passed,1 known-failed real CLI probe excluded,1 cache warning. Full-suite attempt:7 collection errors (`contracts.adapters`, `runtime.transport`), not acceptance. Preserve the failed CLI tool-inventory result, original review findings, raw RED/harness logs and C2-only owner boundary. See `reviews/tasks/PAEOS_B00_COMBINED_20261021/FINAL_ASSEMBLY.json`. No runtime, install, provider, Court or debt activation.
+
+
+### 2026-10-21 — broker continuation source boundary (no permit added)
+
+Preserved source41edb289. Valid v2 parser plus v1 loader controls expose a RED pinned-v2 bridge outside the mutable root card. Existing mediated result dictionaries/canonical exact-frame claims do not establish authenticated dynamic derivation. Exact owner/scope/preimage packet and untouched C2 e74208da recovery evidence are in reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021. No source/test edits, C2 integration, new review, host key, provider, runtime or qualification effect. Architect owns successor scoping; no premature Founder action requested.

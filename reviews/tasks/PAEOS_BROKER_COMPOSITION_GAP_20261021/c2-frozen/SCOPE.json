@@ -1,0 +1,118 @@
+{
+  "state": "ISSUED_OFFLINE_DEFAULT_DENY_SOURCE_CONSTRUCTION",
+  "issuer": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+  "technical_owner": "01a15526-84df-7fe3-9863-bfb64754d733",
+  "target": "/Users/bob/.codex/worktrees/debt0261-slice1/paeos",
+  "head": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "mutable_preimages": {
+    "runtime/scheduler.py": "7d224317b36956f19c35c353166a60ce1598299ebdfa867a6392c4cc5a14d206",
+    "tests/runtime/test_scheduler.py": "9ae092b28ffd35e62e61e79909148a7f31675e46eec60be40be27152754a6b97"
+  },
+  "readonly_dependency_closure": "Exactly the 82 files pinned by references.closure; all 82 rehashed unchanged this turn. Static closure is not execution/import authorization or runtime-resource completeness.",
+  "source_import_manifest": [],
+  "behavior": [
+    "Guard both continuous and concurrent initial/repair scheduler paths before any governor reserve/charge, submission or run_one invocation. Missing/None/exception/malformed/stale/contradictory verdict holds with a stable reason; never default Ready.",
+    "Keep readiness advisory. Any future positive production dispatch must consume the existing canonical admission result bound to authenticated root/task/parent, current authority and scope, prerequisites/evidence qualification, unique accepted attempt, source/snapshot and fencing ownership. Do not mint these from Intake or goal_signature.",
+    "The selected closure supplies no verified complete production admission adapter: leave production positive admission unavailable. Explicit synthetic adapter/receipt fixtures live in the test file only; no production fake authority factory, allow-all default, environment switch or test-mode bypass.",
+    "Revalidate at the admission boundary; a local K11 budget lock cannot be presented as a cross-store or cross-process transaction. If positive runtime behavior requires a missing primitive or a third source file, stop and return the exact gap. No new authority ledger, reservation state machine, lock hierarchy, runner or lifecycle.",
+    "Report held intakes/reasons as held, not completed/source-exhausted work. Do not spin, retry UNKNOWN, or add wake/indexer/Trace/router expansion."
+  ],
+  "synthetic_acceptance": {
+    "R1": "Blocked prerequisite, absent/None/invalid/exception verdict: zero reserve, charge, submit and invocation in both schedulers and repair paths.",
+    "R2": "Completed but unqualified, superseded or source-mismatched dependency remains held.",
+    "R4": "Explicit safe synthetic admissions permit independent compatible tasks to overlap under existing K11 limits; no production overlap claim.",
+    "R5": "Synthetic snapshot/authority invalidation before admission holds before any reserve or invocation; no claim that a mutable verdict eliminates production TOCTOU.",
+    "R6": "Synthetic canonical adapter admits at most one incompatible attempt; scheduler never dispatches the refused one. Production atomic compatible claims remain held.",
+    "R7": "Missing/duplicate/stale attempt or fence, quarantine, contradictory lineage and UNKNOWN acceptance hold; goal_signature alone never suffices. No real restart/nonduplication qualification.",
+    "R8": "Existing single-goal and budget semantics retained with explicit safe fixtures for permitted runs. Default uncomposed production scheduling intentionally holds.",
+    "RED_and_focused": "First show new denial controls fail on the pinned baseline using synthetic callbacks only; then run tests/runtime/test_scheduler.py in the owner-approved offline runner. Tests must not launch SoftLoop, Builder, providers, readiness canaries or production modules as workflows. AST import closure is not enough: stop if test setup needs external resources, installation or unadmitted effects. Actual affected-closure regression is a later integration gate; no full-suite authorization here."
+  },
+  "budget": "Proposed ceiling: one isolated source candidate, one RED and one focused GREEN run, at most one corrective focused rerun for an observed defect. Provider calls=0, paid calls=0, new formal reviews=0 within this scope. Any stricter existing cumulative ceiling wins; no reset or expansion on handoff. Stop on missing prerequisite or larger seam.",
+  "exclusions": [
+    "ops/autonomous_run.py and all C1/R3/recovery changes",
+    "runtime/readiness.py",
+    "all kernel/dependency mutations or copying",
+    "new worktree or baseline replacement",
+    "production wiring/activation/claims of C2 completion",
+    "EAP/Recovery Step 8 and Trace revalidation",
+    "SENTIUM_FROZEN"
+  ],
+  "rollback": "Retain base and exact candidate diff. Discard/revert only this candidate two-file diff through its owner; never reset the workspace, overwrite concurrent work or roll back shared dependencies.",
+  "integration_review": "Return exact diff/hash/test receipts to Architect. Root 01a1403f-1034-74c2-95ce-bd0f705dbaef alone integrates bootstrap candidates serially against the current combined tree. The chosen older target is not a baseline replacement: kernel/ledger.py and provider_transports.py differ from combined; transfer only reviewed two-file changes and re-evaluate affected closure there. Chat1 01a147d5-525b-7e31-9fb1-80de3a325e51 remains sole D0258 integrator. Independent exact-byte review remains separately held pending 01a13075-533b-72a1-b8f8-8f109414f707 evidence of lawful privacy/$0/different-family/authority/allocation. Source construction is not review, admission or qualification.",
+  "schema": "paeos.human-delegated-offline-source-scope/1",
+  "scope_id": "DEBT0261-C2-offline-denial-port-source-20261021-v1",
+  "issued_at_utc": "2026-10-21T14:06:12.200708+00:00",
+  "canonical_runtime_authority": false,
+  "runtime_admission_receipt": null,
+  "source_authoring_basis": {
+    "direct_human_message": "msg_01a15c1e-a64b-7ea2-a036-0172ddfc7693",
+    "attachment_sha256": "73a12bbd9b72cedeff22f08155417de9640c2991d192a2acd107511a0f637f9f",
+    "original_native_coordination_message": "msg_01a14f2a-967f-7a93-8267-b87dab40196a",
+    "delegated_technical_issuer": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+    "limited_scope": "Current human instruction permits this bounded offline denial/test slice under delegated source engineering. No production, custody, runtime admission or debt repayment authority is created."
+  },
+  "proposal_reference": {
+    "path": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/c2-source-contract-20261021-01a15526/PROPOSAL.json",
+    "sha256": "fc7901ae87e353970d0c06134b56a2e4824eec2eba7abac0ab35661cde352ebe"
+  },
+  "dependency_applicability": {
+    "offline_port": "Proposed limited source construction is a reversible default-deny boundary plus explicit synthetic tests. It neither constructs/uses D0258 custody nor supplies runtime admission. Clause 72 is preserved as an activation/composition hold, not waived or satisfied by source tests. Architect must record this bounded applicability in the issued source scope.",
+    "debt0260": "DEBT-0260:103 permits compact non-applicability for a small reversible cheaply verified edit. That rationale applies only to the local denial port. Real R4/R5/R6/R7 concurrency/currentness/attempt guarantees cross authority and persistence boundaries and remain APPLICABLE under :103-106; unresolved transaction/UNKNOWN deficits block implementation of those production guarantees. Builder cannot resolve its own primitive deficit.",
+    "not_inferred": "No D0258 qualification or installation is inferred from classes, source pins, tests, native messaging, or B00 review artifacts. No C2-wide D0260 exemption is asserted."
+  },
+  "references": {
+    "root_scope": {
+      "path": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/reviews/tasks/PAEOS_B00_COMBINED_20261021/C2_SOURCE_SCOPE_DISPOSITION.json",
+      "sha256": "eb587d31448c079f93d7fe90387f7d04e8ee55a47c1521179978ae6d7285e7be"
+    },
+    "closure": {
+      "path": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/reviews/tasks/PAEOS_B00_COMBINED_20261021/C2_DIRECTED_CLOSURE_OBSERVATION.json",
+      "sha256": "5b53768d794cb30543777cd06eaa47d79cbd14927258b5573c3f441f850dd4f3"
+    },
+    "prior_disposition": {
+      "path": "/Users/bob/.codex/visualizations/2026/10/19/01a151d6-4fd3-7f23-a35d-167815a58cdb/debt0261-c2-disposition-20261021/DISPOSITION.json",
+      "sha256": "c08c69c8586fcbfdc1fdb251cff7ed28306e90a606f90058205e06e3041a1606"
+    },
+    "human_continuation": {
+      "path": "/Users/bob/.codex/attachments/8bc2bdca-007a-4bb3-aa8b-a4be29f954c5/Pasted text.txt",
+      "sha256": "73a12bbd9b72cedeff22f08155417de9640c2991d192a2acd107511a0f637f9f"
+    },
+    "debt0261": {
+      "path": "/Users/bob/GitHub/paeos/ledger/debt/DEBT-0261.md",
+      "sha256": "191e775be7b8a7048d8f28528ca51042304c57d684e343f2ae5ac0c43cd1fd91"
+    },
+    "debt0260": {
+      "path": "/Users/bob/GitHub/paeos/ledger/debt/DEBT-0260.md",
+      "sha256": "d87c090ccc0c8ae26e80d5c3d0217c1ba81cabd2bf79bffd1d290fda21ad1d67"
+    },
+    "concurrency_contract": {
+      "path": "/Users/bob/GitHub/paeos/docs/PAEOS_MULTI_GOAL_CONCURRENCY_CONTRACT.md",
+      "sha256": "1d257c84dd27f249a077979311d7cf24a1fda21f0c710c3b7c6c6fe0d63ab532"
+    },
+    "old_combined_contract": {
+      "path": "/Users/bob/GitHub/paeos/PAEOS_DEBT_0261_SLICE1_READINESS_GOAL_BOUND_RECOVERY_CONTRACT.md",
+      "sha256": "81a56682b771b83a771e9ab434ce7c978939a536dcf72d8e0cfd45f8e095eb2d"
+    },
+    "protocol": {
+      "path": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/protocol-v4.json",
+      "sha256": "2d32c9d70c59295ccc4e61c5be7a34ba010dffb4b5ccaaf4fee8034b802c7ce3"
+    }
+  },
+  "budget_counters": {
+    "source_candidates_max": 1,
+    "red_runs_max": 1,
+    "focused_green_runs_max": 1,
+    "corrective_focused_reruns_max": 1,
+    "provider_requests_max": 0,
+    "paid_requests_max": 0,
+    "formal_reviews_max": 0,
+    "carry_rule": "Any stricter existing cumulative ceiling prevails. No inherited attempt/UNKNOWN/provider budget reset. Stop at actual shared-account hard limit."
+  },
+  "validity": "Exact target HEAD, clean preimages and82-file read closure only. Drift, third-file need, missing primitive or exhausted bound => hold and immediate callback; no automatic expansion.",
+  "additional_safety": [
+    "A generic boolean/Ready returned by a caller is not production authority. No synthetic fixture, public allow-all injection or metadata shape may grant real execution.",
+    "If safe positive-path scaffolding would require a missing canonical authority/atomic primitive, retain production denial and report that seam. Bounded synthetic positive controls remain test-only and do not discharge R4/R5/R6/R7 runtime obligations.",
+    "Do not weaken current or historical tests/findings. Current baseline tests that need permitted runs require explicit safe test fixtures within the test file.",
+    "Only the two named source/test files may change. No local factory pretending to be enrolled root, second state/runner, new module or dependency transplant."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "paeos.synthetic-characterization-command/1",
+  "exit_code": 0,
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/root-broker-composition-20261021/probe_existing_primitives.py"
+  ],
+  "profile_sha256": "bbc305a38bdebbd6ffea626e35ad6e4139ba041ba2b17aee3c32f6c48a08b33a",
+  "network": "DENY_ALL",
+  "filesystem": "SCRATCH_WRITES_ONLY",
+  "source_preimages_verified": 17,
+  "source_edits": 0,
+  "script_sha256": "09b22ad4e4974e2250c478340f0201328bebc5da476b5c294851c2b5ed202bb6",
+  "stdout_sha256": "5b7731f88ed3e5d5a681d73eba25cc691e973323eedfc4794f59f9f98662897a",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

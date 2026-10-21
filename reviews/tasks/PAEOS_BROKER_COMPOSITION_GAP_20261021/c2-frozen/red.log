@@ -1,0 +1,58 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_default_scheduler_holds_before_budget_and_invocation[ContinuousScheduler] _
+
+scheduler_type = <class 'runtime.scheduler.ContinuousScheduler'>
+
+    @pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
+    def test_default_scheduler_holds_before_budget_and_invocation(scheduler_type) -> None:
+        # R1: removing the denial boundary would invoke work and consume a run slot.
+        budget = GlobalBudget(tokens=1000, wallclock_s=1000, runs=10)
+        gov = EconomicGovernor(budget)
+        invoked: list[Intake] = []
+        intake = _intake("unadmitted")
+    
+        def record(item: Intake) -> RunOutcome:
+            invoked.append(item)
+            return _sealed(item)
+    
+        report = scheduler_type(record, governor=gov, budget_by_class=_BUDGETS).run([intake])
+    
+>       assert invoked == []
+E       AssertionError: assert [Intake(objec...ersible=True)] == []
+E         
+E         Left contains one more item: Intake(objective='unadmitted', changed_paths=('runtime/x.py',), plan_write_scopes=('runtime/x.py',), builder_evidence=(), goal_signature='domain:runtime', verifiable=True, reversible=True)
+E         Use -v to get more diff
+
+tests/runtime/test_scheduler.py:188: AssertionError
+_ test_default_scheduler_holds_before_budget_and_invocation[ConcurrentScheduler] _
+
+scheduler_type = <class 'runtime.scheduler.ConcurrentScheduler'>
+
+    @pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
+    def test_default_scheduler_holds_before_budget_and_invocation(scheduler_type) -> None:
+        # R1: removing the denial boundary would invoke work and consume a run slot.
+        budget = GlobalBudget(tokens=1000, wallclock_s=1000, runs=10)
+        gov = EconomicGovernor(budget)
+        invoked: list[Intake] = []
+        intake = _intake("unadmitted")
+    
+        def record(item: Intake) -> RunOutcome:
+            invoked.append(item)
+            return _sealed(item)
+    
+        report = scheduler_type(record, governor=gov, budget_by_class=_BUDGETS).run([intake])
+    
+>       assert invoked == []
+E       AssertionError: assert [Intake(objec...ersible=True)] == []
+E         
+E         Left contains one more item: Intake(objective='unadmitted', changed_paths=('runtime/x.py',), plan_write_scopes=('runtime/x.py',), builder_evidence=(), goal_signature='domain:runtime', verifiable=True, reversible=True)
+E         Use -v to get more diff
+
+tests/runtime/test_scheduler.py:188: AssertionError
+=========================== short test summary info ============================
+FAILED tests/runtime/test_scheduler.py::test_default_scheduler_holds_before_budget_and_invocation[ContinuousScheduler]
+FAILED tests/runtime/test_scheduler.py::test_default_scheduler_holds_before_budget_and_invocation[ConcurrentScheduler]
+IMPORTED_SOURCE runtime.scheduler /Users/bob/.codex/worktrees/debt0261-slice1/paeos/runtime/scheduler.py
+IMPORTED_SOURCE runtime.orchestrator /Users/bob/.codex/worktrees/debt0261-slice1/paeos/runtime/orchestrator/__init__.py
+IMPORTED_SOURCE kernel.types /Users/bob/.codex/worktrees/debt0261-slice1/paeos/kernel/types.py

@@ -1,0 +1,78 @@
+{
+  "schema": "paeos.c2-offline-denial-port-result/1",
+  "event_id": "DEBT0261-C2-offline-denial-port-source-20261021-v1-complete",
+  "scope_id": "DEBT0261-C2-offline-denial-port-source-20261021-v1",
+  "scope_sha256": "72dcff62d58461a9f9cabaadc615e2883627ece0f3f6fe7a55810e7554ce3132",
+  "source_thread_id": "01a15526-84df-7fe3-9863-bfb64754d733",
+  "source_turn_id": "01a15ec8-dc57-7bd0-b326-51bc1ea21158",
+  "recorded_at_utc": "2026-10-21T14:16:20.554502+00:00",
+  "canonical_runtime_authority": false,
+  "status": "BOUNDED_OFFLINE_SOURCE_COMPLETE; REVIEW_INTEGRATION_RUNTIME_HELD",
+  "target": "/Users/bob/.codex/worktrees/debt0261-slice1/paeos",
+  "base": "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+  "branch": "codex/debt0261-c2-offline-denial-20261021",
+  "candidate": "e74208da4335f3dc01eb8c313c5d99998cb9c381",
+  "preserved_first_checkpoint": "1ab244b2380a8526058249c9eaab0c5cdaf1659b",
+  "clean": true,
+  "original_branch_preserved": true,
+  "B00_candidate_unchanged": true,
+  "remote_sha_and_fetched_file_hashes_verified": true,
+  "source_sha256": {
+    "runtime/scheduler.py": "0caf4af809ebf75f880e1a2ac8cfc81d776ed4863495cf6bd33779246fd2dfb2",
+    "tests/runtime/test_scheduler.py": "3d62a31ead96cc9c9d889433cf7a1ad8f75dbd89c5165e8a4a6c8ee8a121e4d5"
+  },
+  "patch": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/c2-offline-denial-port-20261021/FINAL_CANDIDATE.patch",
+  "patch_sha256": "57239c32611aac142577ba2f60883a665653917a2189246c33fdf11ef06ec17a",
+  "source_import_manifest": [],
+  "behavior": "Both schedulers check a diagnostic-only boundary before allocation/reservation/charge/submission/invocation, including generated repair intakes. Missing/None/error/malformed and negative readiness always hold. No production positive constructor or public admission bypass exists. Held intakes retain stable reasons and are not reported as completed; a finite pass does not retry them. Existing budget and queue positive controls use explicit test-local substitutions only.",
+  "tests": {
+    "red": {
+      "runs": 1,
+      "failed_expected": 2,
+      "reason": "Baseline invoked unadmitted intake in both schedulers; no collection/import error."
+    },
+    "green": {
+      "runs": 1,
+      "passed": 66
+    },
+    "corrective": {
+      "runs": 1,
+      "passed": 66,
+      "reason": "Observed fixture gap: incompatible-scope case reused same object. Corrected to distinct tasks sharing scope, with no production change."
+    },
+    "final_exact_bytes": "corrective.json source hashes match final committed and fetched files",
+    "runner": "Existing Python3.13/pytest, heavy-test.lock, plugins/cache disabled, network/process effects denied by audit hook, writes confined to evidence temporary directory. No forbidden effects observed.",
+    "full_suite": "NOT_RUN_SCOPE_EXCLUDED"
+  },
+  "static_checks": {
+    "ruff": "PASS",
+    "format": "PASS",
+    "compile": "PASS 2 in-memory compilations",
+    "diff_check": "PASS",
+    "scope": "Exactly two changed source/test files; 80 readonly closure files unchanged",
+    "secret_check": "No matches in bounded added-line secret patterns; not exhaustive secret detection"
+  },
+  "consumed_ceilings": {
+    "source_candidates": 1,
+    "candidate_commits": 2,
+    "red_runs": 1,
+    "focused_green_runs": 1,
+    "corrective_focused_reruns": 1,
+    "provider_requests": 0,
+    "paid_requests": 0,
+    "formal_reviews": 0,
+    "new_worktrees": 0
+  },
+  "acceptance_limits": {
+    "R1_R2": "Production default-denial and supplied negative readiness cause no budget/submit/invoke effects; actual and repair paths covered.",
+    "R4_R8": "Existing overlap/barrier, K11 caps, metering and single-goal controls pass only with explicit safe test fixtures.",
+    "R5_R6_R7": "Synthetic refusal consumption before reservation/invocation is covered, including distinct conflicting tasks and generated repairs. This does not verify production identity, currentness, atomic claims, restart, fencing or nonduplication.",
+    "no_debt_or_court_counts": "Synthetic RunStatus.SEALED objects are test data, not Court disposition or qualification."
+  },
+  "ALLOWED_NOW": "Architect may retain and route this exact source/evidence package through existing review and sole root integration authority. No further test run or source expansion under this consumed card.",
+  "HELD": "Independent different-family review, serial root integration/affected-closure regression, actual C2 admission/activation, D0258 custody use, D0260 systemic sufficiency, C1/R3/recovery, Court/debt closure/P3; SENTIUM_FROZEN.",
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "No complete canonical C2 production admission adapter or runtime-owner admission receipt was established. Actual positive composition needs authenticated root/task/parent, current authority/scope, qualified prerequisites, unique accepted attempt, snapshot/source/fencing ownership and sufficient atomic/reconciliation primitives. D0258 installed/qualified and applicable D0260 obligations remain prerequisites; this port supplies none of them.",
+  "next_gate": "Existing review-route owner 01a13075-533b-72a1-b8f8-8f109414f707 must evidence privacy/$0/different-family/authority/allocation for exact-byte review. Root 01a1403f-1034-74c2-95ce-bd0f705dbaef alone integrates after required disposition, transferring only the reviewed two-file diff to the current combined tree and validating affected closure. No older Ledger/provider transplant. Architect alone coordinates; Chat1 remains sole D0258 integrator.",
+  "unresolved_effects": [],
+  "manifest": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/c2-offline-denial-port-20261021/MANIFEST.json"
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "38fd3e0dc153788bbdd5f542bddf81b0ca433703\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "switch",
+      "-c",
+      "codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Switched to a new branch 'codex/debt0261-c2-offline-denial-20261021'\n"
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "add",
+      "--",
+      "runtime/scheduler.py",
+      "tests/runtime/test_scheduler.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "runtime/scheduler.py\ntests/runtime/test_scheduler.py\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "commit",
+      "-m",
+      "Hold scheduler dispatch without canonical C2 admission",
+      "--",
+      "runtime/scheduler.py",
+      "tests/runtime/test_scheduler.py"
+    ],
+    "exit_code": 0,
+    "stdout": "[codex/debt0261-c2-offline-denial-20261021 1ab244b2] Hold scheduler dispatch without canonical C2 admission\n 2 files changed, 374 insertions(+), 26 deletions(-)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "1ab244b2380a8526058249c9eaab0c5cdaf1659b\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "HEAD^"
+    ],
+    "exit_code": 0,
+    "stdout": "38fd3e0dc153788bbdd5f542bddf81b0ca433703\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

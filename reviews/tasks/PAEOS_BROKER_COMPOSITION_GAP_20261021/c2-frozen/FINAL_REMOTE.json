@@ -1,0 +1,66 @@
+[
+  {
+    "command": [
+      "/usr/bin/git",
+      "push",
+      "origin",
+      "HEAD:refs/heads/codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "To https://github.com/KieranBracken/paeos\n   1ab244b2..e74208da  HEAD -> codex/debt0261-c2-offline-denial-20261021\n"
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "ls-remote",
+      "--heads",
+      "origin",
+      "refs/heads/codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "e74208da4335f3dc01eb8c313c5d99998cb9c381\trefs/heads/codex/debt0261-c2-offline-denial-20261021\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "fetch",
+      "origin",
+      "refs/heads/codex/debt0261-c2-offline-denial-20261021"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "From https://github.com/KieranBracken/paeos\n * branch              codex/debt0261-c2-offline-denial-20261021 -> FETCH_HEAD\n"
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "FETCH_HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "e74208da4335f3dc01eb8c313c5d99998cb9c381\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "codex/debt0261-slice1-readiness-recovery"
+    ],
+    "exit_code": 0,
+    "stdout": "38fd3e0dc153788bbdd5f542bddf81b0ca433703\n",
+    "stderr": ""
+  }
+]

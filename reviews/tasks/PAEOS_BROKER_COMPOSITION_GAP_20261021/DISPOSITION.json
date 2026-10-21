@@ -1,0 +1,114 @@
+{
+  "schema": "paeos.broker-composition-source-boundary/1",
+  "event_id": "B00-broker-composition-primitive-gap-20261021-v1",
+  "recorded_at_utc": "2026-10-21T14:44:51.941836+00:00",
+  "outcome": "AUTHORITY_OR_IMPLEMENTATION_GAP",
+  "source_baseline": "41edb289356f3fe023872b7c15a5de0c00e30d98",
+  "scope_id": "root-broker-composition-continuation-and-c2-frozen-handoff-20261021-v1",
+  "scope_sha256": "d4cba81a6fddd98433a94a689e3aa8d34ee97eaaf57eb9559a19c0beb7f180d5",
+  "minimum_subset_selected": {
+    "schema": "paeos.minimum-source-subset-selection/1",
+    "scope_id": "root-broker-composition-continuation-and-c2-frozen-handoff-20261021-v1",
+    "baseline": "41edb289356f3fe023872b7c15a5de0c00e30d98",
+    "proposed_minimum_mutable_subset": {
+      "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+      "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27"
+    },
+    "actual_source_edits": 0,
+    "decision": "No production permit consumer will be added before resolving the existing provenance/route contract boundary. Other mutable paths remain unused."
+  },
+  "actual_product_source_or_test_edits": 0,
+  "source_pins_verified": {
+    "paeos/model_router/disclosure_store.py": "2307d0707c5fedf595e705f82f0a0e7c39ee07d302ca79943edf36261f1f6a26",
+    "tests/model_router/test_disclosure_store.py": "8b01f7b390cc80240c41ba786530c6f44b47642bf145ee6ac8c991f06a79b46f",
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "tests/runtime/autonomy/test_admission_authority.py": "338961ea4ae0c7ed98cc0dac4b2b5d0659735ff5ade3147f016ba322b0ba45d5",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee",
+    "tests/runtime/autonomy/test_admission_send_fence.py": "1151d01a513bd00346570fb8dfb26fe414c5dc6ca012ac66456cfa5608fa2780",
+    "runtime/integrations/mediated_worker_tools.py": "ad80e62b88f8d3226e1618a809d9575a5ff6138f70eb2cd6d9579d1756a31cec",
+    "tests/runtime/test_mediated_worker_tools.py": "71f5218d3af3c6e96fec7b50d2fda1e8f5fea376a58c14270e2e91d871c0caf5",
+    "ops/trusted_codex_worker_supervisor.py": "e3956b1b9c9764c03beb592ec5950468360ef1490895b250756ddae08ed82857",
+    "tests/runtime/test_confined_codex_cli.py": "cd21c2f45ff73440cbe515046b928e1d3946a37f9d0c133702d27a9b36e65962"
+  },
+  "governing_boundary": {
+    "path": "CONTINUATION_SCOPE.json",
+    "clause": "constraints[4]",
+    "text": "If a missing authority/atomic primitive or outside-card edit is necessary, preserve denial and return exact source/test/preimage/primitive packet; no invented authority or parallel store.",
+    "read_only_store_clause": "disclosure_store.py is read-only. Parser/signature outputs are not enrollment, trusted classification or current egress authority.",
+    "interpretation": "Do not silently extend the read-only authority/observation/store subsystems or replace missing authority with caller dictionaries/callbacks. This is a technical source-scope boundary, not a Founder-only ownership/key requirement."
+  },
+  "established_interfaces": {
+    "exact_frame_fence": "Existing signed admission and root allocation permit an exact allowlisted frame; synthetic fake sink received it once.",
+    "derivative_permission": "Valid signed v2 permission parses, including conservative same-class transformation rules. It is not evidence that any tool/derivation ran.",
+    "canonical_authority": "Existing producer explicitly rejects unsupported event kinds; signed send settlement is not a generic derivation-observation primitive.",
+    "mediated_tool": "A real synthetic read_artifact result contains artifact_id/text/sha256 only. No enrolled observation signature, canonical event binding or currentness is established by that dictionary."
+  },
+  "measured_missing_join": {
+    "pinned_v2_loader": {
+      "source": "paeos/model_router/disclosure_store.py:163",
+      "required_behavior": "Reuse pinned no-follow input loader with valid signed v2 policy, retaining separate non-authority semantics.",
+      "RED": "Valid v1 pinned load and standalone v2 signature controls pass; existing pinned loader rejects the same valid v2 document. Probe exit2 is expected missing-behavior RED, not a product pass.",
+      "outside_card_paths": [
+        "paeos/model_router/disclosure_store.py",
+        "tests/model_router/test_disclosure_store.py"
+      ],
+      "next_bounded_source_slice": "Existing disclosure-input owner extends the existing loader for explicit versioned v1/v2 verification, preserves v1 bytes/pins/path containment, tests wrong pins/unknown versions/unsigned/stale/SECRET/declassification negatives. No enrollment or currentness is claimed by loader output."
+    },
+    "authenticated_derivation": {
+      "sources": [
+        "runtime/integrations/mediated_worker_tools.py:262",
+        "runtime/autonomy/admission_authority.py:343",
+        "paeos/model_router/disclosure_policy.py:319"
+      ],
+      "required_behavior": "Existing canonical authority and protected parent observer must authenticate the actual input/tool/envelope/output provenance and its root/task/session/scope/policy identity. Only then can the broker consume a valid derivative permission.",
+      "negative_controls": "Unlisted derived frame produces zero sink writes; hypothetical unsupported derivation event is rejected without changing the synthetic ledger head. Neither test creates a new event kind/authority.",
+      "owner_route": "Architect -> existing admission owner Chat3 and observation/custody owner Chat4 after its current two-file diagnostic freezes. Do not change their files concurrently.",
+      "proposed_scope_basis": [
+        "runtime/autonomy/admission_authority.py",
+        "tests/runtime/autonomy/test_admission_authority.py",
+        "runtime/autonomy/admission_send_fence.py",
+        "tests/runtime/autonomy/test_admission_send_fence.py",
+        "runtime/integrations/mediated_worker_tools.py",
+        "tests/runtime/test_mediated_worker_tools.py",
+        "ops/trusted_codex_worker_supervisor.py",
+        "tests/runtime/test_confined_codex_cli.py"
+      ],
+      "receipt_needed_before_root_consumer": "Owner-frozen authenticated observation/verifier contract with exact preimages and delegated role/currentness/claim semantics, using the existing Ledger and trust root; no new authority store or private key in a worker. These paths are a proposal, not new permission."
+    }
+  },
+  "conditional_route_question": {
+    "observation": "Current v1/v2 ExactRouteIdentity accepts only FREE. A separately proposed CODEX_PLAN_QUOTA marker is rejected in the synthetic probe.",
+    "limit": "This proves schema behavior only; it does not prove provider/account entitlement or that a route is globally impossible.",
+    "required_decision": "Existing route/policy owner must distinguish any lawfully authorized native-plan one-use canary from a free-provider route. Do not relabel quotas as FREE or widen v1 semantics silently. Scope any versioned representation under the existing one-use authorization and reconciliation gates; no provider call is permitted here.",
+    "not_a_blanket_source_hold": true
+  },
+  "resumption_packet": {
+    "immediately_runnable_next_source_fix": "A narrow existing-owner successor scope for the two pinned-loader paths; the genuine RED is already captured. Architect may prepare that source scope under standing delegation and existing remaining budget; no general Founder approval/key ceremony is requested.",
+    "then": "Freeze authenticated derivation producer/verifier owner contract and source package; root resumes complete-frame/route/claim composition from the unchanged broker preimages. Exact-only milestones must be labelled explicitly and cannot claim dynamic tool provenance.",
+    "C2": "Frozen e74208da captured separately, source not merged; all C2 card test allowances remain consumed."
+  },
+  "verification": {
+    "existing_interface_probe": "Exit0; one exact-frame positive and unlisted-frame/unknown-kind negative controls, actual synthetic tool result inspected. Not a lifecycle test or review.",
+    "pinned_v2_join_RED": "Exit2 after valid v1 and v2 signature controls; no GREEN/implementation claimed.",
+    "diagnostic_compile": "Both probe scripts compile; no bytecode written.",
+    "product_source_checks": "No product change; prior 520-focused result remains historical on unchanged source41edb289.",
+    "full_suite": "Not repeated. Prior one attempt with7 collection errors is preserved.",
+    "independent_review": "No new attempt; held on eligible exact-byte route and allocation."
+  },
+  "effects": {
+    "in_memory_synthetic_keys_generated": true,
+    "synthetic_private_keys_persisted_or_printed": false,
+    "host_keys_or_credentials": false,
+    "canonical_host_state_changed": false,
+    "production_permit_or_operation": false,
+    "provider_or_paid_calls": 0,
+    "new_review_calls": 0,
+    "installation": false,
+    "runtime_admission": false,
+    "qualification_or_Court": false,
+    "source_import_or_C2_merge": false
+  },
+  "ALLOWED_NOW": "Save evidence; Architect issues only lawful bounded successor owner scope(s) with current preimages and remaining allocation. Keep running eligible independent source work.",
+  "HELD": "Unsafe positive broker composition and all real policy/enrollment/egress/install/qualification/Court/debt/P3 gates.",
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "Pinned input v2 bridge is outside the card; authenticated derivation observation/consumer contract is not established by the current read-only APIs. Do not invent it in the broker."
+}

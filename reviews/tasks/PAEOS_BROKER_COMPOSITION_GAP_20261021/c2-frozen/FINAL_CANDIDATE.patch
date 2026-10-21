@@ -1,0 +1,600 @@
+diff --git a/runtime/scheduler.py b/runtime/scheduler.py
+index 5e4ec56e..2c93cbfb 100644
+--- a/runtime/scheduler.py
++++ b/runtime/scheduler.py
+@@ -7,9 +7,10 @@ never exceed the global budget, per dimension (tokens · wallclock · runs). Whe
+ admit the next run, the scheduler **HALTS — it does not spin** (halt-not-spiral, §9.4), and under
+ budget pressure it recommends a cheaper model **tier** (backpressure, 7.5 A-7).
+ 
+-The scheduler depends only on an injected `run_one: Intake -> RunOutcome` (the soft-loop driver) and
+-the governor — no vendor, no live coupling. Tests inject a scripted `run_one`; deployment injects a
+-self-host driver.
++The scheduler's readiness port supplies negative diagnostics only. No verified canonical C2
++admission adapter is composed here, so production dispatch remains unavailable even when a caller
++claims readiness. Test-only substitutions exercise queue and budget behavior; they supply no
++runtime authority, atomic admission or qualification evidence.
+ """
+ 
+ from __future__ import annotations
+@@ -32,6 +33,8 @@ __all__ = [
+     "ContinuousScheduler",
+     "EconomicGovernor",
+     "GlobalBudget",
++    "HeldIntake",
++    "ReadinessHold",
+     "SchedulerReport",
+     "StopReason",
+ ]
+@@ -132,6 +135,50 @@ class BudgetConservationError(Exception):
+ class StopReason(Enum):
+     SOURCE_EXHAUSTED = "source-exhausted"  # nothing left
+     BUDGET_EXHAUSTED = "budget-exhausted"  # governor cannot admit the next run (halt-not-spiral)
++    READINESS_HELD = "readiness-held"  # unfinished work, not source completion
++
++
++class ReadinessHold(Enum):
++    """Negative diagnostics only; no member grants execution authority."""
++
++    MISSING = "missing-readiness"
++    ERROR = "readiness-error"
++    INVALID = "invalid-readiness"
++    BLOCKED = "prerequisite-blocked"
++    UNQUALIFIED = "prerequisite-unqualified"
++    STALE = "stale-readiness"
++    CONTRADICTORY = "contradictory-readiness"
++    UNKNOWN = "acceptance-unknown"
++    ADMISSION_UNAVAILABLE = "canonical-admission-unavailable"
++
++
++@dataclass(frozen=True, slots=True)
++class HeldIntake:
++    intake: Intake
++    reason: ReadinessHold
++
++
++def _admission_hold(
++    intake: Intake, readiness_probe: Callable[[Intake], object] | None
++) -> ReadinessHold:
++    """Deny before budget effects; caller readiness can only explain the hold.
++
++    A boolean, metadata shape or caller-supplied Ready is not authenticated admission.
++    The missing production adapter must eventually bind current canonical identity,
++    authority, prerequisites, attempt, scope, snapshot and fencing atomically with
++    the applicable budget reservation. This local port cannot establish that proof.
++    """
++    if readiness_probe is None:
++        return ReadinessHold.MISSING
++    try:
++        verdict = readiness_probe(intake)
++    except Exception:
++        return ReadinessHold.ERROR
++    if verdict is None:
++        return ReadinessHold.MISSING
++    if isinstance(verdict, ReadinessHold):
++        return verdict
++    return ReadinessHold.INVALID
+ 
+ 
+ @dataclass(frozen=True, slots=True)
+@@ -141,6 +188,7 @@ class SchedulerReport:
+     outcomes: tuple[RunOutcome, ...]
+     remaining: GlobalBudget
+     stop_reason: StopReason
++    held: tuple[HeldIntake, ...] = ()
+ 
+ 
+ def _allocation(intake: Intake, budget_by_class: Mapping[WeightClass, Budget]) -> Budget:
+@@ -162,10 +210,12 @@ class ContinuousScheduler:
+         *,
+         governor: EconomicGovernor,
+         budget_by_class: Mapping[WeightClass, Budget],
++        readiness_probe: Callable[[Intake], object] | None = None,
+     ) -> None:
+         self._run_one = run_one
+         self._governor = governor
+         self._budget_by_class = budget_by_class
++        self._readiness_probe = readiness_probe
+ 
+     def _allocation(self, intake: Intake) -> Budget:
+         return _allocation(intake, self._budget_by_class)
+@@ -173,10 +223,15 @@ class ContinuousScheduler:
+     def run(self, source: Iterable[Intake]) -> SchedulerReport:
+         """Run goals until the source is exhausted OR the governor halts the loop."""
+         outcomes: list[RunOutcome] = []
++        held: list[HeldIntake] = []
+         stop = StopReason.SOURCE_EXHAUSTED
+         queue = deque(source)
+         while queue:
+             intake = queue.popleft()
++            reason = _admission_hold(intake, self._readiness_probe)
++            if reason is not None:
++                held.append(HeldIntake(intake, reason))
++                continue  # retain the hold; never requeue/retry it in this pass
+             allocation = self._allocation(intake)
+             if not self._governor.can_admit(allocation):
+                 stop = StopReason.BUDGET_EXHAUSTED  # halt, do NOT spin (§9.4)
+@@ -188,7 +243,9 @@ class ContinuousScheduler:
+             # RB-0008 §3: Queue high-leverage (>5x) friction repair intakes ahead of goals
+             if outcome.high_leverage_intake is not None:
+                 queue.appendleft(outcome.high_leverage_intake)
+-        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
++        if held and stop is StopReason.SOURCE_EXHAUSTED:
++            stop = StopReason.READINESS_HELD
++        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop, tuple(held))
+ 
+ 
+ class ConcurrentScheduler:
+@@ -201,6 +258,7 @@ class ConcurrentScheduler:
+         governor: EconomicGovernor,
+         budget_by_class: Mapping[WeightClass, Budget],
+         max_concurrency: int = 4,
++        readiness_probe: Callable[[Intake], object] | None = None,
+     ) -> None:
+         if max_concurrency < 1:
+             raise ValueError("max_concurrency must be >= 1")
+@@ -208,6 +266,7 @@ class ConcurrentScheduler:
+         self._governor = governor
+         self._budget_by_class = budget_by_class
+         self._max_concurrency = max_concurrency
++        self._readiness_probe = readiness_probe
+ 
+     def run(self, source: Iterable[Intake]) -> SchedulerReport:
+         """Admit and run goals concurrently under the K11 parent until the source is exhausted or
+@@ -215,6 +274,7 @@ class ConcurrentScheduler:
+         it = iter(source)
+         pending: deque[Intake] = deque()
+         outcomes: list[RunOutcome] = []
++        held: list[HeldIntake] = []
+         stop = StopReason.SOURCE_EXHAUSTED
+         inflight: dict[Future[RunOutcome], Budget] = {}
+         holdover: Intake | None = None  # an intake refused under pressure, awaiting freed budget
+@@ -235,6 +295,10 @@ class ConcurrentScheduler:
+                     if intake is None:
+                         source_done = True
+                         break
++                    reason = _admission_hold(intake, self._readiness_probe)
++                    if reason is not None:
++                        held.append(HeldIntake(intake, reason))
++                        continue
+                     allocation = self._allocation(intake)
+                     if self._governor.try_admit(allocation):  # atomic reserve (K11 child)
+                         inflight[pool.submit(self._run_one, intake)] = allocation
+@@ -264,7 +328,9 @@ class ConcurrentScheduler:
+                         pending.appendleft(outcome.high_leverage_intake)
+                         source_done = False
+ 
+-        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop)
++        if held and stop is StopReason.SOURCE_EXHAUSTED:
++            stop = StopReason.READINESS_HELD
++        return SchedulerReport(tuple(outcomes), self._governor.remaining(), stop, tuple(held))
+ 
+     def _allocation(self, intake: Intake) -> Budget:
+         return _allocation(intake, self._budget_by_class)
+diff --git a/tests/runtime/test_scheduler.py b/tests/runtime/test_scheduler.py
+index b622ae14..b8c56d98 100644
+--- a/tests/runtime/test_scheduler.py
++++ b/tests/runtime/test_scheduler.py
+@@ -3,8 +3,10 @@
+ from __future__ import annotations
+ 
+ import threading
++from dataclasses import replace
+ 
+ import pytest
++import runtime.scheduler as scheduler_module
+ from kernel.types import WeightClass
+ from runtime.orchestrator import Intake, RunOutcome, RunStatus
+ from runtime.scheduler import (
+@@ -13,6 +15,7 @@ from runtime.scheduler import (
+     ContinuousScheduler,
+     EconomicGovernor,
+     GlobalBudget,
++    ReadinessHold,
+     StopReason,
+ )
+ from runtime.task_package import Budget
+@@ -26,9 +29,13 @@ _BUDGETS = {
+ 
+ def _intake(objective: str = "g") -> Intake:
+     return Intake(
+-        objective=objective, changed_paths=("runtime/x.py",),  # SOFT + verifiable ⇒ ROUTINE
+-        plan_write_scopes=("runtime/x.py",), builder_evidence=(),
+-        goal_signature="domain:runtime", verifiable=True, reversible=True,
++        objective=objective,
++        changed_paths=("runtime/x.py",),  # SOFT + verifiable ⇒ ROUTINE
++        plan_write_scopes=("runtime/x.py",),
++        builder_evidence=(),
++        goal_signature="domain:runtime",
++        verifiable=True,
++        reversible=True,
+     )
+ 
+ 
+@@ -38,8 +45,11 @@ def _outcome(
+     # spent_tokens defaults to the ROUTINE ceiling (100) — a run that spends its whole allocation,
+     # so `settle` refunds nothing and the governor behaves like the old ceiling-charge.
+     return RunOutcome(
+-        RunStatus.SEALED, "g-" + intake.objective, "sealed",
+-        spent_tokens=spent_tokens, spent_wallclock_s=spent_wallclock,
++        RunStatus.SEALED,
++        "g-" + intake.objective,
++        "sealed",
++        spent_tokens=spent_tokens,
++        spent_wallclock_s=spent_wallclock,
+     )
+ 
+ 
+@@ -47,6 +57,23 @@ def _sealed(intake: Intake) -> RunOutcome:
+     return _outcome(intake)
+ 
+ 
++def _synthetic_admissions(monkeypatch, intakes: list[Intake]) -> None:
++    """Test-only substitution of the unavailable canonical admission boundary.
++
++    Exact object allowlist, with no production constructor, flag or public positive
++    callback. This preserves local budget/queue tests; it proves no runtime authority.
++    Every permitted run_one in this file is a side-effect-free scripted callback.
++    """
++    deny = scheduler_module._admission_hold
++
++    def synthetic(item, probe):
++        if any(item is permitted for permitted in intakes):
++            return None
++        return deny(item, probe)
++
++    monkeypatch.setattr(scheduler_module, "_admission_hold", synthetic)
++
++
+ # ---- Economic Governor: K11 conservation ----------------------------------
+ 
+ 
+@@ -73,15 +100,17 @@ def test_governor_tier_is_backpressure_under_low_budget() -> None:
+ # ---- Continuous scheduler: RESTART loop, halt-not-spiral -------------------
+ 
+ 
+-def test_scheduler_runs_until_source_exhausted() -> None:
++def test_scheduler_runs_until_source_exhausted(monkeypatch) -> None:
+     gov = EconomicGovernor(GlobalBudget(tokens=10_000, wallclock_s=10_000, runs=100))
+     sched = ContinuousScheduler(_sealed, governor=gov, budget_by_class=_BUDGETS)
+-    report = sched.run([_intake("a"), _intake("b"), _intake("c")])
++    intakes = [_intake("a"), _intake("b"), _intake("c")]
++    _synthetic_admissions(monkeypatch, intakes)
++    report = sched.run(intakes)
+     assert len(report.outcomes) == 3
+     assert report.stop_reason is StopReason.SOURCE_EXHAUSTED
+ 
+ 
+-def test_scheduler_halts_not_spins_on_budget_exhaustion() -> None:
++def test_scheduler_halts_not_spins_on_budget_exhaustion(monkeypatch) -> None:
+     # global 250 tokens; each ROUTINE run allocates 100 ⇒ 2 admitted, the rest refused (halt)
+     gov = EconomicGovernor(GlobalBudget(tokens=250, wallclock_s=10_000, runs=100))
+     ran: list[str] = []
+@@ -91,14 +120,16 @@ def test_scheduler_halts_not_spins_on_budget_exhaustion() -> None:
+         return _sealed(intake)
+ 
+     sched = ContinuousScheduler(_record, governor=gov, budget_by_class=_BUDGETS)
+-    report = sched.run(_intake(str(i)) for i in range(10))  # a long source
++    intakes = [_intake(str(i)) for i in range(10)]
++    _synthetic_admissions(monkeypatch, intakes)
++    report = sched.run(iter(intakes))  # a long source
+     assert len(report.outcomes) == 2  # only what the budget allowed
+     assert ran == ["0", "1"]  # the loop HALTED — it did not keep pulling goals
+     assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+     assert report.remaining.tokens == 50
+ 
+ 
+-def test_governor_settles_actual_spend_so_more_runs_fit_exactly() -> None:
++def test_governor_settles_actual_spend_so_more_runs_fit_exactly(monkeypatch) -> None:
+     # M2 exact metering: global 250 tokens, ROUTINE ceiling 100, but each run only SPENDS 50.
+     # `charge` reserves 100 (admission stays conservative), `settle` refunds the unspent 50, so the
+     # running total grows by the ACTUAL 50/run — 4 runs fit (Σ actual 200 ≤ 250) where pure
+@@ -108,7 +139,9 @@ def test_governor_settles_actual_spend_so_more_runs_fit_exactly() -> None:
+     sched = ContinuousScheduler(
+         lambda i: _outcome(i, spent_tokens=50), governor=gov, budget_by_class=_BUDGETS
+     )
+-    report = sched.run(_intake(str(i)) for i in range(10))
++    intakes = [_intake(str(i)) for i in range(10)]
++    _synthetic_admissions(monkeypatch, intakes)
++    report = sched.run(iter(intakes))
+     assert len(report.outcomes) == 4  # exact metering fit 4; ceiling-charge would fit only 2
+     assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+     assert report.remaining.tokens == 50  # Sum of actual spend = 4 * 50 = 200 charged of 250
+@@ -128,7 +161,7 @@ def test_governor_settle_never_refunds_the_run_slot_or_overspend() -> None:
+ # ---- Concurrent scheduler: parallel children under one K11 parent (M2) -----
+ 
+ 
+-def test_concurrent_scheduler_caps_concurrency_at_the_k11_parent_and_halts() -> None:
++def test_concurrent_scheduler_caps_concurrency_at_the_k11_parent_and_halts(monkeypatch) -> None:
+     # global 300 tokens, ROUTINE ceiling 100 ⇒ the K11 parent admits at most 3 concurrent children,
+     # regardless of the larger pool (max_concurrency=10). A Barrier(3) proves all three run AT ONCE
+     # (a governor that wrongly serialized would break the barrier ⇒ error). Each spends its whole
+@@ -140,16 +173,16 @@ def test_concurrent_scheduler_caps_concurrency_at_the_k11_parent_and_halts() ->
+         barrier.wait()  # only returns if 3 children are concurrent; else BrokenBarrierError
+         return _outcome(intake, spent_tokens=100)  # spends the full ceiling ⇒ no refund
+ 
+-    sched = ConcurrentScheduler(
+-        run_one, governor=gov, budget_by_class=_BUDGETS, max_concurrency=10
+-    )
+-    report = sched.run(_intake(str(i)) for i in range(5))
++    sched = ConcurrentScheduler(run_one, governor=gov, budget_by_class=_BUDGETS, max_concurrency=10)
++    intakes = [_intake(str(i)) for i in range(5)]
++    _synthetic_admissions(monkeypatch, intakes)
++    report = sched.run(iter(intakes))
+     assert len(report.outcomes) == 3  # only three children fit the parent budget
+     assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
+     assert report.remaining.tokens == 0  # Σ children.reserved == parent (never exceeded)
+ 
+ 
+-def test_concurrent_scheduler_runs_all_isolated_under_exact_metering() -> None:
++def test_concurrent_scheduler_runs_all_isolated_under_exact_metering(monkeypatch) -> None:
+     # Ample parent (1000 tokens); 9 isolated children run concurrently (max 3 at a time), each
+     # spending only 30 of its 100 ceiling. All complete; the governor tracks EXACT actual spend.
+     gov = EconomicGovernor(GlobalBudget(tokens=1000, wallclock_s=100_000, runs=100))
+@@ -161,11 +194,263 @@ def test_concurrent_scheduler_runs_all_isolated_under_exact_metering() -> None:
+             seen.add(intake.objective)  # isolation: each child processed once, independently
+         return _outcome(intake, spent_tokens=30)
+ 
+-    sched = ConcurrentScheduler(
+-        run_one, governor=gov, budget_by_class=_BUDGETS, max_concurrency=3
+-    )
+-    report = sched.run(_intake(str(i)) for i in range(9))
++    sched = ConcurrentScheduler(run_one, governor=gov, budget_by_class=_BUDGETS, max_concurrency=3)
++    intakes = [_intake(str(i)) for i in range(9)]
++    _synthetic_admissions(monkeypatch, intakes)
++    report = sched.run(iter(intakes))
+     assert len(report.outcomes) == 9
+     assert seen == {str(i) for i in range(9)}  # every goal ran, exactly once, isolated
+     assert report.stop_reason is StopReason.SOURCE_EXHAUSTED
+     assert report.remaining.tokens == 1000 - 9 * 30  # exact: Σ actual spend, not Σ ceiling
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++def test_default_scheduler_holds_before_budget_and_invocation(scheduler_type) -> None:
++    # R1: removing the denial boundary would invoke work and consume a run slot.
++    budget = GlobalBudget(tokens=1000, wallclock_s=1000, runs=10)
++    gov = EconomicGovernor(budget)
++    invoked: list[Intake] = []
++    intake = _intake("unadmitted")
++
++    def record(item: Intake) -> RunOutcome:
++        invoked.append(item)
++        return _sealed(item)
++
++    report = scheduler_type(record, governor=gov, budget_by_class=_BUDGETS).run([intake])
++
++    assert invoked == []
++    assert report.outcomes == ()
++    assert report.remaining == budget
++    assert report.stop_reason.value == "readiness-held"
++    assert report.held[0].intake is intake
++    assert report.held[0].reason.value == "missing-readiness"
++
++
++# R1/R2/R7: callbacks supply negative diagnostics only. Even plausible positive
++# shapes must not cause a reserve or dispatch without a real admission adapter.
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++@pytest.mark.parametrize(
++    ("verdict", "reason"),
++    [
++        (None, ReadinessHold.MISSING),
++        (False, ReadinessHold.INVALID),
++        (True, ReadinessHold.INVALID),
++        ("Ready", ReadinessHold.INVALID),
++        ({"ready": True, "goal_signature": "domain:runtime"}, ReadinessHold.INVALID),
++        (
++            {"root": "root", "task": "task", "parent": "parent", "attempt": "a", "fence": 1},
++            ReadinessHold.INVALID,
++        ),
++        (ReadinessHold.BLOCKED, ReadinessHold.BLOCKED),
++        (ReadinessHold.UNQUALIFIED, ReadinessHold.UNQUALIFIED),
++        (ReadinessHold.STALE, ReadinessHold.STALE),
++        (ReadinessHold.CONTRADICTORY, ReadinessHold.CONTRADICTORY),
++        (ReadinessHold.UNKNOWN, ReadinessHold.UNKNOWN),
++        (ReadinessHold.ADMISSION_UNAVAILABLE, ReadinessHold.ADMISSION_UNAVAILABLE),
++    ],
++)
++def test_readiness_diagnostics_never_reserve_or_submit(
++    monkeypatch, scheduler_type, verdict, reason
++) -> None:
++    budget = GlobalBudget(tokens=1000, wallclock_s=1000, runs=10)
++    gov = EconomicGovernor(budget)
++    intake = _intake("diagnostic-only")
++    probed = []
++
++    def forbidden(*args, **kwargs):
++        pytest.fail("held intake reached reservation, charge, submission or invocation")
++
++    for name in ("can_admit", "charge", "try_admit"):
++        monkeypatch.setattr(gov, name, forbidden)
++    monkeypatch.setattr(scheduler_module.ThreadPoolExecutor, "submit", forbidden)
++
++    def probe(item):
++        probed.append(item)
++        return verdict
++
++    report = scheduler_type(
++        forbidden, governor=gov, budget_by_class=_BUDGETS, readiness_probe=probe
++    ).run([intake])
++    assert probed == [intake]
++    assert report.outcomes == ()
++    assert report.remaining == budget
++    assert report.stop_reason is StopReason.READINESS_HELD
++    assert [(hold.intake, hold.reason) for hold in report.held] == [(intake, reason)]
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++def test_probe_exception_holds_once_without_exposing_error(scheduler_type) -> None:
++    probed = []
++    intake = _intake()
++    gov = EconomicGovernor(GlobalBudget(1000, 1000, 10))
++
++    def probe(item):
++        probed.append(item)
++        raise RuntimeError("sensitive error detail")
++
++    report = scheduler_type(
++        _sealed, governor=gov, budget_by_class=_BUDGETS, readiness_probe=probe
++    ).run([intake])
++    assert probed == [intake]
++    assert report.outcomes == ()
++    assert report.remaining == GlobalBudget(1000, 1000, 10)
++    assert report.held[0].reason is ReadinessHold.ERROR
++    assert "sensitive" not in repr(report)
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++def test_all_held_inputs_are_reported_once_without_retry(scheduler_type) -> None:
++    intakes = [_intake("a"), _intake("b")]
++    probed = []
++
++    def probe(item):
++        probed.append(item)
++        return ReadinessHold.BLOCKED
++
++    report = scheduler_type(
++        _sealed,
++        governor=EconomicGovernor(GlobalBudget(1000, 1000, 10)),
++        budget_by_class=_BUDGETS,
++        readiness_probe=probe,
++    ).run(iter(intakes))
++    assert probed == intakes
++    assert [hold.intake for hold in report.held] == intakes
++    assert report.stop_reason is StopReason.READINESS_HELD
++    assert report.outcomes == ()
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++def test_empty_source_is_exhausted_without_querying_readiness(scheduler_type) -> None:
++    def forbidden(item):
++        pytest.fail("empty source queried readiness")
++
++    report = scheduler_type(
++        _sealed,
++        governor=EconomicGovernor(GlobalBudget(1000, 1000, 10)),
++        budget_by_class=_BUDGETS,
++        readiness_probe=forbidden,
++    ).run([])
++    assert report.stop_reason is StopReason.SOURCE_EXHAUSTED
++    assert report.held == ()
++    assert report.outcomes == ()
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++@pytest.mark.parametrize("reason", [ReadinessHold.STALE, ReadinessHold.UNQUALIFIED])
++def test_synthetic_parent_cannot_bypass_denial_for_generated_repair(
++    monkeypatch, scheduler_type, reason
++) -> None:
++    # R1/R2/R5: only the parent is synthetically admitted. Its repair returns
++    # through the real denial boundary after the parent's completion invalidates it.
++    parent, repair = _intake("parent"), _intake("repair")
++    _synthetic_admissions(monkeypatch, [parent])
++    ran, probed = [], []
++
++    def run_one(item):
++        ran.append(item)
++        assert item is parent
++        return replace(_sealed(item), high_leverage_intake=repair)
++
++    def probe(item):
++        assert ran == [parent]
++        probed.append(item)
++        return reason
++
++    report = scheduler_type(
++        run_one,
++        governor=EconomicGovernor(GlobalBudget(1000, 1000, 10)),
++        budget_by_class=_BUDGETS,
++        readiness_probe=probe,
++    ).run([parent])
++    assert ran == [parent]
++    assert probed == [repair]
++    assert len(report.outcomes) == 1
++    assert report.remaining == GlobalBudget(900, 1000, 9)
++    assert report.stop_reason is StopReason.READINESS_HELD
++    assert [(hold.intake, hold.reason) for hold in report.held] == [(repair, reason)]
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++def test_synthetic_valid_intake_can_progress_after_a_held_one(monkeypatch, scheduler_type) -> None:
++    blocked, independent = _intake("blocked"), _intake("independent")
++    _synthetic_admissions(monkeypatch, [independent])
++    ran = []
++
++    def run_one(item):
++        ran.append(item)
++        return _sealed(item)
++
++    report = scheduler_type(
++        run_one,
++        governor=EconomicGovernor(GlobalBudget(1000, 1000, 10)),
++        budget_by_class=_BUDGETS,
++    ).run([blocked, independent])
++    assert ran == [independent]
++    assert [hold.intake for hold in report.held] == [blocked]
++    assert report.remaining.runs == 9
++    assert report.stop_reason is StopReason.READINESS_HELD
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++@pytest.mark.parametrize(
++    ("case", "reason"),
++    [
++        ("snapshot-changed", ReadinessHold.STALE),
++        ("authority-revoked", ReadinessHold.STALE),
++        ("scope-incompatible", ReadinessHold.BLOCKED),
++        ("attempt-missing", ReadinessHold.INVALID),
++        ("duplicate-attempt", ReadinessHold.CONTRADICTORY),
++        ("fence-stale", ReadinessHold.STALE),
++        ("registry-quarantined", ReadinessHold.BLOCKED),
++        ("lineage-contradictory", ReadinessHold.CONTRADICTORY),
++        ("acceptance-unknown", ReadinessHold.UNKNOWN),
++    ],
++)
++def test_synthetic_admission_refusal_precedes_second_reservation(
++    monkeypatch, scheduler_type, case, reason
++) -> None:
++    # R5/R6/R7 exercise scheduler consumption of a synthetic canonical refusal,
++    # not authentication or atomicity of the nonexistent production adapter.
++    intake = _intake(case)
++    # R6 needs two distinct tasks competing for the same scope, not a duplicate.
++    contender = _intake("incompatible-contender") if case == "scope-incompatible" else intake
++    expected = [intake, contender]
++    checked, ran = [], []
++
++    def synthetic(item, probe):
++        assert item is expected[len(checked)]
++        checked.append(item)
++        return None if len(checked) == 1 else reason
++
++    monkeypatch.setattr(scheduler_module, "_admission_hold", synthetic)
++
++    def run_one(item):
++        ran.append(item)
++        return _sealed(item)
++
++    report = scheduler_type(
++        run_one,
++        governor=EconomicGovernor(GlobalBudget(1000, 1000, 10)),
++        budget_by_class=_BUDGETS,
++    ).run(expected)
++    assert checked == expected
++    assert ran == [intake]
++    assert len(report.outcomes) == 1
++    assert report.remaining == GlobalBudget(900, 1000, 9)
++    assert report.stop_reason is StopReason.READINESS_HELD
++    assert [(hold.intake, hold.reason) for hold in report.held] == [(contender, reason)]
++
++
++@pytest.mark.parametrize("scheduler_type", [ContinuousScheduler, ConcurrentScheduler])
++def test_budget_halt_does_not_erase_prior_holds(monkeypatch, scheduler_type) -> None:
++    blocked, candidate = _intake("blocked"), _intake("candidate")
++    _synthetic_admissions(monkeypatch, [candidate])
++    report = scheduler_type(
++        _sealed,
++        governor=EconomicGovernor(GlobalBudget(0, 1000, 10)),
++        budget_by_class=_BUDGETS,
++    ).run([blocked, candidate])
++    assert report.outcomes == ()
++    assert report.stop_reason is StopReason.BUDGET_EXHAUSTED
++    assert [hold.intake for hold in report.held] == [blocked]
++    assert report.remaining == GlobalBudget(0, 1000, 10)

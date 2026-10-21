@@ -1,0 +1,99 @@
+[
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "tests/runtime/test_scheduler.py\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "add",
+      "--",
+      "tests/runtime/test_scheduler.py"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "--cached",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "tests/runtime/test_scheduler.py\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "commit",
+      "-m",
+      "Distinguish incompatible tasks in synthetic scheduler control",
+      "--",
+      "tests/runtime/test_scheduler.py"
+    ],
+    "exit_code": 0,
+    "stdout": "[codex/debt0261-c2-offline-denial-20261021 e74208da] Distinguish incompatible tasks in synthetic scheduler control\n 1 file changed, 7 insertions(+), 4 deletions(-)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "e74208da4335f3dc01eb8c313c5d99998cb9c381\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "diff",
+      "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+      "--name-only"
+    ],
+    "exit_code": 0,
+    "stdout": "runtime/scheduler.py\ntests/runtime/test_scheduler.py\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "status",
+      "--porcelain=v1"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/git",
+      "rev-parse",
+      "HEAD^"
+    ],
+    "exit_code": 0,
+    "stdout": "1ab244b2380a8526058249c9eaab0c5cdaf1659b\n",
+    "stderr": ""
+  }
+]

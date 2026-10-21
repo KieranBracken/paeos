@@ -1,0 +1,29 @@
+{
+  "phase": "green",
+  "command": [
+    "/Users/bob/GitHub/paeos/.venv/bin/python",
+    "-B",
+    "-c",
+    "import os, pathlib, sys\nallowed = pathlib.Path(sys.argv[1]).resolve()\ndef guard(event, args):\n    if event in {\"socket.connect\", \"socket.bind\", \"subprocess.Popen\", \"os.system\", \"os.exec\", \"os.posix_spawn\", \"os.fork\"}:\n        raise RuntimeError(\"OFFLINE_EFFECT_DENIED: \" + event)\n    if event == \"open\":\n        path, mode, flags = args\n        if isinstance(path, (str, bytes, os.PathLike)) and ((isinstance(mode,str) and any(c in mode for c in \"wax+\")) or (isinstance(flags,int) and flags & (os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND))):\n            resolved = pathlib.Path(os.fsdecode(path)).resolve()\n            if resolved != pathlib.Path('/dev/null') and not resolved.is_relative_to(allowed):\n                raise RuntimeError(\"OFFLINE_WRITE_DENIED: \" + str(resolved))\nsys.addaudithook(guard)\nimport pytest\nresult = pytest.main(sys.argv[2:])\nfor name in ('runtime.scheduler','runtime.orchestrator','kernel.types'):\n    module = sys.modules.get(name)\n    print('IMPORTED_SOURCE',name,getattr(module,'__file__',None))\nsys.exit(result)\n",
+    "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/c2-offline-denial-port-20261021/tmp-green",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--noconftest",
+    "tests/runtime/test_scheduler.py"
+  ],
+  "cwd": "/Users/bob/.codex/worktrees/debt0261-slice1/paeos",
+  "env_overrides": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONPATH": "/Users/bob/.codex/worktrees/debt0261-slice1/paeos",
+    "TMPDIR": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/c2-offline-denial-port-20261021/tmp-green"
+  },
+  "source_sha256": {
+    "runtime/scheduler.py": "0caf4af809ebf75f880e1a2ac8cfc81d776ed4863495cf6bd33779246fd2dfb2",
+    "tests/runtime/test_scheduler.py": "66c0ad859a854b9b3398ac9e2347996a544fb96cf0dbde5e57b29a46e500a823"
+  },
+  "state": "FINISHED",
+  "exit_code": 0,
+  "seconds": 0.312
+}

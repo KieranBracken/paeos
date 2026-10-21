@@ -1,0 +1,32 @@
+{
+  "probe": "EXISTING_SOURCE_INTERFACE_CHARACTERIZATION_ONLY",
+  "valid_signed_v2_derivative_permission": "PARSED_SIGNATURE_AND_SHAPE_ONLY_NOT_EGRESS_AUTHORITY",
+  "plan_quota_route_class": "REJECTED_BY_EXISTING_ROUTE_POLICY_VOCABULARY",
+  "signed_exact_frame_positive_control": {
+    "fake_sink_writes": 1
+  },
+  "unlisted_derived_frame_negative_control": {
+    "fake_sink_writes": 0
+  },
+  "unknown_derivation_authority_event": {
+    "rejected": true,
+    "ledger_head_unchanged": true
+  },
+  "actual_parent_tool_result": {
+    "keys": [
+      "artifact_id",
+      "sha256",
+      "text"
+    ],
+    "content_digest": "9cc27f4c0426a48414fc781084600e8625fee022c898b7324acdd7183c0d95cc",
+    "authority_or_currentness_established": false
+  },
+  "boundary": "The source has exact-frame admission and derivative permission syntax, but this probe did not establish an authenticated derivation observation/consumer join or a plan-quota route contract. No new event kind or authority is introduced.",
+  "effects": {
+    "canonical_host_store": false,
+    "host_keys": false,
+    "external_network": false,
+    "provider_calls": 0,
+    "production_admission": false
+  }
+}

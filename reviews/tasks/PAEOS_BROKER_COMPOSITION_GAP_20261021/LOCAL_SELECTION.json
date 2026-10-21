@@ -1,0 +1,11 @@
+{
+  "schema": "paeos.minimum-source-subset-selection/1",
+  "scope_id": "root-broker-composition-continuation-and-c2-frozen-handoff-20261021-v1",
+  "baseline": "41edb289356f3fe023872b7c15a5de0c00e30d98",
+  "proposed_minimum_mutable_subset": {
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27"
+  },
+  "actual_source_edits": 0,
+  "decision": "No production permit consumer will be added before resolving the existing provenance/route contract boundary. Other mutable paths remain unused."
+}

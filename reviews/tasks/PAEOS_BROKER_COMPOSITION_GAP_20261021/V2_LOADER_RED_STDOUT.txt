@@ -1,0 +1,10 @@
+{
+  "required_behavior": "Load an independently pinned valid signed v2 snapshot through the existing store, still without granting egress.",
+  "v1_loader_control": "PASS",
+  "v2_signature_and_shape_control": "PASS",
+  "v2_pinned_loader_join": "RED_REJECTED",
+  "source_changed": false,
+  "provider_calls": 0,
+  "host_keys": false,
+  "new_authority": false
+}

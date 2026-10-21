@@ -1,0 +1,103 @@
+{
+  "schema": "paeos.offline-evidence-manifest/1",
+  "scope_id": "DEBT0261-C2-offline-denial-port-source-20261021-v1",
+  "artifacts": {
+    "CHECKPOINT.json": {
+      "sha256": "a88e1b1cea1d2f02676aa1c2751f44bf6b99637d9ab04c07a693060e2800bcdb",
+      "bytes": 2152
+    },
+    "CORRECTIVE_CHECKPOINT.json": {
+      "sha256": "1524c36b142591b3360e575c2ae765f19e634891f3e2ce5db3e00d7181704e2e",
+      "bytes": 1906
+    },
+    "FINAL_CANDIDATE.patch": {
+      "sha256": "57239c32611aac142577ba2f60883a665653917a2189246c33fdf11ef06ec17a",
+      "bytes": 26364
+    },
+    "FINAL_REMOTE.json": {
+      "sha256": "fb20d8c3ee985556ea28787ad583a671050a0d33d2a147c8e8384aaaeb8a5295",
+      "bytes": 1531
+    },
+    "FINAL_STATIC_CHECKS.json": {
+      "sha256": "10f21f76a53384dd085bea0132cda8cb0f2374b865fea72c91fb5dd9328a3dd4",
+      "bytes": 1348
+    },
+    "PROGRESS.json": {
+      "sha256": "f2f94a65ad4496a5be01fc3dcd5d419c011307b2f25b08a9cdb40578cb5da12e",
+      "bytes": 1394
+    },
+    "REMOTE.json": {
+      "sha256": "9fca9d8d08779732e29103dc42b2b3826ed96068df80fea5053c4f37230e3dca",
+      "bytes": 1685
+    },
+    "RESULT.json": {
+      "sha256": "88e706421a52cd34c0f30b97e1a060036381fb9a7d86933f41a5c7af2164ace9",
+      "bytes": 5684
+    },
+    "SCOPE.json": {
+      "sha256": "72dcff62d58461a9f9cabaadc615e2883627ece0f3f6fe7a55810e7554ce3132",
+      "bytes": 11029
+    },
+    "STATIC_CHECKS.json": {
+      "sha256": "3906fc544031fde0c315deed469b7c2794ea837d1e54c1d58f3c8ece25509194",
+      "bytes": 1331
+    },
+    "candidate.patch": {
+      "sha256": "3a628e824f99368e48dfa55c92bcc76d5e462ec3f89d5ef2d709c0d51b38bb66",
+      "bytes": 26148
+    },
+    "corrective.json": {
+      "sha256": "e527837bef0750ae2c7de0c12e414fc2f3832e1fb1c1b0f79eb2fe9d7518acef",
+      "bytes": 2107
+    },
+    "corrective.log": {
+      "sha256": "465d900201c25b865ac94b9023615889314bd9005325addb0f92376a721cb2a7",
+      "bytes": 400
+    },
+    "diff-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "diff-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "format-final.log": {
+      "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+      "bytes": 26
+    },
+    "format.log": {
+      "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+      "bytes": 26
+    },
+    "green.json": {
+      "sha256": "a3d145ebb402d8a44520dec0e7687a99867dfe0c21d17eb430a44c83ac8a3d6c",
+      "bytes": 2092
+    },
+    "green.log": {
+      "sha256": "465d900201c25b865ac94b9023615889314bd9005325addb0f92376a721cb2a7",
+      "bytes": 400
+    },
+    "red.json": {
+      "sha256": "9a2c6112bdd9520b43642c69a5893c1a00508198f8a6d07cb94e8db693838046",
+      "bytes": 2156
+    },
+    "red.log": {
+      "sha256": "29837c32bed1ee65ef3cc933867a700167791c07756c54c9c6cde964ca3caf6a",
+      "bytes": 3292
+    },
+    "ruff-final.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "ruff.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "run_focused.py": {
+      "sha256": "2c80108b5a2f9bad3db5c8626be8138bff91772bc6f99145052b3524a5ae9d38",
+      "bytes": 3199
+    }
+  },
+  "exclusions": "Transient pytest scratch directories and subsequent native callback receipt; no runtime authority."
+}

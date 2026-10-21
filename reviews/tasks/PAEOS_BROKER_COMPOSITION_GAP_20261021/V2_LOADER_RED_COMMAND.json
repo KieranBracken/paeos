@@ -1,0 +1,14 @@
+{
+  "schema": "paeos.required-source-join-red/1",
+  "exit_code": 2,
+  "expected_missing_behavior_exit": 2,
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/evidence/root-broker-composition-20261021/probe_pinned_v2_loader.py"
+  ],
+  "profile_sha256": "0cc73e580be3b6036b38b8fc916de24b49adec84b61256a8c0e74e4e3e64fbb8",
+  "script_sha256": "d3c42070e35ba3c7a60e3645ba60444328b2dc75d7ee7b19c65ef834d7989266",
+  "stdout_sha256": "e33a6766c5e9753a8cbd36e42ecc8d02ca923c4fa8e83ffe4ea78ddcf23d9164",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "meaning": "Valid v1 load and valid v2 signature controls succeed; existing pinned loader rejects valid v2. No egress permission follows from either parsed snapshot."
+}

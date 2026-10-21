@@ -1,0 +1,45 @@
+{
+  "schema": "paeos.existing-owner-offline-source-continuation/1",
+  "scope_id": "root-broker-composition-continuation-and-c2-frozen-handoff-20261021-v1",
+  "original_assignment": "B00-20261019-disclosure-v1",
+  "issuer": "01a151d6-4fd3-7f23-a35d-167815a58cdb",
+  "owner": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "issued_at_utc": "2026-10-21T14:21:05.452500+00:00",
+  "canonical_runtime_authority": false,
+  "baseline": "41edb289356f3fe023872b7c15a5de0c00e30d98",
+  "target": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "original_card": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/docs/superpowers/plans/2026-10-18-luna-guide/reactive-execution-20261019/disclosure.json",
+  "original_card_sha256": "b78326e3482ee00e9a974cddc24d3b0aa935faf516cf2f9e462164b745f2778b",
+  "mutable_preimages": {
+    "runtime/integrations/disclosure_frame.py": "c865813ffc133e2e214f8f71c83dd9a82f599947ceb2754ea81a3857c19cba01",
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "runtime/integrations/trusted_codex_transport.py": "04e2aba7a25da3c28d1f964a998ef6aff9e03463cd1f0c117c8c44a4b6ef176e",
+    "runtime/integrations/trusted_codex_planner_transport.py": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d",
+    "runtime/integrations/provider_broker.py": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1",
+    "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+    "tests/runtime/test_disclosure_frame.py": "04fa7687c73cf5761e55835a7eaaf595c3bd4771b5921849d7cd8f2a3da0558b",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27",
+    "tests/runtime/test_trusted_codex_worker_transport.py": "1b55259b22de674a763bdf4edc5bbf7b681d1fb77434b8e2747fc904e63e3cd2",
+    "tests/model_router/test_disclosure_policy.py": "bedcd929617dc6ac02cd5384ffa1520938e0ee8539ac7847a1353d727e7371f8",
+    "ops/autonomous_run.py": "d5d984c4a3c9835431f666fc992671668030dca08ae41653a4c4747b82ca2f91",
+    "tests/ops/test_autonomous_run_fence_composition.py": "8114afb07aefa8e816aa1ee7c10aa532f4850e0148d52e6c4614d0acb1a77f07",
+    "ops/install_trusted_codex_worker_supervisor.py": "3514b2cba5b9099cc0fc9f302ef97c775cbf051b14bb6e651eba0d777d816615",
+    "tests/ops/test_trusted_codex_installer_binding.py": "78f532db39a89116903a452b210b485550510223e39e01eeef04e812674db37a",
+    "tests/runtime/test_responses_broker_request_limit.py": "b7ad19e8c46f79e0eb21d92699765e774a62a4fe90ca62a6888e04d7e15c7e39"
+  },
+  "readonly_admission_preimages": {
+    "runtime/autonomy/admission_authority.py": "ee4f818f99db12b4b583c41d3b8cee87f1c6470aff1f4402139e1c99ca4f7606",
+    "runtime/autonomy/admission_send_fence.py": "7fd4909068b18a86d743b6bb0a8906e7e6a71aa17779b13ecf4213e08f760dee"
+  },
+  "objective": "Existing root-owned offline broker policy/classification/currentness/frame/claim composition; preserve default denial without independently trusted bindings.",
+  "source_gate_event": "B00-broker-composition-gate-20261021-v1",
+  "budget": "Same original root/task ceilings and cumulative effects. Provider/paid/new formal reviews zero. One previous full-suite attempt remains consumed; no repeat unchanged collection failure. Focused tests and static verification for new source work under heavy-test.lock.",
+  "constraints": [
+    "Choose and record minimum needed subset of the existing15mutable paths before edits. No changes outside this card.",
+    "No source edits to Chat3 admission files, C2 two-file candidate or Chat4 current diagnostic paths. No C1/R3 goal-recovery change.",
+    "No production enrollment/host credentials/positive external egress/installation/runtime admission/qualification/Court/debt effect.",
+    "disclosure_store.py is read-only. Parser/signature outputs are not enrollment, trusted classification or current egress authority.",
+    "If a missing authority/atomic primitive or outside-card edit is necessary, preserve denial and return exact source/test/preimage/primitive packet; no invented authority or parallel store.",
+    "Original findings, review holds, pinned-client refusal, protected-service gates, Chat1 exclusive D0258 and SENTIUM_FROZEN persist."
+  ]
+}

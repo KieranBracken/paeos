@@ -1,0 +1,48 @@
+{
+  "checks": [
+    {
+      "command": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "--no-cache",
+        "runtime/scheduler.py",
+        "tests/runtime/test_scheduler.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/Users/bob/GitHub/paeos/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "--no-cache",
+        "runtime/scheduler.py",
+        "tests/runtime/test_scheduler.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/usr/bin/git",
+        "diff",
+        "38fd3e0dc153788bbdd5f542bddf81b0ca433703",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": {
+    "runtime/scheduler.py": "0caf4af809ebf75f880e1a2ac8cfc81d776ed4863495cf6bd33779246fd2dfb2",
+    "tests/runtime/test_scheduler.py": "3d62a31ead96cc9c9d889433cf7a1ad8f75dbd89c5165e8a4a6c8ee8a121e4d5"
+  },
+  "compile": "2 in-memory compilations passed",
+  "secret_scan": "0 added-line bounded pattern matches",
+  "readonly_closure_files_unchanged": 80,
+  "passed": 66,
+  "patch_sha256": "57239c32611aac142577ba2f60883a665653917a2189246c33fdf11ef06ec17a",
+  "correction": "R6 scope-incompatible fixture now has distinct contenders with identical scope. Production code unchanged since first GREEN."
+}

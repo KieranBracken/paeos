@@ -1,0 +1,182 @@
+{
+  "schema": "paeos.explicit-boundary-evidence-manifest/1",
+  "source_commit": "41edb289356f3fe023872b7c15a5de0c00e30d98",
+  "files": {
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/CONTINUATION_SCOPE.json": {
+      "sha256": "d4cba81a6fddd98433a94a689e3aa8d34ee97eaaf57eb9559a19c0beb7f180d5",
+      "bytes": 4341
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/LOCAL_SELECTION.json": {
+      "sha256": "af1ff5b8378464f4dbe3c2e01b22989527880f1e8057c8e04f325a269d713fe4",
+      "bytes": 697
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/probe_existing_primitives.py": {
+      "sha256": "09b22ad4e4974e2250c478340f0201328bebc5da476b5c294851c2b5ed202bb6",
+      "bytes": 4767
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/PROBE_COMMAND.json": {
+      "sha256": "2985e7be3c51944e077eac8f2cd71e80b337d1d9c743f67082b554b74d2635d8",
+      "bytes": 790
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/PROBE_STDOUT.txt": {
+      "sha256": "5b7731f88ed3e5d5a681d73eba25cc691e973323eedfc4794f59f9f98662897a",
+      "bytes": 1166
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/PROBE_STDERR.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/probe_pinned_v2_loader.py": {
+      "sha256": "d3c42070e35ba3c7a60e3645ba60444328b2dc75d7ee7b19c65ef834d7989266",
+      "bytes": 3057
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/V2_LOADER_RED_COMMAND.json": {
+      "sha256": "d48a389396673290264a5712879a7b59c13da76afe0d3ee6fd437744eefc170e",
+      "bytes": 866
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/V2_LOADER_RED_STDOUT.txt": {
+      "sha256": "e33a6766c5e9753a8cbd36e42ecc8d02ca923c4fa8e83ffe4ea78ddcf23d9164",
+      "bytes": 358
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/V2_LOADER_RED_STDERR.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/C2_HANDOFF_RECEIPT.json": {
+      "sha256": "eaf79e892cbcd222843862d85f24387e2e292b2c39aab989495f4283bee70ac5",
+      "bytes": 674
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/DISPOSITION.json": {
+      "sha256": "cb55a64cfd3fae0dc16571287f44b4735809736ca6042eb08f40e1a159073a4b",
+      "bytes": 9752
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/CHECKPOINT.json": {
+      "sha256": "a88e1b1cea1d2f02676aa1c2751f44bf6b99637d9ab04c07a693060e2800bcdb",
+      "bytes": 2152
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/CORRECTIVE_CHECKPOINT.json": {
+      "sha256": "1524c36b142591b3360e575c2ae765f19e634891f3e2ce5db3e00d7181704e2e",
+      "bytes": 1906
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/FINAL_CANDIDATE.patch": {
+      "sha256": "57239c32611aac142577ba2f60883a665653917a2189246c33fdf11ef06ec17a",
+      "bytes": 26364
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/FINAL_REMOTE.json": {
+      "sha256": "fb20d8c3ee985556ea28787ad583a671050a0d33d2a147c8e8384aaaeb8a5295",
+      "bytes": 1531
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/FINAL_STATIC_CHECKS.json": {
+      "sha256": "10f21f76a53384dd085bea0132cda8cb0f2374b865fea72c91fb5dd9328a3dd4",
+      "bytes": 1348
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/PROGRESS.json": {
+      "sha256": "f2f94a65ad4496a5be01fc3dcd5d419c011307b2f25b08a9cdb40578cb5da12e",
+      "bytes": 1394
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/REMOTE.json": {
+      "sha256": "9fca9d8d08779732e29103dc42b2b3826ed96068df80fea5053c4f37230e3dca",
+      "bytes": 1685
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/RESULT.json": {
+      "sha256": "88e706421a52cd34c0f30b97e1a060036381fb9a7d86933f41a5c7af2164ace9",
+      "bytes": 5684
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/SCOPE.json": {
+      "sha256": "72dcff62d58461a9f9cabaadc615e2883627ece0f3f6fe7a55810e7554ce3132",
+      "bytes": 11029
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/STATIC_CHECKS.json": {
+      "sha256": "3906fc544031fde0c315deed469b7c2794ea837d1e54c1d58f3c8ece25509194",
+      "bytes": 1331
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/candidate.patch": {
+      "sha256": "3a628e824f99368e48dfa55c92bcc76d5e462ec3f89d5ef2d709c0d51b38bb66",
+      "bytes": 26148
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/corrective.json": {
+      "sha256": "e527837bef0750ae2c7de0c12e414fc2f3832e1fb1c1b0f79eb2fe9d7518acef",
+      "bytes": 2107
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/corrective.log": {
+      "sha256": "465d900201c25b865ac94b9023615889314bd9005325addb0f92376a721cb2a7",
+      "bytes": 400
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/diff-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/diff-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/format-final.log": {
+      "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+      "bytes": 26
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/format.log": {
+      "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+      "bytes": 26
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/green.json": {
+      "sha256": "a3d145ebb402d8a44520dec0e7687a99867dfe0c21d17eb430a44c83ac8a3d6c",
+      "bytes": 2092
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/green.log": {
+      "sha256": "465d900201c25b865ac94b9023615889314bd9005325addb0f92376a721cb2a7",
+      "bytes": 400
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/red.json": {
+      "sha256": "9a2c6112bdd9520b43642c69a5893c1a00508198f8a6d07cb94e8db693838046",
+      "bytes": 2156
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/red.log": {
+      "sha256": "29837c32bed1ee65ef3cc933867a700167791c07756c54c9c6cde964ca3caf6a",
+      "bytes": 3292
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/ruff-final.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/ruff.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/run_focused.py": {
+      "sha256": "2c80108b5a2f9bad3db5c8626be8138bff91772bc6f99145052b3524a5ae9d38",
+      "bytes": 3199
+    },
+    "reviews/tasks/PAEOS_BROKER_COMPOSITION_GAP_20261021/c2-frozen/MANIFEST.json": {
+      "sha256": "c363a1a957922395709f7dd42a31ad583cce804c0cbf7253c0903c6e5fc8f5c8",
+      "bytes": 3484
+    },
+    "PAEOS_HALLUCINATION_CHECKER_NOTEBOOK.md": {
+      "sha256": "44521f4bcc87fae050c044c809133287db578616bac8c5dc6cc038ade334027e",
+      "bytes": 1514894
+    },
+    "MessyChangesNeedsReview.md": {
+      "sha256": "ab249d01ae418323bdedf2f7cc0bb2e911dd70a535d6b60eba2ec2de0c1b278e",
+      "bytes": 676059
+    }
+  },
+  "source_pins_unchanged": {
+    "runtime/integrations/disclosure_frame.py": "c865813ffc133e2e214f8f71c83dd9a82f599947ceb2754ea81a3857c19cba01",
+    "runtime/integrations/task_scoped_responses_broker.py": "8aea3fe5ba5be7cbe68a3eff637d84c751dfaf5b892b6877b9f6b2442bb8071d",
+    "runtime/integrations/trusted_codex_transport.py": "04e2aba7a25da3c28d1f964a998ef6aff9e03463cd1f0c117c8c44a4b6ef176e",
+    "runtime/integrations/trusted_codex_planner_transport.py": "ee3b74fbf0907016296217df1fa6caae2fb17cdbc7c533023b7401c8bcf7b91d",
+    "runtime/integrations/provider_broker.py": "92070ef755a8e51b193d9fe65e2785a07897e2b4acd2435e02ab9333bf9a7eb1",
+    "paeos/model_router/disclosure_policy.py": "adcf36b943274ffb692c2d8f6f2e9bd6e87b819e7c30b5d7f1f99fe7a07e403f",
+    "tests/runtime/test_disclosure_frame.py": "04fa7687c73cf5761e55835a7eaaf595c3bd4771b5921849d7cd8f2a3da0558b",
+    "tests/runtime/test_responses_broker_disclosure_denial.py": "fc65c547c28daf329a8d10f708b02731c38f7d8595687498af4fc3f3331bdf27",
+    "tests/runtime/test_trusted_codex_worker_transport.py": "1b55259b22de674a763bdf4edc5bbf7b681d1fb77434b8e2747fc904e63e3cd2",
+    "tests/model_router/test_disclosure_policy.py": "bedcd929617dc6ac02cd5384ffa1520938e0ee8539ac7847a1353d727e7371f8",
+    "ops/autonomous_run.py": "d5d984c4a3c9835431f666fc992671668030dca08ae41653a4c4747b82ca2f91",
+    "tests/ops/test_autonomous_run_fence_composition.py": "8114afb07aefa8e816aa1ee7c10aa532f4850e0148d52e6c4614d0acb1a77f07",
+    "ops/install_trusted_codex_worker_supervisor.py": "3514b2cba5b9099cc0fc9f302ef97c775cbf051b14bb6e651eba0d777d816615",
+    "tests/ops/test_trusted_codex_installer_binding.py": "78f532db39a89116903a452b210b485550510223e39e01eeef04e812674db37a",
+    "tests/runtime/test_responses_broker_request_limit.py": "b7ad19e8c46f79e0eb21d92699765e774a62a4fe90ca62a6888e04d7e15c7e39"
+  },
+  "bounded_secret_scan": "No targeted high-confidence key patterns in explicit synthetic artifacts; not comprehensive detection or classification authority.",
+  "product_source_edits": 0,
+  "C2_source_integrated": false
+}
