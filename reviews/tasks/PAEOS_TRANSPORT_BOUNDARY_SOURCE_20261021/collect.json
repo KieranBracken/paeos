@@ -1,0 +1,30 @@
+{
+  "phase": "collect",
+  "state": "RETURNED",
+  "started_at_utc": "2026-10-21T15:32:35.886456+00:00",
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "tests/runtime/test_transport.py",
+    "tests/runtime/test_claude_cli_transport.py",
+    "tests/runtime/test_mcp_transport.py",
+    "--collect-only",
+    "-o",
+    "addopts=",
+    "-q"
+  ],
+  "environment": "Isolated HOME/CODEX_HOME/TMPDIR; no credentials; plugin autoload disabled",
+  "network": "DENY_ALL",
+  "filesystem": "Scratch writes only; known host credentials/USB reads denied",
+  "profile_sha256": "f9d5ec1819da1723b966ce4095adf8a18ad2180de12fb413a827a590b4f88aeb",
+  "source_hashes": {
+    "runtime/transport.py": "4165e2cb3267ab855077ac9812259463e9227840c1ad86ce5a5e5d3975900a04",
+    "tests/runtime/test_transport_boundary_restoration.py": "8868df42ffd04c50b055b0357ad6affb4b3052bb3eaf555821d6f867e24423d5"
+  },
+  "exit_code": 0,
+  "seconds": 0.78,
+  "stdout_sha256": "58d1a15e5fc1617b1f723a5457832fd1bf1a07e3add1234086a964ea855872dd"
+}

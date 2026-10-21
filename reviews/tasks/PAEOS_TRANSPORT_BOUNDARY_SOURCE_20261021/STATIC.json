@@ -1,0 +1,62 @@
+{
+  "ruff_lint": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "check",
+      "--no-cache",
+      "runtime/transport.py",
+      "tests/runtime/test_transport_boundary_restoration.py"
+    ],
+    "exit_code": 0,
+    "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "ruff_format": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "runtime/transport.py",
+      "tests/runtime/test_transport_boundary_restoration.py"
+    ],
+    "exit_code": 0,
+    "output_sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938"
+  },
+  "compile": {
+    "passed": true,
+    "method": "in-memory compile of exact two files; no pycache writes"
+  },
+  "secret_pattern_scan": {
+    "source_files": [
+      "runtime/transport.py",
+      "tests/runtime/test_transport_boundary_restoration.py"
+    ],
+    "pattern_count": 2,
+    "matches": 0,
+    "limits": "Bounded pattern scan, not comprehensive secret detection or classification authority"
+  },
+  "postimages": {
+    "runtime/transport.py": "4165e2cb3267ab855077ac9812259463e9227840c1ad86ce5a5e5d3975900a04",
+    "tests/runtime/test_transport_boundary_restoration.py": "8868df42ffd04c50b055b0357ad6affb4b3052bb3eaf555821d6f867e24423d5"
+  },
+  "read_only_preimages_unchanged": {
+    "tests/runtime/test_transport.py": "594e08792b440cc74e275ac210bbdb022e338aecf1875b61ac2b8366745c0490",
+    "tests/runtime/test_claude_cli_transport.py": "f1780374de27212b367a1defc0ee4a62205160ca14c7b6965b50142b8a9af4e1",
+    "tests/runtime/test_mcp_transport.py": "8c81dea164e05f14859a61001a61ba1af26f45e3c0f298f6c9eb5631f78be645",
+    "runtime/orchestrator/__init__.py": "f56a0aac982e8fec7c47256391aa5467dc1bdd209b0fd4952726fd4f68995bff",
+    "kernel/evidence.py": "29a8ae8d7e7612903dd0a1567333895d1c86689011e37de64bbaaafbf9cd5235",
+    "runtime/transports/claude_cli.py": "e9a62a0b0635555df05ed833246f18a91e72e1c78e6659386c007786778f1c38",
+    "runtime/transports/mcp/transport.py": "80d78e52f1df8f5c05a55f0d06d883c831b17cbd1c8bcaeda5b3216c9283ac6b",
+    "runtime/transports/mcp/court_server.py": "e7e860c417c2bc5ec2f3393de52cbe57a976f813ad65e96c313a0fc17cf34214"
+  },
+  "source_diff_check": {
+    "passed": true,
+    "staged_exact_paths": [
+      "runtime/transport.py",
+      "tests/runtime/test_transport_boundary_restoration.py"
+    ]
+  }
+}

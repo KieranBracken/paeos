@@ -1,0 +1,10 @@
+tests/runtime/test_transport.py::test_file_worker_transport_three_verbs
+tests/runtime/test_transport.py::test_file_worker_transport_satisfies_both_protocols
+tests/runtime/test_transport.py::test_soft_loop_seals_on_transport_submitted_evidence
+tests/runtime/test_claude_cli_transport.py::test_transport_captures_declared_evidence
+tests/runtime/test_claude_cli_transport.py::test_soft_loop_seals_autonomously_via_claude_cli_transport
+tests/runtime/test_mcp_transport.py::test_mcp_submit_evidence_reaches_the_transport
+tests/runtime/test_mcp_transport.py::test_mcp_config_launches_the_court_server_against_the_pool
+tests/runtime/test_mcp_transport.py::test_soft_loop_seals_on_mcp_submitted_evidence
+
+8 tests collected in 0.54s

@@ -1,0 +1,109 @@
+{
+  "permitted_collect_only": true,
+  "cases": [
+    {
+      "path": "tests/runtime/test_transport.py",
+      "sha256": "594e08792b440cc74e275ac210bbdb022e338aecf1875b61ac2b8366745c0490",
+      "non_definition_statements": [
+        {
+          "line": 1,
+          "kind": "Expr",
+          "calls": []
+        },
+        {
+          "line": 22,
+          "kind": "Assign",
+          "calls": []
+        },
+        {
+          "line": 23,
+          "kind": "Assign",
+          "calls": [
+            "content_hash"
+          ]
+        },
+        {
+          "line": 24,
+          "kind": "Assign",
+          "calls": [
+            "Budget",
+            "Budget",
+            "Budget"
+          ]
+        }
+      ],
+      "test_bodies": "NOT_EXECUTED"
+    },
+    {
+      "path": "tests/runtime/test_claude_cli_transport.py",
+      "sha256": "f1780374de27212b367a1defc0ee4a62205160ca14c7b6965b50142b8a9af4e1",
+      "non_definition_statements": [
+        {
+          "line": 1,
+          "kind": "Expr",
+          "calls": []
+        },
+        {
+          "line": 23,
+          "kind": "Assign",
+          "calls": []
+        },
+        {
+          "line": 24,
+          "kind": "Assign",
+          "calls": []
+        },
+        {
+          "line": 29,
+          "kind": "Assign",
+          "calls": [
+            "Budget",
+            "Budget",
+            "Budget"
+          ]
+        }
+      ],
+      "test_bodies": "NOT_EXECUTED"
+    },
+    {
+      "path": "tests/runtime/test_mcp_transport.py",
+      "sha256": "8c81dea164e05f14859a61001a61ba1af26f45e3c0f298f6c9eb5631f78be645",
+      "non_definition_statements": [
+        {
+          "line": 1,
+          "kind": "Expr",
+          "calls": []
+        },
+        {
+          "line": 28,
+          "kind": "Assign",
+          "calls": []
+        },
+        {
+          "line": 29,
+          "kind": "Assign",
+          "calls": [
+            "Budget",
+            "Budget",
+            "Budget"
+          ]
+        }
+      ],
+      "test_bodies": "NOT_EXECUTED"
+    }
+  ],
+  "conftest": {
+    "conftest.py": "ABSENT",
+    "tests/conftest.py": "ABSENT",
+    "tests/runtime/conftest.py": "ABSENT"
+  },
+  "inspected_boundary_dependencies": [
+    "runtime/__init__.py empty",
+    "runtime/transports/__init__.py empty",
+    "runtime/transports/mcp/__init__.py empty",
+    "current runtime.orchestrator class/function definitions and dependency imports; no wrapper constructor invoked by collection",
+    "court MCP server builds tools only in build_court_mcp_server, no server startup at import",
+    "Claude transport class definitions; inner AgentRuntime.run only in test bodies"
+  ],
+  "limits": "Static targeted inspection; imports execute in network-denied/scratch-write-only child with isolated HOME/env and plugin autoload off. Only pytest --collect-only, no test bodies, provider/CLI invocation or host state."
+}

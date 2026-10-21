@@ -1,0 +1,123 @@
+{
+  "schema": "paeos.bounded-offline-source-construction-scope/1",
+  "assignment_id": "B00-vendor-neutral-transport-boundary-source-20261021-v1",
+  "owner_thread": "01a1403f-1034-74c2-95ce-bd0f705dbaef",
+  "baseline": "ec77b8d23958999007131b161daff7197b7ae057",
+  "workspace": "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos",
+  "branch": "codex/b00-combined-bootstrap-20261021",
+  "source_event": "B00-seven-origin-packet-completed-20261021-3211620b",
+  "authority_and_ownership": "Standing direct human follow-through; execution guide54 exact restoration discipline and97 B00-B06 bootstrap integrator. Internal provider-neutral missing boundary only; no D0258 codec/support/supersession debt integration or ownership transfer. Chat1 exclusive D0258 integration retained.",
+  "mutable_product_manifest": {
+    "runtime/transport.py": "ABSENT",
+    "tests/runtime/test_transport_boundary_restoration.py": "ABSENT"
+  },
+  "provenance_input": {
+    "origin": "transport_predelete",
+    "ref": "85a9f9d4983ab7a43c1b311b680118abfa0d312d",
+    "path": "runtime/transport.py",
+    "present": true,
+    "blob": "4c851322afa290db120b21f63c756533fc14de3f",
+    "sha256": "e4c4db9f979c682f9f252319e22a4da9a925aaa5ae7fd65316bec9c1b0073e89",
+    "lines": 63,
+    "imports": [
+      {
+        "line": 19,
+        "module": "__future__",
+        "names": [
+          "annotations"
+        ],
+        "level": 0
+      },
+      {
+        "line": 21,
+        "module": "pathlib",
+        "names": [
+          "Path"
+        ],
+        "level": 0
+      },
+      {
+        "line": 22,
+        "module": "typing",
+        "names": [
+          "Protocol",
+          "runtime_checkable"
+        ],
+        "level": 0
+      },
+      {
+        "line": 24,
+        "module": "kernel.evidence",
+        "names": [
+          "Evidence"
+        ],
+        "level": 0
+      },
+      {
+        "line": 26,
+        "module": "runtime.orchestrator",
+        "names": [
+          "FileCourtEvidencePool"
+        ],
+        "level": 0
+      }
+    ],
+    "exports": [
+      "WorkerTransport",
+      "FileWorkerTransport"
+    ],
+    "current_preimage": "ABSENT",
+    "base_preimage": "ABSENT",
+    "origin_disposition": "PROVENANCE_SOURCE_ONLY; NOT_REVIEWED_ADOPTION_AUTHORITY",
+    "dynamic_import_calls": []
+  },
+  "read_only_preimages": {
+    "tests/runtime/test_transport.py": "594e08792b440cc74e275ac210bbdb022e338aecf1875b61ac2b8366745c0490",
+    "tests/runtime/test_claude_cli_transport.py": "f1780374de27212b367a1defc0ee4a62205160ca14c7b6965b50142b8a9af4e1",
+    "tests/runtime/test_mcp_transport.py": "8c81dea164e05f14859a61001a61ba1af26f45e3c0f298f6c9eb5631f78be645",
+    "runtime/orchestrator/__init__.py": "f56a0aac982e8fec7c47256391aa5467dc1bdd209b0fd4952726fd4f68995bff",
+    "kernel/evidence.py": "29a8ae8d7e7612903dd0a1567333895d1c86689011e37de64bbaaafbf9cd5235",
+    "runtime/transports/claude_cli.py": "e9a62a0b0635555df05ed833246f18a91e72e1c78e6659386c007786778f1c38",
+    "runtime/transports/mcp/transport.py": "80d78e52f1df8f5c05a55f0d06d883c831b17cbd1c8bcaeda5b3216c9283ac6b",
+    "runtime/transports/mcp/court_server.py": "e7e860c417c2bc5ec2f3393de52cbe57a976f813ad65e96c313a0fc17cf34214"
+  },
+  "source_import_manifest": [
+    "Reconstruct only runtime/transport.py protocol and file-evidence wrapper from the exact63line predelete blob as compatibility reference; no blanket historical restore or imported dependency changes."
+  ],
+  "acceptance": [
+    "Export runtime-checkable WorkerTransport submit/status/receive protocol and FileWorkerTransport submit/status/receive/evidence_for wrapper using CURRENT FileCourtEvidencePool. No vendor imports/client/network/process/auto-submit/import-time activation.",
+    "Bound run identity before path-bearing delegation; reject traversal, separators, absolute/invalid/control identities before reads/writes. Synthetic outside sentinel unchanged; current pool taint/evidence semantics preserved. Do not add trust, classify evidence or change Court receipts.",
+    "Tests use isolated temporary controlled roots and synthetic evidence only. Protocol/filepool function and identity-negative controls, existing source import origin. Do not claim complete path-race/custody security or production readiness from a wrapper; if necessary safety cannot fit exact2files, preserve denial and return exact additional path/primitive.",
+    "Keep original3transport tests untouched; collect-only once under isolated network-denied environment only after inspecting collection effects. No test bodies/provider subprocesses; report next actual collection exception separately. Do not weaken scripted SEALED expectations or L14 to make tests green.",
+    "No contracts/Sentium/Orca/classifier restore, no old Ledger/orchestrator/provider transplant, no C2 merge/loader mutation/CLI probe/custody/key/enrollment/install/qualification/production activation.",
+    "Source construction only. Broker/current real admissions remain default-deny. Explicit sanitized source/evidence checkpoint and remote readback; applicable exact-byte independent review before acceptance."
+  ],
+  "budget": {
+    "one_source_candidate": true,
+    "red_max": 1,
+    "focused_green_new_testfile_max": 1,
+    "corrective_focused_rerun_max": 1,
+    "original_three_modules_collect_only_max": 1,
+    "full_suite": 0,
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "inherit_all_cumulative_limits": true,
+    "prior_loader_counters": {
+      "red": 1,
+      "green": 1,
+      "corrective": 1,
+      "all_consumed": true
+    },
+    "C2_ceiling_unchanged": true,
+    "usage_percent": 21,
+    "ordinary_usage_allowed": true,
+    "credits": 0,
+    "new_override": false,
+    "heavy_test_lock": "/Users/bob/.codex/paeos-coordination/completion-loop-20261018/heavy-test.lock"
+  },
+  "logging": "Append exact bounded findings to candidate notebook/MessyChangesNeedsReview under existing mandate; evidence under issued directory or explicit immutable task packet. Preserve raw failures.",
+  "callback": "Immediate literal result to Architect01a151d6-4fd3-7f23-a35d-167815a58cdb; reopen card after compaction and before finalizing.",
+  "review": "HELD existing exact privacy/$0/family/authority/allocation; no review call in card",
+  "next_gate": "Frozen source/test evidence to Architect; source wrapper alone does not qualify transports, activate subscription/provider paths or discharge debts."
+}

@@ -1,0 +1,66 @@
+{
+  "assignment_id": "B00-vendor-neutral-transport-boundary-source-20261021-v1",
+  "source_commit": "af83a2f4c9b7516be9cae61b0963271fd282cc5f",
+  "baseline": "ec77b8d23958999007131b161daff7197b7ae057",
+  "captured_at_utc": "2026-10-21T15:34:00.870116+00:00",
+  "scope_sha256": "f39945c86d72b9425cd4c11278a1f3bb228ac1fadbd3233433d1c6ec7d7a5b41",
+  "source_postimages": {
+    "runtime/transport.py": "4165e2cb3267ab855077ac9812259463e9227840c1ad86ce5a5e5d3975900a04",
+    "tests/runtime/test_transport_boundary_restoration.py": "8868df42ffd04c50b055b0357ad6affb4b3052bb3eaf555821d6f867e24423d5"
+  },
+  "change": "Restore provider-neutral runtime-checkable WorkerTransport protocol and FileWorkerTransport adapter. Delegate current FileCourtEvidencePool; validate bounded ASCII run identities before path-bearing pool calls. Lazy current-pool import; no import-time pool creation or provider/worker dispatch.",
+  "verification": {
+    "red": "1failed missing runtime.transport; baseline ABSENT",
+    "green": "95passed in0.22s; positive, invalid-label, real outside sentinel, reopen, taint-filter and inert-import controls",
+    "legacy_collection": "One --collect-only on original3unchanged modules, exit0,8tests collected in0.54s; no test bodies executed",
+    "static": "Ruff lint/format, compile, staged diff check passed; bounded source secret-pattern scan0matches"
+  },
+  "counters": {
+    "red": 1,
+    "green": 1,
+    "corrective": 0,
+    "collect": 1
+  },
+  "previous_loader_counters": {
+    "red": 1,
+    "green": 1,
+    "corrective": 1,
+    "all_consumed": true
+  },
+  "C2_counters": "Unchanged; no reruns",
+  "effects": {
+    "provider": 0,
+    "paid": 0,
+    "formal_review": 0,
+    "full_suite": 0,
+    "legacy_test_bodies": 0,
+    "cli_probe": 0,
+    "host_keys_or_enrollment": 0,
+    "installation": 0,
+    "production_activation": 0
+  },
+  "review": "PENDING; no authorized route/allocation in this card; no independence/acceptance claim",
+  "suite_disposition": "Historical7collection errors retained. This candidate closes the observed missing-module exception for the3legacy transport modules in one collected run. Four historical contracts collection failures remain unresolved; no full-suite rerun/current total/pass claim. Historical22error result stays separate.",
+  "limitations": [
+    "Directories must remain parent-controlled; run-label validation is not complete symlink-race protection, cross-process transaction serialization or custody",
+    "File observations, structural protocol conformance and synthetic tests grant no authenticated evidence, admission, currentness, disclosure, Court or qualification authority",
+    "Legacy SEALED/Court/L14 test bodies were not executed or weakened",
+    "No historical pool/orchestrator/Ledger/provider source was copied; original3tests and declared read-only preimages unchanged"
+  ],
+  "ALLOWED_NOW": {
+    "owner": "Architect",
+    "action": "Validate frozen package and choose eligible existing-owner successor; source candidate available for applicable exact-byte review"
+  },
+  "HELD": {
+    "owner": "Existing review/runtime/admission/custody owners; Chat1 exclusive D0258",
+    "wake": "Actual eligible privacy/$0/different-family review allocation; independently established runtime/enrollment/currentness/egress/editing/qualification gates; exact contracts provenance/quarantine successor for remaining source gaps"
+  },
+  "AUTHORITY_OR_IMPLEMENTATION_GAP": "Provider-neutral boundary implemented/tested, source review pending. This alone does not enable subscription/provider paths, broker egress, operational PAEOS/debt integration or P3.",
+  "preserved": [
+    "Original failures and review findings",
+    "C2 unmerged",
+    "SENTIUM_FROZEN",
+    "Chat1 exclusive D0258",
+    "All real Court/qualification/debt/P3 gates"
+  ]
+}

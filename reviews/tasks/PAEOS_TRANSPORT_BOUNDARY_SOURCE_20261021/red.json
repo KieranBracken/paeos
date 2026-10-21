@@ -1,0 +1,27 @@
+{
+  "phase": "red",
+  "state": "RETURNED",
+  "started_at_utc": "2026-10-21T15:31:55.232077+00:00",
+  "command": [
+    "/Users/bob/.codex/worktrees/p1-bound-source-recovery/paeos/.venv/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "tests/runtime/test_transport_boundary_restoration.py::test_missing_boundary_exports_runtime_checkable_protocol",
+    "-o",
+    "addopts=",
+    "-q"
+  ],
+  "environment": "Isolated HOME/CODEX_HOME/TMPDIR; no credentials; plugin autoload disabled",
+  "network": "DENY_ALL",
+  "filesystem": "Scratch writes only; known host credentials/USB reads denied",
+  "profile_sha256": "ab2e308583b82acc2bba2c2cf58185f3f29901d19193b645cc2ea8e3d1f14736",
+  "source_hashes": {
+    "runtime/transport.py": "ABSENT",
+    "tests/runtime/test_transport_boundary_restoration.py": "8868df42ffd04c50b055b0357ad6affb4b3052bb3eaf555821d6f867e24423d5"
+  },
+  "exit_code": 1,
+  "seconds": 0.208,
+  "stdout_sha256": "7bb00fc6ad83fcfb4a46c20d0a932a62b07ac3ff4a0d5aa1b1407d0eabab9d31"
+}

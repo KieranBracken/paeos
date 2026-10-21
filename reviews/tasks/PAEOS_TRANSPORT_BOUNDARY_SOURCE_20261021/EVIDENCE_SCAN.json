@@ -1,0 +1,5 @@
+{
+  "pattern_count": 2,
+  "matches": 0,
+  "scope": "Exact new artifacts plus appended notebook text only; no credentials/keys/private provider responses. Pattern-limited, not classification authority."
+}

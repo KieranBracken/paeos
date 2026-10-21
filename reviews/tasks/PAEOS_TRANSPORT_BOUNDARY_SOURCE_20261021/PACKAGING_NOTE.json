@@ -1,0 +1,6 @@
+{
+  "observed_failure": "Git staged whitespace check rejected original pytest traceback trailing spaces",
+  "disposition": "Raw RED output preserved unchanged locally and losslessly JSON-encoded publicly; decode red_stdout.json stdout and hash against red.json stdout_sha256",
+  "source_test_changes": 0,
+  "extra_test_or_provider_runs": 0
+}
