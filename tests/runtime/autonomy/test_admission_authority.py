@@ -1943,3 +1943,49 @@ def test_parent_tool_distinct_identity_labels_cannot_alias_ack_signing_key(alias
     with pytest.raises(ValueError):
         a.claim_parent_tool_read(tool_request(f, grant=grant))
     assert ledger.head_hash() == before
+
+
+def test_parent_tool_distinct_parent_label_cannot_alias_active_grant_root_key():
+    from runtime.autonomy.admission_authority import EnrolledIdentity
+
+    f = tool_fixture()
+    root_key = f["root"].public_key().public_bytes_raw()
+    grant = copy.deepcopy(f["grant"])
+    grant["parent_identity_sha256"] = sha(root_key)
+    for entry in grant["purpose_delegations"][:2]:
+        assert entry["signer_identity_id"] == "parent"
+        entry["public_key_sha256"] = sha(root_key)
+    grant_wire = tool_signed(grant, f["root"])
+    trust = replace(
+        f["trust"],
+        identities=tuple(
+            EnrolledIdentity("parent", root_key) if x.identity_id == "parent" else x
+            for x in f["trust"].identities
+        ),
+        grants=(f["base_raw"], grant_wire),
+    )
+    # The root legitimately signs both wires; failure must be role separation,
+    # not a mismatched parent enrollment, stale CURRENT proof or bad signature.
+    f["parent"] = f["root"]
+    request = tool_request(f, grant=grant)
+    for raw, prefix in (
+        (grant_wire, b"PAEOS_PARENT_TOOL_GRANT/v2\0"),
+        (request, b"PAEOS_PARENT_TOOL_CLAIM_REQUEST/v1\0"),
+    ):
+        envelope = json.loads(raw)
+        f["root"].public_key().verify(
+            bytes.fromhex(envelope["signature"]), prefix + wire_json(envelope["body"])
+        )
+    a = tool_rebuild(f, grant=grant, trust=trust)
+    assert a.verify_policy(f["policy"]) and a.verify_admission(f["admission"])
+    assert grant["issuer_id"] == "root"
+    assert json.loads(request)["body"]["issuer_id"] == "parent"
+    before = f["ledger"].head_hash()
+    with pytest.raises(ValueError):
+        a.claim_parent_tool_read(request)
+    assert f["ledger"].head_hash() == before
+    with pytest.raises(ValueError):
+        a.issue_parent_tool_commit_ack(
+            f["operation"], "CLAIM", issuer_id="issuer", signer=f["issuer"].sign
+        )
+    assert f["ledger"].head_hash() == before

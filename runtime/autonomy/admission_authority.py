@@ -916,6 +916,7 @@ class _ParentToolAuthority:
         root_key = next(
             x.public_key for x in self.a.trust.roots if x.identity_id == base["issuer_id"]
         )
+        _require(parent["public_key_sha256"] != hashlib.sha256(root_key).hexdigest())
         _require(
             ack["public_key_sha256"]
             not in {
