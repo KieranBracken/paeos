@@ -328,7 +328,9 @@ class MediatedWorkerTools:
     def _read_relative(self, relative: str) -> bytes:
         parent_fd, name = self._parent_fd(relative)
         try:
-            fd = os.open(name, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=parent_fd)
+            fd = os.open(
+                name, os.O_RDONLY | os.O_NONBLOCK | getattr(os, "O_NOFOLLOW", 0), dir_fd=parent_fd
+            )
             try:
                 info = os.fstat(fd)
                 if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_ARTIFACT_BYTES:
@@ -354,11 +356,13 @@ class MediatedWorkerTools:
         current_fd = -1
         temporary = f".{name}.{uuid.uuid4().hex}.tmp"
         try:
-            current_fd = os.open(name, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=parent_fd)
-            fcntl.flock(current_fd, fcntl.LOCK_EX)
+            current_fd = os.open(
+                name, os.O_RDONLY | os.O_NONBLOCK | getattr(os, "O_NOFOLLOW", 0), dir_fd=parent_fd
+            )
             info = os.fstat(current_fd)
             if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_ARTIFACT_BYTES:
                 raise MediatedWorkerError("patch target is not a bounded regular file")
+            fcntl.flock(current_fd, fcntl.LOCK_EX)
             latest = self._read_relative(relative)
             if latest != before:
                 raise MediatedWorkerError("patch target changed before atomic replacement")
@@ -449,13 +453,22 @@ class MediatedWorkerTools:
                         break
                 if overflow:
                     break
-            if process.poll() is None and (timed_out or overflow):
-                os.killpg(process.pid, signal.SIGTERM)
-                try:
-                    process.wait(timeout=0.5)
-                except subprocess.TimeoutExpired:
+            if timed_out or overflow:
+                # A reaped leader can leave descendants holding the pipes.
+                # Grace and escalation apply to our entire session group.
+                with contextlib.suppress(ProcessLookupError):
+                    os.killpg(process.pid, signal.SIGTERM)
+                grace_deadline = time.monotonic() + 0.5
+                while time.monotonic() < grace_deadline:
+                    process.poll()
+                    try:
+                        os.killpg(process.pid, 0)
+                    except ProcessLookupError:
+                        break
+                    time.sleep(min(0.01, max(0, grace_deadline - time.monotonic())))
+                with contextlib.suppress(ProcessLookupError):
                     os.killpg(process.pid, signal.SIGKILL)
-                    process.wait(timeout=0.5)
+                process.wait(timeout=0.5)
             else:
                 process.wait(timeout=max(0.1, deadline - time.monotonic()))
         except (OSError, subprocess.TimeoutExpired) as exc:
@@ -611,7 +624,10 @@ def _handle_rpc(tools: MediatedWorkerTools, request: dict[str, object]) -> dict[
 def serve_stdio(tools: MediatedWorkerTools, *, stdin: Any = None, stdout: Any = None) -> int:
     source = stdin or sys.stdin.buffer
     target = stdout or sys.stdout.buffer
-    for raw in source:
+    while True:
+        raw = source.readline(MAX_RPC_LINE_BYTES + 1)
+        if not raw:
+            break
         if len(raw) > MAX_RPC_LINE_BYTES:
             return 2
         try:
